@@ -33,7 +33,7 @@ public class ColossusController extends EntityFz implements IBossDisplayData {
     IDeltaChunk body;
     LimbInfo bodyLimbInfo;
     final StateMachineExecutor walk_controller = new StateMachineExecutor(this, "walk", WalkState.IDLE);
-    final StateMachineExecutor ai_controller = new StateMachineExecutor(this, "tech", Technique.INITIAL_BOW);
+    final StateMachineExecutor ai_controller = new StateMachineExecutor(this, "tech", Technique.STATE_MACHINE_ENTRY);
     boolean setup = false;
     int arm_size = 0, arm_length = 0;
     int leg_size = 0, leg_length = 0;
@@ -60,7 +60,7 @@ public class ColossusController extends EntityFz implements IBossDisplayData {
     
     public ColossusController(World world) {
         super(world);
-        path_target = new Coord(this);
+        path_target = null;
         ignoreFrustumCheck = true;
         dataWatcher.addObject(destroyed_cracked_block_id, (Integer) 0);
     }
@@ -155,7 +155,9 @@ public class ColossusController extends EntityFz implements IBossDisplayData {
         arm_size = data.as(Share.VISIBLE, "armSize").putInt(arm_size);
         arm_length = data.as(Share.VISIBLE, "armLength").putInt(arm_length);
         home = data.as(Share.PRIVATE, "home").put(home);
-        path_target = data.as(Share.PRIVATE, "path_target").put(path_target);
+        if (data.as(Share.PRIVATE, "has_path_target").putBoolean(path_target != null)) {
+            path_target = data.as(Share.PRIVATE, "path_target").put(path_target);
+        }
         cracked_body_blocks = data.as(Share.VISIBLE, "cracks").putInt(cracked_body_blocks);
         int broken_body_blocks = dataWatcher.getWatchableObjectInt(destroyed_cracked_block_id);
         broken_body_blocks = data.as(Share.VISIBLE, "broken").putInt(broken_body_blocks);
@@ -200,7 +202,6 @@ public class ColossusController extends EntityFz implements IBossDisplayData {
             loadLimbs();
             if (home == null) {
                 home = new Coord(this);
-                path_target = home.copy();
             }
             if (!setup) return;
         }
@@ -210,13 +211,13 @@ public class ColossusController extends EntityFz implements IBossDisplayData {
         }
         walk_controller.tick();
         updateBlockClimb();
-        //ai_controller.tick();
-        if (atTarget()) {
+        ai_controller.tick();
+        /*if (atTarget()) {
             int d = 16;
             int dx = worldObj.rand.nextInt(d) - d/2;
             int dz = worldObj.rand.nextInt(d) - d/2;
             path_target = home.copy().add(dx * 2, 0, dz * 2);
-        }
+        }*/
         setPosition(body.posX, body.posY, body.posZ);
     }
 
@@ -315,6 +316,7 @@ public class ColossusController extends EntityFz implements IBossDisplayData {
     }
     
     void updateBlockClimb() {
+        if (walk_controller.state != WalkState.FORWARD) return;
         if (ticksExisted <= 5) return; // Make sure limbs are in position
         if (getHealth() <= 0) {
             return;
@@ -325,7 +327,7 @@ public class ColossusController extends EntityFz implements IBossDisplayData {
             int dy = new HeightCalculator().calc();
             double new_target = (int) (posY + dy);
             if (new_target != (int) target_y) {
-                NORELEASE.println("target_y: " + new_target);
+                //NORELEASE.println("target_y: " + new_target);
                 target_y = new_target;
             }
             if (last_step_direction != dy) {
@@ -382,31 +384,31 @@ public class ColossusController extends EntityFz implements IBossDisplayData {
             }
             double solid_at = 0;
             double solid_below = 0;
-            NORELEASE.println();
+            //NORELEASE.println();
             for (Coord at : found) {
                 if (at.isSolid()) {
-                    new Notice(at, "#").withStyle(Style.FORCE, Style.DRAWFAR, Style.LONG).sendToAll();
+                    //new Notice(at, "#").withStyle(Style.FORCE, Style.DRAWFAR, Style.LONG).sendToAll();
                     solid_at++;
                 }
                 at.y--;
                 if (at.isSolid()) {
-                    new Notice(at, ".").withStyle(Style.FORCE, Style.DRAWFAR, Style.LONG).sendToAll();
+                    //new Notice(at, ".").withStyle(Style.FORCE, Style.DRAWFAR, Style.LONG).sendToAll();
                     solid_below++;
                 }
                 at.y++;
             }
             double at = solid_at / total;
             double below = solid_below / total;
-            NORELEASE.println("total: " + total);
-            NORELEASE.println("at: " + at);
-            NORELEASE.println("below: " + below);
+            //NORELEASE.println("total: " + total);
+            //NORELEASE.println("at: " + at);
+            //NORELEASE.println("below: " + below);
             if (at > 0.4) {
                 // We're standing in something pretty fat; we *must* move up!
                 return 1;
             }
             if (below < 0.2) {
                 // We're unsupported, so we *must* move down!
-                NORELEASE.println("*** GET DOWN ***");
+                //NORELEASE.println("*** GET DOWN ***");
                 return -1;
             } else {
                 return 0;

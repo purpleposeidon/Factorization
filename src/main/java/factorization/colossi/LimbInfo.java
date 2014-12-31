@@ -65,7 +65,7 @@ class LimbInfo {
     
     public void target(Quaternion rot, double power, Interpolation interp) {
         NORELEASE.fixme("implement!");
-        setTargetRotation(rot, 20, interp);
+        setTargetRotation(rot, (int) (60 / power), interp);
     }
     
     public boolean isTurning() {

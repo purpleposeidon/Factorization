@@ -16,6 +16,8 @@ import net.minecraftforge.common.util.ForgeDirection;
 import factorization.api.Coord;
 import factorization.api.ICoordFunction;
 import factorization.api.Quaternion;
+import factorization.colossi.ColossusController.BodySide;
+import factorization.colossi.ColossusController.LimbType;
 import factorization.fzds.TransferLib;
 import factorization.fzds.interfaces.DeltaCapability;
 import factorization.fzds.interfaces.IDeltaChunk;
@@ -24,6 +26,18 @@ import factorization.shared.Core;
 import factorization.shared.ReservoirSampler;
 
 public enum Technique implements IStateMachine<Technique> {
+    STATE_MACHINE_ENTRY {
+        @Override
+        TechniqueKind getKind() {
+            return IDLER;
+        }
+        
+        @Override
+        public Technique tick(ColossusController controller, int age) {
+            return INITIAL_BOW;
+        }
+        
+    },
     PICK_NEXT_TECHNIQUE {
         @Override
         TechniqueKind getKind() {
@@ -84,8 +98,8 @@ public enum Technique implements IStateMachine<Technique> {
         }
         
         @Override
-        public void onEnterState(ColossusController controller, Technique state) {
-            BOW.onEnterState(controller, state);
+        public void onEnterState(ColossusController controller, Technique prevState) {
+            BOW.onEnterState(controller, prevState);
         }
     },
     
@@ -93,6 +107,37 @@ public enum Technique implements IStateMachine<Technique> {
         @Override
         TechniqueKind getKind() {
             return OFFENSIVE;
+        }
+        
+        @Override
+        public void onEnterState(ColossusController controller, Technique prevState) {
+            // So, uh, we really should do some IK here. But that's rather more math than I want to deal with. O.o
+            // So body bends to 90°, arms bend to 45°, and it might clip through the ground or be too high up or something.
+            // (And the legs bend -90° since they're rooted to the body)
+            // And hopefully we're bipedal! It'd do something hilarious & derpy if quadrapedal or polypedal.
+            Quaternion bodyBend = Quaternion.getRotationQuaternionRadians(Math.toRadians(70), ForgeDirection.NORTH);
+            Interpolation bendInterp = Interpolation.LINEAR; // SMOOTH could work; playing it safe tho
+            controller.bodyLimbInfo.target(bodyBend, 0.1, bendInterp);
+            int bodyBendTime;
+            if (controller.body.hasOrderedRotation()) {
+                bodyBendTime = controller.body.getRemainingRotationTime();
+            } else {
+                bodyBendTime = 60; // Hmph! Make something up. Shouldn't happen.
+            }
+            for (LimbInfo limb : controller.limbs) {
+                IDeltaChunk idc = limb.idc.getEntity();
+                if (idc == null) continue;
+                if (limb.type == LimbType.LEG) {
+                    idc.orderTargetRotation(bodyBend.conjugate(), bodyBendTime, bendInterp);
+                } else if (limb.type == LimbType.ARM) {
+                    double armFlap = Math.toRadians(limb.side == BodySide.RIGHT ? -45 : 45);
+                    double armHang = Math.toRadians(-90 - 45);
+                    Quaternion flap = Quaternion.getRotationQuaternionRadians(armFlap, ForgeDirection.EAST);
+                    Quaternion hang = Quaternion.getRotationQuaternionRadians(armHang, ForgeDirection.NORTH);
+                    idc.orderTargetRotation(flap.multiply(hang).multiply(bodyBend), bodyBendTime, Interpolation.SMOOTH);
+                }
+            }
+            controller.setTarget(null);
         }
     },
     
@@ -186,17 +231,17 @@ public enum Technique implements IStateMachine<Technique> {
         }
         
         @Override
-        public void onEnterState(ColossusController controller, Technique state) {
+        public void onEnterState(ColossusController controller, Technique prevState) {
             for (LimbInfo li : controller.limbs) {
                 li.target(controller.body.getRotation(), 1);
             }
-            super.onEnterState(controller, state);
+            super.onEnterState(controller, prevState);
         }
     },
     
     DEATH_FALL {
         @Override
-        public void onEnterState(ColossusController controller, Technique state) {
+        public void onEnterState(ColossusController controller, Technique prevState) {
             for (LimbInfo li : controller.limbs) {
                 IDeltaChunk idc = li.idc.getEntity();
                 idc.setVelocity(0, 0, 0);
@@ -312,7 +357,7 @@ public enum Technique implements IStateMachine<Technique> {
         public Technique tick(ColossusController controller, int age) { return this; }
         
         @Override
-        public void onEnterState(final ColossusController controller, Technique state) {
+        public void onEnterState(final ColossusController controller, Technique prevState) {
             final ArrayList<Entity> lmps = new ArrayList();
             for (final LimbInfo li : controller.limbs) {
                 final IDeltaChunk idc = li.idc.getEntity();
@@ -387,7 +432,7 @@ public enum Technique implements IStateMachine<Technique> {
     }
 
     @Override
-    public void onEnterState(ColossusController controller, Technique state) { }
+    public void onEnterState(ColossusController controller, Technique prevState) { }
 
     @Override
     public void onExitState(ColossusController controller, Technique nextState) { }

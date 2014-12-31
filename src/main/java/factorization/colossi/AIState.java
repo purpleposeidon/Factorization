@@ -72,7 +72,7 @@ public enum AIState implements IStateMachine<AIState> {
         }
         
         @Override
-        public void onEnterState(ColossusController controller, AIState state) {
+        public void onEnterState(ColossusController controller, AIState prevState) {
             controller.goHome();
         }
     },
@@ -85,7 +85,7 @@ public enum AIState implements IStateMachine<AIState> {
         }
         
         @Override
-        public void onEnterState(ColossusController controller, AIState state) {
+        public void onEnterState(ColossusController controller, AIState prevState) {
             int d = (int) (WorldGenColossus.SMOOTH_END * 0.85);
             Coord target = controller.getHome().copy();
             target.x += target.w.rand.nextInt(d) - d / 2;
@@ -146,7 +146,7 @@ public enum AIState implements IStateMachine<AIState> {
         }
         
         @Override
-        public void onEnterState(ColossusController controller, AIState state) {
+        public void onEnterState(ColossusController controller, AIState prevState) {
             for (LimbInfo li : controller.limbs){
                 if (li.type == LimbType.ARM){
                     li.idc.getEntity().permit(DeltaCapability.VIOLENT_COLLISIONS);
@@ -195,7 +195,7 @@ public enum AIState implements IStateMachine<AIState> {
 
     
     public abstract AIState tick(ColossusController controller, int age);
-    public void onEnterState(ColossusController controller, AIState state) { }
+    public void onEnterState(ColossusController controller, AIState prevState) { }
     public void onExitState(ColossusController controller, AIState nextState) { }
     
     protected AIState preempt(ColossusController controller, int age) {
