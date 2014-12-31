@@ -37,7 +37,7 @@ public class ColossusController extends EntityFz implements IBossDisplayData {
     boolean setup = false;
     int arm_size = 0, arm_length = 0;
     int leg_size = 0, leg_length = 0;
-    int cracked_body_blocks = 0;
+    //int cracked_body_blocks = 0;
     private Coord home = null;
     private boolean been_hurt = false;
     
@@ -56,16 +56,18 @@ public class ColossusController extends EntityFz implements IBossDisplayData {
     int target_count = 0;
     transient Entity target_entity;
 
-    private static final int destroyed_cracked_block_id = 2;
+    private static final int _destroyed_cracked_block_id = 2;
+    private static final int _unbroken_cracked_block_id = 3;
     
     public ColossusController(World world) {
         super(world);
         path_target = null;
         ignoreFrustumCheck = true;
-        dataWatcher.addObject(destroyed_cracked_block_id, (Integer) 0);
+        dataWatcher.addObject(_destroyed_cracked_block_id, (Integer) 0);
+        dataWatcher.addObject(_unbroken_cracked_block_id, (Integer) 0);
     }
     
-    public ColossusController(World world, LimbInfo[] limbInfo, int arm_size, int arm_length, int leg_size, int leg_length, int crackedBlocks) {
+    public ColossusController(World world, LimbInfo[] limbInfo, int arm_size, int arm_length, int leg_size, int leg_length) {
         this(world);
         this.limbs = limbInfo;
         for (LimbInfo li : limbs) {
@@ -82,7 +84,6 @@ public class ColossusController extends EntityFz implements IBossDisplayData {
         this.arm_length = arm_length;
         this.leg_size = leg_size;
         this.leg_length = leg_length;
-        this.cracked_body_blocks = crackedBlocks;
         calcLimbParity();
     }
     
@@ -158,10 +159,8 @@ public class ColossusController extends EntityFz implements IBossDisplayData {
         if (data.as(Share.PRIVATE, "has_path_target").putBoolean(path_target != null)) {
             path_target = data.as(Share.PRIVATE, "path_target").put(path_target);
         }
-        cracked_body_blocks = data.as(Share.VISIBLE, "cracks").putInt(cracked_body_blocks);
-        int broken_body_blocks = dataWatcher.getWatchableObjectInt(destroyed_cracked_block_id);
-        broken_body_blocks = data.as(Share.VISIBLE, "broken").putInt(broken_body_blocks);
-        dataWatcher.updateObject(destroyed_cracked_block_id, broken_body_blocks);
+        setTotalCracks(data.as(Share.VISIBLE, "cracks").putInt(getTotalCracks()));
+        setDestroyedCracks(data.as(Share.VISIBLE, "broken").putInt(getDestroyedCracks()));
         turningDirection = data.as(Share.PRIVATE, "turningDirection").putInt(turningDirection);
         target_changed = data.as(Share.PRIVATE, "targetChanged").putBoolean(target_changed);
         walked = data.as(Share.PRIVATE, "walked").putDouble(walked);
@@ -271,23 +270,33 @@ public class ColossusController extends EntityFz implements IBossDisplayData {
 
     @Override
     public float getMaxHealth() {
-        return cracked_body_blocks * 3;
+        return getTotalCracks() * 3;
     }
     
     public int getDestroyedCracks() {
-        return dataWatcher.getWatchableObjectInt(destroyed_cracked_block_id);
+        return dataWatcher.getWatchableObjectInt(_destroyed_cracked_block_id);
+    }
+    
+    public void setDestroyedCracks(int newCount) {
+        dataWatcher.updateObject(_destroyed_cracked_block_id, newCount);
+    }
+    
+    public int getTotalCracks() {
+        return dataWatcher.getWatchableObjectInt(_unbroken_cracked_block_id);
+    }
+    
+    public void setTotalCracks(int newCount) {
+        dataWatcher.updateObject(_unbroken_cracked_block_id, newCount);
     }
 
     @Override
     public float getHealth() {
         float wiggle = 1 - 0.1F * (current_name / (float) max_names);
-        return (cracked_body_blocks - getDestroyedCracks()) * wiggle;
+        return (getTotalCracks() - getDestroyedCracks()) * wiggle;
     }
     
     public void crackBroken() {
-        int cracks = getDestroyedCracks();
-        cracks++;
-        dataWatcher.updateObject(destroyed_cracked_block_id, cracks);
+        setDestroyedCracks(getDestroyedCracks() + 1);
     }
     
     static int max_names = -1;

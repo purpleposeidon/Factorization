@@ -100,6 +100,56 @@ public enum Technique implements IStateMachine<Technique> {
         @Override
         public void onEnterState(ColossusController controller, Technique prevState) {
             BOW.onEnterState(controller, prevState);
+            // Crack 2 mask blocks that are exposed UP or WEST
+            final ReservoirSampler<Coord> sampler = new ReservoirSampler<Coord>(2, controller.worldObj.rand);
+            Coord.iterateCube(controller.body.getCorner(), controller.body.getFarCorner(), new ICoordFunction() {
+                @Override
+                public void handle(Coord here) {
+                    if (here.getBlock() != Core.registry.colossal_block) return;
+                    if (here.getMd() != ColossalBlock.MD_MASK) return;
+                    if (here.add(ForgeDirection.UP).isAir() || here.add(ForgeDirection.WEST).isAir()) {
+                        sampler.give(here.copy());
+                    }
+                }
+            });
+            for (Coord found : sampler) {
+                // We might want a "cracked mask"
+                found.setIdMd(Core.registry.colossal_block, ColossalBlock.MD_BODY_CRACKED, true);
+            }
+        }
+        
+        @Override
+        public Technique tick(ColossusController controller, int age) {
+            if (controller.checkHurt(false)) return PICK_NEXT_TECHNIQUE;
+            return this;
+        }
+        
+        @Override
+        public void onExitState(ColossusController controller, Technique nextState) {
+            // Add the other cracks
+            int ls = controller.leg_size + 1;
+            int count = ls * ls;
+            final ReservoirSampler<Coord> sampler = new ReservoirSampler<Coord>(count, controller.worldObj.rand);
+            Coord.iterateCube(controller.body.getCorner(), controller.body.getFarCorner(), new ICoordFunction() {
+                @Override
+                public void handle(Coord here) {
+                    if (isExposedSkin(here)) {
+                        sampler.give(here.copy());
+                    }
+                }
+            });
+            for (Coord found : sampler) {
+                found.setIdMd(Core.registry.colossal_block, ColossalBlock.MD_BODY_CRACKED /* Unlike the case above, we DO want MD_BODY_CRACKED. I know you're going to mess this up. Don't do it. */, true);
+            }
+        }
+        
+        boolean isExposedSkin(Coord cell) {
+            if (cell.getBlock() != Core.registry.colossal_block) return false;
+            if (cell.getMd() != ColossalBlock.MD_BODY) return false;
+            for (Coord n : cell.getNeighborsAdjacent()) {
+                if (n.isAir()) return true;
+            }
+            return false;
         }
     },
     
@@ -130,7 +180,7 @@ public enum Technique implements IStateMachine<Technique> {
                 if (limb.type == LimbType.LEG) {
                     idc.orderTargetRotation(bodyBend.conjugate(), bodyBendTime, bendInterp);
                 } else if (limb.type == LimbType.ARM) {
-                    double armFlap = Math.toRadians(limb.side == BodySide.RIGHT ? -45 : 45);
+                    double armFlap = Math.toRadians(limb.side == BodySide.RIGHT ? -25 : 25);
                     double armHang = Math.toRadians(-90 - 45);
                     Quaternion flap = Quaternion.getRotationQuaternionRadians(armFlap, ForgeDirection.EAST);
                     Quaternion hang = Quaternion.getRotationQuaternionRadians(armHang, ForgeDirection.NORTH);

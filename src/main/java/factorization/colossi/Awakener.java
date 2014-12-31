@@ -3,7 +3,6 @@ package factorization.colossi;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Random;
 import java.util.Set;
 
 import net.minecraft.item.ItemStack;
@@ -28,7 +27,7 @@ import factorization.notify.Notice;
 import factorization.notify.Style;
 import factorization.shared.Core;
 import factorization.shared.FzUtil;
-import factorization.shared.ReservoirSampler;
+import factorization.shared.NORELEASE;
 
 public class Awakener {
     int arm_size = 0, arm_length = 0;
@@ -43,7 +42,7 @@ public class Awakener {
             TileEntityColossalHeart heart = findNearestHeart(src);
             if (heart == null) return;
             msg("Unknown XR10-class entity detected.");
-            msg("Attempting to awaken Colossal Sentinel " + heart.seed);
+            msg("Attempting to awaken Colossal Sentinel #" + heart.seed);
             Coord core = new Coord(heart);
             Awakener awakener = new Awakener(heart);
             boolean success = awakener.abandonedLongAgo_thisAncientGuardianBurnsItsRemainingPower();
@@ -57,7 +56,7 @@ public class Awakener {
                 core.spawnItem(lmp);
                 return;
             }
-            core.setAir();
+            core.setAir(); // Extra-careful? Should be able to live without it.
             msg("Engaging entity.");
         } finally {
             is_working = false;
@@ -218,8 +217,6 @@ public class Awakener {
         all_members.addAll(arms);
         all_members.addAll(legs);
         
-        int cracked_body_blocks = damageBody(body);
-        
         boolean first = true;
         for (Set<Coord> set : all_members) {
             int l = lowest(set);
@@ -275,7 +272,7 @@ public class Awakener {
         int part_size = parts.size();
         msg("Activated with %s parts", part_size);
         LimbInfo[] info = parts.toArray(new LimbInfo[part_size]);
-        ColossusController controller = new ColossusController(heartTE.getWorldObj(), info, arm_size, arm_length, leg_size, leg_length, cracked_body_blocks);
+        ColossusController controller = new ColossusController(heartTE.getWorldObj(), info, arm_size, arm_length, leg_size, leg_length);
         new Coord(heartTE).setAsEntityLocation(controller);
         FzUtil.spawn(controller);
         
@@ -293,33 +290,6 @@ public class Awakener {
         
         msg("*** WARNING: Energy reserves < 0.1%% ***");
         return true;
-    }
-    
-    private int damageBody(Set<Coord> body) {
-        int ls = leg_size + 1;
-        int count = ls * ls;
-        Random rand = new Random(new Coord(heartTE).seed());
-        ReservoirSampler<Coord> sampler = new ReservoirSampler<Coord>(count, rand);
-        for (Coord cell : body) {
-            if (isExposedSkin(cell)) {
-                sampler.give(cell);
-            }
-        }
-        int damaged = 0;
-        for (Coord cell : sampler) {
-            cell.setIdMd(Core.registry.colossal_block, ColossalBlock.MD_BODY_CRACKED, true);
-            damaged++;
-        }
-        return damaged;
-    }
-    
-    boolean isExposedSkin(Coord cell) {
-        if (cell.getBlock() != Core.registry.colossal_block) return false;
-        if (cell.getMd() != ColossalBlock.MD_BODY) return false;
-        for (Coord n : cell.getNeighborsAdjacent()) {
-            if (n.isAir()) return true;
-        }
-        return false;
     }
 
     BodySide getSide(Set<Coord> set) {
@@ -405,9 +375,9 @@ public class Awakener {
             if (min == null || max == null) {
                 min = c;
                 max = c;
-            } else if (c.get(axis) < min.get(axis)){
+            } else if (c.get(axis) < min.get(axis)) {
                 min = c;
-            } else if (c.get(axis) > max.get(axis)){
+            } else if (c.get(axis) > max.get(axis)) {
                 max = c;
             }
         }
@@ -534,7 +504,7 @@ public class Awakener {
         }
         if (min == null || max == null) return null;
         Coord.sort(min, max);
-        int r = 2;
+        int r = 2; NORELEASE.fixme("Can this be lowered?");
         min.adjust(new DeltaCoord(-r, -r, -r));
         max.adjust(new DeltaCoord(r, r, r));
         IDeltaChunk ret = DeltaChunk.makeSlice(ColossusFeature.deltachunk_channel, min, max, new AreaMap() {
