@@ -196,7 +196,7 @@ public class ColossalBlock extends Block {
     
     @Override
     public boolean onBlockActivated(World world, int x, int y, int z, EntityPlayer player, int side, float vecX, float vecY, float vecZ) {
-        if (world.isRemote) return true;
+        if (world.isRemote) return false;
         if (player == null) return false;
         Coord at = new Coord(world, x, y, z);
         ItemStack held = player.getHeldItem();
@@ -211,7 +211,7 @@ public class ColossalBlock extends Block {
             // player.addChatComponentMessage(new ChatComponentTranslation("tile.factorization:colossalBlock." + md + ".click"));
             return true;
         }
-        if (FzUtil.isPlayerCreative(player)) {
+        if (FzUtil.isPlayerCreative(player) && md == MD_CORE) {
             TileEntityColossalHeart heart = at.getTE(TileEntityColossalHeart.class);
             if (heart != null) {
                 if (player.isSneaking()) {
@@ -219,16 +219,12 @@ public class ColossalBlock extends Block {
                     return true;
                 }
                 heart.showInfo(player);
-            } else if ((at.getMd() == MD_EYE || at.getMd() == MD_EYE_OPEN) && player.isSneaking()) {
-                Awakener.awaken(at);
-                return true;
             }
-            return false;
-        } else {
-            if (md == MD_CORE || md == MD_EYE || md == MD_EYE_OPEN) {
-                Awakener.awaken(at);
-                return true;
-            }
+            return true;
+        }
+        if (md == MD_CORE) {
+            Awakener.awaken(at);
+            return true;
         }
         return false;
     }
