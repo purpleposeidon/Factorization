@@ -18,7 +18,7 @@ public enum WalkState implements IStateMachine<WalkState> {
     },
     TURN {
         @Override
-        public void onEnterState(ColossusController controller, WalkState state) {
+        public void onEnterState(ColossusController controller, WalkState prevState) {
             checkRotation(controller);
             for (LimbInfo limb : controller.limbs) {
                 IDeltaChunk idc = limb.idc.getEntity();
@@ -123,7 +123,7 @@ public enum WalkState implements IStateMachine<WalkState> {
     },
     FORWARD {
         @Override
-        public void onEnterState(ColossusController controller, WalkState state) {
+        public void onEnterState(ColossusController controller, WalkState prevState) {
             if (controller.atTarget()) return;
             IDeltaChunk body = controller.body;
             Vec3 target = controller.getTarget().createVector();
@@ -199,7 +199,7 @@ public enum WalkState implements IStateMachine<WalkState> {
     public abstract WalkState tick(ColossusController controller, int age);
 
     @Override
-    public void onEnterState(ColossusController controller, WalkState state) { }
+    public void onEnterState(ColossusController controller, WalkState prevState) { }
 
     @Override
     public void onExitState(ColossusController controller, WalkState nextState) { }
