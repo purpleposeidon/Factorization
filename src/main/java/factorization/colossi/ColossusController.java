@@ -297,6 +297,7 @@ public class ColossusController extends EntityFz implements IBossDisplayData {
     
     public void crackBroken() {
         setDestroyedCracks(getDestroyedCracks() + 1);
+        been_hurt = true;
     }
     
     static int max_names = -1;

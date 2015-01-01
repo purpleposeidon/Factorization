@@ -120,8 +120,9 @@ public enum Technique implements IStateMachine<Technique> {
         
         @Override
         public Technique tick(ColossusController controller, int age) {
-            if (controller.checkHurt(false)) return PICK_NEXT_TECHNIQUE;
-            return this;
+            // Copy of BOW.tick >_>
+            if (controller.checkHurt(false)) return UNBOW;
+            return this; // Because of this!
         }
         
         @Override
@@ -166,8 +167,7 @@ public enum Technique implements IStateMachine<Technique> {
             // (And the legs bend -90° since they're rooted to the body)
             // And hopefully we're bipedal! It'd do something hilarious & derpy if quadrapedal or polypedal.
             Quaternion bodyBend = Quaternion.getRotationQuaternionRadians(Math.toRadians(70), ForgeDirection.NORTH);
-            Interpolation bendInterp = Interpolation.LINEAR; // SMOOTH could work; playing it safe tho
-            controller.bodyLimbInfo.target(bodyBend, 0.1, bendInterp);
+            controller.bodyLimbInfo.target(bodyBend, bow_power, bendInterp);
             int bodyBendTime;
             if (controller.body.hasOrderedRotation()) {
                 bodyBendTime = controller.body.getRemainingRotationTime();
@@ -188,6 +188,34 @@ public enum Technique implements IStateMachine<Technique> {
                 }
             }
             controller.setTarget(null);
+        }
+        
+        @Override
+        public Technique tick(ColossusController controller, int age) {
+            if (controller.checkHurt(false)) return UNBOW;
+            return this;
+        }
+    },
+    
+    UNBOW {
+        @Override
+        TechniqueKind getKind() {
+            return TechniqueKind.OFFENSIVE;
+        }
+        
+        @Override
+        public void onEnterState(ColossusController controller, Technique prevState) {
+            for (LimbInfo li : controller.limbs) {
+                li.target(new Quaternion(), bow_power, bendInterp);
+            }
+        }
+        
+        @Override
+        public Technique tick(ColossusController controller, int age) {
+            for (LimbInfo li : controller.limbs) {
+                if (li.isTurning()) return this;
+            }
+            return PICK_NEXT_TECHNIQUE;
         }
     },
     
@@ -486,4 +514,7 @@ public enum Technique implements IStateMachine<Technique> {
 
     @Override
     public void onExitState(ColossusController controller, Technique nextState) { }
+    
+    static final double bow_power = 0.1;
+    static final Interpolation bendInterp = Interpolation.LINEAR; // SMOOTH could work; playing it safe tho
 }
