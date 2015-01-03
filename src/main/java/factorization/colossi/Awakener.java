@@ -228,6 +228,8 @@ public class Awakener {
             }
         }
         
+        markCoveredBodyBlocks(body);
+        
         double max_iter = Math.pow(body.size(), 1.0/3.0) * 4;
         includeShell(all_members, new HashSet(), (int) max_iter + 3);
         msg("Attatched adjacent blocks. New body:");
@@ -344,6 +346,27 @@ public class Awakener {
             return false;
         }
         return true;
+    }
+    
+    void markCoveredBodyBlocks(Set<Coord> body) {
+        for (Coord c : body) {
+            if (!(c.getBlock() == Core.registry.colossal_block && c.getMd() == ColossalBlock.MD_BODY)) continue;
+            boolean has_air = false;
+            boolean has_arm_or_leg = false;
+            for (Coord at : c.getNeighborsAdjacent()) {
+                if (at.isAir()) {
+                    has_air = true;
+                    continue;
+                }
+                int md = at.getMd();
+                if (md == ColossalBlock.MD_ARM || md == ColossalBlock.MD_ARM) {
+                    has_arm_or_leg = true;
+                }
+            }
+            if (!has_air && has_arm_or_leg) {
+                c.setMd(ColossalBlock.MD_BODY_COVERED);
+            }
+        }
     }
     
     boolean verifyArmDimensions(ArrayList<Set<Coord>> arms) {

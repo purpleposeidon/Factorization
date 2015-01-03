@@ -48,7 +48,7 @@ public class ColossalBlock extends Block {
         Core.tab(this, TabType.BLOCKS);
     }
     
-    static final byte MD_MASK = 0, MD_BODY = 4, MD_BODY_CRACKED = 1, MD_ARM = 2, MD_LEG = 3, MD_EYE = 5, MD_CORE = 6, MD_EYE_OPEN = 7;
+    static final byte MD_MASK = 0, MD_BODY = 4, MD_BODY_CRACKED = 1, MD_ARM = 2, MD_LEG = 3, MD_EYE = 5, MD_CORE = 6, MD_EYE_OPEN = 7, MD_BODY_COVERED = 8;
     
     static final int EAST_SIDE = 5;
     
@@ -56,6 +56,7 @@ public class ColossalBlock extends Block {
     public IIcon getIcon(int side, int md) {
         switch (md) {
         case MD_BODY: return BlockIcons.colossi$body;
+        case MD_BODY_COVERED: return BlockIcons.uv_test;
         case MD_BODY_CRACKED: return BlockIcons.colossi$body_cracked;
         case MD_ARM: return BlockIcons.colossi$arm;
         case MD_LEG: return BlockIcons.colossi$leg;
@@ -98,7 +99,7 @@ public class ColossalBlock extends Block {
     boolean isSupportive(World world, int x, int y, int z) {
         if (world.getBlock(x, y, z) != this) return false;
         int md = world.getBlockMetadata(x, y, z);
-        return md == MD_BODY || md == MD_EYE || md == MD_EYE_OPEN || md == MD_CORE;
+        return md == MD_BODY || md == MD_BODY_COVERED || md == MD_EYE || md == MD_EYE_OPEN || md == MD_CORE;
         
     }
     
@@ -107,7 +108,8 @@ public class ColossalBlock extends Block {
     
     @Override
     public void getSubBlocks(Item item, CreativeTabs tab, List list) {
-        for (byte md = MD_MASK; md <= MD_EYE_OPEN; md++) {
+        for (byte md = MD_MASK; md <= MD_BODY_COVERED; md++) {
+            if (md == MD_BODY_COVERED) continue; // Technical block; skip
             list.add(new ItemStack(this, 1, md));
         }
     }
@@ -173,6 +175,7 @@ public class ColossalBlock extends Block {
             world.spawnParticle("reddust", px, py, pz, 0, 0, 0);
             break;
         case MD_BODY:
+        case MD_BODY_COVERED:
             if (rand.nextInt(256) == 0) {
                 world.spawnParticle("explode", px, py, pz, 0, 0, 0);
             }
@@ -255,7 +258,8 @@ public class ColossalBlock extends Block {
     }
     
     @Override
-    public void onBlockHarvested(World world, int x, int y, int z, int md, EntityPlayer player) {
+    public void breakBlock(World world, int x, int y, int z, Block block, int md) {
+        super.breakBlock(world, x, y, z, block, md);
         if (world.isRemote) return;
         if (world == DeltaChunk.getServerShadowWorld()) {
             if (md == MD_BODY_CRACKED) {
@@ -265,10 +269,9 @@ public class ColossalBlock extends Block {
                     controller.crackBroken();
                 }
             }
-        } else if (md == MD_EYE || md == MD_EYE_OPEN) {
+        } else if (md == MD_BODY_CRACKED) {
             Awakener.awaken(new Coord(world, x, y, z));
         }
-        
     }
     
     public ColossusController findController(Coord at) {
