@@ -100,16 +100,16 @@ public enum Technique implements IStateMachine<Technique> {
         @Override
         public void onEnterState(ColossusController controller, Technique prevState) {
             BOW.onEnterState(controller, prevState);
-            // Crack 2 mask blocks that are exposed UP or WEST
+            // Crack 2 mask blocks that are exposed UP but not EAST
             final ReservoirSampler<Coord> sampler = new ReservoirSampler<Coord>(2, controller.worldObj.rand);
             Coord.iterateCube(controller.body.getCorner(), controller.body.getFarCorner(), new ICoordFunction() {
                 @Override
                 public void handle(Coord here) {
                     if (here.getBlock() != Core.registry.colossal_block) return;
                     if (here.getMd() != ColossalBlock.MD_MASK) return;
-                    if (here.add(ForgeDirection.UP).isAir() || here.add(ForgeDirection.WEST).isAir()) {
-                        sampler.give(here.copy());
-                    }
+                    if (!here.add(ForgeDirection.UP).isAir()) return;
+                    if (here.add(ForgeDirection.EAST).isAir()) return;
+                    sampler.give(here.copy());
                 }
             });
             for (Coord found : sampler) {
@@ -142,13 +142,16 @@ public enum Technique implements IStateMachine<Technique> {
             for (Coord found : sampler) {
                 found.setIdMd(Core.registry.colossal_block, ColossalBlock.MD_BODY_CRACKED /* Unlike the case above, we DO want MD_BODY_CRACKED. I know you're going to mess this up. Don't do it. */, true);
             }
+            controller.setTotalCracks(sampler.size());
         }
         
         boolean isExposedSkin(Coord cell) {
             if (cell.getBlock() != Core.registry.colossal_block) return false;
             if (cell.getMd() != ColossalBlock.MD_BODY) return false;
-            for (Coord n : cell.getNeighborsAdjacent()) {
-                if (n.isAir()) return true;
+            for (ForgeDirection dir : ForgeDirection.VALID_DIRECTIONS) {
+                if (dir == ForgeDirection.NORTH || dir == ForgeDirection.SOUTH) continue; // There might be arms in the way here
+                Coord n = cell.add(dir);
+                if (n.isAir() || n.isReplacable()) return true;
             }
             return false;
         }
