@@ -77,13 +77,14 @@ public class Awakener {
     static TileEntityColossalHeart findNearestHeart(Coord src) {
         TileEntityColossalHeart ret = null;
         double ret_dist = 0;
-        int r = 0;
+        int chunkSearchRadius = 2;
         Coord at = src.copy();
-        for (int dxChunk = -r; dxChunk <= r; dxChunk++) {
-            for (int dzChunk = -r; dzChunk <= r; dzChunk++) {
+        for (int dxChunk = -chunkSearchRadius; dxChunk <= chunkSearchRadius; dxChunk++) {
+            for (int dzChunk = -chunkSearchRadius; dzChunk <= chunkSearchRadius; dzChunk++) {
                 at.set(src);
                 at.adjust(dxChunk * 16, 0, dzChunk * 16);
-                for (TileEntity te : (Iterable<TileEntity>) at.getChunk().chunkTileEntityMap.values()) {
+                Iterable<TileEntity> tes = (Iterable<TileEntity>) at.getChunk().chunkTileEntityMap.values();
+                for (TileEntity te : tes) {
                     if (!(te instanceof TileEntityColossalHeart)) continue;
                     TileEntityColossalHeart heart = (TileEntityColossalHeart) te;
                     double dist = src.distanceSq(at);
@@ -530,6 +531,7 @@ public class Awakener {
         int r = 2; NORELEASE.fixme("Can this be lowered?");
         min.adjust(new DeltaCoord(-r, -r, -r));
         max.adjust(new DeltaCoord(r, r, r));
+        
         IDeltaChunk ret = DeltaChunk.makeSlice(ColossusFeature.deltachunk_channel, min, max, new AreaMap() {
             @Override
             public void fillDse(DseDestination destination) {
