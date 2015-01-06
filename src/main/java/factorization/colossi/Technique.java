@@ -101,7 +101,7 @@ public enum Technique implements IStateMachine<Technique> {
         public void onEnterState(ColossusController controller, Technique prevState) {
             BOW.onEnterState(controller, prevState);
             // Crack 2 mask blocks that are exposed UP but not EAST
-            final ReservoirSampler<Coord> sampler = new ReservoirSampler<Coord>(2, controller.worldObj.rand);
+            final ReservoirSampler<Coord> sampler = new ReservoirSampler<Coord>(1, controller.worldObj.rand);
             Coord.iterateCube(controller.body.getCorner(), controller.body.getFarCorner(), new ICoordFunction() {
                 @Override
                 public void handle(Coord here) {
@@ -128,8 +128,7 @@ public enum Technique implements IStateMachine<Technique> {
         @Override
         public void onExitState(ColossusController controller, Technique nextState) {
             // Add the other cracks
-            int ls = controller.leg_size + 1;
-            int count = ls * ls;
+            int count = controller.getNaturalCrackCount();
             final ReservoirSampler<Coord> sampler = new ReservoirSampler<Coord>(count, controller.worldObj.rand);
             Coord.iterateCube(controller.body.getCorner(), controller.body.getFarCorner(), new ICoordFunction() {
                 @Override
@@ -149,7 +148,6 @@ public enum Technique implements IStateMachine<Technique> {
             if (cell.getBlock() != Core.registry.colossal_block) return false;
             if (cell.getMd() != ColossalBlock.MD_BODY) return false;
             for (ForgeDirection dir : ForgeDirection.VALID_DIRECTIONS) {
-                if (dir == ForgeDirection.NORTH || dir == ForgeDirection.SOUTH) continue; // There might be arms in the way here
                 Coord n = cell.add(dir);
                 if (n.isAir() || n.isReplacable()) return true;
             }

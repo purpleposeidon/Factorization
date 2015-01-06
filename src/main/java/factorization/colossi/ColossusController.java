@@ -85,6 +85,7 @@ public class ColossusController extends EntityFz implements IBossDisplayData {
         this.leg_size = leg_size;
         this.leg_length = leg_length;
         calcLimbParity();
+        setTotalCracks(getNaturalCrackCount() + 1);
     }
     
     protected void calcLimbParity() {
@@ -149,7 +150,7 @@ public class ColossusController extends EntityFz implements IBossDisplayData {
             limbs[i].putData(data, i);
         }
         walk_controller.serialize("walk", data);
-        //ai_controller.serialize("ai", data);
+        ai_controller.serialize("ai", data);
         
         
         leg_size = data.as(Share.VISIBLE, "legSize").putInt(leg_size);
@@ -266,6 +267,12 @@ public class ColossusController extends EntityFz implements IBossDisplayData {
             idc.setRotationalVelocity(new Quaternion());
             li.reset(time, interp);
         }
+    }
+    
+    public int getNaturalCrackCount() {
+        int ls = leg_size + 1;
+        int count = ls * ls;
+        return count;
     }
 
     @Override
