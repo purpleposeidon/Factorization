@@ -3,17 +3,18 @@ package factorization.docs;
 import java.util.ArrayList;
 
 import net.minecraft.client.gui.FontRenderer;
+import factorization.shared.NORELEASE;
 
 public class WordPage extends AbstractPage {
     ArrayList<ArrayList<Word>> text = new ArrayList();
     Object figure;
-    int lineHeight;
+    static int TEXT_HEIGHT = 9;
     int lineLen = 0;
     FontRenderer font;
     
     WordPage(FontRenderer font) {
         this.font = font;
-        lineHeight = font.FONT_HEIGHT + 2;
+        TEXT_HEIGHT = font.FONT_HEIGHT;
         nl();
     }
     
@@ -44,7 +45,9 @@ public class WordPage extends AbstractPage {
                 break;
             }
         }
-        text.add(new ArrayList());
+        ArrayList newLine = new ArrayList();
+        text.add(newLine);
+        newLine.add(new TextWord("|", null));
         lineLen = 0;
     }
     
@@ -52,8 +55,12 @@ public class WordPage extends AbstractPage {
         int y = 0;
         for (ArrayList<Word> line : text) {
             if (y > relativeY) break;
-            y += lineHeight;
-            if (y < relativeY || line.isEmpty()) continue;
+            int yChange = getPad(line, true) + getPad(line, false);
+            if (y + yChange < relativeY) {
+                y += yChange;
+                continue;
+            }
+            y += getPad(line, true);
             int x = 0;
             for (Word word : line) {
                 int width = word.getWidth(font);
@@ -63,20 +70,32 @@ public class WordPage extends AbstractPage {
                 x += width;
                 if (x > relativeX) break;
             }
-            break;
+            y += getPad(line, false);
         }
         return null;
     }
     
+    int getPad(ArrayList<Word> line, boolean isAbove) {
+        int padUp = 0, padDown = 0;
+        for (Word word : line) {
+            padUp = Math.max(word.getPaddingAbove(), padUp);
+            padDown = Math.max(word.getPaddingBelow(), padDown);
+        }
+        NORELEASE.fixme("No mutliple returns? Idiocy.");
+        if (isAbove) return padUp;
+        return padDown;
+    }
+    
     @Override
-    void draw(DocViewer doc, int ox, int oy) {
+    void draw(DocViewer doc, int ox, int oy, String hoveredLink) {
         int y = 0;
         for (ArrayList<Word> line : text) {
             int x = 0;
+            y += getPad(line, true);
             for (Word word : line) {
-                x += word.draw(doc, ox + x, oy + y);
+                x += word.draw(doc, ox + x, oy + y, hoveredLink != null && hoveredLink.equals(word.getLink()));
             }
-            y += lineHeight;
+            y += getPad(line, false);
         }
     }
 }

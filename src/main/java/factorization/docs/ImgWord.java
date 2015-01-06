@@ -31,7 +31,7 @@ public class ImgWord extends Word {
     }
 
     @Override
-    public int draw(DocViewer doc, int x, int y) {
+    public int draw(DocViewer doc, int x, int y, boolean hover) {
         int z = 0;
         doc.mc.renderEngine.bindTexture(resource);
         Tessellator tess = new Tessellator();

@@ -51,6 +51,16 @@ public class ItemWord extends Word {
         return 16;
     }
     
+    @Override
+    public int getPaddingAbove() {
+        return (16 - WordPage.TEXT_HEIGHT) / 2;
+    }
+    
+    @Override
+    public int getPaddingBelow() {
+        return WordPage.TEXT_HEIGHT + getPaddingAbove();
+    }
+    
     ItemStack getItem() {
         if (is != null) return is;
         if (entries == null) return null;
@@ -60,7 +70,7 @@ public class ItemWord extends Word {
     }
 
     @Override
-    public int draw(DocViewer doc, int x, int y) {
+    public int draw(DocViewer doc, int x, int y, boolean hover) {
         ItemStack toDraw = getItem();
         if (toDraw == null) return 16;
         GL11.glPushAttrib(GL11.GL_ALL_ATTRIB_BITS);

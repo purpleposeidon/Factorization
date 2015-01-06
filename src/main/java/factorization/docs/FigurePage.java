@@ -50,7 +50,7 @@ public class FigurePage extends AbstractPage {
     EntityLivingBase eyeball;
     
     @Override
-    void draw(DocViewer doc, int ox, int oy) {
+    void draw(DocViewer doc, int ox, int oy, String hovered) {
         FzUtil.checkGLError("FigurePage -- before render");
         if (wr == null) {
             GL11.glPushAttrib(GL11.GL_ALL_ATTRIB_BITS);

@@ -232,16 +232,19 @@ public class DocViewer extends GuiScreen {
     void drawPage(int id, int mouseX, int mouseY, int pass) {
         AbstractPage page = getPage(id);
         if (page == null) return;
-        if (pass == 0) {
-            page.draw(this, getPageLeft(id), getPageTop(id));
-        } else if (pass == 1) {
-            if (page instanceof WordPage) {
-                WordPage p = (WordPage) page;
-                Word link = p.click(mouseX - getPageLeft(id), mouseY - getPageTop(id));
-                if (link != null) {
-                    link.drawHover(this, mouseX, mouseY);
-                }
+        Word hovered = null;
+        String hoveredLink = null;
+        if (page instanceof WordPage) {
+            WordPage p = (WordPage) page;
+            hovered = p.click(mouseX - getPageLeft(id), mouseY - getPageTop(id));
+            if (hovered != null) {
+                hoveredLink = hovered.getLink();
             }
+        }
+        if (pass == 0) {
+            page.draw(this, getPageLeft(id), getPageTop(id), hoveredLink);
+        } else if (pass == 1 && hovered != null) {
+            hovered.drawHover(this, mouseX, mouseY);
         }
     }
     

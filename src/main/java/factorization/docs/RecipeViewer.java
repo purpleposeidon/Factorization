@@ -329,7 +329,7 @@ public class RecipeViewer implements IDocGenerator {
         } else if (recipe instanceof Entry) {
             Entry ent = (Entry) recipe;
             addRecipeWithReflection(sb, ent.getKey());
-            sb.add(" ==> ");
+            sb.add(" ➤ ");
             addRecipeWithReflection(sb, ent.getValue());
             return;
         }

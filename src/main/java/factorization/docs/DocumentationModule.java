@@ -254,5 +254,8 @@ public class DocumentationModule {
     static void registerGenerators() {
         registerGenerator("items", new ItemListViewer());
         registerGenerator("recipes", new RecipeViewer());
+        registerGenerator("enchants", new EnchantViewer());
+        registerGenerator("treasure", new TreasureViewer());
+        registerGenerator("biomes", new BiomeViewer());
     }
 }
