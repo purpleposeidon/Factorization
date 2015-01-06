@@ -230,6 +230,21 @@ public enum Technique implements IStateMachine<Technique> {
         boolean usable(ColossusController controller) {
             return true;
         }
+        
+        @Override
+        public void onEnterState(ColossusController controller, Technique prevState) {
+            
+        }
+        
+        @Override
+        public Technique tick(ColossusController controller, int age) {
+            return this;
+        }
+        
+        @Override
+        public void onExitState(ColossusController controller, Technique nextState) {
+            
+        }
     },
     
     KICK {
@@ -241,6 +256,21 @@ public enum Technique implements IStateMachine<Technique> {
         @Override
         boolean usable(ColossusController controller) {
             return true;
+        }
+        
+        @Override
+        public void onEnterState(ColossusController controller, Technique prevState) {
+            
+        }
+        
+        @Override
+        public Technique tick(ColossusController controller, int age) {
+            return this;
+        }
+        
+        @Override
+        public void onExitState(ColossusController controller, Technique nextState) {
+            
         }
     },
     
@@ -254,6 +284,21 @@ public enum Technique implements IStateMachine<Technique> {
         boolean usable(ColossusController controller) {
             return true;
         }
+        
+        @Override
+        public void onEnterState(ColossusController controller, Technique prevState) {
+            
+        }
+        
+        @Override
+        public Technique tick(ColossusController controller, int age) {
+            return this;
+        }
+        
+        @Override
+        public void onExitState(ColossusController controller, Technique nextState) {
+            
+        }
     },
     
     PUNT {
@@ -265,6 +310,21 @@ public enum Technique implements IStateMachine<Technique> {
         @Override
         boolean usable(ColossusController controller) {
             return true;
+        }
+        
+        @Override
+        public void onEnterState(ColossusController controller, Technique prevState) {
+            
+        }
+        
+        @Override
+        public Technique tick(ColossusController controller, int age) {
+            return this;
+        }
+        
+        @Override
+        public void onExitState(ColossusController controller, Technique nextState) {
+            
         }
     },
     
@@ -289,17 +349,15 @@ public enum Technique implements IStateMachine<Technique> {
         }
     },
     
-    SEMI_CARTWHEEL {
-        @Override
-        TechniqueKind getKind() {
-            return DEFENSIVE;
-        }
-    },
-    
     WANDER {
         @Override
         TechniqueKind getKind() {
             return IDLER;
+        }
+        
+        @Override
+        public Technique tick(ColossusController controller, int age) {
+            return this;
         }
     },
     
@@ -315,6 +373,12 @@ public enum Technique implements IStateMachine<Technique> {
                 li.target(controller.body.getRotation(), 1);
             }
             super.onEnterState(controller, prevState);
+        }
+        
+        @Override
+        public Technique tick(ColossusController controller, int age) {
+            if (age > 20 * 20) return PICK_NEXT_TECHNIQUE;
+            return this;
         }
     },
     
