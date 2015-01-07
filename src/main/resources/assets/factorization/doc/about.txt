@@ -13,8 +13,7 @@ Go forth and build cool things!
 \newpage
 \h1{Navigation}
 
-scrollwheel down: next page \nl
-scrollwheel up: previous page \nl
-left click: go back \nl
+scroll: next page \nl
+right click: go back \nl
 escape: close manual \nl
 
