@@ -2,6 +2,8 @@ package factorization.docs;
 
 import java.util.ArrayList;
 
+import org.lwjgl.opengl.GL11;
+
 import net.minecraft.client.gui.FontRenderer;
 import factorization.shared.NORELEASE;
 
@@ -32,22 +34,9 @@ public class WordPage extends AbstractPage {
     }
     
     void nl() {
-        if (!text.isEmpty()) {
-            ArrayList<Word> last = text.get(text.size() - 1);
-            while (!last.isEmpty()) {
-                Word l = last.get(last.size() - 1);
-                if (l instanceof TextWord) {
-                    TextWord tw = (TextWord) l;
-                    if (tw.text.trim().length() == 0) {
-                        last.remove(last.size() - 1);
-                    }
-                }
-                break;
-            }
-        }
         ArrayList newLine = new ArrayList();
+        newLine.add(new TextWord("", null));
         text.add(newLine);
-        newLine.add(new TextWord("|", null));
         lineLen = 0;
     }
     

@@ -15,7 +15,7 @@ import net.minecraft.util.ResourceLocation;
 public class ClientTypesetter extends AbstractTypesetter {
 
     public ClientTypesetter(FontRenderer font, int pageWidth, int pageHeight) {
-        super(font, pageWidth, pageHeight);
+        super(font, pageWidth, pageHeight - WordPage.TEXT_HEIGHT * 2);
     }
 
     @Override

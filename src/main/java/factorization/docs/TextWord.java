@@ -37,11 +37,11 @@ public class TextWord extends Word {
     
     @Override
     public int getPaddingAbove() {
-        return 1;
+        return 2;
     }
     
     @Override
     public int getPaddingBelow() {
-        return WordPage.TEXT_HEIGHT + 1;
+        return WordPage.TEXT_HEIGHT;
     }
 }

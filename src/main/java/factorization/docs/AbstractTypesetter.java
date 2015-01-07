@@ -112,7 +112,7 @@ public abstract class AbstractTypesetter {
             total_height += page.getPad(line, true) + page.getPad(line, false);
         }
         
-        if (total_height > pageHeight) {
+        if (total_height + w.getPaddingAbove() + w.getPaddingBelow() > pageHeight) {
             WordPage oldPage = page;
             ArrayList<Word> oldSeg = segmentStart;
             page = newPage();
