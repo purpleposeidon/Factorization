@@ -1,9 +1,9 @@
 package factorization.fzds;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
-import scala.actors.threadpool.Arrays;
 import net.minecraft.entity.EnumCreatureType;
 import net.minecraft.util.IProgressUpdate;
 import net.minecraft.world.ChunkPosition;

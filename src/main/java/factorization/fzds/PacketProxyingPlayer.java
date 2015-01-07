@@ -25,7 +25,6 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;
 import net.minecraft.world.chunk.Chunk;
-import scala.NotImplementedError;
 
 import com.mojang.authlib.GameProfile;
 
@@ -74,7 +73,7 @@ public class PacketProxyingPlayer extends EntityPlayerMP implements
         }
     };
     
-    static final Throwable generic_future_failure = new NotImplementedError("Sorry!");
+    static final Throwable generic_future_failure = new UnsupportedOperationException("Sorry!");
     
     class WrappedMulticastHandler extends ChannelOutboundHandlerAdapter implements IFzdsShenanigans {
         @Override
