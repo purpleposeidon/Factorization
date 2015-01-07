@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.EnumSet;
 
-import sun.util.locale.provider.AvailableLanguageTags;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.boss.IBossDisplayData;
 import net.minecraft.util.ChatComponentTranslation;
@@ -20,8 +19,6 @@ import factorization.api.datahelpers.Share;
 import factorization.fzds.interfaces.DeltaCapability;
 import factorization.fzds.interfaces.IDeltaChunk;
 import factorization.fzds.interfaces.Interpolation;
-import factorization.notify.Notice;
-import factorization.notify.Style;
 import factorization.shared.Core;
 import factorization.shared.EntityFz;
 import factorization.shared.NORELEASE;

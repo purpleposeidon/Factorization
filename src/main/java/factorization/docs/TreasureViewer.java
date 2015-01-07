@@ -21,7 +21,7 @@ public class TreasureViewer implements IDocGenerator {
             ArrayList<WeightedRandomChestContent> content = ReflectionHelper.<ArrayList<WeightedRandomChestContent>, ChestGenHooks>getPrivateValue(ChestGenHooks.class, hook, "contents");
             if (content == null || content.isEmpty()) continue;
             content = new ArrayList(content);
-            content.sort(new Comparator<WeightedRandomChestContent>() {
+            Collections.sort(content, new Comparator<WeightedRandomChestContent>() {
                 @Override
                 public int compare(WeightedRandomChestContent a, WeightedRandomChestContent b) {
                     return b.itemWeight - a.itemWeight;
