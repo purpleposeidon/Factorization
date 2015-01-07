@@ -183,7 +183,7 @@ public class Registry {
         class NotchBlock extends Block { public NotchBlock(Material honestly) { super(honestly); } }
         fractured_bedrock_block = new NotchBlock(Material.rock).setBlockUnbreakable().setResistance(6000000).setBlockName("bedrock").setBlockTextureName("bedrock").setCreativeTab(Core.tabFactorization);
         colossal_block = new ColossalBlock();
-        gargantuan_block = new GargantuanBlock();
+        gargantuan_block = new GargantuanBlock().setBlockName("factorization:gargantuanBrick").setCreativeTab(Core.tabFactorization);
         
         GameRegistry.registerBlock(factory_block, ItemFactorizationBlock.class, "FzBlock");
         GameRegistry.registerBlock(lightair_block, "Lightair");
@@ -1054,6 +1054,12 @@ public class Registry {
                 Items.diamond,
                 Items.diamond,
                 logicMatrixProgrammer);
+        recipe(new ItemStack(gargantuan_block),
+                "#",
+                "#",
+                "F",
+                '#', Blocks.stone,
+                'F', Blocks.fire);
     }
     
     private void makeServoRecipes() {
