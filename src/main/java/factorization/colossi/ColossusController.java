@@ -467,7 +467,7 @@ public class ColossusController extends EntityFz implements IBossDisplayData {
                 // Merely hard-wire the forgetting
                 switch (learned) {
                 default: break;
-                case HAMMAR: toRemove.add(Technique.BOW); break;
+                case HAMMER: toRemove.add(Technique.BOW); break;
                 }
             }
             locked.remove(learned);

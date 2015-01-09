@@ -220,7 +220,7 @@ public enum Technique implements IStateMachine<Technique> {
         }
     },
     
-    HAMMAR {
+    HAMMER {
         @Override
         TechniqueKind getKind() {
             return OFFENSIVE;
@@ -238,7 +238,10 @@ public enum Technique implements IStateMachine<Technique> {
         
         @Override
         public Technique tick(ColossusController controller, int age) {
-            return this;
+            for (LimbInfo li : controller.limbs) {
+                if (li.isTurning()) return this;
+            }
+            return PICK_NEXT_TECHNIQUE;
         }
         
         @Override
