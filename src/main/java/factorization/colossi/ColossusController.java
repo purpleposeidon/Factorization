@@ -2,6 +2,7 @@ package factorization.colossi;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.EnumSet;
 
@@ -38,14 +39,22 @@ public class ColossusController extends EntityFz implements IBossDisplayData {
     private Coord home = null;
     private boolean been_hurt = false;
     
-    EnumSet<Technique> known = EnumSet.<Technique>of(Technique.INITIAL_BOW);
+    EnumSet<Technique> known = EnumSet.<Technique>of(Technique.BOW, Technique.SHRUG);
     EnumSet<Technique> locked = EnumSet.<Technique>complementOf(known);
+    {
+        for (Technique tech : Technique.values()) {
+            if (tech.getKind() == TechniqueKind.TRANSITION) {
+                locked.remove(tech);
+            }
+        }
+    }
     
     private Coord path_target = null;
     int turningDirection = 0;
     boolean target_changed = false;
     double walked = 0;
     int last_step_direction = -100;
+    BodySide spin_direction = BodySide.UNKNOWN_BODY_SIDE;
     
     transient int last_pos_hash = -1;
     double target_y = Double.NaN;
@@ -166,6 +175,7 @@ public class ColossusController extends EntityFz implements IBossDisplayData {
         target_y = data.as(Share.PRIVATE, "target_y").putDouble(target_y);
         last_step_direction = data.as(Share.PRIVATE, "last_step_direction").putInt(last_step_direction);
         been_hurt = data.as(Share.PRIVATE, "been_hurt").putBoolean(been_hurt);
+        spin_direction = data.as(Share.PRIVATE, "spin_dir").putEnum(spin_direction);
         
         known = putEnumSet(data, "known", known, Technique.class);
         locked = putEnumSet(data, "locked", locked, Technique.class);
@@ -473,6 +483,11 @@ public class ColossusController extends EntityFz implements IBossDisplayData {
             locked.remove(learned);
             known.add(learned);
             known.removeAll(toRemove);
+            String a = "";
+            for (Technique tech : known) {
+                a += " " + tech;
+            }
+            NORELEASE.println("Known:" + a);
         }
     }
     

@@ -29,7 +29,7 @@ public enum Technique implements IStateMachine<Technique> {
     STATE_MACHINE_ENTRY {
         @Override
         TechniqueKind getKind() {
-            return IDLER;
+            return TRANSITION;
         }
         
         @Override
@@ -51,6 +51,7 @@ public enum Technique implements IStateMachine<Technique> {
                 Core.logWarning("This colossus is brain-dead!? " + controller);
                 return DEATH_FALL;
             }
+            if (controller.getHealth() <= 0) return DEATH_FALL;
             boolean use_defense = controller.checkHurt(true);
             Collections.shuffle(avail);
             Technique chosen_offense = null;
@@ -70,6 +71,7 @@ public enum Technique implements IStateMachine<Technique> {
                 case IDLER:
                     chosen_idler = grade(chosen_idler, controller, tech);
                     break;
+                case TRANSITION: continue;
                 }
             }
             if (chosen_defense != null) return chosen_defense;
@@ -89,12 +91,7 @@ public enum Technique implements IStateMachine<Technique> {
     INITIAL_BOW {
         @Override
         TechniqueKind getKind() {
-            return OFFENSIVE;
-        }
-        
-        @Override
-        boolean usable(ColossusController controller) {
-            return false;
+            return TRANSITION;
         }
         
         @Override
@@ -194,6 +191,7 @@ public enum Technique implements IStateMachine<Technique> {
         @Override
         public Technique tick(ColossusController controller, int age) {
             if (controller.checkHurt(false)) return UNBOW;
+            if (age > 20 * 15) return UNBOW;
             return this;
         }
     },
@@ -201,7 +199,7 @@ public enum Technique implements IStateMachine<Technique> {
     UNBOW {
         @Override
         TechniqueKind getKind() {
-            return TechniqueKind.OFFENSIVE;
+            return TRANSITION;
         }
         
         @Override
@@ -213,10 +211,7 @@ public enum Technique implements IStateMachine<Technique> {
         
         @Override
         public Technique tick(ColossusController controller, int age) {
-            for (LimbInfo li : controller.limbs) {
-                if (li.isTurning()) return this;
-            }
-            return PICK_NEXT_TECHNIQUE;
+            return finishMove(controller);
         }
     },
     
@@ -228,7 +223,7 @@ public enum Technique implements IStateMachine<Technique> {
         
         @Override
         boolean usable(ColossusController controller) {
-            return true;
+            return false;
         }
         
         @Override
@@ -238,10 +233,7 @@ public enum Technique implements IStateMachine<Technique> {
         
         @Override
         public Technique tick(ColossusController controller, int age) {
-            for (LimbInfo li : controller.limbs) {
-                if (li.isTurning()) return this;
-            }
-            return PICK_NEXT_TECHNIQUE;
+            return finishMove(controller);
         }
         
         @Override
@@ -258,7 +250,7 @@ public enum Technique implements IStateMachine<Technique> {
         
         @Override
         boolean usable(ColossusController controller) {
-            return true;
+            return false;
         }
         
         @Override
@@ -285,7 +277,7 @@ public enum Technique implements IStateMachine<Technique> {
         
         @Override
         boolean usable(ColossusController controller) {
-            return true;
+            return false;
         }
         
         @Override
@@ -312,7 +304,7 @@ public enum Technique implements IStateMachine<Technique> {
         
         @Override
         boolean usable(ColossusController controller) {
-            return true;
+            return false;
         }
         
         @Override
@@ -338,10 +330,75 @@ public enum Technique implements IStateMachine<Technique> {
         }
     },
     
-    SPIN {
+    SPIN_WINDUP {
         @Override
         TechniqueKind getKind() {
             return DEFENSIVE;
+        }
+        
+        @Override
+        public void onEnterState(ColossusController controller, Technique prevState) {
+            // Hold arms to the $LEFT
+            BodySide side = controller.worldObj.rand.nextBoolean() ? BodySide.LEFT : BodySide.RIGHT;
+            controller.spin_direction = side;
+            for (LimbInfo li : controller.limbs) {
+                targetLimb(li, side);
+            }
+        }
+        
+        @Override
+        public Technique tick(ColossusController controller, int age) {
+            return finishMove(controller, SPIN_UNWIND);
+        }
+    },
+    
+    SPIN_UNWIND {
+        @Override
+        TechniqueKind getKind() {
+            return TRANSITION;
+        }
+        
+        @Override
+        public void onEnterState(ColossusController controller, Technique prevState) {
+            // Swing arms to the $RIGHT, extend a $LEFT leg, rapidly spin body
+            double d = controller.spin_direction == BodySide.RIGHT ? -1 : +1;
+            Quaternion bodyRot = controller.body.getRotation().multiply(Quaternion.getRotationQuaternionRadians(d * Math.PI, ForgeDirection.UP));
+            controller.bodyLimbInfo.target(bodyRot, 8, Interpolation.SMOOTHER);
+            
+            BodySide oppositeSide = controller.spin_direction == BodySide.LEFT ? BodySide.RIGHT : BodySide.LEFT;
+            for (LimbInfo li : controller.limbs) {
+                targetLimb(li, oppositeSide);
+            }
+            for (LimbInfo li : controller.limbs) {
+                if (li.type == LimbType.LEG && li.side == controller.spin_direction) {
+                    Quaternion rot = Quaternion.getRotationQuaternionRadians(d * Math.PI / 2, ForgeDirection.EAST);
+                    rot.incrMultiply(controller.body.getOrderedRotationTarget());
+                    li.target(rot, 3, Interpolation.SMOOTH);
+                    break; // Only lift 1 leg if not bipedal
+                }
+            }
+        }
+        
+        @Override
+        public Technique tick(ColossusController controller, int age) {
+            return finishMove(controller, SPIN_RESET);
+        }
+    },
+    
+    SPIN_RESET {
+        @Override
+        TechniqueKind getKind() {
+            return TRANSITION;
+        }
+        
+        @Override
+        public void onEnterState(ColossusController controller, Technique prevState) {
+            STAND_STILL.onEnterState(controller, prevState);
+        }
+        
+        @Override
+        public Technique tick(ColossusController controller, int age) {
+            return finishMove(controller);
         }
     },
     
@@ -349,6 +406,40 @@ public enum Technique implements IStateMachine<Technique> {
         @Override
         TechniqueKind getKind() {
             return DEFENSIVE;
+        }
+        
+        @Override
+        public void onEnterState(ColossusController controller, Technique prevState) {
+            for (LimbInfo li : controller.limbs) {
+                IDeltaChunk idc = li.idc.getEntity();
+                if (idc == null) continue;
+                if (li.type != LimbType.ARM) continue;
+                double angle = (li.side == BodySide.RIGHT ? -1 : +1) * Math.toRadians(90 + 45);
+                Quaternion rot = Quaternion.getRotationQuaternionRadians(angle, ForgeDirection.EAST);
+                li.target(rot, 3, Interpolation.SMOOTH);
+            }
+        }
+        
+        @Override
+        public Technique tick(ColossusController controller, int age) {
+            return finishMove(controller, UNSHRUG);
+        }
+    },
+    
+    UNSHRUG {
+        @Override
+        TechniqueKind getKind() {
+            return TRANSITION;
+        }
+        
+        @Override
+        public void onEnterState(ColossusController controller, Technique prevState) {
+            STAND_STILL.onEnterState(controller, prevState);
+        }
+        
+        @Override
+        public Technique tick(ColossusController controller, int age) {
+            return finishMove(controller);
         }
     },
     
@@ -360,7 +451,22 @@ public enum Technique implements IStateMachine<Technique> {
         
         @Override
         public Technique tick(ColossusController controller, int age) {
+            if (controller.atTarget()) return PICK_NEXT_TECHNIQUE;
             return this;
+        }
+        
+        @Override
+        public void onEnterState(ColossusController controller, Technique prevState) {
+            double range = (WorldGenColossus.SMOOTH_START + WorldGenColossus.SMOOTH_END)/2;
+            Coord target = controller.getHome().copy();
+            double dx = rng(controller) * range;
+            double dz = rng(controller) * range;
+            target = target.add((int) dx, 0, (int) dz);
+            controller.setTarget(target);
+        }
+        
+        double rng(ColossusController controller) {
+            return controller.worldObj.rand.nextDouble() * 2 - 1;
         }
     },
     
@@ -375,12 +481,12 @@ public enum Technique implements IStateMachine<Technique> {
             for (LimbInfo li : controller.limbs) {
                 li.target(controller.body.getRotation(), 1);
             }
-            super.onEnterState(controller, prevState);
         }
         
         @Override
         public Technique tick(ColossusController controller, int age) {
-            if (age > 20 * 20) return PICK_NEXT_TECHNIQUE;
+            if (age > 20 * 15) return PICK_NEXT_TECHNIQUE;
+            if (controller.checkHurt(false)) return PICK_NEXT_TECHNIQUE;
             return this;
         }
     },
@@ -417,7 +523,7 @@ public enum Technique implements IStateMachine<Technique> {
 
         @Override
         TechniqueKind getKind() {
-            return IDLER;
+            return TRANSITION;
         }
     },
     
@@ -493,7 +599,7 @@ public enum Technique implements IStateMachine<Technique> {
         
         @Override
         TechniqueKind getKind() {
-            return IDLER;
+            return TRANSITION;
         }
         
     },
@@ -560,7 +666,7 @@ public enum Technique implements IStateMachine<Technique> {
         
         @Override
         TechniqueKind getKind() {
-            return IDLER;
+            return TRANSITION;
         }
     }
     
@@ -585,4 +691,31 @@ public enum Technique implements IStateMachine<Technique> {
     
     static final double bow_power = 0.1;
     static final Interpolation bendInterp = Interpolation.LINEAR; // SMOOTH could work; playing it safe tho
+    
+    protected Technique finishMove(ColossusController controller, Technique next) {
+        for (LimbInfo li : controller.limbs) {
+            if (li.isTurning()) return this;
+        }
+        return next;
+    }
+    
+    protected Technique finishMove(ColossusController controller) {
+        return finishMove(controller, PICK_NEXT_TECHNIQUE);
+    }
+    
+    protected void targetLimb(LimbInfo li, BodySide side) {
+        if (li.type != LimbType.ARM) return;
+        double d = side == BodySide.RIGHT ? -1 : +1;
+        Quaternion rot = Quaternion.getRotationQuaternionRadians(d * Math.PI / 2, ForgeDirection.EAST);
+        double turn;
+        if (li.side == side) {
+            // Arm goes towards back
+            turn = Math.toRadians(45) * -d;
+        } else {
+            // Arm goes towards front
+            turn = Math.toRadians(90 + 45) * -d;
+        }
+        rot.incrMultiply(Quaternion.getRotationQuaternionRadians(turn, ForgeDirection.UP));
+        li.target(rot, 3, Interpolation.SMOOTH);
+    }
 }
