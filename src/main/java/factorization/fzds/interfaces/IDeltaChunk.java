@@ -83,6 +83,8 @@ public abstract class IDeltaChunk extends EntityFz {
     
     public abstract void cancelOrderedRotation();
     
+    public abstract Quaternion getOrderedRotationTarget();
+    
     
     
     /***

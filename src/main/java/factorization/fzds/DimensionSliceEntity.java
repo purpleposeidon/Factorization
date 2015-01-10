@@ -1175,6 +1175,11 @@ public class DimensionSliceEntity extends IDeltaChunk implements IFzdsEntryContr
     }
     
     @Override
+    public Quaternion getOrderedRotationTarget() {
+        return rotationEnd;
+    }
+    
+    @Override
     public Vec3 getRotationalCenterOffset() {
         return centerOffset;
     }
