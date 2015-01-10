@@ -11,16 +11,10 @@ import java.util.Random;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockSlab;
 import net.minecraft.block.BlockStairs;
-import net.minecraft.block.material.Material;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.OpenGlHelper;
-import net.minecraft.client.renderer.RenderBlocks;
-import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.texture.IIconRegister;
 import net.minecraft.client.resources.I18n;
-import net.minecraft.client.shader.ShaderManager;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.item.Item;
@@ -32,24 +26,20 @@ import net.minecraft.util.IIcon;
 import net.minecraft.util.MovingObjectPosition;
 import net.minecraft.util.MovingObjectPosition.MovingObjectType;
 import net.minecraft.world.World;
-import net.minecraftforge.client.event.RenderWorldLastEvent;
 import net.minecraftforge.common.util.ForgeDirection;
 import net.minecraftforge.event.world.BlockEvent.BreakEvent;
 
 import org.apache.commons.lang3.ArrayUtils;
-import org.lwjgl.opengl.GL11;
 
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import cpw.mods.fml.common.network.internal.FMLProxyPacket;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import factorization.api.Coord;
-import factorization.common.BlockIcons;
 import factorization.common.Command;
 import factorization.common.ItemIcons;
 import factorization.coremodhooks.HandleAttackKeyEvent;
 import factorization.coremodhooks.HandleUseKeyEvent;
-import factorization.shared.BlockRenderHelper;
 import factorization.shared.Core;
 import factorization.shared.Core.TabType;
 import factorization.shared.DropCaptureHandler;
@@ -128,10 +118,13 @@ public class ItemGoo extends ItemFactorization {
     }
     
     public void executeCommand(Command command, EntityPlayerMP player) {
+        ItemStack held = player.getHeldItem();
+        if (command == Command.gooSelectNone) {
+            trySelectNone(player, held);
+            return;
+        }
         MovingObjectPosition mop = getMovingObjectPositionFromPlayer(player.worldObj, player, false);
         if (mop == null || mop.typeOfHit != MovingObjectPosition.MovingObjectType.BLOCK) return;
-        
-        ItemStack held = player.getHeldItem();
         
         for (int slot = 0; slot < 9; slot++) {
             ItemStack is = player.inventory.getStackInSlot(slot);
@@ -231,7 +224,15 @@ public class ItemGoo extends ItemFactorization {
         return offset == 0 || i == x;
     }
     
+    boolean similarBlocks(Coord a, Coord b) {
+        if (a.getBlock() == b.getBlock()) return true;
+        ItemStack ais = a.getBrokenBlock();
+        if (ais == null) return false;
+        return FzUtil.identical(ais, b.getBrokenBlock());
+    }
+    
     private void expandSelection(ItemStack is, GooData data, EntityPlayer player, World world, int x, int y, int z, ForgeDirection dir) {
+        Coord src = new Coord(world, x, y, z);
         HashSet<Coord> found = new HashSet();
         for (int i = 0; i < data.coords.length; i += 3) {
             int ix = data.coords[i + 0];
@@ -241,13 +242,11 @@ public class ItemGoo extends ItemFactorization {
                 Coord at = new Coord(world, ix, iy, iz);
                 Coord adj = at.add(dir);
                 if (adj.isSolid() || adj.isSolidOnSide(dir.getOpposite())) continue;
-                Block atBlock = at.getBlock();
-                ItemStack atDrop = at.getBrokenBlock();
+                if (!similarBlocks(src, at)) continue;
                 for (ForgeDirection fd : ForgeDirection.VALID_DIRECTIONS) {
                     if (fd == dir || fd == dir.getOpposite()) continue;
                     Coord n = at.add(fd);
-                    Block nBlock = n.getBlock();
-                    if (atBlock == nBlock && (atDrop == null || FzUtil.couldMerge(atDrop, n.getBrokenBlock())) && !n.add(dir).isSolid()) {
+                    if (similarBlocks(at, n)) {
                         Coord nadj = n.add(dir);
                         if (nadj.isSolidOnSide(dir.getOpposite())) continue;
                         if (nadj.getBlock() instanceof BlockSlab && (nadj.getMd() & 8) == 0) {
@@ -287,6 +286,9 @@ public class ItemGoo extends ItemFactorization {
             use[i * 3 + 2] = c.z;
         }
         is.stackSize -= count;
+        if (player.capabilities.isCreativeMode) {
+            is.stackSize = Math.max(1, is.stackSize);
+        }
         data.coords = ArrayUtils.addAll(data.coords, use);
         data.markDirty();
     }
@@ -541,16 +543,63 @@ public class ItemGoo extends ItemFactorization {
         }
     }
     
+    private boolean trySelectNone(EntityPlayer player, ItemStack is) {
+        if (is == null || !(is.getItem() instanceof ItemGoo)) return false;
+        GooData data = GooData.getNullGooData(is, player.worldObj);
+        if (data == null) return false;
+        if (player.worldObj.isRemote) {
+            return true;
+        }
+        int deployed_goo = data.coords.length / 3;
+        data.wipe(is, player.worldObj);
+        is.stackSize += deployed_goo;
+        is.stackSize = Math.min(is.stackSize, maxStackSize);
+        return true;
+    }
+    
+    long break_prevention = 0;
+    int goo_recently_clicked_index = -1;
+    
     @SubscribeEvent
     @SideOnly(Side.CLIENT)
     public void interceptGooBreak(HandleAttackKeyEvent event) {
         Minecraft mc = Minecraft.getMinecraft();
         MovingObjectPosition mop = mc.objectMouseOver;
         EntityPlayer player = mc.thePlayer;
+        if (break_prevention > 0) {
+            if (break_prevention > System.currentTimeMillis()) {
+                if (goo_recently_clicked_index == idOfHeld(player) && !player.isSneaking()) {
+                    Command.gooSelectNone.call(player);
+                    goo_recently_clicked_index = -1;
+                }
+                event.setCanceled(true);
+                delayBreak();
+                return;
+            }
+            break_prevention = 0;
+        }
+        ItemStack held = player.getHeldItem();
+        if (held != null && (held.getItem() instanceof ItemTool || !held.getItem().getToolClasses(held).isEmpty())) return;
         if (gooHilighted(player, mop)) {
             Command.gooLeftClick.call(player);
             event.setCanceled(true);
+            delayBreak();
+            goo_recently_clicked_index = idOfHeld(player);
         }
+    }
+    
+    private int idOfHeld(EntityPlayer player) {
+        if (player == null) return -1;
+        GooData gd = GooData.getNullGooData(player.getHeldItem(), player.worldObj);
+        if (gd == null) return -1;
+        return player.getHeldItem().getItemDamage();
+    }
+    
+    private void delayBreak() {
+        int delay = 450;
+        Minecraft mc = Minecraft.getMinecraft();
+        break_prevention = System.currentTimeMillis() + delay;
+        mc.leftClickCounter = delay;
     }
     
     

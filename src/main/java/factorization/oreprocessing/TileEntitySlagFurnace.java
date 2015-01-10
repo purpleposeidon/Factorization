@@ -285,7 +285,6 @@ public class TileEntitySlagFurnace extends TileEntityFactorization {
         public static void register(Object o_input, float prob1, Object o_output1, float prob2,
                 Object o_output2) {
             ItemStack input = obj2is(o_input), output1 = obj2is(o_output1), output2 = obj2is(o_output2);
-            input = ItemStack.copyItemStack(input);
             input.stackSize = 1;
             SmeltingResult value = new SmeltingResult(input, prob1, output1, prob2, output2);
             smeltingResults.add(value);
@@ -293,7 +292,7 @@ public class TileEntitySlagFurnace extends TileEntityFactorization {
 
         static ItemStack obj2is(Object o) {
             if (o instanceof ItemStack) {
-                return (ItemStack) o;
+                return ItemStack.copyItemStack((ItemStack) o);
             }
             if (o instanceof Block) {
                 Block b = (Block) o;

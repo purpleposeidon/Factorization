@@ -66,8 +66,8 @@ public class GooData extends WorldSavedData {
         coords = new int[0];
         dimensionId = 0;
         if (!is.hasDisplayName()) {
-            is.setItemDamage(0);
             deleteDataFile(world);
+            is.setItemDamage(0);
         } else {
             markDirty();
         }
@@ -82,7 +82,12 @@ public class GooData extends WorldSavedData {
     static GooData getGooData(ItemStack is, World world) {
         GooData data = (GooData) world.loadItemData(GooData.class, getGooName(is));
         if (data == null && !world.isRemote) {
-            is.setItemDamage(world.getUniqueDataId(fz_goo));
+            int unique_id = world.getUniqueDataId(fz_goo);
+            if (unique_id == 0) {
+                // '0' conflicts with the empty ID, so skip it
+                unique_id = world.getUniqueDataId(fz_goo);
+            }
+            is.setItemDamage(unique_id);
             String name = getGooName(is);
             data = new GooData(name);
             data.markDirty();
@@ -92,6 +97,9 @@ public class GooData extends WorldSavedData {
     }
     
     static GooData getNullGooData(ItemStack is, World world) {
+        if (is == null) return null;
+        if (!(is.getItem() instanceof ItemGoo)) return null;
+        if (is.getItemDamage() == 0) return null;
         return (GooData) world.loadItemData(GooData.class, getGooName(is));
     }
     

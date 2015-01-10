@@ -393,11 +393,11 @@ public class Registry {
         postMakeItems();
     }
 
-    public void recipe(ItemStack res, Object... params) {
+    public void vanillaRecipe(ItemStack res, Object... params) {
         GameRegistry.addRecipe(res, params);
     }
 
-    public void shapelessRecipe(ItemStack res, Object... params) {
+    public void vanillaShapelessRecipe(ItemStack res, Object... params) {
         if (res == null) {
             return;
         }
@@ -441,31 +441,33 @@ public class Registry {
                 params[i] = "stone";
             } else if (params[i] == Items.stick) {
                 params[i] = "stickWood";
+            } else if (params[i] == dark_iron) {
+                params[i] = "ingotFzDarkIron";
             }
         }
     }
 
     public void makeRecipes() {
-        recipe(FzUtil.nameItemStack(new ItemStack(Blocks.double_stone_slab), "Double Half Slab"),
+        vanillaRecipe(FzUtil.nameItemStack(new ItemStack(Blocks.double_stone_slab), "Double Half Slab"),
                 "-",
                 "-",
                 '-', new ItemStack(Blocks.stone_slab));
-        recipe(FzUtil.nameItemStack(new ItemStack(Blocks.double_stone_slab, 2, 8), "Flat Stone"),
+        vanillaRecipe(FzUtil.nameItemStack(new ItemStack(Blocks.double_stone_slab, 2, 8), "Flat Stone"),
                 "##",
                 "##",
                 '#', new ItemStack(Blocks.stone_slab));
-        recipe(FzUtil.nameItemStack(new ItemStack(Blocks.double_stone_slab, 2, 9), "Flat Sandstone"),
+        vanillaRecipe(FzUtil.nameItemStack(new ItemStack(Blocks.double_stone_slab, 2, 9), "Flat Sandstone"),
                 "#",
                 "#",
                 '#', new ItemStack(Blocks.sandstone, 1, 2));
-        shapelessRecipe(FzUtil.nameItemStack(new ItemStack(Blocks.dirt, 4, 1), "Dry Dirt"),
+        vanillaShapelessRecipe(FzUtil.nameItemStack(new ItemStack(Blocks.dirt, 4, 1), "Dry Dirt"),
                 Blocks.dirt,
                 Blocks.dirt,
                 Blocks.dirt,
                 Blocks.dirt);
         
-        shapelessRecipe(new ItemStack(dark_iron, 9), dark_iron_block_item);
-        recipe(dark_iron_block_item,
+        shapelessOreRecipe(new ItemStack(dark_iron, 9), dark_iron_block_item);
+        oreRecipe(dark_iron_block_item,
                 "III",
                 "III",
                 "III",
@@ -478,7 +480,7 @@ public class Registry {
                 '#', Blocks.crafting_table,
                 '|', Items.stick);
 
-        recipe(new ItemStack(logicMatrixIdentifier),
+        oreRecipe(new ItemStack(logicMatrixIdentifier),
                 "MiX",
                 'M', logicMatrix,
                 'i', Items.quartz,
@@ -490,12 +492,12 @@ public class Registry {
                 'i', "ingotSilver",
                 'X', logicMatrixProgrammer);
         GameRegistry.addSmelting(logicMatrixController, new ItemStack(logicMatrix), 0);
-        recipe(new ItemStack(logicMatrixProgrammer),
+        oreRecipe(new ItemStack(logicMatrixProgrammer),
                 "MiX",
                 'M', logicMatrix,
                 'i', dark_iron,
                 'X', logicMatrixProgrammer);
-        recipe(new ItemStack(logicMatrixProgrammer),
+        oreRecipe(new ItemStack(logicMatrixProgrammer),
                 "DSI",
                 " #>",
                 "BSI",
@@ -524,8 +526,8 @@ public class Registry {
         TileEntityCrystallizer.addRecipe(new ItemStack(Blocks.redstone_block), new ItemStack(logicMatrix), 1, Core.registry.aqua_regia);
 
         //Resources
-        recipe(new ItemStack(lead_ingot, 9), "#", '#', lead_block_item);
-        recipe(new ItemStack(silver_ingot, 9), "#", '#', silver_block_item);
+        oreRecipe(new ItemStack(lead_ingot, 9), "#", '#', lead_block_item);
+        oreRecipe(new ItemStack(silver_ingot, 9), "#", '#', silver_block_item);
         oreRecipe(lead_block_item, "###", "###", "###", '#', "ingotLead");
         oreRecipe(silver_block_item, "###", "###", "###", '#', "ingotSilver");
         FurnaceRecipes.smelting().func_151394_a(new ItemStack(resource_block, 1, ResourceType.SILVERORE.md), new ItemStack(silver_ingot), 0.3F);
@@ -772,7 +774,7 @@ public class Registry {
                 'W', diamond_shard);
 
         //Slag furnace
-        recipe(slagfurnace_item,
+        oreRecipe(slagfurnace_item,
                 "CFC",
                 "C C",
                 "CFC",
@@ -793,23 +795,23 @@ public class Registry {
         //Electricity
 
         
-        shapelessRecipe(sulfuric_acid, Items.gunpowder, Items.gunpowder, Items.coal, Items.potionitem);
+        shapelessOreRecipe(sulfuric_acid, Items.gunpowder, Items.gunpowder, Items.coal, Items.potionitem);
         shapelessOreRecipe(sulfuric_acid, "dustSulfur", Items.coal, Items.potionitem);
-        shapelessRecipe(aqua_regia, sulfuric_acid, nether_powder, Items.fire_charge);
-        shapelessRecipe(aqua_regia, sulfuric_acid, Items.blaze_powder, Items.fire_charge); //I'd kind of like this to be a recipe for a different — but compatible — aqua regia. 
-        recipe(new ItemStack(fan),
+        shapelessOreRecipe(aqua_regia, sulfuric_acid, nether_powder, Items.fire_charge);
+        shapelessOreRecipe(aqua_regia, sulfuric_acid, Items.blaze_powder, Items.fire_charge); //I'd kind of like this to be a recipe for a different — but compatible — aqua regia. 
+        oreRecipe(new ItemStack(fan),
                 "I I",
                 " - ",
                 "I I",
                 'I', Items.iron_ingot,
                 '-', Blocks.heavy_weighted_pressure_plate);
-        recipe(new ItemStack(corkscrew),
+        oreRecipe(new ItemStack(corkscrew),
                 " |-",
                 "-| ",
                 " |-",
                 '|', Items.iron_ingot,
                 '-', Blocks.heavy_weighted_pressure_plate);
-        recipe(new ItemStack(giant_scissors),
+        oreRecipe(new ItemStack(giant_scissors),
                 "I I",
                 " S ",
                 "P P",
@@ -817,7 +819,7 @@ public class Registry {
                 'S', Items.shears,
                 'I', Items.iron_sword);
         if (FzConfig.enable_solar_steam) {
-            recipe(solarboiler_item,
+            oreRecipe(solarboiler_item,
                     "I#I",
                     "I I",
                     "III",
@@ -900,7 +902,7 @@ public class Registry {
         oreRecipe(with_8,
                 "LLL",
                 'L', "ingotLead");
-        recipe(new ItemStack(diamond_cutting_head),
+        oreRecipe(new ItemStack(diamond_cutting_head),
                 "SSS",
                 "S-S",
                 "SSS",
@@ -987,11 +989,11 @@ public class Registry {
         //Rocketry
         TileEntityGrinder.addRecipe(new ItemStack(Blocks.netherrack), new ItemStack(nether_powder, 1), 1);
         if (FzConfig.enable_rocketry) {
-            shapelessRecipe(new ItemStack(rocket_fuel, 9),
+            shapelessOreRecipe(new ItemStack(rocket_fuel, 9),
                     nether_powder, nether_powder, nether_powder,
                     nether_powder, Items.fire_charge, nether_powder,
                     nether_powder, nether_powder, nether_powder);
-            recipe(new ItemStack(rocket_engine),
+            oreRecipe(new ItemStack(rocket_engine),
                     "#F#",
                     "#I#",
                     "I I",
@@ -1035,13 +1037,13 @@ public class Registry {
                 '#', instruction_plate,
                 'T', Items.sign);
         GameRegistry.addSmelting(servo_widget_instruction, new ItemStack(instruction_plate), 0);
-        recipe(new ItemStack(docbook),
+        oreRecipe(new ItemStack(docbook),
                 "B~>",
                 'B', Items.book,
                 '~', new ItemStack(Items.dye, 1, 0), // The book says "ink sac", so you'll have to use an actual ink sac.
                 '>', logicMatrixProgrammer);
         ItemStack tons_of_bonemeal = new ItemStack(Items.dye, 12 /* stacksize */, 15 /* damage value for bonemeal */);
-        recipe(tons_of_bonemeal,
+        oreRecipe(tons_of_bonemeal,
                 "MSH",
                 "nXn",
                 'M', Blocks.melon_block,
@@ -1049,12 +1051,12 @@ public class Registry {
                 'H', Blocks.hay_block,
                 'n', Items.nether_wart,
                 'X', Items.bone);
-        shapelessRecipe(new ItemStack(utiligoo, 32), // NORELEASE: Temporary recipe!
+        shapelessOreRecipe(new ItemStack(utiligoo, 32), // NORELEASE: Temporary recipe!
                 Blocks.red_mushroom,
                 Items.diamond,
                 Items.diamond,
                 logicMatrixProgrammer);
-        recipe(new ItemStack(gargantuan_block),
+        vanillaRecipe(new ItemStack(gargantuan_block),
                 "#",
                 "#",
                 "F",

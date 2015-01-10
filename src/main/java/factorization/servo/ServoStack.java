@@ -110,7 +110,7 @@ public class ServoStack implements IDataSerializable, Iterable {
                 it.remove();
                 continue;
             }
-            if (o.getClass() == eClass) {
+            if (o.getClass() == eClass || eClass.isInstance(o)) {
                 if (remove) {
                     executioner.stacks_changed = true;
                     it.remove();

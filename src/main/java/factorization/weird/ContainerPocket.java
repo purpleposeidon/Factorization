@@ -14,6 +14,7 @@ import net.minecraft.inventory.Slot;
 import net.minecraft.inventory.SlotCrafting;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.CraftingManager;
+import net.minecraft.item.crafting.IRecipe;
 import net.minecraft.world.World;
 import factorization.common.Command;
 import factorization.shared.Core;
@@ -35,6 +36,7 @@ public class ContainerPocket extends Container {
     ItemStack fake_is;
     
     boolean isCrafting = false;
+    boolean dirty = false;
 
     public ContainerPocket(EntityPlayer player) {
         this.player = player;
@@ -115,6 +117,12 @@ public class ContainerPocket extends Container {
         int remapSlotId(int i) {
             return i;
         }
+        
+        boolean isCraftingArea(int slot) {
+            if (slot < 8) return false;
+            int col = slot % 9;
+            return col < 6;
+        }
 
         @Override
         public int getSizeInventory() {
@@ -129,7 +137,9 @@ public class ContainerPocket extends Container {
         @Override
         public ItemStack decrStackSize(int var1, int var2) {
             ItemStack ret = src.decrStackSize(remapSlotId(var1), var2);
-            updateCraft();
+            if (!isCrafting && isCraftingArea(var1)) {
+                updateCraft();
+            }
             return ret;
         }
 
@@ -141,7 +151,7 @@ public class ContainerPocket extends Container {
         @Override
         public void setInventorySlotContents(int var1, ItemStack var2) {
             src.setInventorySlotContents(remapSlotId(var1), var2);
-            if (!isCrafting) {
+            if (!isCrafting && isCraftingArea(var1)) {
                 updateCraft();
             }
         }
@@ -201,16 +211,36 @@ public class ContainerPocket extends Container {
 
     public void updateCraft() {
         if (isWorking) {
+            dirty = true;
             return;
-        }
+        } 
         updateMatrix();
-        ItemStack result = CraftingManager.getInstance().findMatchingRecipe(craftMatrix, world);
+        ItemStack result = null;
+        IRecipe match = FzUtil.findMatchingRecipe(craftMatrix, world);
+        if (match != null) {
+            result = match.getCraftingResult(craftMatrix);
+        }
         craftResult.setInventorySlotContents(0, result);
+        dirty = false;
+    }
+    
+    @Override
+    public void putStacksInSlots(ItemStack[] stacks) {
+        isWorking = true;
+        super.putStacksInSlots(stacks);
+        isWorking = false;
     }
     
     @Override
     public void onCraftMatrixChanged(IInventory inv) {
         super.onCraftMatrixChanged(inv);
+    }
+    
+    @Override
+    public void detectAndSendChanges() {
+        if (!isCrafting) {
+            super.detectAndSendChanges();
+        }
     }
 
     
@@ -496,7 +526,13 @@ public class ContainerPocket extends Container {
                 bad_news = true;
             }
         }
-        if (!bad_news) return super.slotClick(slotId, clickedButton, mode, player);
+        if (!bad_news) {
+            ItemStack ret = super.slotClick(slotId, clickedButton, mode, player);
+            if (dirty) {
+                updateCraft();
+            }
+            return ret;
+        }
         final InventoryPlayer realInventory = player.inventory;
         
         try {
@@ -527,6 +563,9 @@ public class ContainerPocket extends Container {
             return null;
         } finally {
             player.inventory = realInventory;
+            if (dirty) {
+                updateCraft();
+            }
         }
         // (Could we just verify the crafting recipe instead of this nosense? Might not actually be possible. But if it is, it'd be less terrible.)
         

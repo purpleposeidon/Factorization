@@ -19,6 +19,7 @@ import net.minecraft.client.renderer.texture.TextureManager;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.init.Blocks;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.launchwrapper.Launch;
@@ -189,6 +190,7 @@ public class Core {
         for (FactoryType ft : FactoryType.values()) ft.getRepresentative(); // Make sure everyone's registered to the EVENT_BUS
         proxy.afterLoad();
         finished_loading = true;
+        Blocks.diamond_block.setHardness(5.0F).setResistance(10.0F);
         validateEnvironment();
     }
     

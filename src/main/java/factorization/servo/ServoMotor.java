@@ -334,6 +334,10 @@ public class ServoMotor extends Entity implements IEntityAdditionalSpawnData, IE
         return executioner.getInstructionStack();
     }
     
+    public ServoStack getEntryInstructionStack() {
+        return executioner.getEntryInstructionStack();
+    }
+    
     public void putError(Object error) {
         executioner.putError(error);
     }

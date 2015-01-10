@@ -59,7 +59,7 @@ public class Compare extends Instruction {
 
     @Override
     protected ItemStack getRecipeItem() {
-        return new ItemStack(Items.comparator);
+        return new ItemStack(Items.quartz);
     }
 
     @Override

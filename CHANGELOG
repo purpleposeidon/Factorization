@@ -1,3 +1,16 @@
+0.8.88.8
+  Add "Count Items" servo instruction. Counts the number of items the servo's holding.
+  Add "Read Redstone" servo instruction. Gets the redstone signal on the block the servo is pointing at.
+  Made goo less buggy in creative mode
+  Double-punch a gooey block while holding goo to deselect everything
+
+0.8.88.7
+  A copy of this changelog is now located INSIDE the mod itself! Whoah! It's like a whole new mod!
+  They told me not to feed the Greg. I fed the Greg. Hopefully there won't be any strange consequences?
+
+0.8.88.6
+  Hopefully made the pocket crafting table less laggy
+
 0.8.88.5
   Hopefully fixed AT verifier issues
 

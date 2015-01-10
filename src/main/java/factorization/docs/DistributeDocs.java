@@ -69,6 +69,7 @@ public class DistributeDocs {
             return;
         }
         StatisticsFile sfw = FzUtil.getStatsFile(player);
+        if (sfw == null) return;
         if (!sfw.hasAchievementUnlocked(AchievementList.diamonds)) {
             return;
         }

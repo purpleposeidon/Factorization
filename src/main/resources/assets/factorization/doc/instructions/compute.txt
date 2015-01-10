@@ -21,7 +21,37 @@ This controls what the servo does when it runs over instructions.
 \- \img{factorization:textures/blocks/servo/entry_write.png} Write from IO Stack: When the servo enters a new tile, a value will be popped from the IO stack and written to that tile. When it runs out of instructions, it will switch its action to Ignore.
 \- \img{factorization:textures/blocks/servo/entry_ignore.png} Ignore: Ignores all instructions.
 
-Note that this instruction is special in that it will execute even when the servo is Reading, Writing, or Ignoring.
+Note that Entry Action will execute even when the servo is reading, writing, or ignoring.
 \endseg
 
 
+\seg
+\nl\u{\#{item.factorization:servo/component.fz.instruction.repeatedInstruction} Repeat Instruction}
+
+This pops a value off of the stack, such as instruction read via Entry Action, and saves it as the "block entry instruction".
+The block entry instruction whenver the servo enters a new block.
+If Repeat Instruction called when an empty stack, or with "Repeat Instruction" on the top of the stack,
+then the block entry instruction will be cleared.
+A servo's block entry instruction can be seen by looking through an \lmp .
+\endseg
+
+
+\seg
+A typical use is to repeatedly invoke Socket Signal:
+
+[Servo Start]
+
+\#{item.factorization:servo/component.fz.instruction.entryaction} Entry Action: read to stack
+
+\#{item.factorization:servo/component.fz.instruction.socketCtrl} Socket Signal: pulse
+
+\#{item.factorization:servo/component.fz.instruction.entryaction} Entry Action: execute immediately
+
+\#{item.factorization:servo/component.fz.instruction.repeatedInstruction} Repeat Instruction
+
+\#{item.factorization:servo/component.fz.instruction.trap} Trap
+\endseg
+
+\topic{item.factorization:servo/component.fz.instruction.jmp}
+\topic{item.factorization:servo/component.fz.instruction.entryaction}
+\topic{item.factorization:servo/component.fz.instruction.repeatedInstruction}

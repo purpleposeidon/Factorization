@@ -3,9 +3,18 @@
 \h1{\#{item.factorization:servo/component.fz.instruction.pulse} Redstone Pulse}
 
 This causes a redstone pulse to be emitted from the servo rail.
-Note that this *can* cause nearby instructions to be temporarily disabled.
+Note that this \i{can} cause nearby instructions to be temporarily disabled.
 
-\seg
+\newpage
+\h1{\#{item.factorization:servo/component.fz.instruction.readredstone} Read Redstone}
+
+Measures the redstone power in the direction the servo is facing.
+If there is no signal, then it will push 0.
+If this instruction is laid on a servo rail, and it is receiving a direct redstone signal, then of course it will not work.
+To avoid this problem the signal must run along or underneath the servo rail.
+
+
+\newpage
 \h1{\#{item.factorization:servo/component.fz.instruction.socketCtrl} Socket Signal}
 
 This sends a redstone signal,
@@ -23,16 +32,22 @@ It has three modes:
 If a socket pulse is sent when Socket Powered is active,
 then the signal will flicker off.
 
-\endseg
+
+\newpage
+\h1{\#{item.factorization:servo/component.fz.instruction.countitems} Count Items}
+
+Counts how many items are held by the servo.
+This instruction can run without an item shifter installed.
+
 
 \newpage
 \h1{\#{item.factorization:servo/component.fz.instruction.shifterctrl} Item Shifter Control}
 
 This instruction modifies \link{itemshifter}{Item Shifter} settings.
-So, it only works if there's an item shifter installed on the servo.
+So of course it only works if there's an item shifter installed on the servo.
 
-There are several settings; most of them correspond to the \lmp\ configuration on the Item Shifter.
-Of note:
+There are several modes; most of them correspond to the \lmp\ configuration on the Item Shifter.
+Clicking on the instruction with an \lmp\ will cycle through the modes.
 
 \img{factorization:textures/blocks/servo/ctrl/shift_target_slot.png}
 Set Transfer Limit: reads an integer.
@@ -52,4 +67,9 @@ then it pushes -1.
 
 If the servo is holding no item, then it will count all items in the inventory.
 
+\topic{item.factorization:servo/component.fz.instruction.pulse}
+\topic{item.factorization:servo/component.fz.instruction.readredstone}
+\topic{item.factorization:servo/component.fz.instruction.socketCtrl}
+\topic{item.factorization:servo/component.fz.instruction.countitems}
+\topic{item.factorization:servo/component.fz.instruction.shifterctrl}
 

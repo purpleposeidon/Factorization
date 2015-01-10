@@ -27,7 +27,7 @@ public abstract class Instruction extends Decorator {
     
     @Override
     protected void addRecipes() {
-        Core.registry.recipe(toItem(),
+        Core.registry.oreRecipe(toItem(),
                 "I<#",
                 'I', getInstructionPlate(),
                 '<', getRecipeItem(),

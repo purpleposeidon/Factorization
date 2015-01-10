@@ -191,6 +191,7 @@ public class MiscellaneousNonsense {
     public float getTpsRatio() {
         //Yoink from GuiStatsComponent.updateStats
         MinecraftServer ms = MinecraftServer.getServer();
+        if (ms == null) return 1F;
         double ticks_time_ms = MathHelper.average(ms.tickTimeArray)*1.0E-6D;
         return (float) Math.min(expected_tick_time_ms/ticks_time_ms, 1);
     }
@@ -227,7 +228,6 @@ public class MiscellaneousNonsense {
     
     @SubscribeEvent
     public void playerLoggedIn(PlayerEvent.PlayerLoggedInEvent event) {
-        MinecraftServer ms = MinecraftServer.getServer();
         {
             // Give the first achievement, because it is stupid and nobody cares.
             // If you're using this mod, you've probably opened your inventory before anyways.
@@ -239,7 +239,8 @@ public class MiscellaneousNonsense {
             }
         }
         {
-            if (ms.getTickCounter() >= ms.tickTimeArray.length) {
+            MinecraftServer ms = MinecraftServer.getServer();
+            if (ms != null && ms.getTickCounter() >= ms.tickTimeArray.length) {
                 //Startup time is ignored; early birds will get a TPS packet soon enough
                 MiscNet.channel.sendTo(MiscNet.makeTpsReportPacket(getTpsRatio()), (EntityPlayerMP) event.player);
             }

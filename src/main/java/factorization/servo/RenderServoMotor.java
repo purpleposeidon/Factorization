@@ -360,6 +360,7 @@ public class RenderServoMotor extends RenderEntity {
         GL11.glScalef(scale, scale, scale);
         renderStack(motor.getArgStack(), scale, 0);
         renderStack(motor.getInstructionsStack(), scale, 1);
+        renderStack(motor.getEntryInstructionStack(), scale, 2);
         
         FzColor color = motor.motionHandler.color;
         if (color != FzColor.NO_COLOR) {
@@ -378,16 +379,19 @@ public class RenderServoMotor extends RenderEntity {
     }
     
     void renderStack(ServoStack ss, float scale, int i) {
-        //if (stack.getSize() == 0) return;
+        if (i != 0 && ss.getSize() == 0) return;
         GL11.glPushMatrix();
         GL11.glRotatef(180, 0, 0, 1);
         GL11.glTranslatef(0, -(0.9F)/scale, 0);
         int color = 0xFFFFCF;
         if (i == 0) {
-            GL11.glTranslatef(-16, 0, 0);
+            GL11.glTranslatef(0, 0, 0);
         } else if (i == 1) {
-            GL11.glTranslatef(16, 8*ss.getSize(), 0);
+            GL11.glTranslatef(-32, 8*ss.getSize(), 0);
             color = 0xCFFFCF;
+        } else if (i == 2) {
+            GL11.glTranslatef(32, 8*ss.getSize(), 0);
+            color = 0xEFEFEF;
         }
         if (renderStackWithColor(ss, color)) {
         }

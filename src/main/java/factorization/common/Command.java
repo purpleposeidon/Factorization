@@ -9,7 +9,7 @@ import factorization.weird.ContainerPocket;
 
 public enum Command {
     craftClear(2, true), craftSwirl(3, true), craftBalance(4, true), craftOpen(5, true), craftFill(11, true),
-    gooRightClick(12, false), gooLeftClick(13, false);
+    gooRightClick(12, false), gooLeftClick(13, false), gooSelectNone(14, false);
 
     static class name {
         static HashMap<Byte, Command> map = new HashMap<Byte, Command>();
@@ -71,6 +71,7 @@ public enum Command {
             break;
         case gooLeftClick:
         case gooRightClick:
+        case gooSelectNone:
             if (player instanceof EntityPlayerMP) {
                 Core.registry.utiligoo.executeCommand(this, (EntityPlayerMP) player);
             }

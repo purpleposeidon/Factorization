@@ -19,7 +19,7 @@ public class GlassServoGrate extends WoodenServoGrate {
     
     @Override
     protected void addRecipes() {
-        Core.registry.recipe(toItem(),
+        Core.registry.oreRecipe(toItem(),
                 " # ",
                 "#-#",
                 " # ",

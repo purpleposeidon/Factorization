@@ -38,7 +38,7 @@ public class FactorizationOreProcessingHandler {
         } catch (NullPointerException e) {
             e.printStackTrace();
         }
-        smeltingRegistry.func_151394_a(is, ingot, xp);
+        smeltingRegistry.func_151394_a(is.copy(), ingot.copy(), xp);
     }
     
     void addProcessingFront(OreType oreType, ItemStack ore, ItemStack ingot) {
