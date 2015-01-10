@@ -152,7 +152,7 @@ public class PumpLiquids extends SocketFanturpeller implements IFluidHandler {
         final ForgeDirection dir;
         public FoundFluidHandler(IFluidHandler te, ForgeDirection dir) {
             this.te = te;
-            this.dir = dir;
+            this.dir = dir.getOpposite();
         }
     }
     
