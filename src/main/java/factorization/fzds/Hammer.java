@@ -50,7 +50,6 @@ public class Hammer {
     public static HammerNet net;
     @SidedProxy(clientSide = "factorization.fzds.HammerClientProxy", serverSide = "factorization.fzds.HammerProxy")
     public static HammerProxy proxy;
-    public static boolean enabled;
     public static int dimensionID;
     public static World worldClient = null; //This is actually a WorldClient that is actually HammerClientProxy.HammerWorldClient
     public static double DSE_ChunkUpdateRangeSquared = Math.pow(16*8, 2); //This is actually set when the server starts
@@ -72,10 +71,8 @@ public class Hammer {
     @EventHandler
     public void setup(FMLPreInitializationEvent event) {
         event.getModMetadata().parent = Core.modId;
-        enabled = FzConfig.enable_dimension_slice;
-        if (!enabled) {
-            return;
-        }
+        File base = event.getSuggestedConfigurationFile().getParentFile();
+        hammerInfo.setConfigFile(new File(base, "hammerChannels.cfg"));
         
         int client_despawn_distance = 16*10; //NORELEASE: This wants for a config setting. "How far away the a client must be from a DSE before the server will tell the client to forget about it (eg, client side despawn)."
         EntityRegistry.registerModEntity(DimensionSliceEntity.class, "fzds", 1, this, client_despawn_distance, 1, true);
@@ -84,8 +81,6 @@ public class Hammer {
         dimensionID = FzConfig.dimension_slice_dimid;
         DimensionManager.registerProviderType(dimensionID, HammerWorldProvider.class, true);
         DimensionManager.registerDimension(dimensionID, dimensionID);
-        File base = event.getSuggestedConfigurationFile().getParentFile();
-        hammerInfo.setConfigFile(new File(base, "hammerChannels.cfg"));
         fzds_command_channel = hammerInfo.makeChannelFor(Core.modId, "fzdscmd", fzds_command_channel, -1, "This channel is used for Slices created using the /fzds command");
         FzdsPacketRegistry.init();
         
@@ -105,9 +100,6 @@ public class Hammer {
     
     @EventHandler
     public void serverStart(FMLServerStartingEvent event) {
-        if (!enabled) {
-            return;
-        }
         event.registerServerCommand(new FZDSCommand());
         DimensionManager.initDimension(dimensionID);
         if (!DimensionManager.shouldLoadSpawn(dimensionID)) {

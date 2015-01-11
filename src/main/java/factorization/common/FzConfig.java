@@ -1,8 +1,6 @@
 package factorization.common;
 
 import java.io.File;
-import java.util.regex.Pattern;
-import java.util.regex.PatternSyntaxException;
 
 import net.minecraftforge.common.config.Configuration;
 import net.minecraftforge.common.config.Property;
@@ -23,7 +21,6 @@ public class FzConfig {
     public static boolean gen_broken_bedrock = true;
     public static int silver_ore_node_new_size = 18;
     public static boolean gen_colossi = true;
-    public static boolean enable_dimension_slice = Core.dev_environ;
     public static int dimension_slice_dimid = -7;
     public static int force_max_entity_radius = -1;
     public static boolean pocket_craft_anywhere = true;
@@ -58,7 +55,7 @@ public class FzConfig {
     public static boolean players_discover_colossus_guides = true;
     public static boolean disable_endermen_griefing = false;
     public static boolean debug_fzds_collisions = false;
-    public static boolean enable_rocketry = /* Hey! If you're turning this on, remove stuff from factorization_dead_items */ enable_dimension_slice && Core.dev_environ;
+    public static boolean enable_rocketry = /* Hey! If you're turning this on, remove stuff from factorization_dead_items */ Core.dev_environ;
     public static boolean sockets_ignore_front_redstone = true;
     public static boolean show_time_on_fullscreen = true;
     
@@ -154,7 +151,6 @@ public class FzConfig {
             retrogen_dark_iron = getBoolConfig("retrogenDarkIron", "retrogen", retrogen_dark_iron, null);
         }
         
-        enable_dimension_slice = getBoolConfig("enableDimensionSlices", "dimensionSlices", enable_dimension_slice, "work in progress; may be unstable");
         entity_relight_task_id = config.get("general", "entityRelightTask", -1).getInt();
         if (entity_relight_task_id == -1) {
             entity_relight_task_id = EntityRegistry.findGlobalUniqueEntityId();
