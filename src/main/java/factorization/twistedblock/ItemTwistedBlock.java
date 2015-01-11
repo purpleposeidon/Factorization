@@ -1,7 +1,11 @@
 package factorization.twistedblock;
 
+import java.util.List;
+
 import net.minecraft.block.Block;
+import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.Vec3;
@@ -96,5 +100,10 @@ public class ItemTwistedBlock extends ItemBlockProxy {
         idc.setRotationalCenterOffset(center);
         idc.worldObj.spawnEntityInWorld(idc);
         return true;
+    }
+    
+    @Override
+    public void getSubItems(Item itemId, CreativeTabs tab, List list) {
+        list.add(new ItemStack(this));
     }
 }
