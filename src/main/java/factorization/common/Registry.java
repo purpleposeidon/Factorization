@@ -85,6 +85,7 @@ import factorization.shared.ItemBlockProxy;
 import factorization.shared.ItemCraftingComponent;
 import factorization.shared.ItemFactorizationBlock;
 import factorization.sockets.ItemSocketPart;
+import factorization.twistedblock.ItemTwistedBlock;
 import factorization.utiligoo.ItemGoo;
 import factorization.weird.ItemDayBarrel;
 import factorization.weird.ItemPocketTable;
@@ -153,6 +154,7 @@ public class Registry {
     public ItemDocBook docbook;
     public ItemGoo utiligoo;
     public ItemColossusGuide colossusGuide;
+    public ItemTwistedBlock twistedBlock;
 
     public Material materialMachine = new Material(MapColor.ironColor);
     
@@ -390,6 +392,7 @@ public class Registry {
         docbook = new ItemDocBook("docbook", TabType.TOOLS);
         utiligoo = new ItemGoo("utiligoo", TabType.TOOLS);
         colossusGuide = new ItemColossusGuide("colossusGuide", TabType.TOOLS);
+        twistedBlock = new ItemTwistedBlock();
         postMakeItems();
     }
 
@@ -1062,6 +1065,13 @@ public class Registry {
                 "F",
                 '#', Blocks.stone,
                 'F', Blocks.fire);
+        oreRecipe(new ItemStack(twistedBlock),
+                "P  ",
+                " O ",
+                " |P",
+                'P', Blocks.piston,
+                'O', this.dark_iron_block_item,
+                '|', Blocks.fence);
     }
     
     private void makeServoRecipes() {

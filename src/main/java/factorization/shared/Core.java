@@ -70,11 +70,12 @@ import factorization.darkiron.BlockDarkIronOre;
 import factorization.docs.DistributeDocs;
 import factorization.docs.DocumentationModule;
 import factorization.docs.RecipeViewer;
+import factorization.fzds.Hammer;
 import factorization.oreprocessing.FactorizationOreProcessingHandler;
 import factorization.servo.ServoMotor;
 import factorization.wrath.TileEntityWrathLamp;
 
-@Mod(modid = Core.modId, name = Core.name, version = Core.version, acceptedMinecraftVersions = "1.7.10")
+@Mod(modid = Core.modId, name = Core.name, version = Core.version, acceptedMinecraftVersions = "1.7.10", dependencies = "required-after: " + Hammer.modId)
 public class Core {
     //We should repackage stuff. And rename the API package possibly.
     public static final String modId = "factorization";
@@ -415,7 +416,7 @@ public class Core {
     
     
     public static enum TabType {
-        ART, CHARGE, OREP, SERVOS, ROCKETRY, TOOLS, BLOCKS, MATERIALS;
+        ART, CHARGE, OREP, SERVOS, ROCKETRY, TOOLS, BLOCKS, MATERIALS, COLOSSAL;
     }
     
     public static CreativeTabs tabFactorization = new CreativeTabs("factorizationTab") {
