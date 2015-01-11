@@ -86,7 +86,7 @@ public class Hammer {
         DimensionManager.registerDimension(dimensionID, dimensionID);
         File base = event.getSuggestedConfigurationFile().getParentFile();
         hammerInfo.setConfigFile(new File(base, "hammerChannels.cfg"));
-        fzds_command_channel = hammerInfo.makeChannelFor(modId, "cmd", fzds_command_channel, -1, "This channel is used for Slices created using the /fzds command");
+        fzds_command_channel = hammerInfo.makeChannelFor(Core.modId, "fzdscmd", fzds_command_channel, -1, "This channel is used for Slices created using the /fzds command");
         FzdsPacketRegistry.init();
         
         if (FMLCommonHandler.instance().getSide() == Side.CLIENT) {

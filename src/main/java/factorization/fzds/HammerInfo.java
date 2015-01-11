@@ -163,7 +163,9 @@ public class HammerInfo {
     }
     
     public void saveChannelConfig() {
-        channelConfig.save();
+        if (channelConfig.hasChanged()) {
+            channelConfig.save();
+        }
     }
     
 }

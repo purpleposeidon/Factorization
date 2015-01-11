@@ -28,7 +28,7 @@ public class ItemTwistedBlock extends ItemBlockProxy {
         super(Core.registry.dark_iron_block_item.copy(), "twistedBlock", TabType.ART);
     }
     
-    final int channel = Hammer.instance.hammerInfo.makeChannelFor("factorization", "twistedBlocks", 10, 64, "Allows placement of blocks at angles");
+    final int channel = Hammer.instance.hammerInfo.makeChannelFor(Core.name, "twistedBlocks", 10, 64, "Allows placement of blocks at angles");
 
     @Override
     public boolean placeBlockAt(ItemStack stack, EntityPlayer player, World world, int x, int y, int z, int side,
