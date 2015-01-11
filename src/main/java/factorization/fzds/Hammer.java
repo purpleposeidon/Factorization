@@ -32,7 +32,7 @@ import factorization.fzds.network.WrappedPacket;
 import factorization.shared.Core;
 import factorization.shared.NORELEASE;
 
-@Mod(modid = Hammer.modId, name = Hammer.name, version = Core.version, dependencies = "required-after: " + Core.modId)
+@Mod(modid = Hammer.modId, name = Hammer.name, version = Core.version)
 public class Hammer {
     final String[] Lore = new String[] {
             "At twilight's end, the shadow's crossed,",
@@ -66,7 +66,7 @@ public class Hammer {
         Core.loadBus(this);
     }
     
-    final static HammerInfo hammerInfo = new HammerInfo();
+    public static final HammerInfo hammerInfo = new HammerInfo();
     static final int channelWidth = 16*50;
     
     @EventHandler

@@ -417,6 +417,7 @@ public class DimensionSliceEntity extends IDeltaChunk implements IFzdsEntryContr
         Coord c = getCorner();
         Coord d = getFarCorner();
         AxisAlignedBB start = null;
+        NORELEASE.fixme("omfg slow?");
         for (int x = c.x; x <= d.x; x++) {
             for (int y = c.y; y <= d.y; y++) {
                 for (int z = c.z; z <= d.z; z++) {
@@ -445,6 +446,11 @@ public class DimensionSliceEntity extends IDeltaChunk implements IFzdsEntryContr
             if (worldObj.isRemote) {
                 return;
             }
+            if (can(DeltaCapability.DIE_WHEN_EMPTY)) {
+                Core.logInfo("IDC requests deletion when empty, and is empty: %s", this);
+                setDead();
+                return;
+            }
             shadowArea = makeAABB();
             realArea = makeAABB();
             return;
@@ -460,8 +466,8 @@ public class DimensionSliceEntity extends IDeltaChunk implements IFzdsEntryContr
             needAreaUpdate = true;
             return;
         }
-        needAreaUpdate |= x < shadowArea.minX || y < shadowArea.minY || z < shadowArea.minZ
-                || x > shadowArea.maxX || y > shadowArea.maxY || z > shadowArea.maxZ;
+        needAreaUpdate |= x <= shadowArea.minX || y <= shadowArea.minY || z <= shadowArea.minZ
+                || x >= shadowArea.maxX || y >= shadowArea.maxY || z >= shadowArea.maxZ;
     }
     
     @Override
@@ -863,6 +869,9 @@ public class DimensionSliceEntity extends IDeltaChunk implements IFzdsEntryContr
         }
         if (needAreaUpdate) {
             Core.profileStart("updateArea");
+            if (!worldObj.isRemote) {
+                NORELEASE.fixme("");
+            }
             updateShadowArea();
             Core.profileEnd();
         }
@@ -873,7 +882,7 @@ public class DimensionSliceEntity extends IDeltaChunk implements IFzdsEntryContr
                 updateShadowArea();
             }
             if (shadowArea == null) {
-                if (cornerMin.blockExists() && !can(DeltaCapability.EMPTY)) {
+                if (cornerMin.blockExists() && can(DeltaCapability.DIE_WHEN_EMPTY)) {
                     setDead();
                     Core.logFine("%s destroyed due to empty area", this.toString());
                 } else {

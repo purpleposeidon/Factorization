@@ -19,7 +19,7 @@ public enum DeltaCapability {
     /** The DSE reflects the real world instead of hammerspace. */
     ORACLE,
     /** The DSE will self-destruct if it is empty. (TODO: Is this implemented?) (TODO: This is a bad/confusing name.) */
-    EMPTY,
+    DIE_WHEN_EMPTY,
     /** The DSE can be rescaled. (Not implemented.) */
     SCALE,
     /** The DSE will render with a custom opacity. (Not implemented? Should be easy.) */

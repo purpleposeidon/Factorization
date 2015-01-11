@@ -21,6 +21,7 @@ import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.entity.player.PlayerDestroyItemEvent;
+import net.minecraftforge.event.world.BlockEvent.PlaceEvent;
 
 import com.google.common.io.ByteArrayDataOutput;
 import com.google.common.io.ByteStreams;
@@ -34,6 +35,7 @@ import cpw.mods.fml.common.network.NetworkRegistry;
 import cpw.mods.fml.common.network.internal.FMLProxyPacket;
 import factorization.api.Coord;
 import factorization.api.Quaternion;
+import factorization.fzds.interfaces.DeltaCapability;
 import factorization.fzds.interfaces.IDeltaChunk;
 import factorization.fzds.interfaces.IFzdsShenanigans;
 import factorization.fzds.interfaces.Interpolation;
@@ -49,6 +51,7 @@ public class HammerNet {
     public HammerNet() {
         instance = this;
         channel.register(this);
+        Core.loadBus(this);
     }
     
     public static class HammerNetType {
@@ -155,8 +158,20 @@ public class HammerNet {
         if (!(ent instanceof IDeltaChunk)) {
             throw new IOException("Did not select a DimensionSliceEntity (id = " + dse_id + ", messageType = " + type + ")");
         }
-        IDeltaChunk idc = (IDeltaChunk) ent;
+        DimensionSliceEntity idc = (DimensionSliceEntity) ent;
+        
+        if (!idc.can(DeltaCapability.INTERACT)) {
+            if (type == HammerNetType.digFinish || type == HammerNetType.digProgress || type == HammerNetType.digStart || type == HammerNetType.rightClickBlock) {
+                Core.logWarning("%s tried to interact with IDC that doesn't permit that %s", player, idc);
+                return;
+            }
+        }
+        
         if (type == HammerNetType.digFinish || type == HammerNetType.digProgress || type == HammerNetType.digStart) {
+            if (!idc.can(DeltaCapability.BLOCK_MINE)) {
+                Core.logWarning("%s tried to mine IDC that doesn't permit that %s", player, idc);
+                return;
+            }
             int x = dis.readInt();
             int y = dis.readInt();
             int z = dis.readInt();
@@ -166,7 +181,12 @@ public class HammerNet {
             } else if (type == HammerNetType.digStart) {
                 punchBlock(idc, player, dis, x, y, z, sideHit);
             }
+            idc.blocksChanged(x, y, z);
         } else if (type == HammerNetType.rightClickBlock) {
+            if (!idc.can(DeltaCapability.BLOCK_PLACE)) {
+                Core.logWarning("%s tried to use an item on IDC that doesn't permit that %s", player, idc);
+                return;
+            }
             int x = dis.readInt();
             int y = dis.readInt();
             int z = dis.readInt();
@@ -174,8 +194,36 @@ public class HammerNet {
             float vecX = dis.readFloat();
             float vecY = dis.readFloat();
             float vecZ = dis.readFloat();
-            clickBlock(idc, player, x, y, z, sideHit, vecX, vecY, vecZ);
+            try {
+                dont_check_range = false;
+                active_idc = idc;
+                clickBlock(idc, player, x, y, z, sideHit, vecX, vecY, vecZ);
+            } finally {
+                dont_check_range = true;
+                active_idc = null;
+            }
+            idc.blocksChanged(x, y, z);
+        } else {
+            Core.logWarning("%s tried sent an unknown packet %s to IDC %s", player, type, idc);
         }
+    }
+    
+    private boolean dont_check_range = true;
+    private IDeltaChunk active_idc = null;
+    
+    @SubscribeEvent
+    public void cancelOutOfRangePlacements(PlaceEvent event) {
+        if (dont_check_range) return;
+        if (active_idc == null) return;
+        Coord min = active_idc.getCorner();
+        if (event.world != min.w) return;
+        Coord max = active_idc.getFarCorner();
+        if (in(min.x, event.x, max.x) && in(min.y, event.y, max.y) && in(min.z, event.z, max.z)) return;
+        event.setCanceled(true);
+    }
+    
+    boolean in(int low, int x, int high) {
+        return low <= x && x <= high;
     }
     
     boolean blockInReach(IDeltaChunk idc, EntityPlayerMP player, Coord at) {

@@ -553,7 +553,7 @@ public class Awakener {
         }) {
             ret.permit(permit);
         }
-        ret.forbid(DeltaCapability.EMPTY);
+        ret.forbid(DeltaCapability.DIE_WHEN_EMPTY);
         ret.forbid(DeltaCapability.COLLIDE);
         ret.setPartName(partName);
         ret.changeRotationCenter(rotationCenter);
