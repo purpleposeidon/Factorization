@@ -165,7 +165,6 @@ public class RecipeViewer implements IDocGenerator {
     void loadRecipes() {
         putCategory("Workbench", CraftingManager.getInstance().getRecipeList());
         putCategory("Furnace", FurnaceRecipes.smelting().getSmeltingList().entrySet());
-        putCategory("Slag Furnace", TileEntitySlagFurnace.SlagRecipes.smeltingResults);
         HashMap ores = new HashMap();
         for (String name : OreDictionary.getOreNames()) {
             ores.put("\"" + name + "\"", OreDictionary.getOres(name));
