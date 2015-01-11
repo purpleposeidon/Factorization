@@ -37,6 +37,7 @@ public class ItemBlockProxy extends ItemFactorization {
     //NOTE: Copied from ItemBlock, *EXCEPT* that in the final check, I've changed the AABB check is done w/ null instead of the player.
     //Why is that even necessary...?
     //TODO: Fix this stupidity. Seems like every other release it gets messed up.
+    //Ah! Might have something to do with clicking on blocks that have an incorrect return. At one point clicking on colossal blocks made it place even if you were in front...
     @Override
     public boolean onItemUse(ItemStack par1ItemStack, EntityPlayer par2EntityPlayer, World par3World, int par4, int par5, int par6, int par7, float par8, float par9, float par10)
     {
