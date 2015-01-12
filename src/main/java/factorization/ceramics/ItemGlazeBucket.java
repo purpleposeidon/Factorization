@@ -227,7 +227,7 @@ public class ItemGlazeBucket extends ItemFactorization {
         }
         ClayState state = clay.getState();
         ClayLump part = clay.parts.get(mop.subHit);
-        boolean repairMissingBlock = part.icon_id == null || part.icon_id == Blocks.air;
+        boolean repairMissingBlock = part.icon_id == null || part.icon_id == Blocks.air || (part.icon_id == Core.registry.resource_block && part.icon_md > 0xF);
         if (player.capabilities.isCreativeMode) {
             if (state != ClayState.HIGHFIRED) {
                 clay.totalHeat = TileEntityGreenware.highfireHeat + 1;
