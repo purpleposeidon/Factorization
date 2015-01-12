@@ -406,9 +406,6 @@ public class RenderDimensionSliceEntity extends Render implements IFzdsShenaniga
         if (ent.isDead) {
             return;
         }
-        if (nest > 3) {
-            return; //This will never happen, except with outside help.
-        }
         DimensionSliceEntity dse = (DimensionSliceEntity) ent;
         DSRenderInfo renderInfo = getRenderInfo(dse);
         if (nest == 0) {
@@ -417,6 +414,8 @@ public class RenderDimensionSliceEntity extends Render implements IFzdsShenaniga
             renderInfo.lastRenderInMegaticks = megatickCount;
         } else if (nest == 1) {
             Core.profileStart("recursion");
+        } else if (nest > 3) {
+            return; //This will never happen, except with outside help.
         }
         EntityPlayer real_player = Minecraft.getMinecraft().thePlayer;
         

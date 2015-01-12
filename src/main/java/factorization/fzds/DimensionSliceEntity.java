@@ -41,7 +41,6 @@ import factorization.fzds.interfaces.IDeltaChunk;
 import factorization.fzds.interfaces.IFzdsCustomTeleport;
 import factorization.fzds.interfaces.IFzdsEntryControl;
 import factorization.fzds.interfaces.Interpolation;
-import factorization.notify.Notice;
 import factorization.shared.Core;
 import factorization.shared.EntityReference;
 import factorization.shared.FzUtil;
@@ -60,7 +59,7 @@ public class DimensionSliceEntity extends IDeltaChunk implements IFzdsEntryContr
     
     private long capabilities = DeltaCapability.of(DeltaCapability.MOVE, DeltaCapability.COLLIDE, DeltaCapability.DRAG, DeltaCapability.REMOVE_ITEM_ENTITIES);
     
-    AxisAlignedBB realArea = null;
+    AxisAlignedBB realArea = makeAABB();
     MetaAxisAlignedBB metaAABB = null;
     
     private AxisAlignedBB shadowArea = null, realDragArea = null;
@@ -91,8 +90,6 @@ public class DimensionSliceEntity extends IDeltaChunk implements IFzdsEntryContr
             Core.logWarning("Aborting attempt to spawn DSE in Hammerspace");
             setDead();
         }
-        ignoreFrustumCheck = true; NORELEASE.fixme("Just use realarea as the bounding box? realarea = boundingBox");
-        boundingBox.setBounds(0, 0, 0, 0, 0, 0);
         universalCollider = new UniversalCollider(this, world);
         parent = new EntityReference<DimensionSliceEntity>(world);
     }
@@ -284,38 +281,25 @@ public class DimensionSliceEntity extends IDeltaChunk implements IFzdsEntryContr
     }
     
     private void updateRealArea() {
-        Coord c = cornerMin;
-        double odx = posX - c.x - centerOffset.xCoord;
-        double ody = posY - c.y - centerOffset.yCoord;
-        double odz = posZ - c.z - centerOffset.zCoord;
-        realArea = offsetAABB(shadowArea, odx, ody, odz); //NOTE: Will need to update realArea when we move
-        if (can(DeltaCapability.ROTATE)) {
-            double d = cornerMax.distance(cornerMin) / 2;
-            realArea.minX -= d;
-            realArea.minY -= d;
-            realArea.minZ -= d;
-            realArea.maxX += d;
-            realArea.maxY += d;
-            realArea.maxZ += d;
-            for (Vec3 vec : FzUtil.getCorners(shadowArea)) {
-                if (!worldObj.isRemote) new Notice(vec, "X").sendToAll();
-            }
+        Vec3[] corners = FzUtil.getCorners(shadowArea);
+        Vec3 first = shadow2real(corners[0]);
+        FzUtil.setAABB(realArea, first, first);
+        for (int i = 1; i < corners.length; i++) {
+            Vec3 v = corners[i];
+            v = shadow2real(v);
+            if (v.xCoord < realArea.minX) realArea.minX = v.xCoord;
+            if (v.yCoord < realArea.minY) realArea.minY = v.yCoord;
+            if (v.zCoord < realArea.minZ) realArea.minZ = v.zCoord;
+            
+            if (v.xCoord > realArea.maxX) realArea.maxX = v.xCoord;
+            if (v.yCoord > realArea.maxY) realArea.maxY = v.yCoord;
+            if (v.zCoord > realArea.maxZ) realArea.maxZ = v.zCoord;
         }
         
-        needAreaUpdate = false;
-        //this.boundingBox.setBB(realArea);
-        int r = 16;
-        if (motionX == 0) {
-            odx = Math.round(odx*r)/r;
-        }
-        if (motionY == 0) {
-            ody = Math.round(ody*r)/r;
-        }
-        if (motionZ == 0) {
-            odz = Math.round(odz*r)/r;
-        }
+        this.boundingBox.setBB(realArea);
         if (metaAABB == null) metaAABB = new MetaAxisAlignedBB(this, cornerMin.w);
         metaAABB.setUnderlying(realArea);
+        needAreaUpdate = false;
     }
     
     double last_uni_x = Double.NEGATIVE_INFINITY;
@@ -452,7 +436,6 @@ public class DimensionSliceEntity extends IDeltaChunk implements IFzdsEntryContr
                 return;
             }
             shadowArea = makeAABB();
-            realArea = makeAABB();
             return;
         }
         
