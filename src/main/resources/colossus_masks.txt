@@ -33,6 +33,8 @@
 ' *** IMPORTANT *** The font isn't square. So these images aren't going to look square,
 ' and the proportions will be bad if you edit them here.
 ' Design them in minecraft, and copy them in.
+'
+' Throw in a bunch of http://en.wikipedia.org/wiki/File:Geweihe_Pierer.jpg ?
 
 
 
