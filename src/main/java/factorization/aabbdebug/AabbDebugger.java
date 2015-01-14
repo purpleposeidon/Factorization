@@ -26,6 +26,7 @@ public enum AabbDebugger {
     static ArrayList<AxisAlignedBB> boxes = new ArrayList();
     
     public static void addBox(AxisAlignedBB box) {
+        if (box == null) return;
         boxes.add(box.copy());
     }
     
@@ -51,7 +52,7 @@ public enum AabbDebugger {
         
         GL11.glTranslated(-cx, -cy, -cz);
         GL11.glDepthMask(false);
-        GL11.glDisable(GL11.GL_DEPTH_TEST);
+        //GL11.glDisable(GL11.GL_DEPTH_TEST);
         GL11.glEnable(GL11.GL_BLEND);
         GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
         GL11.glColor4f(1, 1, 1, 0.5F);
