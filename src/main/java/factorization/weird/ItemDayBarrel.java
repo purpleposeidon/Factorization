@@ -1,6 +1,5 @@
 package factorization.weird;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import net.minecraft.client.renderer.texture.IIconRegister;
@@ -45,6 +44,7 @@ public class ItemDayBarrel extends ItemBlockProxy {
     }
     
     @Override
+    @SideOnly(Side.CLIENT) // Invokes a client-only function
     protected void addExtraInformation(ItemStack is, EntityPlayer player, List list, boolean verbose) {
         Type upgrade = TileEntityDayBarrel.getUpgrade(is);
         if (upgrade == Type.SILKY) {
@@ -57,7 +57,7 @@ public class ItemDayBarrel extends ItemBlockProxy {
                     list.add("?");
                     return;
                 }
-                ArrayList sub = new ArrayList();
+                List sub = db.item.getTooltip/* Client-only */(player, false /* Propagating verbose would be natural, but let's keep the tool-tip short */);
                 db.item.getItem().addInformation(db.item, player, sub, verbose);
                 if (!sub.isEmpty()) {
                     Object first = sub.get(0);
