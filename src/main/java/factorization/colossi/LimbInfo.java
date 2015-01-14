@@ -8,6 +8,7 @@ import factorization.api.datahelpers.DataHelper;
 import factorization.api.datahelpers.Share;
 import factorization.colossi.ColossusController.BodySide;
 import factorization.colossi.ColossusController.LimbType;
+import factorization.fzds.interfaces.DeltaCapability;
 import factorization.fzds.interfaces.IDeltaChunk;
 import factorization.fzds.interfaces.Interpolation;
 import factorization.shared.EntityReference;
@@ -80,5 +81,15 @@ class LimbInfo {
         Quaternion zero = new Quaternion();
         dse.multiplyParentRotations(zero);
         setTargetRotation(zero, time, interp);
+    }
+    
+    public void causesPain(boolean pain) {
+        IDeltaChunk dse = idc.getEntity();
+        if (dse == null) return;
+        if (pain) {
+            dse.permit(DeltaCapability.PHYSICS_DAMAGE);
+        } else {
+            dse.forbid(DeltaCapability.PHYSICS_DAMAGE);
+        }
     }
 }
