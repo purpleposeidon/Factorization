@@ -85,6 +85,11 @@ public abstract class IDeltaChunk extends EntityFz {
     
     public abstract Quaternion getOrderedRotationTarget();
     
+    public Quaternion getEventualRotation() {
+        if (hasOrderedRotation()) return getOrderedRotationTarget();
+        return getRotation();
+    }
+    
     
     
     /***
