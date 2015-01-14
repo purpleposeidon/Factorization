@@ -42,6 +42,7 @@ import org.lwjgl.opengl.GL11;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import cpw.mods.fml.common.gameevent.TickEvent.Phase;
 import cpw.mods.fml.common.gameevent.TickEvent.RenderTickEvent;
+import factorization.aabbdebug.AabbDebugger;
 import factorization.api.Coord;
 import factorization.api.Quaternion;
 import factorization.common.FzConfig;
@@ -49,7 +50,6 @@ import factorization.fzds.interfaces.DeltaCapability;
 import factorization.fzds.interfaces.IFzdsShenanigans;
 import factorization.shared.Core;
 import factorization.shared.FzUtil;
-import factorization.shared.NORELEASE;
 
 
 public class RenderDimensionSliceEntity extends Render implements IFzdsShenanigans {
@@ -409,6 +409,9 @@ public class RenderDimensionSliceEntity extends Render implements IFzdsShenaniga
         DimensionSliceEntity dse = (DimensionSliceEntity) ent;
         DSRenderInfo renderInfo = getRenderInfo(dse);
         if (nest == 0) {
+            if (RenderManager.debugBoundingBox) {
+                AabbDebugger.addBox(dse.realArea);
+            }
             Core.profileStart("fzds");
             FzUtil.checkGLError("FZDS before render -- somebody left us a mess!");
             renderInfo.lastRenderInMegaticks = megatickCount;
