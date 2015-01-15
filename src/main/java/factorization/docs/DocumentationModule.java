@@ -257,5 +257,7 @@ public class DocumentationModule {
         registerGenerator("enchants", new EnchantViewer());
         registerGenerator("treasure", new TreasureViewer());
         registerGenerator("biomes", new BiomeViewer());
+        registerGenerator("fluids", new FluidViewer());
+        registerGenerator("oredictionary", new OreDictionaryViewer());
     }
 }

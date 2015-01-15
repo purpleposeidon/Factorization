@@ -1,7 +1,8 @@
 \title{Reference}
 
-\index{cgi/recipes}{Recipes}
 \index{cgi/items}{Items}
+\index{cgi/recipes}{Crafting}
+\index{cgi/biomes}{Biomes}
 %
 % Dedicated recipe viewer mods do a much much better job.
 % The output of this is pretty ugly, and there's no way to search for items.
@@ -17,8 +18,9 @@
 %
 % Custom IRecipes will be included naturally as part of the exploration of Workbench recipes.
 %
-\index{cgi/enchants}{The Enchantments}
-\index{cgi/treasure}{Treasures of the World}
-\index{cgi/biomes}{The Biomes}
+\index{cgi/enchants}{Enchantments}
+\index{cgi/treasure}{Secret Treasures}
+\index{cgi/fluids}{Liquids & Gasses}
+\index{cgi/oredictionary}{Ore Thesaurus}
 
 \nl
