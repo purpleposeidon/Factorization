@@ -5,9 +5,9 @@ import java.util.HashSet;
 import java.util.PriorityQueue;
 
 import net.minecraft.block.Block;
-import net.minecraft.init.Blocks;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.IIcon;
@@ -167,27 +167,38 @@ public class TileEntityWrathLamp extends TileEntityCommon {
         Core.profileEnd();
     }
 
+    private static ThreadLocal<Boolean> invalidating = new ThreadLocal<Boolean>();
     @Override
     public void invalidate() {
         super.invalidate();
-        Core.profileStart("WrathLamp");
-        for (int x = xCoord - radius; x <= xCoord + radius; x++) {
-            for (int z = zCoord - radius; z <= zCoord + radius; z++) {
-                Block id = worldObj.getBlock(x, yCoord, z);
-                if (id == Core.registry.lightair_block) {
-                    if (worldObj.isRemote) {
-                        worldObj.setBlockToAir(x, yCoord, z);
-                    } else {
-                        worldObj.setBlock(x, yCoord, z, Blocks.air);
+        if (worldObj.getBlock(xCoord, yCoord, zCoord) != Core.registry.factory_block) {
+            Core.logSevere("TileEntityWrathLamp.invalidate() called, but the block is not factory_block! " + new factorization.api.Coord(this));
+            return;
+        }
+        if (invalidating.get() != null) return;
+        invalidating.set(Boolean.TRUE);
+        try {
+            Core.profileStart("WrathLamp");
+            for (int x = xCoord - radius; x <= xCoord + radius; x++) {
+                for (int z = zCoord - radius; z <= zCoord + radius; z++) {
+                    Block id = worldObj.getBlock(x, yCoord, z);
+                    if (id == Core.registry.lightair_block) {
+                        if (worldObj.isRemote) {
+                            worldObj.setBlockToAir(x, yCoord, z);
+                        } else {
+                            worldObj.setBlock(x, yCoord, z, Blocks.air);
+                        }
                     }
                 }
             }
-        }
-        Core.profileEnd();
-        if (worldObj.isRemote) {
-            RelightTask task = new RelightTask(worldObj);
-            task.setPosition(xCoord, yCoord, zCoord);
-            worldObj.spawnEntityInWorld(task); //No comods, right? Right?
+            Core.profileEnd();
+            if (worldObj.isRemote) {
+                RelightTask task = new RelightTask(worldObj);
+                task.setPosition(xCoord, yCoord, zCoord);
+                worldObj.spawnEntityInWorld(task);
+            }
+        } finally {
+            invalidating.remove();
         }
     }
 
