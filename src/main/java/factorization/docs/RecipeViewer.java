@@ -24,7 +24,6 @@ import net.minecraftforge.oredict.ShapedOreRecipe;
 import net.minecraftforge.oredict.ShapelessOreRecipe;
 import cpw.mods.fml.common.event.FMLInterModComms.IMCMessage;
 import cpw.mods.fml.relauncher.ReflectionHelper;
-import factorization.oreprocessing.TileEntitySlagFurnace;
 import factorization.shared.Core;
 import factorization.shared.FzUtil;
 
@@ -52,6 +51,7 @@ public class RecipeViewer implements IDocGenerator {
     @Override
     public void process(AbstractTypesetter out, String arg) {
         if (recipeCategories == null) {
+            categoryOrder.clear();
             recipeCategories = new HashMap();
             Core.logInfo("Loading recipe list");
             loadRecipes();
@@ -269,9 +269,9 @@ public class RecipeViewer implements IDocGenerator {
             }
             i++;
             if (i % width == 0) {
-                sb.add("\n\n");
+                sb.add("\\nl");
             } else {
-                sb.add(" ");
+                //sb.add(" ");
             }
         }
     }
@@ -282,9 +282,9 @@ public class RecipeViewer implements IDocGenerator {
         for (int i = 0; i < recipe.recipeItems.length; i++) {
             sb.add(new ItemWord(fixMojangRecipes(recipe.recipeItems[i])));
             if ((i + 1) % width == 0) {
-                sb.add("\n\n");
+                sb.add("\\nl");
             } else {
-                sb.add(" ");
+                //sb.add(" ");
             }
         }
     }
