@@ -24,12 +24,9 @@ public class TextWord extends Word {
     @Override
     public int draw(DocViewer page, int x, int y, boolean hover) {
         String t = text;
-        int color = DocViewer.dark_color_scheme ? 0xEEEEEE : 0x111111;
+        int color = getLinkColor(hover);
         if (getLink() != null) {
-            //EnumChatFormatting col = DocViewer.dark_color_scheme ? EnumChatFormatting.AQUA : EnumChatFormatting.DARK_BLUE;
-            t = /*"" + col +*/ EnumChatFormatting.UNDERLINE + text;
-            if (hover) color = DocViewer.dark_color_scheme ? 0xFF0080 : 0x441111;
-            else color = DocViewer.dark_color_scheme ? 0x00FFFF : 0x000080;
+            t = EnumChatFormatting.UNDERLINE + text;
         }
         page.getFont().drawString(t, x, y, color); // The return value of drawString isn't helpful.
         return page.getFont().getStringWidth(text);

@@ -73,9 +73,46 @@ public class ItemWord extends Word {
     public int draw(DocViewer doc, int x, int y, boolean hover) {
         ItemStack toDraw = getItem();
         if (toDraw == null) return 16;
+        y -= 4;
+        
+        {
+            GL11.glDisable(GL11.GL_TEXTURE_2D);
+            float gray = DocViewer.dark_color_scheme ? 0.2F : 139F/0xFF;
+            GL11.glColor3f(gray, gray, gray);
+            
+            float z = 0;
+            float d = 16;
+            
+            GL11.glBegin(GL11.GL_QUADS);
+            GL11.glVertex3f(x + 0, y + 0, z);
+            GL11.glVertex3f(x + 0, y + d, z);
+            GL11.glVertex3f(x + d, y + d, z);
+            GL11.glVertex3f(x + d, y + 0, z);
+            GL11.glEnd();
+            
+            if (hover) {
+                int color = getLinkColor(hover);
+                byte r = (byte) ((color >> 16) & 0xFF);
+                byte g = (byte) ((color >> 8) & 0xFF);
+                byte b = (byte) ((color >> 0) & 0xFF);
+                GL11.glColor3b(r, g, b);
+                GL11.glLineWidth(1);
+                
+                GL11.glBegin(GL11.GL_LINE_LOOP);
+                GL11.glVertex3f(x + 0, y + 0, z);
+                GL11.glVertex3f(x + 0, y + d, z);
+                GL11.glVertex3f(x + d, y + d, z);
+                GL11.glVertex3f(x + d, y + 0, z);
+                GL11.glEnd();
+            }
+            
+            GL11.glColor3f(1, 1, 1);
+            GL11.glEnable(GL11.GL_TEXTURE_2D);
+        }
+        
         GL11.glPushAttrib(GL11.GL_ALL_ATTRIB_BITS);
         try {
-            doc.drawItem(toDraw, x, y - 4);
+            doc.drawItem(toDraw, x, y);
         } catch (Throwable t) {
             t.printStackTrace();
             is = null;
