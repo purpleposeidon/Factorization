@@ -2,15 +2,13 @@ package factorization.docs;
 
 import java.util.ArrayList;
 
-import cpw.mods.fml.common.FMLCommonHandler;
-import cpw.mods.fml.common.Loader;
-
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.resources.IResource;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumChatFormatting;
 import net.minecraft.util.ResourceLocation;
+import cpw.mods.fml.common.Loader;
 
 public class ClientTypesetter extends AbstractTypesetter {
 
@@ -230,6 +228,13 @@ public class ClientTypesetter extends AbstractTypesetter {
             } else if (other != null) {
                 process(other, link, style);
             }
+        } else if (cmd.equals("\\vpad")) {
+            String height_ = getParameter(cmd, tokenizer);
+            if (height_ == null) {
+                error("\\vpad missing parameter");
+            }
+            int height = Integer.parseInt(height_);
+            emitWord(new VerticalSpacerWord(height));
         } else {
             error("Unknown command: ");
             emit(cmd, null);

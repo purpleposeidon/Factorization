@@ -26,6 +26,7 @@ import cpw.mods.fml.common.event.FMLInterModComms.IMCMessage;
 import cpw.mods.fml.relauncher.ReflectionHelper;
 import factorization.shared.Core;
 import factorization.shared.FzUtil;
+import factorization.shared.NORELEASE;
 
 public class RecipeViewer implements IDocGenerator {
     HashMap<String, ArrayList<ArrayList>> recipeCategories = null;
@@ -50,7 +51,7 @@ public class RecipeViewer implements IDocGenerator {
      */
     @Override
     public void process(AbstractTypesetter out, String arg) {
-        if (recipeCategories == null) {
+        if (recipeCategories == null || NORELEASE.on) {
             categoryOrder.clear();
             recipeCategories = new HashMap();
             Core.logInfo("Loading recipe list");
@@ -227,14 +228,14 @@ public class RecipeViewer implements IDocGenerator {
             }
         }
         sb.add("\\endseg");
-        sb.add("\n\n");
+        sb.add("\\nl");
     }
     
     Object genericRecipePrefix(List sb, IRecipe recipe) {
         ItemStack output = ((IRecipe) recipe).getRecipeOutput();
         if (output == null) return null;
         sb.add(new ItemWord(output));
-        sb.add(" \\b{" + getDisplayName(output) + "}\n\n");
+        sb.add(" \\b{" + getDisplayName(output) + "}\\vpad{15}\\nl");
         return output;
     }
     
