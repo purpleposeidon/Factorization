@@ -1147,6 +1147,7 @@ public class DimensionSliceEntity extends IDeltaChunk implements IFzdsEntryContr
     
     @Override
     public void orderTargetRotation(Quaternion target, int tickTime, Interpolation interp) {
+        target.incrNormalize();
         rotationStart = new Quaternion(getRotation());
         rotationEnd = new Quaternion(target);
         orderTimeStart = worldObj.getTotalWorldTime();
@@ -1192,7 +1193,7 @@ public class DimensionSliceEntity extends IDeltaChunk implements IFzdsEntryContr
         double d = orderTimeEnd - orderTimeStart;
         double t = (tick - orderTimeStart) / d;
         t = orderInterp.scale(t);
-        Quaternion ret = rotationStart.slerpBlender(rotationEnd, t);
+        Quaternion ret = rotationStart.slerp(rotationEnd, t);
         ret.incrNormalize();
         return ret;
     }

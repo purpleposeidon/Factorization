@@ -3,7 +3,9 @@ package factorization.colossi;
 import static factorization.colossi.TechniqueKind.*;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
+import java.util.List;
 
 import net.minecraft.block.Block;
 import net.minecraft.entity.Entity;
@@ -25,6 +27,7 @@ import factorization.fzds.interfaces.IDeltaChunk;
 import factorization.fzds.interfaces.Interpolation;
 import factorization.shared.Core;
 import factorization.shared.FzUtil;
+import factorization.shared.NORELEASE;
 import factorization.shared.ReservoirSampler;
 
 public enum Technique implements IStateMachine<Technique> {
@@ -48,13 +51,11 @@ public enum Technique implements IStateMachine<Technique> {
         
         @Override
         public Technique tick(ColossusController controller, int age) {
-            ArrayList<Technique> avail = new ArrayList(controller.known);
-            if (avail.isEmpty()) {
-                Core.logWarning("This colossus is brain-dead!? " + controller);
-                return DEATH_FALL;
-            }
+            if (NORELEASE.on) return SPIN_WINDUP;
+            if (NORELEASE.on && age < 60) return this;
             if (controller.getHealth() <= 0) return DEATH_FALL;
             boolean use_defense = controller.checkHurt(true);
+            List<Technique> avail = Arrays.asList(this.values());
             Collections.shuffle(avail);
             Technique chosen_offense = null;
             Technique chosen_defense = null;
@@ -65,7 +66,9 @@ public enum Technique implements IStateMachine<Technique> {
                 switch (kind) {
                 case OFFENSIVE:
                     chosen_offense = grade(chosen_offense, controller, tech);
-                    if (chosen_offense != null) return chosen_offense;
+                    if (chosen_offense != null) {
+                        return chosen_offense;
+                    }
                     break;
                 case DEFENSIVE:
                     chosen_defense = grade(chosen_defense, controller, tech);
@@ -82,9 +85,8 @@ public enum Technique implements IStateMachine<Technique> {
         }
         
         Technique grade(Technique orig, ColossusController controller, Technique next) {
-            if (orig != null) return orig;
-            if (next.usable(controller)) return next;
-            return null;
+            if (orig == null && next.usable(controller)) return next;
+            return orig;
         }
         
     },
@@ -97,16 +99,51 @@ public enum Technique implements IStateMachine<Technique> {
         
         @Override
         public void onEnterState(ColossusController controller, Technique prevState) {
+            // Reset everything except for the body's rotation on the Y-axis.
+            
             for (LimbInfo li : controller.limbs) {
-                li.target(controller.body.getRotation(), 1);
+                // if (li.type.isArmOrLeg()) {
+                if (li.type != LimbType.BODY) {
+                    li.target(new Quaternion(), 1);
+                }
             }
+
+            Quaternion bodyRot = controller.body.getRotation();
+            double yRot = bodyRot.toRotationVector().yCoord;
+            Quaternion straightRot = Quaternion.getRotationQuaternionRadians(yRot, ForgeDirection.UP);
+            controller.bodyLimbInfo.target(straightRot, 1);
+            
+            // The above is way better than the commented out stuff! Keep for educational purposes!
+            
+            /*
+            Quaternion bodyRot = controller.body.getRotation();
+            Quaternion up = Quaternion.getRotationQuaternionRadians(0, ForgeDirection.UP);
+            double tiltAngle = bodyRot.dotProduct(up);
+            Vec3 right = bodyRot.cross(up).toVector().normalize();
+            Quaternion correction = Quaternion.getRotationQuaternionRadians(tiltAngle, right);
+            Quaternion newBod = bodyRot.multiply(correction);
+            newBod.incrNormalize(); // Not normalizing causes limbs to de-joint?
+            controller.bodyLimbInfo.target(newBod, 1);*/
+        }
+
+        @Override
+        public Technique tick(ColossusController controller, int age) {
+            if (NORELEASE.on) return finishMove(controller);
+            if (age > 20 * 15) return PICK_NEXT_TECHNIQUE;
+            if (controller.checkHurt(false)) return PICK_NEXT_TECHNIQUE;
+            return this;
+        }
+    },
+    
+    FINISH_MOVE {
+        @Override
+        TechniqueKind getKind() {
+            return TRANSITION;
         }
         
         @Override
         public Technique tick(ColossusController controller, int age) {
-            if (age > 20 * 15) return PICK_NEXT_TECHNIQUE;
-            if (controller.checkHurt(false)) return PICK_NEXT_TECHNIQUE;
-            return this;
+            return finishMove(controller);
         }
     },
     
@@ -134,7 +171,10 @@ public enum Technique implements IStateMachine<Technique> {
             for (Coord found : sampler) {
                 // NORELEASE: We might want a "cracked mask"
                 found.setIdMd(Core.registry.colossal_block, ColossalBlock.MD_BODY_CRACKED, true);
+                return;
             }
+            // No suitable mask to crack? Might be a custom design. Silently skip this bow then.
+            controller.crackBroken();
         }
         
         @Override
@@ -182,7 +222,30 @@ public enum Technique implements IStateMachine<Technique> {
         
         @Override
         boolean usable(ColossusController controller) {
-            return true;
+            return iteratePotentialPlayers(controller) != null;
+        }
+        
+        @Override
+        protected Object visitPlayer(EntityPlayer player, ColossusController controller) {
+            if (player.posY < controller.posY) return null;
+            double height = controller.bodyLimbInfo.length;
+            if (player.posY > controller.posY + height + 5) return null; // cheap coarse-check if the player is far above us
+            Coord top = controller.body.getCorner().copy();
+            controller.body.shadow2real(top);
+            if (player.posY > top.y) return null;
+            double radius = getTotalSize(controller) + 2;
+            if (controller.getDistanceSqToEntity(player) > radius * radius) return null;
+            return player;
+        }
+        
+        double getTotalSize(ColossusController controller) {
+            int bodWidth = measureWidth(controller.body);
+            int armWidth = measureWidth(controller.body);
+            return (bodWidth + armWidth) / 2.0;
+        }
+        
+        int measureWidth(IDeltaChunk bod) {
+            return bod.getFarCorner().difference(bod.getCorner()).z;
         }
         
         @Override
@@ -290,7 +353,7 @@ public enum Technique implements IStateMachine<Technique> {
                 
                 // The player has to be within a shell defined by the limb's length
                 double farthest = (1.10) * li.length;
-                double nearest = (0.80) * li.length;
+                double nearest = (0.20) * li.length;
                 
                 double dist = idc.getDistanceToEntity(player);
                 if (dist > farthest || dist < nearest) continue;
@@ -366,8 +429,12 @@ public enum Technique implements IStateMachine<Technique> {
         
         @Override
         public Technique tick(ColossusController controller, int age) {
-            // TODO Auto-generated method stub
-            return super.tick(controller, age);
+            return finishMove(controller, FINISH_MOVE);
+        }
+        
+        @Override
+        public void onExitState(ColossusController controller, Technique nextState) {
+            STAND_STILL.onEnterState(controller, this);
         }
     },
     
@@ -381,6 +448,7 @@ public enum Technique implements IStateMachine<Technique> {
         public void onEnterState(ColossusController controller, Technique prevState) {
             // Hold arms to the $LEFT
             BodySide side = controller.worldObj.rand.nextBoolean() ? BodySide.LEFT : BodySide.RIGHT;
+            //if (NORELEASE.on) side = BodySide.RIGHT;
             controller.spin_direction = side;
             for (LimbInfo li : controller.limbs) {
                 targetLimb(li, side);
@@ -403,18 +471,20 @@ public enum Technique implements IStateMachine<Technique> {
         public void onEnterState(ColossusController controller, Technique prevState) {
             // Swing arms to the $RIGHT, extend a $LEFT leg, rapidly spin body
             double d = controller.spin_direction == BodySide.RIGHT ? -1 : +1;
-            Quaternion bodyRot = controller.body.getRotation().multiply(Quaternion.getRotationQuaternionRadians(d * Math.PI, ForgeDirection.UP));
-            controller.bodyLimbInfo.target(bodyRot, 8, Interpolation.SMOOTHER);
             
             BodySide oppositeSide = controller.spin_direction == BodySide.LEFT ? BodySide.RIGHT : BodySide.LEFT;
             for (LimbInfo li : controller.limbs) {
                 targetLimb(li, oppositeSide);
             }
+            Quaternion bod = controller.body.getRotation();
+            Quaternion newBod = bod.multiply(Quaternion.getRotationQuaternionRadians(d * Math.PI * 1.75, ForgeDirection.UP));
+            newBod.incrLongFor(bod);
+            //controller.bodyLimbInfo.target(newBod, 1F/8F, Interpolation.SMOOTHER);
             for (LimbInfo li : controller.limbs) {
                 if (li.type == LimbType.LEG && li.side == controller.spin_direction) {
                     Quaternion rot = Quaternion.getRotationQuaternionRadians(d * Math.PI / 2, ForgeDirection.EAST);
                     rot.incrMultiply(controller.body.getOrderedRotationTarget());
-                    li.target(rot, 3, Interpolation.SMOOTH);
+                    li.target(rot, 1, Interpolation.SMOOTH);
                     break; // Only lift 1 leg if not bipedal
                 }
             }
@@ -422,24 +492,13 @@ public enum Technique implements IStateMachine<Technique> {
         
         @Override
         public Technique tick(ColossusController controller, int age) {
-            return finishMove(controller, SPIN_RESET);
-        }
-    },
-    
-    SPIN_RESET {
-        @Override
-        TechniqueKind getKind() {
-            return TRANSITION;
+            // NORELEASE return finishMove(controller, FINISH_MOVE);
+            return finishMove(controller, STAND_STILL);
         }
         
         @Override
-        public void onEnterState(ColossusController controller, Technique prevState) {
-            STAND_STILL.onEnterState(controller, prevState);
-        }
-        
-        @Override
-        public Technique tick(ColossusController controller, int age) {
-            return finishMove(controller);
+        public void onExitState(ColossusController controller, Technique nextState) {
+            STAND_STILL.onEnterState(controller, this);
         }
     },
     
@@ -722,20 +781,21 @@ public enum Technique implements IStateMachine<Technique> {
         return finishMove(controller, PICK_NEXT_TECHNIQUE);
     }
     
-    protected void targetLimb(LimbInfo li, BodySide side) {
+    protected void targetLimb(LimbInfo li, BodySide turnDirection) {
         if (li.type != LimbType.ARM) return;
-        double d = side == BodySide.RIGHT ? -1 : +1;
-        Quaternion rot = Quaternion.getRotationQuaternionRadians(d * Math.PI / 2, ForgeDirection.EAST);
+        // Swing arms towards side
+        double d = turnDirection == BodySide.RIGHT ? -1 : +1;
+        Quaternion rot = Quaternion.getRotationQuaternionRadians(Math.PI / 2, ForgeDirection.SOUTH);
         double turn;
-        if (li.side == side) {
-            // Arm goes towards back
-            turn = Math.toRadians(45) * -d;
+        // But the arm that's crossing the body can't, anatomically speaking, go all the way
+        if (li.side == turnDirection) {
+            turn = 90;
         } else {
-            // Arm goes towards front
-            turn = Math.toRadians(90 + 45) * -d;
+            turn = +45;
         }
-        rot.incrMultiply(Quaternion.getRotationQuaternionRadians(turn, ForgeDirection.UP));
-        li.target(rot, 3, Interpolation.SMOOTH);
+        turn = Math.toRadians(turn) * d;
+        rot = Quaternion.getRotationQuaternionRadians(turn, ForgeDirection.UP).multiply(rot);
+        li.target(rot, 1F/3F, Interpolation.SMOOTH);
     }
     
     private static final double distSq = WorldGenColossus.SMOOTH_START * WorldGenColossus.SMOOTH_START;

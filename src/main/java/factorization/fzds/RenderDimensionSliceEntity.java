@@ -447,7 +447,7 @@ public class RenderDimensionSliceEntity extends Render implements IFzdsShenaniga
                 GL11.glTranslated(x, y, z);
                 Quaternion rotation = dse.getRotation();
                 if (!rotation.isZero() || !dse.prevTickRotation.isZero()) {
-                    dse.prevTickRotation.slerpBlender(rotation, partialTicks).glRotate();
+                    dse.prevTickRotation.slerp(rotation, partialTicks).glRotate();
                 }
                 Vec3 centerOffset = dse.getRotationalCenterOffset();
                 GL11.glTranslated(

@@ -329,10 +329,28 @@ public class Quaternion implements IDataSerializable {
         return ret;
     }
     
-    public Quaternion slerpBlender(Quaternion other, double t) {
+    /**
+     * When this Quaternion is going to be interpolated to other, it can be interpolated either the long way around, or the short way.
+     * This method makes sure it will be the short interpolation.
+     */
+    public void incrShortFor(Quaternion other) {
+        double cosom = this.dotProduct(other);
+        if (cosom < 0) {
+            incrScale(-1);
+        }
+    }
+    
+    public void incrLongFor(Quaternion other) {
+        double cosom = this.dotProduct(other);
+        if (cosom > 0) {
+            incrScale(-1);
+        }
+    }
+    
+    public Quaternion slerp(Quaternion other, double t) {
         // from blender/blenlib/intern/math_rotation.c interp_qt_qtqt
         double cosom = this.dotProduct(other);
-        // We don't do the dot product thing, because maybe we'd like long-ways rotation some times
+        // We don't make the dot product > 0, because maybe we'd like long-ways rotation some times
         double omega, sinom, sc1, sc2;
 
         if ((1.0f - cosom) > 0.0001f) {
@@ -350,41 +368,8 @@ public class Quaternion implements IDataSerializable {
                 sc1 * this.x + sc2 * other.x,
                 sc1 * this.y + sc2 * other.y,
                 sc1 * this.z + sc2 * other.z);
-        }
-    
-    private static final double DOT_THRESHOLD = 0.9995;
-    public Quaternion slerp(Quaternion other, double t) {
-        // From http://number-none.com/product/Understanding%20Slerp,%20Then%20Not%20Using%20It/index.html (encoding = Western; ISO-8859-1)
-        // But see also: http://physicsforgames.blogspot.com/2010/02/quaternions.html
-
-        // v0 and v1 should be unit length or else
-        // something broken will happen.
-
-        // Compute the cosine of the angle between the two vectors.
-        double dot = dotProduct(other);
-
-        if (dot > DOT_THRESHOLD) {
-            // If the inputs are too close for comfort, linearly interpolate
-            // and normalize the result.
-            Quaternion result = new Quaternion(this);
-            Quaternion temp = other.add(this, -1);
-            temp.incrScale(t);
-            result.incrAdd(temp);
-            result.incrNormalize();
-            return result;
-        }
-        dot = Math.min(-1, Math.max(1, dot)); // Robustness: Stay within domain of acos()
-        double theta_0 = Math.acos(dot); // theta_0 = angle between input vectors
-        double theta = theta_0 * t; // theta = angle between v0 and result
-
-        Quaternion v2 = other.add(this, -dot);
-        v2.incrNormalize(); // { v0, v2 } is now an orthonormal basis
-
-        Quaternion ret = this.scale(Math.cos(theta));
-        v2.incrScale(Math.sin(theta));
-        ret.incrAdd(v2);
-        return ret;
     }
+    
     
     public double getAngleBetween(Quaternion other) {
         double dot = dotProduct(other);
@@ -473,6 +458,12 @@ public class Quaternion implements IDataSerializable {
         this.x = X;
         this.y = Y;
         this.z = Z;
+    }
+    
+    public Quaternion cross(Quaternion other) {
+        Quaternion m = new Quaternion(this);
+        m.incrCross(other);
+        return m;
     }
     
     public void incrRotateBy(Quaternion rotation) {
@@ -579,4 +570,6 @@ public class Quaternion implements IDataSerializable {
         double sat = Math.sin(alphaTheta);
         return new Quaternion(W, x * sat, y * sat, z * sat);
     }
+    
+    
 }

@@ -2,8 +2,6 @@ package factorization.colossi;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.EnumSet;
 
 import net.minecraft.entity.Entity;
@@ -26,7 +24,11 @@ import factorization.shared.NORELEASE;
 
 public class ColossusController extends EntityFz implements IBossDisplayData {
     static enum BodySide { LEFT, RIGHT, CENTER, UNKNOWN_BODY_SIDE };
-    static enum LimbType { BODY, ARM, LEG, UNKNOWN_LIMB_TYPE };
+    static enum LimbType {
+        BODY, ARM, LEG, UNKNOWN_LIMB_TYPE;
+        
+        public boolean isArmOrLeg() { return this == ARM || this == LEG; }
+    };
     LimbInfo[] limbs;
     IDeltaChunk body;
     LimbInfo bodyLimbInfo;
@@ -39,14 +41,25 @@ public class ColossusController extends EntityFz implements IBossDisplayData {
     private Coord home = null;
     private boolean been_hurt = false;
     
-    EnumSet<Technique> known = EnumSet.<Technique>of(Technique.BOW, Technique.SHRUG);
-    EnumSet<Technique> locked = EnumSet.<Technique>complementOf(known);
-    {
+    
+    static Technique[] offensives, idlers, defensives;
+    static {
+        ArrayList<Technique> _offensives = new ArrayList();
+        ArrayList<Technique> _idlers = new ArrayList();
+        ArrayList<Technique> _defensives = new ArrayList();
         for (Technique tech : Technique.values()) {
-            if (tech.getKind() == TechniqueKind.TRANSITION) {
-                locked.remove(tech);
+            ArrayList<Technique> use;
+            switch (tech.getKind()) {
+            default: continue;
+            case DEFENSIVE: use = _defensives; break;
+            case IDLER: use = _idlers; break;
+            case OFFENSIVE: use = _offensives; break;
             }
+            use.add(tech);
         }
+        offensives = _offensives.toArray(new Technique[0]);
+        idlers = _idlers.toArray(new Technique[0]);
+        defensives = _defensives.toArray(new Technique[0]);
     }
     
     private Coord path_target = null;
@@ -176,9 +189,6 @@ public class ColossusController extends EntityFz implements IBossDisplayData {
         last_step_direction = data.as(Share.PRIVATE, "last_step_direction").putInt(last_step_direction);
         been_hurt = data.as(Share.PRIVATE, "been_hurt").putBoolean(been_hurt);
         spin_direction = data.as(Share.PRIVATE, "spin_dir").putEnum(spin_direction);
-        
-        known = putEnumSet(data, "known", known, Technique.class);
-        locked = putEnumSet(data, "locked", locked, Technique.class);
     }
     
     <E extends Enum<E>> EnumSet<E> putEnumSet(DataHelper data, String prefix, EnumSet<E> set, Class<E> elementType) throws IOException {
@@ -467,28 +477,6 @@ public class ColossusController extends EntityFz implements IBossDisplayData {
     
     void wakeUpMore() {
         openEyes();
-        if (!locked.isEmpty()) {
-            ArrayList<Technique> avail = new ArrayList(locked);
-            ArrayList<Technique> toRemove = new ArrayList();
-            Collections.shuffle(avail);
-            Technique learned = avail.remove(0);
-            {
-                toRemove.add(Technique.INITIAL_BOW);
-                // Merely hard-wire the forgetting
-                switch (learned) {
-                default: break;
-                case HAMMER: toRemove.add(Technique.BOW); break;
-                }
-            }
-            locked.remove(learned);
-            known.add(learned);
-            known.removeAll(toRemove);
-            String a = "";
-            for (Technique tech : known) {
-                a += " " + tech;
-            }
-            NORELEASE.println("Known:" + a);
-        }
     }
     
     void openEyes() {
