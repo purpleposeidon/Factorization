@@ -47,7 +47,7 @@ import factorization.shared.FzUtil;
 import factorization.shared.NORELEASE;
 
 public class DimensionSliceEntity extends IDeltaChunk implements IFzdsEntryControl {
-    //Dang, this is a lot of fields
+    //Dang, this class is a mess! Code folding, activate!
     
     private Coord cornerMin = Coord.ZERO.copy();
     private Coord cornerMax = Coord.ZERO.copy();
@@ -501,11 +501,19 @@ public class DimensionSliceEntity extends IDeltaChunk implements IFzdsEntryContr
             return;
         }
         if (hasOrderedRotation() && orderTimeEnd <= worldObj.getTotalWorldTime()) {
-            //setRotation(new Quaternion(rotationEnd));
+            if (can(DeltaCapability.SNAP_TO_EXACT_ORDERED_ROTATION)) {
+                Quaternion trueRot = new Quaternion(rotationEnd);
+                IDeltaChunk here = this.getParent();
+                while (here != null) {
+                    here.getRotation().incrToOtherMultiply(trueRot);
+                    here = here.getParent();
+                }
+                setRotation(trueRot);
+            }
             cancelOrderedRotation();
         }
-        boolean parentRotation = !parentTickRotation.isZero();
-        final boolean linearMotion = !FzUtil.isZero(parentTickDisp) || hasLinearMotion() || parentRotation;
+        final boolean parentRotation = !parentTickRotation.isZero();
+        final boolean linearMotion = parentRotation || !FzUtil.isZero(parentTickDisp) || hasLinearMotion();
         final boolean rotationalMotion = parentRotation || hasRotationalMotion();
         
         Vec3 mot = null;
@@ -1139,7 +1147,7 @@ public class DimensionSliceEntity extends IDeltaChunk implements IFzdsEntryContr
     @Override
     public void cancelOrderedRotation() {
         if (!worldObj.isRemote && orderTimeEnd > worldObj.getTotalWorldTime() /* Didn't end naturally */) {
-            FMLProxyPacket toSend = HammerNet.makePacket(HammerNet.HammerNetType.orderedRotation, this.getEntityId(), getRotation(), getRotation(), 0, Interpolation.CONSTANT.ordinal());
+            FMLProxyPacket toSend = HammerNet.makePacket(HammerNet.HammerNetType.orderedRotation, this.getEntityId(), getRotation(), getRotation(), -1, Interpolation.CONSTANT.ordinal());
             broadcastPacket(toSend);
         }
         orderTimeStart = orderTimeEnd = -1;
@@ -1188,12 +1196,26 @@ public class DimensionSliceEntity extends IDeltaChunk implements IFzdsEntryContr
     
     private Quaternion getOrderedRotation(long tick) {
         // !this.hasOrderedRotation() --> tick >= -1 --> return rotationEnd
-        if (tick <= orderTimeStart) return new Quaternion(rotationStart);
-        if (tick >= orderTimeEnd) return new Quaternion(rotationEnd);
+        Quaternion useStart = rotationStart, useEnd = rotationEnd;
+        
+        IDeltaChunk parent = this.getParent();
+        if (parent != null) {
+            useStart = new Quaternion(useStart);
+            useEnd = new Quaternion(useEnd);
+            while (parent != null) {
+                Quaternion pRot = parent.getRotation();
+                //pRot.incrToOtherMultiply(useStart);
+                pRot.incrToOtherMultiply(useEnd);
+                parent = parent.getParent();
+            }
+        }
+        if (tick <= orderTimeStart) return new Quaternion(useStart);
+        if (tick >= orderTimeEnd) return new Quaternion(useEnd);
+        
         double d = orderTimeEnd - orderTimeStart;
         double t = (tick - orderTimeStart) / d;
         t = orderInterp.scale(t);
-        Quaternion ret = rotationStart.slerp(rotationEnd, t);
+        Quaternion ret = useStart.slerp(useEnd, t);
         ret.incrNormalize();
         return ret;
     }

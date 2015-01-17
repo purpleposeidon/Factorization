@@ -54,12 +54,12 @@ public abstract class IDeltaChunk extends EntityFz {
      */
     public abstract Quaternion getRotationalVelocity();
     /***
-     * Sets the rotation (theta).
+     * Sets the rotation (theta), relative to the world. The default Quaternion represents zero rotation.
      * @param r A {@link Quaternion}
      */
     public abstract void setRotation(Quaternion r);
     /***
-     * Sets the rotational velocity (omega).
+     * Sets the rotational velocity (omega), relative to the world. The default Quaternion represents zero angular velocity.
      * @param w A {@link Quaternion}
      */
     public abstract void setRotationalVelocity(Quaternion w);
@@ -68,9 +68,20 @@ public abstract class IDeltaChunk extends EntityFz {
      * Orders the IDC to move to a target rotation. This will set the rotational velocity to 0.
      * If setTargetRotation is called before a previous order has completed, the old order will be interrupted.
      * 
+     * This method causes the DIC to sweep its rotation between its current rotation, and the target rotation.
+     * The target rotation is *NOT* globally relative; it is instead relative to the rotation of its parent.
+     * Consider a carousel with a grandfather clock standing on it. The cabinet and the carousel would be represented with 1 IDC,
+     * and the hands of the clock would be each represented with an IDC. Let the carousel be still and at its default position,
+     * with the clock facing NORTH. When it is 12 o'clock, the hand will have zero rotation, and when it's 6 o'clock, the hand will
+     * have half a turn around the NORTH axis. Using this method to order rotations between 6 o'clock and 12 o'clock will have the
+     * natural, desired effect.
+     * 
+     * However, using setRotation or setRotationalVelocity can result in the hand not being flush with the face of the clock, since
+     * those methods are relative to the world.
+     * 
      * @param target The target rotation. The method will make a copy of that parameter.
      * @param tickTime How many ticks to reach that rotation
-     * @param interp How to interpolate between them.
+     * @param interp How to interpolate between them. SMOOTH is a good default value.
      */
     public abstract void orderTargetRotation(Quaternion target, int tickTime, Interpolation interp);
     
@@ -81,10 +92,17 @@ public abstract class IDeltaChunk extends EntityFz {
      */
     public abstract int getRemainingRotationTime();
     
+    /**
+     * Interrupts the rotation order. The rotation will remain at wherever it was when this method is called.
+     */
     public abstract void cancelOrderedRotation();
     
     public abstract Quaternion getOrderedRotationTarget();
     
+    /**
+     * Helper function.
+     * @return
+     */
     public Quaternion getEventualRotation() {
         if (hasOrderedRotation()) return getOrderedRotationTarget();
         return getRotation();

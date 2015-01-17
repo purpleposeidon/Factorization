@@ -111,8 +111,12 @@ public class HammerNet {
             int orderTime = dis.readInt();
             byte interpIndex = dis.readByte();
             Interpolation interp = Interpolation.values()[interpIndex];
-            dse.setRotation(rotationStart);
-            dse.orderTargetRotation(rotationEnd, orderTime, interp);
+            if (orderTime < 0) {
+                dse.cancelOrderedRotation();
+            } else {
+                dse.setRotation(rotationStart);
+                dse.orderTargetRotation(rotationEnd, orderTime, interp);
+            }
             break;
         }
         

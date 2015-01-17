@@ -18,32 +18,34 @@ public enum DeltaCapability {
     TRANSFER_PLAYERS,
     /** The DSE reflects the real world instead of hammerspace. */
     ORACLE,
-    /** The DSE will self-destruct if it is empty. (TODO: Is this implemented?) (TODO: This is a bad/confusing name.) */
+    /** The DSE will self-destruct if it is empty. */
     DIE_WHEN_EMPTY,
-    /** The DSE can be rescaled. (Not implemented.) */
+    /** The DSE can be rescaled. (Collisions/interactions unlikely to ever be implemented?) */
     SCALE,
     /** The DSE will render with a custom opacity. (Not implemented? Should be easy.) */
     TRANSPARENT,
     /** The player can punch and click on blocks & entities. */
     INTERACT,
-    /** The player can place blocks. (TODO: Verify respect) */
+    /** The player can place blocks. */
     BLOCK_PLACE,
-    /** The player can mine blocks. (TODO: Verify respect) */
+    /** The player can mine blocks. */
     BLOCK_MINE,
     /** All item entities will be ejected from hammer space. */
     REMOVE_ITEM_ENTITIES,
     /** All entities will be ejected from hammer space. */
     REMOVE_ALL_ENTITIES,
-    /** Entities will have their velocities adjusted when they collide with a moving DSE. (TODO) */
+    /** Entities will have their velocities adjusted when they collide with a moving DSE. */
     ENTITY_PHYSICS,
-    /** Living entities can be hurt by physics (TODO) */
+    /** Living entities can be hurt by physics */
     PHYSICS_DAMAGE,
     /** When a DSE hits an entity, an opposing force will be applied to the DSE. (TODO) */
     CONSERVE_MOMENTUM,
     /** When a DSE hits an entity, hurt it & apply knockback */
     VIOLENT_COLLISIONS,
     /** The DSE stops moving if it hits a block */
-    COLLIDE_WITH_WORLD
+    COLLIDE_WITH_WORLD,
+    /** When an ordered rotation completes, recalculate the orientation. For debugging; might also be useful if there are precision issues */
+    SNAP_TO_EXACT_ORDERED_ROTATION
     ;
     //Do not re-order this list, only append.
     public final long bit;
