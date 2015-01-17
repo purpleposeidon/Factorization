@@ -39,6 +39,7 @@ import factorization.fzds.DeltaChunk.AreaMap;
 import factorization.fzds.DeltaChunk.DseDestination;
 import factorization.fzds.interfaces.DeltaCapability;
 import factorization.fzds.interfaces.IDeltaChunk;
+import factorization.fzds.interfaces.Interpolation;
 import factorization.notify.Notice;
 import factorization.shared.Core;
 import factorization.shared.FzUtil;
@@ -1004,6 +1005,50 @@ public class FZDSCommand extends CommandBase {
                     // If there was a loop, we'd already be doomed I guess maybe?
                     NORELEASE.fixme("Loop-checking in DSE de-serialization");
                 }
+            }
+            
+        }, Requires.SLICE_SELECTED);
+        add(new SubCommand("setParent") {
+            @Override
+            String details() {
+                return "Sets the selected DSE's parent by the parent's ID";
+            }
+
+            @Override
+            void call(String[] args) {
+                int id = Integer.parseInt(args[0]);
+                Entity ent = selected.worldObj.getEntityByID(id);
+                if (!(ent instanceof IDeltaChunk)) {
+                    sendChat("ID did not point to a DSE");
+                    return;
+                }
+                IDeltaChunk parent = (IDeltaChunk) ent;
+                if (parent == selected) {
+                    sendChat("Can't parent to itself");
+                    return;
+                }
+                Vec3 at = FzUtil.fromEntPos(selected);
+                Vec3 shadow = parent.real2shadow(at);
+                Coord corner = parent.getCorner();
+                shadow.xCoord -= corner.x;
+                shadow.yCoord -= corner.y;
+                shadow.zCoord -= corner.z;
+                selected.setParent(parent, shadow);
+            }
+            
+        }, Requires.SLICE_SELECTED);
+        if (Core.dev_environ) add(new SubCommand("test") {
+            @Override
+            void call(String[] args) {
+                double angle = Math.PI * selected.worldObj.rand.nextDouble();
+                ForgeDirection up = ForgeDirection.UP;
+                int time = 30;
+                if (selected.getParent() == null) {
+                    up = ForgeDirection.NORTH;
+                    time = 300;
+                }
+                Quaternion quat = Quaternion.getRotationQuaternionRadians(angle, up);
+                selected.orderTargetRotation(quat, time, Interpolation.SMOOTH);
             }
             
         }, Requires.SLICE_SELECTED);
