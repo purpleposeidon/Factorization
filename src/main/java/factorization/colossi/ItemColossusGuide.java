@@ -48,7 +48,7 @@ public class ItemColossusGuide extends ItemFactorization {
             Notice.chat(player, msgKey, new ChatComponentTranslation("colossus.is.no_nearby"));
             return is;
         }
-        if (FzUtil.isPlayerCreative(player)) {
+        if (FzUtil.isPlayerCreative(player) && Core.dev_environ) {
             int limit = 4;
             for (Coord at : nearby) {
                 String t = at.toString();
