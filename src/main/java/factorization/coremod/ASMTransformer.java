@@ -19,10 +19,10 @@ import org.objectweb.asm.tree.ClassNode;
 import org.objectweb.asm.tree.JumpInsnNode;
 import org.objectweb.asm.tree.LabelNode;
 import org.objectweb.asm.tree.MethodNode;
+import org.objectweb.asm.util.CheckClassAdapter;
 import org.objectweb.asm.util.TraceClassVisitor;
 
 import cpw.mods.fml.relauncher.FMLRelaunchLog;
-import factorization.coremodhooks.MixinExtraChunkData;
 
 public class ASMTransformer implements IClassTransformer {
     @Override
@@ -53,6 +53,13 @@ public class ASMTransformer implements IClassTransformer {
         if (transformedName.equals("net.minecraft.entity.Entity")) {
             return applyTransform(basicClass,
                     new AbstractAsmClassTransform.Mixin("factorization.coremodhooks.MixinEntityKinematicsTracker", "Lfactorization/coremodhooks/MixinEntityKinematicsTracker;"));
+        }
+        if (transformedName.equals("net.minecraft.client.renderer.EntityRenderer")) {
+            final String vec_vec_mop = "(Lnet/minecraft/util/Vec3;Lnet/minecraft/util/Vec3;)Lnet/minecraft/util/MovingObjectPosition;";
+            return applyTransform(basicClass,
+                    new AbstractAsmMethodTransform.MutateCall(name, transformedName, "func_78467_g", "orientCamera")
+                        .find("net.minecraft.client.multiplayer.WorldClient", "func_72933_a", "rayTraceBlocks", vec_vec_mop)
+            );
         }
         return basicClass;
     }
@@ -91,7 +98,7 @@ public class ASMTransformer implements IClassTransformer {
                 throw new RuntimeException("Unable to find method " + cn.name + "." + change.srgName + " (" + change.mcpName + ")");
             }
         }
-
+        
         ClassWriter cw = new ClassWriter(ClassWriter.COMPUTE_MAXS);
         cn.accept(cw);
         return cw.toByteArray();

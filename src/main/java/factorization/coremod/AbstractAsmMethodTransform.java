@@ -2,7 +2,9 @@ package factorization.coremod;
 
 import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.tree.AbstractInsnNode;
+import org.objectweb.asm.tree.InsnList;
 import org.objectweb.asm.tree.LineNumberNode;
+import org.objectweb.asm.tree.MethodInsnNode;
 import org.objectweb.asm.tree.MethodNode;
 
 import cpw.mods.fml.common.asm.transformers.deobf.FMLDeobfuscatingRemapper;
@@ -84,6 +86,42 @@ abstract class AbstractAsmMethodTransform {
                 cleaner = next;
             }
             base.instructions.insertBefore(head, addition.instructions);
+        }
+        
+    }
+    
+    static class MutateCall extends AbstractAsmMethodTransform {
+        MutateCall(String obfClassName, String srgClassName, String srgName, String mcpName) {
+            super(obfClassName, srgClassName, srgName, mcpName);
+        }
+
+        private String find_owner, find_mcp_name, find_srg_name, find_desc;
+        
+        public MutateCall find(String owner, String srg_name, String mcp_name, String descriptor) {
+            this.find_owner = owner.replace(".", "/");
+            this.find_mcp_name = mcp_name;
+            this.find_srg_name = srg_name;
+            this.find_desc = descriptor;
+            return this;
+        }
+        
+        @Override
+        void apply(MethodNode base, MethodNode addition) {
+            InsnList instructions = base.instructions;
+            for (AbstractInsnNode insn = instructions.getFirst(); insn != null; insn = insn.getNext()) {
+                if (insn.getOpcode() != Opcodes.INVOKEVIRTUAL) {
+                    continue;
+                }
+                MethodInsnNode meth = (MethodInsnNode) insn;
+                boolean match = meth.owner.equals(find_owner) && meth.desc.equals(find_desc) && (meth.name.equals(find_mcp_name) || meth.name.equals(find_srg_name));
+                if (!match) {
+                    continue;
+                }
+                meth.setOpcode(Opcodes.INVOKESTATIC);
+                meth.owner = "factorization/coremod/MethodSplices";
+                meth.name = addition.name;
+                meth.desc = addition.desc;
+            }
         }
         
     }
