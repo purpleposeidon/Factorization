@@ -1224,6 +1224,12 @@ public class FzUtil {
         return ret;
     }
     
+    public static Vec3 subtract(Vec3 a, Vec3 b) {
+        Vec3 ret = Vec3.createVectorHelper(a.xCoord, a.yCoord, a.zCoord);
+        incrSubtract(ret, b);
+        return ret;
+    }
+    
     public static Vec3 copy(Vec3 a) {
         return Vec3.createVectorHelper(a.xCoord, a.yCoord, a.zCoord);
     }
