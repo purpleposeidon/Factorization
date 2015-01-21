@@ -58,6 +58,7 @@ public class FzConfig {
     public static boolean enable_rocketry = /* Hey! If you're turning this on, remove stuff from factorization_dead_items */ Core.dev_environ;
     public static boolean sockets_ignore_front_redstone = true;
     public static boolean show_time_on_fullscreen = true;
+    public static boolean require_book_for_manual = true;
     
     public static boolean enable_retrogen = false;
     public static String retrogen_key = "DEFAULT";
@@ -173,6 +174,7 @@ public class FzConfig {
         enable_solar_steam = getBoolConfig("enableSolarSteam", "server", enable_solar_steam, "Set to false to disable the crafting recipe for solar2steam machines");
         fanturpeller_works_on_players = getBoolConfig("fanturpellerWorksOnPlayers", "server", fanturpeller_works_on_players, "If set to false, fanturpellers will not move players.");
         sockets_ignore_front_redstone = getBoolConfig("socketsIgnoreFacePower", "server", sockets_ignore_front_redstone, "Set to false to let socket blocks detect redstone from their front; provided for legacy worlds.");
+        require_book_for_manual = getBoolConfig("requireBookForManual", "general", require_book_for_manual, "If set to true, then you must have a manual in your inventory to look up items");
         if (config.hasChanged()) {
             config.save();
         }

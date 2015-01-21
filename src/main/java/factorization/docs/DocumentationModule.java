@@ -38,6 +38,7 @@ import cpw.mods.fml.common.Loader;
 import cpw.mods.fml.common.event.FMLServerStartingEvent;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
+import factorization.common.FzConfig;
 import factorization.shared.Core;
 import factorization.shared.FzUtil;
 
@@ -217,10 +218,15 @@ public class DocumentationModule {
         if (is == null) return false;
         Minecraft mc = Minecraft.getMinecraft();
         EntityPlayer player = mc.thePlayer;
-        if (!player.capabilities.isCreativeMode) {
-            ItemStack manual = player.getHeldItem();
-            if (manual == null) return false;
-            if (manual.getItem() != Core.registry.docbook) return false;
+        if (!player.capabilities.isCreativeMode && !FzConfig.require_book_for_manual) {
+            boolean found = false;
+            for (ItemStack manual : player.inventory.mainInventory) {
+                if (manual == null) continue;
+                if (manual.getItem() != Core.registry.docbook) continue;
+                found = true;
+                break;
+            }
+            if (!found) return false;
         }
         String name = is.getUnlocalizedName();
         InputStream topic_index = getDocumentResource("topic_index");
@@ -246,7 +252,7 @@ public class DocumentationModule {
         } finally {
             FzUtil.closeNoisily("closing topic_index", topic_index);
         }
-        if (Loader.isModLoaded("NotEnoughItems") || Loader.isModLoaded("craftguide")) return false;
+        // if (Loader.isModLoaded("NotEnoughItems") || Loader.isModLoaded("craftguide")) return false;
         mc.displayGuiScreen(new DocViewer("cgi/recipes/" + name));
         return true;
     }
