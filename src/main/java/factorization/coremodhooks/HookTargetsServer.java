@@ -27,7 +27,7 @@ public class HookTargetsServer {
             int spawn = world.rand.nextInt(3) + 2;
             spawn = Math.min(spawn, i);
             i -= spawn;
-            EntityItem ent = c.spawnItem(new ItemStack(Core.registry.diamond_shard, spawn));
+            Entity ent = c.spawnItem(new ItemStack(Core.registry.diamond_shard, spawn));
             ent.invulnerable = true;
             ent.motionX = randShardVelocity(world);
             ent.motionY = randShardVelocity(world);

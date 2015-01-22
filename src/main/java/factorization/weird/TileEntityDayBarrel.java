@@ -9,6 +9,7 @@ import net.minecraft.block.BlockRailBase;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.GLAllocation;
 import net.minecraft.enchantment.EnchantmentHelper;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
@@ -952,8 +953,12 @@ public class TileEntityDayBarrel extends TileEntityFactorization {
         if (to_remove > 1 && to_remove == getItemCount()) {
             to_remove--;
         }
-        EntityItem ent = ejectItem(makeStack(to_remove), false, entityplayer, last_hit_side);
+        Entity ent = ejectItem(makeStack(to_remove), false, entityplayer, last_hit_side);
         if (ent != null && !(entityplayer instanceof FakePlayer)) {
+            if (ent instanceof EntityItem) {
+                EntityItem ei = (EntityItem) ent;
+                ei.delayBeforeCanPickup = 0;
+            }
             if (origHeldItem != null) {
                 ent.onCollideWithPlayer(entityplayer);
             } else {

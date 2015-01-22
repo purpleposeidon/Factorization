@@ -11,6 +11,7 @@ import net.minecraft.block.Block;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.init.Blocks;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.Packet;
@@ -768,8 +769,12 @@ public class Coord implements IDataSerializable, ISaneCoord, Comparable<Coord> {
         return !w.isRemote;
     }
     
-    public EntityItem spawnItem(ItemStack is) {
-        EntityItem ent = new EntityItem(w, x + 0.5, y + 0.5, z + 0.5, is);
+    public Entity spawnItem(ItemStack is) {
+        Entity ent = new EntityItem(w, x + 0.5, y + 0.5, z + 0.5, is);
+        Item item = is.getItem();
+        if (item.hasCustomEntity(is)) {
+            ent = item.createEntity(w, ent, is);
+        }
         w.spawnEntityInWorld(ent);
         return ent;
     }
