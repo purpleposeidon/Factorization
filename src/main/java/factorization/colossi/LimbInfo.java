@@ -67,11 +67,6 @@ class LimbInfo {
     public void target(Quaternion rot, double power, Interpolation interp) {
         if (NORELEASE.on) power = 1;
         NORELEASE.fixme("implement!");
-        IDeltaChunk parent = idc.getEntity().getParent();
-        if (parent != null) {
-            rot = rot.multiply(parent.getRotation());
-        }
-        //rot = 
         setTargetRotation(rot, (int) (60 / power), interp);
     }
     
@@ -97,5 +92,10 @@ class LimbInfo {
         } else {
             dse.forbid(DeltaCapability.PHYSICS_DAMAGE);
         }
+    }
+
+    @Override
+    public String toString() {
+        return type + " " + side + "#" + parity;
     }
 }
