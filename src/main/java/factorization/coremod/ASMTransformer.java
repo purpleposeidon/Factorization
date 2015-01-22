@@ -99,7 +99,7 @@ public class ASMTransformer implements IClassTransformer {
             }
         }
         
-        ClassWriter cw = new ClassWriter(ClassWriter.COMPUTE_MAXS);
+        ClassWriter cw = new ClassWriter(ClassWriter.COMPUTE_MAXS | ClassWriter.COMPUTE_FRAMES);
         cn.accept(cw);
         return cw.toByteArray();
     }
