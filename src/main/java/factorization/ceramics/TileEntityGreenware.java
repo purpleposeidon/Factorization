@@ -477,7 +477,7 @@ public class TileEntityGreenware extends TileEntityCommon {
         if (held.getItem() != Items.clay_ball || held.stackSize == 0) {
             return false;
         }
-        if (state != ClayState.WET) {
+        if (!creative && state != ClayState.WET) {
             new Notice(this, "Not wet").send(player);
             return false;
         }
@@ -830,6 +830,9 @@ public class TileEntityGreenware extends TileEntityCommon {
         Coord c = new Coord(event.player.worldObj, event.target);
         TileEntityGreenware clay = c.getTE(TileEntityGreenware.class);
         if (clay == null) {
+            return;
+        }
+        if (event.target.subHit < 0 || event.target.subHit >= clay.parts.size()) {
             return;
         }
         event.setCanceled(true);

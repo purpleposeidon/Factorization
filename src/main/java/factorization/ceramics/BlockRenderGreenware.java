@@ -2,6 +2,7 @@ package factorization.ceramics;
 
 import java.util.Random;
 
+import factorization.common.ResourceType;
 import net.minecraft.block.Block;
 import net.minecraft.client.renderer.RenderBlocks;
 import net.minecraft.client.renderer.Tessellator;
@@ -108,6 +109,10 @@ public class BlockRenderGreenware extends FactorizationBlockRender {
     
     int getColor(ClayLump rc) {
         if (rc.raw_color == -1) {
+            if (rc.icon_id == Core.registry.resource_block && rc.icon_md == ResourceType.BISQUE.md) {
+                rc.raw_color = 0;
+                return rc.raw_color;
+            }
             //Get the raw color, possibly making something up
             rawMimicRandom.setSeed(rc.icon_id.getUnlocalizedName().hashCode() << 4 + rc.icon_md);
             int c = 0;
@@ -183,7 +188,14 @@ public class BlockRenderGreenware extends FactorizationBlockRender {
                 }
             }
             if (state == ClayState.UNFIRED_GLAZED) {
-                block.setColor(getColor(rc));
+                int color = getColor(rc);
+                if (color == 0) {
+                    block.useTexture(BlockIcons.ceramics$bisque);
+                    block.setColor(0xFFFFFFFF);
+                } else {
+                    block.useTexture(BlockIcons.ceramics$rawglaze);
+                    block.setColor(color);
+                }
                 colors_changed = true;
             }
             rc.toBlockBounds(block);
