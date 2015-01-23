@@ -1,20 +1,18 @@
 package factorization.fzds;
 
-import java.util.ArrayList;
-import java.util.List;
-
+import factorization.fzds.interfaces.IFzdsShenanigans;
+import factorization.shared.Core;
+import factorization.shared.FzUtil;
 import net.minecraft.entity.Entity;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.Vec3;
 import net.minecraft.world.World;
-import factorization.fzds.interfaces.IFzdsShenanigans;
-import factorization.shared.Core;
-import factorization.shared.FzUtil;
-import factorization.shared.NORELEASE;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class MetaAxisAlignedBB extends AxisAlignedBB implements IFzdsShenanigans {
-    // NORELEASE: Optimize & cache
     /*
      * So, there's 2 operations: calculate<Axis>Offset and intersectsWith.
      * For each operation, we need to gather a list of relevant AABBs in hammer space and apply the operation to each of them.
@@ -63,9 +61,10 @@ public class MetaAxisAlignedBB extends AxisAlignedBB implements IFzdsShenanigans
     private static final List<AxisAlignedBB> EMPTY = new ArrayList<AxisAlignedBB>();
     
     List<AxisAlignedBB> getShadowBoxesWithinShadowBox(AxisAlignedBB aabb) {
-        aabbHolder.held = aabb; //.expand(padding, padding, padding);
+        aabbHolder.held = aabb;
         if (aabb.getAverageEdgeLength() > 1024) {
             Core.logSevere("Giant MetaAABB!? {}", this);
+            Thread.dumpStack();
             return EMPTY;
         }
         return shadowWorld.getCollidingBoundingBoxes(aabbHolder, aabb);
@@ -93,31 +92,33 @@ public class MetaAxisAlignedBB extends AxisAlignedBB implements IFzdsShenanigans
         // Could probably be done as a simpleish function depending on rotationQuaternion.w
         AxisAlignedBB shadowBox = convertRealBoxToShadowBox(realBox);
         if (!idc.getRotation().isZero()) {
-            shadowBox = shadowBox.expand(expansion, expansion, expansion); NORELEASE.fixme(/* cache */);
+            shadowBox = outset(shadowBox, expansion, expansion, expansion);
         }
         return getShadowBoxesWithinShadowBox(shadowBox);
     }
-    
+
+    private AxisAlignedBB real2shadowBox = FzUtil.newBox();
+    private Vec3 realMiddle = FzUtil.newVec3();
+
     AxisAlignedBB convertRealBoxToShadowBox(AxisAlignedBB realBox) {
         // This function returns a box is likely larger than what it should really be.
         // A more accurate algo would be to translate each corner and make a box that contains them.
-        Vec3 realMiddle = Vec3.createVectorHelper(0, 0, 0); NORELEASE.fixme(/* Can be cached */);
         FzUtil.setMiddle(realBox, realMiddle);
         double d = FzUtil.getDiagonalLength(realBox);
         Vec3 shadowMiddle = convertRealVecToShadowVec(realMiddle);
-        return AxisAlignedBB.getBoundingBox(
-                shadowMiddle.xCoord - d,
-                shadowMiddle.yCoord - d,
-                shadowMiddle.zCoord - d,
-                shadowMiddle.xCoord + d,
-                shadowMiddle.yCoord + d,
-                shadowMiddle.zCoord + d);
+        real2shadowBox.minX = shadowMiddle.xCoord - d;
+        real2shadowBox.minY = shadowMiddle.yCoord - d;
+        real2shadowBox.minZ = shadowMiddle.zCoord - d;
+        real2shadowBox.maxX = shadowMiddle.xCoord + d;
+        real2shadowBox.maxY = shadowMiddle.yCoord + d;
+        real2shadowBox.maxZ = shadowMiddle.zCoord + d;
+        return real2shadowBox;
     }
     
-    private Vec3 minMinusMiddle = Vec3.createVectorHelper(0, 0, 0);
-    private Vec3 maxMinusMiddle = Vec3.createVectorHelper(0, 0, 0);
-    private AxisAlignedBB shadowWorker = AxisAlignedBB.getBoundingBox(0, 0, 0, 0, 0, 0);
-    private Vec3 shadowMiddle = Vec3.createVectorHelper(0, 0, 0);
+    private Vec3 minMinusMiddle = FzUtil.newVec3();
+    private Vec3 maxMinusMiddle = FzUtil.newVec3();
+    private AxisAlignedBB shadowWorker = FzUtil.newBox();
+    private Vec3 shadowMiddle = FzUtil.newVec3();
     AxisAlignedBB convertShadowBoxToRealBox(AxisAlignedBB shadowBox) {
         // We're gonna try a different approach here.
         // Will work well so long as everything is a cube.
@@ -141,7 +142,7 @@ public class MetaAxisAlignedBB extends AxisAlignedBB implements IFzdsShenanigans
         return idc.shadow2real(shadow);
     }
     
-    private final AxisAlignedBB worker = AxisAlignedBB.getBoundingBox(0, 0, 0, 0, 0, 0);
+    private final AxisAlignedBB worker = FzUtil.newBox();
     private AxisAlignedBB expand(AxisAlignedBB collider, double dx, double dy, double dz) {
         if (dx >= 0) {
             worker.minX = collider.minX;
@@ -165,6 +166,16 @@ public class MetaAxisAlignedBB extends AxisAlignedBB implements IFzdsShenanigans
             worker.maxZ = collider.maxZ;
         }
         return worker;
+    }
+
+    private AxisAlignedBB outset(AxisAlignedBB box, double dx, double dy, double dz) {
+        box.minX -= dx;
+        box.minY -= dy;
+        box.minZ -= dz;
+        box.maxX += dx;
+        box.maxY += dy;
+        box.maxZ += dz;
+        return box;
     }
 
     /*

@@ -1,6 +1,8 @@
 package factorization.shared;
 
 import static org.lwjgl.opengl.GL11.glGetError;
+
+import com.sun.org.apache.xerces.internal.impl.xpath.XPath;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelOutboundHandlerAdapter;
@@ -1153,6 +1155,14 @@ public class FzUtil {
         v.yCoord = (ab.minY + ab.maxY)/2;
         v.zCoord = (ab.minZ + ab.maxZ)/2;
     }
+
+    public static AxisAlignedBB newBox() {
+        return AxisAlignedBB.getBoundingBox(0, 0, 0, 0, 0, 0);
+    }
+
+    public static Vec3 newVec3() {
+        return Vec3.createVectorHelper(0, 0, 0);
+    }
     
     public static void sort(Vec3 min, Vec3 max) {
         if (min.xCoord > max.xCoord) {
@@ -1270,6 +1280,16 @@ public class FzUtil {
         double maxY = Math.max(min.yCoord, max.yCoord);
         double maxZ = Math.max(min.zCoord, max.zCoord);
         return AxisAlignedBB.getBoundingBox(minX, minY, minZ, maxX, maxY, maxZ);
+    }
+
+    public static void updateAABB(AxisAlignedBB box, Vec3 min, Vec3 max) {
+        box.minX = min.xCoord;
+        box.minY = min.yCoord;
+        box.minZ = min.zCoord;
+
+        box.maxX = max.xCoord;
+        box.maxY = max.yCoord;
+        box.maxZ = max.zCoord;
     }
     
     public static void assignBoxFrom(AxisAlignedBB dest, AxisAlignedBB orig) {
