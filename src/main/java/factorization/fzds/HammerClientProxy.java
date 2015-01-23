@@ -1,6 +1,20 @@
 package factorization.fzds;
 
+import cpw.mods.fml.client.registry.RenderingRegistry;
+import cpw.mods.fml.common.FMLCommonHandler;
+import cpw.mods.fml.common.eventhandler.SubscribeEvent;
+import cpw.mods.fml.common.gameevent.TickEvent;
+import cpw.mods.fml.common.gameevent.TickEvent.ClientTickEvent;
+import cpw.mods.fml.common.gameevent.TickEvent.Phase;
+import cpw.mods.fml.common.network.FMLNetworkEvent.ClientDisconnectionFromServerEvent;
+import cpw.mods.fml.relauncher.Side;
+import factorization.api.Coord;
+import factorization.api.Quaternion;
+import factorization.coremodhooks.IExtraChunkData;
+import factorization.fzds.interfaces.IDeltaChunk;
 import factorization.shared.BlockRenderHelper;
+import factorization.shared.Core;
+import factorization.shared.FzUtil;
 import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityClientPlayerMP;
@@ -24,25 +38,7 @@ import net.minecraft.world.storage.WorldInfo;
 import net.minecraftforge.client.ForgeHooksClient;
 import net.minecraftforge.client.event.DrawBlockHighlightEvent;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
-import net.minecraftforge.client.event.RenderGameOverlayEvent.ElementType;
-
 import org.lwjgl.opengl.GL11;
-
-import cpw.mods.fml.client.registry.RenderingRegistry;
-import cpw.mods.fml.common.FMLCommonHandler;
-import cpw.mods.fml.common.eventhandler.SubscribeEvent;
-import cpw.mods.fml.common.gameevent.TickEvent;
-import cpw.mods.fml.common.gameevent.TickEvent.ClientTickEvent;
-import cpw.mods.fml.common.gameevent.TickEvent.Phase;
-import cpw.mods.fml.common.network.FMLNetworkEvent.ClientDisconnectionFromServerEvent;
-import cpw.mods.fml.relauncher.Side;
-import factorization.api.Coord;
-import factorization.api.Quaternion;
-import factorization.coremodhooks.IExtraChunkData;
-import factorization.fzds.interfaces.IDeltaChunk;
-import factorization.shared.Core;
-import factorization.shared.FzUtil;
-import factorization.shared.NORELEASE;
 
 public class HammerClientProxy extends HammerProxy {
     public HammerClientProxy() {
@@ -275,24 +271,20 @@ public class HammerClientProxy extends HammerProxy {
     @SubscribeEvent
     public void resetTracing(ClientTickEvent event) {
         if (event.phase != TickEvent.Phase.START) return;
-        distance = Double.POSITIVE_INFINITY;
-        // _shadowSelected = null;
-        //_rayTarget = null;
-        //_selectionBlockBounds = null;
-        //_hitSlice = null;
-        NORELEASE.fixme("Can do the wrong thing when there's overlapping DSEs");
+        _distance = Double.POSITIVE_INFINITY;
     }
     
     public void offerHit(MovingObjectPosition mop, DseRayTarget rayTarget, AxisAlignedBB moppedBounds) {
         double d = rayTarget.getDistanceSqToEntity(mc.thePlayer);
-        if (d > distance) return;
+        if (d > _distance) return;
         _shadowSelected = mop;
         _rayTarget = rayTarget;
         _selectionBlockBounds = moppedBounds;
         _hitSlice = rayTarget.parent;
+        _distance = d;
     }
     
-    double distance;
+    double _distance;
     MovingObjectPosition _shadowSelected;
     DseRayTarget _rayTarget;
     AxisAlignedBB _selectionBlockBounds;

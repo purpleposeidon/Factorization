@@ -1,18 +1,5 @@
 package factorization.fzds;
 
-import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
-
-import net.minecraft.command.ICommand;
-import net.minecraft.command.ICommandSender;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.server.MinecraftServer;
-import net.minecraft.server.management.PlayerManager;
-import net.minecraft.util.Vec3;
-import net.minecraft.world.World;
-import net.minecraftforge.common.DimensionManager;
 import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.Mod;
 import cpw.mods.fml.common.Mod.EventHandler;
@@ -26,11 +13,17 @@ import cpw.mods.fml.common.network.FMLNetworkEvent.ClientDisconnectionFromServer
 import cpw.mods.fml.common.registry.EntityRegistry;
 import cpw.mods.fml.relauncher.Side;
 import factorization.common.FzConfig;
-import factorization.fzds.interfaces.IDeltaChunk;
 import factorization.fzds.network.FzdsPacketRegistry;
 import factorization.fzds.network.WrappedPacket;
 import factorization.shared.Core;
-import factorization.shared.NORELEASE;
+import net.minecraft.entity.Entity;
+import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.management.PlayerManager;
+import net.minecraft.util.Vec3;
+import net.minecraft.world.World;
+import net.minecraftforge.common.DimensionManager;
+
+import java.io.File;
 
 @Mod(modid = Hammer.modId, name = Hammer.name, version = Core.version)
 public class Hammer {
