@@ -3,6 +3,7 @@ package factorization.twistedblock;
 import java.util.List;
 
 import net.minecraft.block.Block;
+import net.minecraft.client.renderer.texture.IIconRegister;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
@@ -10,6 +11,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.Vec3;
 import net.minecraft.world.World;
+import net.minecraftforge.common.util.FakePlayer;
 import net.minecraftforge.common.util.ForgeDirection;
 import factorization.api.Coord;
 import factorization.api.DeltaCoord;
@@ -38,11 +40,10 @@ public class ItemTwistedBlock extends ItemBlockProxy {
     public boolean placeBlockAt(ItemStack stack, EntityPlayer player, World world, int x, int y, int z, int side,
             float hitX, float hitY, float hitZ, int metadata) {
         if (world.isRemote) return false;
+        if (player instanceof FakePlayer) return false;
         Coord at = new Coord(world, x, y, z);
         if (world == DeltaChunk.getWorld(world)) {
             // Do the twist!
-            Coord hit = at.add(ForgeDirection.getOrientation(side).getOpposite());
-            if (hit.getBlock() != darkIron || hit.getMd() != darkIronMd) return false;
             IDeltaChunk[] found = DeltaChunk.getSlicesContainingPoint(at);
             if (found == null || found.length != 1) return false;
             IDeltaChunk idc = found[0];
@@ -90,7 +91,6 @@ public class ItemTwistedBlock extends ItemBlockProxy {
         }
         ForgeDirection axis = ForgeDirection.getOrientation(side);
         double amount = Math.toRadians(45);
-        idc.setRotation(Quaternion.getRotationQuaternionRadians(amount, axis));
         idc.getCenter().setIdMd(darkIron, darkIronMd, true);
         idc.posX = at.x + 0.5;
         idc.posY = at.y + 0.5;
@@ -99,6 +99,10 @@ public class ItemTwistedBlock extends ItemBlockProxy {
         Vec3 center = idc.getRotationalCenterOffset().addVector(0.5, 0.5, 0.5);
         idc.setRotationalCenterOffset(center);
         idc.worldObj.spawnEntityInWorld(idc);
+
+        Quaternion rotation = Quaternion.getRotationQuaternionRadians(amount, axis);
+        idc.orderTargetRotation(rotation, 20 * 16, Interpolation.SMOOTH3);
+
         return true;
     }
     
@@ -106,4 +110,7 @@ public class ItemTwistedBlock extends ItemBlockProxy {
     public void getSubItems(Item itemId, CreativeTabs tab, List list) {
         list.add(new ItemStack(this));
     }
+
+    @Override
+    public void registerIcons(IIconRegister registry) { }
 }
