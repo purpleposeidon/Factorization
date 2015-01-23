@@ -1006,8 +1006,6 @@ public class FZDSCommand extends CommandBase {
                     FzUtil.toEntPos(idc, snapTo);
                     selected = idc;
                     this.call(args);
-                    // If there was a loop, we'd already be doomed I guess maybe?
-                    NORELEASE.fixme("Loop-checking in DSE de-serialization");
                 }
             }
             

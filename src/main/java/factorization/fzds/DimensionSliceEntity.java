@@ -6,6 +6,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 
+import factorization.shared.*;
 import net.minecraft.block.Block;
 import net.minecraft.command.IEntitySelector;
 import net.minecraft.entity.Entity;
@@ -41,10 +42,6 @@ import factorization.fzds.interfaces.IDeltaChunk;
 import factorization.fzds.interfaces.IFzdsCustomTeleport;
 import factorization.fzds.interfaces.IFzdsEntryControl;
 import factorization.fzds.interfaces.Interpolation;
-import factorization.shared.Core;
-import factorization.shared.EntityReference;
-import factorization.shared.FzUtil;
-import factorization.shared.NORELEASE;
 
 public class DimensionSliceEntity extends IDeltaChunk implements IFzdsEntryControl {
     //Dang, this class is a mess! Code folding, activate!
@@ -262,6 +259,14 @@ public class DimensionSliceEntity extends IDeltaChunk implements IFzdsEntryContr
     
     @Override
     public void setParent(IDeltaChunk _parent, Vec3 jointPositionAtParent) {
+        if (null != TortoiseAndHare.race(this, new TortoiseAndHare.Advancer<IDeltaChunk>() {
+            @Override
+            public IDeltaChunk getNext(IDeltaChunk node) {
+                return node.getParent();
+            }
+        })) {
+            throw new IllegalArgumentException("Parenting loop!");
+        }
         DimensionSliceEntity newParent = (DimensionSliceEntity) _parent;
         if (this.parent.trackingEntity()) {
             DimensionSliceEntity oldParent = parent.getEntity();
@@ -350,7 +355,7 @@ public class DimensionSliceEntity extends IDeltaChunk implements IFzdsEntryContr
         if (last_x == Double.NEGATIVE_INFINITY) return;
         boolean in_range = (minX <= last_x && last_x <= maxX) && (minZ <= last_z && last_z <= maxZ);
         if (in_range) return;
-        // Have we teleported a long distance? Clean up our previous location
+        // Have we teleported a long _distance? Clean up our previous location
         d += FzUtil.getDiagonalLength(realArea);
         for (double x = last_x - d; x <= last_x + d; x += 16) {
             for (double z = last_z - d; z <= last_z + d; z += 16) {
