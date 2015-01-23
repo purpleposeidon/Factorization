@@ -46,7 +46,7 @@ public class NORELEASE {
     public static PrintStream trace;
     
     /**
-     * Indicate something that needs to be done before release. Maybe use as NORELEASE.fixme(/* some stuff &#42;/)
+     * Indicate something that needs to be done before release, eg <code>NORELEASE.fixme("some stuff")</code>
      * @param notes
      */
     public static void fixme(Object... notes) { }
