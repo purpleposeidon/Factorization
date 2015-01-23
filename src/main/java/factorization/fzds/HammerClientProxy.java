@@ -1,5 +1,6 @@
 package factorization.fzds;
 
+import factorization.shared.BlockRenderHelper;
 import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityClientPlayerMP;
@@ -311,10 +312,11 @@ public class HammerClientProxy extends HammerProxy {
             return;
         }
         Coord here = new Coord(DeltaChunk.getClientShadowWorld(), shadowSelected.blockX, shadowSelected.blockY, shadowSelected.blockZ);
-        here.getBlock().setBlockBounds(
-                (float)(box.minX - here.x), (float)(box.minY - here.y), (float)(box.minZ - here.z),
-                (float)(box.maxX - here.x), (float)(box.maxY - here.y), (float)(box.maxZ - here.z)
-            );
+        Block hereBlock = BlockRenderHelper.instance; //here.getBlock();
+        hereBlock.setBlockBounds(
+                (float) (box.minX - here.x), (float) (box.minY - here.y), (float) (box.minZ - here.z),
+                (float) (box.maxX - here.x), (float) (box.maxY - here.y), (float) (box.maxZ - here.z)
+        );
         EntityPlayer player = event.player;
         RenderGlobal rg = event.context;
         ItemStack is = event.currentItem;
