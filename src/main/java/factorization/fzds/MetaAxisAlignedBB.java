@@ -60,7 +60,7 @@ public class MetaAxisAlignedBB extends AxisAlignedBB implements IFzdsShenanigans
     }
     
     AabbHolder aabbHolder = new AabbHolder();
-    private static final List<AxisAlignedBB> EMPTY = new ArrayList();
+    private static final List<AxisAlignedBB> EMPTY = new ArrayList<AxisAlignedBB>();
     
     List<AxisAlignedBB> getShadowBoxesWithinShadowBox(AxisAlignedBB aabb) {
         aabbHolder.held = aabb; //.expand(padding, padding, padding);
@@ -69,13 +69,6 @@ public class MetaAxisAlignedBB extends AxisAlignedBB implements IFzdsShenanigans
             return EMPTY;
         }
         return shadowWorld.getCollidingBoundingBoxes(aabbHolder, aabb);
-    }
-    
-    static void debugBox(String name, AxisAlignedBB box) {
-        double bx = box.maxX - box.minX;
-        double by = box.maxY - box.minY;
-        double bz = box.maxZ - box.minZ;
-        System.out.println(name + ": " + (bx * by * bz) + " = " + bx + ", " + by + ", " + bz);
     }
     
     List<AxisAlignedBB> getShadowBoxesInRealBox(AxisAlignedBB realBox) {
@@ -102,9 +95,6 @@ public class MetaAxisAlignedBB extends AxisAlignedBB implements IFzdsShenanigans
         if (!idc.getRotation().isZero()) {
             shadowBox = shadowBox.expand(expansion, expansion, expansion); NORELEASE.fixme(/* cache */);
         }
-        /*if (FMLCommonHandler.instance().getEffectiveSide() == Side.CLIENT) {
-            AabbDebugger.addBox(realBox);
-        }*/
         return getShadowBoxesWithinShadowBox(shadowBox);
     }
     
@@ -126,10 +116,11 @@ public class MetaAxisAlignedBB extends AxisAlignedBB implements IFzdsShenanigans
     
     private Vec3 minMinusMiddle = Vec3.createVectorHelper(0, 0, 0);
     private Vec3 maxMinusMiddle = Vec3.createVectorHelper(0, 0, 0);
+    private AxisAlignedBB shadowWorker = AxisAlignedBB.getBoundingBox(0, 0, 0, 0, 0, 0);
+    private Vec3 shadowMiddle = Vec3.createVectorHelper(0, 0, 0);
     AxisAlignedBB convertShadowBoxToRealBox(AxisAlignedBB shadowBox) {
         // We're gonna try a different approach here.
         // Will work well so long as everything is a cube.
-        Vec3 shadowMiddle = Vec3.createVectorHelper(0, 0, 0);
         FzUtil.setMiddle(shadowBox, shadowMiddle);
         FzUtil.getMin(shadowBox, minMinusMiddle);
         FzUtil.getMax(shadowBox, maxMinusMiddle);
@@ -138,7 +129,8 @@ public class MetaAxisAlignedBB extends AxisAlignedBB implements IFzdsShenanigans
         Vec3 realMiddle = convertShadowVecToRealVec(shadowMiddle);
         FzUtil.incrAdd(minMinusMiddle, realMiddle);
         FzUtil.incrAdd(maxMinusMiddle, realMiddle);
-        return FzUtil.createAABB(minMinusMiddle, maxMinusMiddle);
+        FzUtil.updateAABB(shadowWorker, minMinusMiddle, maxMinusMiddle);
+        return shadowWorker;
     }
     
     Vec3 convertRealVecToShadowVec(Vec3 real) {
@@ -149,9 +141,32 @@ public class MetaAxisAlignedBB extends AxisAlignedBB implements IFzdsShenanigans
         return idc.shadow2real(shadow);
     }
     
-    
-    
-    
+    private final AxisAlignedBB worker = AxisAlignedBB.getBoundingBox(0, 0, 0, 0, 0, 0);
+    private AxisAlignedBB expand(AxisAlignedBB collider, double dx, double dy, double dz) {
+        if (dx >= 0) {
+            worker.minX = collider.minX;
+            worker.maxX = collider.maxX + dx;
+        } else {
+            worker.minX = collider.minX + dx /* subtract! */;
+            worker.maxX = collider.maxX;
+        }
+        if (dy >= 0) {
+            worker.minY = collider.minY;
+            worker.maxY = collider.maxY + dy;
+        } else {
+            worker.minY = collider.minY + dy /* subtract! */;
+            worker.maxY = collider.maxY;
+        }
+        if (dz >= 0) {
+            worker.minZ = collider.minZ;
+            worker.maxZ = collider.maxZ + dz;
+        } else {
+            worker.minZ = collider.minZ + dz /* subtract! */;
+            worker.maxZ = collider.maxZ;
+        }
+        return worker;
+    }
+
     /*
      * The three functions are decomposed here:
      *  - Vec3 offset = rotateOffset(XcurrentOffset, YcurrentOffset, ZcurrentOffset)
@@ -163,7 +178,7 @@ public class MetaAxisAlignedBB extends AxisAlignedBB implements IFzdsShenanigans
     @Override
     public double calculateXOffset(AxisAlignedBB collider, double currentOffset) {
         collider = collider.copy();
-        List<AxisAlignedBB> shadowBoxes = getShadowBoxesInRealBox(collider.expand(1, 0, 0));
+        List<AxisAlignedBB> shadowBoxes = getShadowBoxesInRealBox(expand(collider, currentOffset, 0, 0));
         for (AxisAlignedBB shadowBox : shadowBoxes) {
             AxisAlignedBB realShadow = convertShadowBoxToRealBox(shadowBox);
             currentOffset = realShadow.calculateXOffset(collider, currentOffset);
@@ -174,7 +189,7 @@ public class MetaAxisAlignedBB extends AxisAlignedBB implements IFzdsShenanigans
     @Override
     public double calculateYOffset(AxisAlignedBB collider, double currentOffset) {
         collider = collider.copy();
-        List<AxisAlignedBB> shadowBoxes = getShadowBoxesInRealBox(collider.expand(0, 1, 0));
+        List<AxisAlignedBB> shadowBoxes = getShadowBoxesInRealBox(expand(collider, 0, currentOffset, 0));
         for (AxisAlignedBB shadowBox : shadowBoxes) {
             AxisAlignedBB realShadow = convertShadowBoxToRealBox(shadowBox);
             currentOffset = realShadow.calculateYOffset(collider, currentOffset);
@@ -185,18 +200,15 @@ public class MetaAxisAlignedBB extends AxisAlignedBB implements IFzdsShenanigans
     @Override
     public double calculateZOffset(AxisAlignedBB collider, double currentOffset) {
         collider = collider.copy();
-        List<AxisAlignedBB> shadowBoxes = getShadowBoxesInRealBox(collider.expand(0, 0, 1));
+        List<AxisAlignedBB> shadowBoxes = getShadowBoxesInRealBox(expand(collider, 0, 0, currentOffset));
         for (AxisAlignedBB shadowBox : shadowBoxes) {
             AxisAlignedBB realShadow = convertShadowBoxToRealBox(shadowBox);
             currentOffset = realShadow.calculateZOffset(collider, currentOffset);
         }
         return currentOffset;
     }
-    
-    
-    
-    
-    
+
+
     @Override
     public boolean intersectsWith(AxisAlignedBB collider) {
         if (!idc.realArea.intersectsWith(collider)) return false;
