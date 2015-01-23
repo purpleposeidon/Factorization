@@ -2,10 +2,7 @@ package factorization.docs;
 
 import java.util.ArrayList;
 
-import org.lwjgl.opengl.GL11;
-
 import net.minecraft.client.gui.FontRenderer;
-import factorization.shared.NORELEASE;
 
 public class WordPage extends AbstractPage {
     ArrayList<ArrayList<Word>> text = new ArrayList();
@@ -44,12 +41,14 @@ public class WordPage extends AbstractPage {
         int y = 0;
         for (ArrayList<Word> line : text) {
             if (y > relativeY) break;
-            int yChange = getPad(line, true) + getPad(line, false);
+            int[] padding = getVerticalPadding(line);
+            int paddingTop = padding[0], paddingBottom = padding[1];
+            int yChange = paddingTop + paddingBottom;
             if (y + yChange < relativeY) {
                 y += yChange;
                 continue;
             }
-            y += getPad(line, true);
+            y += paddingTop;
             int x = 0;
             for (Word word : line) {
                 int width = word.getWidth(font);
@@ -59,20 +58,23 @@ public class WordPage extends AbstractPage {
                 x += width;
                 if (x > relativeX) break;
             }
-            y += getPad(line, false);
+            y += paddingBottom;
         }
         return null;
     }
-    
-    int getPad(ArrayList<Word> line, boolean isAbove) {
+
+    /**
+     * Return the padding on a line.
+     * @param line
+     * @return the "tuple" int[] { padUp, padDown }
+     */
+    int[] getVerticalPadding(ArrayList<Word> line) {
         int padUp = 0, padDown = 0;
         for (Word word : line) {
             padUp = Math.max(word.getPaddingAbove(), padUp);
             padDown = Math.max(word.getPaddingBelow(), padDown);
         }
-        NORELEASE.fixme("No mutliple returns? Idiocy.");
-        if (isAbove) return padUp;
-        return padDown;
+        return new int[] {padUp, padDown};
     }
     
     @Override
@@ -80,11 +82,13 @@ public class WordPage extends AbstractPage {
         int y = 0;
         for (ArrayList<Word> line : text) {
             int x = 0;
-            y += getPad(line, true);
+            int[] padding = getVerticalPadding(line);
+            int paddingTop = padding[0], paddingBottom = padding[1];
+            y += paddingTop;
             for (Word word : line) {
                 x += word.draw(doc, ox + x, oy + y, hoveredLink != null && hoveredLink.equals(word.getLink()));
             }
-            y += getPad(line, false);
+            y += paddingBottom;
         }
     }
 }

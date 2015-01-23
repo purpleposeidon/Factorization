@@ -7,8 +7,6 @@ import net.minecraft.util.EnumChatFormatting;
 
 import com.google.common.base.Strings;
 
-import factorization.shared.NORELEASE;
-
 public abstract class AbstractTypesetter {
     // Super-awesome typesetter version π², by neptunepink
     
@@ -109,7 +107,9 @@ public abstract class AbstractTypesetter {
         }
         int total_height = 0;
         for (ArrayList<Word> line : page.text) {
-            total_height += page.getPad(line, true) + page.getPad(line, false);
+            int[] padding = page.getVerticalPadding(line);
+            int paddingTop = padding[0], paddingBottom = padding[1];
+            total_height += paddingTop + paddingBottom;
         }
         
         if (total_height + w.getPaddingAbove() + w.getPaddingBelow() > pageHeight) {

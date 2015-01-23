@@ -1,11 +1,14 @@
 package factorization.fzds;
 
 import java.lang.ref.WeakReference;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map.Entry;
 
+import net.minecraft.client.Minecraft;
 import net.minecraft.command.CommandBase;
 import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommandSender;
@@ -30,6 +33,7 @@ import com.google.common.base.Splitter;
 import com.google.common.base.Strings;
 import com.google.common.collect.Iterables;
 
+import cpw.mods.fml.relauncher.ReflectionHelper;
 import factorization.api.Coord;
 import factorization.api.DeltaCoord;
 import factorization.api.ICoordFunction;
@@ -1040,6 +1044,10 @@ public class FZDSCommand extends CommandBase {
         if (Core.dev_environ) add(new SubCommand("test") {
             @Override
             void call(String[] args) {
+                if (args.length > 0 && args[0].equals("cam")) {
+                    Minecraft.getMinecraft().gameSettings.debugCamEnable ^= true;
+                    return;
+                }
                 double angle = Math.PI * selected.worldObj.rand.nextDouble();
                 ForgeDirection up = ForgeDirection.UP;
                 int time = 30;

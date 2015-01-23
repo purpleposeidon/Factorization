@@ -497,7 +497,7 @@ public class DimensionSliceEntity extends IDeltaChunk implements IFzdsEntryContr
     }
     
     void updateMotion(Vec3 parentTickDisp, Quaternion parentTickRotation) {
-        if (realArea == null || metaAABB == null) {
+        if (metaAABB == null) {
             return;
         }
         if (hasOrderedRotation() && orderTimeEnd <= worldObj.getTotalWorldTime()) {
