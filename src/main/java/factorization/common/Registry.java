@@ -557,7 +557,7 @@ public class Registry {
         
         ItemStack lapis = new ItemStack(Items.dye, 1, 4);
         
-        shapelessOreRecipe(base_common, empty_glaze_bucket.copy(), Items.water_bucket, Blocks.sand, Items.clay_ball);
+        shapelessOreRecipe(base_common, empty_glaze_bucket.copy(), Items.water_bucket, new ItemStack(Blocks.sand, 1, OreDictionary.WILDCARD_VALUE), Items.clay_ball);
         shapelessOreRecipe(glaze_base_mimicry, base_common, Items.redstone, Items.slime_ball, lapis);
         
         ItemStack waterFeature = glaze_bucket.makeMimicingGlaze(Blocks.water, 0, -1);
