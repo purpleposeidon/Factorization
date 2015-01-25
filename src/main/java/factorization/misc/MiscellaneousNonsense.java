@@ -281,11 +281,11 @@ public class MiscellaneousNonsense {
             awesome &= held instanceof ItemSword || held instanceof ItemAxe || held instanceof ItemBow || player.riddenByEntity instanceof EntityPlayer || player.riddenByEntity instanceof EntityVillager;
         }
         if (awesome) {
-            horse.addPotionEffect(new PotionEffect(Potion.moveSpeed.id, 20*15, 2, false));
-            horse.addPotionEffect(new PotionEffect(Potion.resistance.id, 20*15, 1, true));
-            horse.addPotionEffect(new PotionEffect(Potion.jump.id, 20*15, 1, true));
+            horse.addPotionEffect(new PotionEffect(Potion.moveSpeed.id, 20 * 40, 2, false));
+            horse.addPotionEffect(new PotionEffect(Potion.resistance.id, 20 * 40, 1, true));
+            horse.addPotionEffect(new PotionEffect(Potion.jump.id, 20 * 40, 1, true));
         } else {
-            horse.addPotionEffect(new PotionEffect(Potion.moveSpeed.id, 20, 1, false));
+            horse.addPotionEffect(new PotionEffect(Potion.moveSpeed.id, 20 * 8, 1, false));
         }
         horse.playLivingSound();
     }
