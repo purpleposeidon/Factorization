@@ -22,7 +22,6 @@ public class FzConfig {
     public static int silver_ore_node_new_size = 18;
     public static boolean gen_colossi = true;
     public static int dimension_slice_dimid = -7;
-    public static int force_max_entity_radius = -1;
     public static boolean pocket_craft_anywhere = true;
     public static String pocketActions = "xcbf";
     public static boolean renderTEs = true;

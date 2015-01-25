@@ -121,20 +121,4 @@ public class Hammer {
     public static Vec3 ent2vec(Entity ent) {
         return Vec3.createVectorHelper(ent.posX, ent.posY, ent.posZ);
     }
-    
-    @EventHandler
-    public void modsLoaded(FMLPostInitializationEvent event) {
-        double desired_radius = 16/2;
-        if (FzConfig.force_max_entity_radius >= 0 && FzConfig.force_max_entity_radius < desired_radius) {
-            desired_radius = FzConfig.force_max_entity_radius;
-            Core.logFine("Using %f as FZDS's maximum entity radius; this could cause failure to collide with FZDS entities");
-        }
-        if (World.MAX_ENTITY_RADIUS < desired_radius) {
-            Core.logFine("Enlarging World.MAX_ENTITY_RADIUS from %f to %f", World.MAX_ENTITY_RADIUS, desired_radius);
-            Core.logFine("Please let the author know if this causes problems.");
-            World.MAX_ENTITY_RADIUS = desired_radius;
-        } else {
-            Core.logFine("World.MAX_ENTITY_RADIUS was already set to %f, which is large enough for our purposes (%f)", World.MAX_ENTITY_RADIUS, desired_radius);
-        }
-    }
 }
