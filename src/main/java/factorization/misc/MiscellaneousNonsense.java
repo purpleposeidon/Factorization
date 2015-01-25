@@ -300,6 +300,7 @@ public class MiscellaneousNonsense {
     @EventHandler
     public void registerCommands(FMLServerStartingEvent event) {
         event.registerServerCommand(new MC16009());
+        event.registerServerCommand(new Deglitch());
     }
     
 
