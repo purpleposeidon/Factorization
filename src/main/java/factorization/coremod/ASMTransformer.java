@@ -9,6 +9,7 @@ import java.util.HashMap;
 import java.util.List;
 
 import net.minecraft.launchwrapper.IClassTransformer;
+import net.minecraft.launchwrapper.Launch;
 import net.minecraft.launchwrapper.LaunchClassLoader;
 
 import org.objectweb.asm.ClassReader;
@@ -25,6 +26,8 @@ import org.objectweb.asm.util.TraceClassVisitor;
 import cpw.mods.fml.relauncher.FMLRelaunchLog;
 
 public class ASMTransformer implements IClassTransformer {
+    public static boolean dev_environ = Launch.blackboard != null ? (Boolean) Launch.blackboard.get("fml.deobfuscatedEnvironment") : false;
+
     @Override
     public byte[] transform(String name, String transformedName, byte[] basicClass) {
         if (transformedName.equals("net.minecraft.block.Block")) {
@@ -98,8 +101,9 @@ public class ASMTransformer implements IClassTransformer {
                 throw new RuntimeException("Unable to find method " + cn.name + "." + change.srgName + " (" + change.mcpName + ")");
             }
         }
-        
-        ClassWriter cw = new ClassWriter(ClassWriter.COMPUTE_MAXS | ClassWriter.COMPUTE_FRAMES);
+        int flags = ClassWriter.COMPUTE_MAXS;
+        if (dev_environ) flags |= ClassWriter.COMPUTE_FRAMES; // FIXME: Troubles running with intellij? Different JVM or something?
+        ClassWriter cw = new ClassWriter(flags);
         cn.accept(cw);
         return cw.toByteArray();
     }
