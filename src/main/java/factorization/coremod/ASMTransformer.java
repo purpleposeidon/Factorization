@@ -102,7 +102,7 @@ public class ASMTransformer implements IClassTransformer {
             }
         }
         int flags = ClassWriter.COMPUTE_MAXS;
-        if (dev_environ) flags |= ClassWriter.COMPUTE_FRAMES; // FIXME: Troubles running with intellij? Different JVM or something?
+        flags |= ClassWriter.COMPUTE_FRAMES; // FIXME: Troubles running with intellij? Different JVM or something?
         ClassWriter cw = new ClassWriter(flags);
         cn.accept(cw);
         return cw.toByteArray();
