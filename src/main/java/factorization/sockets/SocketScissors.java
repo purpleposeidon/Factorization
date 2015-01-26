@@ -5,6 +5,7 @@ import static org.lwjgl.opengl.GL11.*;
 import java.io.DataInput;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 
@@ -54,18 +55,16 @@ import factorization.shared.NetworkFactorization.MessageType;
 import factorization.shared.ObjectModel;
 
 public class SocketScissors extends TileEntitySocketBase implements ICaptureDrops {
-    boolean wasPowered = false;
-    boolean sound = false;
-    byte openCount = 0;
-    static byte openTime = 6;
+    private boolean wasPowered = false;
+    private ArrayList<ItemStack> buffer = new ArrayList();
+    private byte openCount = 0;
+    private static byte openTime = 6;
 
-    boolean blocked = false;
-    
-    boolean dirty = false;
+    private boolean sound = false;
+    private boolean blocked = false;
+    private boolean dirty = false;
     
     public static Entity lootingPlayer;
-    
-    ArrayList<ItemStack> buffer = new ArrayList();
     
     @Override
     public FactoryType getFactoryType() {
@@ -186,27 +185,27 @@ public class SocketScissors extends TileEntitySocketBase implements ICaptureDrop
     };
 
     public boolean _handleRay(ISocketHolder socket, MovingObjectPosition mop, boolean mopIsThis, boolean powered) {
-        ItemStack shears = new ItemStack(Items.shears);
-        shears.addEnchantment(Enchantment.silkTouch, 1);
-        ItemStack sword = new ItemStack(Items.diamond_sword);
-        if (worldObj.rand.nextInt(10) > 3) {
-            sword.addEnchantment(Enchantment.looting, 1);
-        }
         if (mop.typeOfHit == MovingObjectPosition.MovingObjectType.ENTITY) {
+            ItemStack sword = new ItemStack(Items.diamond_sword, 0 /* In case it somehow gets yoinked from us */);
+            if (worldObj.rand.nextInt(10) > 3) {
+                sword.addEnchantment(Enchantment.looting, 1);
+            }
             Entity entity = mop.entityHit;
             if (entity instanceof EntityLivingBase) {
-                EntityLivingBase living = (EntityLivingBase)entity;
+                EntityLivingBase living = (EntityLivingBase) entity;
                 EntityPlayer player = getFakePlayer();
                 player.inventory.mainInventory[0] = sword;
                 SocketScissors.lootingPlayer = player;
                 int prevRecentlyHit = living.recentlyHit;
                 living.attackEntityFrom(ScissorsDamge, 2);
                 living.recentlyHit = prevRecentlyHit;
-                SocketScissors.lootingPlayer.isDead=true;
+                SocketScissors.lootingPlayer.isDead = true;
                 return true;
             }
         }
         if (mop.typeOfHit == MovingObjectPosition.MovingObjectType.BLOCK) {
+            ItemStack shears = new ItemStack(Items.shears, 0 /* In case it somehow gets yoinked from us */);
+            shears.addEnchantment(Enchantment.silkTouch, 1);
             Block block = worldObj.getBlock(mop.blockX, mop.blockY, mop.blockZ);
             int metadata = worldObj.getBlockMetadata(mop.blockX, mop.blockY, mop.blockZ);
             if (block.isAir(worldObj, mop.blockX, mop.blockY, mop.blockZ)) {
@@ -216,23 +215,20 @@ public class SocketScissors extends TileEntitySocketBase implements ICaptureDrop
                 EntityPlayer player = getFakePlayer();
                 player.inventory.mainInventory[0] = shears;
                 if (block instanceof IShearable) {
-                     IShearable target = (IShearable)block;
-                     if (target.isShearable(shears, worldObj, mop.blockX,mop.blockY,mop.blockZ)) {
-                            List<ItemStack> stacks = target.onSheared(shears, worldObj, mop.blockX,mop.blockY,mop.blockZ, 0);
-                            for(ItemStack stack : stacks) {
-                                processCollectedItem(stack);
-                            }
-                            removeBlock(player,block,metadata, mop.blockX, mop.blockY, mop.blockZ);
-                            return true;
-                     }
+                    IShearable target = (IShearable) block;
+                    if (target.isShearable(shears, worldObj, mop.blockX, mop.blockY, mop.blockZ)) {
+                        List<ItemStack> stacks = target.onSheared(shears, worldObj, mop.blockX, mop.blockY, mop.blockZ, 0);
+                        processCollectedItems(stacks);
+                        removeBlock(player, block, metadata, mop.blockX, mop.blockY, mop.blockZ);
+                        return true;
+                    }
                 } else {
-                    boolean didRemove = removeBlock(player,block,metadata,mop.blockX,mop.blockY,mop.blockZ);
+                    boolean didRemove = removeBlock(player, block, metadata, mop.blockX, mop.blockY, mop.blockZ);
                     if (didRemove) {
                         block.harvestBlock(worldObj, player, mop.blockX, mop.blockY, mop.blockZ, metadata);
                     }
                 }
-            }
-            else{
+            } else {
                 blocked = true;
             }
         }
@@ -273,15 +269,13 @@ public class SocketScissors extends TileEntitySocketBase implements ICaptureDrop
         if (dist > maxDist) {
             return false;
         }
-        for (int i = 0; i < stacks.size(); i++) {
-            ItemStack is = stacks.get(i);
-            processCollectedItem(is);
-        }
+        processCollectedItems(stacks);
         return true;
     }
-    
-    void processCollectedItem(ItemStack is) {
-        buffer.add(is);
+
+    void processCollectedItems(Collection<ItemStack> items) {
+        buffer.addAll(items);
+        items.clear();
     }
 
     @Override
