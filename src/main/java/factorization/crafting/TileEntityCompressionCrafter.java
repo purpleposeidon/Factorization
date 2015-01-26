@@ -4,6 +4,7 @@ import java.io.DataInput;
 import java.io.IOException;
 import java.util.ArrayList;
 
+import factorization.notify.Notice;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
@@ -26,9 +27,9 @@ import factorization.shared.FzUtil.FzInv;
 import factorization.shared.NetworkFactorization.MessageType;
 import factorization.shared.TileEntityCommon;
 
-public class TileEntityCompressionCrafter extends TileEntityCommon implements IMeterInfo {
+public class TileEntityCompressionCrafter extends TileEntityCommon {
     static ThreadLocal<CompressionState> states = new ThreadLocal();
-    
+
     ArrayList<ItemStack> buffer = new ArrayList();
     
     CompressionState getStateHelper() {
@@ -273,6 +274,10 @@ public class TileEntityCompressionCrafter extends TileEntityCommon implements IM
         if (entityplayer.isSneaking()) {
             return false;
         }
+        if (!buffer.isEmpty()) {
+            new Notice(this, "Buffered output").sendTo(entityplayer);
+            return false;
+        }
         Coord c = getCoord();
         for (int dx = -1; dx <= 1; dx++) {
             for (int dy = -1; dy <= 1; dy++) {
@@ -311,12 +316,6 @@ public class TileEntityCompressionCrafter extends TileEntityCommon implements IM
             return ab;
         }
         return super.getRenderBoundingBox();
-    }
-
-    @Override
-    public String getInfo() {
-        if (!buffer.isEmpty()) return "Buffered output";
-        return null;
     }
     
     @Override

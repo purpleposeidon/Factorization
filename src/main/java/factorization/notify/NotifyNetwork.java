@@ -123,6 +123,7 @@ public class NotifyNetwork {
     private static void writeStrings(DataOutputStream output, String[] args) throws IOException {
         output.writeByte((byte) args.length);
         for (String s : args) {
+            if (s == null) s = "null";
             output.writeUTF(s);
         }
     }

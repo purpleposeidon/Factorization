@@ -49,7 +49,9 @@ public class ItemChargeMeter extends ItemFactorization {
             new Notice(te, new NoticeUpdater() {
                 @Override
                 public void update(Notice msg) {
-                    msg.setMessage("%s", im.getInfo());
+                    String info = im.getInfo();
+                    if (info == null) return;
+                    msg.setMessage("%s", info);
                 }
             }).send(player);
             return true;

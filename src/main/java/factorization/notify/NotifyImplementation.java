@@ -111,6 +111,7 @@ public class NotifyImplementation {
                     target = new TargetPoint(dimension, x, y, z, range);
                 }
             }
+            if (args == null) args = new String[0];
             FMLProxyPacket packet = NotifyNetwork.notifyPacket(where, item, format, args);
             NotifyNetwork.broadcast(packet, player, target);
         }
