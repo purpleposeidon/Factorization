@@ -20,17 +20,16 @@ the bottom of the crafting grid.
 
 \newpage
 
-Blocks can be converted to item form in different ways.
-The contents of barrels will be used as-is.
-A circle of 9 barrels full of cobblestone will make
-up to 32 furnaces.
+Blocks can be converted to item form in different ways:
 
-The item that a block drops can be used,
-as can the item dropped broken with silk touch.
+\- The contents of barrels will be used as-is.
+8 barrels full of cobblestone can be used to craft
+32 furnaces in a single cycle.
+\- The item that a block drops can be used,
+as can the item dropped when mined with silk touch.
 A line of 3 smoothstone will make cobblestone slabs,
 but a 2x2 of smoothstone will make stone bricks.
-
-Finally, the block can be broken, and then uncrafted.
+\- Finally, the block can be broken, and then uncrafted.
 Two wooden logs can be used to make 4 wooden pressure plates.
 
 \newpage
