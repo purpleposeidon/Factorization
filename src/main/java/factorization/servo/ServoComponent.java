@@ -3,6 +3,8 @@ package factorization.servo;
 import java.io.DataInput;
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.lang.reflect.Array;
+import java.lang.reflect.Constructor;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -60,17 +62,19 @@ public abstract class ServoComponent implements IDataSerializable {
     private static HashMap<String, Class<? extends ServoComponent>> componentMap = new HashMap<String, Class<? extends ServoComponent>>(50, 0.5F);
     final private static String componentTagKey = "SCId";
 
-    public static void register(Class<? extends ServoComponent> componentClass) {
+    public static void register(Class<? extends ServoComponent> componentClass, ArrayList<ItemStack> sortedList) {
         String name;
+        ServoComponent decor;
         try {
-            ServoComponent decor = componentClass.newInstance();
-            name = decor.getName();
-        } catch (Throwable e) {
+            decor = componentClass.getConstructor().newInstance();
+        } catch (ReflectiveOperationException e) {
             Core.logSevere("Unable to instantiate %s: %s", componentClass, e);
             e.printStackTrace();
             throw new IllegalArgumentException(e);
         }
+        name = decor.getName();
         componentMap.put(name, componentClass);
+        sortedList.add(decor.toItem());
     }
 
     public static Class<? extends ServoComponent> getComponent(String name) {
@@ -245,44 +249,54 @@ public abstract class ServoComponent implements IDataSerializable {
             }
         }
     }*/
-    
+
+    static ArrayList<ItemStack> sorted_instructions = new ArrayList<ItemStack>();
+    static ArrayList<ItemStack> sorted_decors = new ArrayList<ItemStack>();
+
     static {
         //registerRecursivelyFromPackage("factorization.common.servo.actuators");
         //registerRecursivelyFromPackage("factorization.common.servo.instructions");
-        for (Class cl : new Class[] {
-                EntryControl.class,
-                RedstonePulse.class,
-                RotateTop.class,
-                Spin.class,
-                SetDirection.class,
-                SetSpeed.class,
-                SocketCtrl.class,
-                Trap.class,
-                
-                Compare.class,
-                Drop.class,
-                Dup.class,
-                IntegerValue.class,
-                BooleanValue.class,
-                Jump.class,
-                Product.class,
-                Sum.class,
-                //ServoEquipmentBay.class,
+        Class[] decorations = new Class[] {
                 WoodenServoGrate.class,
                 GlassServoGrate.class,
                 IronServoGrate.class,
-                ShifterControl.class,
-                
                 ScanColor.class,
-                SetEntryAction.class,
-                InstructionGroup.class,
-                
+        };
+        Class[] instructions = new Class[] {
+                // Color by class, sort by color
+                // Cyan: Motion instructions
+                EntryControl.class,
+                SetDirection.class,
+                Spin.class,
+                RotateTop.class,
+                SetSpeed.class,
+                Trap.class,
+
+                // Red: Redstone-ish instructions
+                RedstonePulse.class,
+                SocketCtrl.class,
                 ReadRedstone.class,
                 CountItems.class,
-                SetRepeatedInstruction.class
-        }) {
-            register(cl);
-        }
+                ShifterControl.class,
+
+                // Yellow: Math instructions
+                Drop.class,
+                Dup.class,
+                IntegerValue.class,
+                Sum.class,
+                Product.class,
+                BooleanValue.class,
+                Compare.class,
+
+                // White: Computation instructions
+                Jump.class,
+                SetEntryAction.class,
+                SetRepeatedInstruction.class,
+                InstructionGroup.class,
+        };
+
+        for (Class cl : decorations) register(cl, sorted_decors);
+        for (Class cl : instructions) register(cl, sorted_instructions);
     }
     
     public static void setupRecipes() {

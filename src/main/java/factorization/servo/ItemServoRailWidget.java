@@ -1,16 +1,5 @@
 package factorization.servo;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import net.minecraft.client.renderer.texture.IIconRegister;
-import net.minecraft.creativetab.CreativeTabs;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.IIcon;
-import net.minecraft.world.World;
-import net.minecraftforge.common.util.ForgeDirection;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import factorization.api.Coord;
@@ -19,6 +8,17 @@ import factorization.shared.Core;
 import factorization.shared.Core.TabType;
 import factorization.shared.FzUtil;
 import factorization.shared.ItemFactorization;
+import net.minecraft.client.renderer.texture.IIconRegister;
+import net.minecraft.creativetab.CreativeTabs;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
+import net.minecraft.util.IIcon;
+import net.minecraft.world.World;
+import net.minecraftforge.common.util.ForgeDirection;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class ItemServoRailWidget extends ItemFactorization {
     public ItemServoRailWidget(String name) {
@@ -94,27 +94,20 @@ public class ItemServoRailWidget extends ItemFactorization {
             sc.addInformation(list);
         }
     }
-    
-    
+
+
     private List<ItemStack> subItemsCache = null;
     
     void loadSubItems() {
         if (subItemsCache != null) {
             return;
         }
-        subItemsCache = new ArrayList<ItemStack>(100);
-        for (Class<? extends ServoComponent> scClass : ServoComponent.getComponents()) {
-            try {
-                ServoComponent sc = scClass.newInstance();
-                if (sc instanceof Instruction && this == Core.registry.servo_widget_instruction) {
-                    subItemsCache.add(sc.toItem());
-                } else if (this == Core.registry.servo_widget_decor && !(sc instanceof Instruction)) {
-                    subItemsCache.add(sc.toItem());
-                }
-            } catch (Throwable e) {
-                e.printStackTrace();
-                continue;
-            }
+        if (this == Core.registry.servo_widget_instruction) {
+            subItemsCache = ServoComponent.sorted_instructions;
+        } else if (this == Core.registry.servo_widget_decor) {
+            subItemsCache = ServoComponent.sorted_decors;
+        } else {
+            subItemsCache = new ArrayList<ItemStack>();
         }
     }
     
