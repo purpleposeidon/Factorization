@@ -101,9 +101,9 @@ public class ASMTransformer implements IClassTransformer {
                 throw new RuntimeException("Unable to find method " + cn.name + "." + change.srgName + " (" + change.mcpName + ")");
             }
         }
-        int flags = ClassWriter.COMPUTE_MAXS;
-        flags |= ClassWriter.COMPUTE_FRAMES; // FIXME: Troubles running with intellij? Different JVM or something?
-        ClassWriter cw = new ClassWriter(flags);
+        int flags = 0; // FIXME: Troubles running with intellij? Different JVM or something?
+        if (dev_environ) flags |= ClassWriter.COMPUTE_MAXS | ClassWriter.COMPUTE_FRAMES;
+        ClassWriter cw = new ClassWriter(cr, flags);
         cn.accept(cw);
         return cw.toByteArray();
     }
