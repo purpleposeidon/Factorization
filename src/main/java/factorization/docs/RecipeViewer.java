@@ -1,5 +1,6 @@
 package factorization.docs;
 
+import com.google.common.collect.Collections2;
 import cpw.mods.fml.common.event.FMLInterModComms.IMCMessage;
 import cpw.mods.fml.relauncher.ReflectionHelper;
 import factorization.shared.Core;
@@ -11,6 +12,7 @@ import net.minecraft.item.crafting.*;
 import net.minecraftforge.oredict.OreDictionary;
 import net.minecraftforge.oredict.ShapedOreRecipe;
 import net.minecraftforge.oredict.ShapelessOreRecipe;
+import org.apache.commons.lang3.ArrayUtils;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
@@ -20,6 +22,7 @@ import java.util.Map.Entry;
 public class RecipeViewer implements IDocGenerator {
     HashMap<String, ArrayList<ArrayList>> recipeCategories = null;
     ArrayList<String> categoryOrder = new ArrayList();
+    HashMap<List<ItemStack>, String> reverseOD = new HashMap<List<ItemStack>, String>();
     
     /** USAGE
      * recipe/
@@ -40,10 +43,12 @@ public class RecipeViewer implements IDocGenerator {
      */
     @Override
     public void process(AbstractTypesetter out, String arg) {
-        if (recipeCategories == null) {
+        if (recipeCategories == null || Core.dev_environ) {
             categoryOrder.clear();
             recipeCategories = new HashMap();
+            reverseOD.clear();
             Core.logInfo("Loading recipe list");
+            setupReverseOD();
             loadRecipes();
             Core.logInfo("Done");
         }
@@ -151,7 +156,14 @@ public class RecipeViewer implements IDocGenerator {
         Object obj = field.get(null);
         customRecipes.put(key, (Iterable) obj);
     }
-    
+
+    void setupReverseOD() {
+        for (String name : OreDictionary.getOreNames()) {
+            List<ItemStack> entries = OreDictionary.getOres(name);
+            reverseOD.put(entries, name);
+        }
+    }
+
     void loadRecipes() {
         putCategory("Workbench", CraftingManager.getInstance().getRecipeList());
         putCategory("Furnace", FurnaceRecipes.smelting().getSmeltingList().entrySet());
@@ -351,7 +363,6 @@ public class RecipeViewer implements IDocGenerator {
         if (recursion > 4) {
             return;
         }
-        boolean probableOreDictionary = recursion >= 1;
         if (obj instanceof Item) {
             obj = new ItemStack((Item) obj);
         } else if (obj instanceof Block) {
@@ -371,8 +382,13 @@ public class RecipeViewer implements IDocGenerator {
                 sb.add(obj.toString());
             } else if (obj.getClass().isArray()) {
                 Class<?> component = obj.getClass().getComponentType();
-                if (probableOreDictionary && component == ItemStack.class) {
-                    sb.add(new ItemWord((ItemStack[]) obj));
+                if (component == ItemStack.class) {
+                    ItemStack[] array = (ItemStack[]) obj;
+                    if (array == null || array.length == 0) {
+                        sb.add(new TextWord("<Empty>", null));
+                    } else {
+                        sb.add(new ItemWord(array));
+                    }
                 } else {
                     if (component == Object.class) {
                         Object[] listy = (Object[]) obj;
@@ -395,20 +411,21 @@ public class RecipeViewer implements IDocGenerator {
                     }
                 }
             } else if (obj instanceof Collection) {
+                boolean probableOreDictionary = false;
+                if (obj instanceof List) {
+                    probableOreDictionary = reverseOD.containsKey(obj);
+                }
                 if (probableOreDictionary) {
                     boolean bad = false;
                     for (Object o : (Collection) obj) {
                         if (!(o instanceof ItemStack)) {
                             bad = true;
+                            break;
                         }
                     }
                     if (!bad) {
-                        Collection col = (Collection) obj;
-                        ItemStack[] items = new ItemStack[col.size()];
-                        int i = 0;
-                        for (Object o : col) {
-                            items[i++] = (ItemStack) o;
-                        }
+                        Collection<ItemStack> col = (Collection<ItemStack>) obj;
+                        ItemStack[] items = col.toArray(new ItemStack[col.size()]);
                         sb.add(new ItemWord(items));
                         return;
                     }

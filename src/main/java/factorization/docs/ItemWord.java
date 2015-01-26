@@ -17,6 +17,7 @@ public class ItemWord extends Word {
     
     public ItemWord(ItemStack[] entries) {
         super(getDefaultHyperlink(entries));
+        if (entries.length == 0) entries = null;
         this.entries = entries;
     }
     
