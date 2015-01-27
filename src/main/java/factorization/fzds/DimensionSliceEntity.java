@@ -312,6 +312,11 @@ public class DimensionSliceEntity extends IDeltaChunk implements IFzdsEntryContr
     Quaternion last_uni_rot = null;
     
     boolean significantMovement() {
+        if (ticksExisted <= 2) {
+            return true;
+        }
+        // This counter doesn't get serialized, so we'll be sure to update the colliders
+
         double dx = Math.abs(last_uni_x - posX);
         double dz = Math.abs(last_uni_z - posZ);
         if (dx > 8 || dz > 8) {
@@ -337,7 +342,7 @@ public class DimensionSliceEntity extends IDeltaChunk implements IFzdsEntryContr
         double last_x = last_uni_x;
         double last_z = last_uni_z;
         if (!significantMovement()) return;
-        double d = 16;
+        double d = 17;
         if (can(DeltaCapability.ROTATE)) {
             d += Math.sqrt(cornerMin.distanceSq(cornerMax));
         }
