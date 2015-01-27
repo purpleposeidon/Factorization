@@ -7,6 +7,8 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+import factorization.aabbdebug.AabbDebugger;
+import factorization.api.DeltaCoord;
 import net.minecraft.block.Block;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.item.EntityFallingBlock;
@@ -336,9 +338,7 @@ public enum Technique implements IStateMachine<Technique> {
             TargetSmash smash = findSmashable(controller);
             if (smash == null) return; // !!
             smash.limb.causesPain(true);
-            // A fury of fists is no use if they do not strike through the enemy.
-            Quaternion target = new Quaternion().slerp(smash.rotation, 2);
-            smash.limb.target(target, 5, Interpolation.CUBIC);
+            smash.limb.target(smash.rotation, 6, Interpolation.CUBIC);
         }
         
         @Override
@@ -352,6 +352,8 @@ public enum Technique implements IStateMachine<Technique> {
         
         @Override
         protected Object visitPlayer(EntityPlayer player, ColossusController controller) {
+            DeltaCoord bodySize = controller.body.getFarCorner().difference(controller.body.getCorner());
+            double halfBodyWidth = bodySize.x / 2;
             for (LimbInfo li : controller.limbs) {
                 if (li.type != LimbType.ARM && li.type != LimbType.LEG) continue;
                 IDeltaChunk idc = li.idc.getEntity();
@@ -370,27 +372,33 @@ public enum Technique implements IStateMachine<Technique> {
                 
                 double dist = idc.getDistanceToEntity(player);
                 if (dist > farthest || dist < nearest) continue;
-                NORELEASE.println("Dist: " + dist + " " + li);
                 
                 // We won't hit across the body
-                Vec3 li2player = FzUtil.fromEntPos(player).subtract(FzUtil.fromEntPos(idc));
+                Vec3 li2player = FzUtil.subtract(FzUtil.fromEntPos(player), FzUtil.fromEntPos(idc));
                 Vec3 localOffset = FzUtil.copy(li2player);
                 controller.body.getRotation().applyReverseRotation(localOffset);
                 if (li.side == BodySide.LEFT) {
-                    if (localOffset.zCoord < 0) continue;
+                    if (localOffset.zCoord > +halfBodyWidth) continue;
                 } else {
-                    if (localOffset.zCoord > 0) continue;
+                    if (localOffset.zCoord < -halfBodyWidth) continue;
                 }
                 
                 // And striking backwards would be weird
-                // if (localOffset.xCoord < 0) continue;
+                if (localOffset.xCoord < 0) continue;
                 
 
-                // What Quaternion do we need to make the limb hit the player?
-                Vec3 src = Vec3.createVectorHelper(0, -1, 0); // This represents no rotation
+                // The Quaternion needed to cause the limb to hit the player is the quaternion
+                // that changes DOWN to the normalized direction.
+                // The cross product of the two gives the axis of rotation,
+                // and the dot product can be converted to
+                Vec3 src = Vec3.createVectorHelper(0, -1, 0);
                 Vec3 dst = li2player.normalize();
                 Vec3 axis = src.crossProduct(dst);
-                double angle = src.dotProduct(dst);
+                double angle = FzUtil.getAngle(src, dst);
+
+                // A single strike through your oponnent will hurt him more than two hundred blows to his skin
+                angle *= 1.25;
+
                 Quaternion hitQuat = Quaternion.getRotationQuaternionRadians(angle, axis);
 
                 TargetSmash smash = new TargetSmash();

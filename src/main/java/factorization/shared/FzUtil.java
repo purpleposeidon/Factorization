@@ -1227,6 +1227,10 @@ public class FzUtil {
         base.zCoord -= sub.zCoord;
         return base;
     }
+
+    public static double getAngle(Vec3 a, Vec3 b) {
+        return Math.abs(a.dotProduct(b));
+    }
     
     public static void setAABB(AxisAlignedBB target, Vec3 min, Vec3 max) {
         target.minX = min.xCoord;
