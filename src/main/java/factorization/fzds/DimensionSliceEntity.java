@@ -311,8 +311,13 @@ public class DimensionSliceEntity extends IDeltaChunk implements IFzdsEntryContr
     double last_uni_x = Double.NEGATIVE_INFINITY;
     double last_uni_z = Double.NEGATIVE_INFINITY;
     Quaternion last_uni_rot = null;
+    boolean need_recheck = false;
     
     boolean significantMovement() {
+        if (need_recheck) {
+            need_recheck = false;
+            return true;
+        }
         if (ticksExisted <= 2) {
             return true;
         }
@@ -343,20 +348,27 @@ public class DimensionSliceEntity extends IDeltaChunk implements IFzdsEntryContr
         double last_x = last_uni_x;
         double last_z = last_uni_z;
         if (!significantMovement()) return;
-        double d = 17;
+        double d = 0;
         if (can(DeltaCapability.ROTATE)) {
-            d += Math.sqrt(cornerMin.distanceSq(cornerMax));
+            // Must enlarge by the worst-case rotation
+            Coord min = getCorner(), max = getFarCorner();
+            Vec3 center = real2shadow(FzUtil.fromEntPos(this));
+            double sx = Math.max(center.xCoord - min.x, max.x - center.xCoord);
+            double sy = Math.max(center.yCoord - min.y, max.y - center.yCoord);
+            double sz = Math.max(center.zCoord - min.z, max.z - center.zCoord);
+            double r = Math.sqrt(sx * sx + sy * sy + sz * sz);
+            d += r;
         }
-        double minX = realArea.minX;
-        double maxX = realArea.maxX;
-        double minZ = realArea.minZ;
-        double maxZ = realArea.maxZ;
+        double minX = realArea.minX - d;
+        double maxX = realArea.maxX + d;
+        double minZ = realArea.minZ - d;
+        double maxZ = realArea.maxZ + d;
         // Check nearby areas
         HashSet<IExtraChunkData> toDeregister = new HashSet<IExtraChunkData>(registered_chunks.size());
         toDeregister.addAll(registered_chunks);
-        for (double x = minX - d; x <= maxX + d; x += 16) {
-            for (double z = minZ - d; z <= maxZ + d; z += 16) {
-                check_chunk(x, z, minX, maxX, minZ, maxZ, toDeregister);
+        for (double x = minX; x <= maxX; x += 16) {
+            for (double z = minZ; z <= maxZ; z += 16) {
+                check_chunk(x, z, toDeregister);
             }
         }
         deregisterUCs(toDeregister);
@@ -379,23 +391,23 @@ public class DimensionSliceEntity extends IDeltaChunk implements IFzdsEntryContr
         }
     }
     
-    private void check_chunk(double x, double z, double minX, double maxX, double minZ, double maxZ, HashSet<IExtraChunkData> toDeregister) {
+    private void check_chunk(double x, double z, HashSet<IExtraChunkData> toDeregister) {
+        if (isDead) return;
         int ix = (int) x;
         int iz = (int) z;
         if (!worldObj.blockExists(ix, 64, iz)) return;
         Chunk mc_chunk = worldObj.getChunkFromBlockCoords(ix, iz);
         if (mc_chunk == null) return;
+        if (mc_chunk.isEmpty() && worldObj.isRemote) need_recheck = true;
         IExtraChunkData chunk = (IExtraChunkData) mc_chunk;
         Entity[] colliders = chunk.getConstantColliders();
-        boolean require_collision = (minX <= x && x <= maxX + 16) && (minZ <= z && z <= maxZ + 16) && !isDead;
         boolean is_registered = ArrayUtils.contains(colliders, universalCollider);
-        if (require_collision) {
-            toDeregister.remove(chunk);
-            if (!is_registered) {
-                colliders = ArrayUtils.add(colliders, universalCollider);
-                registered_chunks.add(chunk);
-                chunk.setConstantColliders(colliders);
-            }
+
+        toDeregister.remove(chunk);
+        if (!is_registered) {
+            colliders = ArrayUtils.add(colliders, universalCollider);
+            registered_chunks.add(chunk);
+            chunk.setConstantColliders(colliders);
         }
     }
     
@@ -826,6 +838,10 @@ public class DimensionSliceEntity extends IDeltaChunk implements IFzdsEntryContr
             Core.profileEnd();
             Core.profileEnd(); // Really should be try/finally or nested in another method...
             return;
+        }
+        if (NORELEASE.on && ticksExisted % 60 == 0) {
+            need_recheck = true;
+            updateUniversalCollisions();
         }
         Core.profileEnd();
         if (!parent.trackingEntity()) {
