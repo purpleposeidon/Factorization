@@ -65,7 +65,7 @@ public enum Technique implements IStateMachine<Technique> {
                     return FINISH_MOVE;
                 }
             }
-            if (NORELEASE.on) return HIT_WITH_LIMB;
+            if (NORELEASE.on) return BOW;
             boolean use_defense = controller.checkHurt(true);
             List<Technique> avail = Arrays.asList(Technique.values());
             Collections.shuffle(avail);
@@ -112,19 +112,24 @@ public enum Technique implements IStateMachine<Technique> {
         
         @Override
         public void onEnterState(ColossusController controller, Technique prevState) {
-            // Reset everything except for the body's rotation on the Y-axis.
-            
-            for (LimbInfo li : controller.limbs) {
-                // if (li.type.isArmOrLeg()) {
-                if (li.type != LimbType.BODY) {
-                    li.target(new Quaternion(), 1);
-                }
-            }
+            // Reset everything, but set the body's rotation to its y-axis rotation
 
             Quaternion bodyRot = controller.body.getRotation();
             double yRot = bodyRot.toRotationVector().yCoord;
             Quaternion straightRot = Quaternion.getRotationQuaternionRadians(yRot, ForgeDirection.UP);
             controller.bodyLimbInfo.target(straightRot, 1);
+            int time = controller.bodyLimbInfo.idc.getEntity().getRemainingRotationTime();
+
+            for (LimbInfo li : controller.limbs) {
+                if (li.type.isArmOrLeg()) {
+                    Quaternion or = li.idc.getEntity().getRotation();
+                    li.idc.getEntity().orderTargetRotation(or, time, Interpolation.SMOOTH3);
+                    //li.target(or.conjugate(), 1);
+                    li.target(new Quaternion(), 1);
+                }
+            }
+
+
             
             // The above is way better than the commented out stuff! Keep for educational purposes!
             
@@ -280,7 +285,7 @@ public enum Technique implements IStateMachine<Technique> {
             } else {
                 bodyBendTime = 60; // Hmph! Make something up. Shouldn't happen.
             }
-            Quaternion legBend = Quaternion.getRotationQuaternionRadians(-bowAngle, ForgeDirection.NORTH);
+            Quaternion legBend = Quaternion.getRotationQuaternionRadians(-bowAngle * 1.5, ForgeDirection.NORTH);
             for (LimbInfo limb : controller.limbs) {
                 IDeltaChunk idc = limb.idc.getEntity();
                 if (idc == null) continue;
@@ -299,7 +304,9 @@ public enum Technique implements IStateMachine<Technique> {
         
         @Override
         public Technique tick(ColossusController controller, int age) {
+            if (NORELEASE.on) controller.checkHurt(true);
             if (controller.checkHurt(false)) return UNBOW;
+            if (NORELEASE.on && age > 20 * 6) return UNBOW;
             if (age > 20 * 15) return UNBOW;
             return this;
         }
@@ -313,7 +320,19 @@ public enum Technique implements IStateMachine<Technique> {
         
         @Override
         public void onEnterState(ColossusController controller, Technique prevState) {
-            STAND_STILL.onEnterState(controller, this);
+            Quaternion bodyRot = controller.body.getRotation();
+            double yRot = bodyRot.toRotationVector().yCoord;
+            Quaternion straightRot = Quaternion.getRotationQuaternionRadians(yRot, ForgeDirection.UP);
+            controller.bodyLimbInfo.target(straightRot, 1);
+
+            Quaternion straightenIsh = new Quaternion().slerp(bodyRot, 0.5);
+            int time = controller.bodyLimbInfo.idc.getEntity().getRemainingRotationTime();
+            for (LimbInfo li : controller.limbs) {
+                if (li.type.isArmOrLeg()) {
+                    // TODO/FIXME: Make the limbs end up normally rather than requiring STAND_STILL to fix it
+                    li.idc.getEntity().orderTargetRotation(straightenIsh, time, Interpolation.SMOOTH);
+                }
+            }
         }
         
         @Override

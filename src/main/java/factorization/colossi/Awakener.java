@@ -195,14 +195,13 @@ public class Awakener {
         
         ArrayList<SetAndInfo> limbInfo = new ArrayList();
         for (Set<Coord> arm : arms) {
-            Vec3 joint = calculateJointPosition(arm, arm_size, arm_length);
+            Vec3 joint = calculateJointPosition(arm, arm_size, arm_length, LimbType.ARM);
             SetAndInfo sai = new SetAndInfo(arm, arm_length, arm_size, joint, LimbType.ARM, getSide(arm));
             limbInfo.add(sai);
         }
         Vec3 leg_sum = Vec3.createVectorHelper(0, 0, 0);
         for (Set<Coord> leg: legs) {
-            Vec3 joint = calculateJointPosition(leg, leg_size, leg_length);
-            joint.yCoord += leg_size / 2;
+            Vec3 joint = calculateJointPosition(leg, leg_size, leg_length, LimbType.LEG);
             SetAndInfo sai = new SetAndInfo(leg, leg_length, leg_size, joint, LimbType.LEG, getSide(leg));
             limbInfo.add(sai);
             FzUtil.incrAdd(leg_sum, joint);
@@ -299,7 +298,7 @@ public class Awakener {
         return one(set).z > heartTE.zCoord ? BodySide.RIGHT : BodySide.LEFT;
     }
     
-    Vec3 calculateJointPosition(Set<Coord> limb, int size, int length) {
+    Vec3 calculateJointPosition(Set<Coord> limb, int size, int length, LimbType type) {
         size++;
         Coord corner = null;
         for (Coord c : limb) {
@@ -321,8 +320,11 @@ public class Awakener {
         corner = corner.add(ForgeDirection.UP); // Make the Y axis start at the top
         Vec3 ret = corner.createVector();
         ret.xCoord += size/2.0;
-        ret.yCoord -= size/2.0;
         ret.zCoord += size/2.0;
+        if (type == LimbType.ARM) {
+            // Legs will be jointed at the top, and arms from the center.
+            ret.yCoord -= size/2.0;
+        }
         return ret;
     }
 
@@ -360,7 +362,7 @@ public class Awakener {
                     continue;
                 }
                 int md = at.getMd();
-                if (md == ColossalBlock.MD_ARM || md == ColossalBlock.MD_ARM) {
+                if (md == ColossalBlock.MD_ARM || md == ColossalBlock.MD_LEG || md == ColossalBlock.MD_BODY_COVERED) {
                     has_arm_or_leg = true;
                 }
             }
