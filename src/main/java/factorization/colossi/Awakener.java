@@ -208,7 +208,7 @@ public class Awakener {
         }
         Vec3 body_center_of_mass = leg_sum;
         FzUtil.scale(body_center_of_mass, 1.0/legs.size());
-        body_center_of_mass.yCoord += 1;
+        //body_center_of_mass.yCoord += 1;
         SetAndInfo sai = new SetAndInfo(body, measure_dim(body, 1), leg_size, body_center_of_mass, LimbType.BODY, BodySide.RIGHT);
         limbInfo.add(sai);
         

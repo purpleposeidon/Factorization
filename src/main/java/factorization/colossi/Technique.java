@@ -65,7 +65,6 @@ public enum Technique implements IStateMachine<Technique> {
                     return FINISH_MOVE;
                 }
             }
-            if (NORELEASE.on) return BOW;
             boolean use_defense = controller.checkHurt(true);
             List<Technique> avail = Arrays.asList(Technique.values());
             Collections.shuffle(avail);
@@ -304,9 +303,7 @@ public enum Technique implements IStateMachine<Technique> {
         
         @Override
         public Technique tick(ColossusController controller, int age) {
-            if (NORELEASE.on) controller.checkHurt(true);
             if (controller.checkHurt(false)) return UNBOW;
-            if (NORELEASE.on && age > 20 * 6) return UNBOW;
             if (age > 20 * 15) return UNBOW;
             return this;
         }
@@ -338,6 +335,127 @@ public enum Technique implements IStateMachine<Technique> {
         @Override
         public Technique tick(ColossusController controller, int age) {
             return finishMove(controller);
+        }
+    },
+
+    CHASE_PLAYER {
+        @Override
+        TechniqueKind getKind() {
+            return OFFENSIVE;
+        }
+
+        @Override
+        boolean usable(ColossusController controller) {
+            return iteratePotentialPlayers(controller) != null;
+        }
+
+        @Override
+        protected Object visitPlayer(EntityPlayer player, ColossusController controller) {
+            if (!player.onGround) return CONTINUE;
+            if (player.getDistanceSqToEntity(controller) < controller.leg_size) return CONTINUE;
+            return player;
+        }
+
+        @Override
+        public void onEnterState(ColossusController controller, Technique prevState) {
+            EntityPlayer player = iteratePotentialPlayers(controller);
+            if (player == null) return;
+            controller.setTarget(new Coord(player));
+        }
+
+        @Override
+        public Technique tick(ColossusController controller, int age) {
+            if (controller.atTarget()) return PICK_NEXT_TECHNIQUE;
+            return this;
+        }
+    },
+
+    SIT_DOWN {
+        @Override
+        TechniqueKind getKind() {
+            return IDLER;
+        }
+
+        @Override
+        boolean usable(ColossusController controller) {
+            return iteratePotentialPlayers(controller) == null;
+        }
+
+        @Override
+        protected Object visitPlayer(EntityPlayer player, ColossusController controller) {
+            if (!player.onGround) return CONTINUE;
+            return player;
+        }
+
+        @Override
+        public void onEnterState(ColossusController controller, Technique prevState) {
+            double v = controller.leg_length / (double) SIT_FALL_TIME;
+            controller.body.setVelocity(0, -v, 0);
+            Quaternion legBend = Quaternion.getRotationQuaternionRadians(Math.PI / 2, ForgeDirection.NORTH);
+            for (LimbInfo limb : controller.limbs) {
+                if (limb.type == LimbType.LEG) {
+                    limb.setTargetRotation(legBend, SIT_FALL_TIME, Interpolation.SMOOTH);
+                }
+                // TODO: Do something with the arms?
+            }
+        }
+
+        @Override
+        public void onExitState(ColossusController controller, Technique nextState) {
+            controller.body.setVelocity(0, 0, 0);
+        }
+
+        @Override
+        public Technique tick(ColossusController controller, int age) {
+            if (age >= SIT_FALL_TIME) return SIT_WAIT;
+            return this;
+        }
+    },
+
+    SIT_WAIT {
+        @Override
+        TechniqueKind getKind() {
+            return TRANSITION;
+        }
+
+        @Override
+        public Technique tick(ColossusController controller, int age) {
+            if (age % 60 == 0 && iteratePotentialPlayers(controller) != null) return STAND_UP;
+            return this;
+        }
+
+        @Override
+        protected Object visitPlayer(EntityPlayer player, ColossusController controller) {
+            return player;
+        }
+    },
+
+    STAND_UP {
+        @Override
+        TechniqueKind getKind() {
+            return TRANSITION;
+        }
+
+        @Override
+        public void onEnterState(ColossusController controller, Technique prevState) {
+            double v = controller.leg_length / (double) SIT_FALL_TIME;
+            controller.body.setVelocity(0, +v, 0);
+            for (LimbInfo limb : controller.limbs) {
+                if (limb.type.isArmOrLeg()) {
+                    limb.setTargetRotation(new Quaternion(), SIT_FALL_TIME, Interpolation.SMOOTH);
+                }
+            }
+        }
+
+        @Override
+        public Technique tick(ColossusController controller, int age) {
+            if (age >= SIT_FALL_TIME) return PICK_NEXT_TECHNIQUE;
+            return this;
+        }
+
+        @Override
+        public void onExitState(ColossusController controller, Technique nextState) {
+            controller.body.setVelocity(0, 0, 0);
         }
     },
     
@@ -861,4 +979,6 @@ public enum Technique implements IStateMachine<Technique> {
     }
     
     protected Object visitPlayer(EntityPlayer player, ColossusController controller) { return null; }
+
+    static final int SIT_FALL_TIME = 20 * 3;
 }

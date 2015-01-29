@@ -40,7 +40,7 @@ public abstract class IDeltaChunk extends EntityFz {
     public abstract ArrayList<IDeltaChunk> getChildren();
     
     /***
-     * @return the {@link Quaternion} representing the rotation (theta).
+     * @return the {@link Quaternion} representing the rotation (theta). This is the global rotation.
      */
     public abstract Quaternion getRotation();
     /***

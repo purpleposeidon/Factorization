@@ -50,7 +50,6 @@ public enum WalkState implements IStateMachine<WalkState> {
                     }
                     double arm_angle = arms_angle * (limb.side == BodySide.LEFT ? +1 : -1);
                     Quaternion ar = Quaternion.getRotationQuaternionRadians(arm_angle, ForgeDirection.EAST);
-                    idc.multiplyParentRotations(ar);
                     limb.setTargetRotation(ar, 20, Interpolation.SMOOTH);
                     continue;
                 }
@@ -78,7 +77,6 @@ public enum WalkState implements IStateMachine<WalkState> {
                     // Lift a leg up a tiny bit
                     nr.incrMultiply(Quaternion.getRotationQuaternionRadians(Math.toRadians(2), ForgeDirection.SOUTH));
                 }
-                idc.multiplyParentRotations(nr);
                 limb.setTargetRotation(nr, (int) nextRotationTime, interp);
             }
             
@@ -172,7 +170,6 @@ public enum WalkState implements IStateMachine<WalkState> {
                     p = 0;
                 }
                 Quaternion nextRotation = Quaternion.getRotationQuaternionRadians(max_leg_swing_radians * p, ForgeDirection.NORTH);
-                idc.multiplyParentRotations(nextRotation);
                 if (limb.type == LimbType.ARM) {
                     if (limb.limbSwingParity()) {
                         nextRotation.incrMultiply(arm_hang);
