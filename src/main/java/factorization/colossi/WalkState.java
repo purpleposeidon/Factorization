@@ -24,7 +24,7 @@ public enum WalkState implements IStateMachine<WalkState> {
                 IDeltaChunk idc = limb.idc.getEntity();
                 if (idc == null) continue;
                 if (limb.type == LimbType.ARM) {
-                    limb.reset(20, Interpolation.SMOOTH);
+                    limb.target(new Quaternion(), 1);
                 }
             }
         }
@@ -171,10 +171,10 @@ public enum WalkState implements IStateMachine<WalkState> {
                 }
                 Quaternion nextRotation = Quaternion.getRotationQuaternionRadians(max_leg_swing_radians * p, ForgeDirection.NORTH);
                 if (limb.type == LimbType.ARM) {
-                    if (limb.limbSwingParity()) {
+                    if (limb.side == BodySide.LEFT) {
                         nextRotation.incrMultiply(arm_hang);
                     } else {
-                        arm_hang.incrToOtherMultiply(nextRotation);
+                        nextRotation.incrMultiply(arm_hang.conjugate());
                     }
                 }
                 limb.setTargetRotation(nextRotation, (int) nextRotationTime, Interpolation.SMOOTH);

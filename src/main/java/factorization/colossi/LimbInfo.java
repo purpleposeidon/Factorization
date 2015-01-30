@@ -80,7 +80,6 @@ class LimbInfo {
         IDeltaChunk dse = idc.getEntity();
         if (dse == null) return;
         Quaternion zero = new Quaternion();
-        dse.multiplyParentRotations(zero);
         setTargetRotation(zero, time, interp);
     }
     

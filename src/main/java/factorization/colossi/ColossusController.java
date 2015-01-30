@@ -1,15 +1,5 @@
 package factorization.colossi;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.EnumSet;
-
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.boss.IBossDisplayData;
-import net.minecraft.util.ChatComponentTranslation;
-import net.minecraft.util.IChatComponent;
-import net.minecraft.world.World;
-import net.minecraftforge.common.util.ForgeDirection;
 import factorization.api.Coord;
 import factorization.api.ICoordFunction;
 import factorization.api.Quaternion;
@@ -21,6 +11,15 @@ import factorization.fzds.interfaces.Interpolation;
 import factorization.shared.Core;
 import factorization.shared.EntityFz;
 import factorization.shared.NORELEASE;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.boss.IBossDisplayData;
+import net.minecraft.util.ChatComponentTranslation;
+import net.minecraft.util.IChatComponent;
+import net.minecraft.world.World;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.EnumSet;
 
 public class ColossusController extends EntityFz implements IBossDisplayData {
     static enum BodySide { LEFT, RIGHT, CENTER, UNKNOWN_BODY_SIDE };
@@ -355,13 +354,12 @@ public class ColossusController extends EntityFz implements IBossDisplayData {
         if (getHealth() <= 0) {
             return;
         }
-        int currentPosHash = new Coord(this).hashCode() + 100 * (int) posY;
+        int currentPosHash = new Coord(this).hashCode();
         if (currentPosHash != last_pos_hash) {
             last_pos_hash = currentPosHash;
             int dy = new HeightCalculator().calc();
             double new_target = (int) (posY + dy);
             if (new_target != (int) target_y) {
-                //NORELEASE.println("target_y: " + new_target);
                 target_y = new_target;
             }
             if (last_step_direction != dy) {
@@ -372,7 +370,6 @@ public class ColossusController extends EntityFz implements IBossDisplayData {
                 }
             }
         }
-        //if (target_y == posY) return;
         double close_enough = 1.0 / 64.0;
         if (Math.abs(posY - target_y) <= close_enough) {
             target_y = posY;
@@ -386,83 +383,57 @@ public class ColossusController extends EntityFz implements IBossDisplayData {
         if (delta < 1.0/16.0) sign = 0;
         body.motionY = sign * Math.min(maxV, delta);
     }
-    
-    private static final Quaternion down = Quaternion.getRotationQuaternionRadians(0, ForgeDirection.DOWN);
-    private static final double max_leg_angle = Math.toRadians(25);
+
     class HeightCalculator implements ICoordFunction {
-        
-        int lowest = Integer.MAX_VALUE;
-        ArrayList<Coord> found = new ArrayList();
-        IDeltaChunk idc;
-        boolean any;
+        // If most blocks are solid, move up.
+        // If most blocks are supported, stay still
+        // If most blocks are unsupported, fall down
+        int unsupported, supported, inside;
+
         int calc() {
-            found.clear();
+            int leg_height = 0;
+            for (LimbInfo li : limbs) {
+                if (li.type == LimbType.LEG) {
+                    leg_height = li.length + 1;
+                    break;
+                }
+            }
+
+
+            int y = (int) body.posY - leg_height;
+
             for (LimbInfo li : limbs) {
                 if (li.type != LimbType.LEG) continue;
-                idc = li.idc.getEntity();
-                //if (down.getAngleBetween(idc.getRotation()) > max_leg_angle) continue;
-                Coord min = idc.getCorner().copy();
-                Coord max = idc.getFarCorner().copy();
-                Coord.sort(min, max);
-                final int maxY = max.y;
-                any = false;
-                for (int y = min.y; y < maxY; y++) {
-                    max.y = min.y = y;
-                    Coord.iterateCube(min, max, this);
-                    if (any) break;
-                }
+                Coord at = new Coord(li.idc.getEntity());
+                at.y = y;
+                Coord min = at.copy();
+                Coord max = at.copy();
+                int half = (int) ((leg_size + 1) / 2);
+                min.x -= half;
+                min.z -= half;
+                max.x += half;
+                max.z += half;
+                Coord.iterateCube(min, max, this);
             }
-            int total = found.size();
-            if (total == 0) {
-                return 0; // Or return -1?
+
+            if (inside >= (supported + unsupported) / 2) {
+                return +1;
             }
-            double solid_at = 0;
-            double solid_below = 0;
-            //NORELEASE.println();
-            for (Coord at : found) {
-                if (at.isSolid()) {
-                    //new Notice(at, "#").withStyle(Style.FORCE, Style.DRAWFAR, Style.LONG).sendToAll();
-                    solid_at++;
-                }
-                at.y--;
-                if (at.isSolid()) {
-                    //new Notice(at, ".").withStyle(Style.FORCE, Style.DRAWFAR, Style.LONG).sendToAll();
-                    solid_below++;
-                }
-                at.y++;
-            }
-            double at = solid_at / total;
-            double below = solid_below / total;
-            //NORELEASE.println("total: " + total);
-            //NORELEASE.println("at: " + at);
-            //NORELEASE.println("below: " + below);
-            if (at > 0.4) {
-                // We're standing in something pretty fat; we *must* move up!
-                return 1;
-            }
-            if (below < 0.2) {
-                // We're unsupported, so we *must* move down!
-                //NORELEASE.println("*** GET DOWN ***");
+            if (unsupported > supported && unsupported > inside) {
                 return -1;
-            } else {
-                return 0;
             }
+            return 0;
         }
         
         @Override
         public void handle(Coord here) {
-            if (here.getBlock() != Core.registry.colossal_block) return;
-            Coord real = here.copy();
-            idc.shadow2real(real);
-            if (real.y > lowest) return;
-            if (real.y < lowest) {
-                lowest = real.y;
-                found.clear();
+            if (here.isSolid()) inside++;
+            here.y--;
+            if (here.isSolid()) {
+                supported++;
+            } else {
+                unsupported++;
             }
-            NORELEASE.fixme("hashset");
-            if (found.contains(real)) return;
-            found.add(real);
-            any = true;
         }
     }
     

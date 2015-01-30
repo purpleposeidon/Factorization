@@ -348,7 +348,7 @@ public class DimensionSliceEntity extends IDeltaChunk implements IFzdsEntryContr
         double last_x = last_uni_x;
         double last_z = last_uni_z;
         if (!significantMovement()) return;
-        double d = 0;
+        double d = 8;
         if (can(DeltaCapability.ROTATE)) {
             // Must enlarge by the worst-case rotation
             Coord min = getCorner(), max = getFarCorner();
@@ -841,7 +841,7 @@ public class DimensionSliceEntity extends IDeltaChunk implements IFzdsEntryContr
         }
         if (NORELEASE.on && ticksExisted % 60 == 0) {
             need_recheck = true;
-            updateUniversalCollisions();
+            updateUniversalCollisions(); // TODO: Do it properly
         }
         Core.profileEnd();
         if (!parent.trackingEntity()) {
@@ -1205,7 +1205,7 @@ public class DimensionSliceEntity extends IDeltaChunk implements IFzdsEntryContr
             useEnd = new Quaternion(useEnd);
             while (parent != null) {
                 Quaternion pRot = parent.getRotation();
-                //pRot.incrToOtherMultiply(useStart);
+                //tpRot.incrToOtherMultiply(useStart);
                 pRot.incrToOtherMultiply(useEnd);
                 parent = parent.getParent();
             }

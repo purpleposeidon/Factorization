@@ -478,3 +478,25 @@ We return to the ore-doubling.
     Nether quartz: Lacerate. Gives ridiculous amounts of quartz.
 All the processes should give a unique decorative block.
     Emerald ore: Hrrm. Attack with enormous scissors to chip pieces of emerald out? Recieve chipped emerald ore?
+
+
+AMPHORA
+-------
+CPC  stained Clay, Planks
+C C
+ C 
+
+Holds 4 buckets of fluid.
+Crafting an amphora w/ a stick underneath gives a leaky amphora. Ejects fluids downwards, and can dispense liquids into the world.
+
+
+
+DARK IRON TOOLS
+---------------
+Ball & Chain: Mid-range weapon.
+  /   / dark iron ingot
+ /$   $ dark iron chain
+/ B   Block of dark iron
+Has a range of 8 blocks or so
+Damages blocks in a 3³ area where it lands
+
