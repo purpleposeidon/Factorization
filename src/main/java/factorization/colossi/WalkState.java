@@ -20,11 +20,18 @@ public enum WalkState implements IStateMachine<WalkState> {
         @Override
         public void onEnterState(ColossusController controller, WalkState prevState) {
             checkRotation(controller);
+            final double arms_angle = Math.PI * 0.45;
             for (LimbInfo limb : controller.limbs) {
                 IDeltaChunk idc = limb.idc.getEntity();
                 if (idc == null) continue;
                 if (limb.type == LimbType.ARM) {
-                    limb.target(new Quaternion(), 1);
+                    if ((limb.side == BodySide.LEFT) ^ controller.turningDirection == 1) {
+                        limb.target(new Quaternion(), 1);
+                    } else {
+                        double arm_angle = arms_angle * (limb.side == BodySide.LEFT ? +1 : -1);
+                        Quaternion ar = Quaternion.getRotationQuaternionRadians(arm_angle, ForgeDirection.EAST);
+                        limb.target(ar, 1);
+                    }
                 }
             }
         }
@@ -38,21 +45,11 @@ public enum WalkState implements IStateMachine<WalkState> {
             // double lift_height = 1.5F/16F;
             double base_twist = Math.PI * 2 * 0.03;
             double phase_length = 36; //18;
-            double arms_angle = Math.PI * 0.45;
             for (LimbInfo limb : controller.limbs) {
                 // Twist the legs while the body turns
                 IDeltaChunk idc = limb.idc.getEntity();
                 if (idc == null) continue;
                 if (limb.isTurning()) continue;
-                if (limb.type == LimbType.ARM) {
-                    if ((limb.side == BodySide.LEFT) ^ controller.turningDirection == 1) {
-                        continue;
-                    }
-                    double arm_angle = arms_angle * (limb.side == BodySide.LEFT ? +1 : -1);
-                    Quaternion ar = Quaternion.getRotationQuaternionRadians(arm_angle, ForgeDirection.EAST);
-                    limb.setTargetRotation(ar, 20, Interpolation.SMOOTH);
-                    continue;
-                }
                 if (limb.type != LimbType.LEG) continue;
                 double nextRotation = base_twist;
                 double nextRotationTime = phase_length;
@@ -95,7 +92,7 @@ public enum WalkState implements IStateMachine<WalkState> {
             Quaternion current_rotation = body.getRotation();
             double rotation_distance = target_rotation.getAngleBetween(current_rotation);
             int size = controller.leg_size + 1;
-            double rotation_speed = (Math.PI * 2) / (360 * size * size * 2);
+            double rotation_speed = (Math.PI * 2) / (360 * size * 2);
             double rotation_time = rotation_distance / rotation_speed;
             if (rotation_time >= 1) {
                 controller.bodyLimbInfo.setTargetRotation(target_rotation, (int) rotation_time, Interpolation.SMOOTH);
@@ -117,6 +114,7 @@ public enum WalkState implements IStateMachine<WalkState> {
         public void onExitState(ColossusController controller, WalkState nextState) {
             controller.turningDirection = 0;
             controller.resetLimbs(20, Interpolation.SMOOTH);
+            controller.body.motionY = 0; // Might not be quite where this belongs. Stop moving after block climbing.
         }
     },
     FORWARD {
@@ -128,7 +126,7 @@ public enum WalkState implements IStateMachine<WalkState> {
             target.yCoord = controller.posY;
             Vec3 me = FzUtil.fromEntPos(body);
             Vec3 delta = me.subtract(target);
-            double walk_speed = Math.min(1.0/20.0 /* TODO: Inversely proportional to size? */, delta.lengthVector());
+            double walk_speed = Math.min(MAX_WALK_SPEED, delta.lengthVector());
             delta = delta.normalize();
             body.motionX = delta.xCoord * walk_speed;
             body.motionZ = delta.zCoord * walk_speed;
@@ -139,6 +137,8 @@ public enum WalkState implements IStateMachine<WalkState> {
         private final double max_leg_swing_degrees = 22.5;
         private final double max_leg_swing_radians = Math.toRadians(max_leg_swing_degrees);
         private final Quaternion arm_hang = Quaternion.getRotationQuaternionRadians(Math.toRadians(5), ForgeDirection.EAST);
+        private final int SPEED = 2;
+        private final double MAX_WALK_SPEED = SPEED / 20.0;
         
         
         @Override
@@ -147,7 +147,7 @@ public enum WalkState implements IStateMachine<WalkState> {
             
             
             final double legCircumference = 2 * Math.PI * controller.leg_size;
-            final double swingTime = legCircumference * 360 / (2 * max_leg_swing_degrees);
+            final double swingTime = legCircumference * 360 / (2 * max_leg_swing_degrees * SPEED);
             
             
             for (LimbInfo limb : controller.limbs) {
@@ -187,7 +187,8 @@ public enum WalkState implements IStateMachine<WalkState> {
         public void onExitState(ColossusController controller, WalkState nextState) {
             controller.resetLimbs(20, Interpolation.SMOOTH);
             IDeltaChunk body = controller.body;
-            body.motionX = body.motionZ = 0; // Not setting motionY so that I can easily implement jumping
+            body.motionX = body.motionZ = 0; // We've reached our destination
+            body.motionY = 0; // Might not be quite where this belongs. Stop moving after block climbing.
         }
     }
     ;
