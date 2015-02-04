@@ -349,7 +349,11 @@ public class ColossusController extends EntityFz implements IBossDisplayData {
     }
     
     void updateBlockClimb() {
-        if (walk_controller.state != WalkState.FORWARD) return;
+        if (walk_controller.state != WalkState.FORWARD) {
+            // Could sorta do it while TURNING as well, but it seems glitchier
+            last_pos_hash = -1;
+            return;
+        }
         if (ticksExisted <= 5) return; // Make sure limbs are in position
         if (getHealth() <= 0) {
             return;
@@ -358,7 +362,7 @@ public class ColossusController extends EntityFz implements IBossDisplayData {
         if (currentPosHash != last_pos_hash) {
             last_pos_hash = currentPosHash;
             int dy = new HeightCalculator().calc();
-            double new_target = (int) (posY + dy);
+            double new_target = (int) (posY) + dy;
             if (new_target != (int) target_y) {
                 target_y = new_target;
             }
@@ -370,17 +374,18 @@ public class ColossusController extends EntityFz implements IBossDisplayData {
                 }
             }
         }
-        double close_enough = 1.0 / 64.0;
+        /*double close_enough = 1.0 / 512.0;
         if (Math.abs(posY - target_y) <= close_enough) {
+            NORELEASE.println("Close enough!");
             target_y = posY;
             body.motionY = 0;
             return;
-        }
-        double maxV = 1.0/16.0;
+        }*/
+        double maxV = 3.0/16.0;
         int sign = posY > target_y ? -1 : +1;
         if (posY == target_y) sign = 0;
         double delta = Math.abs(posY - target_y);
-        if (delta < 1.0/16.0) sign = 0;
+        //if (delta < close_enough) sign = 0;
         body.motionY = sign * Math.min(maxV, delta);
     }
 
@@ -399,12 +404,14 @@ public class ColossusController extends EntityFz implements IBossDisplayData {
                 }
             }
 
-
-            int y = (int) body.posY - leg_height;
+            double rage = body.posY - leg_height;
+            // hiccup? if (Math.abs(rage - Math.round(rage)) < 0.1 && rage != Math.round(rage)) { }
+            int y = (int) rage; //Math.ceil(rage);
 
             for (LimbInfo li : limbs) {
                 if (li.type != LimbType.LEG) continue;
-                Coord at = new Coord(li.idc.getEntity());
+                IDeltaChunk idc = li.idc.getEntity();
+                Coord at = new Coord(idc);
                 at.y = y;
                 Coord min = at.copy();
                 Coord max = at.copy();
@@ -415,12 +422,16 @@ public class ColossusController extends EntityFz implements IBossDisplayData {
                 max.z += half;
                 Coord.iterateCube(min, max, this);
             }
-
-            if (inside >= (supported + unsupported) / 2) {
-                return +1;
+            int s = leg_size + 1;
+            int leg_area = s * s * 2;
+            if (unsupported > leg_area * 0.5) {
+                if (supported < leg_area * 0.5) {
+                    return -1;
+                }
             }
-            if (unsupported > supported && unsupported > inside) {
-                return -1;
+
+            if (inside > leg_area * 0.8) {
+                return +1;
             }
             return 0;
         }
