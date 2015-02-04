@@ -261,16 +261,27 @@ public class ColossalBlock extends Block {
     public void breakBlock(World world, int x, int y, int z, Block block, int md) {
         super.breakBlock(world, x, y, z, block, md);
         if (world.isRemote) return;
+        Coord at = new Coord(world, x, y, z);
         if (world == DeltaChunk.getServerShadowWorld()) {
             if (md == MD_BODY_CRACKED) {
-                Coord at = new Coord(world, x, y, z);
                 ColossusController controller = findController(at);
                 if (controller != null) {
                     controller.crackBroken();
                 }
             }
         } else if (md == MD_BODY_CRACKED) {
-            Awakener.awaken(new Coord(world, x, y, z));
+            for (Coord neighbor : at.getNeighborsAdjacent()) {
+                if (neighbor.getBlock() == this && neighbor.getMd() == MD_BODY) {
+                    int air = 0;
+                    for (Coord n2 : neighbor.getNeighborsAdjacent()) {
+                        if (n2.isAir()) air++;
+                    }
+                    if (air <= 1) {
+                        neighbor.setMd(MD_BODY_COVERED);
+                    }
+                }
+            }
+            Awakener.awaken(at);
         }
     }
     

@@ -141,7 +141,7 @@ public class Awakener {
         public boolean matches(Coord at) {
             if (at.getBlock() == Core.registry.colossal_block) {
                 int md = at.getMd();
-                return md == ColossalBlock.MD_BODY || md == ColossalBlock.MD_BODY_CRACKED;
+                return md == ColossalBlock.MD_BODY || md == ColossalBlock.MD_BODY_CRACKED || md == ColossalBlock.MD_BODY_COVERED;
             }
             return false;
         }
