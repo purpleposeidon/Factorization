@@ -38,6 +38,7 @@ public enum WalkState implements IStateMachine<WalkState> {
         
         @Override
         public WalkState tick(ColossusController controller, int age) {
+            if (interruptWalk(controller)) return IDLE;
             if (!controller.body.hasOrderedRotation()) return checkRotation(controller);
             if (controller.atTarget() || controller.targetChanged()) return IDLE;
             
@@ -143,6 +144,7 @@ public enum WalkState implements IStateMachine<WalkState> {
         
         @Override
         public WalkState tick(ColossusController controller, int age) {
+            if (interruptWalk(controller)) return IDLE;
             if (controller.atTarget() || controller.targetChanged()) return IDLE;
             
             
@@ -202,4 +204,19 @@ public enum WalkState implements IStateMachine<WalkState> {
     @Override
     public void onExitState(ColossusController controller, WalkState nextState) { }
 
+    static final Technique[] walk_interrupters = new Technique[] {
+            Technique.DEATH_FALL,
+            Technique.HIT_WITH_LIMB,
+    };
+
+    boolean interruptWalk(ColossusController controller) {
+        for (Technique tech : walk_interrupters) {
+            if (!tech.usable(controller)) continue;
+            if (controller.ai_controller.getState() == tech) break; // unlikely? Probably wouldn't be a huge problem anyways.
+            controller.ai_controller.forceState(tech);
+            controller.setTarget(null);
+            return true;
+        }
+        return false;
+    }
 }

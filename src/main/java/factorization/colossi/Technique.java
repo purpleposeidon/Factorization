@@ -70,7 +70,7 @@ public enum Technique implements IStateMachine<Technique> {
             Collections.shuffle(avail);
             Technique chosen_offense = null;
             Technique chosen_defense = null;
-            Technique chosen_idler = null;
+            boolean force_idler = iteratePotentialPlayers(controller) == null;
             for (Technique tech : avail) {
                 TechniqueKind kind = tech.getKind();
                 if (use_defense && kind != DEFENSIVE) continue;
@@ -84,15 +84,12 @@ public enum Technique implements IStateMachine<Technique> {
                         }
                         break;
                     case DEFENSIVE:
-                        chosen_defense = grade(chosen_defense, controller, tech);
-                        break;
                     case IDLER:
-                        chosen_idler = grade(chosen_idler, controller, tech);
+                        chosen_defense = grade(chosen_defense, controller, tech);
                         break;
                 }
             }
             if (chosen_defense != null) return chosen_defense;
-            if (chosen_idler != null) return chosen_idler;
             return STAND_STILL; // Shouldn't happen. Delay for a bit.
         }
         
@@ -100,7 +97,11 @@ public enum Technique implements IStateMachine<Technique> {
             if (orig == null && next.usable(controller)) return next;
             return orig;
         }
-        
+
+        @Override
+        protected Object visitPlayer(EntityPlayer player, ColossusController controller) {
+            return player;
+        }
     },
     
     STAND_STILL {
@@ -320,6 +321,10 @@ public enum Technique implements IStateMachine<Technique> {
             Quaternion bodyRot = controller.body.getRotation();
             double yRot = bodyRot.toRotationVector().yCoord;
             Quaternion straightRot = Quaternion.getRotationQuaternionRadians(yRot, ForgeDirection.UP);
+            if (bodyRot.dotProduct(straightRot) < 0) {
+                // Sometimes seems to go the long way 'round; this should make it short
+                straightRot.incrConjugate();
+            }
             controller.bodyLimbInfo.target(straightRot, 1);
 
             Quaternion straightenIsh = new Quaternion().slerp(bodyRot, 0.5);
@@ -352,7 +357,10 @@ public enum Technique implements IStateMachine<Technique> {
         @Override
         protected Object visitPlayer(EntityPlayer player, ColossusController controller) {
             if (!player.onGround) return CONTINUE;
-            if (player.getDistanceSqToEntity(controller) < controller.leg_size) return CONTINUE;
+            double dx = controller.posX - player.posX;
+            double dz = controller.posZ - player.posZ;
+            double d = Math.sqrt(dx * dx + dz * dz);
+            if (d < controller.leg_size + 2) return CONTINUE;
             return player;
         }
 
@@ -391,7 +399,7 @@ public enum Technique implements IStateMachine<Technique> {
         public void onEnterState(ColossusController controller, Technique prevState) {
             double v = controller.leg_length / (double) SIT_FALL_TIME;
             controller.body.setVelocity(0, -v, 0);
-            Quaternion legBend = Quaternion.getRotationQuaternionRadians(Math.PI / 2, ForgeDirection.NORTH);
+            Quaternion legBend = Quaternion.getRotationQuaternionRadians(Math.PI / 2, ForgeDirection.SOUTH);
             for (LimbInfo limb : controller.limbs) {
                 if (limb.type == LimbType.LEG) {
                     limb.setTargetRotation(legBend, SIT_FALL_TIME, Interpolation.SMOOTH);
@@ -421,6 +429,7 @@ public enum Technique implements IStateMachine<Technique> {
         @Override
         public Technique tick(ColossusController controller, int age) {
             if (age % 60 == 0 && iteratePotentialPlayers(controller) != null) return STAND_UP;
+            if (controller.checkHurt(false)) return STAND_UP;
             return this;
         }
 
@@ -577,7 +586,8 @@ public enum Technique implements IStateMachine<Technique> {
     LEAN_BACK_AND_FLAIL {
         @Override
         TechniqueKind getKind() {
-            return DEFENSIVE;
+            return TRANSITION; // lame technique; disabled
+            //return DEFENSIVE;
         }
         
         @Override
@@ -741,7 +751,12 @@ public enum Technique implements IStateMachine<Technique> {
         TechniqueKind getKind() {
             return TRANSITION;
         }
-        
+
+        @Override
+        boolean usable(ColossusController controller) {
+            return controller.getHealth() <= 0;
+        }
+
         @Override
         public void onEnterState(ColossusController controller, Technique prevState) {
             for (LimbInfo li : controller.limbs) {
@@ -970,7 +985,7 @@ public enum Technique implements IStateMachine<Technique> {
     protected <E> E iteratePotentialPlayers(ColossusController controller) {
         for (EntityPlayer player : (Iterable<EntityPlayer>) controller.worldObj.playerEntities) {
             if (player.getDistanceSqToEntity(controller) > distSq) continue;
-            if (player.capabilities.isCreativeMode && !Core.dev_environ) continue;
+            if (player.capabilities.isCreativeMode /*&& !Core.dev_environ*/) continue;
             Object res = this.visitPlayer(player, controller);
             if (res == CONTINUE) continue;
             return (E) res;

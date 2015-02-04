@@ -25,15 +25,23 @@ public class StateMachineExecutor<E extends Enum<E> & IStateMachine<E> > impleme
         state = data.as(Share.PRIVATE, machineName + prefix + "_state").putEnum(state);
         return this;
     }
-    
+
+    public void forceState(E nextState) {
+        NORELEASE.println(machineName + nextState);
+        state.onExitState(controller, nextState);
+        nextState.onEnterState(controller, state);
+        age = 0;
+        state = nextState;
+    }
+
+    public E getState() {
+        return state;
+    }
+
     void tick() {
         E nextState = state.tick(controller, age++);
         if (nextState != state) {
-            NORELEASE.println(machineName + nextState);
-            state.onExitState(controller, nextState);
-            nextState.onEnterState(controller, state);
-            age = 0;
-            state = nextState;
+            forceState(nextState);
         }
     }
 }
