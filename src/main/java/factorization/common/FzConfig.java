@@ -58,6 +58,7 @@ public class FzConfig {
     public static boolean sockets_ignore_front_redstone = true;
     public static boolean show_time_on_fullscreen = true;
     public static boolean require_book_for_manual = true;
+    public static boolean infinite_guide_usage = false;
     
     public static boolean enable_retrogen = false;
     public static String retrogen_key = "DEFAULT";
@@ -168,6 +169,7 @@ public class FzConfig {
         proper_projectile_physics = getBoolConfig("properProjectilePhysics", "server", proper_projectile_physics, "Makes projectiles start with the velocity of the thrower");
         buffed_nametags = getBoolConfig("buffedNametags", "server", buffed_nametags, "Naming entities gives them +5 hearts");
         players_discover_colossus_guides = getBoolConfig("playersDiscoverColossusGuides", "server", players_discover_colossus_guides, "If set to true, players will find a weird tablet after getting the diamonds achievement");
+        infinite_guide_usage = getBoolConfig("infiniteGuideUse", "server", infinite_guide_usage, "If set to true, the Lost Map won't take damage");
         //invasiveCharge = getBoolConfig("invasiveCharge", "server", invasiveCharge, "Set to true to prevent charge from connecting over metal blocks.");
         //Broken. Doesn't work.
         enable_solar_steam = getBoolConfig("enableSolarSteam", "server", enable_solar_steam, "Set to false to disable the crafting recipe for solar2steam machines");

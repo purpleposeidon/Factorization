@@ -2,7 +2,11 @@ package factorization.colossi;
 
 import java.util.ArrayList;
 
+import factorization.common.FzConfig;
+import net.minecraft.enchantment.Enchantment;
+import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.ChatComponentText;
@@ -25,6 +29,7 @@ public class ItemColossusGuide extends ItemFactorization {
         super(name, tabType);
         Core.loadBus(this);
         setMaxStackSize(1);
+        setMaxDamage(24);
     }
     
     @Override
@@ -48,7 +53,7 @@ public class ItemColossusGuide extends ItemFactorization {
             Notice.chat(player, msgKey, new ChatComponentTranslation("colossus.is.no_nearby"));
             return is;
         }
-        if (FzUtil.isPlayerCreative(player) && Core.dev_environ) {
+        if (FzUtil.isPlayerCreative(player) && player.isSneaking()) {
             int limit = 4;
             for (Coord at : nearby) {
                 String t = at.toString();
@@ -77,11 +82,13 @@ public class ItemColossusGuide extends ItemFactorization {
                 msg = new ChatComponentTranslation(getDirection(dc), getDistance(dc));
             }
             Notice.chat(player, msgKey, msg);
+            
+            if (!FzConfig.infinite_guide_usage) is.damageItem(1, player);
         }
         
         return is;
     }
-    
+
     String getDistance(DeltaCoord dc) {
         int d = (int) dc.magnitude();
         String pretty = "" + d;
