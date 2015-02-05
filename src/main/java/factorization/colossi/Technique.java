@@ -187,8 +187,11 @@ public enum Technique implements IStateMachine<Technique> {
                 }
             });
             for (Coord found : sampler) {
-                // NORELEASE: We might want a "cracked mask"
-                found.setIdMd(Core.registry.colossal_block, ColossalBlock.MD_BODY_CRACKED, true);
+                if (found.getMd() == ColossalBlock.MD_MASK && found.getId() == Core.registry.colossal_block) {
+                    found.setIdMd(Core.registry.colossal_block, ColossalBlock.MD_MASK_CRACKED, true);
+                } else {
+                    found.setIdMd(Core.registry.colossal_block, ColossalBlock.MD_BODY_CRACKED, true);
+                }
                 return;
             }
             // No suitable mask to crack? Might be a custom design. Silently skip this bow then.
@@ -212,6 +215,9 @@ public enum Technique implements IStateMachine<Technique> {
                 public void handle(Coord here) {
                     if (isExposedSkin(here)) {
                         sampler.give(here.copy());
+                    }
+                    if (here.getBlock() == Core.registry.colossal_block && here.getMd() == ColossalBlock.MD_EYE) {
+                        here.setMd(ColossalBlock.MD_EYE_OPEN, true);
                     }
                 }
             });

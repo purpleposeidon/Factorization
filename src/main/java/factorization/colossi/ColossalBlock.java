@@ -37,8 +37,14 @@ import factorization.shared.Core.TabType;
 import factorization.shared.FzUtil;
 
 public class ColossalBlock extends Block {
+    static final byte MD_MASK = 0, MD_BODY = 4, MD_BODY_CRACKED = 1, MD_ARM = 2, MD_LEG = 3, MD_EYE = 5, MD_CORE = 6, MD_EYE_OPEN = 7, MD_BODY_COVERED = 8, MD_MASK_CRACKED = 9;
+
     static Material collosal_material = new Material(MapColor.purpleColor);
-    
+
+    static final int UP = ForgeDirection.UP.ordinal();
+    static final int DOWN = ForgeDirection.DOWN.ordinal();
+    static final int EAST = ForgeDirection.EAST.ordinal();
+
     public ColossalBlock() {
         super(collosal_material);
         setHardness(-1);
@@ -49,10 +55,7 @@ public class ColossalBlock extends Block {
         Core.tab(this, TabType.BLOCKS);
     }
     
-    static final byte MD_MASK = 0, MD_BODY = 4, MD_BODY_CRACKED = 1, MD_ARM = 2, MD_LEG = 3, MD_EYE = 5, MD_CORE = 6, MD_EYE_OPEN = 7, MD_BODY_COVERED = 8;
-    
-    static final int EAST_SIDE = 5;
-    
+
     @Override
     public IIcon getIcon(int side, int md) {
         switch (md) {
@@ -62,6 +65,7 @@ public class ColossalBlock extends Block {
         case MD_ARM: return BlockIcons.colossi$arm_side; // Item-only
         case MD_LEG: return BlockIcons.colossi$leg;
         case MD_MASK: return BlockIcons.colossi$mask;
+        case MD_MASK_CRACKED: return BlockIcons.colossi$mask_cracked;
         case MD_EYE: return BlockIcons.colossi$eye; // Item-only
         case MD_CORE: {
             if (side == EAST) return BlockIcons.colossi$core;
@@ -71,10 +75,6 @@ public class ColossalBlock extends Block {
         default: return super.getIcon(side, md);
         }
     }
-
-    static final int UP = ForgeDirection.UP.ordinal();
-    static final int DOWN = ForgeDirection.DOWN.ordinal();
-    static final int EAST = ForgeDirection.EAST.ordinal();
     
     @Override
     @SideOnly(Side.CLIENT)
@@ -82,7 +82,7 @@ public class ColossalBlock extends Block {
         int md = w.getBlockMetadata(x, y, z);
         if (md == MD_EYE || md == MD_EYE_OPEN) {
             // This is here rather than up there so that the item form doesn't look lame
-            if (side != EAST_SIDE) return BlockIcons.colossi$mask;
+            if (side != EAST) return BlockIcons.colossi$mask;
             return md == MD_EYE_OPEN ? BlockIcons.colossi$eye_open : BlockIcons.colossi$eye;
         }
         if (md == MD_ARM) {
@@ -106,10 +106,11 @@ public class ColossalBlock extends Block {
     
     @Override
     public float getBlockHardness(World world, int x, int y, int z) {
-        if (world.getBlockMetadata(x, y, z) == MD_BODY_CRACKED) {
+        int md = world.getBlockMetadata(x, y, z);
+        if (md == MD_BODY_CRACKED || md == MD_MASK_CRACKED) {
             return 6; // 10
         }
-        if (world.getBlockMetadata(x, y, z) == MD_MASK) {
+        if (md == MD_MASK) {
             for (ForgeDirection dir : ForgeDirection.VALID_DIRECTIONS) {
                 if (isSupportive(world, x + dir.offsetX, y + dir.offsetY, z + dir.offsetZ)) {
                     return super.getBlockHardness(world, x, y, z);
@@ -124,7 +125,6 @@ public class ColossalBlock extends Block {
         if (world.getBlock(x, y, z) != this) return false;
         int md = world.getBlockMetadata(x, y, z);
         return md == MD_BODY || md == MD_BODY_COVERED || md == MD_EYE || md == MD_EYE_OPEN || md == MD_CORE;
-        
     }
     
     @Override
@@ -132,7 +132,7 @@ public class ColossalBlock extends Block {
     
     @Override
     public void getSubBlocks(Item item, CreativeTabs tab, List list) {
-        for (byte md = MD_MASK; md <= MD_BODY_COVERED; md++) {
+        for (byte md = MD_MASK; md <= MD_MASK_CRACKED; md++) {
             if (md == MD_BODY_COVERED) continue; // Technical block; skip
             list.add(new ItemStack(this, 1, md));
         }
@@ -156,22 +156,21 @@ public class ColossalBlock extends Block {
     }
     
     @Override
-    public ArrayList<ItemStack> getDrops(World world, int x, int y, int z, int metadata, int fortune) {
+    public ArrayList<ItemStack> getDrops(World world, int x, int y, int z, int md, int fortune) {
         ArrayList<ItemStack> ret = new ArrayList();
-        if (metadata == MD_MASK) {
-            ret.add(new ItemStack(this, 1, metadata));
+        if (md == MD_MASK) {
+            ret.add(new ItemStack(this, 1, md));
         }
-        if (metadata != MD_CORE && metadata != MD_BODY_CRACKED) {
-            return ret;
+        if (md == MD_BODY_CRACKED || md == MD_MASK_CRACKED) {
+            int count = 2 + world.rand.nextInt(3 + fortune);
+            for (int i = 0; i < count; i++) {
+                ret.add(getChest().getOneItem(world.rand));
+            }
         }
-        if (metadata == MD_CORE) {
+        if (md == MD_CORE) {
             ret.add(new ItemStack(Core.registry.logicMatrixProgrammer));
         }
-        int count = 2 + world.rand.nextInt(3 + fortune);
-        for (int i = 0; i < count; i++) {
-            ret.add(getChest().getOneItem(world.rand));
-        }
-        if (metadata == MD_BODY_CRACKED) {
+        if (md == MD_BODY_CRACKED || md == MD_MASK_CRACKED) {
             Coord me = new Coord(world, x, y, z);
             Coord back = me.add(ForgeDirection.WEST);
             if (back.getBlock() == this && back.getMd() == MD_CORE) {
@@ -193,6 +192,7 @@ public class ColossalBlock extends Block {
         float pz = z - 0.5F + rand.nextFloat()*r;
         switch (md) {
         case MD_BODY_CRACKED:
+        case MD_MASK_CRACKED:
             world.spawnParticle("flame", px, py, pz, 0, 0, 0);
             break;
         case MD_CORE:
@@ -272,28 +272,18 @@ public class ColossalBlock extends Block {
     }
     
     @Override
-    @SideOnly(Side.CLIENT)
-    public int colorMultiplier(IBlockAccess w, int x, int y, int z) {
-        int ret = 0xFFFFFF;
-        World mcw = Minecraft.getMinecraft().theWorld;
-        if (mcw == null) return ret;
-        if (mcw.provider.dimensionId == Hammer.dimensionID) return ret;
-        return 0x9284B4;
-    }
-    
-    @Override
     public void breakBlock(World world, int x, int y, int z, Block block, int md) {
         super.breakBlock(world, x, y, z, block, md);
         if (world.isRemote) return;
         Coord at = new Coord(world, x, y, z);
         if (world == DeltaChunk.getServerShadowWorld()) {
-            if (md == MD_BODY_CRACKED) {
+            if (md == MD_BODY_CRACKED || md == MD_MASK_CRACKED) {
                 ColossusController controller = findController(at);
                 if (controller != null) {
                     controller.crackBroken();
                 }
             }
-        } else if (md == MD_BODY_CRACKED) {
+        } else if (md == MD_BODY_CRACKED || md == MD_MASK_CRACKED) {
             for (Coord neighbor : at.getNeighborsAdjacent()) {
                 if (neighbor.getBlock() == this && neighbor.getMd() == MD_BODY) {
                     int air = 0;
