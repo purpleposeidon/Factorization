@@ -113,7 +113,8 @@ public class BlockIcons {
     
     
     
-    public static IIcon colossi$body, colossi$body_cracked, colossi$arm, colossi$mask, colossi$core, colossi$leg, colossi$eye, colossi$eye_open;
+    public static IIcon colossi$body, colossi$body_cracked, colossi$mask, colossi$mask_cracked, colossi$core, colossi$core_back, colossi$leg, colossi$eye, colossi$eye_open;
+    public static IIcon colossi$arm_bottom, colossi$arm_side, colossi$arm_side_top, colossi$arm_side_bottom;
     
     public static class ActivatingMachineIIcon extends IIconGroup {
         public IIcon top, bottom, side, side_on;

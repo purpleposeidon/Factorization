@@ -21,6 +21,7 @@ import net.minecraft.util.WeightedRandomChestContent;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import net.minecraftforge.common.ChestGenHooks;
+import net.minecraftforge.common.util.Constants;
 import net.minecraftforge.common.util.ForgeDirection;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
@@ -56,17 +57,24 @@ public class ColossalBlock extends Block {
     public IIcon getIcon(int side, int md) {
         switch (md) {
         case MD_BODY: return BlockIcons.colossi$body;
-        case MD_BODY_COVERED: return BlockIcons.uv_test;
+        case MD_BODY_COVERED: return BlockIcons.colossi$body;
         case MD_BODY_CRACKED: return BlockIcons.colossi$body_cracked;
-        case MD_ARM: return BlockIcons.colossi$arm;
+        case MD_ARM: return BlockIcons.colossi$arm_side; // Item-only
         case MD_LEG: return BlockIcons.colossi$leg;
         case MD_MASK: return BlockIcons.colossi$mask;
-        case MD_EYE: return BlockIcons.colossi$eye;
-        case MD_CORE: return BlockIcons.colossi$core;
+        case MD_EYE: return BlockIcons.colossi$eye; // Item-only
+        case MD_CORE: {
+            if (side == EAST) return BlockIcons.colossi$core;
+            return BlockIcons.colossi$core_back;
+        }
         case MD_EYE_OPEN: return BlockIcons.colossi$eye_open;
         default: return super.getIcon(side, md);
         }
     }
+
+    static final int UP = ForgeDirection.UP.ordinal();
+    static final int DOWN = ForgeDirection.DOWN.ordinal();
+    static final int EAST = ForgeDirection.EAST.ordinal();
     
     @Override
     @SideOnly(Side.CLIENT)
@@ -76,6 +84,22 @@ public class ColossalBlock extends Block {
             // This is here rather than up there so that the item form doesn't look lame
             if (side != EAST_SIDE) return BlockIcons.colossi$mask;
             return md == MD_EYE_OPEN ? BlockIcons.colossi$eye_open : BlockIcons.colossi$eye;
+        }
+        if (md == MD_ARM) {
+            if (side == UP) return BlockIcons.colossi$body;
+            if (side == DOWN) return BlockIcons.colossi$arm_bottom;
+            Block downId = w.getBlock(x, y - 1, z);
+            int downMd = w.getBlockMetadata(x, y - 1, z);
+            Block upId = w.getBlock(x, y + 1, z);
+            int upMd = w.getBlockMetadata(x, y + 1, z);
+
+            if (downId == this && downMd == MD_ARM) {
+                if (upId != this || upMd != MD_ARM) {
+                    return BlockIcons.colossi$arm_side_top;
+                }
+                return BlockIcons.colossi$arm_side;
+            }
+            return BlockIcons.colossi$arm_side_bottom;
         }
         return getIcon(side, md);
     }
