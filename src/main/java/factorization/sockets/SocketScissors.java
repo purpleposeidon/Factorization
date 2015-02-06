@@ -9,7 +9,8 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 
-import net.minecraft.block.Block;
+import factorization.shared.*;
+import net.minecraft.block.*;
 import net.minecraft.block.material.Material;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.texture.TextureManager;
@@ -46,13 +47,7 @@ import factorization.common.FactoryType;
 import factorization.common.ItemIcons;
 import factorization.notify.Notice;
 import factorization.servo.ServoMotor;
-import factorization.shared.Core;
-import factorization.shared.DropCaptureHandler;
-import factorization.shared.FactorizationBlockRender;
-import factorization.shared.FzUtil;
-import factorization.shared.ICaptureDrops;
 import factorization.shared.NetworkFactorization.MessageType;
-import factorization.shared.ObjectModel;
 
 public class SocketScissors extends TileEntitySocketBase implements ICaptureDrops {
     private boolean wasPowered = false;
@@ -211,18 +206,18 @@ public class SocketScissors extends TileEntitySocketBase implements ICaptureDrop
             if (block.isAir(worldObj, mop.blockX, mop.blockY, mop.blockZ)) {
                 return false;
             }
-            if (canCutBlock(worldObj, block, mop.blockX, mop.blockY, mop.blockZ)) {
-                EntityPlayer player = getFakePlayer();
+            EntityPlayer player = getFakePlayer();
+            if (canCutBlock(player, worldObj, block, mop.blockX, mop.blockY, mop.blockZ)) {
                 player.inventory.mainInventory[0] = shears;
-                if (block instanceof IShearable) {
+                /*if (block instanceof IShearable) {
                     IShearable target = (IShearable) block;
-                    if (target.isShearable(shears, worldObj, mop.blockX, mop.blockY, mop.blockZ)) {
+                    if (NORELEASE.on || target.isShearable(shears, worldObj, mop.blockX, mop.blockY, mop.blockZ)) {
                         List<ItemStack> stacks = target.onSheared(shears, worldObj, mop.blockX, mop.blockY, mop.blockZ, 0);
                         processCollectedItems(stacks);
                         removeBlock(player, block, metadata, mop.blockX, mop.blockY, mop.blockZ);
                         return true;
                     }
-                } else {
+                } else*/ {
                     boolean didRemove = removeBlock(player, block, metadata, mop.blockX, mop.blockY, mop.blockZ);
                     if (didRemove) {
                         block.harvestBlock(worldObj, player, mop.blockX, mop.blockY, mop.blockZ, metadata);
@@ -244,18 +239,26 @@ public class SocketScissors extends TileEntitySocketBase implements ICaptureDrop
         }
         return false;
     }
-    
-    public static boolean canCutBlock(World world, Block block, int x, int y, int z) {
+
+    public static boolean canCutBlock(EntityPlayer player, World world, Block block, int x, int y, int z) {
+        int md = world.getBlockMetadata(x, y, z);
         Material mat = block.getMaterial();
-        if (mat == Material.leaves || mat == Material.cactus || mat == Material.plants) {
-            return true;
-        }
-        if (block == Blocks.web || block == Blocks.tallgrass || block == Blocks.vine || block == Blocks.tripwire || block instanceof IShearable) {
-            return true;
-        }
         if (block.getBlockHardness(world, x, y, z) == 0 && mat != Material.circuits && mat != Material.fire && mat != Material.air) {
             return true;
         }
+        // if (!block.canSilkHarvest(world, player, x, y, z, md)) return false; -- useless; vanilla things return values that don't work for us
+        // if (block instanceof IShearable) return true;
+        if (block instanceof BlockPortal) return true;
+        if (block.getBlockHardness(world, x, y, z) == 0 && mat != Material.circuits && mat != Material.fire && mat != Material.air) {
+            return true;
+        }
+        if (mat == Material.leaves || mat == Material.cactus || mat == Material.plants || mat == Material.cloth || mat == Material.carpet) {
+            return true;
+        }
+        if (block instanceof BlockWeb || block instanceof BlockTallGrass || block instanceof BlockVine || block instanceof BlockTripWire) {
+            return true;
+        }
+
         return false;
     }
 
@@ -274,6 +277,7 @@ public class SocketScissors extends TileEntitySocketBase implements ICaptureDrop
     }
 
     void processCollectedItems(Collection<ItemStack> items) {
+        if (items == null) return;
         buffer.addAll(items);
         items.clear();
     }
