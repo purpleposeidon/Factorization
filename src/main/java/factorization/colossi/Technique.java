@@ -588,34 +588,7 @@ public enum Technique implements IStateMachine<Technique> {
             return finishMove(controller);
         }
     },
-    
-    LEAN_BACK_AND_FLAIL {
-        @Override
-        TechniqueKind getKind() {
-            return TRANSITION; // lame technique; disabled
-            //return DEFENSIVE;
-        }
-        
-        @Override
-        public void onEnterState(ColossusController controller, Technique prevState) {
-            Quaternion lean = Quaternion.getRotationQuaternionRadians(Math.toRadians(20), ForgeDirection.SOUTH);
-            Quaternion rot = controller.body.getRotation().multiply(lean);
-            controller.bodyLimbInfo.target(rot, 4);
-            // TODO Auto-generated method stub
-            super.onEnterState(controller, prevState);
-        }
-        
-        @Override
-        public Technique tick(ColossusController controller, int age) {
-            return finishMove(controller, FINISH_MOVE);
-        }
-        
-        @Override
-        public void onExitState(ColossusController controller, Technique nextState) {
-            STAND_STILL.onEnterState(controller, this);
-        }
-    },
-    
+
     SPIN_WINDUP {
         @Override
         TechniqueKind getKind() {
