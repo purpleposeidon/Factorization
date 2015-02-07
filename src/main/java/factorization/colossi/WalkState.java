@@ -34,6 +34,7 @@ public enum WalkState implements IStateMachine<WalkState> {
                         Quaternion ar = Quaternion.getRotationQuaternionRadians(arm_angle, ForgeDirection.EAST);
                         limb.target(ar, 1);
                     }
+                    limb.creak();
                 }
             }
         }
@@ -79,6 +80,7 @@ public enum WalkState implements IStateMachine<WalkState> {
                     nr.incrMultiply(Quaternion.getRotationQuaternionRadians(Math.toRadians(2), ForgeDirection.SOUTH));
                 }
                 limb.setTargetRotation(nr, (int) nextRotationTime, interp);
+                limb.creak();
             }
             
             return this;
@@ -184,6 +186,7 @@ public enum WalkState implements IStateMachine<WalkState> {
                     }
                 }
                 limb.setTargetRotation(nextRotation, (int) nextRotationTime, Interpolation.SMOOTH);
+                limb.creak();
             }
             
             return this;

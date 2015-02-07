@@ -452,6 +452,8 @@ public class ColossusController extends EntityFz implements IBossDisplayData {
         if (been_hurt && reset) {
             been_hurt = false;
             wakeUpMore();
+            float pitch = 4 * getHealth() / (getMaxHealth() + 0.1F);
+            worldObj.playSoundAtEntity(this, "factorization:colossus.hurt", 1, pitch);
             return true;
         }
         return been_hurt;
@@ -472,6 +474,4 @@ public class ColossusController extends EntityFz implements IBossDisplayData {
         if (getHome().distanceSq(new Coord(player)) > max_home_dist) return false;
         return true;
     }
-    
-    
 }

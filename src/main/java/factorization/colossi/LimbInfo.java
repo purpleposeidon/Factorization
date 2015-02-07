@@ -65,8 +65,6 @@ class LimbInfo {
     }
     
     public void target(Quaternion rot, double power, Interpolation interp) {
-        if (NORELEASE.on) power = 1;
-        NORELEASE.fixme("implement!");
         setTargetRotation(rot, (int) (60 / power), interp);
     }
     
@@ -96,5 +94,14 @@ class LimbInfo {
     @Override
     public String toString() {
         return type + " " + side + "#" + parity;
+    }
+
+    public void creak() {
+        IDeltaChunk ent = idc.getEntity();
+        if (ent == null) return;
+        if (ent.worldObj.rand.nextInt(5) != 0) return;
+        float volume = 0.5F + ent.worldObj.rand.nextFloat();
+        float pitch = 1F / 16F + (1F / 8F) * ent.worldObj.rand.nextFloat();
+        ent.worldObj.playSoundAtEntity(ent, "factorization:colossus.creak", volume, pitch);
     }
 }

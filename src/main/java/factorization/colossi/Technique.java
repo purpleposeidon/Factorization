@@ -124,7 +124,6 @@ public enum Technique implements IStateMachine<Technique> {
                 if (li.type.isArmOrLeg()) {
                     Quaternion or = li.idc.getEntity().getRotation();
                     li.idc.getEntity().orderTargetRotation(or, time, Interpolation.SMOOTH3);
-                    //li.target(or.conjugate(), 1);
                     li.target(new Quaternion(), 1);
                 }
             }
@@ -201,7 +200,7 @@ public enum Technique implements IStateMachine<Technique> {
         @Override
         public Technique tick(ColossusController controller, int age) {
             // Copy of BOW.tick >_>
-            if (controller.checkHurt(false)) return UNBOW;
+            if (controller.checkHurt(false)) return INITIAL_UNBOW;
             return this; // Because of this!
         }
         
@@ -313,6 +312,28 @@ public enum Technique implements IStateMachine<Technique> {
             if (controller.checkHurt(false)) return UNBOW;
             if (age > 20 * 15) return UNBOW;
             return this;
+        }
+    },
+
+    INITIAL_UNBOW {
+        @Override
+        TechniqueKind getKind() {
+            return TRANSITION;
+        }
+
+        @Override
+        public void onEnterState(ColossusController controller, Technique prevState) {
+            UNBOW.onEnterState(controller, prevState);
+        }
+
+        @Override
+        public Technique tick(ColossusController controller, int age) {
+            return UNBOW.tick(controller, age);
+        }
+
+        @Override
+        public void onExitState(ColossusController controller, Technique nextState) {
+            UNBOW.onExitState(controller, nextState);
         }
     },
     
@@ -639,7 +660,7 @@ public enum Technique implements IStateMachine<Technique> {
             Quaternion bod = controller.body.getRotation();
             Quaternion newBod = bod.multiply(Quaternion.getRotationQuaternionRadians(d * Math.PI * 1.75, ForgeDirection.UP));
             newBod.incrLongFor(bod);
-            controller.bodyLimbInfo.target(newBod, 1F/8F, Interpolation.SMOOTHER);
+            controller.bodyLimbInfo.target(newBod, 1F, Interpolation.SMOOTHER);
         }
         
         @Override
@@ -671,7 +692,7 @@ public enum Technique implements IStateMachine<Technique> {
                 if (li.type != LimbType.ARM) continue;
                 double angle = (li.side == BodySide.RIGHT ? -1 : +1) * Math.toRadians(90 + 45);
                 Quaternion rot = Quaternion.getRotationQuaternionRadians(angle, ForgeDirection.EAST);
-                li.target(rot, 3, Interpolation.SMOOTH);
+                li.target(rot, 1, Interpolation.SMOOTH);
             }
         }
         
@@ -747,7 +768,7 @@ public enum Technique implements IStateMachine<Technique> {
             Quaternion fallAxis = Quaternion.getRotationQuaternionRadians(Math.PI / 2, ForgeDirection.SOUTH);
             Quaternion rotation = controller.body.getRotation();
             fallAxis = rotation.multiply(fallAxis);
-            controller.bodyLimbInfo.target(fallAxis, 3, Interpolation.CUBIC);
+            controller.body.orderTargetRotation(fallAxis, (int) (20 * 2.5 /* 2.5 seconds for the fall sound to hit */), Interpolation.SQUARE);
             controller.setTarget(null);
         }
         
@@ -927,7 +948,7 @@ public enum Technique implements IStateMachine<Technique> {
     @Override
     public void onExitState(ColossusController controller, Technique nextState) { }
     
-    static final double bow_power = 0.1;
+    static final double bow_power = 0.4;
     static final Interpolation bendInterp = Interpolation.LINEAR; // SMOOTH could work; playing it safe tho
     
     protected Technique finishMove(ColossusController controller, Technique next) {
@@ -955,7 +976,7 @@ public enum Technique implements IStateMachine<Technique> {
         }
         turn = Math.toRadians(turn) * d;
         rot = Quaternion.getRotationQuaternionRadians(turn, ForgeDirection.UP).multiply(rot);
-        li.target(rot, 1F/3F, Interpolation.SMOOTH);
+        li.target(rot, 1 /*1F/3F*/, Interpolation.SMOOTH);
     }
     
     private static final double distSq = WorldGenColossus.SMOOTH_START * WorldGenColossus.SMOOTH_START;
