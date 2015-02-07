@@ -174,7 +174,7 @@ public class ColossalBuilder {
         
         Coord heart_crack = start.add(leg_size + body_front_padding, leg_height + 1 + ((body_height + 1) / 2), leg_size + ((1 + leg_spread) / 2));
         Coord hc_front = heart_crack.add(ForgeDirection.EAST);
-        if (MASK.matches(hc_front)) {
+        if (MASK.matches(hc_front) || EYE.matches(hc_front)) {
             heart_crack.adjust(ForgeDirection.EAST);
             fill(heart_crack, heart_crack, MASK_CRACK);
         } else {
