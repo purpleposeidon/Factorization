@@ -1,5 +1,7 @@
 package factorization.colossi;
 
+import factorization.api.Coord;
+import net.minecraft.block.Block;
 import net.minecraft.util.Vec3;
 import net.minecraftforge.common.util.ForgeDirection;
 import factorization.api.Quaternion;
@@ -39,8 +41,9 @@ public enum WalkState implements IStateMachine<WalkState> {
         @Override
         public WalkState tick(ColossusController controller, int age) {
             if (interruptWalk(controller)) return IDLE;
-            if (!controller.body.hasOrderedRotation()) return checkRotation(controller);
             if (controller.atTarget() || controller.targetChanged()) return IDLE;
+            playStepSounds(controller, age);
+            if (!controller.body.hasOrderedRotation()) return checkRotation(controller);
             
             // System no longer supports joint displacement, but if it did:
             // double lift_height = 1.5F/16F;
@@ -146,6 +149,7 @@ public enum WalkState implements IStateMachine<WalkState> {
         public WalkState tick(ColossusController controller, int age) {
             if (interruptWalk(controller)) return IDLE;
             if (controller.atTarget() || controller.targetChanged()) return IDLE;
+            playStepSounds(controller, age);
             
             
             final double legCircumference = 2 * Math.PI * controller.leg_size;
@@ -184,7 +188,7 @@ public enum WalkState implements IStateMachine<WalkState> {
             
             return this;
         }
-        
+
         @Override
         public void onExitState(ColossusController controller, WalkState nextState) {
             controller.resetLimbs(20, Interpolation.SMOOTH);
@@ -218,5 +222,28 @@ public enum WalkState implements IStateMachine<WalkState> {
             return true;
         }
         return false;
+    }
+
+    void playStepSounds(ColossusController controller, int age) {
+        if (age % 35 != 0) return;
+        for (LimbInfo limb : controller.limbs) {
+            if (limb.type != LimbType.LEG) continue;
+            IDeltaChunk idc = limb.idc.getEntity();
+            if (idc == null) continue;
+            Coord min = idc.getCorner();
+            Coord max = idc.getFarCorner();
+            Coord.sort(min, max);
+            max.y = min.y;
+            Vec3 shadowFoot = min.centerVec(max);
+            Vec3 realFoot = idc.shadow2real(shadowFoot);
+
+            Coord stomped = new Coord(controller.worldObj, realFoot);
+            stomped.y--;
+
+            if (stomped.isAir()) continue;
+            Block.SoundType sound = stomped.getBlock().stepSound;
+            if (sound == null) continue;
+            idc.worldObj.playSoundEffect(realFoot.xCoord, realFoot.yCoord, realFoot.zCoord, sound.getStepResourcePath(), sound.getPitch() * 0.9F, sound.getVolume() * 1.1F);
+        }
     }
 }

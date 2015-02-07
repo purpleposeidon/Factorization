@@ -30,7 +30,7 @@ public class StateMachineExecutor<E extends Enum<E> & IStateMachine<E> > impleme
         float volume = 1;
         float pitch = 1;
 
-        controller.worldObj.playSoundAtEntity(controller, "factorization:colossus." + machineName + state + "_exit", volume, pitch);
+        //controller.worldObj.playSoundAtEntity(controller, "factorization:colossus." + machineName + state + "_exit", volume, pitch);
         controller.worldObj.playSoundAtEntity(controller, "factorization:colossus." + machineName + nextState + "_enter", volume, pitch);
         NORELEASE.println(machineName + nextState);
         state.onExitState(controller, nextState);

@@ -73,6 +73,10 @@ public class Coord implements IDataSerializable, ISaneCoord, Comparable<Coord> {
         this(w, (int) x, (int) y, (int) z);
         //this(w, (int) Math.floor(x + 0.5), (int) Math.floor(y + 0.5), (int) Math.floor(z + 0.5));
     }
+
+    public Coord(World w, Vec3 v) {
+        this(w, v.xCoord, v.yCoord, v.zCoord);
+    }
     
     public Coord(World w, MovingObjectPosition mop) {
         this(w, mop.blockX, mop.blockY, mop.blockZ);
