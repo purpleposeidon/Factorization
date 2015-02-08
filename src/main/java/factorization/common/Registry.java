@@ -1068,12 +1068,10 @@ public class Registry {
                 '#', Blocks.stone,
                 'F', Blocks.fire);
         oreRecipe(new ItemStack(twistedBlock),
-                "P  ",
-                " O ",
-                " |P",
-                'P', Blocks.piston,
+                "O",
+                "#",
                 'O', this.dark_iron_block_item,
-                '|', Blocks.fence);
+                '#', dark_iron_sprocket);
     }
     
     private void makeServoRecipes() {
