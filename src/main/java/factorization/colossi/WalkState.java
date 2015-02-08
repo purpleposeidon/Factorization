@@ -13,12 +13,28 @@ import factorization.shared.FzUtil;
 
 public enum WalkState implements IStateMachine<WalkState> {
     IDLE {
+        final Technique[] idle_interrupters = new Technique[] {};
+
+        @Override
+        protected Technique[] getInterrupters() {
+            return idle_interrupters;
+        }
+
         @Override
         public WalkState tick(ColossusController controller, int age) {
             return controller.atTarget() ? this : TURN;
         }
     },
     TURN {
+        final Technique[] turn_interrupters = new Technique[] {
+                Technique.DEATH_FALL
+        };
+
+        @Override
+        protected Technique[] getInterrupters() {
+            return turn_interrupters;
+        }
+
         @Override
         public void onEnterState(ColossusController controller, WalkState prevState) {
             checkRotation(controller);
@@ -124,6 +140,16 @@ public enum WalkState implements IStateMachine<WalkState> {
         }
     },
     FORWARD {
+        final Technique[] forward_interrupters = new Technique[] {
+                Technique.DEATH_FALL,
+                Technique.HIT_WITH_LIMB,
+        };
+
+        @Override
+        protected Technique[] getInterrupters() {
+            return forward_interrupters;
+        }
+
         @Override
         public void onEnterState(ColossusController controller, WalkState prevState) {
             if (controller.atTarget()) return;
@@ -211,13 +237,10 @@ public enum WalkState implements IStateMachine<WalkState> {
     @Override
     public void onExitState(ColossusController controller, WalkState nextState) { }
 
-    static final Technique[] walk_interrupters = new Technique[] {
-            Technique.DEATH_FALL,
-            Technique.HIT_WITH_LIMB,
-    };
+    protected abstract Technique[] getInterrupters();
 
     boolean interruptWalk(ColossusController controller) {
-        for (Technique tech : walk_interrupters) {
+        for (Technique tech : getInterrupters()) {
             if (!tech.usable(controller)) continue;
             if (controller.ai_controller.getState() == tech) break; // unlikely? Probably wouldn't be a huge problem anyways.
             controller.ai_controller.forceState(tech);
