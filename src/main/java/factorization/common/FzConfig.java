@@ -18,7 +18,6 @@ public class FzConfig {
     public static int entity_relight_task_id = -1;
     public static boolean gen_silver_ore = true;
     public static boolean gen_dark_iron_ore = true;
-    public static boolean gen_broken_bedrock = true;
     public static int silver_ore_node_new_size = 18;
     public static boolean gen_colossi = true;
     public static int dimension_slice_dimid = -7;
@@ -142,7 +141,6 @@ public class FzConfig {
         int config_silver_size = getIntConfig("silverOreNodeNewSize", "general", silver_ore_node_new_size, "The size of silver ore nodes. Between 5 & 35. Default is " + silver_ore_node_new_size);
         silver_ore_node_new_size = Math.max(5, Math.min(config_silver_size, 35));
         gen_dark_iron_ore = getBoolConfig("generateDarkIronOre", "general", gen_dark_iron_ore, "Set to false to disable dark iron ore generation");
-        gen_broken_bedrock = getBoolConfig("generateBrokenBedrock", "general", gen_broken_bedrock, "Set to false to disable broken bedrock spawning around dark iron ore");
         gen_colossi = getBoolConfig("generateColossi", "general", gen_colossi, "If true, Colossi will generate in the world.");
         
         {
@@ -168,7 +166,7 @@ public class FzConfig {
         mushroomalize = getBoolConfig("mushroomNormalize", "server", mushroomalize, "Textures giant mushroom blocks when placed");
         proper_projectile_physics = getBoolConfig("properProjectilePhysics", "server", proper_projectile_physics, "Makes projectiles start with the velocity of the thrower");
         buffed_nametags = getBoolConfig("buffedNametags", "server", buffed_nametags, "Naming entities gives them +5 hearts");
-        players_discover_colossus_guides = getBoolConfig("playersDiscoverColossusGuides", "server", players_discover_colossus_guides, "If set to true, players will find a weird tablet after getting the diamonds achievement");
+        players_discover_colossus_guides = getBoolConfig("playersDiscoverColossusGuides", "server", players_discover_colossus_guides, "If set to true, players will find a lost map after getting the diamonds achievement");
         infinite_guide_usage = getBoolConfig("infiniteGuideUse", "server", infinite_guide_usage, "If set to true, the Lost Map won't take damage");
         //invasiveCharge = getBoolConfig("invasiveCharge", "server", invasiveCharge, "Set to true to prevent charge from connecting over metal blocks.");
         //Broken. Doesn't work.
