@@ -21,6 +21,7 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.init.Blocks;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.ChatComponentText;
@@ -228,12 +229,17 @@ public class MiscClientCommands implements ICommand {
             if (player.worldObj.isRaining()) {
                 player.sendChatMessage("/weather clear");
             }
-            double angle =player.worldObj.getCelestialAngle(0) % 360;
+            double angle = player.worldObj.getCelestialAngle(0) % 360;
             if (angle < 45 || angle > 90+45) {
                 player.sendChatMessage("/time set " + 20*60);
             }
             clear();
             queue_delay = 10;
+        }
+
+        @help("Makes it night")
+        public static void night() {
+            player.sendChatMessage("/time set 18000");
         }
         
         @help("Shows the mods screen")
@@ -500,6 +506,17 @@ public class MiscClientCommands implements ICommand {
             if (name.isEmpty()) {
                 return "Item's localization key is empty!";
             }
+            FzUtil.copyStringToClipboard(name);
+            return "Copied to clipboard: " + name;
+        }
+
+        @help("Copy the internal name of the held item to the clipboard")
+        public static String copyname() {
+            ItemStack is = mc.thePlayer.getHeldItem();
+            if (is == null) {
+                return "Not holding anything";
+            }
+            String name = Item.itemRegistry.getNameForObject(is.getItem());
             FzUtil.copyStringToClipboard(name);
             return "Copied to clipboard: " + name;
         }
