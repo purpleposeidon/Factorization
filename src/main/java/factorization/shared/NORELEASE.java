@@ -50,6 +50,11 @@ public class NORELEASE {
      * @param notes
      */
     public static void fixme(Object... notes) { }
+
+    /**
+     * Create a place to put a breakpoint
+     */
+    public static void breakpoint() { }
     
     static {
         try {
