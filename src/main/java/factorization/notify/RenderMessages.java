@@ -96,9 +96,9 @@ public class RenderMessages extends RenderMessagesProxy {
         if (w == null) {
             return;
         }
-        /*if (messages.size() == 0) {
+        if (messages.size() == 0) {
             return;
-        }*/ // NORELEASE
+        }
         Iterator<ClientMessage> it = messages.iterator();
         long approximateNow = System.currentTimeMillis();
         EntityLivingBase camera = Minecraft.getMinecraft().renderViewEntity;
