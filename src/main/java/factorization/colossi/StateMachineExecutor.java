@@ -1,11 +1,11 @@
 package factorization.colossi;
 
-import java.io.IOException;
-
 import factorization.api.datahelpers.DataHelper;
 import factorization.api.datahelpers.IDataSerializable;
 import factorization.api.datahelpers.Share;
-import factorization.shared.NORELEASE;
+import factorization.shared.Core;
+
+import java.io.IOException;
 
 public class StateMachineExecutor<E extends Enum<E> & IStateMachine<E> > implements IDataSerializable {
     final ColossusController controller;
@@ -27,12 +27,7 @@ public class StateMachineExecutor<E extends Enum<E> & IStateMachine<E> > impleme
     }
 
     public void forceState(E nextState) {
-        float volume = 1;
-        float pitch = 1;
-
-        //controller.worldObj.playSoundAtEntity(controller, "factorization:colossus." + machineName + state + "_exit", volume, pitch);
-        controller.worldObj.playSoundAtEntity(controller, "factorization:colossus." + machineName + nextState + "_enter", volume, pitch);
-        NORELEASE.println(machineName + nextState);
+        Core.logFine(machineName + nextState);
         state.onExitState(controller, nextState);
         nextState.onEnterState(controller, state);
         age = 0;

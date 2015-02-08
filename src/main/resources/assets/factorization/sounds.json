@@ -1,11 +1,11 @@
 {
-    "colossus.tech_INITIAL_BOW_enter": {"category": "hostile", "sounds": ["colossus_first_bow"]},
-    "colossus.tech_INITIAL_UNBOW_enter": {"category": "hostile", "sounds": ["colossus_rise"]},
-    "colossus.tech_BOW_enter": {"category": "hostile", "sounds": ["colossus_bow"]},
-    "colossus.tech_UNBOW_enter": {"category": "hostile", "sounds": ["colossus_unbow"]},
-    "colossus.tech_HIT_WITH_LIMB_enter": {"category": "hostile", "sounds": ["colossus_attack"]},
-    "colossus.tech_SPIN_WINDUP_enter": {"category": "hostile", "sounds": ["colossus_prespin"]},
-    "colossus.tech_DEATH_FALL_enter": {"category": "hostile", "sounds": ["colossus_death"]},
+    "colossus.tech_INITIAL_BOW": {"category": "hostile", "sounds": ["colossus_first_bow"]},
+    "colossus.tech_INITIAL_UNBOW": {"category": "hostile", "sounds": ["colossus_rise"]},
+    "colossus.tech_BOW": {"category": "hostile", "sounds": ["colossus_bow"]},
+    "colossus.tech_UNBOW": {"category": "hostile", "sounds": ["colossus_unbow"]},
+    "colossus.tech_HIT_WITH_LIMB": {"category": "hostile", "sounds": ["colossus_attack"]},
+    "colossus.tech_SPIN_WINDUP": {"category": "hostile", "sounds": ["colossus_prespin"]},
+    "colossus.tech_DEATH_FALL": {"category": "hostile", "sounds": ["colossus_death"]},
     "colossus.creak": {"category": "hostile", "sounds": ["colossus_creak1", "colossus_creak2", "colossus_creak3", "colossus_creak4"]},
     "colossus.hurt": {"category": "hostile", "sounds": ["colossus_hurt"]}
 }

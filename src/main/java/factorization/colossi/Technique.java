@@ -172,7 +172,8 @@ public enum Technique implements IStateMachine<Technique> {
         
         @Override
         public void onEnterState(ColossusController controller, Technique prevState) {
-            BOW.onEnterState(controller, prevState);
+            playNoise(controller);
+            BOW.onEnterState(controller, this);
             // Crack a mask blocks that is exposed UP but not EAST
             final ReservoirSampler<Coord> sampler = new ReservoirSampler<Coord>(1, controller.worldObj.rand);
             Coord.iterateCube(controller.body.getCorner(), controller.body.getFarCorner(), new ICoordFunction() {
@@ -276,6 +277,7 @@ public enum Technique implements IStateMachine<Technique> {
         
         @Override
         public void onEnterState(ColossusController controller, Technique prevState) {
+            if (prevState != INITIAL_BOW) playNoise(controller);
             // So, uh, we really should do some IK here. But that's rather more math than I want to deal with. O.o
             // So body bends to 90°, arms bend to 45°, and it might clip through the ground or be too high up or something.
             // (And the legs bend -90° since they're rooted to the body)
@@ -323,7 +325,8 @@ public enum Technique implements IStateMachine<Technique> {
 
         @Override
         public void onEnterState(ColossusController controller, Technique prevState) {
-            UNBOW.onEnterState(controller, prevState);
+            playNoise(controller);
+            UNBOW.onEnterState(controller, this);
         }
 
         @Override
@@ -512,6 +515,7 @@ public enum Technique implements IStateMachine<Technique> {
             if (smash == null) return; // !!
             smash.limb.causesPain(true);
             smash.limb.target(smash.rotation, 6, Interpolation.CUBIC);
+            playNoise(controller);
         }
         
         @Override
@@ -618,6 +622,7 @@ public enum Technique implements IStateMachine<Technique> {
         
         @Override
         public void onEnterState(ColossusController controller, Technique prevState) {
+            playNoise(controller);
             // Hold arms to the $LEFT
             BodySide side = controller.worldObj.rand.nextBoolean() ? BodySide.LEFT : BodySide.RIGHT;
             BodySide oppositeSide = controller.spin_direction == BodySide.LEFT ? BodySide.RIGHT : BodySide.LEFT;
@@ -759,6 +764,7 @@ public enum Technique implements IStateMachine<Technique> {
 
         @Override
         public void onEnterState(ColossusController controller, Technique prevState) {
+            playNoise(controller);
             for (LimbInfo li : controller.limbs) {
                 IDeltaChunk idc = li.idc.getEntity();
                 idc.setVelocity(0, 0, 0);
@@ -943,7 +949,9 @@ public enum Technique implements IStateMachine<Technique> {
     }
 
     @Override
-    public void onEnterState(ColossusController controller, Technique prevState) { }
+    public void onEnterState(ColossusController controller, Technique prevState) {
+        if (prevState != INITIAL_UNBOW) playNoise(controller);
+    }
 
     @Override
     public void onExitState(ColossusController controller, Technique nextState) { }
@@ -996,4 +1004,10 @@ public enum Technique implements IStateMachine<Technique> {
     protected Object visitPlayer(EntityPlayer player, ColossusController controller) { return null; }
 
     static final int SIT_FALL_TIME = 20 * 3;
+
+    void playNoise(ColossusController controller) {
+        float volume = 1;
+        float pitch = 1;
+        controller.worldObj.playSoundAtEntity(controller, "factorization:colossus.tech_" + this, volume, pitch);
+    }
 }
