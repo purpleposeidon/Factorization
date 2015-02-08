@@ -96,12 +96,18 @@ class LimbInfo {
         return type + " " + side + "#" + parity;
     }
 
+    long next_creak = 0;
+    int creak_delay = 20 * 25;
+
     public void creak() {
         IDeltaChunk ent = idc.getEntity();
         if (ent == null) return;
-        if (ent.worldObj.rand.nextInt(5) != 0) return;
-        float volume = 0.5F + ent.worldObj.rand.nextFloat();
-        float pitch = 1F / 16F + (1F / 8F) * ent.worldObj.rand.nextFloat();
+        long now = ent.worldObj.getTotalWorldTime();
+        if (now < next_creak) return;
+        if (ent.worldObj.rand.nextInt(6) != 0) return;
+        next_creak = now + creak_delay;
+        float volume = 0.1F + ent.worldObj.rand.nextFloat() * 0.3F;
+        float pitch = 1F / 32F + (1F / 16F) * ent.worldObj.rand.nextFloat();
         ent.worldObj.playSoundAtEntity(ent, "factorization:colossus.creak", volume, pitch);
     }
 }
