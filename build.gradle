@@ -17,7 +17,7 @@ buildscript {
 
 apply plugin: 'forge' // Try this some time: apply plugin: 'checkstyle'... well that might not work. But see Buildcraft.
 
-version = new File('fzversion').getText('UTF-8').replaceAll("\\s","")
+version = new File(projectDir.getPath() + "/fzversion").getText("UTF-8").replaceAll("\\s", "")
 group = "factorization"
 archivesBaseName = "Factorization"
 
@@ -46,6 +46,7 @@ dependencies {
 compileJava {
     // Prevents NORELEASE from being compiled
     exclude "factorization/shared/NORELEASE.java"
+    exclude "Gradle*.java"
 }
 
 task writeFzFile {
