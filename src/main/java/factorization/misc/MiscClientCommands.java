@@ -1,28 +1,15 @@
 package factorization.misc;
 
-import static java.lang.annotation.ElementType.*;
-import static java.lang.annotation.RetentionPolicy.*;
-
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.Writer;
-import java.lang.annotation.Retention;
-import java.lang.annotation.Target;
-import java.lang.reflect.Method;
-import java.text.DateFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Random;
-
 import com.google.common.base.Joiner;
-
+import cpw.mods.fml.client.GuiModList;
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
+import factorization.api.Coord;
+import factorization.common.FzConfig;
+import factorization.notify.Notice;
+import factorization.notify.Style;
+import factorization.shared.Core;
+import factorization.shared.FzUtil;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityClientPlayerMP;
 import net.minecraft.client.renderer.Tessellator;
@@ -40,15 +27,19 @@ import net.minecraft.util.ChatComponentText;
 import net.minecraft.util.EnumChatFormatting;
 import net.minecraft.world.World;
 import net.minecraft.world.chunk.Chunk;
-import cpw.mods.fml.client.GuiModList;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
-import factorization.api.Coord;
-import factorization.common.FzConfig;
-import factorization.notify.Notice;
-import factorization.notify.Style;
-import factorization.shared.Core;
-import factorization.shared.FzUtil;
+
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.Writer;
+import java.lang.annotation.Retention;
+import java.lang.annotation.Target;
+import java.lang.reflect.Method;
+import java.text.DateFormat;
+import java.util.*;
+
+import static java.lang.annotation.ElementType.METHOD;
+import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
 public class MiscClientCommands implements ICommand {
     static final Minecraft mc = Minecraft.getMinecraft();
@@ -117,7 +108,7 @@ public class MiscClientCommands implements ICommand {
         @alias({"date", "time"})
         @help("Show the real-world time. Notes can be added.")
         public static String now() {
-            DateFormat df = DateFormat.getDateTimeInstance();
+            DateFormat df = DateFormat.getTimeInstance(DateFormat.SHORT);
             String ret = "[" + df.format(new Date()) + "]";
             args.remove(0);
             if (!args.isEmpty()) {
