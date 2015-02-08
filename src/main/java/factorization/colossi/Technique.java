@@ -239,7 +239,8 @@ public enum Technique implements IStateMachine<Technique> {
     BOW {
         @Override
         TechniqueKind getKind() {
-            return OFFENSIVE;
+            return TRANSITION; // Unbowing is being buggy :(
+            // return OFFENSIVE;
         }
         
         @Override
@@ -346,7 +347,7 @@ public enum Technique implements IStateMachine<Technique> {
         public void onEnterState(ColossusController controller, Technique prevState) {
             Quaternion bodyRot = controller.body.getRotation();
             double yRot = bodyRot.toRotationVector().yCoord;
-            Quaternion straightRot = Quaternion.getRotationQuaternionRadians(yRot, ForgeDirection.UP);
+            Quaternion straightRot = Quaternion.getRotationQuaternionRadians(-yRot, ForgeDirection.UP);
             if (bodyRot.dotProduct(straightRot) < 0) {
                 // Sometimes seems to go the long way 'round; this should make it short
                 straightRot.incrConjugate();
