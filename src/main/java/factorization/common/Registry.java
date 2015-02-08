@@ -102,6 +102,7 @@ public class Registry {
     public BlockResource resource_block;
     public Block dark_iron_ore;
     public Block fractured_bedrock_block;
+    public Block blasted_bedrock_block;
     public Block colossal_block;
     public Block gargantuan_block;
 
@@ -182,8 +183,8 @@ public class Registry {
         lightair_block = new BlockLightAir();
         resource_block = new BlockResource();
         dark_iron_ore = new BlockDarkIronOre().setBlockName("factorization:darkIronOre").setBlockTextureName("stone").setCreativeTab(Core.tabFactorization).setHardness(3.0F).setResistance(5.0F);
-        class NotchBlock extends Block { public NotchBlock(Material honestly) { super(honestly); } }
-        fractured_bedrock_block = new NotchBlock(Material.rock).setBlockUnbreakable().setResistance(6000000).setBlockName("bedrock").setBlockTextureName("bedrock").setCreativeTab(Core.tabFactorization);
+        fractured_bedrock_block = new FracturedBedrock();
+        blasted_bedrock_block = new BlastedBedrock();
         colossal_block = new ColossalBlock();
         gargantuan_block = new GargantuanBlock().setBlockName("factorization:gargantuanBrick").setCreativeTab(Core.tabFactorization);
         
@@ -192,6 +193,7 @@ public class Registry {
         GameRegistry.registerBlock(resource_block, ItemBlockResource.class, "ResourceBlock");
         GameRegistry.registerBlock(dark_iron_ore, "DarkIronOre");
         GameRegistry.registerBlock(fractured_bedrock_block, "FracturedBedrock");
+        GameRegistry.registerBlock(blasted_bedrock_block, "BlastedBedrock");
         GameRegistry.registerBlock(colossal_block, ColossalBlockItem.class, "ColossalBlock");
         GameRegistry.registerBlock(gargantuan_block, ItemGargantuanBlock.class, "GargantuanBlock");
         GameRegistry.registerTileEntity(TileEntityColossalHeart.class, "fz_colossal_heart");
