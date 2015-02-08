@@ -2,7 +2,7 @@ package factorization.fzds;
 
 import factorization.fzds.interfaces.IFzdsShenanigans;
 import factorization.shared.Core;
-import factorization.shared.FzUtil;
+import factorization.util.SpaceUtil;
 import net.minecraft.entity.Entity;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.AxisAlignedBB;
@@ -97,14 +97,14 @@ public class MetaAxisAlignedBB extends AxisAlignedBB implements IFzdsShenanigans
         return getShadowBoxesWithinShadowBox(shadowBox);
     }
 
-    private AxisAlignedBB real2shadowBox = FzUtil.newBox();
-    private Vec3 realMiddle = FzUtil.newVec3();
+    private AxisAlignedBB real2shadowBox = SpaceUtil.newBox();
+    private Vec3 realMiddle = SpaceUtil.newVec3();
 
     AxisAlignedBB convertRealBoxToShadowBox(AxisAlignedBB realBox) {
         // This function returns a box is likely larger than what it should really be.
         // A more accurate algo would be to translate each corner and make a box that contains them.
-        FzUtil.setMiddle(realBox, realMiddle);
-        double d = FzUtil.getDiagonalLength(realBox);
+        SpaceUtil.setMiddle(realBox, realMiddle);
+        double d = SpaceUtil.getDiagonalLength(realBox);
         Vec3 shadowMiddle = convertRealVecToShadowVec(realMiddle);
         real2shadowBox.minX = shadowMiddle.xCoord - d;
         real2shadowBox.minY = shadowMiddle.yCoord - d;
@@ -115,22 +115,22 @@ public class MetaAxisAlignedBB extends AxisAlignedBB implements IFzdsShenanigans
         return real2shadowBox;
     }
     
-    private Vec3 minMinusMiddle = FzUtil.newVec3();
-    private Vec3 maxMinusMiddle = FzUtil.newVec3();
-    private AxisAlignedBB shadowWorker = FzUtil.newBox();
-    private Vec3 shadowMiddle = FzUtil.newVec3();
+    private Vec3 minMinusMiddle = SpaceUtil.newVec3();
+    private Vec3 maxMinusMiddle = SpaceUtil.newVec3();
+    private AxisAlignedBB shadowWorker = SpaceUtil.newBox();
+    private Vec3 shadowMiddle = SpaceUtil.newVec3();
     AxisAlignedBB convertShadowBoxToRealBox(AxisAlignedBB shadowBox) {
         // We're gonna try a different approach here.
         // Will work well so long as everything is a cube.
-        FzUtil.setMiddle(shadowBox, shadowMiddle);
-        FzUtil.getMin(shadowBox, minMinusMiddle);
-        FzUtil.getMax(shadowBox, maxMinusMiddle);
-        FzUtil.incrSubtract(minMinusMiddle, shadowMiddle);
-        FzUtil.incrSubtract(maxMinusMiddle, shadowMiddle);
+        SpaceUtil.setMiddle(shadowBox, shadowMiddle);
+        SpaceUtil.getMin(shadowBox, minMinusMiddle);
+        SpaceUtil.getMax(shadowBox, maxMinusMiddle);
+        SpaceUtil.incrSubtract(minMinusMiddle, shadowMiddle);
+        SpaceUtil.incrSubtract(maxMinusMiddle, shadowMiddle);
         Vec3 realMiddle = convertShadowVecToRealVec(shadowMiddle);
-        FzUtil.incrAdd(minMinusMiddle, realMiddle);
-        FzUtil.incrAdd(maxMinusMiddle, realMiddle);
-        FzUtil.updateAABB(shadowWorker, minMinusMiddle, maxMinusMiddle);
+        SpaceUtil.incrAdd(minMinusMiddle, realMiddle);
+        SpaceUtil.incrAdd(maxMinusMiddle, realMiddle);
+        SpaceUtil.updateAABB(shadowWorker, minMinusMiddle, maxMinusMiddle);
         return shadowWorker;
     }
     
@@ -142,7 +142,7 @@ public class MetaAxisAlignedBB extends AxisAlignedBB implements IFzdsShenanigans
         return idc.shadow2real(shadow);
     }
     
-    private final AxisAlignedBB worker = FzUtil.newBox();
+    private final AxisAlignedBB worker = SpaceUtil.newBox();
     private AxisAlignedBB expand(AxisAlignedBB collider, double dx, double dy, double dz) {
         if (dx >= 0) {
             worker.minX = collider.minX;

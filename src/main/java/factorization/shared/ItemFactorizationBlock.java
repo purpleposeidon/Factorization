@@ -2,6 +2,7 @@ package factorization.shared;
 
 import java.util.List;
 
+import factorization.util.ItemUtil;
 import net.minecraft.block.Block;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemBlock;
@@ -94,7 +95,7 @@ public class ItemFactorizationBlock extends ItemBlock {
                 infoList.add(state.toString());
             }
         }
-        if (FzUtil.similar(is, Core.registry.leydenjar_item)) {
+        if (ItemUtil.similar(is, Core.registry.leydenjar_item)) {
             int perc = 0;
             if (is.hasTagCompound()) {
                 FactoryType ft = FactoryType.LEYDENJAR;

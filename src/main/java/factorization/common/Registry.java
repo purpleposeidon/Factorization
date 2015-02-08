@@ -8,6 +8,11 @@ import java.util.List;
 import java.util.Random;
 import java.util.regex.Matcher;
 
+import factorization.shared.*;
+import factorization.util.CraftUtil;
+import factorization.util.DataUtil;
+import factorization.util.FzUtil;
+import factorization.util.ItemUtil;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.MapColor;
 import net.minecraft.block.material.Material;
@@ -75,15 +80,7 @@ import factorization.servo.ItemMatrixProgrammer;
 import factorization.servo.ItemServoMotor;
 import factorization.servo.ItemServoRailWidget;
 import factorization.servo.ServoComponent;
-import factorization.shared.BlockClass;
-import factorization.shared.BlockFactorization;
-import factorization.shared.BlockRenderHelper;
-import factorization.shared.Core;
 import factorization.shared.Core.TabType;
-import factorization.shared.FzUtil;
-import factorization.shared.ItemBlockProxy;
-import factorization.shared.ItemCraftingComponent;
-import factorization.shared.ItemFactorizationBlock;
 import factorization.sockets.ItemSocketPart;
 import factorization.twistedblock.ItemTwistedBlock;
 import factorization.utiligoo.ItemGoo;
@@ -252,9 +249,9 @@ public class Registry {
             }
         }
         
-        Block invalid = FzUtil.getBlock((Item) null);
+        Block invalid = DataUtil.getBlock((Item) null);
         for (Item it : foundItems) {
-            if (FzUtil.getBlock(it) == invalid) {
+            if (DataUtil.getBlock(it) == invalid) {
                 it.setTextureName(it.getUnlocalizedName());
                 registerItem(it);
             }
@@ -453,19 +450,19 @@ public class Registry {
     }
 
     public void makeRecipes() {
-        vanillaRecipe(FzUtil.nameItemStack(new ItemStack(Blocks.double_stone_slab), "Double Half Slab"),
+        vanillaRecipe(ItemUtil.nameItemStack(new ItemStack(Blocks.double_stone_slab), "Double Half Slab"),
                 "-",
                 "-",
                 '-', new ItemStack(Blocks.stone_slab));
-        vanillaRecipe(FzUtil.nameItemStack(new ItemStack(Blocks.double_stone_slab, 2, 8), "Flat Stone"),
+        vanillaRecipe(ItemUtil.nameItemStack(new ItemStack(Blocks.double_stone_slab, 2, 8), "Flat Stone"),
                 "##",
                 "##",
                 '#', new ItemStack(Blocks.stone_slab));
-        vanillaRecipe(FzUtil.nameItemStack(new ItemStack(Blocks.double_stone_slab, 2, 9), "Flat Sandstone"),
+        vanillaRecipe(ItemUtil.nameItemStack(new ItemStack(Blocks.double_stone_slab, 2, 9), "Flat Sandstone"),
                 "#",
                 "#",
                 '#', new ItemStack(Blocks.sandstone, 1, 2));
-        vanillaShapelessRecipe(FzUtil.nameItemStack(new ItemStack(Blocks.dirt, 4, 1), "Dry Dirt"),
+        vanillaShapelessRecipe(ItemUtil.nameItemStack(new ItemStack(Blocks.dirt, 4, 1), "Dry Dirt"),
                 Blocks.dirt,
                 Blocks.dirt,
                 Blocks.dirt,
@@ -583,7 +580,7 @@ public class Registry {
                         return null;
                     }
                     Item item = is.getItem();
-                    if (FzUtil.similar(Core.registry.greenware_item, is)) {
+                    if (ItemUtil.similar(Core.registry.greenware_item, is)) {
                         match.add(is);
                     } else {
                         return null;
@@ -650,7 +647,7 @@ public class Registry {
                     if (is == null) {
                         continue;
                     }
-                    if (FzUtil.couldMerge(glaze_base_mimicry, is)) {
+                    if (ItemUtil.couldMerge(glaze_base_mimicry, is)) {
                         mimic_items++;
                     } else {
                         if (!(is.getItem() instanceof ItemBlock)) continue;
@@ -692,7 +689,7 @@ public class Registry {
                     if (is == null) {
                         continue;
                     }
-                    if (FzUtil.couldMerge(glaze_base_mimicry, is)) {
+                    if (ItemUtil.couldMerge(glaze_base_mimicry, is)) {
                         bucket_slot = i;
                         continue;
                     }
@@ -1192,7 +1189,7 @@ public class Registry {
             if (log == null || log == Blocks.log || log == Blocks.log2) {
                 continue;
             }
-            if (is.getItemDamage() == FzUtil.WILDCARD_DAMAGE) {
+            if (is.getItemDamage() == ItemUtil.WILDCARD_DAMAGE) {
                 for (int md = 0; md < 16; md++) {
                     ItemStack ilog = new ItemStack(log);
                     ilog.setItemDamage(md);
@@ -1205,20 +1202,20 @@ public class Registry {
         }
         for (ItemStack log : theLogs) {
             log = log.copy();
-            List<ItemStack> planks = FzUtil.copyWithoutNull(FzUtil.craft1x1(null, true, log.copy()));
-            if (planks.size() != 1 || !FzUtil.craft_succeeded) {
+            List<ItemStack> planks = FzUtil.copyWithoutNull(CraftUtil.craft1x1(null, true, log.copy()));
+            if (planks.size() != 1 || !CraftUtil.craft_succeeded) {
                 continue;
             }
             ItemStack plank = planks.get(0).copy();
             plank.stackSize = 1;
-            List<ItemStack> slabs = FzUtil.copyWithoutNull(FzUtil.craft3x3(null, true, true, new ItemStack[] {
+            List<ItemStack> slabs = FzUtil.copyWithoutNull(CraftUtil.craft3x3(null, true, true, new ItemStack[]{
                     plank.copy(), plank.copy(), plank.copy(),
                     null, null, null,
                     null, null, null
             }));
             ItemStack slab;
             String odType;
-            if (slabs.size() != 1 || !FzUtil.craft_succeeded) {
+            if (slabs.size() != 1 || !CraftUtil.craft_succeeded) {
                 slab = plank; // can't convert to slabs; strange wood
                 odType = "plankWood";
             } else {

@@ -1,5 +1,6 @@
 package factorization.charge;
 
+import factorization.util.PlayerUtil;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
@@ -13,7 +14,6 @@ import factorization.notify.Notice;
 import factorization.notify.NoticeUpdater;
 import factorization.shared.Core;
 import factorization.shared.Core.TabType;
-import factorization.shared.FzUtil;
 import factorization.shared.ItemFactorization;
 
 public class ItemChargeMeter extends ItemFactorization {
@@ -40,7 +40,7 @@ public class ItemChargeMeter extends ItemFactorization {
         final TileEntity te = here.getTE();
         if (te == null) return false;
         final IChargeConductor ic = here.getTE(IChargeConductor.class);
-        player = FzUtil.fakeplayerToNull(player);
+        player = PlayerUtil.fakeplayerToNull(player);
         if (ic == null) {
             final IMeterInfo im = here.getTE(IMeterInfo.class);
             if (im == null) {

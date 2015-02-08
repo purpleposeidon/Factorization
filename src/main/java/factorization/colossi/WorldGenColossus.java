@@ -7,6 +7,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.Random;
 
+import factorization.util.NumUtil;
 import net.minecraft.block.material.Material;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.world.ChunkCoordIntPair;
@@ -29,7 +30,6 @@ import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import factorization.api.Coord;
 import factorization.common.FzConfig;
 import factorization.shared.Core;
-import factorization.shared.FzUtil;
 
 public class WorldGenColossus implements IWorldGenerator {
     {
@@ -187,10 +187,10 @@ public class WorldGenColossus implements IWorldGenerator {
             // "They're smooth posers" -- LSP
             if (dist > SMOOTH_START) return max;
             if (dist < SMOOTH_END) return min;
-            double val = FzUtil.uninterp(SMOOTH_END, SMOOTH_START, dist); // val between 0, 1
+            double val = NumUtil.uninterp(SMOOTH_END, SMOOTH_START, dist); // val between 0, 1
             //val += 0.1;
             //val = Math.pow(2, val * val * val) - 1; // Gives a smooth _|-shaped curve.
-            return FzUtil.interp(min, max, val);
+            return NumUtil.interp(min, max, val);
         }
         
     }

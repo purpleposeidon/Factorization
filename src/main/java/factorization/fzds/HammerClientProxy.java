@@ -12,9 +12,9 @@ import factorization.api.Coord;
 import factorization.api.Quaternion;
 import factorization.coremodhooks.IExtraChunkData;
 import factorization.fzds.interfaces.IDeltaChunk;
-import factorization.shared.BlockRenderHelper;
-import factorization.shared.Core;
-import factorization.shared.FzUtil;
+import factorization.shared.*;
+import factorization.util.NumUtil;
+import factorization.util.SpaceUtil;
 import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityClientPlayerMP;
@@ -326,9 +326,9 @@ public class HammerClientProxy extends HammerProxy {
                 GL11.glColorMask(false, true, true, true);
             }*/
             GL11.glTranslated(
-                    FzUtil.interp(dse.lastTickPosX - player.lastTickPosX, dse.posX - player.posX, partialTicks),
-                    FzUtil.interp(dse.lastTickPosY - player.lastTickPosY, dse.posY - player.posY, partialTicks),
-                    FzUtil.interp(dse.lastTickPosZ - player.lastTickPosZ, dse.posZ - player.posZ, partialTicks));
+                    NumUtil.interp(dse.lastTickPosX - player.lastTickPosX, dse.posX - player.posX, partialTicks),
+                    NumUtil.interp(dse.lastTickPosY - player.lastTickPosY, dse.posY - player.posY, partialTicks),
+                    NumUtil.interp(dse.lastTickPosZ - player.lastTickPosZ, dse.posZ - player.posZ, partialTicks));
             Quaternion rot = new Quaternion(rotation);
             rot.incrNormalize();
             rot.glRotate();
@@ -376,11 +376,11 @@ public class HammerClientProxy extends HammerProxy {
         EntityPlayer player = mc.thePlayer;
         Vec3 realPos = player.getPosition(1);
         Vec3 tmp = player.getLookVec();
-        FzUtil.incrAdd(tmp, realPos);
+        SpaceUtil.incrAdd(tmp, realPos);
         Vec3 realLookEnd = tmp;
         Vec3 shadowPos = ray.parent.real2shadow(realPos); // This used to be the raw ent pos, which isn't the same.
         Vec3 tmp_shadowLookEnd = ray.parent.real2shadow(realLookEnd);
-        FzUtil.incrSubtract(tmp_shadowLookEnd, shadowPos);
+        SpaceUtil.incrSubtract(tmp_shadowLookEnd, shadowPos);
         Vec3 shadowLook = tmp_shadowLookEnd;
         double xz_len = Math.hypot(shadowLook.xCoord, shadowLook.zCoord);
         double shadow_pitch = -Math.toDegrees(Math.atan2(shadowLook.yCoord, xz_len)); // erm, negative? Dunno.
@@ -429,7 +429,7 @@ public class HammerClientProxy extends HammerProxy {
             // Create a realbox that contains the entirety of the shadowbox
             Vec3 min, max;
             {
-                Vec3 corners[] = FzUtil.getCorners(mopBox);
+                Vec3 corners[] = SpaceUtil.getCorners(mopBox);
                 min = ray.parent.shadow2real(corners[0]);
                 max = min.addVector(0, 0, 0);
                 for (int i = 1; i < corners.length; i++) {
@@ -443,8 +443,8 @@ public class HammerClientProxy extends HammerProxy {
                 }
             }
             ray.setPosition((min.xCoord + max.xCoord) / 2, (min.yCoord + max.yCoord) / 2, (min.zCoord + max.zCoord) / 2);
-            FzUtil.setMin(ray.boundingBox, min);
-            FzUtil.setMax(ray.boundingBox, max);
+            SpaceUtil.setMin(ray.boundingBox, min);
+            SpaceUtil.setMax(ray.boundingBox, max);
             offerHit(mop, ray, mopBox);
         } finally {
             mc.objectMouseOver = origMouseOver;

@@ -34,13 +34,12 @@ import org.lwjgl.input.Mouse;
 import com.google.common.io.Closeables;
 
 import cpw.mods.fml.common.FMLCommonHandler;
-import cpw.mods.fml.common.Loader;
 import cpw.mods.fml.common.event.FMLServerStartingEvent;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import factorization.common.FzConfig;
 import factorization.shared.Core;
-import factorization.shared.FzUtil;
+import factorization.util.FzUtil;
 
 public class DocumentationModule {
     public static final DocumentationModule instance = new DocumentationModule();

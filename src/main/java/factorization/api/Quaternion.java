@@ -1,5 +1,6 @@
 package factorization.api;
 
+import factorization.util.SpaceUtil;
 import io.netty.buffer.ByteBuf;
 
 import java.io.DataInput;
@@ -18,7 +19,6 @@ import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import factorization.api.datahelpers.DataHelper;
 import factorization.api.datahelpers.IDataSerializable;
-import factorization.shared.FzUtil;
 
 public class Quaternion implements IDataSerializable {
     public double w, x, y, z;
@@ -191,7 +191,7 @@ public class Quaternion implements IDataSerializable {
      */
     public Vec3 toRotationVector() {
         Vec3 rotVec = toVector().normalize();
-        FzUtil.scale(rotVec, getAngleRadians());
+        SpaceUtil.incrScale(rotVec, getAngleRadians());
         return rotVec;
     }
     

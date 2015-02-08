@@ -3,6 +3,10 @@ package factorization.servo;
 import java.util.Arrays;
 import java.util.HashMap;
 
+import factorization.shared.*;
+import factorization.util.DataUtil;
+import factorization.util.InvUtil;
+import factorization.util.ItemUtil;
 import net.minecraft.entity.Entity;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.ISidedInventory;
@@ -22,11 +26,7 @@ import cpw.mods.fml.relauncher.SideOnly;
 import factorization.api.Coord;
 import factorization.common.BlockIcons;
 import factorization.common.FactoryType;
-import factorization.shared.BlockClass;
-import factorization.shared.Core;
-import factorization.shared.FzUtil;
-import factorization.shared.FzUtil.FzInv;
-import factorization.shared.TileEntityFactorization;
+import factorization.util.InvUtil.FzInv;
 
 public class TileEntityParaSieve extends TileEntityFactorization implements ISidedInventory {
     public ItemStack[] filters = new ItemStack[8];
@@ -110,19 +110,19 @@ public class TileEntityParaSieve extends TileEntityFactorization implements ISid
         }
         if (a == null || b == null) {
             if (a != null) {
-                return FzUtil.couldMerge(a, stranger);
+                return ItemUtil.couldMerge(a, stranger);
             }
             if (b != null) {
-                return FzUtil.couldMerge(b, stranger);
+                return ItemUtil.couldMerge(b, stranger);
             }
             return false;
         }
         if (a.getItem() != b.getItem()) {
             //Compare on mods
-            short aId = itemId2modIndex[FzUtil.getId(a)];
-            short bId = itemId2modIndex[FzUtil.getId(b)];
+            short aId = itemId2modIndex[DataUtil.getId(a)];
+            short bId = itemId2modIndex[DataUtil.getId(b)];
             if (aId == bId && aId != 0) {
-                return itemId2modIndex[FzUtil.getId(stranger)] == aId;
+                return itemId2modIndex[DataUtil.getId(stranger)] == aId;
             }
             //Compare on Item class
             Class ca = a.getItem().getClass(), cb = b.getItem().getClass();
@@ -237,7 +237,7 @@ public class TileEntityParaSieve extends TileEntityFactorization implements ISid
         }
         if (cached_te != null) {
             if (!cached_te.isInvalid()) {
-                return FzUtil.openDoubleChest((IInventory) cached_te, true);
+                return InvUtil.openDoubleChest((IInventory) cached_te, true);
             }
             cached_te = null;
         } else if (cached_ent != null) {
@@ -249,7 +249,7 @@ public class TileEntityParaSieve extends TileEntityFactorization implements ISid
         TileEntity te = worldObj.getTileEntity(xCoord + facing.offsetX, yCoord + facing.offsetY, zCoord + facing.offsetZ);
         if (te instanceof IInventory) {
             cached_te = te;
-            return FzUtil.openDoubleChest((IInventory) te, true);
+            return InvUtil.openDoubleChest((IInventory) te, true);
         }
         for (Entity ent : (Iterable<Entity>)worldObj.getEntitiesWithinAABB(IInventory.class, getTargetArea())) {
             if (ent instanceof IInventory) {
@@ -432,7 +432,7 @@ public class TileEntityParaSieve extends TileEntityFactorization implements ISid
             if (empty) {
                 return getCoord().add(getFacing()).getComparatorOverride(getFacing().getOpposite());
             }
-            FzInv inv = FzUtil.openInventory(getCoord().add(getFacing()).getTE(IInventory.class), getFacing().getOpposite());
+            FzInv inv = InvUtil.openInventory(getCoord().add(getFacing()).getTE(IInventory.class), getFacing().getOpposite());
             if (inv == null) {
                 return getCoord().add(getFacing()).getComparatorOverride(getFacing().getOpposite());
             }
@@ -442,13 +442,13 @@ public class TileEntityParaSieve extends TileEntityFactorization implements ISid
                     final ItemStack low = filters[fidx];
                     if (low == null) continue;
                     final ItemStack high = filters[fidx+1];
-                    if (!FzUtil.identical(low, high)) continue;
+                    if (!ItemUtil.identical(low, high)) continue;
                     int min = Math.min(low.stackSize, high.stackSize);
                     int max = Math.max(low.stackSize, high.stackSize);
                     int count = 0;
                     for (int i = 0; i < inv.size(); i++) {
                         ItemStack is = inv.get(i);
-                        if (FzUtil.identical(low, is)) {
+                        if (ItemUtil.identical(low, is)) {
                             count += is.stackSize;
                         }
                     }
@@ -570,7 +570,7 @@ public class TileEntityParaSieve extends TileEntityFactorization implements ISid
                 val = seen;
                 seen++;
             }
-            int id = FzUtil.getId(item);
+            int id = DataUtil.getId(item);
             if (id >= itemId2modIndex.length) {
                 itemId2modIndex = Arrays.copyOf(itemId2modIndex, id + 1024);
             }

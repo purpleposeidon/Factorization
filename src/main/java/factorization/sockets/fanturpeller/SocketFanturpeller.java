@@ -3,6 +3,8 @@ package factorization.sockets.fanturpeller;
 import java.io.DataInput;
 import java.io.IOException;
 
+import factorization.shared.*;
+import factorization.util.NumUtil;
 import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.Tessellator;
@@ -31,10 +33,6 @@ import factorization.common.BlockIcons;
 import factorization.common.FactoryType;
 import factorization.servo.RenderServoMotor;
 import factorization.servo.ServoMotor;
-import factorization.shared.BlockRenderHelper;
-import factorization.shared.Core;
-import factorization.shared.FactorizationBlockRender;
-import factorization.shared.FzUtil;
 import factorization.shared.NetworkFactorization.MessageType;
 import factorization.sockets.ISocketHolder;
 import factorization.sockets.TileEntitySocketBase;
@@ -244,7 +242,7 @@ public abstract class SocketFanturpeller extends TileEntitySocketBase implements
         float d = 0.5F;
         GL11.glTranslatef(d, d, d);
         Quaternion.fromOrientation(FzOrientation.fromDirection(facing.getOpposite())).glRotate();
-        float turn = scaleRotation(FzUtil.interp(prevFanRotation, fanRotation, partial));
+        float turn = scaleRotation(NumUtil.interp(prevFanRotation, fanRotation, partial));
         float dr = Math.abs(scaleRotation(fanRotation) - scaleRotation(prevFanRotation));
         GL11.glRotatef(turn, 0, 1, 0);
         float sd = motor == null ? -2F/16F : 3F/16F;

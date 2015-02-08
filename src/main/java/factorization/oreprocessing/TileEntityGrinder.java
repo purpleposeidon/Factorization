@@ -1,29 +1,13 @@
 package factorization.oreprocessing;
 
-import java.io.DataInput;
-import java.io.IOException;
 import java.util.ArrayList;
 
+import factorization.shared.*;
+import factorization.util.ItemUtil;
 import net.minecraft.block.Block;
-import net.minecraft.init.Blocks;
 import net.minecraft.item.Item;
-import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.util.IIcon;
-import net.minecraftforge.common.util.ForgeDirection;
 import net.minecraftforge.oredict.OreDictionary;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
-import factorization.api.Charge;
-import factorization.api.IChargeConductor;
-import factorization.common.BlockIcons;
-import factorization.common.FactoryType;
-import factorization.shared.BlockClass;
-import factorization.shared.Core;
-import factorization.shared.FzUtil;
-import factorization.shared.NetworkFactorization.MessageType;
-import factorization.shared.TileEntityFactorization;
 
 public class TileEntityGrinder {
     // This is now just a recipe-holder class...
@@ -52,9 +36,9 @@ public class TileEntityGrinder {
             this.output = output;
             this.probability = probability;
             if (input instanceof Block) {
-                itemstack = new ItemStack((Block) input, 1, FzUtil.WILDCARD_DAMAGE);
+                itemstack = new ItemStack((Block) input, 1, ItemUtil.WILDCARD_DAMAGE);
             } else if (input instanceof Item) {
-                itemstack = new ItemStack((Item) input, 1, FzUtil.WILDCARD_DAMAGE);
+                itemstack = new ItemStack((Item) input, 1, ItemUtil.WILDCARD_DAMAGE);
             } else if (input instanceof ItemStack) {
                 itemstack = (ItemStack) input;
                 if (itemstack.getItem() == null) {

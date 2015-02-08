@@ -3,13 +3,12 @@ package factorization.servo;
 import java.io.DataInput;
 import java.io.DataOutputStream;
 import java.io.IOException;
-import java.lang.reflect.Array;
-import java.lang.reflect.Constructor;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 
+import factorization.util.RenderUtil;
 import net.minecraft.client.renderer.RenderBlocks;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.entity.player.EntityPlayer;
@@ -56,7 +55,6 @@ import factorization.servo.instructions.Sum;
 import factorization.servo.instructions.Trap;
 import factorization.servo.instructions.WoodenServoGrate;
 import factorization.shared.Core;
-import factorization.shared.FzUtil;
 
 public abstract class ServoComponent implements IDataSerializable {
     private static HashMap<String, Class<? extends ServoComponent>> componentMap = new HashMap<String, Class<? extends ServoComponent>>(50, 0.5F);
@@ -214,7 +212,7 @@ public abstract class ServoComponent implements IDataSerializable {
     public void renderDynamic() {
         Tessellator tess = Tessellator.instance;
         tess.startDrawingQuads();
-        renderStatic(null, FzUtil.getRB());
+        renderStatic(null, RenderUtil.getRB());
         tess.draw();
     }
     

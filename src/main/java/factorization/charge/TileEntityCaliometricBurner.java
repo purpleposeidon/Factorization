@@ -2,6 +2,9 @@ package factorization.charge;
 
 import java.io.IOException;
 
+import factorization.shared.*;
+import factorization.util.InvUtil;
+import factorization.util.ItemUtil;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Items;
 import net.minecraft.item.Item;
@@ -21,10 +24,6 @@ import factorization.api.datahelpers.Share;
 import factorization.common.BlockIcons;
 import factorization.common.FactoryType;
 import factorization.notify.Notice;
-import factorization.shared.BlockClass;
-import factorization.shared.FzUtil;
-import factorization.shared.Sound;
-import factorization.shared.TileEntityFactorization;
 
 public class TileEntityCaliometricBurner extends TileEntityFactorization implements IDataSerializable {
     ItemStack stomache;
@@ -147,12 +146,12 @@ public class TileEntityCaliometricBurner extends TileEntityFactorization impleme
     }
     
     int consumeFood() {
-        stomache = FzUtil.normalize(stomache);
+        stomache = ItemUtil.normalize(stomache);
         if (stomache == null) {
             return 0;
         }
         int noms = getFoodValue(stomache);
-        stomache = FzUtil.normalDecr(stomache);
+        stomache = ItemUtil.normalDecr(stomache);
         markDirty();
         Sound.caliometricDigest.playAt(this);
         ticksUntilNextDigestion = 20*10*noms;
@@ -189,7 +188,7 @@ public class TileEntityCaliometricBurner extends TileEntityFactorization impleme
             info(entityplayer);
             return false;
         }
-        is = FzUtil.openInventory(this, ForgeDirection.NORTH).push(is);
+        is = InvUtil.openInventory(this, ForgeDirection.NORTH).push(is);
         entityplayer.setCurrentItemOrArmor(0, is);
         info(entityplayer);
         markDirty();

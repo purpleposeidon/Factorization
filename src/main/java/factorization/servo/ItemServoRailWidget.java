@@ -6,8 +6,8 @@ import factorization.api.Coord;
 import factorization.common.BlockIcons;
 import factorization.shared.Core;
 import factorization.shared.Core.TabType;
-import factorization.shared.FzUtil;
 import factorization.shared.ItemFactorization;
+import factorization.util.ItemUtil;
 import net.minecraft.client.renderer.texture.IIconRegister;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.player.EntityPlayer;
@@ -52,7 +52,7 @@ public class ItemServoRailWidget extends ItemFactorization {
     
     void update(ItemStack is, ServoComponent sc) {
         if (sc != null) {
-            sc.save(FzUtil.getTag(is));
+            sc.save(ItemUtil.getTag(is));
         } else {
             is.setTagCompound(null);
         }

@@ -21,7 +21,6 @@ import cpw.mods.fml.common.network.internal.FMLProxyPacket;
 import factorization.api.Coord;
 import factorization.fzds.HammerNet.HammerNetType;
 import factorization.fzds.interfaces.DeltaCapability;
-import factorization.shared.FzUtil;
 
 public class ClickHandler {
     //Note that these events will be triggered client-side only, as this entity is only used client-side.

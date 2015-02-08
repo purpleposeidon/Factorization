@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 
+import factorization.util.SpaceUtil;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.Vec3;
@@ -13,7 +14,6 @@ import factorization.api.Coord;
 import factorization.api.FzOrientation;
 import factorization.shared.Core;
 import factorization.shared.Core.TabType;
-import factorization.shared.FzUtil;
 import factorization.shared.ItemCraftingComponent;
 
 public class ItemServoMotor extends ItemCraftingComponent {
@@ -49,7 +49,7 @@ public class ItemServoMotor extends ItemCraftingComponent {
         ArrayList<FzOrientation> valid = new ArrayList();
         motor.motionHandler.beforeSpawn();
         
-        ForgeDirection playerAngle = ForgeDirection.getOrientation(FzUtil.determineOrientation(player));
+        ForgeDirection playerAngle = ForgeDirection.getOrientation(SpaceUtil.determineOrientation(player));
         
         for (ForgeDirection fd : ForgeDirection.VALID_DIRECTIONS) {
             if (top == fd || top.getOpposite() == fd) {

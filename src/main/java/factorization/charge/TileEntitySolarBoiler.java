@@ -1,6 +1,8 @@
 package factorization.charge;
 
-import net.minecraft.block.Block;
+import factorization.shared.*;
+import factorization.util.DataUtil;
+import factorization.util.FluidUtil;
 import net.minecraft.init.Blocks;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.IIcon;
@@ -17,9 +19,6 @@ import factorization.api.IReflectionTarget;
 import factorization.common.BlockIcons;
 import factorization.common.FactoryType;
 import factorization.common.FzConfig;
-import factorization.shared.BlockClass;
-import factorization.shared.FzUtil;
-import factorization.shared.TileEntityCommon;
 
 public class TileEntitySolarBoiler extends TileEntityCommon implements IReflectionTarget, IFluidHandler, IMeterInfo {
     public static Fluid steam;
@@ -64,15 +63,15 @@ public class TileEntitySolarBoiler extends TileEntityCommon implements IReflecti
     @Override
     public void writeToNBT(NBTTagCompound tag) {
         super.writeToNBT(tag);
-        FzUtil.writeTank(tag, waterTank, "water");
-        FzUtil.writeTank(tag, steamTank, "steam");
+        DataUtil.writeTank(tag, waterTank, "water");
+        DataUtil.writeTank(tag, steamTank, "steam");
     }
     
     @Override
     public void readFromNBT(NBTTagCompound tag) {
         super.readFromNBT(tag);
-        FzUtil.readTank(tag, waterTank, "water");
-        FzUtil.readTank(tag, steamTank, "steam");
+        DataUtil.readTank(tag, waterTank, "water");
+        DataUtil.readTank(tag, steamTank, "steam");
         sanitize();
     }
     
@@ -236,8 +235,8 @@ public class TileEntitySolarBoiler extends TileEntityCommon implements IReflecti
     protected void onRemove() {
         super.onRemove();
         Coord here = getCoord();
-        FzUtil.spill(here, waterTank.getFluid());
-        FzUtil.spill(here, steamTank.getFluid());
+        FluidUtil.spill(here, waterTank.getFluid());
+        FluidUtil.spill(here, steamTank.getFluid());
     }
     
     @Override

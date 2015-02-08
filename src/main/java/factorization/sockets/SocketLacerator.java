@@ -5,6 +5,10 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
 
+import factorization.shared.*;
+import factorization.util.InvUtil;
+import factorization.util.ItemUtil;
+import factorization.util.NumUtil;
 import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.particle.EffectRenderer;
@@ -28,12 +32,10 @@ import net.minecraft.util.StatCollector;
 import net.minecraft.util.Vec3;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.ForgeDirection;
-import net.minecraftforge.event.world.BlockEvent;
 import net.minecraftforge.event.world.WorldEvent;
 
 import org.lwjgl.opengl.GL11;
 
-import cpw.mods.fml.common.eventhandler.EventPriority;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
@@ -53,11 +55,6 @@ import factorization.oreprocessing.TileEntityGrinder.GrinderRecipe;
 import factorization.oreprocessing.TileEntityGrinderRender;
 import factorization.servo.RenderServoMotor;
 import factorization.servo.ServoMotor;
-import factorization.shared.BlockRenderHelper;
-import factorization.shared.Core;
-import factorization.shared.DropCaptureHandler;
-import factorization.shared.FzUtil;
-import factorization.shared.ICaptureDrops;
 import factorization.shared.NetworkFactorization.MessageType;
 import factorization.weird.TileEntityDayBarrel;
 
@@ -156,7 +153,7 @@ public class SocketLacerator extends TileEntitySocketBase implements IChargeCond
         }
         isPowered = powered;
         genericUpdate_implementation(socket, coord, powered);
-        if (FzUtil.significantChange(last_shared_speed, speed)) {
+        if (NumUtil.significantChange(last_shared_speed, speed)) {
             socket.sendMessage(MessageType.LaceratorSpeed, speed);
             last_shared_speed = speed;
         }
@@ -186,7 +183,7 @@ public class SocketLacerator extends TileEntitySocketBase implements IChargeCond
         if (socket.dumpBuffer(buffer)) {
             for (Iterator<ItemStack> iterator = buffer.iterator(); iterator.hasNext();) {
                 ItemStack is = iterator.next();
-                if (FzUtil.normalize(is) == null) {
+                if (ItemUtil.normalize(is) == null) {
                     iterator.remove();
                 }
             }
@@ -252,7 +249,7 @@ public class SocketLacerator extends TileEntitySocketBase implements IChargeCond
         ArrayList<GrinderRecipe> recipes = TileEntityGrinder.recipes;
         for (int i = 0; i < recipes.size(); i++) {
             GrinderRecipe gr = recipes.get(i);
-            if (FzUtil.oreDictionarySimilar(gr.getOreDictionaryInput(), is)) {
+            if (ItemUtil.oreDictionarySimilar(gr.getOreDictionaryInput(), is)) {
                 ItemStack output = gr.output.copy();
                 output.stackSize = 0;
                 int min = (int) gr.probability;
@@ -488,13 +485,13 @@ public class SocketLacerator extends TileEntitySocketBase implements IChargeCond
         super.onRemove();
         Coord here = getCoord();
         for (ItemStack is : buffer) {
-            FzUtil.spawnItemStack(here, is);
+            InvUtil.spawnItemStack(here, is);
         }
     }
     
     @Override
     public void click(EntityPlayer entityplayer) {
-        FzUtil.emptyBuffer(entityplayer, buffer, this);
+        InvUtil.emptyBuffer(entityplayer, buffer, this);
     }
     
     
@@ -505,7 +502,7 @@ public class SocketLacerator extends TileEntitySocketBase implements IChargeCond
         float d = 0.5F;
         GL11.glTranslatef(d, d, d);
         Quaternion.fromOrientation(FzOrientation.fromDirection(facing.getOpposite())).glRotate();
-        float turn = FzUtil.interp(prev_rotation, rotation, partial) / 5.0F;
+        float turn = NumUtil.interp(prev_rotation, rotation, partial) / 5.0F;
         GL11.glRotatef(turn, 0, 1, 0);
         float sd = motor == null ? 1F/16F : 3F/16F;
         GL11.glTranslatef(0, -4F/16F + sd + (float) Math.abs(Math.sin(turn/800))/32F, 0);
@@ -655,7 +652,7 @@ public class SocketLacerator extends TileEntitySocketBase implements IChargeCond
         //super.renderItemOnServo(render, motor, is, partial);
         GL11.glPushMatrix();
         GL11.glTranslatef(0, 6F/16F, 0);
-        float turn = FzUtil.interp(prev_rotation, rotation, partial) / 5.0F;
+        float turn = NumUtil.interp(prev_rotation, rotation, partial) / 5.0F;
         GL11.glRotatef(-turn, 0, 1, 0);
         float s = 12F/16F;
         GL11.glScalef(s, s, s);

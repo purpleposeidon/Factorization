@@ -4,16 +4,15 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import factorization.shared.*;
+import factorization.util.CraftUtil;
+import factorization.util.ItemUtil;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.IIcon;
 import net.minecraftforge.common.util.ForgeDirection;
 import factorization.common.BlockIcons;
 import factorization.common.FactoryType;
-import factorization.shared.BlockClass;
-import factorization.shared.FzUtil;
-import factorization.shared.Sound;
-import factorization.shared.TileEntityFactorization;
 
 
 public class TileEntityStamper extends TileEntityFactorization {
@@ -105,7 +104,7 @@ public class TileEntityStamper extends TileEntityFactorization {
             if (item == null) {
                 continue;
             }
-            if (!FzUtil.couldMerge(output, item)) {
+            if (!ItemUtil.couldMerge(output, item)) {
                 return false;
             }
             if (output.stackSize + item.stackSize > output.getMaxStackSize()) {
@@ -134,7 +133,7 @@ public class TileEntityStamper extends TileEntityFactorization {
                 any = true;
                 continue;
             }
-            if (FzUtil.couldMerge(output, here)) {
+            if (ItemUtil.couldMerge(output, here)) {
                 any = true;
                 int can_take = output.getMaxStackSize() - output.stackSize;
                 if (here.stackSize > can_take) {
@@ -152,12 +151,12 @@ public class TileEntityStamper extends TileEntityFactorization {
     }
     
     protected List<ItemStack> tryCrafting() {
-        List<ItemStack> fakeResult = FzUtil.craft1x1(this, true, input);
-        if (!FzUtil.craft_succeeded) {
+        List<ItemStack> fakeResult = CraftUtil.craft1x1(this, true, input);
+        if (!CraftUtil.craft_succeeded) {
             return null;
         }
         if (canMerge(fakeResult)) {
-            return FzUtil.craft1x1(this, false, input.splitStack(1));
+            return CraftUtil.craft1x1(this, false, input.splitStack(1));
         }
         return null;
     }

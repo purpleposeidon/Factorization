@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Random;
 import java.util.UUID;
 
+import factorization.util.PlayerUtil;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.MapColor;
 import net.minecraft.block.material.Material;
@@ -32,7 +33,6 @@ import factorization.fzds.interfaces.IDeltaChunk;
 import factorization.oreprocessing.ItemOreProcessing;
 import factorization.shared.Core;
 import factorization.shared.Core.TabType;
-import factorization.shared.FzUtil;
 
 public class ColossalBlock extends Block {
     static final byte MD_MASK = 0, MD_BODY = 4, MD_BODY_CRACKED = 1, MD_ARM = 2, MD_LEG = 3, MD_EYE = 5, MD_CORE = 6, MD_EYE_OPEN = 7, MD_BODY_COVERED = 8, MD_MASK_CRACKED = 9;
@@ -233,7 +233,7 @@ public class ColossalBlock extends Block {
             // player.addChatComponentMessage(new ChatComponentTranslation("tile.factorization:colossalBlock." + md + ".click"));
             return true;
         }
-        if (FzUtil.isPlayerCreative(player) && md == MD_CORE) {
+        if (PlayerUtil.isPlayerCreative(player) && md == MD_CORE) {
             TileEntityColossalHeart heart = at.getTE(TileEntityColossalHeart.class);
             if (heart != null) {
                 if (player.isSneaking()) {

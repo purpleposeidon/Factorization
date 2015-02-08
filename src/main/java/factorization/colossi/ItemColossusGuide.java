@@ -3,10 +3,8 @@ package factorization.colossi;
 import java.util.ArrayList;
 
 import factorization.common.FzConfig;
-import net.minecraft.enchantment.Enchantment;
-import net.minecraft.enchantment.EnchantmentHelper;
+import factorization.util.PlayerUtil;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.ChatComponentText;
@@ -20,7 +18,6 @@ import factorization.api.DeltaCoord;
 import factorization.notify.Notice;
 import factorization.shared.Core;
 import factorization.shared.Core.TabType;
-import factorization.shared.FzUtil;
 import factorization.shared.ItemFactorization;
 
 public class ItemColossusGuide extends ItemFactorization {
@@ -53,7 +50,7 @@ public class ItemColossusGuide extends ItemFactorization {
             Notice.chat(player, msgKey, new ChatComponentTranslation("colossus.is.no_nearby"));
             return is;
         }
-        if (FzUtil.isPlayerCreative(player) && player.isSneaking()) {
+        if (PlayerUtil.isPlayerCreative(player) && player.isSneaking()) {
             int limit = 4;
             for (Coord at : nearby) {
                 String t = at.toString();

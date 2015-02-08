@@ -1,5 +1,7 @@
 package factorization.fzds;
 
+import factorization.util.PlayerUtil;
+import factorization.util.SpaceUtil;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 
@@ -40,7 +42,6 @@ import factorization.fzds.interfaces.IDeltaChunk;
 import factorization.fzds.interfaces.IFzdsShenanigans;
 import factorization.fzds.interfaces.Interpolation;
 import factorization.shared.Core;
-import factorization.shared.FzUtil;
 
 
 public class HammerNet {
@@ -232,7 +233,7 @@ public class HammerNet {
     
     boolean blockInReach(IDeltaChunk idc, EntityPlayerMP player, Coord at) {
         double reach_distance = player.theItemInWorldManager.getBlockReachDistance();
-        Vec3 playerAt = FzUtil.fromEntPos(player);
+        Vec3 playerAt = SpaceUtil.fromEntPos(player);
         playerAt = idc.real2shadow(playerAt);
         double distance = at.createVector().distanceTo(playerAt);
         return distance <= reach_distance;
@@ -311,7 +312,7 @@ public class HammerNet {
             return true;
         } else if (is == null) {
             return false;
-        } else if (FzUtil.isPlayerCreative(player)) {
+        } else if (PlayerUtil.isPlayerCreative(player)) {
             int j1 = is.getItemDamage();
             int i1 = is.stackSize;
             boolean flag1 = is.tryPlaceItemIntoWorld(player, world, x, y, z,

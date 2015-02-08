@@ -2,6 +2,9 @@ package factorization.ceramics;
 
 import java.util.List;
 
+import factorization.shared.*;
+import factorization.util.InvUtil;
+import factorization.util.ItemUtil;
 import net.minecraft.client.renderer.texture.IIconRegister;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Items;
@@ -19,12 +22,8 @@ import factorization.ceramics.TileEntityGreenware.ClayState;
 import factorization.common.FactoryType;
 import factorization.common.ItemIcons;
 import factorization.notify.Notice;
-import factorization.shared.BlockRenderHelper;
-import factorization.shared.Core;
 import factorization.shared.Core.TabType;
-import factorization.shared.FzUtil;
-import factorization.shared.FzUtil.FzInv;
-import factorization.shared.ItemFactorization;
+import factorization.util.InvUtil.FzInv;
 
 public class ItemSculptingTool extends ItemFactorization {
 
@@ -173,7 +172,7 @@ public class ItemSculptingTool extends ItemFactorization {
                 new Notice(here, "Not fired").send(player);
                 return true;
             }
-            FzInv inv = FzUtil.openInventory(player.inventory, 0);
+            FzInv inv = InvUtil.openInventory(player.inventory, 0);
             if (!player.capabilities.isCreativeMode) {
                 ItemStack theSlab = null;
                 int materialCount = 0;
@@ -186,7 +185,7 @@ public class ItemSculptingTool extends ItemFactorization {
                     if (it.getItem() == Items.clay_ball) {
                         materialCount += it.stackSize;
                     }
-                    if (theSlab == null && FzUtil.oreDictionarySimilar("slabWood", it)) {
+                    if (theSlab == null && ItemUtil.oreDictionarySimilar("slabWood", it)) {
                         theSlab = it;
                     }
                 }

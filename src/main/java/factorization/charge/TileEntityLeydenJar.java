@@ -4,6 +4,9 @@ import java.io.DataInput;
 import java.io.IOException;
 import java.util.Random;
 
+import factorization.shared.*;
+import factorization.util.ItemUtil;
+import factorization.util.NumUtil;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
@@ -22,11 +25,7 @@ import factorization.api.datahelpers.DataOutNBT;
 import factorization.api.datahelpers.Share;
 import factorization.common.BlockIcons;
 import factorization.common.FactoryType;
-import factorization.shared.BlockClass;
-import factorization.shared.Core;
-import factorization.shared.FzUtil;
 import factorization.shared.NetworkFactorization.MessageType;
-import factorization.shared.TileEntityCommon;
 
 public class TileEntityLeydenJar extends TileEntityCommon implements IChargeConductor {
     private Charge charge = new Charge(this);
@@ -78,11 +77,11 @@ public class TileEntityLeydenJar extends TileEntityCommon implements IChargeCond
     }
     
     public int getChargeThreshold() {
-        return (int) FzUtil.interp(min_charge_threshold, max_charge_threshold, (float) getLevel());
+        return (int) NumUtil.interp(min_charge_threshold, max_charge_threshold, (float) getLevel());
     }
     
     public int getDischargeThreshold() {
-        return (int) FzUtil.interp(min_discharge_threshold, max_discharge_threshold, (float) getLevel());
+        return (int) NumUtil.interp(min_discharge_threshold, max_discharge_threshold, (float) getLevel());
     }
     
     private static Random rand = new Random();
@@ -163,7 +162,7 @@ public class TileEntityLeydenJar extends TileEntityCommon implements IChargeCond
     
     void updateClients() {
         if (storage != last_storage) {
-            if (FzUtil.significantChange(storage, last_storage, 0.05F)) {
+            if (NumUtil.significantChange(storage, last_storage, 0.05F)) {
                 broadcastMessage(null, MessageType.LeydenjarLevel, storage);
                 last_storage = storage;
             }
@@ -215,7 +214,7 @@ public class TileEntityLeydenJar extends TileEntityCommon implements IChargeCond
     @Override
     public void onPlacedBy(EntityPlayer player, ItemStack is, int side) {
         if (is.hasTagCompound()) {
-            NBTTagCompound tag = FzUtil.getTag(is);
+            NBTTagCompound tag = ItemUtil.getTag(is);
             storage = tag.getInteger("storage");
         }
     }
@@ -233,7 +232,7 @@ public class TileEntityLeydenJar extends TileEntityCommon implements IChargeCond
     @Override
     public ItemStack getDroppedBlock() {
         ItemStack is = new ItemStack(Core.registry.item_factorization, 1, getFactoryType().md);
-        NBTTagCompound tag = FzUtil.getTag(is);
+        NBTTagCompound tag = ItemUtil.getTag(is);
         tag.setInteger("storage", storage);
         return is;
     }

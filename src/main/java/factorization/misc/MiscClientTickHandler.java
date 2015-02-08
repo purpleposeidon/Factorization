@@ -6,6 +6,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
+import factorization.util.ItemUtil;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.audio.PositionedSoundRecord;
 import net.minecraft.client.gui.GuiMainMenu;
@@ -25,7 +26,6 @@ import cpw.mods.fml.common.gameevent.TickEvent.ClientTickEvent;
 import cpw.mods.fml.common.gameevent.TickEvent.Phase;
 import factorization.api.Coord;
 import factorization.common.FzConfig;
-import factorization.shared.FzUtil;
 
 public class MiscClientTickHandler {
     private final Minecraft mc = Minecraft.getMinecraft();
@@ -99,7 +99,7 @@ public class MiscClientTickHandler {
                 if (is == null && firstEmpty == -1 && i < 9) {
                     firstEmpty = i;
                 }
-                if (is == null || !FzUtil.couldMerge(needle, is)) {
+                if (is == null || !ItemUtil.couldMerge(needle, is)) {
                     continue;
                 }
                 if (i < 9) {
@@ -121,10 +121,10 @@ public class MiscClientTickHandler {
         if (held == null) {
             return false;
         }
-        if (FzUtil.couldMerge(held, here.getPickBlock(mop))) {
+        if (ItemUtil.couldMerge(held, here.getPickBlock(mop))) {
             return true;
         }
-        if (FzUtil.couldMerge(held, here.getBrokenBlock())) {
+        if (ItemUtil.couldMerge(held, here.getBrokenBlock())) {
             return true;
         }
         return false;

@@ -2,8 +2,7 @@ package factorization.fzds;
 
 import factorization.api.Coord;
 import factorization.fzds.interfaces.IDeltaChunk;
-import factorization.shared.FzUtil;
-import gnu.trove.set.hash.THashSet;
+import factorization.util.NumUtil;
 
 import java.util.HashMap;
 import java.util.Iterator;
@@ -48,9 +47,9 @@ class ShadowRenderGlobal implements IWorldAccess {
         for (IDeltaChunk idc : DeltaChunk.getSlicesInRange(realClientWorld, lx, ly, lz, hx, hy, hz)) {
             DimensionSliceEntity dse = (DimensionSliceEntity) idc;
             Coord near = dse.getCorner(), far = dse.getFarCorner();
-            if (FzUtil.intersect(near.x, far.x, lx, hx)
-                    && FzUtil.intersect(near.y, far.y, ly, hy)
-                    && FzUtil.intersect(near.z, far.z, lz, hz)) {
+            if (NumUtil.intersect(near.x, far.x, lx, hx)
+                    && NumUtil.intersect(near.y, far.y, ly, hy)
+                    && NumUtil.intersect(near.z, far.z, lz, hz)) {
                 RenderDimensionSliceEntity.markBlocksForUpdate(dse, lx, ly, lz, hx, hy, hz);
                 dse.blocksChanged(lx, ly, lz);
                 dse.blocksChanged(hx, hy, hz);

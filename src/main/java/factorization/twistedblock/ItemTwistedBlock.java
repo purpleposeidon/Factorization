@@ -22,7 +22,6 @@ import factorization.fzds.interfaces.DeltaCapability;
 import factorization.fzds.interfaces.IDeltaChunk;
 import factorization.fzds.interfaces.Interpolation;
 import factorization.shared.Core;
-import factorization.shared.FzUtil;
 import factorization.shared.Core.TabType;
 import factorization.shared.ItemBlockProxy;
 

@@ -12,8 +12,6 @@ import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import cpw.mods.fml.common.gameevent.TickEvent.Phase;
 import cpw.mods.fml.common.gameevent.TickEvent.ServerTickEvent;
 import factorization.api.Coord;
-import factorization.shared.Core;
-import factorization.shared.FzUtil;
 
 public class Mushroomalizer {
     Item red_mushroom = new ItemStack(Blocks.red_mushroom_block).getItem();

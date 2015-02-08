@@ -13,7 +13,8 @@ import factorization.fzds.interfaces.IDeltaChunk;
 import factorization.notify.Notice;
 import factorization.notify.Style;
 import factorization.shared.Core;
-import factorization.shared.FzUtil;
+import factorization.util.FzUtil;
+import factorization.util.SpaceUtil;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.Vec3;
@@ -201,10 +202,10 @@ public class Awakener {
             Vec3 joint = calculateJointPosition(leg, leg_size, leg_length, LimbType.LEG);
             SetAndInfo sai = new SetAndInfo(leg, leg_length, leg_size, joint, LimbType.LEG, getSide(leg));
             limbInfo.add(sai);
-            FzUtil.incrAdd(leg_sum, joint);
+            SpaceUtil.incrAdd(leg_sum, joint);
         }
         Vec3 body_center_of_mass = leg_sum;
-        FzUtil.scale(body_center_of_mass, 1.0/legs.size());
+        SpaceUtil.incrScale(body_center_of_mass, 1.0 / legs.size());
         //body_center_of_mass.yCoord += 1;
         SetAndInfo sai = new SetAndInfo(body, measure_dim(body, 1), leg_size, body_center_of_mass, LimbType.BODY, BodySide.RIGHT);
         limbInfo.add(sai);
@@ -257,7 +258,7 @@ public class Awakener {
         for (LimbInfo li : parts) {
             IDeltaChunk idc = li.idc.getEntity();
             if (idc != bodyIdc) {
-                Vec3 at = FzUtil.fromEntPos(idc);
+                Vec3 at = SpaceUtil.fromEntPos(idc);
                 at = bodyIdc.real2shadow(at);
                 Coord corner = bodyIdc.getCorner();
                 at.xCoord -= corner.x;

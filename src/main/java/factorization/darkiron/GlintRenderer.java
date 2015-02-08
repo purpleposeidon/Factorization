@@ -1,5 +1,6 @@
 package factorization.darkiron;
 
+import factorization.util.NumUtil;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.OpenGlHelper;
 import net.minecraft.client.renderer.RenderBlocks;
@@ -12,13 +13,11 @@ import net.minecraft.world.World;
 import net.minecraftforge.common.util.ForgeDirection;
 
 import org.lwjgl.opengl.GL11;
-import org.lwjgl.opengl.GL12;
 
 import factorization.common.BlockIcons;
 import factorization.darkiron.BlockDarkIronOre.Glint;
 import factorization.shared.BlockRenderHelper;
 import factorization.shared.Core;
-import factorization.shared.FzUtil;
 
 public class GlintRenderer extends TileEntitySpecialRenderer {
     
@@ -68,7 +67,7 @@ public class GlintRenderer extends TileEntitySpecialRenderer {
             opacity *= distPacity;
             double maxTheta = 3;
             double minTheta = 2.8;
-            float r = FzUtil.uninterp((float) minTheta, (float) maxTheta, (float) theta);
+            float r = NumUtil.uninterp((float) minTheta, (float) maxTheta, (float) theta);
             opacity *= r;
             
             int light = w.getBlockLightValue(te.xCoord + dir.offsetX, te.yCoord + dir.offsetY, te.zCoord + dir.offsetZ);

@@ -1,5 +1,8 @@
 package factorization.api;
 
+import factorization.shared.*;
+import factorization.util.FzUtil;
+import factorization.util.ItemUtil;
 import io.netty.buffer.ByteBuf;
 
 import java.io.IOException;
@@ -14,7 +17,6 @@ import net.minecraft.init.Blocks;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.network.Packet;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.ChunkCoordinates;
@@ -38,10 +40,6 @@ import cpw.mods.fml.relauncher.SideOnly;
 import factorization.api.datahelpers.DataHelper;
 import factorization.api.datahelpers.IDataSerializable;
 import factorization.notify.ISaneCoord;
-import factorization.shared.BlockHelper;
-import factorization.shared.Core;
-import factorization.shared.FzUtil;
-import factorization.shared.TileEntityCommon;
 import factorization.shared.NetworkFactorization.MessageType;
 
 // Note: The rules for holding on to references to Coord are the same as for holding on to World.
@@ -988,7 +986,7 @@ public class Coord implements IDataSerializable, ISaneCoord, Comparable<Coord> {
         ItemStack main = dropped.remove(0);
         for (int i = 0; i < dropped.size(); i++) {
             ItemStack other = dropped.get(i);
-            if (!FzUtil.couldMerge(main, other)) {
+            if (!ItemUtil.couldMerge(main, other)) {
                 return null;
             }
             main.stackSize += other.stackSize;

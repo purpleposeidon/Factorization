@@ -3,6 +3,9 @@ package factorization.charge;
 import java.io.DataInput;
 import java.io.IOException;
 
+import factorization.shared.*;
+import factorization.util.DataUtil;
+import factorization.util.NumUtil;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.IIcon;
 import net.minecraftforge.common.util.ForgeDirection;
@@ -16,9 +19,6 @@ import factorization.api.Charge;
 import factorization.api.IChargeConductor;
 import factorization.common.BlockIcons;
 import factorization.common.FactoryType;
-import factorization.shared.BlockClass;
-import factorization.shared.FzUtil;
-import factorization.shared.TileEntityCommon;
 import factorization.shared.NetworkFactorization.MessageType;
 
 public class TileEntitySteamTurbine extends TileEntityCommon implements IFluidHandler, IChargeConductor {
@@ -49,7 +49,7 @@ public class TileEntitySteamTurbine extends TileEntityCommon implements IFluidHa
     @Override
     public void writeToNBT(NBTTagCompound tag) {
         super.writeToNBT(tag);
-        FzUtil.writeTank(tag, steamTank, "steam");
+        DataUtil.writeTank(tag, steamTank, "steam");
         charge.writeToNBT(tag);
         tag.setInteger("fan", fan_speed);
     }
@@ -57,7 +57,7 @@ public class TileEntitySteamTurbine extends TileEntityCommon implements IFluidHa
     @Override
     public void readFromNBT(NBTTagCompound tag) {
         super.readFromNBT(tag);
-        FzUtil.readTank(tag, steamTank, "steam");
+        DataUtil.readTank(tag, steamTank, "steam");
         charge.readFromNBT(tag);
         fan_speed = tag.getInteger("fan");
     }
@@ -110,7 +110,7 @@ public class TileEntitySteamTurbine extends TileEntityCommon implements IFluidHa
     int last_speed = -9999;
     public void shareFanSpeed() {
         if (last_speed == fan_speed) return;
-        if (FzUtil.significantChange(last_speed, fan_speed, 0.10F)) {
+        if (NumUtil.significantChange(last_speed, fan_speed, 0.10F)) {
             last_speed = fan_speed;
             broadcastMessage(null, MessageType.TurbineSpeed, fan_speed);
         }

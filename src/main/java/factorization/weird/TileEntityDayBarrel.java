@@ -4,6 +4,11 @@ import java.io.DataInput;
 import java.io.IOException;
 import java.util.ArrayList;
 
+import factorization.shared.*;
+import factorization.util.DataUtil;
+import factorization.util.InvUtil;
+import factorization.util.ItemUtil;
+import factorization.util.SpaceUtil;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockRailBase;
 import net.minecraft.client.Minecraft;
@@ -13,7 +18,6 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
@@ -21,7 +25,6 @@ import net.minecraft.inventory.IInventory;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.network.play.client.C07PacketPlayerDigging;
 import net.minecraft.potion.Potion;
 import net.minecraft.potion.PotionEffect;
 import net.minecraft.tileentity.TileEntity;
@@ -38,7 +41,6 @@ import net.minecraftforge.event.world.ChunkEvent;
 
 import org.lwjgl.opengl.GL11;
 
-import cpw.mods.fml.client.FMLClientHandler;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import cpw.mods.fml.common.gameevent.TickEvent;
 import cpw.mods.fml.common.gameevent.TickEvent.ClientTickEvent;
@@ -54,14 +56,8 @@ import factorization.api.datahelpers.Share;
 import factorization.common.FactoryType;
 import factorization.notify.Notice;
 import factorization.notify.NoticeUpdater;
-import factorization.shared.BlockClass;
-import factorization.shared.Core;
-import factorization.shared.FzUtil;
-import factorization.shared.FzUtil.FzInv;
-import factorization.shared.NetworkFactorization;
+import factorization.util.InvUtil.FzInv;
 import factorization.shared.NetworkFactorization.MessageType;
-import factorization.shared.Sound;
-import factorization.shared.TileEntityFactorization;
 
 public class TileEntityDayBarrel extends TileEntityFactorization {
     public ItemStack item;
@@ -193,7 +189,7 @@ public class TileEntityDayBarrel extends TileEntityFactorization {
             Coord here = getCoord();
             here.adjust(orientation.top);
             IInventory upi = here.getTE(IInventory.class);
-            FzInv upinv = FzUtil.openInventory(upi, orientation.top.getOpposite());
+            FzInv upinv = InvUtil.openInventory(upi, orientation.top.getOpposite());
             
             if (upinv != null) {
                 ItemStack got = upinv.pull(item, 1, true);
@@ -210,7 +206,7 @@ public class TileEntityDayBarrel extends TileEntityFactorization {
             Coord here = getCoord();
             here.adjust(orientation.top.getOpposite());
             IInventory downi = here.getTE(IInventory.class);
-            FzInv downinv = FzUtil.openInventory(downi, orientation.top);
+            FzInv downinv = InvUtil.openInventory(downi, orientation.top);
             
             if (downinv != null) {
                 ItemStack bottom_item = getStackInSlot(1);
@@ -289,7 +285,7 @@ public class TileEntityDayBarrel extends TileEntityFactorization {
         if (is == null || item == null) {
             return false;
         }
-        return FzUtil.couldMerge(item, is);
+        return ItemUtil.couldMerge(item, is);
     }
     
     boolean taint(ItemStack is) {
@@ -304,7 +300,7 @@ public class TileEntityDayBarrel extends TileEntityFactorization {
             item.stackSize = 0;
             return true;
         }
-        return FzUtil.couldMerge(item, is);
+        return ItemUtil.couldMerge(item, is);
     }
     
     boolean isTop(ForgeDirection d) {
@@ -413,9 +409,9 @@ public class TileEntityDayBarrel extends TileEntityFactorization {
         for (int X = 0; X < pointy; X++) {
             fo = fo.getNextRotationOnFace();
         }
-        if (FzUtil.determineOrientation(player) >= 2 /* player isn't looking straight down */
+        if (SpaceUtil.determineOrientation(player) >= 2 /* player isn't looking straight down */
                 && side < 2 /* and the side is the bottom */) {
-            side = FzUtil.determineOrientation(player);
+            side = SpaceUtil.determineOrientation(player);
             fo = FzOrientation.fromDirection(ForgeDirection.getOrientation(side).getOpposite());
             FzOrientation perfect = fo.pointTopTo(ForgeDirection.UP);
             if (perfect != FzOrientation.UNKNOWN) {
@@ -507,10 +503,10 @@ public class TileEntityDayBarrel extends TileEntityFactorization {
             return true;
         }
         if (messageType == MessageType.BarrelDescription) {
-            item = FzUtil.readStack(input);
+            item = DataUtil.readStack(input);
             setItemCount(input.readInt());
-            woodLog = FzUtil.readStack(input);
-            woodSlab = FzUtil.readStack(input);
+            woodLog = DataUtil.readStack(input);
+            woodSlab = DataUtil.readStack(input);
             orientation = FzOrientation.getOrientation(input.readByte());
             type = Type.valueOf(input.readByte());
             freeDisplayList();
@@ -522,7 +518,7 @@ public class TileEntityDayBarrel extends TileEntityFactorization {
             return true;
         }
         if (messageType == MessageType.BarrelItem) {
-            item = FzUtil.readStack(input);
+            item = DataUtil.readStack(input);
             setItemCount(input.readInt());
             freeDisplayList();
             return true;
@@ -1026,13 +1022,13 @@ public class TileEntityDayBarrel extends TileEntityFactorization {
     @SideOnly(Side.CLIENT)
     public IIcon getIcon(ForgeDirection dir) {
         if (dir.offsetY != 0) {
-            Block ws = FzUtil.getBlock(woodSlab);
+            Block ws = DataUtil.getBlock(woodSlab);
             if (ws != null) {
                 return ws.getIcon(0, woodSlab.getItemDamage());
             }
             return woodSlab.getItem().getIcon(woodSlab, 0);
         }
-        Block wl = FzUtil.getBlock(woodLog);
+        Block wl = DataUtil.getBlock(woodLog);
         if (wl != null) {
             return wl.getIcon(2, woodLog.getItemDamage());
         }
@@ -1069,10 +1065,10 @@ public class TileEntityDayBarrel extends TileEntityFactorization {
     public static ItemStack makeBarrel(Type type, ItemStack log, ItemStack slab) {
         ItemStack barrel_item = new ItemStack(Core.registry.daybarrel);
         barrel_item = addUpgrade(barrel_item, type);
-        NBTTagCompound tag = FzUtil.getTag(barrel_item);
-        tag.setTag("log", FzUtil.item2tag(log));
-        tag.setTag("slab", FzUtil.item2tag(slab));
-        int dmg = FzUtil.getId(log)*16 + log.getItemDamage();
+        NBTTagCompound tag = ItemUtil.getTag(barrel_item);
+        tag.setTag("log", DataUtil.item2tag(log));
+        tag.setTag("slab", DataUtil.item2tag(slab));
+        int dmg = DataUtil.getId(log)*16 + log.getItemDamage();
         dmg %= 1000;
         dmg *= 10;
         dmg += type.ordinal();
@@ -1159,7 +1155,7 @@ public class TileEntityDayBarrel extends TileEntityFactorization {
         if (tag == null) {
             return default_.copy();
         }
-        return FzUtil.tag2item(tag, default_);
+        return DataUtil.tag2item(tag, default_);
     }
     
     static ItemStack addUpgrade(ItemStack barrel, Type upgrade) {
@@ -1167,7 +1163,7 @@ public class TileEntityDayBarrel extends TileEntityFactorization {
             return barrel;
         }
         barrel = barrel.copy();
-        NBTTagCompound tag = FzUtil.getTag(barrel);
+        NBTTagCompound tag = ItemUtil.getTag(barrel);
         tag.setString("type", upgrade.toString());
         return barrel;
     }
@@ -1193,7 +1189,7 @@ public class TileEntityDayBarrel extends TileEntityFactorization {
     public ItemStack getDroppedBlock() {
         ItemStack is = makeBarrel(type, woodLog, woodSlab);
         if (type == Type.SILKY && item != null && getItemCount() > 0) {
-            NBTTagCompound tag = FzUtil.getTag(is);
+            NBTTagCompound tag = ItemUtil.getTag(is);
             tag.setInteger("SilkCount", getItemCount());
             NBTTagCompound si = new NBTTagCompound();
             item.writeToNBT(si);

@@ -5,6 +5,10 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 import factorization.notify.Notice;
+import factorization.shared.*;
+import factorization.util.InvUtil;
+import factorization.util.ItemUtil;
+import factorization.util.SpaceUtil;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
@@ -17,15 +21,10 @@ import cpw.mods.fml.common.network.internal.FMLProxyPacket;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import factorization.api.Coord;
-import factorization.api.IMeterInfo;
 import factorization.common.BlockIcons;
 import factorization.common.FactoryType;
-import factorization.shared.BlockClass;
-import factorization.shared.Core;
-import factorization.shared.FzUtil;
-import factorization.shared.FzUtil.FzInv;
+import factorization.util.InvUtil.FzInv;
 import factorization.shared.NetworkFactorization.MessageType;
-import factorization.shared.TileEntityCommon;
 
 public class TileEntityCompressionCrafter extends TileEntityCommon {
     static ThreadLocal<CompressionState> states = new ThreadLocal();
@@ -110,7 +109,7 @@ public class TileEntityCompressionCrafter extends TileEntityCommon {
     @Override
     public void onPlacedBy(EntityPlayer player, ItemStack is, int side) {
         super.onPlacedBy(player, is, side);
-        b_facing = FzUtil.getOpposite(FzUtil.determineOrientation(player));
+        b_facing = SpaceUtil.getOpposite(SpaceUtil.determineOrientation(player));
     }
     
     @Override
@@ -137,9 +136,9 @@ public class TileEntityCompressionCrafter extends TileEntityCommon {
         for (FzInv fz : getAdjacentInventories()) {
             if (fz == null) break;
             while (!buffer.isEmpty()) {
-                ItemStack is = FzUtil.normalize(buffer.get(0));
+                ItemStack is = ItemUtil.normalize(buffer.get(0));
                 if (is != null) {
-                    is = FzUtil.normalize(fz.push(is));
+                    is = ItemUtil.normalize(fz.push(is));
                 }
                 if (is == null) {
                     buffer.remove(0);
@@ -164,7 +163,7 @@ public class TileEntityCompressionCrafter extends TileEntityCommon {
             Coord sc = me.add(fd);
             IInventory inv = sc.getTE(IInventory.class);
             if (inv != null) {
-                ret[i++] = FzUtil.openInventory(inv, back);
+                ret[i++] = InvUtil.openInventory(inv, back);
             } else if (fd != behind) {
                 TileEntityCompressionCrafter neighbor = sc.getTE(TileEntityCompressionCrafter.class);
                 if (neighbor == null) continue;
@@ -176,7 +175,7 @@ public class TileEntityCompressionCrafter extends TileEntityCommon {
                     Coord sd = sc.add(nfd);
                     ForgeDirection newBack = nfd.getOpposite();
                     IInventory newInv = sd.getTE(IInventory.class);
-                    if (newInv != null) ret[i++] = FzUtil.openInventory(newInv, newBack);
+                    if (newInv != null) ret[i++] = InvUtil.openInventory(newInv, newBack);
                 }
             }
         }
@@ -320,6 +319,6 @@ public class TileEntityCompressionCrafter extends TileEntityCommon {
     
     @Override
     public void click(EntityPlayer entityplayer) {
-        FzUtil.emptyBuffer(entityplayer, buffer, this);
+        InvUtil.emptyBuffer(entityplayer, buffer, this);
     }
 }

@@ -4,7 +4,7 @@ import java.util.Random;
 
 import factorization.api.Coord;
 import factorization.api.DeltaCoord;
-import factorization.shared.FzUtil;
+import factorization.util.NumUtil;
 
 public class Brush {
     public static enum BrushMask {
@@ -54,9 +54,9 @@ public class Brush {
         double length = Math.sqrt(start.distanceSq(end));
         Coord mid = start.copy();
         for (int i = 0; i < length; i++) {
-            mid.x = (int) Math.round(FzUtil.interp(start.x, start.x, i/length));
-            mid.y = (int) Math.round(FzUtil.interp(start.y, start.y, i/length));
-            mid.z = (int) Math.round(FzUtil.interp(start.z, start.z, i/length));
+            mid.x = (int) Math.round(NumUtil.interp(start.x, start.x, i / length));
+            mid.y = (int) Math.round(NumUtil.interp(start.y, start.y, i / length));
+            mid.z = (int) Math.round(NumUtil.interp(start.z, start.z, i / length));
             paint(mid);
         }
     }

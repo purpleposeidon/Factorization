@@ -1,6 +1,7 @@
 package factorization.colossi;
 
 import factorization.api.Coord;
+import factorization.util.SpaceUtil;
 import net.minecraft.block.Block;
 import net.minecraft.util.Vec3;
 import net.minecraftforge.common.util.ForgeDirection;
@@ -9,7 +10,6 @@ import factorization.colossi.ColossusController.BodySide;
 import factorization.colossi.ColossusController.LimbType;
 import factorization.fzds.interfaces.IDeltaChunk;
 import factorization.fzds.interfaces.Interpolation;
-import factorization.shared.FzUtil;
 
 public enum WalkState implements IStateMachine<WalkState> {
     IDLE {
@@ -107,7 +107,7 @@ public enum WalkState implements IStateMachine<WalkState> {
             IDeltaChunk body = controller.body;
             Vec3 target = controller.getTarget().createVector();
             target.yCoord = controller.posY;
-            Vec3 me = FzUtil.fromEntPos(body);
+            Vec3 me = SpaceUtil.fromEntPos(body);
             Vec3 delta = me.subtract(target);
             double angle = Math.atan2(delta.xCoord, delta.zCoord) - Math.PI / 2;
             Quaternion target_rotation = Quaternion.getRotationQuaternionRadians(angle, ForgeDirection.UP);
@@ -156,7 +156,7 @@ public enum WalkState implements IStateMachine<WalkState> {
             IDeltaChunk body = controller.body;
             Vec3 target = controller.getTarget().createVector();
             target.yCoord = controller.posY;
-            Vec3 me = FzUtil.fromEntPos(body);
+            Vec3 me = SpaceUtil.fromEntPos(body);
             Vec3 delta = me.subtract(target);
             double walk_speed = Math.min(MAX_WALK_SPEED, delta.lengthVector());
             delta = delta.normalize();

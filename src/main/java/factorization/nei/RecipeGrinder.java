@@ -4,9 +4,7 @@ import java.awt.Rectangle;
 import java.util.Arrays;
 import java.util.List;
 
-import net.minecraft.block.Block;
-import net.minecraft.init.Blocks;
-import net.minecraft.client.gui.inventory.GuiContainer;
+import factorization.util.ItemUtil;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import codechicken.nei.PositionedStack;
@@ -15,9 +13,6 @@ import codechicken.nei.recipe.TemplateRecipeHandler;
 import factorization.oreprocessing.TileEntityGrinder;
 import factorization.oreprocessing.TileEntityGrinder.GrinderRecipe;
 import factorization.shared.Core;
-import factorization.shared.FzUtil;
-
-import static codechicken.lib.gui.GuiDraw.*;
 
 public class RecipeGrinder extends TemplateRecipeHandler {
     @Override
@@ -43,10 +38,10 @@ public class RecipeGrinder extends TemplateRecipeHandler {
     public void loadUsageRecipes(ItemStack ingredient) {
         //XXX NOTE: This is probably a lame implementation of this function.
         Item ingredientItem = ingredient == null ? null : ingredient.getItem();
-        if (FzUtil.couldMerge(ingredient, Core.registry.socket_lacerator)) {
+        if (ItemUtil.couldMerge(ingredient, Core.registry.socket_lacerator)) {
             ingredient = null;
         }
-        if (FzUtil.couldMerge(ingredient, Core.registry.empty_socket_item)) {
+        if (ItemUtil.couldMerge(ingredient, Core.registry.empty_socket_item)) {
             ingredient = null;
         }
         if (ingredientItem == Core.registry.motor) {
@@ -65,7 +60,7 @@ public class RecipeGrinder extends TemplateRecipeHandler {
                     Core.logSevere("Bad item! Recipe output is " + gr.output);
                     continue;
                 }
-                if (FzUtil.wildcardSimilar(is, ingredient)) {
+                if (ItemUtil.wildcardSimilar(is, ingredient)) {
                     arecipes.add(new CachedGrinderRecipe(gr));
                     break;
                 }
@@ -117,7 +112,7 @@ public class RecipeGrinder extends TemplateRecipeHandler {
             currenttip.add(((int)prob) + "%"); 
         }
         for (ItemStack is : gr.getInput()) {
-            if (FzUtil.wildcardSimilar(is, stack)) {
+            if (ItemUtil.wildcardSimilar(is, stack)) {
                 currenttip.add("In a barrel, or as a block");
                 break;
             }

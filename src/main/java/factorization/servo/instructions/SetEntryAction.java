@@ -3,7 +3,6 @@ package factorization.servo.instructions;
 import java.io.IOException;
 
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.item.Item;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.IIcon;
@@ -14,10 +13,9 @@ import factorization.api.datahelpers.IDataSerializable;
 import factorization.common.BlockIcons;
 import factorization.servo.CpuBlocking;
 import factorization.servo.EntryAction;
-import factorization.servo.Executioner;
 import factorization.servo.Instruction;
 import factorization.servo.ServoMotor;
-import factorization.shared.FzUtil;
+import factorization.util.FzUtil;
 
 public class SetEntryAction extends Instruction {
     EntryAction mode = EntryAction.ENTRY_EXECUTE;

@@ -5,8 +5,9 @@ import java.util.List;
 
 import factorization.common.BlockIcons;
 import factorization.common.FactoryType;
-import factorization.shared.FzUtil;
+import factorization.util.CraftUtil;
 
+import factorization.util.ItemUtil;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.IIcon;
 import net.minecraftforge.common.util.ForgeDirection;
@@ -39,21 +40,21 @@ public class TileEntityPackager extends TileEntityStamper {
                 matrix[i] = p;
             }
             to_remove = 9;
-            testOutput = FzUtil.craft3x3(this, true, true, matrix);
+            testOutput = CraftUtil.craft3x3(this, true, true, matrix);
         } else {
-            FzUtil.craft_succeeded = false;
+            CraftUtil.craft_succeeded = false;
         }
-        if (input.stackSize >= 4 && !FzUtil.craft_succeeded) {
+        if (input.stackSize >= 4 && !CraftUtil.craft_succeeded) {
             Arrays.fill(matrix, null);
             matrix[0] = p;
             matrix[1] = p;
             matrix[3] = p;
             matrix[4] = p;
             to_remove = 4;
-            testOutput = FzUtil.craft3x3(this, true, true, matrix);
+            testOutput = CraftUtil.craft3x3(this, true, true, matrix);
         }
         
-        if (!FzUtil.craft_succeeded) {
+        if (!CraftUtil.craft_succeeded) {
             return null;
         }
         
@@ -64,9 +65,9 @@ public class TileEntityPackager extends TileEntityStamper {
         if (!canMerge(testOutput)) {
             return null;
         }
-        List<ItemStack> ret = FzUtil.craft3x3(this, false, false, matrix);
+        List<ItemStack> ret = CraftUtil.craft3x3(this, false, false, matrix);
         input.stackSize -= to_remove;
-        input = FzUtil.normalize(input);
+        input = ItemUtil.normalize(input);
         return ret;
     }
 }

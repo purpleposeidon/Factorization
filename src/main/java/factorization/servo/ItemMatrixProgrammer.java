@@ -17,7 +17,7 @@ import factorization.notify.Notice;
 import factorization.notify.Style;
 import factorization.shared.Core;
 import factorization.shared.Core.TabType;
-import factorization.shared.FzUtil;
+import factorization.util.FzUtil;
 import factorization.shared.ItemFactorization;
 
 public class ItemMatrixProgrammer extends ItemFactorization {

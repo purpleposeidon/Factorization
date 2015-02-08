@@ -9,10 +9,10 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 
+import factorization.util.PlayerUtil;
 import net.minecraft.command.ICommand;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.entity.player.EntityPlayer;
-import factorization.shared.FzUtil;
 
 public class ExportHtml implements ICommand {
     @Override
@@ -39,7 +39,7 @@ public class ExportHtml implements ICommand {
 
     @Override
     public boolean canCommandSenderUseCommand(ICommandSender icommandsender) {
-        return icommandsender instanceof EntityPlayer && FzUtil.isCommandSenderOpped(icommandsender);
+        return icommandsender instanceof EntityPlayer && PlayerUtil.isCommandSenderOpped(icommandsender);
     }
 
     @Override

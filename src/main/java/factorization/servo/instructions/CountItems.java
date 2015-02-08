@@ -2,6 +2,7 @@ package factorization.servo.instructions;
 
 import java.io.IOException;
 
+import factorization.util.InvUtil;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.IIcon;
@@ -11,8 +12,7 @@ import factorization.api.datahelpers.IDataSerializable;
 import factorization.common.BlockIcons;
 import factorization.servo.Instruction;
 import factorization.servo.ServoMotor;
-import factorization.shared.FzUtil;
-import factorization.shared.FzUtil.FzInv;
+import factorization.util.InvUtil.FzInv;
 
 public class CountItems extends Instruction {
 
@@ -29,7 +29,7 @@ public class CountItems extends Instruction {
     @Override
     public void motorHit(ServoMotor motor) {
         int count = 0;
-        FzInv inv = FzUtil.openInventory(motor, false);
+        FzInv inv = InvUtil.openInventory(motor, false);
         for (int i = 0; i < inv.size(); i++) {
             ItemStack is = inv.get(i);
             if (is == null) continue;

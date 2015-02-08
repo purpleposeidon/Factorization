@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import factorization.util.ItemUtil;
 import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.oredict.OreDictionary;
@@ -14,7 +15,6 @@ import factorization.crafting.GuiMixer;
 import factorization.crafting.TileEntityMixer;
 import factorization.crafting.TileEntityMixer.RecipeMatchInfo;
 import factorization.shared.Core;
-import factorization.shared.FzUtil;
 
 public class RecipeMixer extends TemplateRecipeHandler {
     //FIXME: People keep sending invalid bug reports for the mixer because it can't really merge OD ItemStacks.
@@ -130,7 +130,7 @@ public class RecipeMixer extends TemplateRecipeHandler {
                 if (o instanceof ItemStack) {
                     ItemStack is = (ItemStack) o;
                     if (is.getItem().hasContainerItem(is)) {
-                        ItemStack cnt = FzUtil.normalize(is.getItem().getContainerItem(is));
+                        ItemStack cnt = ItemUtil.normalize(is.getItem().getContainerItem(is));
                         if (cnt != null) {
                             output.add(cnt);
                         }

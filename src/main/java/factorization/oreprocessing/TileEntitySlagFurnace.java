@@ -5,6 +5,10 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Random;
 
+import factorization.shared.*;
+import factorization.util.DataUtil;
+import factorization.util.ItemUtil;
+import factorization.util.SpaceUtil;
 import net.minecraft.block.Block;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
@@ -16,11 +20,7 @@ import net.minecraft.world.World;
 import net.minecraftforge.common.util.ForgeDirection;
 import factorization.common.BlockIcons;
 import factorization.common.FactoryType;
-import factorization.shared.BlockClass;
-import factorization.shared.Core;
-import factorization.shared.FzUtil;
 import factorization.shared.NetworkFactorization.MessageType;
-import factorization.shared.TileEntityFactorization;
 
 public class TileEntitySlagFurnace extends TileEntityFactorization {
     ItemStack furnaceItemStacks[] = new ItemStack[4];
@@ -38,7 +38,7 @@ public class TileEntitySlagFurnace extends TileEntityFactorization {
     @Override
     public void onPlacedBy(EntityPlayer player, ItemStack is, int side) {
         super.onPlacedBy(player, is, side);
-        facing_direction = FzUtil.getOpposite(FzUtil.determineFlatOrientation(player));
+        facing_direction = SpaceUtil.getOpposite(SpaceUtil.determineFlatOrientation(player));
     }
 
     @Override
@@ -182,7 +182,7 @@ public class TileEntitySlagFurnace extends TileEntityFactorization {
         if (output == null) {
             return true;
         }
-        if (!FzUtil.couldMerge(output, res)) {
+        if (!ItemUtil.couldMerge(output, res)) {
             return false;
         }
         if (output.stackSize + resSize <= output.getMaxStackSize()) {
@@ -296,7 +296,7 @@ public class TileEntitySlagFurnace extends TileEntityFactorization {
             }
             if (o instanceof Block) {
                 Block b = (Block) o;
-                Item it = FzUtil.getItem(b);
+                Item it = DataUtil.getItem(b);
                 if (it == null) return null;
                 return new ItemStack(it);
             }
@@ -308,7 +308,7 @@ public class TileEntitySlagFurnace extends TileEntityFactorization {
 
         static SmeltingResult getSlaggingResult(ItemStack input) {
             for (SmeltingResult res : smeltingResults) {
-                if (FzUtil.wildcardSimilar(res.input, input)) {
+                if (ItemUtil.wildcardSimilar(res.input, input)) {
                     return res;
                 }
             }

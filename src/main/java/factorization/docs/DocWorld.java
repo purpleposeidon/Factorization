@@ -2,6 +2,7 @@ package factorization.docs;
 
 import java.util.ArrayList;
 
+import factorization.util.DataUtil;
 import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.WorldClient;
@@ -20,7 +21,6 @@ import cpw.mods.fml.relauncher.SideOnly;
 import factorization.api.Coord;
 import factorization.api.DeltaCoord;
 import factorization.shared.Core;
-import factorization.shared.FzUtil;
 
 public class DocWorld extends WorldClient {
     static final Minecraft mc = Minecraft.getMinecraft();
@@ -112,7 +112,7 @@ public class DocWorld extends WorldClient {
         } else if (id == -12) {
             return Core.registry.dark_iron_ore;
         } else {
-            return FzUtil.getBlock(id);
+            return DataUtil.getBlock(id);
         }
     }
     
@@ -147,7 +147,7 @@ public class DocWorld extends WorldClient {
     void setIdMdTe(DeltaCoord dc, Block block, int md, TileEntity te) {
         int i = getIndex(dc.x, dc.y, dc.z);
         if (i == -1) return;
-        int useId = FzUtil.getId(block);
+        int useId = DataUtil.getId(block);
         if (block == Core.registry.factory_block) {
             useId = -10;
         } else if (block == Core.registry.resource_block) {
@@ -159,7 +159,7 @@ public class DocWorld extends WorldClient {
         blockMetadatas[i] = md;
         
         if (te == null) return;
-        TileEntity clone = FzUtil.cloneTileEntity(te);
+        TileEntity clone = DataUtil.cloneTileEntity(te);
         clone.xCoord = dc.x;
         clone.yCoord = dc.y;
         clone.zCoord = dc.z;

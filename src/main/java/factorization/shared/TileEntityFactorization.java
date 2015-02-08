@@ -3,8 +3,9 @@ package factorization.shared;
 import java.io.DataInput;
 import java.io.IOException;
 
+import factorization.util.InvUtil;
+import factorization.util.ItemUtil;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.ISidedInventory;
@@ -137,7 +138,7 @@ public abstract class TileEntityFactorization extends TileEntityCommon
         // XXX TODO: ModLoader.genericContainerRemoval
         Coord here = getCoord();
         for (int i = 0; i < getSizeInventory(); i++) {
-            FzUtil.spawnItemStack(here, getStackInSlot(i));
+            InvUtil.spawnItemStack(here, getStackInSlot(i));
         }
     }
     
@@ -204,7 +205,7 @@ public abstract class TileEntityFactorization extends TileEntityCommon
 
     @Override
     public ItemStack decrStackSize(int i, int amount) {
-        ItemStack target = FzUtil.normalize(getStackInSlot(i));
+        ItemStack target = ItemUtil.normalize(getStackInSlot(i));
         if (target == null) {
             return null;
         }

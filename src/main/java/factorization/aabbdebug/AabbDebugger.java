@@ -3,6 +3,7 @@ package factorization.aabbdebug;
 import java.util.ArrayList;
 import java.util.List;
 
+import factorization.util.SpaceUtil;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.RenderGlobal;
 import net.minecraft.command.ICommand;
@@ -20,7 +21,6 @@ import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import cpw.mods.fml.common.gameevent.TickEvent.ClientTickEvent;
 import cpw.mods.fml.common.gameevent.TickEvent.Phase;
 import factorization.shared.Core;
-import factorization.shared.FzUtil;
 
 public enum AabbDebugger {
     INSTANCE;
@@ -84,8 +84,8 @@ public enum AabbDebugger {
     
     public static void addLine(Vec3 start, Vec3 end) {
         Line line = new Line();
-        line.start = FzUtil.copy(start);
-        line.end = FzUtil.copy(end);
+        line.start = SpaceUtil.copy(start);
+        line.end = SpaceUtil.copy(end);
         lines.add(line);
     }
     

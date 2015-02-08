@@ -1,11 +1,11 @@
 package factorization.oreprocessing;
 
+import factorization.util.NumUtil;
 import org.lwjgl.opengl.GL11;
 
 import factorization.common.ContainerFactorization;
 import factorization.shared.Core;
 import factorization.shared.FactorizationGui;
-import factorization.shared.FzUtil;
 
 public class GuiCrystallizer extends FactorizationGui {
     TileEntityCrystallizer crys;
@@ -39,7 +39,7 @@ public class GuiCrystallizer extends FactorizationGui {
         float cool_start = 1F/20F;
         float cool_end = 2F/20F;
         if (prog > cool_start) {
-            h *= (1 - FzUtil.uninterp(cool_start, cool_end, prog));
+            h *= (1 - NumUtil.uninterp(cool_start, cool_end, prog));
         }
         int heat = (int) ((1 - h) * 13);
         for (int dx : new int[] { 54, 109 }) {

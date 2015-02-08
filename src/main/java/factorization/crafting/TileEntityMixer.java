@@ -8,6 +8,11 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 
+import factorization.shared.*;
+import factorization.util.CraftUtil;
+import factorization.util.InvUtil;
+import factorization.util.ItemUtil;
+import factorization.util.PlayerUtil;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Items;
 import net.minecraft.inventory.IInventory;
@@ -31,12 +36,8 @@ import factorization.api.Coord;
 import factorization.api.IChargeConductor;
 import factorization.common.BlockIcons;
 import factorization.common.FactoryType;
-import factorization.shared.BlockClass;
-import factorization.shared.Core;
-import factorization.shared.FzUtil;
-import factorization.shared.FzUtil.FzInv;
+import factorization.util.InvUtil.FzInv;
 import factorization.shared.NetworkFactorization.MessageType;
-import factorization.shared.TileEntityFactorization;
 
 public class TileEntityMixer extends TileEntityFactorization implements
         IChargeConductor {
@@ -109,7 +110,7 @@ public class TileEntityMixer extends TileEntityFactorization implements
         super.dropContents();
         Coord here = getCoord();
         for (ItemStack is : outputBuffer) {
-            FzUtil.spawnItemStack(here, is);
+            InvUtil.spawnItemStack(here, is);
         }
         markDirty();
     }
@@ -247,7 +248,7 @@ public class TileEntityMixer extends TileEntityFactorization implements
                     Object h = inputs.get(i);
                     if (h instanceof ItemStack) {
                         ItemStack here = (ItemStack) h;
-                        if (FzUtil.couldMerge(here, it)) {
+                        if (ItemUtil.couldMerge(here, it)) {
                             here.stackSize += s;
                             size += s;
                             return;
@@ -290,11 +291,11 @@ public class TileEntityMixer extends TileEntityFactorization implements
     boolean removeMatching(ItemStack[] hay, ItemStack needle) {
         needle = needle.copy();
         for (int i = 0; i < hay.length; i++) {
-            if (FzUtil.wildcardSimilar(needle, hay[i])) {
+            if (ItemUtil.wildcardSimilar(needle, hay[i])) {
                 int delta = Math.min(hay[i].stackSize, needle.stackSize);
                 hay[i].stackSize -= delta;
                 needle.stackSize -= delta;
-                hay[i] = FzUtil.normalize(hay[i]);
+                hay[i] = ItemUtil.normalize(hay[i]);
                 if (needle.stackSize <= 0) {
                     return true;
                 }
@@ -418,7 +419,7 @@ public class TileEntityMixer extends TileEntityFactorization implements
             //We're going to filter out items like:
             //  Logic matrix programmers
             //  Diamond drawplates
-            ItemStack container = FzUtil.normalize(item.getContainerItem(is));
+            ItemStack container = ItemUtil.normalize(item.getContainerItem(is));
             if (container == null) {
                 return true;
             }
@@ -478,12 +479,12 @@ public class TileEntityMixer extends TileEntityFactorization implements
         for (ItemStack is : src) {
             //increase already-started stacks
             for (int i = 0; i < out.length; i++) {
-                if (out[i] != null && FzUtil.couldMerge(is, out[i])) {
+                if (out[i] != null && ItemUtil.couldMerge(is, out[i])) {
                     int free = out[i].getMaxStackSize() - out[i].stackSize;
                     int delta = Math.min(free, is.stackSize);
                     is.stackSize -= delta;
                     out[i].stackSize += delta;
-                    is = FzUtil.normalize(is);
+                    is = ItemUtil.normalize(is);
                     if (is == null) {
                         break;
                     }
@@ -557,9 +558,9 @@ public class TileEntityMixer extends TileEntityFactorization implements
     }
     
     void craftRecipe(RecipeMatchInfo mr) {
-        InventoryCrafting craft = FzUtil.makeCraftingGrid();
+        InventoryCrafting craft = CraftUtil.makeCraftingGrid();
         int craft_slot = 0;
-        FzInv inv = FzUtil.openInventory(this, ForgeDirection.UP);
+        FzInv inv = InvUtil.openInventory(this, ForgeDirection.UP);
         ArrayList recipeInputs = new ArrayList();
         for (Object o : mr.inputs) {
             if (o instanceof ItemStack) {
@@ -580,7 +581,7 @@ public class TileEntityMixer extends TileEntityFactorization implements
                 is.stackSize = 0;
             } else {
                 for (ItemStack is : ((Iterable<ItemStack>) o)) {
-                    ItemStack got = FzUtil.normalize(inv.pull(is, 1, false));
+                    ItemStack got = ItemUtil.normalize(inv.pull(is, 1, false));
                     if (got != null) {
                         for (Iterator<ItemStack> iterator = ((Iterable<ItemStack>) o).iterator(); iterator.hasNext();) {
                             ItemStack others = iterator.next();
@@ -595,7 +596,7 @@ public class TileEntityMixer extends TileEntityFactorization implements
                 }
             }
         }
-        EntityPlayer fakePlayer = FzUtil.makePlayer(getCoord(), "Mixer");
+        EntityPlayer fakePlayer = PlayerUtil.makePlayer(getCoord(), "Mixer");
         IInventory craftResult = new InventoryCraftResult();
         ItemStack out = mr.output.copy();
         if (out.stackSize < 1) {
@@ -605,15 +606,15 @@ public class TileEntityMixer extends TileEntityFactorization implements
         SlotCrafting slot = new SlotCrafting(fakePlayer, craft, craftResult, 0, 0, 0);
         slot.onPickupFromSlot(fakePlayer, out);
         outputBuffer.add(out);
-        FzUtil.addInventoryToArray(craft, outputBuffer);
-        FzUtil.addInventoryToArray(fakePlayer.inventory, outputBuffer);
+        CraftUtil.addInventoryToArray(craft, outputBuffer);
+        CraftUtil.addInventoryToArray(fakePlayer.inventory, outputBuffer);
         markDirty();
     }
     
     boolean dumpBuffer() {
         if (outputBuffer.size() > 0) {
             ItemStack toAdd = outputBuffer.get(0);
-            FzInv out = FzUtil.openInventory(this, ForgeDirection.DOWN);
+            FzInv out = InvUtil.openInventory(this, ForgeDirection.DOWN);
             out.setInsertForce(true);
             Iterator<ItemStack> it = outputBuffer.iterator();
             while (it.hasNext()) {
@@ -666,7 +667,7 @@ public class TileEntityMixer extends TileEntityFactorization implements
 
     void normalize(ItemStack is[]) {
         for (int i = 0; i < is.length; i++) {
-            is[i] = FzUtil.normalize(is[i]);
+            is[i] = ItemUtil.normalize(is[i]);
         }
     }
 

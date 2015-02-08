@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 
+import factorization.util.ItemUtil;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.event.entity.living.LivingDropsEvent;
@@ -30,7 +31,7 @@ public enum DropCaptureHandler {
     
     void removeInvalids(Collection<ItemStack> drops) {
         for (Iterator<ItemStack> it = drops.iterator(); it.hasNext();) {
-            if (FzUtil.normalize(it.next()) == null) {
+            if (ItemUtil.normalize(it.next()) == null) {
                 it.remove();
             }
         }
@@ -58,7 +59,7 @@ public enum DropCaptureHandler {
         if (catcher.captureDrops((int)event.entity.posX, (int)event.entity.posY, (int)event.entity.posZ, drops)) {
             for (Iterator<EntityItem> it = event.drops.iterator(); it.hasNext();) {
                 EntityItem ent = it.next();
-                if (ent == null || FzUtil.normalize(ent.getEntityItem()) == null) {
+                if (ent == null || ItemUtil.normalize(ent.getEntityItem()) == null) {
                     it.remove();
                 }
             }

@@ -1,5 +1,6 @@
 package factorization.coremodhooks;
 
+import factorization.util.SpaceUtil;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
@@ -14,7 +15,6 @@ import factorization.common.Command;
 import factorization.common.FactorizationKeyHandler;
 import factorization.common.FzConfig;
 import factorization.docs.DocumentationModule;
-import factorization.shared.FzUtil;
 
 public class HookTargetsClient {
     public static void keyTyped(char chr, int keysym) {
@@ -49,7 +49,7 @@ public class HookTargetsClient {
     }
     
     public static MovingObjectPosition boxTrace(World world, Vec3 traceStart, Vec3 traceEnd) {
-        MovingObjectPosition ret = world.rayTraceBlocks(FzUtil.copy(traceStart), FzUtil.copy(traceEnd));
+        MovingObjectPosition ret = world.rayTraceBlocks(SpaceUtil.copy(traceStart), SpaceUtil.copy(traceEnd));
         if (!hasColliders(world, traceStart) && !hasColliders(world, traceEnd)) return ret;
         
         Entity box = new Entity(world) {

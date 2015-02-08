@@ -1,5 +1,9 @@
 package factorization.servo;
 
+import factorization.shared.*;
+import factorization.util.DataUtil;
+import factorization.util.InvUtil;
+import factorization.util.ItemUtil;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufInputStream;
 import io.netty.buffer.ByteBufOutputStream;
@@ -45,13 +49,8 @@ import factorization.api.datahelpers.DataOutNBT;
 import factorization.api.datahelpers.DataOutPacket;
 import factorization.api.datahelpers.Share;
 import factorization.common.FactoryType;
-import factorization.shared.Core;
-import factorization.shared.FzNetDispatch;
-import factorization.shared.FzUtil;
-import factorization.shared.FzUtil.FzInv;
+import factorization.util.InvUtil.FzInv;
 import factorization.shared.NetworkFactorization.MessageType;
-import factorization.shared.Sound;
-import factorization.shared.TileEntityCommon;
 import factorization.sockets.GuiDataConfig;
 import factorization.sockets.ISocketHolder;
 import factorization.sockets.SocketEmpty;
@@ -212,7 +211,7 @@ public class ServoMotor extends Entity implements IEntityAdditionalSpawnData, IE
                 if (index < 0) {
                     break;
                 }
-                inv[index] = FzUtil.readStack(input);
+                inv[index] = DataUtil.readStack(input);
             }
             return true;
         case servo_brief:
@@ -402,7 +401,7 @@ public class ServoMotor extends Entity implements IEntityAdditionalSpawnData, IE
     public boolean interactFirst(EntityPlayer player) {
         if (worldObj.isRemote) return true;
         executioner.stacks_changed = true;
-        ItemStack is = FzUtil.normalize(player.getHeldItem());
+        ItemStack is = ItemUtil.normalize(player.getHeldItem());
         if (is == null) {
             return false;
         }
@@ -427,14 +426,14 @@ public class ServoMotor extends Entity implements IEntityAdditionalSpawnData, IE
         }
         if (socket == null) return false;
         if (socket.activateOnServo(player, this)) return false;
-        if (FzUtil.identical(socket.getCreatingItem(), is)) return false;
+        if (ItemUtil.identical(socket.getCreatingItem(), is)) return false;
         for (FactoryType ft : FactoryType.values()) {
             TileEntityCommon tec = ft.getRepresentative();
             if (tec == null) continue;
             if (!(tec instanceof TileEntitySocketBase)) continue;
             TileEntitySocketBase rep = (TileEntitySocketBase) tec;
             ItemStack creator = rep.getCreatingItem();
-            if (creator != null && FzUtil.couldMerge(is, creator)) {
+            if (creator != null && ItemUtil.couldMerge(is, creator)) {
                 if (rep.getParentFactoryType() != socket.getFactoryType()) {
                     rep.mentionPrereq(this, player);
                     return false;
@@ -455,7 +454,7 @@ public class ServoMotor extends Entity implements IEntityAdditionalSpawnData, IE
                 motionHandler.color = newColor;
                 markDirty();
                 if (!player.capabilities.isCreativeMode) {
-                    player.setCurrentItemOrArmor(0, FzUtil.normalDecr(is));
+                    player.setCurrentItemOrArmor(0, ItemUtil.normalDecr(is));
                 }
                 return true;
             }
@@ -508,7 +507,7 @@ public class ServoMotor extends Entity implements IEntityAdditionalSpawnData, IE
     
     public void dropItemStacks(Iterable<ItemStack> toDrop) {
         for (ItemStack is : toDrop) {
-            FzUtil.spawnItemStack(this, is);
+            InvUtil.spawnItemStack(this, is);
         }
     }
 
@@ -581,7 +580,7 @@ public class ServoMotor extends Entity implements IEntityAdditionalSpawnData, IE
     @Override
     public ItemStack decrStackSize(int i, int j) {
         ItemStack ret = inv[i].splitStack(j);
-        inv[i] = FzUtil.normalize(inv[i]);
+        inv[i] = ItemUtil.normalize(inv[i]);
         return ret;
     }
 
@@ -616,7 +615,7 @@ public class ServoMotor extends Entity implements IEntityAdditionalSpawnData, IE
     public void markDirty() {
         ArrayList<Object> toSend = new ArrayList(inv.length*2);
         for (byte i = 0; i < inv.length; i++) {
-            if (FzUtil.identical(inv[i], inv_last_sent[i])) {
+            if (ItemUtil.identical(inv[i], inv_last_sent[i])) {
                 continue;
             }
             toSend.add(i);
@@ -703,7 +702,7 @@ public class ServoMotor extends Entity implements IEntityAdditionalSpawnData, IE
         if (buffer.isEmpty()) {
             return false;
         }
-        FzInv me = FzUtil.openInventory(this, false);
+        FzInv me = InvUtil.openInventory(this, false);
         ItemStack got = buffer.get(0);
         if (got == null) {
             buffer.remove(0);

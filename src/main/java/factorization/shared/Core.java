@@ -12,6 +12,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import factorization.util.DataUtil;
+import factorization.util.FzUtil;
 import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.texture.IIconRegister;
@@ -58,7 +60,6 @@ import factorization.charge.TileEntitySolarBoiler;
 import factorization.colossi.BuildColossusCommand;
 import factorization.colossi.ColossusController;
 import factorization.colossi.ColossusFeature;
-import factorization.colossi.MaskLoader;
 import factorization.common.FactorizationProxy;
 import factorization.common.FactoryType;
 import factorization.common.FzConfig;
@@ -290,7 +291,7 @@ public class Core {
             if (missed.type == Type.BLOCK) {
                 missed.remap(value);
             } else if (missed.type == Type.ITEM) {
-                Item it = FzUtil.getItem(value);
+                Item it = DataUtil.getItem(value);
                 if (it != null) {
                     missed.remap(it);
                 }

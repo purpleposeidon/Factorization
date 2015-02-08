@@ -1,6 +1,6 @@
 package factorization.notify;
 
-import factorization.shared.FzUtil;
+import factorization.util.DataUtil;
 import io.netty.buffer.ByteBufInputStream;
 import io.netty.buffer.Unpooled;
 
@@ -101,7 +101,7 @@ public class NotifyNetwork {
             return;
         }
         
-        ItemStack item = FzUtil.readStack(input);
+        ItemStack item = DataUtil.readStack(input);
         if (item != null && EMPTY_ITEMSTACK.isItemEqual(item)) {
             item = null;
         }

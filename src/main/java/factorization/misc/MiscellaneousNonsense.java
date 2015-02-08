@@ -6,6 +6,7 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 
+import factorization.util.PlayerUtil;
 import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.EntityLeashKnot;
@@ -50,7 +51,6 @@ import cpw.mods.fml.relauncher.Side;
 import factorization.api.Coord;
 import factorization.common.FzConfig;
 import factorization.shared.Core;
-import factorization.shared.FzUtil;
 
 @Mod(modid = MiscellaneousNonsense.modId, name = MiscellaneousNonsense.name, version = Core.version, dependencies = "required-after: " + Core.modId)
 public class MiscellaneousNonsense {
@@ -231,7 +231,7 @@ public class MiscellaneousNonsense {
         {
             // Give the first achievement, because it is stupid and nobody cares.
             // If you're using this mod, you've probably opened your inventory before anyways.
-            StatisticsFile sfw = FzUtil.getStatsFile(event.player);
+            StatisticsFile sfw = PlayerUtil.getStatsFile(event.player);
             if (sfw != null && !sfw.hasAchievementUnlocked(AchievementList.openInventory) && FMLCommonHandler.instance().getSide() == Side.CLIENT) {
                 sfw.func_150873_a(event.player, AchievementList.openInventory, -1);
                 sfw.func_150873_a(event.player, AchievementList.openInventory, 300); // Literally, hundreds of times. :D

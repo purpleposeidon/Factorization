@@ -1,12 +1,12 @@
 package factorization.shared;
 
+import factorization.util.DataUtil;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufOutputStream;
 import io.netty.buffer.Unpooled;
 
 import java.io.ByteArrayOutputStream;
 import java.io.DataInput;
-import java.io.DataInputStream;
 import java.io.DataOutput;
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -402,7 +402,7 @@ public class NetworkFactorization {
     
     public static ItemStack denullItem(ItemStack is) {
         if (is == null) return null;
-        if (FzUtil.getId(is) == FzUtil.getId(Blocks.air)) return null;
+        if (DataUtil.getId(is) == DataUtil.getId(Blocks.air)) return null;
         return is;
     }
 }

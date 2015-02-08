@@ -17,7 +17,7 @@ import cpw.mods.fml.common.eventhandler.EventPriority;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import factorization.common.FzConfig;
 import factorization.shared.Core;
-import factorization.shared.FzUtil;
+import factorization.util.FzUtil;
 import factorization.weird.NeptuneCape;
 
 public class MiscClientProxy extends MiscProxy {

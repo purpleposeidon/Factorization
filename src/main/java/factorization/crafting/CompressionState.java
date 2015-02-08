@@ -6,6 +6,10 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 
+import factorization.shared.*;
+import factorization.util.CraftUtil;
+import factorization.util.InvUtil;
+import factorization.util.ItemUtil;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -13,9 +17,7 @@ import net.minecraftforge.common.util.ForgeDirection;
 import factorization.api.Coord;
 import factorization.notify.Notice;
 import factorization.notify.Style;
-import factorization.shared.Core;
-import factorization.shared.FzUtil;
-import factorization.shared.FzUtil.FzInv;
+import factorization.util.InvUtil.FzInv;
 import factorization.shared.NetworkFactorization.MessageType;
 import factorization.weird.TileEntityDayBarrel;
 
@@ -300,7 +302,7 @@ public class CompressionState {
             items[BREAK] = cell.getBrokenBlock();
             if (items[BREAK] != null) {
                 ItemStack b = items[BREAK];
-                List<ItemStack> craftRes = FzUtil.craft1x1(null, true, b);
+                List<ItemStack> craftRes = CraftUtil.craft1x1(null, true, b);
                 if (craftRes != null && craftRes.size() == 1) {
                     items[SMACKED] = craftRes.get(0);
                 }
@@ -327,10 +329,10 @@ public class CompressionState {
                 cell.getTE(TileEntityDayBarrel.class).changeItemCount(-amount);
                 break;
             case SMACKED:
-                List<ItemStack> craftRes = FzUtil.craft1x1(null, true, items[BREAK]);
+                List<ItemStack> craftRes = CraftUtil.craft1x1(null, true, items[BREAK]);
                 for (Iterator<ItemStack> it = craftRes.iterator(); it.hasNext();) {
                     ItemStack is = it.next();
-                    if (FzUtil.couldMerge(is, leftOvers)) {
+                    if (ItemUtil.couldMerge(is, leftOvers)) {
                         is.stackSize = leftOvers.stackSize;
                         if (is.stackSize <= 0) {
                             it.remove();
@@ -342,7 +344,7 @@ public class CompressionState {
                 return craftRes;
             }
             List<ItemStack> ret = new ArrayList(1);
-            leftOvers = FzUtil.normalize(leftOvers);
+            leftOvers = ItemUtil.normalize(leftOvers);
             if (leftOvers != null) {
                 ret.add(leftOvers);
             }
@@ -360,7 +362,7 @@ public class CompressionState {
         }
 
         public void updateBarrelExtraction(int maxCraft) {
-            if (FzUtil.getStackSize(items[BARREL]) > maxCraft) {
+            if (ItemUtil.getStackSize(items[BARREL]) > maxCraft) {
                 items[BARREL].stackSize = Math.min(items[BARREL].stackSize, maxCraft);
             }
         }
@@ -507,8 +509,8 @@ public class CompressionState {
                 continue iteratePermutations;
             }
             
-            FzUtil.craft3x3(root, true, true, craftingGrid);
-            if (!FzUtil.craft_succeeded) {
+            CraftUtil.craft3x3(root, true, true, craftingGrid);
+            if (!CraftUtil.craft_succeeded) {
                 continue iteratePermutations;
             }
             
@@ -524,8 +526,8 @@ public class CompressionState {
                         ci.updateBarrelExtraction(maxCraft);
                     }
                 }
-                List<ItemStack> result = FzUtil.craft3x3(root, fake, !fake && craftCount != maxCraft - 1, craftingGrid);
-                if (!FzUtil.craft_succeeded) {
+                List<ItemStack> result = CraftUtil.craft3x3(root, fake, !fake && craftCount != maxCraft - 1, craftingGrid);
+                if (!CraftUtil.craft_succeeded) {
                     if (craftCount == 0) {
                         continue iteratePermutations; //This won't usually happen except for very strange recipes
                     } else {
@@ -555,7 +557,7 @@ public class CompressionState {
                     ci.consume(ci.getBestMode(mode), items_used);
                 }
             }
-            FzUtil.collapseItemList(total);
+            InvUtil.collapseItemList(total);
             start.buffer = total;
             return true;
         }

@@ -2,14 +2,13 @@ package factorization.servo;
 
 import java.util.Iterator;
 
+import factorization.shared.*;
+import factorization.util.NumUtil;
 import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
-import net.minecraft.client.model.ModelBiped;
-import net.minecraft.client.model.ModelZombie;
 import net.minecraft.client.renderer.RenderBlocks;
 import net.minecraft.client.renderer.Tessellator;
-import net.minecraft.client.renderer.entity.RenderBiped;
 import net.minecraft.client.renderer.entity.RenderEntity;
 import net.minecraft.client.renderer.entity.RenderItem;
 import net.minecraft.client.renderer.entity.RenderManager;
@@ -32,12 +31,7 @@ import org.lwjgl.opengl.GL12;
 import factorization.api.FzColor;
 import factorization.api.FzOrientation;
 import factorization.api.Quaternion;
-import factorization.charge.BlockRenderHeater;
 import factorization.common.BlockIcons;
-import factorization.shared.BlockRenderHelper;
-import factorization.shared.Core;
-import factorization.shared.FzUtil;
-import factorization.shared.ObjectModel;
 import factorization.sockets.TileEntitySocketBase;
 
 public class RenderServoMotor extends RenderEntity {
@@ -254,7 +248,7 @@ public class RenderServoMotor extends RenderEntity {
         double radius = 0.56 /* from sprocket center to the outer edge of the ring (excluding the teeth) */
                     + 0.06305 /* half the width of the teeth */;
         double constant = Math.PI * 2 * (radius);
-        double partial_rotation = FzUtil.interp((float) motor.motionHandler.prev_sprocket_rotation, (float) motor.motionHandler.sprocket_rotation, partial);
+        double partial_rotation = NumUtil.interp((float) motor.motionHandler.prev_sprocket_rotation, (float) motor.motionHandler.sprocket_rotation, partial);
         final double angle = constant * partial_rotation;
 
         radius = 0.25 - 1.0 / 48.0;

@@ -9,6 +9,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import factorization.util.NumUtil;
+import factorization.util.RenderUtil;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.client.Minecraft;
@@ -49,7 +51,6 @@ import factorization.common.FzConfig;
 import factorization.fzds.interfaces.DeltaCapability;
 import factorization.fzds.interfaces.IFzdsShenanigans;
 import factorization.shared.Core;
-import factorization.shared.FzUtil;
 
 
 public class RenderDimensionSliceEntity extends Render implements IFzdsShenanigans {
@@ -120,7 +121,7 @@ public class RenderDimensionSliceEntity extends Render implements IFzdsShenaniga
             
             renderers = new WorldRenderer[cubicChunkCount];
             int i = 0;
-            FzUtil.checkGLError("FZDS before render");
+            RenderUtil.checkGLError("FZDS before render");
             int DC = 16;
             for (int y = corner.y; y <= far.y; y += DC) {
                 for (int x = corner.x; x <= far.x; x += DC) {
@@ -133,7 +134,7 @@ public class RenderDimensionSliceEntity extends Render implements IFzdsShenaniga
                         renderers[i].posYClip = y - corner.y;
                         renderers[i].posZClip = z - corner.z;
                         renderers[i].markDirty();
-                        FzUtil.checkGLError("FZDS WorldRenderer init");
+                        RenderUtil.checkGLError("FZDS WorldRenderer init");
                         i++;
                     }
                 }
@@ -165,7 +166,7 @@ public class RenderDimensionSliceEntity extends Render implements IFzdsShenaniga
             } // NORELEASE: Can we queue the renderchunks up to something in 1.8?
             boolean start_from_begining = last_update_index == 0;
             Core.profileStart("updateFzdsTerrain");
-            FzUtil.checkGLError("FZDS before WorldRender update");
+            RenderUtil.checkGLError("FZDS before WorldRender update");
             final int update_limit = 20; //NORELEASE?
             int updates = 0;
             while (last_update_index < renderers.length) {
@@ -337,9 +338,9 @@ public class RenderDimensionSliceEntity extends Render implements IFzdsShenaniga
             GL11.glAlphaFunc(GL11.GL_GREATER, 0.1F);
             GL11.glEnable(GL11.GL_ALPHA_TEST);
             tess.startDrawingQuads();
-            double dx = FzUtil.interp(player.prevPosX, player.posX, partial);
-            double dy = FzUtil.interp(player.prevPosY, player.posY, partial);
-            double dz = FzUtil.interp(player.prevPosZ, player.posZ, partial);
+            double dx = NumUtil.interp(player.prevPosX, player.posX, partial);
+            double dy = NumUtil.interp(player.prevPosY, player.posY, partial);
+            double dz = NumUtil.interp(player.prevPosZ, player.posZ, partial);
             tess.setTranslation(-dx, -dy, -dz);
             tess.disableColor();
         }
@@ -384,9 +385,9 @@ public class RenderDimensionSliceEntity extends Render implements IFzdsShenaniga
         renderInfo.anyRenderersDirty = true;
         for (int i = 0; i < renderInfo.renderers.length; i++) {
             WorldRenderer wr = renderInfo.renderers[i];
-            if (FzUtil.intersect(lx, hx, wr.posX, wr.posX + 16) &&
-                    FzUtil.intersect(ly, hy, wr.posY, wr.posY + 16) && 
-                    FzUtil.intersect(lz, hz, wr.posZ, wr.posZ + 16)) {
+            if (NumUtil.intersect(lx, hx, wr.posX, wr.posX + 16) &&
+                    NumUtil.intersect(ly, hy, wr.posY, wr.posY + 16) &&
+                    NumUtil.intersect(lz, hz, wr.posZ, wr.posZ + 16)) {
                 wr.markDirty();
             }
         }
@@ -413,7 +414,7 @@ public class RenderDimensionSliceEntity extends Render implements IFzdsShenaniga
                 AabbDebugger.addBox(dse.realArea);
             }
             Core.profileStart("fzds");
-            FzUtil.checkGLError("FZDS before render -- somebody left us a mess!");
+            RenderUtil.checkGLError("FZDS before render -- somebody left us a mess!");
             renderInfo.lastRenderInMegaticks = megatickCount;
         } else if (nest == 1) {
             Core.profileStart("recursion");
@@ -463,7 +464,7 @@ public class RenderDimensionSliceEntity extends Render implements IFzdsShenaniga
                 Core.profileStart("renderTerrain");
                 renderInfo.renderTerrain();
                 Core.profileEnd();
-                FzUtil.checkGLError("FZDS terrain display list render");
+                RenderUtil.checkGLError("FZDS terrain display list render");
                 GL11.glTranslated(dse.posX - x, dse.posY - y, dse.posZ - z);
                 Coord c = dse.getCorner();
                 GL11.glTranslated(-c.x, -c.y, -c.z);
@@ -485,7 +486,7 @@ public class RenderDimensionSliceEntity extends Render implements IFzdsShenaniga
                 } else {
                     renderInfo.renderEntities(partialTicks);
                 }
-                FzUtil.checkGLError("FZDS entity render");
+                RenderUtil.checkGLError("FZDS entity render");
             } finally {
                 if (dse.opacity != 1) {
                     GL11.glColor4f(1, 1, 1, 1);
@@ -499,7 +500,7 @@ public class RenderDimensionSliceEntity extends Render implements IFzdsShenaniga
         finally {
             nest--;
             if (nest == 0) {
-                FzUtil.checkGLError("FZDS after render");
+                RenderUtil.checkGLError("FZDS after render");
                 Core.profileEnd();
             } else if (nest == 1) {
                 Core.profileEnd();

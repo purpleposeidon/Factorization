@@ -2,6 +2,9 @@ package factorization.sockets;
 
 import java.io.IOException;
 
+import factorization.shared.*;
+import factorization.util.InvUtil;
+import factorization.util.ItemUtil;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
@@ -24,10 +27,7 @@ import factorization.common.FactoryType;
 import factorization.notify.Notice;
 import factorization.servo.RenderServoMotor;
 import factorization.servo.ServoMotor;
-import factorization.shared.BlockRenderHelper;
-import factorization.shared.Core;
-import factorization.shared.FzUtil;
-import factorization.shared.FzUtil.FzInv;
+import factorization.util.InvUtil.FzInv;
 
 public class SocketShifter extends TileEntitySocketBase {
     public static enum ShifterMode {
@@ -124,17 +124,17 @@ public class SocketShifter extends TileEntitySocketBase {
         ForgeDirection back = facing.getOpposite();
         if (socket != this) {
             // meaning we're on a Servo
-            localInv = FzUtil.openInventory((IInventory) socket, facing);
+            localInv = InvUtil.openInventory((IInventory) socket, facing);
         } else {
             coord.adjust(back);
-            localInv = FzUtil.openInventory(coord.getTE(IInventory.class), facing);
+            localInv = InvUtil.openInventory(coord.getTE(IInventory.class), facing);
             coord.adjust(facing);
         }
         if (localInv == null) {
             return;
         }
         coord.adjust(facing);
-        foreignInv = FzUtil.openInventory(coord.getTE(IInventory.class), back);
+        foreignInv = InvUtil.openInventory(coord.getTE(IInventory.class), back);
         coord.adjust(back);
         if (foreignInv == null) {
             final ForgeDirection top = facing;
@@ -143,7 +143,7 @@ public class SocketShifter extends TileEntitySocketBase {
                 if (!(entity instanceof IInventory)) {
                     continue;
                 }
-                foreignInv = FzUtil.openInventory(entity, false);
+                foreignInv = InvUtil.openInventory(entity, false);
                 if (foreignInv != null) {
                     break;
                 }
@@ -244,7 +244,7 @@ public class SocketShifter extends TileEntitySocketBase {
                 had_change = true;
                 int limit = transferLimit;
                 for (int i = pull; i <= pullEnd; i++) {
-                    if (!FzUtil.couldMerge(is, pullInv.get(i))) {
+                    if (!ItemUtil.couldMerge(is, pullInv.get(i))) {
                         continue;
                     }
                     while (limit > 0) {
@@ -303,7 +303,7 @@ public class SocketShifter extends TileEntitySocketBase {
                 visitedSlots[i] = true;
                 continue;
             }
-            if (FzUtil.couldMerge(seed, is)) {
+            if (ItemUtil.couldMerge(seed, is)) {
                 visitedSlots[i] = true;
                 if (!inv.canExtract(i, is)) {
                     continue;
@@ -322,7 +322,7 @@ public class SocketShifter extends TileEntitySocketBase {
         ForgeDirection fd = motor.getOrientation().top;
         final ForgeDirection fdOp = fd.getOpposite();
         at.adjust(fd);
-        FzInv target = FzUtil.openInventory(at.getTE(IInventory.class), fdOp);
+        FzInv target = InvUtil.openInventory(at.getTE(IInventory.class), fdOp);
         at.adjust(fdOp);
         if (target == null) {
             motor.getArgStack().push(-1);
@@ -330,7 +330,7 @@ public class SocketShifter extends TileEntitySocketBase {
             //motor.putError("Not pointing at an inventory!");
             return;
         }
-        FzInv backInv = FzUtil.openInventory(motor, false);
+        FzInv backInv = InvUtil.openInventory(motor, false);
         
         int targetStart, targetEnd;
         if (foreignSlot == -1) {
@@ -350,7 +350,7 @@ public class SocketShifter extends TileEntitySocketBase {
             ItemStack is = backInv.get(backIndex);
             for (int i = targetStart; i < targetEnd; i++) {
                 ItemStack it = target.get(i);
-                if (it != null && FzUtil.couldMerge(is, it)) {
+                if (it != null && ItemUtil.couldMerge(is, it)) {
                     if (target.canInsert(i, it) || target.canExtract(i, it)) {
                         count += it.stackSize;
                     }

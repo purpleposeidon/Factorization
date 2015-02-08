@@ -2,9 +2,11 @@ package factorization.sockets;
 
 import java.io.IOException;
 
+import factorization.shared.*;
+import factorization.util.InvUtil;
+import factorization.util.ItemUtil;
 import net.minecraft.block.Block;
 import net.minecraft.client.renderer.Tessellator;
-import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -28,10 +30,7 @@ import factorization.common.BlockIcons;
 import factorization.common.FactoryType;
 import factorization.servo.RenderServoMotor;
 import factorization.servo.ServoMotor;
-import factorization.shared.BlockRenderHelper;
-import factorization.shared.Core;
-import factorization.shared.FzUtil;
-import factorization.shared.FzUtil.FzInv;
+import factorization.util.InvUtil.FzInv;
 
 public class SocketRobotHand extends TileEntitySocketBase {
     boolean wasPowered = false;
@@ -98,7 +97,7 @@ public class SocketRobotHand extends TileEntitySocketBase {
             fakePlayer = getFakePlayer();
         }
         EntityPlayer player = fakePlayer;
-        FzInv inv = FzUtil.openInventory(getBackingInventory(socket), facing);
+        FzInv inv = InvUtil.openInventory(getBackingInventory(socket), facing);
         if (inv == null) {
             return clickWithoutInventory(player, mop);
         }
@@ -128,7 +127,7 @@ public class SocketRobotHand extends TileEntitySocketBase {
         ItemStack orig = is == null ? null : is.copy();
         boolean result = clickItem(player, is, mop);
         firstTry = false;
-        int newSize = FzUtil.getStackSize(is);
+        int newSize = ItemUtil.getStackSize(is);
         is = player.inventory.mainInventory[0];
         // Easiest case: the item is all used up.
         // Worst case: barrel of magic jumping beans that change color.
@@ -136,7 +135,7 @@ public class SocketRobotHand extends TileEntitySocketBase {
         // To handle: extract the entire stack. It is lost. Attempt to stuff the rest of the inv back in.
         // Anything that can't be stuffed gets dropped on the ground.
         // This could break with funky items/inventories tho.
-        if (newSize <= 0 || !FzUtil.couldMerge(orig, is)) {
+        if (newSize <= 0 || !ItemUtil.couldMerge(orig, is)) {
             inv.set(i, null); //Bye-bye!
             if (newSize > 0) {
                 is = inv.pushInto(i, is);
@@ -186,7 +185,7 @@ public class SocketRobotHand extends TileEntitySocketBase {
         final float dy = (float)hitVec.yCoord - (float)y;
         final float dz = (float)hitVec.zCoord - (float)z;
         final Item item = itemstack == null ? null : itemstack.getItem();
-        final long origItemHash = FzUtil.getItemHash(itemstack);
+        final long origItemHash = ItemUtil.getItemHash(itemstack);
         
         boolean ret = false;
         do {
@@ -197,7 +196,7 @@ public class SocketRobotHand extends TileEntitySocketBase {
                     ret = true;
                     break;
                 }
-                if (!FzUtil.identical(itemstack, orig)) {
+                if (!ItemUtil.identical(itemstack, orig)) {
                     ret = true;
                     break;
                 }
@@ -221,13 +220,13 @@ public class SocketRobotHand extends TileEntitySocketBase {
         if (itemstack == null) {
             return ret;
         }
-        int origSize = FzUtil.getStackSize(itemstack);
+        int origSize = ItemUtil.getStackSize(itemstack);
         ItemStack mutatedItem = itemstack.useItemRightClick(world, player);
         ret = ret
                 | mutatedItem != itemstack
-                | origSize != FzUtil.getStackSize(mutatedItem)
-                | !FzUtil.identical(mutatedItem, itemstack)
-                | origItemHash != FzUtil.getItemHash(mutatedItem);
+                | origSize != ItemUtil.getStackSize(mutatedItem)
+                | !ItemUtil.identical(mutatedItem, itemstack)
+                | origItemHash != ItemUtil.getItemHash(mutatedItem);
         player.inventory.mainInventory[player.inventory.currentItem] = mutatedItem;
         return ret;
     }

@@ -3,6 +3,8 @@ package factorization.sockets.fanturpeller;
 import java.io.IOException;
 import java.util.ArrayList;
 
+import factorization.util.InvUtil;
+import factorization.util.NumUtil;
 import net.minecraft.command.IEntitySelector;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLiving;
@@ -34,8 +36,7 @@ import factorization.common.FzConfig;
 import factorization.notify.Notice;
 import factorization.servo.RenderServoMotor;
 import factorization.servo.ServoMotor;
-import factorization.shared.FzUtil;
-import factorization.shared.FzUtil.FzInv;
+import factorization.util.InvUtil.FzInv;
 import factorization.sockets.ISocketHolder;
 
 public class BlowEntities extends SocketFanturpeller implements IEntitySelector {
@@ -273,10 +274,10 @@ public class BlowEntities extends SocketFanturpeller implements IEntitySelector 
         FzInv back = null;
         if (socket == this) {
             coord.adjust(facing.getOpposite());
-            back = FzUtil.openInventory(coord.getTE(IInventory.class), facing);
+            back = InvUtil.openInventory(coord.getTE(IInventory.class), facing);
             coord.adjust(facing);
         } else {
-            back = FzUtil.openInventory((Entity) socket, false);
+            back = InvUtil.openInventory((Entity) socket, false);
         }
         if (back == null) {
             return;
@@ -297,7 +298,7 @@ public class BlowEntities extends SocketFanturpeller implements IEntitySelector 
         super.onRemove();
         Coord here = getCoord();
         for (ItemStack item : buffer) {
-            FzUtil.spawnItemStack(here, item);
+            InvUtil.spawnItemStack(here, item);
         }
     }
     
@@ -312,7 +313,7 @@ public class BlowEntities extends SocketFanturpeller implements IEntitySelector 
     
     @Override
     public void click(EntityPlayer entityplayer) {
-        FzUtil.emptyBuffer(entityplayer, buffer, this);
+        InvUtil.emptyBuffer(entityplayer, buffer, this);
     }
     
     @Override
@@ -326,7 +327,7 @@ public class BlowEntities extends SocketFanturpeller implements IEntitySelector 
     public void renderItemOnServo(RenderServoMotor render, ServoMotor motor, ItemStack is, float partial) {
         GL11.glPushMatrix();
         GL11.glTranslatef(0, 5F/16F, 0);
-        float turn = scaleRotation(FzUtil.interp(prevFanRotation, fanRotation, partial));
+        float turn = scaleRotation(NumUtil.interp(prevFanRotation, fanRotation, partial));
         GL11.glRotatef(-turn, 0, 1, 0);
         float s = 9F/16F;
         GL11.glScalef(s, s, s);

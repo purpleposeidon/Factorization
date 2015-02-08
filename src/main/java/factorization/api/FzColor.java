@@ -1,12 +1,12 @@
 package factorization.api;
 
+import factorization.util.ItemUtil;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockCarpet;
 import net.minecraft.block.BlockColored;
 import net.minecraft.block.BlockStainedGlass;
 import net.minecraft.block.BlockStainedGlassPane;
 import net.minecraft.item.ItemStack;
-import factorization.shared.FzUtil;
 
 public enum FzColor {
     NO_COLOR(null, 0xFFFFFF),
@@ -106,7 +106,7 @@ public enum FzColor {
     public static FzColor fromItem(ItemStack is) {
         if (is == null) return NO_COLOR;
         for (FzColor color : VALID_COLORS) {
-            if (FzUtil.oreDictionarySimilar(color.dyeName, is)) {
+            if (ItemUtil.oreDictionarySimilar(color.dyeName, is)) {
                 return color;
             }
         }

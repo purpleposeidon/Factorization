@@ -3,6 +3,7 @@ package factorization.servo;
 import java.io.IOException;
 import java.util.ArrayList;
 
+import factorization.util.SpaceUtil;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraftforge.common.util.ForgeDirection;
 import factorization.api.Coord;
@@ -11,7 +12,6 @@ import factorization.api.FzOrientation;
 import factorization.api.datahelpers.DataHelper;
 import factorization.api.datahelpers.Share;
 import factorization.shared.Core;
-import factorization.shared.FzUtil;
 
 public class MotionHandler {
     public final ServoMotor motor;
@@ -187,7 +187,7 @@ public class MotionHandler {
     }
 
     boolean pickNextOrientation_impl() {
-        ArrayList<ForgeDirection> dirs = FzUtil.getRandomDirections(motor.worldObj.rand);
+        ArrayList<ForgeDirection> dirs = SpaceUtil.getRandomDirections(motor.worldObj.rand);
         int available_nonbackwards_directions = 0;
         Coord look = pos_next.copy();
         int all_count = 0;

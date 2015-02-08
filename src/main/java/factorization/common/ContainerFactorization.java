@@ -3,6 +3,7 @@ package factorization.common;
 import java.util.ArrayList;
 import java.util.Arrays;
 
+import factorization.util.InvUtil;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.inventory.Container;
@@ -15,10 +16,8 @@ import net.minecraft.tileentity.TileEntityFurnace;
 import factorization.crafting.TileEntityMixer;
 import factorization.crafting.TileEntityStamper;
 import factorization.oreprocessing.TileEntityCrystallizer;
-import factorization.oreprocessing.TileEntityGrinder;
 import factorization.oreprocessing.TileEntitySlagFurnace;
 import factorization.servo.TileEntityParaSieve;
-import factorization.shared.FzUtil;
 import factorization.shared.TileEntityFactorization;
 
 public class ContainerFactorization extends Container {
@@ -183,16 +182,16 @@ public class ContainerFactorization extends Container {
         case SLAGFURNACE:
             if (i >= 4) {
                 if (TileEntityFurnace.getItemBurnTime(itemstack) > 0) {
-                    return FzUtil.transferSlotToSlots(player, slot, Arrays.asList((Slot) inventorySlots.get(1)));
+                    return InvUtil.transferSlotToSlots(player, slot, Arrays.asList((Slot) inventorySlots.get(1)));
                 } else {
-                    return FzUtil.transferSlotToSlots(player, slot, Arrays.asList((Slot) inventorySlots.get(0)));
+                    return InvUtil.transferSlotToSlots(player, slot, Arrays.asList((Slot) inventorySlots.get(0)));
                 }
             }
             break;
         case STAMPER:
         case PACKAGER:
             if (i >= 2) {
-                return FzUtil.transferSlotToSlots(player, slot, Arrays.asList((Slot) inventorySlots.get(0)));
+                return InvUtil.transferSlotToSlots(player, slot, Arrays.asList((Slot) inventorySlots.get(0)));
             }
             break;
         case MIXER:
@@ -201,7 +200,7 @@ public class ContainerFactorization extends Container {
                 for (int j = 0; j < 4; j++) {
                     av.add((Slot)inventorySlots.get(j));
                 }
-                return FzUtil.transferSlotToSlots(player, slot, av);
+                return InvUtil.transferSlotToSlots(player, slot, av);
             }
             break;
         case CRYSTALLIZER:
@@ -210,7 +209,7 @@ public class ContainerFactorization extends Container {
                 for (int j = 0; j < 6; j++) {
                     av.add((Slot)inventorySlots.get(j));
                 }
-                return FzUtil.transferSlotToSlots(player, slot, av);
+                return InvUtil.transferSlotToSlots(player, slot, av);
             }
             break;
         }

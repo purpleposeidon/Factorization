@@ -6,6 +6,10 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import factorization.shared.*;
+import factorization.util.DataUtil;
+import factorization.util.InvUtil;
+import factorization.util.SpaceUtil;
 import net.minecraft.block.Block;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.entity.Entity;
@@ -41,13 +45,7 @@ import factorization.common.FactoryType;
 import factorization.common.FzConfig;
 import factorization.common.ResourceType;
 import factorization.notify.Notice;
-import factorization.shared.BlockClass;
-import factorization.shared.BlockRenderHelper;
-import factorization.shared.Core;
-import factorization.shared.FzUtil;
 import factorization.shared.NetworkFactorization.MessageType;
-import factorization.shared.TileEntityCommon;
-import factorization.shared.TileEntityExtension;
 
 public class TileEntityGreenware extends TileEntityCommon {
     public static int MAX_PARTS = 32;
@@ -98,7 +96,7 @@ public class TileEntityGreenware extends TileEntityCommon {
             tag.setByte("hy", maxY);
             tag.setByte("hz", maxZ);
             //tag.setShort("icon_id", (short) FzUtil.getId(icon_id));
-            String iname = FzUtil.getName(icon_id);
+            String iname = DataUtil.getName(icon_id);
             if (iname != null) {
                 tag.setString("icon_idC", iname);
             }
@@ -114,7 +112,7 @@ public class TileEntityGreenware extends TileEntityCommon {
             out.add(maxX);
             out.add(maxY);
             out.add(maxZ);
-            out.add((short) FzUtil.getId(icon_id));
+            out.add((short) DataUtil.getId(icon_id));
             out.add(icon_md);
             out.add(icon_side);
             out.add(quat);
@@ -127,7 +125,7 @@ public class TileEntityGreenware extends TileEntityCommon {
             maxX = in.readByte();
             maxY = in.readByte();
             maxZ = in.readByte();
-            icon_id = FzUtil.getBlock(in.readShort());
+            icon_id = DataUtil.getBlock(in.readShort());
             icon_md = in.readByte();
             icon_side = in.readByte();
             quat = Quaternion.read(in);
@@ -142,9 +140,9 @@ public class TileEntityGreenware extends TileEntityCommon {
             maxY = tag.getByte("hy");
             maxZ = tag.getByte("hz");
             if (tag.hasKey("icon_id")) {
-                icon_id = FzUtil.getBlock(tag.getShort("icon_id"));
+                icon_id = DataUtil.getBlock(tag.getShort("icon_id"));
             } else {
-                icon_id = FzUtil.getBlockFromName(tag.getString("icon_idC"));
+                icon_id = DataUtil.getBlockFromName(tag.getString("icon_idC"));
             }
             icon_md = tag.getByte("icon_md");
             if (tag.hasKey("icon_sd")) {
@@ -265,7 +263,7 @@ public class TileEntityGreenware extends TileEntityCommon {
         case UNFIRED_GLAZED:
             return BlockIcons.error;
         case HIGHFIRED:
-            Item it = FzUtil.getItem(lump.icon_id);
+            Item it = DataUtil.getItem(lump.icon_id);
             if (it == null || lump.icon_id == Blocks.air) {
                 return BlockIcons.error;
             }
@@ -373,7 +371,7 @@ public class TileEntityGreenware extends TileEntityCommon {
         super.onPlacedBy(player, is, side);
         NBTTagCompound tag = is.getTagCompound();
         loadParts(tag);
-        ForgeDirection placement = ForgeDirection.getOrientation(FzUtil.determineFlatOrientation(player));
+        ForgeDirection placement = ForgeDirection.getOrientation(SpaceUtil.determineFlatOrientation(player));
         if (tag == null || !tag.hasKey("front")) {
             front = placement;
             setRotation((byte) 0);
@@ -427,7 +425,7 @@ public class TileEntityGreenware extends TileEntityCommon {
                         lump.asDefault();
                     } else {
                         it.remove();
-                        FzUtil.spawnItemStack(getCoord(), new ItemStack(Items.clay_ball));
+                        InvUtil.spawnItemStack(getCoord(), new ItemStack(Items.clay_ball));
                     }
                 }
             }
@@ -758,11 +756,11 @@ public class TileEntityGreenware extends TileEntityCommon {
         }
         shouldDestroy |= state != ClayState.WET;
         if (shouldDestroy) {
-            FzUtil.spawnItemStack(here, getItem());
+            InvUtil.spawnItemStack(here, getItem());
             here.setAir();
         } else {
             removeLump(hit.subHit);
-            FzUtil.spawnItemStack(here, new ItemStack(Items.clay_ball));
+            InvUtil.spawnItemStack(here, new ItemStack(Items.clay_ball));
         }
         return false;
     }
@@ -780,7 +778,7 @@ public class TileEntityGreenware extends TileEntityCommon {
         double dx = startVec.xCoord - endVec.xCoord;
         double dy = startVec.yCoord - endVec.yCoord;
         double dz = startVec.zCoord - endVec.zCoord;
-        double scale = 5.2; // Diagonal of a 3³. (Was initially using scale = 2)
+        double scale = 5.2; // Diagonal of a 3³. (Was initially using incrScale = 2)
         // This isn't quite right; the dVector would properly be normalized here
         // & rescaled to the max diameter. But we can survive without it.
         // Unnormalized length of dVector is 6m in surviavl mode IIRC. This'll

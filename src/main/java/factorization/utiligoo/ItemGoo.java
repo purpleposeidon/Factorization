@@ -8,6 +8,10 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Random;
 
+import factorization.shared.*;
+import factorization.util.DataUtil;
+import factorization.util.InvUtil;
+import factorization.util.ItemUtil;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockSlab;
 import net.minecraft.block.BlockStairs;
@@ -40,13 +44,8 @@ import factorization.common.Command;
 import factorization.common.ItemIcons;
 import factorization.coremodhooks.HandleAttackKeyEvent;
 import factorization.coremodhooks.HandleUseKeyEvent;
-import factorization.shared.Core;
 import factorization.shared.Core.TabType;
-import factorization.shared.DropCaptureHandler;
-import factorization.shared.FzUtil;
-import factorization.shared.FzUtil.FzInv;
-import factorization.shared.ICaptureDrops;
-import factorization.shared.ItemFactorization;
+import factorization.util.InvUtil.FzInv;
 import factorization.shared.NetworkFactorization.MessageType;
 
 public class ItemGoo extends ItemFactorization {
@@ -137,14 +136,14 @@ public class ItemGoo extends ItemFactorization {
                 int iy = data.coords[i + 1];
                 int iz = data.coords[i + 2];
                 if (ix == mop.blockX && iy == mop.blockY && iz == mop.blockZ) {
-                    final FzInv playerInv = FzUtil.openInventory(player, true);
+                    final FzInv playerInv = InvUtil.openInventory(player, true);
                     DropCaptureHandler.startCapture(new ICaptureDrops() {
                         @Override
                         public boolean captureDrops(int x, int y, int z, ArrayList<ItemStack> stacks) {
                             boolean any = false;
                             for (ItemStack is : stacks) {
-                                if (FzUtil.normalize(is) == null) continue;
-                                is.stackSize = FzUtil.getStackSize(playerInv.push(is.copy()));
+                                if (ItemUtil.normalize(is) == null) continue;
+                                is.stackSize = ItemUtil.getStackSize(playerInv.push(is.copy()));
                                 any = true;
                             }
                             return any;
@@ -213,7 +212,7 @@ public class ItemGoo extends ItemFactorization {
             replaceBlocks(gooItem, data, player.worldObj, player, mop, held);
             for (int i = 0; i < player.inventory.getSizeInventory(); i++) {
                 ItemStack is = player.inventory.getStackInSlot(i);
-                if (is != null && FzUtil.normalize(is) == null) {
+                if (is != null && ItemUtil.normalize(is) == null) {
                     player.inventory.setInventorySlotContents(i, null);
                 }
             }
@@ -228,7 +227,7 @@ public class ItemGoo extends ItemFactorization {
         if (a.getBlock() == b.getBlock()) return true;
         ItemStack ais = a.getBrokenBlock();
         if (ais == null) return false;
-        return FzUtil.identical(ais, b.getBrokenBlock());
+        return ItemUtil.identical(ais, b.getBrokenBlock());
     }
     
     private void expandSelection(ItemStack is, GooData data, EntityPlayer player, World world, int x, int y, int z, ForgeDirection dir) {
@@ -313,7 +312,7 @@ public class ItemGoo extends ItemFactorization {
     }
     
     private void replaceBlocks(ItemStack is, GooData data, World world, EntityPlayer player, MovingObjectPosition mop, ItemStack source) {
-        if (FzUtil.normalize(source) == null) return;
+        if (ItemUtil.normalize(source) == null) return;
         int removed = 0;
         Coord at = new Coord(world, 0, 0, 0);
         boolean creative = player.capabilities.isCreativeMode;
@@ -321,14 +320,14 @@ public class ItemGoo extends ItemFactorization {
         for (int i = 0; i < data.coords.length; i += 3) {
             if (source.stackSize <= 0) {
                 for (ItemStack replace : player.inventory.mainInventory) {
-                    if (source != replace && FzUtil.identical(source, replace)) {
-                        if (FzUtil.normalize(replace) != null) {
+                    if (source != replace && ItemUtil.identical(source, replace)) {
+                        if (ItemUtil.normalize(replace) != null) {
                             source = replace;
                             break;
                         }
                     }
                 }
-                if (FzUtil.normalize(source) == null) break;
+                if (ItemUtil.normalize(source) == null) break;
             }
             at.x = data.coords[i + 0];
             at.y = data.coords[i + 1];
@@ -415,7 +414,7 @@ public class ItemGoo extends ItemFactorization {
                     toRemove.add(i + 2);
                 }
             }
-            if (FzUtil.normalize(tool) == null) break;
+            if (ItemUtil.normalize(tool) == null) break;
         }
         if (removed == 0) return;
         data.removeIndices(toRemove, is, world);
@@ -449,7 +448,7 @@ public class ItemGoo extends ItemFactorization {
     
     @SideOnly(Side.CLIENT)
     public static void handlePacket(DataInput input) throws IOException {
-        NBTTagCompound dataTag = FzUtil.readTag(input);
+        NBTTagCompound dataTag = DataUtil.readTag(input);
         World world = Minecraft.getMinecraft().theWorld;
         GooData data = new GooData(dataTag.getString("mapname")); // NOTE: this resets data.last_traced_index to -1. We might have to reset it manually if networking gets more complicated.
         data.readFromNBT(dataTag);
@@ -617,7 +616,7 @@ public class ItemGoo extends ItemFactorization {
         MovingObjectPosition mop = getMovingObjectPositionFromPlayer(player.worldObj, player, false);
         if (mop == null) return;
         for (int slot = 0; slot < 9; slot++) {
-            ItemStack is = FzUtil.normalize(player.inventory.getStackInSlot(slot));
+            ItemStack is = ItemUtil.normalize(player.inventory.getStackInSlot(slot));
             if (is == null || is.getItem() != this) continue;
             GooData data = GooData.getNullGooData(is, player.worldObj);
             if (data == null) continue;

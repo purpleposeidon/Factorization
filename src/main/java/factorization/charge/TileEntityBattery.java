@@ -3,6 +3,8 @@ package factorization.charge;
 import java.io.DataInput;
 import java.io.IOException;
 
+import factorization.shared.*;
+import factorization.util.ItemUtil;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
@@ -12,10 +14,6 @@ import factorization.api.Charge;
 import factorization.api.IChargeConductor;
 import factorization.common.BlockIcons;
 import factorization.common.FactoryType;
-import factorization.shared.BlockClass;
-import factorization.shared.Core;
-import factorization.shared.FzUtil;
-import factorization.shared.TileEntityCommon;
 import factorization.shared.NetworkFactorization.MessageType;
 
 public class TileEntityBattery extends TileEntityCommon implements IChargeConductor {
@@ -131,7 +129,7 @@ public class TileEntityBattery extends TileEntityCommon implements IChargeConduc
     @Override
     public void onPlacedBy(EntityPlayer player, ItemStack is, int side) {
         super.onPlacedBy(player, is, side);
-        NBTTagCompound tag = FzUtil.getTag(is);
+        NBTTagCompound tag = ItemUtil.getTag(is);
         if (tag.hasKey("storage")) {
             storage = tag.getInteger("storage");
         } else {

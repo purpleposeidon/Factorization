@@ -2,10 +2,9 @@ package factorization.docs;
 
 import java.util.HashSet;
 
+import factorization.util.PlayerUtil;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
-import net.minecraft.init.Blocks;
-import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.stats.AchievementList;
 import net.minecraft.stats.StatBase;
@@ -13,15 +12,12 @@ import net.minecraft.stats.StatisticsFile;
 import net.minecraft.util.ChatComponentTranslation;
 import net.minecraft.world.WorldSettings;
 import net.minecraftforge.common.util.FakePlayer;
-import net.minecraftforge.common.util.ForgeDirection;
 import net.minecraftforge.event.world.BlockEvent;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import cpw.mods.fml.common.gameevent.PlayerEvent.PlayerLoggedInEvent;
 import factorization.api.Coord;
 import factorization.common.FzConfig;
 import factorization.shared.Core;
-import factorization.shared.FzUtil;
-import factorization.shared.FzUtil.FzInv;
 
 public class DistributeDocs {
     static HashSet<String> needyPlayers = new HashSet();
@@ -30,14 +26,14 @@ public class DistributeDocs {
     
     static boolean givenBook(EntityPlayer player) {
         if (!FzConfig.players_discover_colossus_guides) return true;
-        StatisticsFile statsFile = FzUtil.getStatsFile(player);
+        StatisticsFile statsFile = PlayerUtil.getStatsFile(player);
         return (statsFile != null && statsFile.writeStat(guideGet) > 0) || player.getEntityData().hasKey(guideKey);
     }
     
     static void setGivenBook(EntityPlayer player) {
         if (!FzConfig.players_discover_colossus_guides) return;
         needyPlayers.remove(player.getCommandSenderName());
-        StatisticsFile statsFile = FzUtil.getStatsFile(player);
+        StatisticsFile statsFile = PlayerUtil.getStatsFile(player);
         if (statsFile != null) {
             statsFile.func_150873_a(player, guideGet, 1);
         }
@@ -68,7 +64,7 @@ public class DistributeDocs {
         if (!needyPlayers.contains(name)) {
             return;
         }
-        StatisticsFile sfw = FzUtil.getStatsFile(player);
+        StatisticsFile sfw = PlayerUtil.getStatsFile(player);
         if (sfw == null) return;
         if (!sfw.hasAchievementUnlocked(AchievementList.diamonds)) {
             return;

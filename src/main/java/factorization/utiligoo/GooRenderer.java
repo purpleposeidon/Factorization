@@ -1,5 +1,6 @@
 package factorization.utiligoo;
 
+import factorization.util.RenderUtil;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.client.Minecraft;
@@ -20,7 +21,6 @@ import cpw.mods.fml.relauncher.SideOnly;
 import factorization.common.BlockIcons;
 import factorization.shared.BlockRenderHelper;
 import factorization.shared.Core;
-import factorization.shared.FzUtil;
 
 public enum GooRenderer {
     INSTANCE;
@@ -138,7 +138,7 @@ public enum GooRenderer {
         double render_dist_sq = 32*32;
         Tessellator tess = Tessellator.instance;
         BlockRenderHelper block = BlockRenderHelper.instance;
-        RenderBlocks rb = FzUtil.getRB();
+        RenderBlocks rb = RenderUtil.getRB();
         for (int i = 0; i < data.coords.length; i += 3) {
             int x = data.coords[i + 0];
             int y = data.coords[i + 1];

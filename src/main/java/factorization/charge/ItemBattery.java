@@ -5,6 +5,7 @@ import java.util.List;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 
+import factorization.util.ItemUtil;
 import net.minecraft.client.renderer.texture.IIconRegister;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
@@ -14,7 +15,6 @@ import net.minecraft.util.StatCollector;
 import net.minecraft.world.World;
 import factorization.api.IActOnCraft;
 import factorization.shared.Core;
-import factorization.shared.FzUtil;
 import factorization.shared.ItemBlockProxy;
 import factorization.shared.Core.TabType;
 
@@ -28,7 +28,7 @@ public class ItemBattery extends ItemBlockProxy implements IActOnCraft {
     }
 
     public int getStorage(ItemStack is) {
-        NBTTagCompound tag = FzUtil.getTag(is);
+        NBTTagCompound tag = ItemUtil.getTag(is);
         if (tag.hasKey("storage")) {
             return tag.getInteger("storage");
         }
@@ -36,7 +36,7 @@ public class ItemBattery extends ItemBlockProxy implements IActOnCraft {
     }
 
     public void setStorage(ItemStack is, int new_charge) {
-        NBTTagCompound tag = FzUtil.getTag(is);
+        NBTTagCompound tag = ItemUtil.getTag(is);
         tag.setInteger("storage", new_charge);
         normalizeDamage(is);
     }
@@ -112,7 +112,7 @@ public class ItemBattery extends ItemBlockProxy implements IActOnCraft {
     @Override
     public void onCreated(ItemStack is, World w, EntityPlayer player) {
         if (is.getTagCompound() == null) {
-            NBTTagCompound tag = FzUtil.getTag(is);
+            NBTTagCompound tag = ItemUtil.getTag(is);
             tag.setInteger("storage", getStorage(is));
         }
     }

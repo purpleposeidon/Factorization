@@ -8,6 +8,11 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.List;
 
+import factorization.shared.*;
+import factorization.util.FzUtil;
+import factorization.util.InvUtil;
+import factorization.util.ItemUtil;
+import factorization.util.PlayerUtil;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.entity.Entity;
@@ -42,14 +47,8 @@ import factorization.notify.Notice;
 import factorization.servo.LoggerDataHelper;
 import factorization.servo.RenderServoMotor;
 import factorization.servo.ServoMotor;
-import factorization.shared.BlockClass;
-import factorization.shared.Core;
-import factorization.shared.FzNetDispatch;
-import factorization.shared.FzUtil;
-import factorization.shared.FzUtil.FzInv;
+import factorization.util.InvUtil.FzInv;
 import factorization.shared.NetworkFactorization.MessageType;
-import factorization.shared.Sound;
-import factorization.shared.TileEntityCommon;
 
 public abstract class TileEntitySocketBase extends TileEntityCommon implements ISocketHolder, IDataSerializable {
     /*
@@ -247,7 +246,7 @@ public abstract class TileEntitySocketBase extends TileEntityCommon implements I
         if (invTe == null) {
             return true;
         }
-        FzInv inv = FzUtil.openInventory(invTe, facing);
+        FzInv inv = InvUtil.openInventory(invTe, facing);
         if (inv == null) {
             return true;
         }
@@ -303,7 +302,7 @@ public abstract class TileEntitySocketBase extends TileEntityCommon implements I
     private static float[] yaw = new float[] {0, 0, 180, 0, 90, -90, 0};
     
     protected EntityPlayer getFakePlayer() {
-        EntityPlayer player = FzUtil.makePlayer(getCoord(), "socket");
+        EntityPlayer player = PlayerUtil.makePlayer(getCoord(), "socket");
         player.worldObj = worldObj;
         player.prevPosX = player.posX = xCoord + 0.5 + facing.offsetX;
         player.prevPosY = player.posY = yCoord + 0.5 - player.getEyeHeight() + facing.offsetY;
@@ -429,14 +428,14 @@ public abstract class TileEntitySocketBase extends TileEntityCommon implements I
             return false;
         } else if (held != null) {
             boolean isValidItem = false;
-            if (FzUtil.identical(getCreatingItem(), held)) return false;
+            if (ItemUtil.identical(getCreatingItem(), held)) return false;
             for (FactoryType ft : FactoryType.values()) {
                 TileEntityCommon tec = ft.getRepresentative();
                 if (tec == null) continue;
                 if (!(tec instanceof TileEntitySocketBase)) continue;
                 TileEntitySocketBase rep = (TileEntitySocketBase) tec;
                 final ItemStack creator = rep.getCreatingItem();
-                if (creator != null && FzUtil.couldMerge(held, creator)) {
+                if (creator != null && ItemUtil.couldMerge(held, creator)) {
                     isValidItem = true;
                     if (worldObj.isRemote) {
                         break;

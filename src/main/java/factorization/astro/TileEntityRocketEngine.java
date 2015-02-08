@@ -9,6 +9,8 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 
+import factorization.shared.*;
+import factorization.util.SpaceUtil;
 import net.minecraft.block.Block;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLiving;
@@ -30,12 +32,7 @@ import factorization.common.FactoryType;
 import factorization.common.FzConfig;
 import factorization.notify.Notice;
 import factorization.notify.Style;
-import factorization.shared.BlockClass;
-import factorization.shared.Core;
-import factorization.shared.FzUtil;
 import factorization.shared.NetworkFactorization.MessageType;
-import factorization.shared.TileEntityCommon;
-import factorization.shared.TileEntityExtension;
 import factorization.weird.TileEntityDayBarrel;
 
 public class TileEntityRocketEngine extends TileEntityCommon {
@@ -107,7 +104,7 @@ public class TileEntityRocketEngine extends TileEntityCommon {
     
     DeltaCoord getCornerDirection(EntityPlayer player, int side) {
         ForgeDirection dir = ForgeDirection.getOrientation(side);
-        DeltaCoord dc = FzUtil.getFlatDiagonalFacing(player);
+        DeltaCoord dc = SpaceUtil.getFlatDiagonalFacing(player);
         if (dc.isZero()) {
             return null;
         }

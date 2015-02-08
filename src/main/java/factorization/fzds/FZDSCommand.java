@@ -6,6 +6,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map.Entry;
 
+import factorization.util.PlayerUtil;
+import factorization.util.SpaceUtil;
 import net.minecraft.client.Minecraft;
 import net.minecraft.command.CommandBase;
 import net.minecraft.command.CommandException;
@@ -43,7 +45,6 @@ import factorization.fzds.interfaces.IDeltaChunk;
 import factorization.fzds.interfaces.Interpolation;
 import factorization.notify.Notice;
 import factorization.shared.Core;
-import factorization.shared.FzUtil;
 
 public class FZDSCommand extends CommandBase {
     //private static DimensionSliceEntity currentWE = null;
@@ -220,7 +221,7 @@ public class FZDSCommand extends CommandBase {
     public void processCommand(ICommandSender sender, String[] args) {
         if (sender instanceof EntityPlayerMP) {
             EntityPlayerMP player = (EntityPlayerMP) sender;
-            boolean op = FzUtil.isPlayerOpped(player);
+            boolean op = PlayerUtil.isPlayerOpped(player);
             boolean cr = player.capabilities.isCreativeMode;
             if (!(op || cr)) {
                 Core.sendChatMessage(true, sender, "You must be op or in creative mode to use these commands");
@@ -874,7 +875,7 @@ public class FZDSCommand extends CommandBase {
                     }
                 }
             }}, Requires.SLICE_SELECTED, Requires.OP);
-        add(new SubCommand("scale", "newScale") {
+        add(new SubCommand("incrScale", "newScale") {
             @Override
             void call(String[] args) {
                 if (!selected.can(DeltaCapability.SCALE)) {
@@ -999,7 +1000,7 @@ public class FZDSCommand extends CommandBase {
                 for (IDeltaChunk idc : selected.getChildren()) {
                     Vec3 base = idc.getParentJoint().addVector(pc.x, pc.y, pc.z);
                     Vec3 snapTo = idc.shadow2real(base);
-                    FzUtil.toEntPos(idc, snapTo);
+                    SpaceUtil.toEntPos(idc, snapTo);
                     selected = idc;
                     this.call(args);
                 }
@@ -1025,7 +1026,7 @@ public class FZDSCommand extends CommandBase {
                     sendChat("Can't parent to itself");
                     return;
                 }
-                Vec3 at = FzUtil.fromEntPos(selected);
+                Vec3 at = SpaceUtil.fromEntPos(selected);
                 Vec3 shadow = parent.real2shadow(at);
                 Coord corner = parent.getCorner();
                 shadow.xCoord -= corner.x;

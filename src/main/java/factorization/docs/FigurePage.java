@@ -2,6 +2,7 @@ package factorization.docs;
 
 import java.util.ArrayList;
 
+import factorization.util.RenderUtil;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.GLAllocation;
 import net.minecraft.client.renderer.WorldRenderer;
@@ -15,9 +16,7 @@ import net.minecraft.tileentity.TileEntity;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL12;
 
-import factorization.api.Coord;
 import factorization.shared.Core;
-import factorization.shared.FzUtil;
 import factorization.weird.TileEntityDayBarrel;
 
 public class FigurePage extends AbstractPage {
@@ -51,14 +50,14 @@ public class FigurePage extends AbstractPage {
     
     @Override
     void draw(DocViewer doc, int ox, int oy, String hovered) {
-        FzUtil.checkGLError("FigurePage -- before render");
+        RenderUtil.checkGLError("FigurePage -- before render");
         if (wr == null) {
             GL11.glPushAttrib(GL11.GL_ALL_ATTRIB_BITS);
             wr = new WorldRenderer(figure, new ArrayList(), 0, 0, 0, getRenderList());
             wr.needsUpdate = true;
             wr.updateRenderer(eyeball);
             GL11.glPopAttrib();
-            FzUtil.checkGLError("FigurePage -- update worldrenderer");
+            RenderUtil.checkGLError("FigurePage -- update worldrenderer");
         }
         wr.isInFrustum = true;
         doc.mc.renderEngine.bindTexture(Core.blockAtlas);
@@ -123,7 +122,7 @@ public class FigurePage extends AbstractPage {
         }
         GL11.glPopAttrib();
         GL11.glPopMatrix();
-        FzUtil.checkGLError("FigurePage -- after rendering everything");
+        RenderUtil.checkGLError("FigurePage -- after rendering everything");
     }
     
     int getRenderList() {

@@ -8,13 +8,17 @@ import java.util.Comparator;
 import java.util.HashSet;
 import java.util.PriorityQueue;
 
+import factorization.shared.*;
+import factorization.util.FluidUtil;
+import factorization.util.InvUtil;
+import factorization.util.ItemUtil;
+import factorization.util.NumUtil;
 import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.texture.TextureManager;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
-import net.minecraft.item.Item;
 import net.minecraft.item.ItemBucket;
 import net.minecraft.item.ItemStack;
 import net.minecraft.world.World;
@@ -42,10 +46,6 @@ import factorization.api.datahelpers.Share;
 import factorization.common.BlockIcons;
 import factorization.common.FactoryType;
 import factorization.servo.ServoMotor;
-import factorization.shared.Core;
-import factorization.shared.FzUtil;
-import factorization.shared.FzUtil.FzInv;
-import factorization.shared.ObjectModel;
 import factorization.sockets.ISocketHolder;
 
 public class PumpLiquids extends SocketFanturpeller implements IFluidHandler {
@@ -207,11 +207,11 @@ public class PumpLiquids extends SocketFanturpeller implements IFluidHandler {
         
         @Override
         public FluidStack drainBlock(PumpCoord probe, boolean doDrain) {
-            return FzUtil.drainSpecificBlockFluid(worldObj, probe.x, probe.y, probe.z, doDrain, targetFluid);
+            return FluidUtil.drainSpecificBlockFluid(worldObj, probe.x, probe.y, probe.z, doDrain, targetFluid);
         }
         
         FluidStack probeAbove(PumpCoord probe) {
-            return FzUtil.drainSpecificBlockFluid(worldObj, probe.x, probe.y + 1, probe.z, false, targetFluid);
+            return FluidUtil.drainSpecificBlockFluid(worldObj, probe.x, probe.y + 1, probe.z, false, targetFluid);
         }
         
         boolean updateFrontier() {
@@ -624,7 +624,7 @@ public class PumpLiquids extends SocketFanturpeller implements IFluidHandler {
         float d = 0.5F;
         GL11.glTranslatef(d, d, d);
         Quaternion.fromOrientation(FzOrientation.fromDirection(facing.getOpposite())).glRotate();
-        float turn = scaleRotation(FzUtil.interp(prevFanRotation, fanRotation, partial));
+        float turn = scaleRotation(NumUtil.interp(prevFanRotation, fanRotation, partial));
         GL11.glRotatef(turn, 0, 1, 0);
         float sd = motor == null ? -2F/16F : 3F/16F;
         sd += -7F/16F;
@@ -673,7 +673,7 @@ public class PumpLiquids extends SocketFanturpeller implements IFluidHandler {
     
     @Override
     public boolean activate(EntityPlayer player, ForgeDirection side) {
-        ItemStack is = FzUtil.normalize(player.getHeldItem());
+        ItemStack is = ItemUtil.normalize(player.getHeldItem());
         if (is != null && is.getItem() instanceof IFluidContainerItem && buffer.getFluidAmount() > 0) {
             ItemStack use = is;
             boolean pushBack = false;
@@ -685,7 +685,7 @@ public class PumpLiquids extends SocketFanturpeller implements IFluidHandler {
             int taken = it.fill(use, buffer.getFluid(), true);
             buffer.drain(taken, true);
             if (pushBack) {
-                FzUtil.givePlayerItem(player, use);
+                InvUtil.givePlayerItem(player, use);
             }
             return true;
         }

@@ -8,6 +8,7 @@ import java.util.List;
 
 import factorization.api.ICoordFunction;
 import factorization.shared.*;
+import factorization.util.SpaceUtil;
 import net.minecraft.block.Block;
 import net.minecraft.command.IEntitySelector;
 import net.minecraft.entity.Entity;
@@ -202,7 +203,7 @@ public class DimensionSliceEntity extends IDeltaChunk implements IFzdsEntryContr
         cornerMax = data.as(Share.VISIBLE, "max").put(cornerMax);
         partName = data.as(Share.VISIBLE, "partName").putString(partName);
         if (can(DeltaCapability.SCALE)) {
-            scale = data.as(Share.VISIBLE, "scale").putFloat(scale);
+            scale = data.as(Share.VISIBLE, "incrScale").putFloat(scale);
         }
         if (can(DeltaCapability.TRANSPARENT)) {
             opacity = data.as(Share.VISIBLE, "opacity").putFloat(opacity);
@@ -287,9 +288,9 @@ public class DimensionSliceEntity extends IDeltaChunk implements IFzdsEntryContr
     }
     
     private void updateRealArea() {
-        Vec3[] corners = FzUtil.getCorners(shadowArea);
+        Vec3[] corners = SpaceUtil.getCorners(shadowArea);
         Vec3 first = shadow2real(corners[0]);
-        FzUtil.setAABB(realArea, first, first);
+        SpaceUtil.setAABB(realArea, first, first);
         for (int i = 1; i < corners.length; i++) {
             Vec3 v = corners[i];
             v = shadow2real(v);
@@ -352,7 +353,7 @@ public class DimensionSliceEntity extends IDeltaChunk implements IFzdsEntryContr
         if (can(DeltaCapability.ROTATE)) {
             // Must enlarge by the worst-case rotation
             Coord min = getCorner(), max = getFarCorner();
-            Vec3 center = real2shadow(FzUtil.fromEntPos(this));
+            Vec3 center = real2shadow(SpaceUtil.fromEntPos(this));
             double sx = Math.max(center.xCoord - min.x, max.x - center.xCoord);
             double sy = Math.max(center.yCoord - min.y, max.y - center.yCoord);
             double sz = Math.max(center.zCoord - min.z, max.z - center.zCoord);
@@ -416,7 +417,7 @@ public class DimensionSliceEntity extends IDeltaChunk implements IFzdsEntryContr
         Coord c = getCorner();
         Coord d = getFarCorner();
         AxisAlignedBB start = null;
-        NORELEASE.fixme("omfg slow?");
+        // NORELEASE omfg slow!
         for (int x = c.x; x <= d.x; x++) {
             for (int y = c.y; y <= d.y; y++) {
                 for (int z = c.z; z <= d.z; z++) {
@@ -495,11 +496,11 @@ public class DimensionSliceEntity extends IDeltaChunk implements IFzdsEntryContr
     private static DamageSource violenceDamage = new DamageSource("dseHit");
     
     public Vec3 getInstantaneousRotationalVelocityAtPointInCornerSpace(Vec3 corner) {
-        Vec3 origPoint = FzUtil.subtract(centerOffset, corner);
+        Vec3 origPoint = SpaceUtil.subtract(centerOffset, corner);
         rotation.applyRotation(origPoint);
-        Vec3 rotatedPoint = FzUtil.copy(origPoint);
+        Vec3 rotatedPoint = SpaceUtil.copy(origPoint);
         rotationalVelocity.applyRotation(rotatedPoint);
-        return FzUtil.subtract(origPoint, rotatedPoint);
+        return SpaceUtil.subtract(origPoint, rotatedPoint);
     }
     
     private boolean hasLinearMotion() {
@@ -527,7 +528,7 @@ public class DimensionSliceEntity extends IDeltaChunk implements IFzdsEntryContr
             cancelOrderedRotation();
         }
         final boolean parentRotation = !parentTickRotation.isZero();
-        final boolean linearMotion = parentRotation || !FzUtil.isZero(parentTickDisp) || hasLinearMotion();
+        final boolean linearMotion = parentRotation || !SpaceUtil.isZero(parentTickDisp) || hasLinearMotion();
         final boolean rotationalMotion = parentRotation || hasRotationalMotion();
         
         Vec3 mot = null;
@@ -630,7 +631,7 @@ public class DimensionSliceEntity extends IDeltaChunk implements IFzdsEntryContr
                 }
                 // could multiply stuff by velocity
                 if (!metaAABB.intersectsWith(ebb)) {
-                    NORELEASE.fixme("metaAABB.intersectsWith is very slow, especially with lots of entities");
+                    // NORELEASE metaAABB.intersectsWith is very slow, especially with lots of entities
                     continue;
                 }
                 
@@ -640,7 +641,7 @@ public class DimensionSliceEntity extends IDeltaChunk implements IFzdsEntryContr
                     double instant_scale = 1;
                     double motion_scale = 1;
                     double vel_scale = 1;
-                    Vec3 entityAt = FzUtil.fromEntPos(e);
+                    Vec3 entityAt = SpaceUtil.fromEntPos(e);
                     Vec3 velocity = calcInstantVelocityAtRealPoint(entityAt, mot, rot);
                     if (can(DeltaCapability.VIOLENT_COLLISIONS) && !worldObj.isRemote) {
                         double smackSpeed = velocity.lengthVector();
@@ -698,7 +699,7 @@ public class DimensionSliceEntity extends IDeltaChunk implements IFzdsEntryContr
             childAt.yCoord = child.posY;
             childAt.zCoord = child.posZ;
             Vec3 inst = getInstRotVel(childAt, rot);
-            FzUtil.incrAdd(inst, mot);
+            SpaceUtil.incrAdd(inst, mot);
             child.updateMotion(inst, rot);
         }
     }
@@ -708,19 +709,19 @@ public class DimensionSliceEntity extends IDeltaChunk implements IFzdsEntryContr
         Vec3 point_a = dse_space;
         Vec3 point_b = dse_space.addVector(0, 0, 0);
         rot.applyRotation(point_b);
-        return FzUtil.subtract(point_b, point_a);
+        return SpaceUtil.subtract(point_b, point_a);
     }
     
-    Vec3 point_a = FzUtil.newVec(), point_b = FzUtil.newVec();
+    Vec3 point_a = SpaceUtil.newVec(), point_b = SpaceUtil.newVec();
     Vec3 calcInstantVelocityAtRealPoint(Vec3 realPos, Vec3 linear, Quaternion rot) {
-        NORELEASE.fixme("center offset? See real2shadow probably");
+        // FIXME center offset? See real2shadow probably
         point_a.xCoord = realPos.xCoord - posX;
         point_a.yCoord = realPos.yCoord - posY;
         point_a.zCoord = realPos.zCoord - posZ;
-        point_b = FzUtil.set(point_b, point_a);
+        point_b = SpaceUtil.set(point_b, point_a);
         rot.applyRotation(point_b);
-        Vec3 rotational = FzUtil.incrSubtract(point_b, point_a);
-        return FzUtil.incrAdd(rotational, linear);
+        Vec3 rotational = SpaceUtil.incrSubtract(point_b, point_a);
+        return SpaceUtil.incrAdd(rotational, linear);
     }
     
     /**
@@ -839,7 +840,7 @@ public class DimensionSliceEntity extends IDeltaChunk implements IFzdsEntryContr
             Core.profileEnd(); // Really should be try/finally or nested in another method...
             return;
         }
-        if (NORELEASE.on && ticksExisted % 60 == 0) {
+        if (ticksExisted % 60 == 0) {
             need_recheck = true;
             updateUniversalCollisions(); // TODO: Do it properly
         }
@@ -862,9 +863,6 @@ public class DimensionSliceEntity extends IDeltaChunk implements IFzdsEntryContr
         }
         if (needAreaUpdate) {
             Core.profileStart("updateArea");
-            if (!worldObj.isRemote) {
-                NORELEASE.fixme("");
-            }
             updateShadowArea();
             Core.profileEnd();
         }

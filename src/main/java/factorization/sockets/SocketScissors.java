@@ -16,6 +16,8 @@ import factorization.notify.Notice;
 import factorization.servo.ServoMotor;
 import factorization.shared.*;
 import factorization.shared.NetworkFactorization.MessageType;
+import factorization.util.InvUtil;
+import factorization.util.ItemUtil;
 import net.minecraft.block.*;
 import net.minecraft.block.material.Material;
 import net.minecraft.client.Minecraft;
@@ -124,7 +126,7 @@ public class SocketScissors extends TileEntitySocketBase implements ICaptureDrop
         if (socket.dumpBuffer(buffer)) {
             for (Iterator<ItemStack> iterator = buffer.iterator(); iterator.hasNext();) {
                 ItemStack is = iterator.next();
-                if (FzUtil.normalize(is) == null) {
+                if (ItemUtil.normalize(is) == null) {
                     iterator.remove();
                 }
             }
@@ -268,7 +270,7 @@ public class SocketScissors extends TileEntitySocketBase implements ICaptureDrop
         super.onRemove();
         Coord here = getCoord();
         for (ItemStack is : buffer) {
-            FzUtil.spawnItemStack(here, is);
+            InvUtil.spawnItemStack(here, is);
         }
     }
     

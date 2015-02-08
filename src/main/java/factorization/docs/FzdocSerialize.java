@@ -2,6 +2,7 @@ package factorization.docs;
 
 import java.util.List;
 
+import factorization.util.PlayerUtil;
 import net.minecraft.block.Block;
 import net.minecraft.command.ICommand;
 import net.minecraft.command.ICommandSender;
@@ -16,7 +17,7 @@ import factorization.api.Coord;
 import factorization.api.DeltaCoord;
 import factorization.api.ICoordFunction;
 import factorization.notify.Notice;
-import factorization.shared.FzUtil;
+import factorization.util.FzUtil;
 
 final class FzdocSerialize implements ICommand {
     @Override
@@ -43,7 +44,7 @@ final class FzdocSerialize implements ICommand {
 
     @Override
     public boolean canCommandSenderUseCommand(ICommandSender icommandsender) {
-        return icommandsender instanceof EntityPlayer && FzUtil.isCommandSenderOpped(icommandsender);
+        return icommandsender instanceof EntityPlayer && PlayerUtil.isCommandSenderOpped(icommandsender);
     }
 
     @Override
@@ -114,7 +115,7 @@ final class FzdocSerialize implements ICommand {
 
     DocWorld copyChunkToWorld(final Coord min, final Coord max) {
         final DocWorld w = new DocWorld();
-        final DeltaCoord start = new DeltaCoord(0, 0, 0); //size.add(maxSize.scale(-1)).scale(0.5);
+        final DeltaCoord start = new DeltaCoord(0, 0, 0); //size.add(maxSize.incrScale(-1)).incrScale(0.5);
         Coord.iterateCube(min, max, new ICoordFunction() { @Override public void handle(Coord here) {
             if (here.isAir()) return;
             DeltaCoord dc = here.difference(min).add(start);

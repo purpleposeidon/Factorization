@@ -7,6 +7,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import factorization.shared.*;
+import factorization.util.ItemUtil;
 import net.minecraft.block.Block;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
@@ -36,12 +38,7 @@ import factorization.common.BlockIcons;
 import factorization.common.FactoryType;
 import factorization.notify.Notice;
 import factorization.notify.Style;
-import factorization.shared.BlockClass;
-import factorization.shared.BlockRenderHelper;
-import factorization.shared.Core;
-import factorization.shared.FzUtil;
 import factorization.shared.NetworkFactorization.MessageType;
-import factorization.shared.TileEntityCommon;
 
 public class TileEntityServoRail extends TileEntityCommon implements IChargeConductor {
     public static final float width = 7F/16F;
@@ -286,7 +283,7 @@ public class TileEntityServoRail extends TileEntityCommon implements IChargeCond
                 color = newColor;
                 if (!entityplayer.capabilities.isCreativeMode) {
                     ItemStack held = entityplayer.getHeldItem();
-                    entityplayer.setCurrentItemOrArmor(0 /* held item slot */, FzUtil.normalDecr(held));
+                    entityplayer.setCurrentItemOrArmor(0 /* held item slot */, ItemUtil.normalDecr(held));
                 }
                 ret = true;
             }

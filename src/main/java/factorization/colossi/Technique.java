@@ -11,8 +11,8 @@ import factorization.fzds.interfaces.DeltaCapability;
 import factorization.fzds.interfaces.IDeltaChunk;
 import factorization.fzds.interfaces.Interpolation;
 import factorization.shared.Core;
-import factorization.shared.FzUtil;
 import factorization.shared.ReservoirSampler;
+import factorization.util.SpaceUtil;
 import net.minecraft.block.Block;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.item.EntityFallingBlock;
@@ -547,8 +547,8 @@ public enum Technique implements IStateMachine<Technique> {
                 if (dist > farthest || dist < nearest) continue;
                 
                 // We won't hit across the body
-                Vec3 li2player = FzUtil.subtract(FzUtil.fromEntPos(player), FzUtil.fromEntPos(idc));
-                Vec3 localOffset = FzUtil.copy(li2player);
+                Vec3 li2player = SpaceUtil.subtract(SpaceUtil.fromEntPos(player), SpaceUtil.fromEntPos(idc));
+                Vec3 localOffset = SpaceUtil.copy(li2player);
                 controller.body.getRotation().applyReverseRotation(localOffset);
                 if (li.side == BodySide.LEFT) {
                     if (localOffset.zCoord > +halfBodyWidth) continue;
@@ -567,7 +567,7 @@ public enum Technique implements IStateMachine<Technique> {
                 Vec3 src = Vec3.createVectorHelper(0, -1, 0);
                 Vec3 dst = li2player.normalize();
                 Vec3 axis = src.crossProduct(dst);
-                double angle = FzUtil.getAngle(src, dst);
+                double angle = SpaceUtil.getAngle(src, dst);
 
                 // A single strike through your oponnent will hurt him more than two hundred blows to his skin
                 angle *= 1.25;

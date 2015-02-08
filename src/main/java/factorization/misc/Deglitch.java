@@ -1,10 +1,9 @@
 package factorization.misc;
 
-import factorization.shared.FzUtil;
+import factorization.util.SpaceUtil;
 import net.minecraft.command.CommandBase;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.entity.player.EntityPlayerMP;
-import net.minecraft.network.play.server.S18PacketEntityTeleport;
 import net.minecraft.util.Vec3;
 
 import java.util.Random;
@@ -34,7 +33,7 @@ public class Deglitch extends CommandBase {
     public void processCommand(ICommandSender sender, String[] args) {
         EntityPlayerMP player = (EntityPlayerMP) sender;
         player.addExhaustion(3);
-        Vec3 at = FzUtil.fromEntPos(player);
+        Vec3 at = SpaceUtil.fromEntPos(player);
         double r = 0.1;
         Random rng = player.worldObj.rand;
         at.xCoord += rng.nextDouble() * r;
