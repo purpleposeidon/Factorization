@@ -29,3 +29,7 @@ at.cfg
 # lang
 # fzsrc
 # textures
+
+# (I've likely derped up my intellij setup somehow)
+src/main/java/GradleStart.java
+src/main/java/GradleStartServer.java

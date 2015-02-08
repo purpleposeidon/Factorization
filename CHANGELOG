@@ -1,3 +1,12 @@
+0.8.88.8.8888
+  Added the Lost Map. It is now the starting point for Factorization. You will find it after getting the Diamonds achievement. Using the map will point you towards... the new source for the LMP, and a nice bit of Dark Iron and Logic Matrices. It can break, so don't use it too much! And you'll only get one, so don't drop it in lava!
+  Added the /deglitch command. Useful for escaping glitchy situations!
+  Added Gargantuan Bricks. I assure you that automatically crafting them is pretty easy.
+  Rewrote dark iron ore spawning. They miiight have been causing worldgen crashes, especially with flat bedrock; hopefully they'll stop doing that, and they'll also be easier to find with flat bedrock as well.
+  Changed the bedrock texture and (less noticably) the Birch log texture.
+  Added the Twisting Dark Iron Block. It has the potential to mess up your world, so be careful with what you put on it. If things go really south with those features, as a last resort you can try deleting its dimension (see the config file). But first see if you can use the /fzds to fix it.
+  A bunch of bug fixes, tweaks, polishes, and minor additions.
+
 0.8.88.8
   Add "Count Items" servo instruction. Counts the number of items the servo's holding.
   Add "Read Redstone" servo instruction. Gets the redstone signal on the block the servo is pointing at.
