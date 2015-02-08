@@ -1,38 +1,5 @@
 package factorization.sockets;
 
-import static org.lwjgl.opengl.GL11.*;
-
-import java.io.DataInput;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.List;
-
-import factorization.shared.*;
-import net.minecraft.block.*;
-import net.minecraft.block.material.Material;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.texture.TextureManager;
-import net.minecraft.enchantment.Enchantment;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.init.Blocks;
-import net.minecraft.init.Items;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.ChatComponentTranslation;
-import net.minecraft.util.DamageSource;
-import net.minecraft.util.IChatComponent;
-import net.minecraft.util.MovingObjectPosition;
-import net.minecraft.util.StatCollector;
-import net.minecraft.world.World;
-import net.minecraftforge.common.IShearable;
-import net.minecraftforge.common.util.ForgeDirection;
-
-import org.lwjgl.opengl.GL11;
-import org.lwjgl.opengl.GL12;
-
 import cpw.mods.fml.common.network.internal.FMLProxyPacket;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
@@ -47,7 +14,31 @@ import factorization.common.FactoryType;
 import factorization.common.ItemIcons;
 import factorization.notify.Notice;
 import factorization.servo.ServoMotor;
+import factorization.shared.*;
 import factorization.shared.NetworkFactorization.MessageType;
+import net.minecraft.block.*;
+import net.minecraft.block.material.Material;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.texture.TextureManager;
+import net.minecraft.enchantment.Enchantment;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.init.Items;
+import net.minecraft.item.ItemStack;
+import net.minecraft.util.*;
+import net.minecraft.world.World;
+import net.minecraftforge.common.util.ForgeDirection;
+import org.lwjgl.opengl.GL11;
+import org.lwjgl.opengl.GL12;
+
+import java.io.DataInput;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Iterator;
+
+import static org.lwjgl.opengl.GL11.*;
 
 public class SocketScissors extends TileEntitySocketBase implements ICaptureDrops {
     private boolean wasPowered = false;
@@ -209,19 +200,9 @@ public class SocketScissors extends TileEntitySocketBase implements ICaptureDrop
             EntityPlayer player = getFakePlayer();
             if (canCutBlock(player, worldObj, block, mop.blockX, mop.blockY, mop.blockZ)) {
                 player.inventory.mainInventory[0] = shears;
-                /*if (block instanceof IShearable) {
-                    IShearable target = (IShearable) block;
-                    if (NORELEASE.on || target.isShearable(shears, worldObj, mop.blockX, mop.blockY, mop.blockZ)) {
-                        List<ItemStack> stacks = target.onSheared(shears, worldObj, mop.blockX, mop.blockY, mop.blockZ, 0);
-                        processCollectedItems(stacks);
-                        removeBlock(player, block, metadata, mop.blockX, mop.blockY, mop.blockZ);
-                        return true;
-                    }
-                } else*/ {
-                    boolean didRemove = removeBlock(player, block, metadata, mop.blockX, mop.blockY, mop.blockZ);
-                    if (didRemove) {
-                        block.harvestBlock(worldObj, player, mop.blockX, mop.blockY, mop.blockZ, metadata);
-                    }
+                boolean didRemove = removeBlock(player, block, metadata, mop.blockX, mop.blockY, mop.blockZ);
+                if (didRemove) {
+                    block.harvestBlock(worldObj, player, mop.blockX, mop.blockY, mop.blockZ, metadata);
                 }
             } else {
                 blocked = true;
