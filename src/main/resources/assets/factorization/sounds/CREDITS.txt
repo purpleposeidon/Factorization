@@ -1,0 +1,34 @@
+
+colossus_attack.ogg
+    "Old Metal", by digifishmusic
+    http://www.freesound.org/people/digifishmusic/sounds/66417/
+
+colossus_creak1.ogg
+colossus_creak2.ogg
+colossus_creak3.ogg
+colossus_creak4.ogg
+colossus_prespin.ogg
+colossus_bow.ogg
+colossus_hurt.ogg
+colossus_unbow.ogg
+colossus_first_bow.ogg
+    "A swing is squeaking at night", by felix.blume
+    http://www.freesound.org/people/felix.blume/sounds/137271/
+
+colossus_death.ogg
+    "ambience 07 Internal.wav", by yewbic
+    http://www.freesound.org/people/yewbic/sounds/66057/
+
+colossus_death.ogg
+    "THE CRASH", by sandyrb
+    http://www.freesound.org/people/sandyrb/sounds/95078/
+
+colossus_first_bow.ogg
+    "Avalance", by mystiscool
+    http://www.freesound.org/people/mystiscool/sounds/7141/
+
+colossus_rise.ogg
+    "Ambienta Soundtrack — Crystal Airlines", by suonho
+    http://www.freesound.org/people/suonho/sounds/56364/
+
+
