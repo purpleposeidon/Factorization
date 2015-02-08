@@ -520,11 +520,11 @@ public class Coord implements IDataSerializable, ISaneCoord, Comparable<Coord> {
     }
     
     public int getLightLevelBlock() {
-        return w.getSkyBlockTypeBrightness(EnumSkyBlock.Block, x, y, z);
+        return w.getSavedLightValue(EnumSkyBlock.Block, x, y, z);
     }
     
     public int getLightLevelSky() {
-        return w.getSkyBlockTypeBrightness(EnumSkyBlock.Sky, x, y, z);
+        return w.getSavedLightValue(EnumSkyBlock.Sky, x, y, z);
     }
     
     public void setLightLevelBlock(int light) {

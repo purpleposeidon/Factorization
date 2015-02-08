@@ -1,20 +1,16 @@
 package factorization.fzds.network;
 
-import java.io.IOException;
-
-import net.minecraft.client.Minecraft;
-import net.minecraft.network.EnumConnectionState;
-import net.minecraft.network.INetHandler;
-import net.minecraft.network.Packet;
-import net.minecraft.network.PacketBuffer;
-
 import com.google.common.collect.BiMap;
-
 import cpw.mods.fml.common.network.internal.FMLProxyPacket;
 import cpw.mods.fml.relauncher.Side;
 import factorization.fzds.Hammer;
 import factorization.fzds.interfaces.IFzdsShenanigans;
 import factorization.shared.Core;
+import net.minecraft.client.Minecraft;
+import net.minecraft.network.EnumConnectionState;
+import net.minecraft.network.INetHandler;
+import net.minecraft.network.Packet;
+import net.minecraft.network.PacketBuffer;
 
 public class WrappedPacket extends Packet implements IFzdsShenanigans {
     /**
@@ -55,6 +51,8 @@ public class WrappedPacket extends Packet implements IFzdsShenanigans {
             recieved_packet.readPacketData(buf);
         } catch (Throwable e) {
             // TODO: This can go away; just to make the compiler happy...
+            e.printStackTrace();
+            return null;
         }
         return recieved_packet;
     }

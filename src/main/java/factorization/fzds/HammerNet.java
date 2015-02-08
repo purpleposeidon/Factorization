@@ -232,7 +232,7 @@ public class HammerNet {
     
     boolean blockInReach(IDeltaChunk idc, EntityPlayerMP player, Coord at) {
         double reach_distance = player.theItemInWorldManager.getBlockReachDistance();
-        Vec3 playerAt = player.getPosition(0);
+        Vec3 playerAt = FzUtil.fromEntPos(player);
         playerAt = idc.real2shadow(playerAt);
         double distance = at.createVector().distanceTo(playerAt);
         return distance <= reach_distance;

@@ -7,10 +7,7 @@ import io.netty.channel.ChannelOutboundHandlerAdapter;
 import io.netty.channel.ChannelPromise;
 import io.netty.channel.embedded.EmbeddedChannel;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.network.EnumConnectionState;
@@ -96,8 +93,10 @@ public class PacketProxyingPlayer extends EntityPlayerMP implements
          */
     }
 
+    private static final UUID proxyUuid = UUID.fromString("69f64f92-665f-457e-ad33-f6082d0b8a75");
+
     public PacketProxyingPlayer(final DimensionSliceEntity dimensionSlice, World shadowWorld) {
-        super(MinecraftServer.getServer(), (WorldServer) shadowWorld, new GameProfile(null, "[FzdsPacket]"), new ItemInWorldManager(shadowWorld));
+        super(MinecraftServer.getServer(), (WorldServer) shadowWorld, new GameProfile(proxyUuid, "[FzdsPacket]"), new ItemInWorldManager(shadowWorld));
         this.dimensionSlice = dimensionSlice;
         Coord c = dimensionSlice.getCenter();
         c.y = -8; // lurk in the void; we should catch most mod's packets.

@@ -265,4 +265,14 @@ public abstract class IDeltaChunk extends EntityFz {
     public void setController(Object controller) {
         this.controller = controller;
     }
+
+    /**
+     * Same thing as Entity.setVelocity, but not client-only.
+     */
+    @Override
+    public void setVelocity(double vx, double vy, double vz) {
+        this.motionX = vx;
+        this.motionY = vy;
+        this.motionZ = vz;
+    }
 }
