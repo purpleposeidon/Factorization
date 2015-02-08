@@ -8,7 +8,6 @@ import java.util.UUID;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.MapColor;
 import net.minecraft.block.material.Material;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.texture.IIconRegister;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.EntityLivingBase;
@@ -21,7 +20,6 @@ import net.minecraft.util.WeightedRandomChestContent;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import net.minecraftforge.common.ChestGenHooks;
-import net.minecraftforge.common.util.Constants;
 import net.minecraftforge.common.util.ForgeDirection;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
@@ -138,21 +136,18 @@ public class ColossalBlock extends Block {
         }
     }
     
-    ChestGenHooks coreChest = new ChestGenHooks("factorization:colossalCore");
+    ChestGenHooks fractureChest = new ChestGenHooks("factorization:colossalFracture");
     boolean setup = false;
     ChestGenHooks getChest() {
-        if (setup) return coreChest;
+        if (setup) return fractureChest;
         setup = true;
-        // No LMP, only the core drops the LMP.
-        coreChest.addItem(new WeightedRandomChestContent(new ItemStack(Core.registry.logicMatrixIdentifier), 1, 1, 5));
-        coreChest.addItem(new WeightedRandomChestContent(new ItemStack(Core.registry.logicMatrixController), 1, 1, 5));
-        coreChest.addItem(new WeightedRandomChestContent(new ItemStack(Core.registry.diamond_shard), 2, 4, 1)); // Hrm. Not sure about this one.
-        coreChest.addItem(new WeightedRandomChestContent(new ItemStack(Core.registry.ore_crystal, 1, ItemOreProcessing.OreType.DARKIRON.ID), 1, 7, 10));
-        coreChest.addItem(new WeightedRandomChestContent(new ItemStack(Core.registry.insulated_coil), 4, 6, 8));
-        coreChest.addItem(new WeightedRandomChestContent(Core.registry.dark_iron_sprocket.copy(), 2, 4, 2));
-        coreChest.addItem(new WeightedRandomChestContent(Core.registry.servorail_item.copy(), 4, 10, 1));
-        // TODO NORELEASE: Would it be better to drop a srapbox item instead!
-        return coreChest;
+        // No LMP: only the core drops the LMP.
+        fractureChest.addItem(new WeightedRandomChestContent(new ItemStack(Core.registry.logicMatrixIdentifier), 1, 1, 3));
+        fractureChest.addItem(new WeightedRandomChestContent(new ItemStack(Core.registry.logicMatrixController), 1, 1, 3));
+        fractureChest.addItem(new WeightedRandomChestContent(new ItemStack(Core.registry.ore_crystal, 1, ItemOreProcessing.OreType.DARKIRON.ID), 1, 2, 6));
+        fractureChest.addItem(new WeightedRandomChestContent(Core.registry.dark_iron_sprocket.copy(), 2, 4, 2));
+
+        return fractureChest;
     }
     
     @Override
@@ -162,7 +157,7 @@ public class ColossalBlock extends Block {
             ret.add(new ItemStack(this, 1, md));
         }
         if (md == MD_BODY_CRACKED || md == MD_MASK_CRACKED) {
-            int count = 2 + world.rand.nextInt(3 + fortune);
+            int count = 1 + world.rand.nextInt(1 + fortune);
             for (int i = 0; i < count; i++) {
                 ret.add(getChest().getOneItem(world.rand));
             }
