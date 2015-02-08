@@ -1,24 +1,7 @@
 package factorization.colossi;
 
-import static factorization.colossi.TechniqueKind.*;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-
-import factorization.aabbdebug.AabbDebugger;
-import factorization.api.DeltaCoord;
-import net.minecraft.block.Block;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.item.EntityFallingBlock;
-import net.minecraft.entity.item.EntityFireworkRocket;
-import net.minecraft.entity.item.EntityItem;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.Vec3;
-import net.minecraftforge.common.util.ForgeDirection;
 import factorization.api.Coord;
+import factorization.api.DeltaCoord;
 import factorization.api.ICoordFunction;
 import factorization.api.Quaternion;
 import factorization.colossi.ColossusController.BodySide;
@@ -29,8 +12,23 @@ import factorization.fzds.interfaces.IDeltaChunk;
 import factorization.fzds.interfaces.Interpolation;
 import factorization.shared.Core;
 import factorization.shared.FzUtil;
-import factorization.shared.NORELEASE;
 import factorization.shared.ReservoirSampler;
+import net.minecraft.block.Block;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.item.EntityFallingBlock;
+import net.minecraft.entity.item.EntityFireworkRocket;
+import net.minecraft.entity.item.EntityItem;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.item.ItemStack;
+import net.minecraft.util.Vec3;
+import net.minecraftforge.common.util.ForgeDirection;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+
+import static factorization.colossi.TechniqueKind.*;
 
 public enum Technique implements IStateMachine<Technique> {
     STATE_MACHINE_ENTRY {
@@ -145,9 +143,7 @@ public enum Technique implements IStateMachine<Technique> {
 
         @Override
         public Technique tick(ColossusController controller, int age) {
-            if (NORELEASE.on) return finishMove(controller);
-            if (age > 20 * 15) return PICK_NEXT_TECHNIQUE;
-            if (controller.checkHurt(false)) return PICK_NEXT_TECHNIQUE;
+            if (age > 20 * 15 || controller.checkHurt(false)) return finishMove(controller);
             return this;
         }
     },

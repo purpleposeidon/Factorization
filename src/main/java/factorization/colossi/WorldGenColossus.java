@@ -228,7 +228,8 @@ public class WorldGenColossus implements IWorldGenerator {
         int blockX = 8 + (chunkX * 16);
         int blockZ = 8 + (chunkZ * 16);
         
-        Coord start = new Coord(world, blockX, 0xFF /* NORELEASE */, blockZ);
+        Coord start = new Coord(world, blockX, 0, blockZ);
+        start.y = start.getColumnHeight();
         boolean bad_biome = isBadBiome(world, chunkX, chunkZ);
         if (bad_biome) {
             return;

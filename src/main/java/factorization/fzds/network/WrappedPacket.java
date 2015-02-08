@@ -65,7 +65,6 @@ public class WrappedPacket extends Packet implements IFzdsShenanigans {
         if (wrapped instanceof FMLProxyPacket) {
             FMLProxyPacket pp = (FMLProxyPacket) wrapped;
             wrapped = pp.toS3FPacket();
-            // NORELEASE: What about reading?
         }
         PacketBuffer buff = new PacketBuffer(data);
         Integer packetId = serverPacketMap.inverse().get(wrapped.getClass());

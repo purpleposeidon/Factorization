@@ -1,8 +1,6 @@
 package factorization.fzds;
 
 import java.lang.ref.WeakReference;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -33,7 +31,6 @@ import com.google.common.base.Splitter;
 import com.google.common.base.Strings;
 import com.google.common.collect.Iterables;
 
-import cpw.mods.fml.relauncher.ReflectionHelper;
 import factorization.api.Coord;
 import factorization.api.DeltaCoord;
 import factorization.api.ICoordFunction;
@@ -47,7 +44,6 @@ import factorization.fzds.interfaces.Interpolation;
 import factorization.notify.Notice;
 import factorization.shared.Core;
 import factorization.shared.FzUtil;
-import factorization.shared.NORELEASE;
 
 public class FZDSCommand extends CommandBase {
     //private static DimensionSliceEntity currentWE = null;

@@ -4,7 +4,6 @@ import cpw.mods.fml.common.IWorldGenerator;
 import factorization.api.Coord;
 import factorization.api.ICoordFunction;
 import factorization.shared.Core;
-import factorization.shared.NORELEASE;
 import net.minecraft.block.Block;
 import net.minecraft.init.Blocks;
 import net.minecraft.world.World;
@@ -14,7 +13,7 @@ import net.minecraft.world.gen.NoiseGeneratorOctaves;
 import java.util.Random;
 
 public class DarkIronOreGenerator implements IWorldGenerator {
-    final int minMeteorR = NORELEASE.one * 4 + 1, maxMeteorR = NORELEASE.one * 4 + 2;
+    final int minMeteorR = 1, maxMeteorR = 2;
     final int maxWidth = maxMeteorR * 2;
     final int minBlastR = 20, maxBlastR = 28;
     final NoiseGeneratorOctaves noise = new NoiseGeneratorOctaves(new Random(0), 2);

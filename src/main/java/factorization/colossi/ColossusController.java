@@ -10,7 +10,6 @@ import factorization.fzds.interfaces.IDeltaChunk;
 import factorization.fzds.interfaces.Interpolation;
 import factorization.shared.Core;
 import factorization.shared.EntityFz;
-import factorization.shared.NORELEASE;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.boss.IBossDisplayData;
 import net.minecraft.util.ChatComponentTranslation;
@@ -374,18 +373,10 @@ public class ColossusController extends EntityFz implements IBossDisplayData {
                 }
             }
         }
-        /*double close_enough = 1.0 / 512.0;
-        if (Math.abs(posY - target_y) <= close_enough) {
-            NORELEASE.println("Close enough!");
-            target_y = posY;
-            body.motionY = 0;
-            return;
-        }*/
         double maxV = 3.0/16.0;
         int sign = posY > target_y ? -1 : +1;
         if (posY == target_y) sign = 0;
         double delta = Math.abs(posY - target_y);
-        //if (delta < close_enough) sign = 0;
         body.motionY = sign * Math.min(maxV, delta);
     }
 
@@ -451,20 +442,11 @@ public class ColossusController extends EntityFz implements IBossDisplayData {
     boolean checkHurt(boolean reset) {
         if (been_hurt && reset) {
             been_hurt = false;
-            wakeUpMore();
             float pitch = 4 * getHealth() / (getMaxHealth() + 0.1F);
             worldObj.playSoundAtEntity(this, "factorization:colossus.hurt", 1, pitch);
             return true;
         }
         return been_hurt;
-    }
-    
-    void wakeUpMore() {
-        openEyes();
-    }
-    
-    void openEyes() {
-        NORELEASE.fixme("Eyelids.");
     }
     
     boolean canTargetPlayer(Entity player) {

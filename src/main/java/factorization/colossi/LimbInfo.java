@@ -12,7 +12,6 @@ import factorization.fzds.interfaces.DeltaCapability;
 import factorization.fzds.interfaces.IDeltaChunk;
 import factorization.fzds.interfaces.Interpolation;
 import factorization.shared.EntityReference;
-import factorization.shared.NORELEASE;
 
 class LimbInfo {
     LimbType type = LimbType.UNKNOWN_LIMB_TYPE;

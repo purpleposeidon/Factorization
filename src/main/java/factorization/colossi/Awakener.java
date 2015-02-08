@@ -1,18 +1,5 @@
 package factorization.colossi;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Set;
-
-import net.minecraft.item.ItemStack;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.Vec3;
-import net.minecraftforge.common.util.ForgeDirection;
-
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-
 import factorization.api.Coord;
 import factorization.api.DeltaCoord;
 import factorization.colossi.ColossusController.BodySide;
@@ -27,7 +14,17 @@ import factorization.notify.Notice;
 import factorization.notify.Style;
 import factorization.shared.Core;
 import factorization.shared.FzUtil;
-import factorization.shared.NORELEASE;
+import net.minecraft.item.ItemStack;
+import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.Vec3;
+import net.minecraftforge.common.util.ForgeDirection;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Set;
 
 public class Awakener {
     int arm_size = 0, arm_length = 0;
@@ -530,7 +527,7 @@ public class Awakener {
         }
         if (min == null || max == null) return null;
         Coord.sort(min, max);
-        int r = 2; NORELEASE.fixme("Can this be lowered?");
+        int r = 2; //NORELEASE.fixme("Can this be lowered?");
         min.adjust(new DeltaCoord(-r, -r, -r));
         max.adjust(new DeltaCoord(r, r, r));
         
