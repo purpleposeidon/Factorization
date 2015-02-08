@@ -174,6 +174,7 @@ public class FzConfig {
         fanturpeller_works_on_players = getBoolConfig("fanturpellerWorksOnPlayers", "server", fanturpeller_works_on_players, "If set to false, fanturpellers will not move players.");
         sockets_ignore_front_redstone = getBoolConfig("socketsIgnoreFacePower", "server", sockets_ignore_front_redstone, "Set to false to let socket blocks detect redstone from their front; provided for legacy worlds.");
         require_book_for_manual = getBoolConfig("requireBookForManual", "general", require_book_for_manual, "If set to true, then you must have a manual in your inventory to look up items");
+        dimension_slice_dimid = getIntConfig("FzdsDimension", "server", dimension_slice_dimid, "The dimension used for FZDS/Hammer/Colossi/rotated/moving blocks, etc. If things go really south with those features, as a last resort you can try deleting this dimension. But first see if you can use the /fzds to fix it.");
         if (config.hasChanged()) {
             config.save();
         }
