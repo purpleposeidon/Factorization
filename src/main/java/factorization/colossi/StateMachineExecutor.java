@@ -27,7 +27,7 @@ public class StateMachineExecutor<E extends Enum<E> & IStateMachine<E> > impleme
     }
 
     public void forceState(E nextState) {
-        Core.logFine(machineName + nextState);
+        Awakener.msg(machineName + nextState);
         state.onExitState(controller, nextState);
         nextState.onEnterState(controller, state);
         age = 0;
