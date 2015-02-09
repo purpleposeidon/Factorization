@@ -1,6 +1,7 @@
 package factorization.colossi;
 
 import static net.minecraftforge.common.BiomeDictionary.Type.*;
+import static net.minecraftforge.event.terraingen.PopulateChunkEvent.Populate.EventType.*;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -30,6 +31,7 @@ import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import factorization.api.Coord;
 import factorization.common.FzConfig;
 import factorization.shared.Core;
+import net.minecraftforge.event.terraingen.PopulateChunkEvent.Populate.EventType;
 
 public class WorldGenColossus implements IWorldGenerator {
     {
@@ -259,32 +261,24 @@ public class WorldGenColossus implements IWorldGenerator {
     @SubscribeEvent
     public void cancelDecorations(Decorate event) {
         if (!genOnWorld(event.world)) return;
-        switch (event.type) {
-        case BIG_SHROOM:
-        case LAKE:
-        case PUMPKIN:
-        case TREE:
+        final Decorate.EventType type = event.type;
+        if (type == Decorate.EventType.BIG_SHROOM || type == Decorate.EventType.LAKE || type == Decorate.EventType.PUMPKIN || type == Decorate.EventType.TREE) {
             if (cancel(event.world, event.chunkX / 16, event.chunkZ / 16)) {
                 event.setResult(Result.DENY);
             }
             return;
-        default: break;
         }
     }
     
     @SubscribeEvent
     public void cancelPopulations(PopulateChunkEvent.Populate event) {
         if (!genOnWorld(event.world)) return;
-        switch (event.type) {
-        case LAKE:
-        case LAVA:
-        case ANIMALS:
-        case CUSTOM:
+
+        final EventType type = event.type;
+        if (type == LAKE || type == LAVA || type == ANIMALS || type == CUSTOM) {
             if (cancel(event.world, event.chunkX, event.chunkZ)) {
                 event.setResult(Result.DENY);
             }
-            return;
-        default: break;
         }
     }
 }
