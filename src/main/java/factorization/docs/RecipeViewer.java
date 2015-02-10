@@ -210,7 +210,6 @@ public class RecipeViewer implements IDocGenerator {
     }
     
     void addRecipe(List sb, Object obj) {
-        sb.add("\\seg");
         if (obj instanceof ShapedOreRecipe) {
             addShapedOreRecipe(sb, (ShapedOreRecipe) obj);
         } else if (obj instanceof ShapedRecipes) {
@@ -226,6 +225,13 @@ public class RecipeViewer implements IDocGenerator {
                 t.printStackTrace();
             }
         }
+        if (sb.isEmpty()) {
+            sb.add(obj.toString());
+        }
+        sb.add(0, "\\seg");
+        if (obj instanceof IRecipe) {
+            genericRecipePrefix(sb, (IRecipe) obj);
+        }
         sb.add("\\endseg");
         sb.add("\\nl");
     }
@@ -233,8 +239,8 @@ public class RecipeViewer implements IDocGenerator {
     Object genericRecipePrefix(List sb, IRecipe recipe) {
         ItemStack output = ((IRecipe) recipe).getRecipeOutput();
         if (output == null) return null;
-        sb.add(new ItemWord(output));
-        sb.add(" \\b{" + getDisplayName(output) + "}\\vpad{15}\\nl");
+        sb.add(1, new ItemWord(output));
+        sb.add(2, " \\b{" + getDisplayName(output) + "}\\vpad{15}\\nl");
         return output;
     }
     
@@ -248,7 +254,6 @@ public class RecipeViewer implements IDocGenerator {
     }
     
     void addShapedOreRecipe(List sb, ShapedOreRecipe recipe) {
-        genericRecipePrefix(sb, recipe);
         int width = ReflectionHelper.getPrivateValue(ShapedOreRecipe.class, recipe, "width");
         //int height = ReflectionHelper.getPrivateValue(ShapedOreRecipe.class, recipe, "height");
         Object[] input = recipe.getInput();
@@ -277,7 +282,6 @@ public class RecipeViewer implements IDocGenerator {
     }
     
     void addShapedRecipes(List sb, ShapedRecipes recipe) {
-        genericRecipePrefix(sb, recipe);
         int width = recipe.recipeWidth;
         for (int i = 0; i < recipe.recipeItems.length; i++) {
             sb.add(new ItemWord(fixMojangRecipes(recipe.recipeItems[i])));
@@ -292,7 +296,6 @@ public class RecipeViewer implements IDocGenerator {
     void addShapelessOreRecipe(List sb, ShapelessOreRecipe recipe) {
         ArrayList<Object> input = recipe.getInput();
         if (input == null) return;
-        genericRecipePrefix(sb, recipe);
         sb.add("Shapeless: ");
         for (Object obj : input) {
             if (obj instanceof Object[]) {
@@ -310,7 +313,6 @@ public class RecipeViewer implements IDocGenerator {
     
     void addShapelessRecipes(List sb, ShapelessRecipes recipe) {
         if (recipe.recipeItems == null) return;
-        genericRecipePrefix(sb, recipe);
         sb.add("Shapeless: ");
         for (Object obj : recipe.recipeItems) {
             convertObject(sb, obj);
@@ -433,7 +435,9 @@ public class RecipeViewer implements IDocGenerator {
                 }
             } else if (obj instanceof IRecipe) {
                 sb.add("Embedded Recipe:\n\n");
-                addRecipe(sb, obj);
+                ArrayList sub = new ArrayList();
+                addRecipe(sub, obj);
+                sb.addAll(sub);
             } else {
                 try {
                     addRecipeWithReflection(sb, obj);
