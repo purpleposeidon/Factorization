@@ -22,6 +22,9 @@ import net.minecraft.server.management.PlayerManager;
 import net.minecraft.util.Vec3;
 import net.minecraft.world.World;
 import net.minecraftforge.common.DimensionManager;
+import net.minecraftforge.common.ForgeChunkManager;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.io.File;
 
@@ -89,6 +92,7 @@ public class Hammer {
             Core.loadBus(new ClickHandler());
         }
         WrappedPacket.registerPacket();
+        ForgeChunkManager.setForcedChunkLoadingCallback(this, new PPPChunkLoader());
     }
     
     @EventHandler
@@ -120,5 +124,28 @@ public class Hammer {
     
     public static Vec3 ent2vec(Entity ent) {
         return Vec3.createVectorHelper(ent.posX, ent.posY, ent.posZ);
+    }
+
+    private static Logger hammerLogger = LogManager.getLogger("FZ-Hammer-init");
+    private void initializeLogging(Logger logger) {
+        Hammer.hammerLogger = logger;
+    }
+
+    public static void logSevere(String format, Object... formatParameters) {
+        hammerLogger.error(String.format(format, formatParameters));
+    }
+
+    public static void logWarning(String format, Object... formatParameters) {
+        hammerLogger.warn(String.format(format, formatParameters));
+    }
+
+    public static void logInfo(String format, Object... formatParameters) {
+        hammerLogger.info(String.format(format, formatParameters));
+    }
+
+    public static void logFine(String format, Object... formatParameters) {
+        if (Core.dev_environ) {
+            hammerLogger.info(String.format(format, formatParameters));
+        }
     }
 }

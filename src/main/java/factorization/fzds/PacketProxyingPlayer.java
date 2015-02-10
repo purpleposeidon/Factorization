@@ -1,5 +1,6 @@
 package factorization.fzds;
 
+import factorization.api.ICoordFunction;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
@@ -7,6 +8,7 @@ import io.netty.channel.ChannelOutboundHandlerAdapter;
 import io.netty.channel.ChannelPromise;
 import io.netty.channel.embedded.EmbeddedChannel;
 
+import java.lang.ref.WeakReference;
 import java.util.*;
 
 import net.minecraft.entity.player.EntityPlayerMP;
@@ -33,10 +35,11 @@ import factorization.fzds.interfaces.IDeltaChunk;
 import factorization.fzds.interfaces.IFzdsEntryControl;
 import factorization.fzds.interfaces.IFzdsShenanigans;
 import factorization.fzds.network.WrappedPacket;
+import net.minecraftforge.common.ForgeChunkManager;
 
 public class PacketProxyingPlayer extends EntityPlayerMP implements
         IFzdsEntryControl, IFzdsShenanigans {
-    DimensionSliceEntity dimensionSlice;
+    WeakReference<DimensionSliceEntity> dimensionSlice = new WeakReference<DimensionSliceEntity>(null);
     static boolean useShortViewRadius = true; // true doesn't actually change the view radius
 
     private HashSet<EntityPlayerMP> trackedPlayers = new HashSet();
@@ -91,13 +94,42 @@ public class PacketProxyingPlayer extends EntityPlayerMP implements
          * NetworkManager.scheduleOutboundPacket is too early I think?
          * What we really want is its channel.
          */
+        registerChunkLoading();
+    }
+
+
+    ForgeChunkManager.Ticket ticket = null;
+    void registerChunkLoading() {
+        ticket = PPPChunkLoader.instance.register(getChunks());
+    }
+
+    void releaseChunkLoading() {
+        if (ticket != null) {
+            PPPChunkLoader.instance.release(ticket);
+            ticket = null;
+        }
+    }
+
+    private Set<Chunk> getChunks() {
+        final HashSet<Chunk> ret = new HashSet<Chunk>();
+        DimensionSliceEntity dse = dimensionSlice.get();
+        if (dse == null) return ret;
+        Coord min = dse.getCorner();
+        Coord max = dse.getFarCorner();
+        Coord.iterateChunks(min, max, new ICoordFunction() {
+            @Override
+            public void handle(Coord here) {
+                ret.add(here.getChunk());
+            }
+        });
+        return ret;
     }
 
     private static final UUID proxyUuid = UUID.fromString("69f64f92-665f-457e-ad33-f6082d0b8a75");
 
     public PacketProxyingPlayer(final DimensionSliceEntity dimensionSlice, World shadowWorld) {
         super(MinecraftServer.getServer(), (WorldServer) shadowWorld, new GameProfile(proxyUuid, "[FzdsPacket]"), new ItemInWorldManager(shadowWorld));
-        this.dimensionSlice = dimensionSlice;
+        this.dimensionSlice = new WeakReference<DimensionSliceEntity>(dimensionSlice);
         Coord c = dimensionSlice.getCenter();
         c.y = -8; // lurk in the void; we should catch most mod's packets.
         c.setAsEntityLocation(this);
@@ -135,7 +167,8 @@ public class PacketProxyingPlayer extends EntityPlayerMP implements
 
     @Override
     public void onUpdate() {
-        if (this.dimensionSlice.isDead) {
+        DimensionSliceEntity dse = dimensionSlice.get();
+        if (dse == null || dse.isDead) {
             endProxy();
         } else if (ticks_since_last_update > 0) {
             ticks_since_last_update--;
@@ -164,12 +197,18 @@ public class PacketProxyingPlayer extends EntityPlayerMP implements
         super.onUpdate(); // we probably want to keep this one, just for the EntityMP stuff
     }
 
+    static final ArrayList empty = new ArrayList();
+
     List getTargetablePlayers() {
-        return dimensionSlice.worldObj.playerEntities;
+        DimensionSliceEntity dse = dimensionSlice.get();
+        if (dse == null) return empty;
+        return dse.worldObj.playerEntities;
     }
 
     boolean isPlayerInUpdateRange(EntityPlayerMP player) {
-        return !player.isDead && dimensionSlice.getDistanceSqToEntity(player) <= Hammer.DSE_ChunkUpdateRangeSquared;
+        DimensionSliceEntity dse = dimensionSlice.get();
+        if (dse == null) return false;
+        return !player.isDead && dse.getDistanceSqToEntity(player) <= Hammer.DSE_ChunkUpdateRangeSquared;
     }
 
     boolean shouldShareChunks() {
@@ -177,13 +216,15 @@ public class PacketProxyingPlayer extends EntityPlayerMP implements
     }
 
     void sendChunkMapDataToPlayer(EntityPlayerMP target) {
+        DimensionSliceEntity dse = dimensionSlice.get();
+        if (dse == null) return;
         // Inspired by EntityPlayerMP.onUpdate. Shame we can't just add chunks directly to target's chunkwatcher... but there'd be no wrapper for the packets.
         ArrayList<Chunk> chunks = new ArrayList();
         ArrayList<TileEntity> tileEntities = new ArrayList();
         World world = DeltaChunk.getServerShadowWorld();
 
-        Coord low = dimensionSlice.getCorner();
-        Coord far = dimensionSlice.getFarCorner();
+        Coord low = dse.getCorner();
+        Coord far = dse.getFarCorner();
         for (int x = low.x - 16; x <= far.x + 16; x += 16) {
             for (int z = low.z - 16; z <= far.z + 16; z += 16) {
                 if (!world.blockExists(x + 1, 0, z + 1)) {
@@ -212,6 +253,7 @@ public class PacketProxyingPlayer extends EntityPlayerMP implements
     }
 
     public void endProxy() {
+        releaseChunkLoading();
         // From playerNetServerHandler.mcServer.getConfigurationManager().playerLoggedOut(this);
         WorldServer var2 = getServerForPlayer();
         var2.removeEntity(this); // setEntityDead
@@ -219,7 +261,7 @@ public class PacketProxyingPlayer extends EntityPlayerMP implements
         MinecraftServer.getServer().getConfigurationManager().playerEntityList.remove(playerNetServerHandler);
         // The stuff above might not be necessary.
         setDead();
-        dimensionSlice.proxy = null;
+        dimensionSlice.clear();
     }
 
     boolean shouldForceChunkLoad() { //TODO: Chunk loading!
@@ -245,7 +287,8 @@ public class PacketProxyingPlayer extends EntityPlayerMP implements
         if (trackedPlayers.isEmpty()) {
             return;
         }
-        if (dimensionSlice.isDead) {
+        DimensionSliceEntity dse = dimensionSlice.get();
+        if (dse == null || dse.isDead) {
             setDead();
             return;
         }
@@ -253,7 +296,7 @@ public class PacketProxyingPlayer extends EntityPlayerMP implements
         Iterator<EntityPlayerMP> it = trackedPlayers.iterator();
         while (it.hasNext()) {
             EntityPlayerMP player = it.next();
-            if (player.isDead || player.worldObj != dimensionSlice.worldObj) {
+            if (player.isDead || player.worldObj != dse.worldObj) {
                 it.remove();
             } else {
                 addNettyMessageForPlayer(player, wrappedMsg);

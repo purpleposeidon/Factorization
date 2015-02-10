@@ -908,6 +908,20 @@ public class Coord implements IDataSerializable, ISaneCoord, Comparable<Coord> {
             }
         }
     }
+
+    public static void iterateChunks(Coord min, Coord max, ICoordFunction func) {
+        min = min.copy();
+        max = max.copy();
+        sort(min, max);
+        Coord here = min.copy();
+        for (int x = min.x; x <= max.x; x += 16) {
+            for (int z = min.z; z <= max.z; z += 16) {
+                here.x = x;
+                here.z = z;
+                func.handle(here);
+            }
+        }
+    }
     
     public static void drawLine(Coord start, Coord end, ICoordFunction func) {
         Coord at = start.copy();
