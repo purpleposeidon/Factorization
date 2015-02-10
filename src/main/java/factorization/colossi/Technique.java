@@ -323,6 +323,24 @@ public enum Technique implements IStateMachine<Technique> {
         @Override
         public void onEnterState(ColossusController controller, Technique prevState) {
             playNoise(controller);
+        }
+
+        @Override
+        public Technique tick(ColossusController controller, int age) {
+            // Wait for the sound to wind up
+            if (age > 5 * 20) return INITIAL_UNBOW2;
+            return this;
+        }
+    },
+
+    INITIAL_UNBOW2 {
+        @Override
+        TechniqueKind getKind() {
+            return TRANSITION;
+        }
+
+        @Override
+        public void onEnterState(ColossusController controller, Technique prevState) {
             UNBOW.onEnterState(controller, this);
         }
 
@@ -345,6 +363,7 @@ public enum Technique implements IStateMachine<Technique> {
         
         @Override
         public void onEnterState(ColossusController controller, Technique prevState) {
+            if (prevState != INITIAL_UNBOW) playNoise(controller);
             Quaternion bodyRot = controller.body.getRotation();
             double yRot = bodyRot.toRotationVector().yCoord;
             Quaternion straightRot = Quaternion.getRotationQuaternionRadians(-yRot, ForgeDirection.UP);
@@ -946,9 +965,7 @@ public enum Technique implements IStateMachine<Technique> {
     }
 
     @Override
-    public void onEnterState(ColossusController controller, Technique prevState) {
-        if (prevState != INITIAL_UNBOW) playNoise(controller);
-    }
+    public void onEnterState(ColossusController controller, Technique prevState) { }
 
     @Override
     public void onExitState(ColossusController controller, Technique nextState) { }
