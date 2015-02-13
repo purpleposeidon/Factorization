@@ -229,12 +229,16 @@ public class HammerClientProxy extends HammerProxy {
     }
     
     void runShadowTick() {
-        Minecraft mc = Minecraft.getMinecraft();
+        final Minecraft mc = Minecraft.getMinecraft();
         if (mc.isGamePaused()) {
             return;
         }
-        EntityPlayer player = mc.thePlayer;
-        if (player == null) {
+        final WorldClient mcWorld = mc.theWorld;
+        if (mcWorld == null) {
+            return;
+        }
+        final EntityPlayer mcPlayer = mc.thePlayer;
+        if (mcPlayer == null) {
             return;
         }
         HammerWorldClient w = (HammerWorldClient) DeltaChunk.getClientShadowWorld();
@@ -242,14 +246,14 @@ public class HammerClientProxy extends HammerProxy {
             return;
         }
         int range = 10;
-        AxisAlignedBB nearby = player.boundingBox.expand(range, range, range);
-        Iterable<IDeltaChunk> nearbyChunks = mc.theWorld.getEntitiesWithinAABB(IDeltaChunk.class, nearby);
+        AxisAlignedBB nearby = mcPlayer.boundingBox.expand(range, range, range);
+        Iterable<IDeltaChunk> nearbyChunks = mcWorld.getEntitiesWithinAABB(IDeltaChunk.class, nearby);
         setShadowWorld();
         Core.profileStart("FZDStick");
         try {
             //Inspired by Minecraft.runTick()
             w.updateEntities();
-            Vec3 playerPos = Vec3.createVectorHelper(player.posX, player.posY, player.posZ);
+            Vec3 playerPos = Vec3.createVectorHelper(mcPlayer.posX, mcPlayer.posY, mcPlayer.posZ);
             for (IDeltaChunk idc : nearbyChunks) {
                 Vec3 center = idc.real2shadow(playerPos);
                 w.doVoidFogParticles((int) center.xCoord, (int) center.yCoord, (int) center.zCoord);
