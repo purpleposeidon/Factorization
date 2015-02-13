@@ -1,5 +1,12 @@
 package factorization.misc;
 
+import cpw.mods.fml.common.FMLCommonHandler;
+import cpw.mods.fml.common.eventhandler.EventPriority;
+import cpw.mods.fml.common.eventhandler.SubscribeEvent;
+import factorization.common.FzConfig;
+import factorization.shared.Core;
+import factorization.util.FzUtil;
+import factorization.weird.NeptuneCape;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiOptions;
@@ -12,13 +19,7 @@ import net.minecraftforge.client.ClientCommandHandler;
 import net.minecraftforge.client.event.GuiScreenEvent.ActionPerformedEvent;
 import net.minecraftforge.client.event.GuiScreenEvent.InitGuiEvent;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
-import cpw.mods.fml.common.FMLCommonHandler;
-import cpw.mods.fml.common.eventhandler.EventPriority;
-import cpw.mods.fml.common.eventhandler.SubscribeEvent;
-import factorization.common.FzConfig;
-import factorization.shared.Core;
-import factorization.util.FzUtil;
-import factorization.weird.NeptuneCape;
+import net.minecraftforge.client.event.sound.PlaySoundEvent17;
 
 public class MiscClientProxy extends MiscProxy {
     static final Minecraft mc = Minecraft.getMinecraft();
@@ -124,5 +125,37 @@ public class MiscClientProxy extends MiscProxy {
             ret += s;
         }
         return ret;
+    }
+
+
+    long present_tick = -100;
+    int event_count = 0;
+    static final int max_event = 4;
+    static final double logMax = Math.log(max_event);
+
+    @SubscribeEvent(priority = EventPriority.LOW)
+    public void supressExcessiveSound(PlaySoundEvent17 event) {
+        // Basically, divide the volume by the number of events minus some threshold
+        Minecraft mc = Minecraft.getMinecraft();
+        if (mc.theWorld == null) {
+            present_tick = -100;
+            return;
+        }
+        if (event.result == null) return;
+        if (event.isCanceled()) return;
+        long now = mc.theWorld.getTotalWorldTime();
+        if (now != present_tick) {
+            present_tick = now;
+            event_count = 0;
+        }
+        if (event_count++ < max_event) return;
+        final double origVolume = event.result.getVolume();
+        final float newVolume = (float)(origVolume / Math.log(event_count) * logMax);
+        event.result = new ProxiedSound(event.result) {
+            @Override
+            public float getVolume() {
+                return newVolume;
+            }
+        };
     }
 }
