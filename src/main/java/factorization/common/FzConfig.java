@@ -144,7 +144,7 @@ public class FzConfig {
         int config_silver_size = getIntConfig("silverOreNodeNewSize", "general", silver_ore_node_new_size, "The size of silver ore nodes. Between 5 & 35. Default is " + silver_ore_node_new_size);
         silver_ore_node_new_size = Math.max(5, Math.min(config_silver_size, 35));
         gen_dark_iron_ore = getBoolConfig("generateDarkIronOre", "general", gen_dark_iron_ore, "Set to false to disable dark iron ore generation");
-        gen_colossi = getBoolConfig("generateColossi", "general", gen_colossi, "If true, Colossi will generate in the world.");
+        gen_colossi = getBoolConfig("generateColossi", "general", gen_colossi, "If true, Colossi will generate in the world. If false, the player will be given an LMP instead of a lost map.");
         
         {
             enable_retrogen = getBoolConfig("enableRetrogen", "retrogen", enable_retrogen, null);

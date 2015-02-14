@@ -5,6 +5,7 @@ import java.util.HashSet;
 import factorization.util.PlayerUtil;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.stats.AchievementList;
 import net.minecraft.stats.StatBase;
@@ -23,6 +24,14 @@ public class DistributeDocs {
     static HashSet<String> needyPlayers = new HashSet();
     static final String guideKey = "fzColossusGuide";
     static StatBase guideGet = new StatBase("factorization.dropcolossusguide", new ChatComponentTranslation("factorization.dropcolossusguide")).registerStat();
+
+    static Item getGivenItem() {
+        if (FzConfig.gen_colossi) {
+            return Core.registry.colossusGuide;
+        } else {
+            return Core.registry.logicMatrixProgrammer;
+        }
+    }
     
     static boolean givenBook(EntityPlayer player) {
         if (!FzConfig.players_discover_colossus_guides) return true;
@@ -69,17 +78,19 @@ public class DistributeDocs {
         if (!sfw.hasAchievementUnlocked(AchievementList.diamonds)) {
             return;
         }
+        Item toGive = getGivenItem();
+
         for (int i = 0; i < player.inventory.getSizeInventory(); i++) {
             ItemStack is = player.inventory.getStackInSlot(i);
             if (is == null) continue;
-            if (is.getItem() == Core.registry.colossusGuide) {
+            if (is.getItem() == toGive) {
                 Core.logInfo("%s already had an Colossus Guide, so won't give another one", player);
                 setGivenBook(player);
                 return;
             }
         }
         Coord broke = new Coord(event.world, event.x, event.y, event.z);
-        broke.spawnItem(new ItemStack(Core.registry.colossusGuide));
+        broke.spawnItem(new ItemStack(toGive));
         setGivenBook(player);
         Core.logInfo("Giving %s a colossus guide", name);
     }
