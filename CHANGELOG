@@ -4,7 +4,7 @@
   Added Gargantuan Bricks. I assure you that automatically crafting them is pretty easy.
   Rewrote dark iron ore spawning. They miiight have been causing worldgen crashes, especially with flat bedrock; hopefully they'll stop doing that, and they'll also be easier to find with flat bedrock as well.
   Changed the bedrock texture and (less noticably) the Birch log texture.
-  Added the Twisting Dark Iron Block. It has the potential to mess up your world, so be careful with what you put on it. If things go really south with those features, as a last resort you can try deleting its dimension (see the config file). But first see if you can use the /fzds to fix it.
+  Added the Twisting Dark Iron Block. It has the potential to mess up your world, so be careful with what you put on it. If things go really south with those features, as a last resort you can try deleting its dimension (see the config file). But first see if you can use the /fzds command to fix it.
   A bunch of bug fixes, tweaks, polishes, and minor additions.
 
 0.8.88.8
@@ -15,7 +15,6 @@
 
 0.8.88.7
   A copy of this changelog is now located INSIDE the mod itself! Whoah! It's like a whole new mod!
-  They told me not to feed the Greg. I fed the Greg. Hopefully there won't be any strange consequences?
 
 0.8.88.6
   Hopefully made the pocket crafting table less laggy

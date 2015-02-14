@@ -84,7 +84,7 @@ public class ColossalBlock extends Block {
             return md == MD_EYE_OPEN ? BlockIcons.colossi$eye_open : BlockIcons.colossi$eye;
         }
         if (md == MD_ARM) {
-            if (side == UP) return BlockIcons.colossi$body;
+            if (side == UP) return BlockIcons.colossi$arm_top;
             if (side == DOWN) return BlockIcons.colossi$arm_bottom;
             Block downId = w.getBlock(x, y - 1, z);
             int downMd = w.getBlockMetadata(x, y - 1, z);
