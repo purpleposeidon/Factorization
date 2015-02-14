@@ -2,6 +2,8 @@ package factorization.common;
 
 import java.io.File;
 
+import factorization.shared.Graylist;
+import net.minecraft.block.Block;
 import net.minecraftforge.common.config.Configuration;
 import net.minecraftforge.common.config.Property;
 import cpw.mods.fml.common.registry.EntityRegistry;
@@ -58,6 +60,7 @@ public class FzConfig {
     public static boolean show_time_on_fullscreen = true;
     public static boolean require_book_for_manual = true;
     public static boolean infinite_guide_usage = false;
+    public static Graylist<Block> lacerator_block_graylist;
     
     public static boolean enable_retrogen = false;
     public static String retrogen_key = "DEFAULT";
@@ -175,6 +178,7 @@ public class FzConfig {
         sockets_ignore_front_redstone = getBoolConfig("socketsIgnoreFacePower", "server", sockets_ignore_front_redstone, "Set to false to let socket blocks detect redstone from their front; provided for legacy worlds.");
         require_book_for_manual = getBoolConfig("requireBookForManual", "general", require_book_for_manual, "If set to true, then you must have a manual in your inventory to look up items");
         dimension_slice_dimid = getIntConfig("FzdsDimension", "server", dimension_slice_dimid, "The dimension used for FZDS/Hammer/Colossi/rotated/moving blocks, etc. If things go really south with those features, as a last resort you can try deleting this dimension. But first see if you can use the /fzds to fix it.");
+        lacerator_block_graylist = Graylist.ofBlocks(getStringConfig("laceratorBlockGraylist", "server", "-minecraft:bedrock,minecraft:end_portal", "Comma-separated list of block names. In front of the list must be either a +, for white-listing, or a -, for black-listing."));
         if (config.hasChanged()) {
             config.save();
         }

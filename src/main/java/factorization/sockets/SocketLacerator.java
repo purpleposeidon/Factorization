@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
 
+import factorization.common.FzConfig;
 import factorization.shared.*;
 import factorization.util.InvUtil;
 import factorization.util.ItemUtil;
@@ -363,6 +364,9 @@ public class SocketLacerator extends TileEntitySocketBase implements IChargeCond
             }
             int md = worldObj.getBlockMetadata(mop.blockX, mop.blockY, mop.blockZ);
             if (!block.canCollideCheck(md, false)) {
+                return false;
+            }
+            if (!FzConfig.lacerator_block_graylist.passes(block)) {
                 return false;
             }
             TileEntity te = null;
