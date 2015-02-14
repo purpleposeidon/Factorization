@@ -2,7 +2,10 @@ package factorization.docs;
 
 import java.util.HashSet;
 
+import factorization.api.DeltaCoord;
+import factorization.api.ICoordFunction;
 import factorization.util.PlayerUtil;
+import net.minecraft.block.material.Material;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.item.Item;
@@ -90,8 +93,28 @@ public class DistributeDocs {
             }
         }
         Coord broke = new Coord(event.world, event.x, event.y, event.z);
+        if (!safeArea(broke)) return;
         broke.spawnItem(new ItemStack(toGive));
         setGivenBook(player);
         Core.logInfo("Giving %s a colossus guide", name);
+    }
+
+    boolean safeArea(Coord at) {
+        int r = 2;
+        Coord min = at.add(-r, -r, -r);
+        Coord max = at.add(+r, +r, +r);
+        Checker c = new Checker();
+        Coord.iterateCube(min, max, c);
+        return c.cool;
+    }
+
+    static class Checker implements ICoordFunction {
+        boolean cool = true;
+
+        @Override
+        public void handle(Coord here) {
+            Material mat = here.getBlock().getMaterial();
+            if (mat == Material.lava || mat == Material.cactus || mat == Material.fire) cool = false;
+        }
     }
 }
