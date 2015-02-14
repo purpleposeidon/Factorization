@@ -31,43 +31,66 @@ public class ASMTransformer implements IClassTransformer {
 
     @Override
     public byte[] transform(String name, String transformedName, byte[] basicClass) {
-        if (transformedName.equals("net.minecraft.block.Block")) {
-            return applyTransform(basicClass,
-                    new AbstractAsmMethodTransform.Append(name, transformedName, "func_149723_a", "onBlockDestroyedByExplosion"),
-                    new AbstractAsmMethodTransform.Append(name, transformedName, "func_149659_a", "canDropFromExplosion")
-            );
+        // Sorted by beauty!
+        {
+            // Why-isn't-this-in-Forge hooks stuff for unspecific FZ features
+
+            // Add an event for unhandled key presses
+            if (transformedName.equals("net.minecraft.client.gui.inventory.GuiContainer")) {
+                return applyTransform(basicClass,
+                        new AbstractAsmMethodTransform.Append(name, transformedName, "func_73869_a", "keyTyped")
+                );
+            }
+
+            // Hack in a method to make diamond blocks explode into shards
+            if (transformedName.equals("net.minecraft.block.Block")) {
+                return applyTransform(basicClass,
+                        new AbstractAsmMethodTransform.Append(name, transformedName, "func_149723_a", "onBlockDestroyedByExplosion"),
+                        new AbstractAsmMethodTransform.Append(name, transformedName, "func_149659_a", "canDropFromExplosion")
+                );
+            }
         }
-        if (transformedName.equals("net.minecraft.client.gui.inventory.GuiContainer")) {
-            return applyTransform(basicClass,
-                    new AbstractAsmMethodTransform.Append(name, transformedName, "func_73869_a", "keyTyped")
-            );
-        }
-        if (transformedName.equals("net.minecraft.client.Minecraft")) {
-            return applyTransform(basicClass,
-                    new AbstractAsmMethodTransform.Prepend(name, transformedName, "func_147116_af", "func_147116_af"), // "attack key pressed" function (first handler), MCPBot name clickMouse
-                    new AbstractAsmMethodTransform.Prepend(name, transformedName, "func_147121_ag", "func_147121_ag") // "use key pressed" function, MCPBot name rightClickMouse
-            );
-        }
-        if (transformedName.equals("net.minecraft.world.chunk.Chunk")) {
-            return applyTransform(basicClass,
-                    new AbstractAsmClassTransform.Mixin("factorization.coremodhooks.MixinExtraChunkData", "Lfactorization/coremodhooks/MixinExtraChunkData;"),
-                    new AbstractAsmMethodTransform.Append(name, transformedName, "func_76588_a", "getEntitiesWithinAABBForEntity")
-            );
-        }
-        if (transformedName.equals("net.minecraft.entity.Entity")) {
-            return applyTransform(basicClass,
-                    new AbstractAsmClassTransform.Mixin("factorization.coremodhooks.MixinEntityKinematicsTracker", "Lfactorization/coremodhooks/MixinEntityKinematicsTracker;"));
-        }
-        if (transformedName.equals("net.minecraft.client.renderer.EntityRenderer")) {
-            final String vec_vec_mop = "(Lnet/minecraft/util/Vec3;Lnet/minecraft/util/Vec3;)Lnet/minecraft/util/MovingObjectPosition;";
-            return applyTransform(basicClass,
-                    new AbstractAsmMethodTransform.MutateCall(name, transformedName, "func_78467_g", "orientCamera")
-                        .find("net.minecraft.client.multiplayer.WorldClient", "func_72933_a", "rayTraceBlocks", vec_vec_mop)
-            );
-        }
-        if (transformedName.equals("net.minecraft.world.World")) {
-            return applyTransform(basicClass,
-                    new AbstractAsmMethodTransform.Append(name, transformedName, "func_72829_c", "checkBlockCollision"));
+
+        {
+            // FZDS-related hooks
+
+            // Add an event to cancel attack/use key presses before anything else
+            // (Should go in Forge)
+            if (transformedName.equals("net.minecraft.client.Minecraft")) {
+                return applyTransform(basicClass,
+                        new AbstractAsmMethodTransform.Prepend(name, transformedName, "func_147116_af", "func_147116_af"), // "attack key pressed" function (first handler), MCPBot name clickMouse
+                        new AbstractAsmMethodTransform.Prepend(name, transformedName, "func_147121_ag", "func_147121_ag") // "use key pressed" function, MCPBot name rightClickMouse
+                );
+            }
+            // Make the camera take UCs into account in 3rd-person view
+            // (Could go in forge, but is implemented specifically for FZDS)
+            if (transformedName.equals("net.minecraft.client.renderer.EntityRenderer")) {
+                final String vec_vec_mop = "(Lnet/minecraft/util/Vec3;Lnet/minecraft/util/Vec3;)Lnet/minecraft/util/MovingObjectPosition;";
+                return applyTransform(basicClass,
+                        new AbstractAsmMethodTransform.MutateCall(name, transformedName, "func_78467_g", "orientCamera")
+                                .find("net.minecraft.client.multiplayer.WorldClient", "func_72933_a", "rayTraceBlocks", vec_vec_mop)
+                );
+            }
+            // Add "Universal Colliders". Adds a list of entities to the chunk that are added to every collision query.
+            // The alternative to this is setting World.MAX_ENTITY_RADIUS to a large value, and putting collodier-entities everywhere, which is slow & ugly
+            if (transformedName.equals("net.minecraft.world.chunk.Chunk")) {
+                return applyTransform(basicClass,
+                        new AbstractAsmClassTransform.Mixin("factorization.coremodhooks.MixinExtraChunkData", "Lfactorization/coremodhooks/MixinExtraChunkData;"),
+                        new AbstractAsmMethodTransform.Append(name, transformedName, "func_76588_a", "getEntitiesWithinAABBForEntity")
+                );
+            }
+            // Allow the player to stand on a UC without getting kicked from the server
+            if (transformedName.equals("net.minecraft.world.World")) {
+                return applyTransform(basicClass,
+                        new AbstractAsmMethodTransform.Append(name, transformedName, "func_72829_c", "checkBlockCollision"));
+            }
+            // (This... might not be entirely necessary. I didn't test this problem enough!)
+            // Something about limiting the velocity of an entity when it's being influenced by multiple IDCs moving in the same direction...
+            // Is this just vestigial? Shouldn't cause too much trouble tho.
+            if (transformedName.equals("net.minecraft.entity.Entity")) {
+                return applyTransform(basicClass,
+                        new AbstractAsmClassTransform.Mixin("factorization.coremodhooks.MixinEntityKinematicsTracker", "Lfactorization/coremodhooks/MixinEntityKinematicsTracker;"));
+            }
         }
         return basicClass;
     }

@@ -1,0 +1,10 @@
+Things the coremod modifies. Last updated for 1.7.10-0.8.88.8.8888
+
+net.minecraft.client.gui.inventory.GuiContainer.keyTyped
+net.minecraft.block.Block.onBlockDestroyedByExplosion
+net.minecraft.client.Minecraft.func_147116_af
+net.minecraft.client.Minecraft.func_147121_ag
+net.minecraft.client.renderer.EntityRenderer.orientCamera
+net.minecraft.world.chunk.Chunk.getEntitiesWithinAABBForEntity (Plus extra fields & methods)
+net.minecraft.world.World.checkBlockCollision
+net.minecraft.entity.Entity add fields & methods
