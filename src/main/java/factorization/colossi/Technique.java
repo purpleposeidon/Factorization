@@ -143,6 +143,7 @@ public enum Technique implements IStateMachine<Technique> {
 
         @Override
         public Technique tick(ColossusController controller, int age) {
+            if (HIT_WITH_LIMB.usable(controller)) return HIT_WITH_LIMB;
             if (age > 20 * 15 || controller.checkHurt(false)) return finishMove(controller);
             return this;
         }
@@ -437,7 +438,6 @@ public enum Technique implements IStateMachine<Technique> {
 
         @Override
         protected Object visitPlayer(EntityPlayer player, ColossusController controller) {
-            if (!player.onGround) return CONTINUE;
             return player;
         }
 
@@ -530,7 +530,7 @@ public enum Technique implements IStateMachine<Technique> {
             TargetSmash smash = findSmashable(controller);
             if (smash == null) return; // !!
             smash.limb.causesPain(true);
-            smash.limb.target(smash.rotation, 6, Interpolation.CUBIC);
+            smash.limb.target(smash.rotation, 8 , Interpolation.CUBIC);
             playNoise(controller);
         }
         
@@ -560,7 +560,7 @@ public enum Technique implements IStateMachine<Technique> {
                 }
                 
                 // The player has to be within a shell defined by the limb's length
-                double farthest = li.length + 2;
+                double farthest = li.length + 2; // And since this is too large, we can miss
                 double nearest = li.length - 2;
                 
                 double dist = idc.getDistanceToEntity(player);
@@ -583,14 +583,16 @@ public enum Technique implements IStateMachine<Technique> {
                 // The Quaternion needed to cause the limb to hit the player is the quaternion
                 // that changes DOWN to the normalized direction.
                 // The cross product of the two gives the axis of rotation,
-                // and the dot product can be converted to
+                // and the dot product can be converted to the angle
                 Vec3 src = Vec3.createVectorHelper(0, -1, 0);
                 Vec3 dst = li2player.normalize();
                 Vec3 axis = src.crossProduct(dst);
                 double angle = SpaceUtil.getAngle(src, dst);
 
+                controller.body.getRotation().applyReverseRotation(axis);
+
                 // A single strike through your oponnent will hurt him more than two hundred blows to his skin
-                angle *= 1.25;
+                angle *= 1.5;
 
                 Quaternion hitQuat = Quaternion.getRotationQuaternionRadians(angle, axis);
 
@@ -616,9 +618,12 @@ public enum Technique implements IStateMachine<Technique> {
         
         @Override
         public void onEnterState(ColossusController controller, Technique prevState) {
+            final Quaternion bodyRotation = controller.body.getRotation();
             for (LimbInfo li : controller.limbs) {
                 if (!li.type.isArmOrLeg()) continue;
                 li.causesPain(false);
+                double error = li.idc.getEntity().getRotation().getAngleBetween(bodyRotation);
+                if (error < 0.001) continue;
                 li.target(new Quaternion(), 1, Interpolation.SMOOTH);
 
             }
@@ -642,7 +647,6 @@ public enum Technique implements IStateMachine<Technique> {
             // Hold arms to the $LEFT
             BodySide side = controller.worldObj.rand.nextBoolean() ? BodySide.LEFT : BodySide.RIGHT;
             BodySide oppositeSide = controller.spin_direction == BodySide.LEFT ? BodySide.RIGHT : BodySide.LEFT;
-            //if (NORELEASE.on) side = BodySide.RIGHT;
             controller.spin_direction = side;
             for (LimbInfo li : controller.limbs) {
                 targetLimb(li, side);
@@ -677,19 +681,70 @@ public enum Technique implements IStateMachine<Technique> {
                 targetLimb(li, oppositeSide);
                 if (li.type.isArmOrLeg()) li.causesPain(true);
             }
-            double d = controller.spin_direction == BodySide.LEFT ? -1 : +1;
-            Quaternion bod = controller.body.getRotation();
-            Quaternion newBod = bod.multiply(Quaternion.getRotationQuaternionRadians(d * Math.PI * 1.75, ForgeDirection.UP));
-            newBod.incrLongFor(bod);
-            controller.bodyLimbInfo.target(newBod, 1F, Interpolation.SMOOTHER);
+            Quaternion newTarget = getBestTargetAngle(controller);
+            controller.bodyLimbInfo.target(newTarget, 1F, Interpolation.SMOOTHER);
         }
         
         @Override
         public Technique tick(ColossusController controller, int age) {
             return finishMove(controller, FINISH_MOVE);
-            //return finishMove(controller, STAND_STILL);
         }
-        
+
+        Quaternion getBestTargetAngle(ColossusController controller) {
+            EntityPlayer player = getClosestPlayer(controller);
+            if (player == null) {
+                return getDefaultSpin(controller);
+            }
+            Vec3 forward = SpaceUtil.fromDirection(ForgeDirection.EAST);
+            Vec3 playerOffset = SpaceUtil.subtract(SpaceUtil.fromEntPos(player), SpaceUtil.fromEntPos(controller));
+            playerOffset.yCoord = 0;
+            playerOffset = playerOffset.normalize();
+            double targetAngle = SpaceUtil.getAngle(forward, playerOffset);
+            if (Math.signum(targetAngle) != getSpinDirection(controller)) {
+                targetAngle = Math.PI * 2 - targetAngle;
+            }
+            double currentAngle = controller.body.getRotation().toRotationVector().yCoord;
+            double dist = Math.abs(targetAngle - currentAngle);
+            if (dist < Math.PI * 0.5) {
+                return getDefaultSpin(controller);
+            }
+            return Quaternion.getRotationQuaternionRadians(targetAngle, ForgeDirection.UP);
+        }
+
+        Quaternion getDefaultSpin(ColossusController controller) {
+            double d = getSpinDirection(controller);
+            Quaternion bod = controller.body.getRotation();
+            Quaternion newBod = bod.multiply(Quaternion.getRotationQuaternionRadians(d * Math.PI * 1.75, ForgeDirection.UP));
+            newBod.incrLongFor(bod);
+            return newBod;
+        }
+
+        private int getSpinDirection(ColossusController controller) {
+            return controller.spin_direction == BodySide.LEFT ? -1 : +1;
+        }
+
+        EntityPlayer getClosestPlayer(ColossusController controller) {
+            EntityPlayer best = null;
+            double bestDist = Double.MAX_VALUE;
+            for (EntityPlayer player : (Iterable<EntityPlayer>) controller.worldObj.playerEntities) {
+                if (!targetablePlayer(player, controller)) continue;
+                if (player.onGround && player.posY < controller.posY) {
+                    double dist = player.getDistanceSqToEntity(controller);
+                    if (best == null || dist < bestDist) {
+                        bestDist = dist;
+                        best = player;
+                    }
+                }
+            }
+            return best;
+        }
+
+        @Override
+        protected Object visitPlayer(EntityPlayer player, ColossusController controller) {
+
+            return null;
+        }
+
         @Override
         public void onExitState(ColossusController controller, Technique nextState) {
             for (LimbInfo li : controller.limbs) {
@@ -1005,14 +1060,21 @@ public enum Technique implements IStateMachine<Technique> {
     protected static final Object CONTINUE = new Object();
     
     protected <E> E iteratePotentialPlayers(ColossusController controller) {
-        for (EntityPlayer player : (Iterable<EntityPlayer>) controller.worldObj.playerEntities) {
-            if (player.getDistanceSqToEntity(controller) > distSq) continue;
-            if (player.capabilities.isCreativeMode /*&& !Core.dev_environ*/) continue;
+        ArrayList<EntityPlayer> allPlayers = new ArrayList<EntityPlayer>(controller.worldObj.playerEntities);
+        Collections.shuffle(allPlayers, controller.worldObj.rand);
+        for (EntityPlayer player : allPlayers) {
+            if (!targetablePlayer(player, controller)) continue;
             Object res = this.visitPlayer(player, controller);
             if (res == CONTINUE) continue;
             return (E) res;
         }
         return null;
+    }
+
+    boolean targetablePlayer(EntityPlayer player, ColossusController controller) {
+        if (player.getDistanceSqToEntity(controller) > distSq) return false;
+        if (player.capabilities.isCreativeMode && !Core.dev_environ) return false;
+        return true;
     }
     
     protected Object visitPlayer(EntityPlayer player, ColossusController controller) { return null; }

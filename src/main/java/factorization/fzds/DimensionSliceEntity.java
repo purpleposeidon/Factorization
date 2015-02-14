@@ -649,7 +649,7 @@ public class DimensionSliceEntity extends IDeltaChunk implements IFzdsEntryContr
                         if (e instanceof EntityLivingBase) {
                             if (smackSpeed > 0.05) {
                                 EntityLivingBase el = (EntityLivingBase) e;
-                                el.attackEntityFrom(violenceDamage, 4);
+                                el.attackEntityFrom(violenceDamage, (float) (20 * smackSpeed));
                                 Vec3 emo = velocity.normalize();
                                 e.motionX += emo.xCoord * vel_scale;
                                 e.motionY += emo.yCoord * vel_scale;

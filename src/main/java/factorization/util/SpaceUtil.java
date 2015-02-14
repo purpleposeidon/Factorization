@@ -123,6 +123,10 @@ public final class SpaceUtil {
         return Vec3.createVectorHelper(0, 0, 0);
     }
 
+    public static Vec3 fromDirection(ForgeDirection dir) {
+        return Vec3.createVectorHelper(dir.offsetX, dir.offsetY, dir.offsetZ);
+    }
+
     public static void sort(Vec3 min, Vec3 max) {
         if (min.xCoord > max.xCoord) {
             double big = min.xCoord;
