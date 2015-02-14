@@ -28,4 +28,6 @@ public class HammerProxy {
     IDeltaChunk getHitIDC() { return null; }
 
     public void createClientShadowWorld() { }
+
+    public void cleanupClientWorld() { }
 }

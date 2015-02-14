@@ -130,6 +130,11 @@ public class HammerClientProxy extends HammerProxy {
     
     @SubscribeEvent
     public void onClientLogout(ClientDisconnectionFromServerEvent event) {
+        cleanupClientWorld();
+    }
+
+    @Override
+    public void cleanupClientWorld() {
         //TODO: what else we can do here to cleanup?
         if (FMLCommonHandler.instance().getEffectiveSide() != Side.CLIENT) {
             return;
@@ -140,8 +145,9 @@ public class HammerClientProxy extends HammerProxy {
         Hammer.worldClient = null;
         send_queue = null;
         fake_player = null;
+        Hammer.clientSlices.clear();
     }
-    
+
     private static NetHandlerPlayClient send_queue;
     private boolean send_queue_spam = false;
     private void setSendQueueWorld(WorldClient wc) {

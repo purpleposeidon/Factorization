@@ -8,6 +8,7 @@ import cpw.mods.fml.common.event.FMLPreInitializationEvent;
 import cpw.mods.fml.common.event.FMLServerStartingEvent;
 import cpw.mods.fml.common.event.FMLServerStoppingEvent;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
+import cpw.mods.fml.common.network.FMLNetworkEvent;
 import cpw.mods.fml.common.network.FMLNetworkEvent.ClientDisconnectionFromServerEvent;
 import cpw.mods.fml.common.registry.EntityRegistry;
 import cpw.mods.fml.relauncher.Side;
@@ -15,7 +16,13 @@ import factorization.common.FzConfig;
 import factorization.fzds.network.FzdsPacketRegistry;
 import factorization.fzds.network.WrappedPacket;
 import factorization.shared.Core;
+import factorization.shared.NORELEASE;
+import net.minecraft.command.CommandBase;
+import net.minecraft.command.ICommand;
+import net.minecraft.command.ICommandSender;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.management.PlayerManager;
 import net.minecraft.util.Vec3;
@@ -26,6 +33,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.io.File;
+import java.util.List;
 
 @Mod(modid = Hammer.modId, name = Hammer.name, version = Core.version)
 public class Hammer {
@@ -115,10 +123,10 @@ public class Hammer {
         serverSlices.clear();
         clientSlices.clear();
     }
-    
+
     @SubscribeEvent
-    public void clearSlices(ClientDisconnectionFromServerEvent event) {
-        clientSlices.clear();
+    public void clearSlicesBeforeConnect(FMLNetworkEvent.ClientConnectedToServerEvent event) {
+        proxy.cleanupClientWorld();
     }
     
     public static Vec3 ent2vec(Entity ent) {
