@@ -12,6 +12,7 @@ import net.minecraft.launchwrapper.IClassTransformer;
 import net.minecraft.launchwrapper.Launch;
 import net.minecraft.launchwrapper.LaunchClassLoader;
 
+import net.minecraft.world.World;
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.ClassWriter;
 import org.objectweb.asm.Opcodes;
@@ -63,6 +64,10 @@ public class ASMTransformer implements IClassTransformer {
                     new AbstractAsmMethodTransform.MutateCall(name, transformedName, "func_78467_g", "orientCamera")
                         .find("net.minecraft.client.multiplayer.WorldClient", "func_72933_a", "rayTraceBlocks", vec_vec_mop)
             );
+        }
+        if (transformedName.equals("net.minecraft.world.World")) {
+            return applyTransform(basicClass,
+                    new AbstractAsmMethodTransform.Append(name, transformedName, "func_72829_c", "checkBlockCollision"));
         }
         return basicClass;
     }

@@ -60,4 +60,9 @@ public class MethodSplices {
     public static MovingObjectPosition func_78467_g(WorldClient world, Vec3 traceStart, Vec3 traceEnd) {
         return HookTargetsClient.boxTrace(world, traceStart, traceEnd);
     }
+
+    // World.checkBlockCollision
+    public boolean func_72829_c(AxisAlignedBB box) {
+        return HookTargetsServer.checkHammerCollision((World) (Object) this, box);
+    }
 }
