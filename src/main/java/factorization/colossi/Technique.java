@@ -1020,7 +1020,7 @@ public enum Technique implements IStateMachine<Technique> {
     static final int SIT_FALL_TIME = 20 * 3;
 
     void playNoise(ColossusController controller) {
-        float volume = 1;
+        float volume = 10; // Loud like a ghast!
         float pitch = 1;
         controller.worldObj.playSoundAtEntity(controller, "factorization:colossus.tech_" + this, volume, pitch);
     }
