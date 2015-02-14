@@ -1,14 +1,8 @@
 package factorization.fzds;
 
-import cpw.mods.fml.repackage.com.nothome.delta.Delta;
 import factorization.api.Coord;
 import factorization.fzds.interfaces.IDeltaChunk;
-import factorization.shared.NORELEASE;
 import factorization.util.NumUtil;
-
-import java.util.HashMap;
-import java.util.Iterator;
-
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.DestroyBlockProgress;
 import net.minecraft.entity.Entity;
@@ -16,6 +10,9 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.Vec3;
 import net.minecraft.world.IWorldAccess;
 import net.minecraft.world.World;
+
+import java.util.HashMap;
+import java.util.Iterator;
 
 class ShadowRenderGlobal implements IWorldAccess {
     /***

@@ -1,15 +1,11 @@
 package factorization.fzds;
 
-import java.util.Iterator;
-
-import cpw.mods.fml.repackage.com.nothome.delta.Delta;
-import factorization.shared.NORELEASE;
+import factorization.api.Coord;
+import factorization.fzds.interfaces.IDeltaChunk;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.world.IWorldAccess;
 import net.minecraft.world.World;
-import factorization.api.Coord;
-import factorization.fzds.interfaces.IDeltaChunk;
 
 public final class ServerShadowWorldAccess implements IWorldAccess {
     // "IWorldAccess" is poorly named; "IWorldWatcher" would be better.
