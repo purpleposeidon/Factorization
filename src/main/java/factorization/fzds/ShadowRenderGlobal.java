@@ -1,7 +1,9 @@
 package factorization.fzds;
 
+import cpw.mods.fml.repackage.com.nothome.delta.Delta;
 import factorization.api.Coord;
 import factorization.fzds.interfaces.IDeltaChunk;
+import factorization.shared.NORELEASE;
 import factorization.util.NumUtil;
 
 import java.util.HashMap;
@@ -67,7 +69,41 @@ class ShadowRenderGlobal implements IWorldAccess {
     }
     
     @Override
-    public void playSoundToNearExcept(EntityPlayer entityplayer, String s, double d0, double d1, double d2, float f, float f1) { }
+    public void playSoundToNearExcept(EntityPlayer entityplayer, String sound, double x, double y, double z, float volume, float pitch) {
+        if (entityplayer != Minecraft.getMinecraft().thePlayer) {
+            playSound(sound, x, y, z, volume, pitch);
+        }
+    }
+
+
+    @Override
+    public void playRecord(String recordName, int x, int y, int z) {
+        Vec3 realCoords = DeltaChunk.shadow2nearestReal(Minecraft.getMinecraft().thePlayer, x, y, z);
+        if (realCoords == null) {
+            return;
+        }
+        Minecraft.getMinecraft().renderGlobal.playRecord(recordName, (int)realCoords.xCoord, (int)realCoords.yCoord, (int)realCoords.zCoord);
+    }
+
+    @Override
+    public void broadcastSound(int soundType, int x, int y, int z, int type) {
+        final Coord here = new Coord(DeltaChunk.getClientShadowWorld(), x, y, z);
+        for (IDeltaChunk idc : DeltaChunk.getSlicesContainingPoint(here)) {
+            Coord at = here.copy();
+            idc.shadow2real(at);
+            at.w.playBroadcastSound(soundType, x, y, z, type);
+        }
+    }
+
+    @Override
+    public void playAuxSFX(EntityPlayer player, int soundType, int x, int y, int z, int soundData) {
+        final Coord here = new Coord(DeltaChunk.getClientShadowWorld(), x, y, z);
+        for (IDeltaChunk idc : DeltaChunk.getSlicesContainingPoint(here)) {
+            Coord at = here.copy();
+            idc.shadow2real(at);
+            at.w.playAuxSFXAtEntity /* MCP name fail */(player, soundType, at.x, at.y, at.z, soundData);
+        }
+    }
 
     @Override
     public void spawnParticle(String particle, double x, double y, double z, double vx, double vy, double vz) {
@@ -93,29 +129,6 @@ class ShadowRenderGlobal implements IWorldAccess {
     @Override
     public void onEntityDestroy(Entity entity) {
         Minecraft.getMinecraft().renderGlobal.onEntityDestroy(entity);
-    }
-
-    @Override
-    public void playRecord(String recordName, int x, int y, int z) {
-        Vec3 realCoords = DeltaChunk.shadow2nearestReal(Minecraft.getMinecraft().thePlayer, x, y, z);
-        if (realCoords == null) {
-            return;
-        }
-        Minecraft.getMinecraft().renderGlobal.playRecord(recordName, (int)realCoords.xCoord, (int)realCoords.yCoord, (int)realCoords.zCoord);
-    }
-
-    @Override
-    public void broadcastSound(int var1, int var2, int var3, int var4,
-            int var5) {
-        // TODO Auto-generated method stub
-        
-    }
-
-    @Override
-    public void playAuxSFX(EntityPlayer var1, int var2, int var3, int var4,
-            int var5, int var6) {
-        // TODO Auto-generated method stub
-        
     }
 
     HashMap<Integer, DestroyBlockProgress> damagedBlocks = new HashMap();

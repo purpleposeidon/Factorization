@@ -4,7 +4,6 @@ import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.Mod;
 import cpw.mods.fml.common.Mod.EventHandler;
 import cpw.mods.fml.common.SidedProxy;
-import cpw.mods.fml.common.event.FMLPostInitializationEvent;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
 import cpw.mods.fml.common.event.FMLServerStartingEvent;
 import cpw.mods.fml.common.event.FMLServerStoppingEvent;
@@ -103,7 +102,7 @@ public class Hammer {
             throw new RuntimeException("hammerWorld is not loaded");
         }
         World hammerWorld = DimensionManager.getWorld(dimensionID);
-        hammerWorld.addWorldAccess(new ShadowWorldAccess());
+        hammerWorld.addWorldAccess(new ServerShadowWorldAccess());
         int view_distance = MinecraftServer.getServer().getConfigurationManager().getViewDistance();
         //the undeobfed method comes after "isPlayerWatchingChunk", also in uses of ServerConfigurationManager.getViewDistance()
         //It returns how many blocks are visible.
