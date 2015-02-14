@@ -89,10 +89,10 @@ public class ItemColossusGuide extends ItemFactorization {
     String getDistance(DeltaCoord dc) {
         int d = (int) dc.magnitude();
         String pretty = "" + d;
-        String unit = "m";
+        String unit = " blocks";
         if (d > 1000) {
             pretty = String.format("%.1f", d / 1000F);
-            unit = "km";
+            unit = " km";
         }
         return pretty + unit;
     }
