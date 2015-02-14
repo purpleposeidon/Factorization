@@ -27,7 +27,16 @@ minecraft {
     replace '@FZVERSION@', (project.version.split("-")[1])
 }
 
+repositories {
+    maven {   
+        name = "ChickenBones"
+        url = "http://chickenbones.net/maven/"
+    }   
+}
+
+
 dependencies {
+    compile 'codechicken:NotEnoughItems:1.7.10-1.0.2.15:dev'
     // you may put jars on which you depend on in ./libs
     // or you may define them like so..
     //compile "some.group:artifact:version:classifier"
