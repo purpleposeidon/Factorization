@@ -1,7 +1,10 @@
 
 colossus_attack.ogg
     "Old Metal", by digifishmusic
-    http://www.freesound.org/people/digifishmusic/sounds/66417/
+        http://www.freesound.org/people/digifishmusic/sounds/66417/
+    Creative Commons, Attribution License
+        http://creativecommons.org/licenses/by/3.0/
+    This work is unmodified.
 
 colossus_creak1.ogg
 colossus_creak2.ogg
@@ -12,23 +15,36 @@ colossus_bow.ogg
 colossus_hurt.ogg
 colossus_unbow.ogg
 colossus_first_bow.ogg
-    "A swing is squeaking at night", by felix.blume
-    http://www.freesound.org/people/felix.blume/sounds/137271/
+    "A swing is squeaking at night (Ukraine. Kiev)", by felix.blume
+        http://www.freesound.org/people/felix.blume/sounds/137271/
+    Creative Commons, Zero License
+        https://creativecommons.org/publicdomain/zero/1.0/
 
 colossus_death.ogg
-    "ambience 07 Internal.wav", by yewbic
-    http://www.freesound.org/people/yewbic/sounds/66057/
+    "Ambience 07 Internal", by yewbic
+        http://www.freesound.org/people/yewbic/sounds/66057/
+    Creative Commons, Zero License
+        https://creativecommons.org/publicdomain/zero/1.0/
 
 colossus_death.ogg
     "THE CRASH", by sandyrb
-    http://www.freesound.org/people/sandyrb/sounds/95078/
+        http://www.freesound.org/people/sandyrb/sounds/95078/
+    Creative Commons, Attribution License
+        http://creativecommons.org/licenses/by/3.0/
+    Cropped & combined with "Ambience 07 Internal".
 
 colossus_first_bow.ogg
-    "Avalance", by mystiscool
-    http://www.freesound.org/people/mystiscool/sounds/7141/
+    "Avalanche", by mystiscool
+        http://www.freesound.org/people/mystiscool/sounds/7141/
+    Creative Commons, Attribution License
+        http://creativecommons.org/licenses/by/3.0/
+    Cropped & combined with other work.
 
 colossus_rise.ogg
-    "Ambienta Soundtrack — Crystal Airlines", by suonho
-    http://www.freesound.org/people/suonho/sounds/56364/
+    "Ambienta Soundtrack: Crystal Airlines", by suonho
+        http://www.freesound.org/people/suonho/sounds/56364/
+    Creative Commons, Attribution License
+        http://creativecommons.org/licenses/by/3.0/
+    Cropped and filtered
 
 
