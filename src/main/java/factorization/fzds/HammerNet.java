@@ -166,7 +166,7 @@ public class HammerNet {
         DimensionSliceEntity idc = (DimensionSliceEntity) ent;
         
         if (!idc.can(DeltaCapability.INTERACT)) {
-            if (type == HammerNetType.digFinish || type == HammerNetType.digProgress || type == HammerNetType.digStart || type == HammerNetType.rightClickBlock) {
+            if (type == HammerNetType.digFinish || type == HammerNetType.digProgress || type == HammerNetType.digStart || type == HammerNetType.rightClickBlock || type == HammerNetType.leftClickBlock) {
                 Core.logWarning("%s tried to interact with IDC that doesn't permit that %s", player, idc);
                 return;
             }
@@ -208,8 +208,19 @@ public class HammerNet {
                 active_idc = null;
             }
             idc.blocksChanged(x, y, z);
+        } else if (type == HammerNetType.leftClickBlock) {
+            int x = dis.readInt();
+            int y = dis.readInt();
+            int z = dis.readInt();
+            byte sideHit = dis.readByte();
+            float vecX = dis.readFloat();
+            float vecY = dis.readFloat();
+            float vecZ = dis.readFloat();
+            World world = idc.getCorner().w;
+            Block block = world.getBlock(x, y, z);
+            block.onBlockClicked(world, x, y, z, player);
         } else {
-            Core.logWarning("%s tried sent an unknown packet %s to IDC %s", player, type, idc);
+            Core.logWarning("%s tried to send an unknown packet %s to IDC %s", player, type, idc);
         }
     }
     
@@ -227,8 +238,8 @@ public class HammerNet {
         event.setCanceled(true);
     }
     
-    boolean in(int low, int x, int high) {
-        return low <= x && x <= high;
+    boolean in(int low, int i, int high) {
+        return low <= i && i <= high;
     }
     
     boolean blockInReach(IDeltaChunk idc, EntityPlayerMP player, Coord at) {
