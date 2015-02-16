@@ -1249,4 +1249,11 @@ public class DimensionSliceEntity extends IDeltaChunk implements IFzdsEntryContr
     private void broadcastPacket(FMLProxyPacket toSend) {
         HammerNet.channel.sendToAllAround(toSend, new NetworkRegistry.TargetPoint(dimension, posX, posY, posZ, 64));
     }
+
+    @Override
+    public float getEyeHeight() {
+        // This is a hack to work around DSEs getting knocked around by explosions
+        // It looks like it won't cause any problems with vanilla at least.
+        return -100000000F;
+    }
 }

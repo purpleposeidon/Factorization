@@ -6,6 +6,7 @@ import java.util.EnumSet;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
@@ -99,7 +100,10 @@ class ClientMessage {
         if (locus instanceof Entity) {
             Entity e = ((Entity) locus);
             double w = e.width*-1.5;
-            double eye_height = e.getEyeHeight() + 4.0/16.0;
+            double eye_height = 4.0/16.0;
+            if (e instanceof EntityLiving) {
+                eye_height += e.getEyeHeight();
+            }
             return Vec3.createVectorHelper(
                     interp(e.prevPosX, e.posX, partial) + w/2,
                     interp(e.prevPosY, e.posY, partial) + eye_height,
