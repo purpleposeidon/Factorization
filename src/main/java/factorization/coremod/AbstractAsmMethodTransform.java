@@ -1,13 +1,8 @@
 package factorization.coremod;
 
-import org.objectweb.asm.Opcodes;
-import org.objectweb.asm.tree.AbstractInsnNode;
-import org.objectweb.asm.tree.InsnList;
-import org.objectweb.asm.tree.LineNumberNode;
-import org.objectweb.asm.tree.MethodInsnNode;
-import org.objectweb.asm.tree.MethodNode;
-
 import cpw.mods.fml.common.asm.transformers.deobf.FMLDeobfuscatingRemapper;
+import org.objectweb.asm.Opcodes;
+import org.objectweb.asm.tree.*;
 
 abstract class AbstractAsmMethodTransform {
     protected final String obfClassName;
@@ -107,9 +102,11 @@ abstract class AbstractAsmMethodTransform {
         
         @Override
         void apply(MethodNode base, MethodNode addition) {
+            boolean any = false;
             InsnList instructions = base.instructions;
             for (AbstractInsnNode insn = instructions.getFirst(); insn != null; insn = insn.getNext()) {
-                if (insn.getOpcode() != Opcodes.INVOKEVIRTUAL) {
+                int op = insn.getOpcode();
+                if (op != Opcodes.INVOKEVIRTUAL && op != Opcodes.INVOKESTATIC) {
                     continue;
                 }
                 MethodInsnNode meth = (MethodInsnNode) insn;
@@ -121,6 +118,10 @@ abstract class AbstractAsmMethodTransform {
                 meth.owner = "factorization/coremod/MethodSplices";
                 meth.name = addition.name;
                 meth.desc = addition.desc;
+                any = true;
+            }
+            if (!any) {
+                throw new RuntimeException("Method mutation failed: did not find " + find_owner + " " + find_desc + " " + find_mcp_name + "/" + find_srg_name);
             }
         }
         

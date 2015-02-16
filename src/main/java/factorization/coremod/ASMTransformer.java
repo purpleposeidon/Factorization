@@ -91,6 +91,14 @@ public class ASMTransformer implements IClassTransformer {
                 return applyTransform(basicClass,
                         new AbstractAsmClassTransform.Mixin("factorization.coremodhooks.MixinEntityKinematicsTracker", "Lfactorization/coremodhooks/MixinEntityKinematicsTracker;"));
             }
+            // Don't let IDCs be knocked backwards
+            if (transformedName.equals("net.minecraft.world.Explosion")) {
+                final String ent_double_double = "(Lnet/minecraft/entity/Entity;D)D";
+                return applyTransform(basicClass,
+                        new AbstractAsmMethodTransform.MutateCall(name, transformedName, "func_77278_a", "doExplosionA")
+                                .find("net.minecraft.enchantment.EnchantmentProtection", "func_92092_a", "func_92092_a", ent_double_double)
+                );
+            }
         }
         return basicClass;
     }

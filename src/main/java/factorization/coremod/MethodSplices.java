@@ -56,7 +56,7 @@ public class MethodSplices {
         HookTargetsServer.addConstantColliders(this, p_76588_1_, p_76588_2_, p_76588_3_, p_76588_4_);
     }
     
-    // EntityRenderer.orientCamera
+    // EntityRenderer.orientCamera; method replacement
     public static MovingObjectPosition func_78467_g(WorldClient world, Vec3 traceStart, Vec3 traceEnd) {
         return HookTargetsClient.boxTrace(world, traceStart, traceEnd);
     }
@@ -64,5 +64,10 @@ public class MethodSplices {
     // World.checkBlockCollision
     public boolean func_72829_c(AxisAlignedBB box) {
         return HookTargetsServer.checkHammerCollision((World) (Object) this, box);
+    }
+
+    // Explosion.doExplosionA; method replacement
+    public static double func_77278_a(Entity ent, double dmg) {
+        return HookTargetsServer.clipExplosionResistance(ent, dmg);
     }
 }

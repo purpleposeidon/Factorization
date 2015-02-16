@@ -6,6 +6,7 @@ import factorization.fzds.DeltaChunk;
 import factorization.fzds.interfaces.IDeltaChunk;
 import factorization.util.SpaceUtil;
 import net.minecraft.command.IEntitySelector;
+import net.minecraft.enchantment.EnchantmentProtection;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.init.Blocks;
@@ -121,5 +122,11 @@ public class HookTargetsServer {
             if (ent.getBoundingBox().intersectsWith(box)) return true;
         }
         return false;
+    }
+
+    public static double clipExplosionResistance(Entity ent, double dmg) {
+        double ret = EnchantmentProtection.func_92092_a(ent, dmg);
+        if (ret < 0) return 0;
+        return ret;
     }
 }

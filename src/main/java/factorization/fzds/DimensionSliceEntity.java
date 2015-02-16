@@ -11,12 +11,16 @@ import factorization.shared.*;
 import factorization.util.SpaceUtil;
 import net.minecraft.block.Block;
 import net.minecraft.command.IEntitySelector;
+import net.minecraft.enchantment.Enchantment;
+import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityList;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.init.Items;
+import net.minecraft.item.ItemStack;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.management.ServerConfigurationManager;
 import net.minecraft.util.AxisAlignedBB;
@@ -1250,10 +1254,14 @@ public class DimensionSliceEntity extends IDeltaChunk implements IFzdsEntryContr
         HammerNet.channel.sendToAllAround(toSend, new NetworkRegistry.TargetPoint(dimension, posX, posY, posZ, 64));
     }
 
+    static final ItemStack[] blast_protection = new ItemStack[1];
+    static {
+        ItemStack is = blast_protection[0] = new ItemStack(Items.diamond_chestplate, 0, 0 /* hopefully it doesn't get stolen */);
+        is.addEnchantment(Enchantment.blastProtection, 88);
+    }
+
     @Override
-    public float getEyeHeight() {
-        // This is a hack to work around DSEs getting knocked around by explosions
-        // It looks like it won't cause any problems with vanilla at least.
-        return -100000000F;
+    public ItemStack[] getLastActiveItems() {
+        return blast_protection;
     }
 }
