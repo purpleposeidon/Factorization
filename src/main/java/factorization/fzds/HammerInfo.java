@@ -21,6 +21,7 @@ public class HammerInfo {
     static File worldConfigFile = null;
     static Configuration channelConfig;
     static Configuration worldState;
+    static int dimension_slice_dimid = -7;
     
     private int unsaved_allocations = 0;
     private boolean channel_config_dirty = false;
@@ -31,6 +32,11 @@ public class HammerInfo {
     
     void setConfigFile(File f) {
         channelConfig = new Configuration(f);
+        final String rem = "The dimension used for FZDS/Hammer/Colossi/rotated/moving blocks, etc.\n" +
+                "If things go really south with those features, as a last resort you can try deleting this dimension.\n" +
+                "But first see if you can use the /fzds to fix it.";
+        dimension_slice_dimid = channelConfig.getInt("FzdsDimension", "Hammer", dimension_slice_dimid, Integer.MIN_VALUE, Integer.MAX_VALUE, rem);
+        saveChannelConfig();
     }
     
     void loadGlobalConfig() {
@@ -55,7 +61,7 @@ public class HammerInfo {
         }
         Core.logFine("Allocating Hammer channel for %s: %s", modName, comment);
         
-        String modCategory = (modName + "." + channelName).toLowerCase();
+        String modCategory = ("hammerChannels." + modName + "." + channelName).toLowerCase();
         
         int max = default_channel_id;
         boolean collision = false;

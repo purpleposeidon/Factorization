@@ -65,7 +65,7 @@ public class DeltaChunk {
     }
     
     public static World getServerShadowWorld() {
-        return DimensionManager.getWorld(Hammer.dimensionID);
+        return DimensionManager.getWorld(Hammer.getDimensionId());
     }
     
     public static World getClientRealWorld() {

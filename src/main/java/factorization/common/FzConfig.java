@@ -22,7 +22,6 @@ public class FzConfig {
     public static boolean gen_dark_iron_ore = true;
     public static int silver_ore_node_new_size = 18;
     public static boolean gen_colossi = true;
-    public static int dimension_slice_dimid = -7;
     public static boolean pocket_craft_anywhere = true;
     public static String pocketActions = "xcbf";
     public static boolean renderTEs = true;
@@ -98,6 +97,19 @@ public class FzConfig {
             prop.comment = comment;
         }
         return prop.getString();
+    }
+
+
+    public static boolean loaded = false;
+    public void load() {
+        if (loaded) return;
+        loaded = true;
+        loadConfig(null);
+    }
+
+    public void reload() {
+        loaded = false;
+        load();
     }
     
     public void loadConfig(File configFile) {
@@ -177,7 +189,6 @@ public class FzConfig {
         fanturpeller_works_on_players = getBoolConfig("fanturpellerWorksOnPlayers", "server", fanturpeller_works_on_players, "If set to false, fanturpellers will not move players.");
         sockets_ignore_front_redstone = getBoolConfig("socketsIgnoreFacePower", "server", sockets_ignore_front_redstone, "Set to false to let socket blocks detect redstone from their front; provided for legacy worlds.");
         require_book_for_manual = getBoolConfig("requireBookForManual", "general", require_book_for_manual, "If set to true, then you must have a manual in your inventory to look up items");
-        dimension_slice_dimid = getIntConfig("FzdsDimension", "server", dimension_slice_dimid, "The dimension used for FZDS/Hammer/Colossi/rotated/moving blocks, etc. If things go really south with those features, as a last resort you can try deleting this dimension. But first see if you can use the /fzds to fix it.");
         lacerator_block_graylist = Graylist.ofBlocks(getStringConfig("laceratorBlockGraylist", "server", "-minecraft:bedrock,minecraft:end_portal", "Comma-separated list of block names. In front of the list must be either a +, for white-listing, or a -, for black-listing."));
         if (config.hasChanged()) {
             config.save();

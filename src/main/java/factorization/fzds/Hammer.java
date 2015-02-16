@@ -4,6 +4,7 @@ import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.Mod;
 import cpw.mods.fml.common.Mod.EventHandler;
 import cpw.mods.fml.common.SidedProxy;
+import cpw.mods.fml.common.event.FMLPostInitializationEvent;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
 import cpw.mods.fml.common.event.FMLServerStartingEvent;
 import cpw.mods.fml.common.event.FMLServerStoppingEvent;
@@ -45,7 +46,6 @@ public class Hammer {
     public static HammerNet net;
     @SidedProxy(clientSide = "factorization.fzds.HammerClientProxy", serverSide = "factorization.fzds.HammerProxy")
     public static HammerProxy proxy;
-    public static int dimensionID;
     public static World worldClient = null; //This is actually a WorldClient that is actually HammerClientProxy.HammerWorldClient
     public static double DSE_ChunkUpdateRangeSquared = Math.pow(16*8, 2); //This is actually set when the server starts
     public static int fzds_command_channel = 0;
@@ -66,16 +66,16 @@ public class Hammer {
     @EventHandler
     public void setup(FMLPreInitializationEvent event) {
         event.getModMetadata().parent = Core.modId;
-        File base = event.getSuggestedConfigurationFile().getParentFile();
+        final File configFile = event.getSuggestedConfigurationFile();
+        File base = configFile.getParentFile();
         hammerInfo.setConfigFile(new File(base, "hammerChannels.cfg"));
         
         int client_despawn_distance = 16*10; //NORELEASE: This wants for a config setting. "How far away the a client must be from a DSE before the server will tell the client to forget about it (eg, client side despawn)."
         EntityRegistry.registerModEntity(DimensionSliceEntity.class, "fzds", 1, this, client_despawn_distance, 1, true);
         
         //Create the hammer dimension
-        dimensionID = FzConfig.dimension_slice_dimid;
-        DimensionManager.registerProviderType(dimensionID, HammerWorldProvider.class, true);
-        DimensionManager.registerDimension(dimensionID, dimensionID);
+        DimensionManager.registerProviderType(getDimensionId(), HammerWorldProvider.class, true);
+        DimensionManager.registerDimension(getDimensionId(), getDimensionId());
         fzds_command_channel = hammerInfo.makeChannelFor(Core.modId, "fzdscmd", fzds_command_channel, -1, "This channel is used for Slices created using the /fzds command");
         FzdsPacketRegistry.init();
         
@@ -93,15 +93,20 @@ public class Hammer {
         WrappedPacket.registerPacket();
         ForgeChunkManager.setForcedChunkLoadingCallback(this, new PPPChunkLoader());
     }
+
+    @EventHandler
+    public void finishLoad(FMLPostInitializationEvent event) {
+        hammerInfo.saveChannelConfig();
+    }
     
     @EventHandler
     public void serverStart(FMLServerStartingEvent event) {
         event.registerServerCommand(new FZDSCommand());
-        DimensionManager.initDimension(dimensionID);
-        if (!DimensionManager.shouldLoadSpawn(dimensionID)) {
+        DimensionManager.initDimension(getDimensionId());
+        if (!DimensionManager.shouldLoadSpawn(getDimensionId())) {
             throw new RuntimeException("hammerWorld is not loaded");
         }
-        World hammerWorld = DimensionManager.getWorld(dimensionID);
+        World hammerWorld = DimensionManager.getWorld(getDimensionId());
         hammerWorld.addWorldAccess(new ServerShadowWorldAccess());
         int view_distance = MinecraftServer.getServer().getConfigurationManager().getViewDistance();
         //the undeobfed method comes after "isPlayerWatchingChunk", also in uses of ServerConfigurationManager.getViewDistance()
@@ -146,5 +151,9 @@ public class Hammer {
         if (Core.dev_environ) {
             hammerLogger.info(String.format(format, formatParameters));
         }
+    }
+
+    public static int getDimensionId() {
+        return HammerInfo.dimension_slice_dimid;
     }
 }

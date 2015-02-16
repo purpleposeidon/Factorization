@@ -10,6 +10,6 @@ public class ColossusFeature {
     public static void init() {
         MaskLoader.loadMasks();
         HammerInfo reg = DeltaChunk.getHammerRegistry();
-        reg.makeChannelFor(Core.name, "collossi", deltachunk_channel, 24, "Channel for awakened colossi body parts");
+        reg.makeChannelFor(Core.name, "collossi", deltachunk_channel, 24, "Channel for awakened colossus body parts");
     }
 }

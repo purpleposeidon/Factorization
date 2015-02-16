@@ -421,8 +421,8 @@ public class FZDSCommand extends CommandBase {
                 } else {
                     tp.destination = selected.getCenter();
                 }
-                if (DimensionManager.getWorld(FzConfig.dimension_slice_dimid) != player.worldObj) {
-                    manager.transferPlayerToDimension(player, FzConfig.dimension_slice_dimid, tp);
+                if (DimensionManager.getWorld(Hammer.getDimensionId()) != player.worldObj) {
+                    manager.transferPlayerToDimension(player, Hammer.getDimensionId(), tp);
                 } else {
                     tp.destination.x--;
                     tp.destination.moveToTopBlock();
@@ -434,12 +434,12 @@ public class FZDSCommand extends CommandBase {
             String details() { return "Teleports the player into hammerspace"; }
             @Override
             void call(String[] args) {
-                if (player.dimension == Hammer.dimensionID) {
+                if (player.dimension == Hammer.getDimensionId()) {
                     return;
                 }
                 DSTeleporter tp = getTp();
                 tp.destination.set(DeltaChunk.getServerShadowWorld(), 0, 64, 0);
-                manager.transferPlayerToDimension(player, Hammer.dimensionID, tp);
+                manager.transferPlayerToDimension(player, Hammer.getDimensionId(), tp);
             }}, Requires.PLAYER, Requires.CREATIVE);
         add(new SubCommand("leave", "[dest=0]") {
             @Override

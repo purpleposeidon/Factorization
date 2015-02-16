@@ -121,7 +121,7 @@ public class HammerClientProxy extends HammerProxy {
         WorldInfo wi = world.getWorldInfo();
         Hammer.worldClient = new HammerWorldClient(send_queue,
                 new WorldSettings(wi),
-                Hammer.dimensionID,
+                Hammer.getDimensionId(),
                 world.difficultySetting,
                 Core.proxy.getProfiler());
         Hammer.worldClient.addWorldAccess(shadowRenderGlobal = new ShadowRenderGlobal(mc.theWorld));

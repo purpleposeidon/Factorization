@@ -179,7 +179,7 @@ public class ColossalBlock extends Block {
     
     @Override
     public void randomDisplayTick(World world, int x, int y, int z, Random rand) {
-        if (world.provider.dimensionId != Hammer.dimensionID) return;
+        if (world.provider.dimensionId != Hammer.getDimensionId()) return;
         int md = world.getBlockMetadata(x, y, z);
         int r = md == MD_BODY_CRACKED ? 4 : 2;
         float px = x - 0.5F + rand.nextFloat()*r;

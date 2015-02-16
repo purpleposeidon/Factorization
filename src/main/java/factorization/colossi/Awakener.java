@@ -36,7 +36,7 @@ public class Awakener {
         if (is_working) return;
         try {
             is_working = true;
-            if (src.getDimensionID() == Hammer.dimensionID) return;
+            if (src.getDimensionID() == Hammer.getDimensionId()) return;
             TileEntityColossalHeart heart = findNearestHeart(src);
             if (heart == null) return;
             msg("Unknown XR10-class entity detected.");
