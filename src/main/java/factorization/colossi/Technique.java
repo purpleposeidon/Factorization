@@ -551,6 +551,7 @@ public enum Technique implements IStateMachine<Technique> {
                 if (li.type != LimbType.ARM && li.type != LimbType.LEG) continue;
                 IDeltaChunk idc = li.idc.getEntity();
                 if (idc == null) continue;
+                if (idc.hasOrderedRotation()) continue;
                 
                 // So! We need to hit the player. There are some constraints on hitability. (These are sorted for efficiency)
                 
