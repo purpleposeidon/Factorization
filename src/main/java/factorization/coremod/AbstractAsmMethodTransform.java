@@ -2,7 +2,10 @@ package factorization.coremod;
 
 import cpw.mods.fml.common.asm.transformers.deobf.FMLDeobfuscatingRemapper;
 import org.objectweb.asm.Opcodes;
+import org.objectweb.asm.Type;
 import org.objectweb.asm.tree.*;
+
+import java.lang.reflect.Method;
 
 abstract class AbstractAsmMethodTransform {
     protected final String obfClassName;
@@ -90,18 +93,27 @@ abstract class AbstractAsmMethodTransform {
             super(obfClassName, srgClassName, srgName, mcpName);
         }
 
-        private String find_owner, find_mcp_name, find_srg_name, find_desc;
+        private String find_owner, find_mcp_name, find_srg_name, find_notch_name, find_notch_desc, find_mcp_desc;
         
-        public MutateCall find(String owner, String srg_name, String mcp_name, String descriptor) {
+        public MutateCall find(String owner, String srg_name, String mcp_name, String notch_name, String find_notch_desc) {
+            if (!ASMTransformer.dev_environ) {
+                owner = FMLDeobfuscatingRemapper.INSTANCE.unmap(owner.replace(".", "/"));
+                find_srg_name = FMLDeobfuscatingRemapper.INSTANCE.unmap(srg_name);
+            }
             this.find_owner = owner.replace(".", "/");
             this.find_mcp_name = mcp_name;
             this.find_srg_name = srg_name;
-            this.find_desc = descriptor;
+            this.find_notch_name = notch_name;
+            this.find_notch_desc = find_notch_desc;
+
+
             return this;
         }
         
         @Override
         void apply(MethodNode base, MethodNode addition) {
+            find_mcp_desc = addition.desc; // Not used. Would have to convert desc from MCP to Notch, and there's no actual bug yet
+            String find_desc = ASMTransformer.dev_environ ? find_mcp_desc : find_notch_desc;
             boolean any = false;
             InsnList instructions = base.instructions;
             for (AbstractInsnNode insn = instructions.getFirst(); insn != null; insn = insn.getNext()) {
@@ -110,7 +122,9 @@ abstract class AbstractAsmMethodTransform {
                     continue;
                 }
                 MethodInsnNode meth = (MethodInsnNode) insn;
-                boolean match = meth.owner.equals(find_owner) && meth.desc.equals(find_desc) && (meth.name.equals(find_mcp_name) || meth.name.equals(find_srg_name));
+                String name = meth.name;
+                if (!meth.desc.equals(find_desc)) continue;
+                boolean match = meth.owner.equals(find_owner) && (name.equals(find_mcp_name) || name.equals(find_srg_name) || name.equals(find_notch_name));
                 if (!match) {
                     continue;
                 }

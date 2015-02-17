@@ -65,10 +65,10 @@ public class ASMTransformer implements IClassTransformer {
             // Make the camera take UCs into account in 3rd-person view
             // (Could go in forge, but is implemented specifically for FZDS)
             if (transformedName.equals("net.minecraft.client.renderer.EntityRenderer")) {
-                final String vec_vec_mop = "(Lnet/minecraft/util/Vec3;Lnet/minecraft/util/Vec3;)Lnet/minecraft/util/MovingObjectPosition;";
+                final String vec_vec_mop = "(Lazw;Lazw;)Lazu;";
                 return applyTransform(basicClass,
                         new AbstractAsmMethodTransform.MutateCall(name, transformedName, "func_78467_g", "orientCamera")
-                                .find("net.minecraft.client.multiplayer.WorldClient", "func_72933_a", "rayTraceBlocks", vec_vec_mop)
+                                .find("net.minecraft.client.multiplayer.WorldClient", "func_72933_a", "rayTraceBlocks", "a", vec_vec_mop)
                 );
             }
             // Add "Universal Colliders". Adds a list of entities to the chunk that are added to every collision query.
@@ -93,10 +93,10 @@ public class ASMTransformer implements IClassTransformer {
             }
             // Don't let IDCs be knocked backwards
             if (transformedName.equals("net.minecraft.world.Explosion")) {
-                final String ent_double_double = "(Lnet/minecraft/entity/Entity;D)D";
+                final String ent_double_double = "(Lsa;D)D";
                 return applyTransform(basicClass,
                         new AbstractAsmMethodTransform.MutateCall(name, transformedName, "func_77278_a", "doExplosionA")
-                                .find("net.minecraft.enchantment.EnchantmentProtection", "func_92092_a", "func_92092_a", ent_double_double)
+                                .find("net.minecraft.enchantment.EnchantmentProtection", "func_92092_a", "func_92092_a", "a", ent_double_double)
                 );
             }
         }
