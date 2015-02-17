@@ -2,10 +2,7 @@ package factorization.coremod;
 
 import cpw.mods.fml.common.asm.transformers.deobf.FMLDeobfuscatingRemapper;
 import org.objectweb.asm.Opcodes;
-import org.objectweb.asm.Type;
 import org.objectweb.asm.tree.*;
-
-import java.lang.reflect.Method;
 
 abstract class AbstractAsmMethodTransform {
     protected final String obfClassName;
@@ -93,14 +90,15 @@ abstract class AbstractAsmMethodTransform {
             super(obfClassName, srgClassName, srgName, mcpName);
         }
 
-        private String find_owner, find_mcp_name, find_srg_name, find_notch_name, find_notch_desc, find_mcp_desc;
+        private String find_notch_owner, find_mcp_owner, find_mcp_name, find_srg_name, find_notch_name, find_notch_desc, find_mcp_desc;
         
         public MutateCall find(String owner, String srg_name, String mcp_name, String notch_name, String find_notch_desc) {
+            this.find_mcp_owner = owner.replace(".", "/");
             if (!ASMTransformer.dev_environ) {
-                owner = FMLDeobfuscatingRemapper.INSTANCE.unmap(owner.replace(".", "/"));
+                owner = FMLDeobfuscatingRemapper.INSTANCE.unmap(find_mcp_owner);
                 find_srg_name = FMLDeobfuscatingRemapper.INSTANCE.unmap(srg_name);
             }
-            this.find_owner = owner.replace(".", "/");
+            this.find_notch_owner = owner.replace(".", "/");
             this.find_mcp_name = mcp_name;
             this.find_srg_name = srg_name;
             this.find_notch_name = notch_name;
@@ -123,8 +121,8 @@ abstract class AbstractAsmMethodTransform {
                 }
                 MethodInsnNode meth = (MethodInsnNode) insn;
                 String name = meth.name;
-                if (!meth.desc.equals(find_desc)) continue;
-                boolean match = meth.owner.equals(find_owner) && (name.equals(find_mcp_name) || name.equals(find_srg_name) || name.equals(find_notch_name));
+                if (!meth.desc.equals(find_mcp_desc) && !meth.desc.equals(find_notch_desc)) continue;
+                boolean match = (meth.owner.equals(find_notch_owner) || meth.owner.equals(find_mcp_owner)) && (name.equals(find_mcp_name) || name.equals(find_srg_name) || name.equals(find_notch_name));
                 if (!match) {
                     continue;
                 }
@@ -135,7 +133,7 @@ abstract class AbstractAsmMethodTransform {
                 any = true;
             }
             if (!any) {
-                throw new RuntimeException("Method mutation failed: did not find " + find_owner + " " + find_desc + " " + find_mcp_name + "/" + find_srg_name);
+                throw new RuntimeException("Method mutation failed: did not find " + find_notch_owner + " " + find_desc + " " + find_mcp_name + "/" + find_srg_name);
             }
         }
         
