@@ -116,13 +116,4 @@ task deobfJar(type: Jar) {
 //     classifier = 'api'
 // }
 
-
-// The following two things cause the output of "Factorization-latest.jar"
-task latestJar(type: Jar, dependsOn: 'classes') {
-    from sourceSets.main.output
-    version = "latest"
-}
  
-reobf {
-    reobf latestJar
-}

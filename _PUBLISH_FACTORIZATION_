@@ -75,7 +75,6 @@ LOG += '''
   adfly(dropbox_url)
 ).strip() + "\n"
 LOG += "Built on " + time.strftime("%F") + " against " + (getForgeVersion() + "\n")
-=======
 LOG += '[url="{0}"]Changelog[/url]\n'.format(changelog_url)
 LOG += '[url="{0}"]Deobf for Mod Authors[/url]'.format(devify(dropbox_url))
 print(LOG)
@@ -83,6 +82,8 @@ print(LOG)
 open("build.log", 'a').write(LOG+ '\n\n')
 
 db = os.system("pidof dropbox > /dev/zero")
-if not db:
+if db:
+    print()
+    print()
     print("Dropbox not running! Starting dropbox")
     os.system("dropbox &")

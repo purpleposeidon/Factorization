@@ -1,59 +1,132 @@
-[u][b][size=6][anchor=ABOUT]Factorization[/anchor][/size][/b][/u]
-This mod adds minimalist parts for expanding vanilla redstone automation, along with many other things.
+[header=1][anchor=ABOUT]Factorization[/anchor][/header]
+This mod adds minimalist parts for expanding vanilla redstone automation, and many other things.
+
+[b][i]Command small robots![/i][/b]
+[img]http://i.imgur.com/eJ2hdsU.png[/img]
+[b][i]Build terracotta armies![/i][/b]
+[img]http://i.imgur.com/bmrAPXz.png[/img]
+[b][i]Spinning blades of death![/i][/b]
+[img]http://i.imgur.com/x6a5b1r.png[/img]
+[b][i]Twist the very fabric of reality![/i][/b]
+[img]http://i.imgur.com/8b9R0ZD.png[/img]
+[b][i]Giant killer robots![/i][/b]
+[img]http://i.imgur.com/oopsies-looks-like-this-link-is-a-404.png[/img]
 
 
-[u][b][size=6][anchor=INSTALL]Installation[/anchor][/size][/b][/u]
-This is a [url="http://files.minecraftforge.net/"]Minecraft Forge[/url] mod.
 
+[header=2][anchor=INSTALL]Installation[/anchor][/header]
 1. Download and run the [url="http://files.minecraftforge.net/"]Minecraft Forge Installer[/url]. The version of Forge that I'm using is given by the download link. Anything newer will usually work, and sometimes older versions will work as well.
-2. Check that the forge install worked by running the client (or the server). Forge information should be on the title screen (or in the server's logs). Stop minecraft.
+2. Check that the forge install worked by running the client (or the server). Forge information should be on the title screen (or in the server's logs). Close Minecraft.
 3. Put Factorization.jar into the mods folder.
 
-[u][b][size=6][anchor=START]Getting Started[/anchor][/size][/b][/u]
-First, you need to obtain a Logic Matrix Programmer. It can then be used in the recipe below to create the Factorization Manual.
+[header=2][anchor=START]Getting Started[/anchor][/header]
+
+First, you must find the Lost Treasure Map. It was last seen near diamond ore. Treasure maps are very rare and very fragile, so treat it gently. Right-click the map once, and follow it to find a well-guarded stash somewhere on the surface. This stash will contain a Logic Matrix Programmer, and occasionally a few other useful materials.
+
+The Logic Matrix Programmer can then be used in the recipe below to create the Factorization Manual, which can teach you everything worth knowing!
 [img]http://i.imgur.com/3GMNpTx.png[/img]
 
 
-[u][b][size=6][anchor=DOWNLOAD]Download[/anchor][/size][/b][/u]
+[header=2][anchor=DOWNLOAD]Download[/anchor][/header]
 
 [b]The license has changed. Read, understand, and accept the license before downloading.[/b][spoiler]
+See the License? Read the License. Love the License? Let the License be your guide.
+
+You can encourage further development of Factorization through my [url="http://www.patreon.com/neptunepink"][img]http://i.imgur.com/srYEtgV.png[/img]Patreon[/url].
+
+Factorization 1.7.10-0.8.88.8.8888a
+[url="http://adf.ly/2137658/https://www.mediafire.com/?2t5bj3utds5inw1"]adfly + MediaFire[/url], or
+[url="http://adf.ly/2137658/http://dl.dropbox.com/u/76265666/old/Factorization-1.7.10-0.8.88.8.8888a.jar"]adfly + DropBox[/url]
+Built on 2015-02-16 against Minecraft Forge 1.7.10-10.13.2.1230
+[url="http://dl.dropbox.com/u/76265666/changelogs/Changelog-1.7.10-0.8.88.8.8888a.txt"]Changelog[/url]
+[url="http://dl.dropbox.com/u/76265666/old/Factorization-1.7.10-0.8.88.8.8888a-dev.jar"]Deobf for Mod Authors[/url]
+
+
+Factorization 1.7.10-0.8.88.8.8888
+[url="http://adf.ly/2137658/https://www.mediafire.com/?nad03nvoj1cbi9u"]adfly + MediaFire[/url], or
+[url="http://adf.ly/2137658/http://dl.dropbox.com/u/76265666/old/Factorization-1.7.10-0.8.88.8.8888.jar"]adfly + DropBox[/url]
+Built on 2015-02-15 against Minecraft Forge 1.7.10-10.13.2.1230
+[url="http://dl.dropbox.com/u/76265666/changelogs/Changelog-1.7.10-0.8.88.8.8888.txt"]Changelog[/url]
+[url="http://dl.dropbox.com/u/76265666/old/Factorization-1.7.10-0.8.88.8.8888-dev.jar"]Deobf for Mod Authors[/url]
+
 Factorization 1.7.10-0.8.88.7
 [url="http://adf.ly/2137658/https://www.mediafire.com/?c7614ip3borr17o"]adfly + MediaFire[/url], or
 [url="http://adf.ly/2137658/http://dl.dropbox.com/u/76265666/old/Factorization-1.7.10-0.8.88.7.jar"]adfly + DropBox[/url]
 Built on 2014-11-16 against Minecraft Forge 1.7.10-10.13.2.1230
 [url="http://dl.dropbox.com/u/76265666/changelogs/Changelog-1.7.10-0.8.88.7.txt"]Changelog[/url]
 [url="http://dl.dropbox.com/u/76265666/old/Factorization-1.7.10-0.8.88.7-dev.jar"]Deobf for Mod Authors[/url]
-[/spoiler]
 
-Old versions [spoiler]
 [url="http://www.minecraftforum.net/forums/mapping-and-modding/minecraft-mods/1284592-factorization-0-8-88-7?page=130#c2601"]Go here for very old versions.[/url]
 [/spoiler]
 
-[u][b][size=6][anchor=LICENSE]License[/anchor][/size][/b][/u]
-Factorization may not be distributed in any way, unless ONE of the following two conditions are met:
-1. It is being distributed as part of a mod pack for a private Minecraft server, and the mod pack is password-protected or otherwise inaccessible to the public.
-2. It is being distributed as part of a public mod pack, where:
-   a) A post has been made to either: the Factorization MCF thread, or the #factorization IRC channel on irc.esper.net.
-   b) Said post demonstrates a usage of Factorization, such that it is either:
-        • a novel and functional build where Factorization provides critical functionality
-        • a novel and aesthetic build dependent on a component added by Factorization
-        • a novel and an actionable bug report for Factorization.
-   c) Said post makes no mention, hint, or reference to this license, or licensing in general, or to mod packs.
-   d) The mod pack must have a publically accessible list of used mods, and that list must contain a link to this 
-
-
-
-[u][b][size=6][anchor=BUGS]Bugs & Other Problems[/anchor][/size][/b][/u]
-For faster customer service, please report bugs & other problems to me in #factorization on irc.esper.net; I don't make a habit of reading this thread.
+[header=2][anchor=BUGS]Bugs & Other Problems[/anchor][/header]
+Please report bugs! But for faster customer service, report them to me in #factorization on irc.esper.net; I don't make a habit of reading this thread.
 
 If something seems like it should be easier than it is, let me know; I tend to have a bit of a heavy hand with these things. Small/simple/tiny feature requests may be welcomed, but Ideas are not.
 
-[u][b][size=6][anchor=LOCAL]Localizations & Translation[/anchor][/size][/b][/u]
-You can contribute localizations at the [url="https://github.com/purpleposeidon/FactorizationLocalizations"]Factorization Localizations Github Project[/url]. The following people have contributed:
+[header=2][anchor=LICENSE]License[/anchor][/header][spoiler]
+[pre]
+This is the "Post Something Interesting License", 2nd revision.
+
+[u]All redistribution permissions granted prior to Feb 16, 2015 by any means other than the PSIL do not apply to further updates of Factorization.[/u]
+
+Factorization may be downloaded and copied as much as you like for personal use. It may be decompiled for the purposes of education, interoperability, and/or security.
+
+[b]Factorization may not be distributed in any way[/b], [i]unless one[/i] of the following lettered conditions are met:
+A. It is being distributed as part of a mod pack for a specific private Minecraft server, and the mod pack is inaccessible to the public.
+B. It is being transferred privately between mod developers solely for the purposes of bug-fixing or compatibility.
+C. It is being distributed to a modpack from a modpack platform where:
+   1) the modpack is hosted on that platform
+   2) AND the modpack has permission to distribute Factorization.
+D. It is being distributed as part of a public mod pack, where:
+   1) A post has been made to either: the Factorization Minecraft Forum thread, or the #factorization IRC channel on irc.esper.net
+   2) AND said post demonstrates a usage of Factorization, such that it is either:
+        • a novel and functional build where Factorization provides critical functionality
+        • OR a novel and aesthetic build dependent on a component added by Factorization
+        • OR a novel and an actionable bug report for Factorization that is reproducible with 8 or fewer other mods installed as counted by the number of primary entries in the mods list accessed from the Minecraft game main menu.
+   3) AND said post makes no mention, hint, or reference to this license, or to licensing, or to mod packs.
+   4) AND the mod pack has a publicly accessible list of the mods used in that pack, and that list must:
+        • include a link to the Factorization forum thread
+        • AND a link to said post if it is on MCF, or a link to a log if on IRC.
+   5) AND said post is not shared with any other modpack.
+
+
+This license does not apply to certain other works included in Factorization as specified by CREDITS.txt in the jar file.
+
+End of License.
+[/pre]
+
 [list]
-[*][url="https://github.com/crafteverywhere"]crafteverywhere[/url]: zh_CN
-[*][url="https://github.com/Darkona"]Darkona[/url]: es_ES
+  [*]Note that the license doesn't apply retroactively if you've already downloaded the mod under a different license. That would be absurd.[/*]
+  [*]Note that sending me PMs does not count as a posting to this thread.[/*]
+  [*]Note that "installers" are not allowed.[/*]
+  [*]Note that "hi i am using factorisation in my modpack kthxbai" is not a post that gives you license to distribute Factorization. Did you just make that post? I anticipate that there will be a great momentum of that. Read the license. Are you covered under condition A?[/*]
+  [*]Note that modpack platforms are not modpacks, and so can not get umbrella permissions for every modpack ever.[/*]
+  [*]Note that a modpack with a password posted somewhere public counts as being accessible to the public.[/*]
+  [*]And also note that clause D.3 is a thing. Did you read it? Read it again. Here's what it says: "Said post makes no mention, hint, or reference to this license, or to licensing, or to mod packs". If your post says "im posting this for my modpack" then you have not earned permission. And then you should feel embarrassed. And fall into a well of deep shame. But, like, don't go overboard with it, okay? You could probably edit your post if I haven't noticed it yet (but you can never [i]really[/i] be sure that I haven't). If I have noticed it, then you'd best make a new post.[/*]
+  [*]Posts to other sites don't count.[/*]
+  [*]Licensing Discussion Annoys Me And I Will Be Annoyed If Ya'll Discuss It Where I Can See It.[/*]
+[/list]
+[/spoiler]
+
+[header=2][anchor=LOCAL]Localizations & Translation[/anchor][/header]
+You can contribute localizations at the [url="https://github.com/purpleposeidon/FactorizationLocalizations"]Factorization Localizations Github Project[/url]. Special thanks to Vexatos and crafteverywhere for managing the repository for me! The following people have contributed:
+[list]
+[*][url="https://github.com/crafteverywhere"]crafteverywhere[/url], [url="https://github.com/SF_Chipan"]SF_Chipan[/url]: zh_CN
 [*][url="https://github.com/Vexatos"]Vexatos[/url]: de_DE
-[*][url="https://github.com/WLCD"]WLCD[/url]: fr_FR
+[*][url="https://github.com/Darkona"]Darkona[/url]: es_ES
+[*][url="https://github.com/WLCD"]WLCD[/url], [url="https://github.com/AegisLesha"]AegisLesha[/url]: fr_FR
 [*][url="https://github.com/golyalpha"]golyalpha[/url]: cs_CZ
+[*][url="https://github.com/natiss88"]natiss88[/url]: it_IT
+[*][url="https://github.com/Anton"]Anton[/url]: ru_RU
+[*][url="https://github.com/Szewek"]Szewek[/url]: pl_PL
+[/list]
+
+[header=2][anchor=CREDITS]Credits[/anchor][/header]
+FZ includes uses Creative Commons sound assets from freesound.org, including:
+[list]
+  [*][url=http://www.freesound.org/people/digifishmusic/sounds/66417/]"Old Metal", by digifishmusic[/url]. Unmodified. [url=http://creativecommons.org/licenses/by/3.0/]CC-BY[/url].[/*]
+  [*][url=http://www.freesound.org/people/sandyrb/sounds/95078/]"THE CRASH", by sandyrb[/url]. Cropped and combined with other work. [url=http://creativecommons.org/licenses/by/3.0/]CC-BY[/url][/*]
+  [*][url=http://www.freesound.org/people/mystiscool/sounds/7141/]"Avalanche", by mystiscool[/url]. Cropped and combined with other work. [url=http://creativecommons.org/licenses/by/3.0/]CC-BY[/url][/*]
+  [*][url=http://www.freesound.org/people/suonho/sounds/56364/]"Ambienta Soundtrack: Crystal Airlines", by suonho[/url]. Cropped and filtered. [url=http://creativecommons.org/licenses/by/3.0/]CC-BY[/url][/*]
 [/list]
