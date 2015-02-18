@@ -58,7 +58,7 @@ public class ItemTwistedBlock extends ItemBlockProxy {
             tag.setInteger("turns", turns);
             double angle = (2 * Math.PI) * turns / 16.0;
             Quaternion newRotation = Quaternion.getRotationQuaternionRadians(angle, orig);
-            idc.orderTargetRotation(newRotation, 60, Interpolation.SMOOTH);
+            idc.orderTargetRotation(newRotation, 60, Interpolation.SMOOTH3);
             return false;
         }
         DeltaCoord size = new DeltaCoord(16, 16, 16);
@@ -100,7 +100,7 @@ public class ItemTwistedBlock extends ItemBlockProxy {
         idc.worldObj.spawnEntityInWorld(idc);
 
         Quaternion rotation = Quaternion.getRotationQuaternionRadians(amount, axis);
-        idc.orderTargetRotation(rotation, 20 * 16, Interpolation.SMOOTH3);
+        idc.orderTargetRotation(rotation, 60, Interpolation.SMOOTH3);
 
         return true;
     }
