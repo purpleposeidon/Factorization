@@ -41,7 +41,7 @@ public class WorldGenColossus implements IWorldGenerator {
         }
     }
     
-    static int GENERATION_SPACING = 32; // TODO NORELEASE: Config option. Default to 50?
+    static int GENERATION_SPACING = FzConfig.colossus_spacing; // TODO NORELEASE: Config option. Default to 50?
     static int GENERATION_START_X = 9, GENERATION_START_Z = 9;
     static final double SMOOTH_START = 16 * 5 / 2;
     static final double SMOOTH_END = 16 * 3 / 2;
@@ -49,7 +49,7 @@ public class WorldGenColossus implements IWorldGenerator {
     static final double SMOOTH_END_FUZZ = SMOOTH_END + 32;
     static {
         if (GENERATION_START_X > GENERATION_SPACING || GENERATION_START_Z > GENERATION_SPACING) {
-            throw new IllegalArgumentException();
+            throw new IllegalArgumentException("colossus spacing must be at least " + Math.max(GENERATION_START_X, GENERATION_START_Z));
         }
     }
     

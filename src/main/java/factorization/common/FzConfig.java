@@ -22,6 +22,7 @@ public class FzConfig {
     public static boolean gen_dark_iron_ore = true;
     public static int silver_ore_node_new_size = 18;
     public static boolean gen_colossi = true;
+    public static int colossus_spacing = 48;
     public static boolean pocket_craft_anywhere = true;
     public static String pocketActions = "xcbf";
     public static boolean renderTEs = true;
@@ -157,6 +158,7 @@ public class FzConfig {
         silver_ore_node_new_size = Math.max(5, Math.min(config_silver_size, 35));
         gen_dark_iron_ore = getBoolConfig("generateDarkIronOre", "general", gen_dark_iron_ore, "Set to false to disable dark iron ore generation");
         gen_colossi = getBoolConfig("generateColossi", "general", gen_colossi, "If true, Colossi will generate in the world. If false, the player will be given an LMP instead of a lost map.");
+        colossus_spacing = getIntConfig("colossusSpacing", "general", colossus_spacing, "Distance between colossi in chunks");
         
         {
             enable_retrogen = getBoolConfig("enableRetrogen", "retrogen", enable_retrogen, null);

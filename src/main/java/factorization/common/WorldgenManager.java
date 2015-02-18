@@ -54,7 +54,7 @@ public class WorldgenManager {
         }
         if (FzConfig.gen_dark_iron_ore) {
             darkIronGen = new DarkIronOreGenerator();
-            GameRegistry.registerWorldGenerator(darkIronGen, 0);
+            GameRegistry.registerWorldGenerator(darkIronGen, 10); // Run after CoFH's flat bedrock, which has priority of 0
         }
         if (FzConfig.gen_colossi) {
             GameRegistry.registerWorldGenerator(new WorldGenColossus(), -50);
