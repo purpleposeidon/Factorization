@@ -90,28 +90,33 @@ abstract class AbstractAsmMethodTransform {
             super(obfClassName, srgClassName, srgName, mcpName);
         }
 
-        private String find_notch_owner, find_mcp_owner, find_mcp_name, find_srg_name, find_notch_name, find_notch_desc, find_mcp_desc;
-        
-        public MutateCall find(String owner, String srg_name, String mcp_name, String notch_name, String find_notch_desc) {
+        private String find_notch_owner, find_mcp_owner, find_mcp_name, find_mcp_descr, find_srg_name, find_notch_name, find_notch_desc, find_mcp_desc;
+
+        public MutateCall setOwner(String owner) {
             this.find_mcp_owner = owner.replace(".", "/");
             if (!ASMTransformer.dev_environ) {
                 owner = FMLDeobfuscatingRemapper.INSTANCE.unmap(find_mcp_owner);
-                find_srg_name = FMLDeobfuscatingRemapper.INSTANCE.unmap(srg_name);
             }
             this.find_notch_owner = owner.replace(".", "/");
-            this.find_mcp_name = mcp_name;
-            this.find_srg_name = srg_name;
-            this.find_notch_name = notch_name;
-            this.find_notch_desc = find_notch_desc;
-
-
             return this;
         }
-        
+
+        public MutateCall setName(String mcp_name, String srg_name, String notch_name) {
+            this.find_srg_name = srg_name;
+            this.find_mcp_name = mcp_name;
+            this.find_notch_name = notch_name;
+            return this;
+        }
+
+        public MutateCall setDescr(String mcp_desc, String notch_desc) {
+            this.find_mcp_desc = mcp_desc;
+            this.find_notch_desc = notch_desc;
+            return this;
+        }
+
+
         @Override
         void apply(MethodNode base, MethodNode addition) {
-            find_mcp_desc = addition.desc; // Not used. Would have to convert desc from MCP to Notch, and there's no actual bug yet
-            String find_desc = ASMTransformer.dev_environ ? find_mcp_desc : find_notch_desc;
             boolean any = false;
             InsnList instructions = base.instructions;
             for (AbstractInsnNode insn = instructions.getFirst(); insn != null; insn = insn.getNext()) {
@@ -133,7 +138,7 @@ abstract class AbstractAsmMethodTransform {
                 any = true;
             }
             if (!any) {
-                throw new RuntimeException("Method mutation failed: did not find " + find_notch_owner + " " + find_desc + " " + find_mcp_name + "/" + find_srg_name);
+                throw new RuntimeException("Method mutation failed: did not find " + find_mcp_owner + "." + find_mcp_name + " / " + find_mcp_desc);
             }
         }
         
