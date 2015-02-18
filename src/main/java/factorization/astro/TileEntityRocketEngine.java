@@ -350,13 +350,13 @@ for x in range(0, len(d[0])):
         DeltaCoord size = max.difference(min);
         DeltaCoord half = size.scale(0.5);
         Coord center = min.add(half);
-        /* NORELEASE
+        /*
         IDeltaChunk dse = DeltaChunk.allocateSlice(worldObj, -1, new DeltaCoord(0, 0, 0));
         center.setAsEntityLocation(dse);
         dse.posX += 0.5;
         dse.posY -= 5;
         dse.posZ += 0.5;
-        //TODO NORELEASE Use the functional method for doing this
+        //TODO Use the functional method for doing this
         
         Vec3 real = Vec3.createVectorHelper(0, 0, 0);
         Coord dest = new Coord(DeltaChunk.getServerShadowWorld(), 0, 0, 0);

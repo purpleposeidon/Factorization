@@ -20,7 +20,6 @@ public class Compat_Thaumcraft {
             
             @Override
             public ScanResult scanPhenomena(ItemStack stack, World world, EntityPlayer player) {
-                System.out.println("NORELEASE: " + stack);
                 return null;
             }
         });*/
