@@ -31,7 +31,7 @@ public class PPPChunkLoader implements ForgeChunkManager.LoadingCallback {
         }
         final int maxSize = ticket.getMaxChunkListDepth();
         final int size = chunkSet.size();
-        if (maxSize > size) {
+        if (size > maxSize) {
             Hammer.logSevere("Registering %s chunks for loading, but ticket only has room for %s. You may need to adjust config/forgeChunkLoading.cfg", size, maxSize);
         }
         for (Chunk chunk : chunkSet) {
