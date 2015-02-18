@@ -41,7 +41,7 @@ public class WorldGenColossus implements IWorldGenerator {
         }
     }
     
-    static int GENERATION_SPACING = FzConfig.colossus_spacing; // TODO NORELEASE: Config option. Default to 50?
+    static int GENERATION_SPACING = FzConfig.colossus_spacing;
     static int GENERATION_START_X = 9, GENERATION_START_Z = 9;
     static final double SMOOTH_START = 16 * 5 / 2;
     static final double SMOOTH_END = 16 * 3 / 2;
