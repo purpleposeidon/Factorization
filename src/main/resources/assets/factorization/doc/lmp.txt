@@ -5,13 +5,12 @@ The Logic Matrix Programmer (LMP) is the primary tool for Factorization.
 It contains a repository of software,
 and the data it caries is important and ubiquitous.
 
-Cloning an LMP is fairly simple;
-however, obtaining the first one can be a bit difficult.
-The easiest way to find one is to convince a librarian villager to part with one, for a few emeralds\#{item.emerald}.
-They can also be found in dungeon chests, and stronghold libraries.
+Being a vast trove of of data, an LMP can not be built from scratch.
+They can often be recovered from ancient & unused devices.
 
-If civilization is far away,
-know that the data can be derived from music disks using stenography.
-Creepers will drop music disks when killed by skeletons.
+
+Certain \link{socket}{socket parts} can be configured by clicking on them with the LMP.
+
+Certain \link{servo}{Servo Instructions} can be configured by clicking on them with the LMP.
 
 \topic{item.factorization:tool/matrix_programmer}
