@@ -23,4 +23,10 @@
 \index{cgi/fluids}{Liquids & Gasses}
 \index{cgi/oredictionary}{Ore Thesaurus}
 
+\newpage\title{Developer Reference}
+
+\index{cgi/mods}{Mods}
+\index{cgi/worldgen}{Mod Worldgen}
+\index{cgi/eventbus}{Event Bus}
+
 \nl

@@ -264,5 +264,8 @@ public class DocumentationModule {
         registerGenerator("biomes", new BiomeViewer());
         registerGenerator("fluids", new FluidViewer());
         registerGenerator("oredictionary", new OreDictionaryViewer());
+        registerGenerator("mods", new ModDependViewer());
+        registerGenerator("worldgen", new WorldgenViewer());
+        registerGenerator("eventbus", new EventbusViewer());
     }
 }
