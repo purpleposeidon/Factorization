@@ -1,8 +1,7 @@
 package factorization.coremod;
 
-import java.util.List;
-
-import net.minecraft.client.multiplayer.WorldClient;
+import factorization.coremodhooks.HookTargetsClient;
+import factorization.coremodhooks.HookTargetsServer;
 import net.minecraft.command.IEntitySelector;
 import net.minecraft.entity.Entity;
 import net.minecraft.init.Blocks;
@@ -11,8 +10,8 @@ import net.minecraft.util.MovingObjectPosition;
 import net.minecraft.util.Vec3;
 import net.minecraft.world.Explosion;
 import net.minecraft.world.World;
-import factorization.coremodhooks.HookTargetsClient;
-import factorization.coremodhooks.HookTargetsServer;
+
+import java.util.List;
 
 public class MethodSplices {
     // Block.onBlockDestroyedByExplosion
@@ -57,7 +56,7 @@ public class MethodSplices {
     }
     
     // EntityRenderer.orientCamera; method replacement
-    public static MovingObjectPosition func_78467_g(WorldClient world, Vec3 traceStart, Vec3 traceEnd) {
+    public static MovingObjectPosition func_78467_g(World world, Vec3 traceStart, Vec3 traceEnd) {
         return HookTargetsClient.boxTrace(world, traceStart, traceEnd);
     }
 
