@@ -1189,16 +1189,21 @@ public class Registry {
             if (log == null || log == Blocks.log || log == Blocks.log2) {
                 continue;
             }
-            if (is.getItemDamage() == ItemUtil.WILDCARD_DAMAGE) {
-                for (int md = 0; md < 16; md++) {
-                    ItemStack ilog = new ItemStack(log);
-                    ilog.setItemDamage(md);
-                    ilog.stackSize = 1;
-                    theLogs.add(ilog);
-                }
+            if (!ItemUtil.isWildcard(is, false)) {
+                theLogs.add(is);
                 continue;
             }
-            theLogs.add(is);
+            List<ItemStack> discovered_plank_types = new ArrayList<ItemStack>();
+            for (int md = 0; md < 16; md++) {
+                ItemStack ilog = new ItemStack(log, 1, md);
+                List<ItemStack> planks = FzUtil.copyWithoutNull(CraftUtil.craft1x1(null, true, ilog.copy()));
+                if (planks.size() == 1) {
+                    ItemStack plank = planks.get(0);
+                    if (discovered_plank_types.contains(plank)) continue;
+                    theLogs.add(ilog);
+                    discovered_plank_types.add(plank);
+                }
+            }
         }
         for (ItemStack log : theLogs) {
             log = log.copy();
@@ -1208,11 +1213,10 @@ public class Registry {
             }
             ItemStack plank = planks.get(0).copy();
             plank.stackSize = 1;
-            List<ItemStack> slabs = FzUtil.copyWithoutNull(CraftUtil.craft3x3(null, true, true, new ItemStack[]{
+            List<ItemStack> slabs = FzUtil.copyWithoutNull(CraftUtil.craft3x3(null, true, true,
                     plank.copy(), plank.copy(), plank.copy(),
                     null, null, null,
-                    null, null, null
-            }));
+                    null, null, null));
             ItemStack slab;
             String odType;
             if (slabs.size() != 1 || !CraftUtil.craft_succeeded) {
