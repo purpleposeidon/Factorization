@@ -210,6 +210,11 @@ public class RecipeViewer implements IDocGenerator {
     }
     
     void addRecipe(List sb, Object obj) {
+        sb.add("\\seg");
+        if (obj instanceof IRecipe) {
+            genericRecipePrefix(sb, (IRecipe) obj);
+        }
+        int origLen = sb.size();
         if (obj instanceof ShapedOreRecipe) {
             addShapedOreRecipe(sb, (ShapedOreRecipe) obj);
         } else if (obj instanceof ShapedRecipes) {
@@ -225,12 +230,8 @@ public class RecipeViewer implements IDocGenerator {
                 t.printStackTrace();
             }
         }
-        if (sb.isEmpty()) {
+        if (sb.size() == origLen) {
             sb.add(obj.toString());
-        }
-        sb.add(0, "\\seg");
-        if (obj instanceof IRecipe) {
-            genericRecipePrefix(sb, (IRecipe) obj);
         }
         sb.add("\\endseg");
         sb.add("\\nl");
@@ -239,8 +240,8 @@ public class RecipeViewer implements IDocGenerator {
     Object genericRecipePrefix(List sb, IRecipe recipe) {
         ItemStack output = ((IRecipe) recipe).getRecipeOutput();
         if (output == null) return null;
-        sb.add(1, new ItemWord(output));
-        sb.add(2, " \\b{" + getDisplayName(output) + "}\\vpad{15}\\nl");
+        sb.add(new ItemWord(output));
+        sb.add(" \\b{" + getDisplayName(output) + "}\\vpad{15}\\nl");
         return output;
     }
     

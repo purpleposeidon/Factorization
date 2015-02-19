@@ -26,6 +26,11 @@ public final class ItemUtil {
         return new ItemStack(item, 1, WILDCARD_DAMAGE);
     }
 
+    public static boolean isWildcard(ItemStack is, boolean ifNull) {
+        if (is == null) return ifNull;
+        return is.getItemDamage() == WILDCARD_DAMAGE;
+    }
+
     /**
      * return if the two itemstacks are identical, excepting stacksize
      */
@@ -175,5 +180,11 @@ public final class ItemUtil {
         is = is.copy();
         is.setStackDisplayName(name);
         return is;
+    }
+
+    public static List<ItemStack> getSubItems(ItemStack is) {
+        ArrayList<ItemStack> out = new ArrayList();
+        is.getItem().getSubItems(is.getItem(), is.getItem().getCreativeTab(), out);
+        return out;
     }
 }
