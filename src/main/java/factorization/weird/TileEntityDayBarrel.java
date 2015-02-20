@@ -39,6 +39,7 @@ import net.minecraftforge.common.util.ForgeDirection;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.minecraftforge.event.world.ChunkEvent;
 
+import net.minecraftforge.oredict.OreDictionary;
 import org.lwjgl.opengl.GL11;
 
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
@@ -1087,14 +1088,27 @@ public class TileEntityDayBarrel extends TileEntityFactorization {
         make(Type.CREATIVE, new ItemStack(Blocks.bedrock), new ItemStack(Blocks.diamond_block));
     }
     
-    public static void makeRecipe(ItemStack log, ItemStack slab) {
+    public static void makeRecipe(Object objLog, Object objSlab) {
+        ItemStack log, slab;
+        if (objLog instanceof ItemStack) {
+            log = (ItemStack) objLog;
+        } else {
+            log = ItemUtil.getFirstOre((String) objLog);
+            if (log == null) return; // Eek!
+        }
+        if (objSlab instanceof ItemStack) {
+            slab = (ItemStack) objSlab;
+        } else {
+            slab = ItemUtil.getFirstOre((String) objSlab);
+            if (slab == null) return; // Meep!
+        }
         ItemStack normal = make(Type.NORMAL, log, slab);
-        Core.registry.vanillaRecipe(normal,
+        Core.registry.oreRecipe(normal,
                 "W-W",
                 "W W",
                 "WWW",
-                'W', log,
-                '-', slab);
+                'W', objLog,
+                '-', objSlab);
         
         //Note: Don't add creative. That'd be bad.
         Core.registry.oreRecipe(make(Type.SILKY, log, slab),

@@ -84,7 +84,7 @@ public class BlockIcons {
     public static IIcon barrel_font;
     
     public static class BarrelTextureset extends IIconGroup {
-        public IIcon side, front, top;
+        public IIcon side, front, top, top_metal;
         
         @Override
         public IIconGroup prefix(String prefix) {

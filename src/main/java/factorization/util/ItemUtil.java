@@ -2,6 +2,7 @@ package factorization.util;
 
 import factorization.util.DataUtil;
 import net.minecraft.block.Block;
+import net.minecraft.init.Items;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
@@ -186,5 +187,23 @@ public final class ItemUtil {
         ArrayList<ItemStack> out = new ArrayList();
         is.getItem().getSubItems(is.getItem(), is.getItem().getCreativeTab(), out);
         return out;
+    }
+
+    public static ItemStack parseBlock(String name) {
+        short md = WILDCARD_DAMAGE;
+        if (name.contains("#")) {
+            String[] split = name.split("#");
+            md = Short.parseShort(split[1]);
+            name = split[0];
+        }
+        Item item = DataUtil.getItemFromName(name);
+        if (item == null) return null;
+        return new ItemStack(item, 1, md);
+    }
+
+    public static ItemStack getFirstOre(String oreName) {
+        List<ItemStack> ores = OreDictionary.getOres(oreName);
+        if (ores == null || ores.isEmpty()) return null;
+        return ores.get(0);
     }
 }

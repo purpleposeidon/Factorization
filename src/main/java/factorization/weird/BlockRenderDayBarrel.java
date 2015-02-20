@@ -1,5 +1,8 @@
 package factorization.weird;
 
+import factorization.util.DataUtil;
+import net.minecraft.block.Block;
+import net.minecraft.block.material.Material;
 import org.lwjgl.opengl.GL11;
 
 import net.minecraft.client.renderer.RenderBlocks;
@@ -71,8 +74,13 @@ public class BlockRenderDayBarrel extends FactorizationBlockRender {
                 default: set = BlockIcons.normal; break;
                 }
                 block.useTexture(set.side);
-                block.setTexture(0, set.top);
-                block.setTexture(1, set.top);
+                IIcon top = set.top;
+                Block slab = DataUtil.getBlock(barrel.woodSlab);
+                if (slab != null && slab.getMaterial() != Material.wood) {
+                    top = set.top_metal;
+                }
+                block.setTexture(0, top);
+                block.setTexture(1, top);
                 block.setTexture(4, set.front);
             }
         }

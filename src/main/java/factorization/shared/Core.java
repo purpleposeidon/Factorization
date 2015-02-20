@@ -169,6 +169,7 @@ public class Core {
     public void handleInteractions(FMLInitializationEvent event) {
         registry.sendIMC();
         ColossusFeature.init();
+        PatreonRewards.init();
     }
     
     @EventHandler
