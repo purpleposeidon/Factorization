@@ -13,6 +13,7 @@ import factorization.fzds.interfaces.IDeltaChunk;
 import factorization.notify.Notice;
 import factorization.notify.Style;
 import factorization.shared.Core;
+import factorization.shared.NORELEASE;
 import factorization.util.FzUtil;
 import factorization.util.SpaceUtil;
 import net.minecraft.item.ItemStack;
@@ -227,9 +228,9 @@ public class Awakener {
         }
         
         markCoveredBodyBlocks(body);
-        
-        double max_iter = Math.pow(body.size(), 1.0/3.0) * 4;
-        includeShell(all_members, new HashSet(), (int) max_iter + 3);
+
+        double max_iter = leg_size + 2;
+        includeShell(all_members, new HashSet(), (int) max_iter);
         msg("Attatched adjacent blocks. New body:");
         limbDetails("arm", arms);
         limbDetails("leg", legs);
