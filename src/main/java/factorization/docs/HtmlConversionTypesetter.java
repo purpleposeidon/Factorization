@@ -1,22 +1,22 @@
 package factorization.docs;
 
+import cpw.mods.fml.common.Loader;
+import net.minecraft.client.renderer.texture.IIconRegister;
+import net.minecraft.item.ItemStack;
+import net.minecraft.util.IIcon;
+import net.minecraft.util.ResourceLocation;
+
 import java.io.OutputStream;
 import java.io.PrintStream;
 import java.util.ArrayList;
 
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.texture.IIconRegister;
-import net.minecraft.client.resources.IResource;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.IIcon;
-import net.minecraft.util.ResourceLocation;
-import cpw.mods.fml.common.Loader;
-
 public class HtmlConversionTypesetter extends AbstractTypesetter {
     PrintStream out;
-    public HtmlConversionTypesetter(OutputStream out) {
+    final String root;
+    public HtmlConversionTypesetter(OutputStream out, String root) {
         super(null, 0, 0);
         this.out = new PrintStream(out);
+        this.root = root;
     }
     
     static String found_icon = null;
@@ -88,7 +88,7 @@ public class HtmlConversionTypesetter extends AbstractTypesetter {
                 error("missing content parameter");
                 return;
             }
-            s("<a href=\"" + newLink + ".html\">", null);
+            s("<a href=\"" + root + newLink + ".html\">", null);
             process(content, newLink, style);
             s("</a>", null);
             if (cmd.equals("\\index")) {
@@ -108,25 +108,14 @@ public class HtmlConversionTypesetter extends AbstractTypesetter {
             }
             // NOTE: This could miss items. Hrm.
             ItemStack theItem = items.get(0);
-            found_icon = null;
-            theItem.getItem().registerIcons(new IIconRegister() {
-                @Override
-                public IIcon registerIcon(String iconName) {
-                    if (found_icon == null) {
-                        found_icon = iconName;
-                    }
-                    return null; // This'll break shit. Oh well. :/
-                }
-            });
-            s("<img src=\"" + found_icon + "\" />", link);
-            found_icon = null;
+            putItem(theItem, link);
         } else if (cmd.equals("\\img")) {
             String imgName = getParameter(cmd, tokenizer);
             if (imgName == null) {
                 error("No img specified");
                 return;
             }
-            s("<img src=\"" + imgName + "\" />", link);
+            s("<img src=\"" + img(imgName) + "\" />", link);
         } else if (cmd.equals("\\imgx")) {
             int width = Integer.parseInt(getParameter(cmd, tokenizer));
             int height = Integer.parseInt(getParameter(cmd, tokenizer));
@@ -135,9 +124,9 @@ public class HtmlConversionTypesetter extends AbstractTypesetter {
                 error("No img specified");
                 return;
             }
-            s(String.format("<img width=%s height=%s src=\"%s\" />", width, height, imgName), link);
+            s(String.format("<img width=%s height=%s src=\"%s\" />", width, height, img(imgName)), link);
         } else if (cmd.equals("\\figure")) {
-            // TODO...
+            // Prooobably not going to implement this one ;)
             String arg = getParameter(cmd, tokenizer);
         } else if (cmd.equals("\\generate")) {
             String arg = getParameter(cmd, tokenizer);
@@ -154,7 +143,13 @@ public class HtmlConversionTypesetter extends AbstractTypesetter {
         } else if (cmd.equals("\\endseg")) {
             // NOP
         } else if (cmd.equals("\\topic")) {
-            // NOP
+            String topic = getParameter(cmd, tokenizer);
+            if (topic == null) {
+                error("\\topic missing parameter");
+                return;
+            }
+            String sub = String.format("\\newpage \\generate{recipes/for/%s}", topic);
+            append(sub);
         } else if (cmd.equals("\\checkmods")) {
             // Eh. Heh. Oh boy...
             String mode = getParameter(cmd, tokenizer); // all some none
@@ -196,6 +191,14 @@ public class HtmlConversionTypesetter extends AbstractTypesetter {
             } else if (other != null) {
                 process(other, link, style);
             }
+        } else if (cmd.equals("\\ifhtml")) {
+            String trueBranch = getParameter(cmd, tokenizer);
+            String falseBranch = getParameter(cmd, tokenizer);
+            process(trueBranch, link, style);
+        } else if (cmd.equals("\\vpad")) {
+            getParameter(cmd, tokenizer);
+        } else if (cmd.equals("\\-")) {
+            s("<br> •", null);
         } else {
             error("Unknown command: ");
             emit(cmd, null);
@@ -205,15 +208,79 @@ public class HtmlConversionTypesetter extends AbstractTypesetter {
     void s(String s, String link) {
         out.print(s);
     }
+
+    static String esc(String s) {
+        return s.replace("&", "&amp;").replace(">", "&gt;");
+    }
+
+    String img(String img) {
+        if (!img.contains(":")) {
+            img = "minecraft:" + img;
+        }
+        String[] parts = img.split(":", 2);
+        String domain = parts[0];
+        String path = parts[1];
+        return root + "resources/" + domain + "/textures/" + path + ".png";
+    }
     
     @Override
     void error(String msg) {
-        s("<span class=\"mcerror\">" + msg + "</s>", null);
+        s("<span class=\"manualerror\">" + msg + "</s>", null);
     }
     
     @Override
     TextWord emit(String text, String link) {
-        s(text, link);
+        s(esc(text), link);
         return null;
+    }
+
+    @Override
+    void emitWord(Word w) {
+        // LAMELY IMPLEMENTED! :O
+        if (w instanceof TextWord) {
+            TextWord tw = (TextWord) w;
+            emit(tw.text, tw.getLink());
+        } else if (w instanceof ItemWord) {
+            ItemWord iw = (ItemWord) w;
+            ItemStack is = iw.getItem();
+            putItem(is, iw.getLink());
+        }
+    }
+
+    void putItem(ItemStack theItem, String link) {
+        String imgType = null;
+        IIcon iconIndex = null;
+        if (theItem != null) {
+            imgType = theItem.getItemSpriteNumber() == 1 ? "items" : "blocks";
+            iconIndex = theItem.getIconIndex();
+        }
+        if (iconIndex == null) {
+            imgType = "items";
+            found_icon = "factorization:transparent_item";
+        } else {
+            found_icon = iconIndex.getIconName();
+            if (!found_icon.contains(":")) {
+                found_icon = "minecraft:" + found_icon;
+            }
+        }
+        String[] parts = found_icon.split(":", 2);
+        String namespace = parts[0];
+        String path = parts[1];
+        found_icon = namespace + ":" + imgType + "/" + path;
+            /*
+            found_icon = null;
+            theItem.getItem().registerIcons(new IIconRegister() {
+                @Override
+                public IIcon registerIcon(String iconName) {
+                    if (found_icon == null) {
+                        found_icon = iconName;
+                    }
+                    return null; // This'll break shit. Oh well. :/
+                }
+            });*/
+        if (found_icon != null) {
+            s("<img class=\"" + imgType + "\" src=\"" + img(found_icon) + "\" />", link);
+        }
+        found_icon = null;
     }
 }

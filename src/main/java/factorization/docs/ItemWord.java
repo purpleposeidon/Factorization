@@ -1,15 +1,11 @@
 package factorization.docs;
 
-import factorization.shared.NORELEASE;
 import factorization.util.ItemUtil;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.item.ItemStack;
-
 import org.lwjgl.opengl.GL11;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 public class ItemWord extends Word {

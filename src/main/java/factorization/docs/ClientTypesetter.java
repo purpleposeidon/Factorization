@@ -235,6 +235,10 @@ public class ClientTypesetter extends AbstractTypesetter {
             }
             int height = Integer.parseInt(height_);
             emitWord(new VerticalSpacerWord(height));
+        } else if (cmd.equals("\\ifhtml")) {
+            String trueBranch = getParameter(cmd, tokenizer);
+            String falseBranch = getParameter(cmd, tokenizer);
+            process(falseBranch, link, style);
         } else {
             error("Unknown command: ");
             emit(cmd, null);

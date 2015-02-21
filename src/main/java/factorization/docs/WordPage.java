@@ -13,7 +13,9 @@ public class WordPage extends AbstractPage {
     
     WordPage(FontRenderer font) {
         this.font = font;
-        TEXT_HEIGHT = font.FONT_HEIGHT;
+        if (font != null) {
+            TEXT_HEIGHT = font.FONT_HEIGHT;
+        }
         nl();
     }
     
@@ -27,7 +29,9 @@ public class WordPage extends AbstractPage {
             }
         }
         text.get(text.size() - 1).add(word);
-        lineLen += word.getWidth(font);
+        if (font != null) {
+            lineLen += word.getWidth(font);
+        }
     }
     
     void nl() {

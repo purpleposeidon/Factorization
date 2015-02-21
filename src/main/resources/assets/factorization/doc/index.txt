@@ -11,10 +11,12 @@
 \index{charge}{\#{item.factorization:motor}Charge Energy}
 % \index{oreprocessing}{Ore Processing}
 \index{building}{\#{tile.fence}Building}
-\index{cookbook}{\#{item.redstone}Designs}
+\ifhtml{
+    % Disabled since docfigures are presently not supported for the HTML export :P
+}{\index{cookbook}{\#{item.redstone}Designs}}
 \index{projects}{\#{item.minecartChest}Projects}
 \index{misc}{\#{item.fish.salmon.raw}Miscellaneous Nonsense}
-\index{reference}{\#{tile.bookshelf}Reference}
+\ifhtml{}{\index{reference}{\#{tile.bookshelf}Reference}}
 
 
 % \figure{

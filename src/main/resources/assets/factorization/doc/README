@@ -47,6 +47,8 @@ This system is TeX-inspired. Commands:
         Basically an 'if' statement.
 \vpad{#}
         Allows precise enlargement of the vertical padding for a line. It will have no effect if it is smaller than the line height, which is 9. Various other elements, such as items, will make the line height larger. For example, the crafting recipe list uses \vpad{15}.
+\ifhtml{TRUE}{FALSE}
+        Emits the TRUE branch if this is for an HTML export, or else the FALSE branch
 
 
 A '%' marks a line-comment.

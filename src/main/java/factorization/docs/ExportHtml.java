@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 
+import factorization.shared.Core;
 import factorization.util.PlayerUtil;
 import net.minecraft.command.ICommand;
 import net.minecraft.command.ICommandSender;
@@ -62,26 +63,31 @@ public class ExportHtml implements ICommand {
     }
     
     void processFile(String filename) throws IOException {
-        File outfile = new File("/tmp/fzdoc-html/" + filename + ".html");
+        Core.logInfo("Processing: " + filename);
+        String root = System.getProperty("fzdoc.webroot", "/FzDocs/");
+        String outDir = System.getProperty("fzdoc.out", "/tmp/fzdoc-html/");
+        File outfile = new File(outDir + filename + ".html");
         outfile.getParentFile().mkdirs();
         outfile.delete();
         OutputStream os = new FileOutputStream(outfile);
         PrintStream out = new PrintStream(os);
+        out.println("<!doctype html>");
         out.println("<html>");
         out.println("<head>");
+        out.println("<meta charset=\"utf-8\"/>");
+        out.println("<title>The Factorization Manual</title>");
+        out.println("<link rel=\"stylesheet\" type=\"text/css\" href=\"" + root + "man.css\">");
         out.println();
         out.println("</head>");
         out.println("<body>");
         try {
-            HtmlConversionTypesetter conv = new HtmlConversionTypesetter(os);
+            HtmlConversionTypesetter conv = new HtmlConversionTypesetter(os, root);
             String text = DocumentationModule.readDocument(filename);
             conv.processText(text);
+        } finally {
             out.println("</body>");
             out.println("</html>");
-        } finally {
-            if (os != null) {
-                os.close();
-            }
+            os.close();
         }
     }
     

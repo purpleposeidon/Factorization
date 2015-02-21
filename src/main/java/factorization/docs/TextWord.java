@@ -18,6 +18,7 @@ public class TextWord extends Word {
     
     @Override
     public int getWidth(FontRenderer font) {
+        if (font == null) return 0;
         return font.getStringWidth(text);
     }
     
