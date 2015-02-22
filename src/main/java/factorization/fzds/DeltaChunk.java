@@ -191,6 +191,7 @@ public class DeltaChunk {
                 @Override
                 public void include(Coord real) {
                     real.markBlockForUpdate();
+                    real.notifyBlockChange();
                 }
             });
         }
