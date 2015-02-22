@@ -16,6 +16,8 @@ import factorization.shared.Core;
 import factorization.shared.NORELEASE;
 import factorization.util.FzUtil;
 import factorization.util.SpaceUtil;
+import net.minecraft.block.Block;
+import net.minecraft.block.material.Material;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.Vec3;
@@ -23,10 +25,7 @@ import net.minecraftforge.common.util.ForgeDirection;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 public class Awakener {
     int arm_size = 0, arm_length = 0;
@@ -130,7 +129,9 @@ public class Awakener {
         @Override
         public boolean matches(Coord at) {
             if (at.y <= ground_level) return false;
-            if (at.getBlock() == Core.registry.colossal_block) return false;
+            Block block1 = at.getBlock();
+            if (block1 == Core.registry.colossal_block) return false;
+            if (block1.getMaterial() == Material.leaves) return false;
             return !at.isAir() && at.getHardness() >= 0;
         }
     };
@@ -229,8 +230,12 @@ public class Awakener {
         
         markCoveredBodyBlocks(body);
 
-        double max_iter = leg_size + 2;
-        includeShell(all_members, new HashSet(), (int) max_iter);
+        final int max_iter = leg_size + 6;
+        final int arm_iter = 2;
+        HashSet<Coord> exclude = includeShell(all_members, new HashSet(), arm_iter);
+        ArrayList<Set<Coord>> justTheBody = new ArrayList<Set<Coord>>();
+        justTheBody.add(body);
+        includeShell(justTheBody, exclude, max_iter - arm_iter);
         msg("Attatched adjacent blocks. New body:");
         limbDetails("arm", arms);
         limbDetails("leg", legs);
@@ -472,36 +477,38 @@ public class Awakener {
         }
         return false;
     }
-    
-    void includeShell(ArrayList<Set<Coord>> sets, Set<Coord> exclude, int maxIter) {
-        HashMap<Set<Coord>, Set<Coord>> pending2origs = new HashMap();
-        ArrayList<Set<Coord>> sortedPendings = new ArrayList();
-        Set<Coord> allFound = new HashSet();
-        for (Set<Coord> f : sets) {
-            sortedPendings.add(f);
-            pending2origs.put(f, f);
-            allFound.addAll(f);
+
+    HashSet<Coord> includeShell(ArrayList<Set<Coord>> sets, HashSet<Coord> exclude, int maxIter) {
+        sets = new ArrayList<Set<Coord>>(sets);
+        for (Set<Coord> set : sets) {
+            exclude.addAll(set);
         }
-        while (!pending2origs.isEmpty() && maxIter-- > 0) {
-            Set<Coord> set = sortedPendings.remove(0);
-            Set<Coord> orig = pending2origs.remove(set);
-            
-            Set<Coord> newBlocks = new HashSet();
-            for (Coord at : set) {
-                for (Coord neighbor : at.getNeighborsAdjacent()) {
-                    if (allFound.contains(neighbor) || set.contains(neighbor) || exclude.contains(neighbor) || !valid_natural_blocks.matches(neighbor)) continue;
-                    newBlocks.add(neighbor);
-                    allFound.add(neighbor);
+        boolean found = true;
+        ArrayList<Coord> pending = new ArrayList<Coord>();
+        while (found && maxIter --> 0) {
+            found = false;
+            for (Iterator<Set<Coord>> iterator = sets.iterator(); iterator.hasNext(); ) {
+                Set<Coord> set = iterator.next();
+                for (Coord c : set) {
+                    for (Coord neighbor : c.getNeighborsAdjacent()) {
+                        if (exclude.contains(neighbor)) continue;
+                        if (!valid_natural_blocks.matches(neighbor)) continue;
+                        pending.add(neighbor);
+                        exclude.add(neighbor);
+                    }
+                }
+                if (pending.isEmpty()) {
+                    iterator.remove();
+                } else {
+                    found = true;
+                    set.addAll(pending);
+                    pending.clear();
                 }
             }
-            if (!newBlocks.isEmpty()) {
-                orig.addAll(newBlocks);
-                sortedPendings.add(newBlocks);
-                pending2origs.put(newBlocks, orig);
-            }
         }
+        return exclude;
     }
-    
+
     Set<Coord> one(HashMap<Set<Coord>, Set<Coord>> map) {
         for (Set<Coord> ret : map.keySet()) return ret;
         return null;
