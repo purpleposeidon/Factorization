@@ -39,7 +39,8 @@ public enum Technique implements IStateMachine<Technique> {
 
         @Override
         public Technique tick(ColossusController controller, int age) {
-            return INITIAL_BOW;
+            if (age > 25) return INITIAL_BOW;
+            return this; // Is awakening laggy? Give everyone a moment to catch their breath before we start moving
         }
     },
     
