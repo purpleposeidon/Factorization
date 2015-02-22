@@ -5,6 +5,7 @@ import net.minecraft.command.ICommandSender;
 import net.minecraft.init.Blocks;
 import net.minecraft.tileentity.TileEntityCommandBlock;
 import net.minecraft.tileentity.TileEntitySign;
+import net.minecraft.util.ChatComponentText;
 import net.minecraft.util.ChunkCoordinates;
 import factorization.api.Coord;
 import factorization.shared.Core;
@@ -17,7 +18,7 @@ public class BuildColossusCommand extends CommandBase {
 
     @Override
     public String getCommandUsage(ICommandSender player) {
-        return "/build-colossus ([spam] seed)|reload-masks";
+        return "/build-colossus ([spam] SEED)|reload-masks";
     }
     
     @Override
@@ -32,6 +33,10 @@ public class BuildColossusCommand extends CommandBase {
 
     @Override
     public void processCommand(ICommandSender player, String[] args) {
+        if (args.length == 0) {
+            player.addChatMessage(new ChatComponentText(getCommandUsage(player)));
+            return;
+        }
         if (args[0].equalsIgnoreCase("reload-masks")) {
             MaskLoader.reloadMasks();
             return;
