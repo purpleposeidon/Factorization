@@ -62,7 +62,41 @@ public class ColossalBuilder {
         face_width = face_width + (face_width % 2);
         face_height = clipMax(3, random_linear(body_height*1/3, body_height*3/5));
         face_depth = clipMax(2, (leg_size + body_back_padding)/2);
-        this.start = start.add(new DeltaCoord(0, 0, -leg_size - leg_spread/2)).add(0, 0, -1);
+        start = start.add(new DeltaCoord(0, 0, -leg_size - leg_spread/2)).add(0, 0, -1);
+        int radius = leg_size + (leg_spread + 1)/2;
+        this.start = moveUp(start, radius);
+    }
+
+    static Coord moveUp(Coord start, final int radius) {
+        class Counter implements ICoordFunction {
+            float total, solid;
+
+            boolean isClear(Coord at) {
+                Coord min = at.add(-radius, 0, -radius);
+                Coord max = at.add(+radius, 0, +radius);
+                Coord.iterateCube(min, max, this);
+                return isSufficientlyClear();
+            }
+
+            @Override
+            public void handle(Coord here) {
+                total++;
+                if (here.isReplacable()) return;
+                if (here.isAir()) return;
+                if (here.isSolid()) solid++;
+            }
+
+            boolean isSufficientlyClear() {
+                return solid / total < 0.2F;
+            }
+        }
+        int max_iter = 32;
+        Coord level = start.copy();
+        while (max_iter-- > 0) {
+            if (new Counter().isClear(level)) return level;
+            level.y++;
+        }
+        return start; // Uh oh!
     }
     
     int clipMax(int... vals) {
