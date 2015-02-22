@@ -76,7 +76,7 @@ public class ItemColossusGuide extends ItemFactorization {
                 msg = new ChatComponentTranslation(m);
             } else {
                 dc.y = 0;
-                msg = new ChatComponentTranslation(getDirection(dc), getDistance(dc));
+                msg = getDistance(dc);
             }
             Notice.chat(player, msgKey, msg);
             
@@ -86,15 +86,15 @@ public class ItemColossusGuide extends ItemFactorization {
         return is;
     }
 
-    String getDistance(DeltaCoord dc) {
+    IChatComponent getDistance(DeltaCoord dc) {
         int d = (int) dc.magnitude();
         String pretty = "" + d;
-        String unit = " blocks";
+        String unit = ".m";
         if (d > 1000) {
             pretty = String.format("%.1f", d / 1000F);
-            unit = " km";
+            unit = ".km";
         }
-        return pretty + unit;
+        return new ChatComponentTranslation(getDirection(dc), pretty, new ChatComponentTranslation("colossus.compass.unit" +unit));
     }
     
     String getDirection(DeltaCoord dc) {
