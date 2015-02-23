@@ -129,6 +129,7 @@ public class PacketProxyingPlayer extends EntityPlayerMP implements
 
     public PacketProxyingPlayer(final DimensionSliceEntity dimensionSlice, World shadowWorld) {
         super(MinecraftServer.getServer(), (WorldServer) shadowWorld, new GameProfile(proxyUuid, "[FzdsPacket]"), new ItemInWorldManager(shadowWorld));
+        initWrapping();
         this.dimensionSlice = new WeakReference<DimensionSliceEntity>(dimensionSlice);
         Coord c = dimensionSlice.getCenter();
         c.y = -8; // lurk in the void; we should catch most mod's packets.
@@ -147,9 +148,6 @@ public class PacketProxyingPlayer extends EntityPlayerMP implements
             scm.func_72375_a(this, null);
         }
         ticks_since_last_update = (int) (Math.random() * 20);
-        initWrapping();
-        // TODO: I think the chunks are unloading despite the PPP's presence.
-        // Need to make DSEs chunkload
     }
     
     int savePlayerViewRadius() {
