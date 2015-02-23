@@ -9,6 +9,10 @@ import java.util.Comparator;
 import java.util.Random;
 
 import factorization.util.NumUtil;
+import gnu.trove.impl.hash.TIntByteHash;
+import gnu.trove.impl.hash.TIntHash;
+import gnu.trove.list.array.TIntArrayList;
+import gnu.trove.map.hash.TIntByteHashMap;
 import net.minecraft.block.material.Material;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.world.ChunkCoordIntPair;
@@ -52,6 +56,7 @@ public class WorldGenColossus implements IWorldGenerator {
             throw new IllegalArgumentException("colossus spacing must be at least " + Math.max(GENERATION_START_X, GENERATION_START_Z));
         }
     }
+    static TIntByteHashMap dimensionBlacklist = new TIntByteHashMap();
     
     private static double dist(int generation_spacing, int pos) {
         pos = Math.abs(pos);
@@ -129,6 +134,13 @@ public class WorldGenColossus implements IWorldGenerator {
         // Create a flat arena around colossi.
         if (!genOnWorld(event.world)) return;
         int[] target_noises = new int[] { 0, 1, 2, 5 };
+        int max = target_noises[0];
+        for (int i : target_noises) max = Math.max(max, i);
+        if (event.newNoiseGens == null || max >= event.newNoiseGens.length) {
+            Core.logWarning("Colossi will not generate in dimension: " + event.world.provider.dimensionId);
+            dimensionBlacklist.put(event.world.provider.dimensionId, (byte) 1);
+            return;
+        }
         for (int noise_index : target_noises) {
             NoiseGenerator parentGenerator = event.newNoiseGens[noise_index];
             event.newNoiseGens[noise_index] = new SmoothNoiseNearColossi(noise_index, (NoiseGeneratorOctaves) parentGenerator);
@@ -198,7 +210,7 @@ public class WorldGenColossus implements IWorldGenerator {
     }
     
     public static boolean genOnWorld(World world) {
-        return world.getWorldInfo().isMapFeaturesEnabled() && world.provider.isSurfaceWorld() && FzConfig.gen_colossi;
+        return world.getWorldInfo().isMapFeaturesEnabled() && world.provider.isSurfaceWorld() && FzConfig.gen_colossi && !dimensionBlacklist.containsKey(world.provider.dimensionId);
     }
     
     static Type[] forbiddenBiomeTypes = new Type[] {
