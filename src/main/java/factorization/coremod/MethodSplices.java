@@ -75,4 +75,9 @@ public class MethodSplices {
     public static boolean net$minecraft$client$multiplayer$WorldClient$init(EventBus bus, WorldEvent.Load event) {
         return HookTargetsClient.abortClientLoadEvent(bus, event);
     }
+
+    public static boolean bjf$init(EventBus bus, WorldEvent.Load event) {
+        // This is me being lazy. Dealing with names is obnoxious. Hopefully we can get this gone when we port to 1.8?
+        return HookTargetsClient.abortClientLoadEvent(bus, event);
+    }
 }
