@@ -1,5 +1,6 @@
 package factorization.coremod;
 
+import cpw.mods.fml.common.eventhandler.EventBus;
 import factorization.coremodhooks.HookTargetsClient;
 import factorization.coremodhooks.HookTargetsServer;
 import net.minecraft.command.IEntitySelector;
@@ -10,6 +11,7 @@ import net.minecraft.util.MovingObjectPosition;
 import net.minecraft.util.Vec3;
 import net.minecraft.world.Explosion;
 import net.minecraft.world.World;
+import net.minecraftforge.event.world.WorldEvent;
 
 import java.util.List;
 
@@ -68,5 +70,9 @@ public class MethodSplices {
     // Explosion.doExplosionA; method replacement
     public static double func_77278_a(Entity ent, double dmg) {
         return HookTargetsServer.clipExplosionResistance(ent, dmg);
+    }
+
+    public static boolean net$minecraft$client$multiplayer$WorldClient$init(EventBus bus, WorldEvent.Load event) {
+        return HookTargetsClient.abortClientLoadEvent(bus, event);
     }
 }

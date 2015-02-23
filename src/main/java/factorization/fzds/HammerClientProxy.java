@@ -10,6 +10,7 @@ import cpw.mods.fml.common.network.FMLNetworkEvent.ClientDisconnectionFromServer
 import cpw.mods.fml.relauncher.Side;
 import factorization.api.Coord;
 import factorization.api.Quaternion;
+import factorization.coremodhooks.HookTargetsClient;
 import factorization.coremodhooks.IExtraChunkData;
 import factorization.fzds.interfaces.IDeltaChunk;
 import factorization.shared.*;
@@ -119,11 +120,16 @@ public class HammerClientProxy extends HammerProxy {
         }
         send_queue = mc.thePlayer.sendQueue;
         WorldInfo wi = world.getWorldInfo();
-        Hammer.worldClient = new HammerWorldClient(send_queue,
-                new WorldSettings(wi),
-                Hammer.getDimensionId(),
-                world.difficultySetting,
-                Core.proxy.getProfiler());
+        try {
+            HookTargetsClient.abort.set(Boolean.TRUE);
+            Hammer.worldClient = new HammerWorldClient(send_queue,
+                    new WorldSettings(wi),
+                    Hammer.getDimensionId(),
+                    world.difficultySetting,
+                    Core.proxy.getProfiler());
+        } finally {
+            HookTargetsClient.abort.remove();
+        }
         Hammer.worldClient.addWorldAccess(shadowRenderGlobal = new ShadowRenderGlobal(mc.theWorld));
     }
     

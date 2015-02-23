@@ -92,7 +92,7 @@ public class ASMTransformer implements IClassTransformer {
                 return applyTransform(basicClass,
                         new AbstractAsmClassTransform.Mixin("factorization.coremodhooks.MixinEntityKinematicsTracker", "Lfactorization/coremodhooks/MixinEntityKinematicsTracker;"));
             }
-            // Don't let IDCs be knocked backwards
+            // Don't let IDCs be knocked backwards; fixes a vanilla bugor
             if (transformedName.equals("net.minecraft.world.Explosion")) {
                 return applyTransform(basicClass,
                         new AbstractAsmMethodTransform.MutateCall(name, transformedName, "func_77278_a", "doExplosionA")
@@ -100,6 +100,15 @@ public class ASMTransformer implements IClassTransformer {
                                 .setOwner("net.minecraft.enchantment.EnchantmentProtection")
                                 .setName("func_92092_a", "func_92092_a", "a")
                                 .setDescr("(Lnet/minecraft/entity/Entity;D)D", "(Lsa;D)D")
+                );
+            }
+            // Sigh. :/ needed to keep minimap mods happy...
+            if (transformedName.equals("net.minecraft.client.multiplayer.WorldClient")) {
+                return applyTransform(basicClass,
+                        new AbstractAsmMethodTransform.MutateCall(name, transformedName, "<init>", "<init>")
+                                .setOwner("cpw.mods.fml.common.eventhandler.EventBus")
+                                .setName("post", "post", "post")
+                                .setDescr("(Lcpw/mods/fml/common/eventhandler/Event;)Z", "(Lcpw/mods/fml/common/eventhandler/Event;)Z")
                 );
             }
         }
@@ -115,6 +124,11 @@ public class ASMTransformer implements IClassTransformer {
     byte[] applyTransform(byte[] basicClass, AbstractAsmClassTransform ct, AbstractAsmMethodTransform... changes) {
         return applyTransform(basicClass, new AbstractAsmClassTransform[] { ct }, changes);
     }
+
+    static String renameMethod(String name, String className) {
+        if (!name.equals("<init>")) return name;
+        return className.replace(".", "$") + "$init";
+    }
     
     byte[] applyTransform(byte[] basicClass, AbstractAsmClassTransform[] classChanges, AbstractAsmMethodTransform... changes) {
         ClassReader cr = new ClassReader(basicClass);
@@ -128,7 +142,7 @@ public class ASMTransformer implements IClassTransformer {
         for (MethodNode m : cn.methods) {
             for (AbstractAsmMethodTransform change : changes) {
                 if (change.applies(m)) {
-                    MethodNode method = getMethod(change.srgName);
+                    MethodNode method = getMethod(renameMethod(change.srgName, change.obfClassName));
                     change.apply(m, method);
                     change.satisfied = true;
                 }

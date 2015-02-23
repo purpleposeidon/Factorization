@@ -1,5 +1,6 @@
 package factorization.coremodhooks;
 
+import cpw.mods.fml.common.eventhandler.EventBus;
 import factorization.util.SpaceUtil;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
@@ -15,6 +16,7 @@ import factorization.common.Command;
 import factorization.common.FactorizationKeyHandler;
 import factorization.common.FzConfig;
 import factorization.docs.DocumentationModule;
+import net.minecraftforge.event.world.WorldEvent;
 
 public class HookTargetsClient {
     public static void keyTyped(char chr, int keysym) {
@@ -101,5 +103,11 @@ public class HookTargetsClient {
             return ret;
         }
         return new MovingObjectPosition(null, hit);
+    }
+
+    public static ThreadLocal<Boolean> abort = new ThreadLocal<Boolean>();
+    public static boolean abortClientLoadEvent(EventBus bus, WorldEvent.Load event) {
+        if (abort.get() == Boolean.TRUE) return false;
+        return bus.post(event);
     }
 }

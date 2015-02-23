@@ -1,5 +1,6 @@
 package factorization.docs;
 
+import factorization.coremodhooks.HookTargetsClient;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufInputStream;
 import io.netty.buffer.Unpooled;
@@ -124,11 +125,14 @@ public class DocumentationModule {
     
     public static DocWorld loadWorld(String text) {
         try {
+            HookTargetsClient.abort.set(Boolean.TRUE);
             NBTTagCompound tag = decodeNBT(text);
             return new DocWorld(tag);
         } catch (IOException e) {
             e.printStackTrace();
             return null;
+        } finally {
+            HookTargetsClient.abort.remove();
         }
     }
     
