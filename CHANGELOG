@@ -1,3 +1,24 @@
+0.8.88.8.8888g
+  Compat bugfix: Mapwriter doesn't open the wrong dimension anymore
+  Compat bugfix: Don't crash when RFTools generates a dimension
+  Changed bedrock back to the vanilla texture
+  Made the (lightened) birch log texture a bit darker
+  Make colossi less willing to generate inside holes
+  Make colossi awakening grab a more reasonable quantity of blocks
+  Don't crash with Optifine. (However, there are still non-crashing issues with optifine.)
+  
+
+0.8.88.8.8888f
+  Taught the wither the true meaning of friendship (AKA made it not break bedrock anymore.)
+  Added a patreon barrel recipe! You can add more barrel recipes by supporting me on Patreon!
+  Non-wood barrels have a different texture on the top
+  A copy of the FZ Manual can be read here: http://purpleposeidon.github.io/FzDocs/
+    (The in-game version is better.)
+  Made the manual handle weird items (eg, Forestry combs) more safely
+
+0.8.88.8.8888e
+  Hopefully maybe actually fixed the WorldClient crash
+
 0.8.88.8.8888d
   Hopefully (?) fixed crashes involving EntityRenderer & Explosion
   Added some references for mod devs
