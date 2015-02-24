@@ -317,14 +317,6 @@ public class Registry {
 
         
         logicMatrixProgrammer = new ItemMatrixProgrammer();
-        for (String chestName : new String[] {
-                ChestGenHooks.STRONGHOLD_LIBRARY,
-                ChestGenHooks.DUNGEON_CHEST,
-                //TODO: Nether fortresses? Needs a forge thing tho.
-                }) {
-            ChestGenHooks dungeon = ChestGenHooks.getInfo(chestName);
-            dungeon.addItem(new WeightedRandomChestContent(new ItemStack(logicMatrixProgrammer), 1, 1, 35)); //XXX TODO: Temporary, put these on asteroids.
-        }
         logicMatrix = new ItemCraftingComponent("logic_matrix");
         logicMatrixIdentifier = new ItemCraftingComponent("logic_matrix_identifier");
         logicMatrixController = new ItemCraftingComponent("logic_matrix_controller");
@@ -509,20 +501,6 @@ public class Registry {
                 'I', dark_iron,
                 '#', logicMatrix,
                 '>', Items.comparator);
-        int librarianVillager = 1;
-        VillagerRegistry.instance().registerVillageTradeHandler(librarianVillager, new IVillageTradeHandler() {
-            @Override
-            public void manipulateTradesForVillager(EntityVillager villager, MerchantRecipeList recipeList, Random random) {
-                int min = 2, max = 4;
-                Item item = Core.registry.logicMatrixProgrammer;
-                float chance = 1;
-                
-                if (min > 0 && max > 0) {
-                    EntityVillager.blacksmithSellingList.put(item, new Tuple(min, max));
-                }
-                EntityVillager.func_146089_b(recipeList, item, random, chance);
-            }
-        });
         TileEntitySlagFurnace.SlagRecipes.register(new ItemStack(logicMatrixProgrammer), 2F/3F, new ItemStack(dark_iron), 0.85F, new ItemStack(logicMatrix));
         
         TileEntityCrystallizer.addRecipe(new ItemStack(Blocks.redstone_block), new ItemStack(logicMatrix), 1, Core.registry.aqua_regia);
