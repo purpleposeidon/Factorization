@@ -39,7 +39,6 @@ import net.minecraftforge.common.util.ForgeDirection;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.minecraftforge.event.world.ChunkEvent;
 
-import net.minecraftforge.oredict.OreDictionary;
 import org.lwjgl.opengl.GL11;
 
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
@@ -1156,26 +1155,22 @@ public class TileEntityDayBarrel extends TileEntityFactorization {
     boolean broken_with_silk_touch = false;
     
     @Override
-    protected boolean removedByPlayer(EntityPlayer player) {
-        if (cancelRemovedByPlayer(player)) {
-            if (player.worldObj.isRemote) {
-                Core.proxy.sendBlockClickPacket();
-            }
-            return false;
-        }
+    protected boolean removedByPlayer(EntityPlayer player, boolean willHarvest) {
+        if (cancelRemovedByPlayer(player)) return false;
         broken_with_silk_touch = EnchantmentHelper.getSilkTouchModifier(player);
-        return super.removedByPlayer(player);
+        return super.removedByPlayer(player, willHarvest);
     }
     
-    @Override
-    public boolean cancelRemovedByPlayer(EntityPlayer player) {
+    private boolean cancelRemovedByPlayer(EntityPlayer player) {
         if (item == null) {
             return false;
         }
         if (player == null) return false;
         if (!player.capabilities.isCreativeMode) return false;
         if (player.isSneaking()) return false;
-        if (!player.worldObj.isRemote) {
+        if (player.worldObj.isRemote) {
+            Core.proxy.sendBlockClickPacket();
+        } else {
             click(player);
         }
         return true;

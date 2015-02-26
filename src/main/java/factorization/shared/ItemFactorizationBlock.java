@@ -100,7 +100,7 @@ public class ItemFactorizationBlock extends ItemBlock {
             if (is.hasTagCompound()) {
                 FactoryType ft = FactoryType.LEYDENJAR;
                 TileEntityLeydenJar jar = (TileEntityLeydenJar) ft.getRepresentative();
-                jar.onPlacedBy(player, is, 0);
+                jar.loadFromStack(is);
                 perc = (int)(jar.getLevel()*100);
                 //infoList.add(( + "% charged"));
             }

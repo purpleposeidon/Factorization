@@ -733,13 +733,13 @@ public class TileEntityGreenware extends TileEntityCommon {
     private static final Vec3 zeroVec = Vec3.createVectorHelper(0, 0, 0);
 
     @Override
-    protected boolean removedByPlayer(EntityPlayer player) {
+    protected boolean removedByPlayer(EntityPlayer player, boolean willHarvest) {
         if (player.worldObj.isRemote) {
             return false;
         }
         MovingObjectPosition hit = ItemSculptingTool.doRayTrace(player);
         if (hit == null || hit.subHit == -1 || parts.size() < 1) {
-            return super.removedByPlayer(player);
+            return super.removedByPlayer(player, willHarvest);
         }
         Coord here = getCoord();
         ClayState state = getState();
@@ -748,7 +748,7 @@ public class TileEntityGreenware extends TileEntityCommon {
         boolean shouldDestroy = player.isSneaking() || parts.size() == 1;
         if (player.capabilities.isCreativeMode) {
             if (shouldDestroy) {
-                return super.removedByPlayer(player);
+                return super.removedByPlayer(player, willHarvest);
             } else {
                 removeLump(hit.subHit);
                 return true;

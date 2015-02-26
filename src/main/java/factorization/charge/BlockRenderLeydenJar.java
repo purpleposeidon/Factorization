@@ -64,7 +64,7 @@ public class BlockRenderLeydenJar extends FactorizationBlockRender {
         renderBlock(rb, block);
         if (!world_mode && is != null && is.hasTagCompound()) {
             TileEntityLeydenJar jar = (TileEntityLeydenJar) FactoryType.LEYDENJAR.getRepresentative();
-            jar.onPlacedBy(null, is, 0);
+            jar.loadFromStack(is);
             ChargeSparks sparks;
             if (!sparkMap.containsKey(is)) {
                 sparks = new ChargeSparks(10);

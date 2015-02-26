@@ -94,8 +94,8 @@ public abstract class TileEntityCommon extends TileEntity implements ICoord, IFa
         customName = ItemUtil.getCustomItemName(is);
     }
     
-    protected boolean removedByPlayer(EntityPlayer player) {
-        return Core.registry.resource_block.removedByPlayer(worldObj, player, xCoord, yCoord, zCoord);
+    protected boolean removedByPlayer(EntityPlayer player, boolean willHarvest) {
+        return worldObj.setBlockToAir(xCoord, yCoord, zCoord);
     }
     
     public void click(EntityPlayer entityplayer) {
@@ -322,6 +322,4 @@ public abstract class TileEntityCommon extends TileEntity implements ICoord, IFa
     public void spawnDisplayTickParticles(Random rand) { }
 
     public boolean recolourBlock(ForgeDirection side, FzColor fzColor) { return false; }
-    
-    public boolean cancelRemovedByPlayer(EntityPlayer player) { return false; }
 }

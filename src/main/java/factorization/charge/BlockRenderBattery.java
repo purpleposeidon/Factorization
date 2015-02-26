@@ -25,7 +25,9 @@ public class BlockRenderBattery extends FactorizationBlockRender {
             bat = (TileEntityBattery) te;
         } else {
             bat = (TileEntityBattery) FactoryType.BATTERY.getRepresentative();
-            bat.onPlacedBy(null, is, 0);
+            if (is != null && is.hasTagCompound()) {
+                bat.loadFromStack(is);
+            }
         }
         if (bat == null) {
             return false;
