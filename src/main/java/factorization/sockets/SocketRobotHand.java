@@ -7,11 +7,15 @@ import factorization.util.InvUtil;
 import factorization.util.ItemUtil;
 import net.minecraft.block.Block;
 import net.minecraft.client.renderer.Tessellator;
+import net.minecraft.crash.CrashReport;
+import net.minecraft.crash.CrashReportCategory;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.MinecraftError;
 import net.minecraft.util.MovingObjectPosition;
 import net.minecraft.util.MovingObjectPosition.MovingObjectType;
+import net.minecraft.util.ReportedException;
 import net.minecraft.util.Vec3;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.ForgeDirection;
@@ -163,12 +167,20 @@ public class SocketRobotHand extends TileEntitySocketBase {
     }
     
     boolean clickItem(EntityPlayer player, ItemStack is, MovingObjectPosition mop) {
-        if (mop.typeOfHit == MovingObjectPosition.MovingObjectType.BLOCK) {
-            return mcClick(player, mop, is);
-        } else if (mop.typeOfHit == MovingObjectPosition.MovingObjectType.ENTITY) {
-            if (player.interactWith(mop.entityHit)) {
-                return true;
+        try {
+            if (mop.typeOfHit == MovingObjectPosition.MovingObjectType.BLOCK) {
+                return mcClick(player, mop, is);
+            } else if (mop.typeOfHit == MovingObjectPosition.MovingObjectType.ENTITY) {
+                if (player.interactWith(mop.entityHit)) {
+                    return true;
+                }
             }
+        } catch (Throwable t) {
+            CrashReport err = new CrashReport("clicking item", t);
+            CrashReportCategory cat = err.makeCategory("clicked item");
+            cat.addCrashSection("Item", is);
+            cat.addCrashSection("Mop", mop);
+            throw new ReportedException(err);
         }
         return false;
     }
