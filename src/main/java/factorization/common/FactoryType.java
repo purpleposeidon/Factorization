@@ -1,5 +1,8 @@
 package factorization.common;
 
+import factorization.mechanisms.TileEntityAnchor;
+import factorization.mechanisms.SocketHandCrank;
+import factorization.mechanisms.TileEntityHinge;
 import net.minecraft.item.ItemStack;
 import cpw.mods.fml.common.registry.GameRegistry;
 import factorization.astro.TileEntityRocketEngine;
@@ -33,7 +36,6 @@ import factorization.sockets.SocketScissors;
 import factorization.sockets.SocketShifter;
 import factorization.sockets.fanturpeller.BlowEntities;
 import factorization.sockets.fanturpeller.PumpLiquids;
-import factorization.sockets.fanturpeller.SocketFanturpeller;
 import factorization.weird.TileEntityDayBarrel;
 import factorization.wrath.TileEntityWrathLamp;
 
@@ -42,7 +44,7 @@ public enum FactoryType {
     //0 -- This used to be ROUTER
     //1 -- This used to be CUTTER
     //2 -- This used to be MAKER
-    STAMPER(3, true, TileEntityStamper.class, "factory_stamper"), // Crafts craft packets, and outputs results
+    STAMPER(3, true, TileEntityStamper.class, "factory_stamper"), // Crafts a single item
     //4 -- This used to be QUEUE
     //5 -- This used to be BARREL
     LAMP(6, false, TileEntityWrathLamp.class, "factory_lamp"), //spawn a bunch of AIR blocks around and below
@@ -64,7 +66,7 @@ public enum FactoryType {
     SOLARBOILER(22, false, TileEntitySolarBoiler.class, "factory_solarfurnace"), //Produces steam from sunlight
     ROCKETENGINE(23, false, TileEntityRocketEngine.class, "factory_rocketengine"), //Is a rocket
     EXTENDED(24, false, TileEntityExtension.class, "factory_ext"), //Used for multipiece blocks (like beds & rocket engines)
-    CERAMIC(25, false, TileEntityGreenware.class, "factory_ceramic"), //clay sculpture (Not really implemented)
+    CERAMIC(25, false, TileEntityGreenware.class, "factory_ceramic"), //clay sculpture
     LEYDENJAR(26, false, TileEntityLeydenJar.class, "factory_leyjar"), //inefficient bulk energy storage
     SERVORAIL(27, false, TileEntityServoRail.class, "factory_rail"),
     PARASIEVE(28, true, TileEntityParaSieve.class, "factory_sieve"),
@@ -83,7 +85,10 @@ public enum FactoryType {
     SOCKET_BARE_MOTOR(41, false, SocketBareMotor.class, "fzsock_motor"),
     SOCKET_SCISSORS(42, false, SocketScissors.class, "fzsock_scissors"),
     CREATIVE_CHARGE(43, false, InfiniteChargeBlock.class, "factory_creative_charge"),
-    
+    HINGE(44, false, TileEntityHinge.class, "factory_hinge"),
+    ANCHOR(45, false, TileEntityAnchor.class, "factory_anchor"),
+    SOCKET_HAND_CRANK(46, false, SocketHandCrank.class, "fzsock_hand_crank"),
+    //SOCKET_POWERED_CRANK(47, true, SocketPoweredCrank.class, "factory_powered_crank"),
 
     POCKETCRAFTGUI(101, true)
     ;

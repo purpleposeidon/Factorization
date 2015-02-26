@@ -364,69 +364,9 @@ public class TileEntityDayBarrel extends TileEntityFactorization {
     
     @Override
     public void onPlacedBy(EntityPlayer player, ItemStack is, int side, float hitX, float hitY, float hitZ) {
-        orientation = getOrientation(player, side, hitX, hitY, hitZ);
+        orientation = SpaceUtil.getOrientation(player, side, hitX, hitY, hitZ);
         loadFromStack(is);
         needLogic();
-    }
-    
-    FzOrientation getOrientation(EntityPlayer player, int side, float hitX, float hitY, float hitZ) {
-        ForgeDirection facing = ForgeDirection.getOrientation(side);
-        double u = 0.5, v = 0.5; //We pick the axiis based on which side gets clicked
-        switch (facing) {
-        case UNKNOWN:
-        case DOWN:
-            u = 1 - hitX;
-            v = hitZ;
-            break;
-        case UP:
-            u = hitX;
-            v = hitZ;
-            break;
-        case NORTH:
-            u = hitX;
-            v = hitY;
-            break;
-        case SOUTH:
-            u = 1 - hitX;
-            v = hitY;
-            break;
-        case WEST:
-            u = 1 - hitZ;
-            v = hitY;
-            break;
-        case EAST:
-            u = hitZ;
-            v = hitY;
-            break;
-        }
-        u -= 0.5;
-        v -= 0.5;
-        double angle = Math.toDegrees(Math.atan2(v, u)) + 180;
-        angle = (angle + 45) % 360;
-        int pointy = (int) (angle/90);
-        pointy = (pointy + 1) % 4;
-        
-        FzOrientation fo = FzOrientation.fromDirection(facing);
-        for (int X = 0; X < pointy; X++) {
-            fo = fo.getNextRotationOnFace();
-        }
-        if (SpaceUtil.determineOrientation(player) >= 2 /* player isn't looking straight down */
-                && side < 2 /* and the side is the bottom */) {
-            side = SpaceUtil.determineOrientation(player);
-            fo = FzOrientation.fromDirection(ForgeDirection.getOrientation(side).getOpposite());
-            FzOrientation perfect = fo.pointTopTo(ForgeDirection.UP);
-            if (perfect != FzOrientation.UNKNOWN) {
-                fo = perfect;
-            }
-        }
-        double dist = Math.max(Math.abs(u), Math.abs(v));
-        if (dist < 0.33) {
-            FzOrientation perfect = fo.pointTopTo(ForgeDirection.UP);
-            if (perfect != FzOrientation.UNKNOWN) {
-                fo = perfect;
-            }
-        }
-        return fo;
     }
     
     @Override

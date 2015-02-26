@@ -1,6 +1,7 @@
 package factorization.util;
 
 import factorization.api.DeltaCoord;
+import factorization.api.FzOrientation;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.AxisAlignedBB;
@@ -224,6 +225,12 @@ public final class SpaceUtil {
         base.zCoord *= s;
     }
 
+    public static Vec3 scale(Vec3 base, double s) {
+        Vec3 ret = copy(base);
+        incrScale(ret, s);
+        return ret;
+    }
+
     public static AxisAlignedBB createAABB(Vec3 min, Vec3 max) {
         double minX = Math.min(min.xCoord, max.xCoord);
         double minY = Math.min(min.yCoord, max.yCoord);
@@ -299,5 +306,79 @@ public final class SpaceUtil {
 
     public static boolean isZero(Vec3 vec) {
         return vec.xCoord == 0 && vec.yCoord == 0 && vec.zCoord == 0;
+    }
+
+
+    /**
+     * Return the distance between point and the line defined as passing through the origin and lineVec
+     * @param lineVec The vector defining the line, relative to the origin.
+     * @param point The point being measured, relative to the origin
+     * @return the distance between line defined by lineVec and point
+     */
+    public static double lineDistance(Vec3 lineVec, Vec3 point) {
+        // http://mathworld.wolfram.com/Point-LineDistance3-Dimensional.html equation 9
+        double mag = lineVec.lengthVector();
+        Vec3 nPoint = scale(point, -1);
+        return lineVec.crossProduct(nPoint).lengthVector() / mag;
+    }
+
+    public static FzOrientation getOrientation(EntityPlayer player, int side, float hitX, float hitY, float hitZ) {
+        ForgeDirection facing = ForgeDirection.getOrientation(side);
+        double u = 0.5, v = 0.5; //We pick the axiis based on which side gets clicked
+        switch (facing) {
+            case UNKNOWN:
+            case DOWN:
+                u = 1 - hitX;
+                v = hitZ;
+                break;
+            case UP:
+                u = hitX;
+                v = hitZ;
+                break;
+            case NORTH:
+                u = hitX;
+                v = hitY;
+                break;
+            case SOUTH:
+                u = 1 - hitX;
+                v = hitY;
+                break;
+            case WEST:
+                u = 1 - hitZ;
+                v = hitY;
+                break;
+            case EAST:
+                u = hitZ;
+                v = hitY;
+                break;
+        }
+        u -= 0.5;
+        v -= 0.5;
+        double angle = Math.toDegrees(Math.atan2(v, u)) + 180;
+        angle = (angle + 45) % 360;
+        int pointy = (int) (angle/90);
+        pointy = (pointy + 1) % 4;
+
+        FzOrientation fo = FzOrientation.fromDirection(facing);
+        for (int X = 0; X < pointy; X++) {
+            fo = fo.getNextRotationOnFace();
+        }
+        if (SpaceUtil.determineOrientation(player) >= 2 /* player isn't looking straight down */
+                && side < 2 /* and the side is the bottom */) {
+            side = SpaceUtil.determineOrientation(player);
+            fo = FzOrientation.fromDirection(ForgeDirection.getOrientation(side).getOpposite());
+            FzOrientation perfect = fo.pointTopTo(ForgeDirection.UP);
+            if (perfect != FzOrientation.UNKNOWN) {
+                fo = perfect;
+            }
+        }
+        double dist = Math.max(Math.abs(u), Math.abs(v));
+        if (dist < 0.33) {
+            FzOrientation perfect = fo.pointTopTo(ForgeDirection.UP);
+            if (perfect != FzOrientation.UNKNOWN) {
+                fo = perfect;
+            }
+        }
+        return fo;
     }
 }

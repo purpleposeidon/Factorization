@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import factorization.mechanisms.MechanismsFeature;
 import factorization.util.DataUtil;
 import factorization.util.FzUtil;
 import net.minecraft.block.Block;
@@ -143,6 +144,8 @@ public class Core {
             MinecraftForge.EVENT_BUS.register(dd);
             FMLCommonHandler.instance().bus().register(dd);
         }
+
+        MechanismsFeature.initialize();
         
         FzConfig.config.save();
         if (FMLCommonHandler.instance().getSide() == Side.CLIENT) {
