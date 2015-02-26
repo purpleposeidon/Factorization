@@ -127,8 +127,8 @@ public class TileEntityBattery extends TileEntityCommon implements IChargeConduc
     }
 
     @Override
-    public void onPlacedBy(EntityPlayer player, ItemStack is, int side) {
-        super.onPlacedBy(player, is, side);
+    public void onPlacedBy(EntityPlayer player, ItemStack is, int side, float hitX, float hitY, float hitZ) {
+        super.onPlacedBy(player, is, side, hitX, hitY, hitZ);
         NBTTagCompound tag = ItemUtil.getTag(is);
         if (tag.hasKey("storage")) {
             storage = tag.getInteger("storage");

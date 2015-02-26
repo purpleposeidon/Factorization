@@ -183,9 +183,10 @@ public class TileEntityRocketEngine extends TileEntityCommon {
         }
         return true;
     }
-    
+
     @Override
-    public void onPlacedBy(EntityPlayer player, ItemStack is, int side) {
+    public void onPlacedBy(EntityPlayer player, ItemStack is, int side, float hitX, float hitY, float hitZ) {
+        super.onPlacedBy(player, is, side, hitX, hitY, hitZ);
         DeltaCoord dc = getCornerDirection(player, side);
         List<Coord> area = getArea(getCoord(), dc);
         Coord myDestination = area.get(0);

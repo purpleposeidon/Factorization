@@ -210,13 +210,11 @@ public class TileEntityLeydenJar extends TileEntityCommon implements IChargeCond
     public IIcon getIcon(ForgeDirection dir) {
         return BlockIcons.leyden_metal;
     }
-    
+
     @Override
-    public void onPlacedBy(EntityPlayer player, ItemStack is, int side) {
-        if (is.hasTagCompound()) {
-            NBTTagCompound tag = ItemUtil.getTag(is);
-            storage = tag.getInteger("storage");
-        }
+    public void loadFromStack(ItemStack is) {
+        super.loadFromStack(is);
+        storage = ItemUtil.getTag(is).getInteger("storage");
     }
     
     @Override

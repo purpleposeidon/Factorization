@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
+import factorization.migration.MigrationHelper;
 import factorization.util.ItemUtil;
 import net.minecraft.block.Block;
 import net.minecraft.entity.Entity;
@@ -37,6 +38,9 @@ import factorization.common.FactoryType;
 import factorization.shared.NetworkFactorization.MessageType;
 
 public abstract class TileEntityCommon extends TileEntity implements ICoord, IFactoryType {
+    public static final short serialization_version = 1;
+    public static final String serialization_version_key = ".";
+
     protected static Random rand = new Random();
     public String customName = null;
 
@@ -81,11 +85,9 @@ public abstract class TileEntityCommon extends TileEntity implements ICoord, IFa
     }
     
     public void onPlacedBy(EntityPlayer player, ItemStack is, int side, float hitX, float hitY, float hitZ) {
-        onPlacedBy(player, is, side);
-    }
-
-    public void onPlacedBy(EntityPlayer player, ItemStack is, int side) {
-        loadFromStack(is);
+        if (is != null && is.hasTagCompound()) {
+            loadFromStack(is);
+        }
     }
     
     public void loadFromStack(ItemStack is) {
@@ -183,8 +185,7 @@ public abstract class TileEntityCommon extends TileEntity implements ICoord, IFa
     @Override
     public void writeToNBT(NBTTagCompound tag) {
         super.writeToNBT(tag);
-        tag.setString("ver", Core.version);
-        //getBlockClass().enforceQuiet(getCoord()); //NOTE: This won't actually work for the quiting save; but a second save'll take care of that.
+        tag.setShort(serialization_version_key, serialization_version);
         if (customName != null) {
             tag.setString("customName", customName);
         }
@@ -201,6 +202,11 @@ public abstract class TileEntityCommon extends TileEntity implements ICoord, IFa
         }
         if (tag.hasKey("rps")) {
             pulseTime = tag.getLong("rps");
+        }
+        short v = tag.getShort(serialization_version_key);
+        if (v < serialization_version) {
+            MigrationHelper.migrate(v, this.getFactoryType(), this, tag);
+            markDirty();
         }
     }
 

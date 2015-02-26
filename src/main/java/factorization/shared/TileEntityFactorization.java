@@ -48,19 +48,17 @@ public abstract class TileEntityFactorization extends TileEntityCommon
     }
 
     @Override
-    //Derived from TileEntityCommon
-    public void onPlacedBy(EntityPlayer player, ItemStack is, int side) {
+    public void onPlacedBy(EntityPlayer player, ItemStack is, int side, float hitX, float hitY, float hitZ) {
+        super.onPlacedBy(player, is, side, hitX, hitY, hitZ);
         if (player == null) {
             return;
         }
-        super.onPlacedBy(player, is, side);
         facing_direction = (byte) side;
     }
 
     void setFacingDirectionFromEntity(Entity player) {
         float yaw = player.rotationYaw % 360F;
         if (yaw < 0) {
-            //Fun fact: Java is retarded.
             yaw += 360F;
         }
 

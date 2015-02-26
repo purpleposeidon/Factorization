@@ -367,8 +367,8 @@ public class TileEntityGreenware extends TileEntityCommon {
     }
 
     @Override
-    public void onPlacedBy(EntityPlayer player, ItemStack is, int side) {
-        super.onPlacedBy(player, is, side);
+    public void onPlacedBy(EntityPlayer player, ItemStack is, int side, float hitX, float hitY, float hitZ) {
+        super.onPlacedBy(player, is, side, hitX, hitY, hitZ);
         NBTTagCompound tag = is.getTagCompound();
         loadParts(tag);
         ForgeDirection placement = ForgeDirection.getOrientation(SpaceUtil.determineFlatOrientation(player));

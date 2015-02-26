@@ -1256,7 +1256,7 @@ public class TileEntityDayBarrel extends TileEntityFactorization {
         MovingObjectPosition mop = mc.objectMouseOver;
         if (mop == null || mop.hitVec == null || mop.typeOfHit != MovingObjectPosition.MovingObjectType.BLOCK) return;
         Vec3 vec = mop.hitVec;
-        FzOrientation orientation = getOrientation(player, mop.sideHit, (float) (vec.xCoord - mop.blockX), (float) (vec.yCoord - mop.blockY), (float) (vec.zCoord - mop.blockZ));
+        FzOrientation orientation = SpaceUtil.getOrientation(player, mop.sideHit, (float) (vec.xCoord - mop.blockX), (float) (vec.yCoord - mop.blockY), (float) (vec.zCoord - mop.blockZ));
         if (orientation.top.offsetY == 1) {
             /*
              * The purpose of this is two-fold:

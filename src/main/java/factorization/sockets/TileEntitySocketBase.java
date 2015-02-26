@@ -72,10 +72,10 @@ public abstract class TileEntitySocketBase extends TileEntityCommon implements I
     public final void useExtraInfo(byte b) {
         facing = ForgeDirection.getOrientation(b);
     }
-    
+
     @Override
-    public void onPlacedBy(EntityPlayer player, ItemStack is, int side) {
-        super.onPlacedBy(player, is, side);
+    public void onPlacedBy(EntityPlayer player, ItemStack is, int side, float hitX, float hitY, float hitZ) {
+        super.onPlacedBy(player, is, side, hitX, hitY, hitZ);
         facing = ForgeDirection.getOrientation(side);
     }
     

@@ -105,10 +105,10 @@ public class TileEntityCompressionCrafter extends TileEntityCommon {
         }
         return BlockIcons.compactSide;
     }
-    
+
     @Override
-    public void onPlacedBy(EntityPlayer player, ItemStack is, int side) {
-        super.onPlacedBy(player, is, side);
+    public void onPlacedBy(EntityPlayer player, ItemStack is, int side, float hitX, float hitY, float hitZ) {
+        super.onPlacedBy(player, is, side, hitX, hitY, hitZ);
         b_facing = SpaceUtil.getOpposite(SpaceUtil.determineOrientation(player));
     }
     

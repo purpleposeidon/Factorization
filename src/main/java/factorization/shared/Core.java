@@ -84,6 +84,7 @@ public class Core {
     public static final String name = "Factorization";
     //The comment below is a marker used by the build script.
     public static final String version = "@FZVERSION@";
+
     public Core() {
         instance = this;
         fzconfig = new FzConfig();

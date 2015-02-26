@@ -173,8 +173,9 @@ public class TileEntityWire extends TileEntityCommon implements IChargeConductor
         return complexity;
     }
 
+
     @Override
-    public void onPlacedBy(EntityPlayer player, ItemStack is, int side) {
+    public void onPlacedBy(EntityPlayer player, ItemStack is, int side, float hitX, float hitY, float hitZ) {
         side = new int[] { 1, 0, 3, 2, 5, 4, }[side];
         if (player.isSneaking()) {
             supporting_side = (byte) side;
