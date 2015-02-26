@@ -21,6 +21,7 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.management.ItemInWorldManager;
 import net.minecraft.server.management.ServerConfigurationManager;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.DamageSource;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;
 import net.minecraft.world.chunk.Chunk;
@@ -129,6 +130,8 @@ public class PacketProxyingPlayer extends EntityPlayerMP implements
 
     public PacketProxyingPlayer(final DimensionSliceEntity dimensionSlice, World shadowWorld) {
         super(MinecraftServer.getServer(), (WorldServer) shadowWorld, new GameProfile(proxyUuid, "[FzdsPacket]"), new ItemInWorldManager(shadowWorld));
+        invulnerable = true;
+        isImmuneToFire = true;
         initWrapping();
         this.dimensionSlice = new WeakReference<DimensionSliceEntity>(dimensionSlice);
         Coord c = dimensionSlice.getCenter();
@@ -250,6 +253,8 @@ public class PacketProxyingPlayer extends EntityPlayerMP implements
         }
     }
 
+    boolean canDie = false;
+
     public void endProxy() {
         releaseChunkLoading();
         // From playerNetServerHandler.mcServer.getConfigurationManager().playerLoggedOut(this);
@@ -258,6 +263,7 @@ public class PacketProxyingPlayer extends EntityPlayerMP implements
         var2.getPlayerManager().removePlayer(this); // No comod?
         MinecraftServer.getServer().getConfigurationManager().playerEntityList.remove(playerNetServerHandler);
         // The stuff above might not be necessary.
+        canDie = true;
         setDead();
         dimensionSlice.clear();
     }
@@ -312,7 +318,9 @@ public class PacketProxyingPlayer extends EntityPlayerMP implements
     
     @Override
     public void setDead() {
-        super.setDead();
+        if (canDie) {
+            super.setDead();
+        }
     }
 
     // IFzdsEntryControl implementation
