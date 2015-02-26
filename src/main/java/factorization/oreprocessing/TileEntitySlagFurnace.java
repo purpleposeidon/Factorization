@@ -367,4 +367,9 @@ public class TileEntitySlagFurnace extends TileEntityFactorization {
             w.spawnParticle("flame", (double) (var7 + var11), (double) var8, (double) (var9 + var10), 0.0D, 0.0D, 0.0D);
         }
     }
+
+    @Override
+    public int getDynamicLight() {
+        return isBurning() ? 13 : 0;
+    }
 }

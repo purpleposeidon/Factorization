@@ -389,22 +389,13 @@ public class BlockFactorization extends BlockContainer {
     public int getLightValue(IBlockAccess world, int x, int y, int z) {
         int md = world.getBlockMetadata(x, y, z);
         BlockClass c = BlockClass.get(md);
-        if (c == BlockClass.MachineLightable) {
-            TileEntity te = world.getTileEntity(x, y, z);
-            if (te instanceof TileEntityFactorization) {
-                if (((TileEntityFactorization) te).draw_active == 0) {
-                    return BlockClass.Machine.lightValue;
-                }
-                return c.lightValue;
-            }
-        }
-        if (c == BlockClass.MachineDynamicLightable) {
+        if (c == BlockClass.MachineDynamicLightable || c == BlockClass.MachineLightable) {
             TileEntity te = world.getTileEntity(x, y, z);
             if (te instanceof TileEntityCommon) {
                 return ((TileEntityCommon) te).getDynamicLight();
             }
         }
-        return BlockClass.get(md).lightValue;
+        return c.lightValue;
     }
 
     @Override
@@ -417,26 +408,27 @@ public class BlockFactorization extends BlockContainer {
     @Override
     public MovingObjectPosition collisionRayTrace(World w, int x, int y, int z,
             Vec3 startVec, Vec3 endVec) {
-        TileEntityCommon tec = new Coord(w, x, y, z).getTE(TileEntityCommon.class);
-        if (tec == null) {
-            return super.collisionRayTrace(w, x, y, z, startVec, endVec);
-        }
+        TileEntity te = w.getTileEntity(x, y, z);
+        if (!(te instanceof TileEntityCommon)) return super.collisionRayTrace(w, x, y, z, startVec, endVec);
+        TileEntityCommon tec = (TileEntityCommon) te;
         return tec.collisionRayTrace(startVec, endVec);
     }
 
     @Override
     public AxisAlignedBB getCollisionBoundingBoxFromPool(World w, int x, int y, int z) {
-        TileEntityCommon tec = new Coord(w, x, y, z).getTE(TileEntityCommon.class);
-        setBlockBounds(0, 0, 0, 1, 1, 1);
-        if (tec == null) {
-            return super.getCollisionBoundingBoxFromPool(w, x, y, z);
-        }
+        TileEntity te = w.getTileEntity(x, y, z);
+        if (!(te instanceof TileEntityCommon)) return super.getCollisionBoundingBoxFromPool(w, x, y, z);
+        TileEntityCommon tec = (TileEntityCommon) te;
         return tec.getCollisionBoundingBoxFromPool();
     }
     
     @Override
     public void addCollisionBoxesToList(World w, int x, int y, int z, AxisAlignedBB aabb, List list, Entity entity) {
-        TileEntityCommon tec = new Coord(w, x, y, z).getTE(TileEntityCommon.class);
+        TileEntity te = w.getTileEntity(x, y, z);
+        TileEntityCommon tec = null;
+        if (te instanceof TileEntityCommon) {
+            tec = (TileEntityCommon) te;
+        }
         Block test = w.isRemote ? Core.registry.clientTraceHelper : Core.registry.serverTraceHelper;
         if (tec == null || !tec.addCollisionBoxesToList(test, aabb, list, entity)) {
             super.addCollisionBoxesToList(w, x, y, z, aabb, list, entity);
