@@ -1,12 +1,12 @@
 package factorization.sockets;
 
-import java.io.ByteArrayOutputStream;
-import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
+import io.netty.buffer.ByteBuf;
+import io.netty.buffer.Unpooled;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.GuiButton;
@@ -22,7 +22,7 @@ import factorization.api.Coord;
 import factorization.api.datahelpers.DataBackup;
 import factorization.api.datahelpers.DataHelper;
 import factorization.api.datahelpers.DataOutPacket;
-import factorization.api.datahelpers.DataOutPacketClientEdited;
+import factorization.api.datahelpers.DataOutByteBufEdited;
 import factorization.api.datahelpers.DataValidator;
 import factorization.api.datahelpers.IDataSerializable;
 import factorization.api.datahelpers.Share;
@@ -451,18 +451,17 @@ public class GuiDataConfig extends GuiScreen {
     }
     
     void sendPacket() throws IOException {
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        DataOutputStream dos = new DataOutputStream(baos);
-        DataOutPacket dop = new DataOutPacketClientEdited(dos);
+        ByteBuf buf = Unpooled.buffer();
+        DataHelper dop = new DataOutByteBufEdited(buf);
         Coord here = new Coord((TileEntity) ids);
         if (containingEntity == null) {
-            Core.network.prefixTePacket(dos, here, MessageType.DataHelperEdit);
+            Core.network.prefixTePacket(buf, here, MessageType.DataHelperEdit);
             ids.serialize("", dop);
-            Core.network.broadcastPacket(mc.thePlayer, here, FzNetDispatch.generate(baos));
+            Core.network.broadcastPacket(mc.thePlayer, here, FzNetDispatch.generate(buf));
         } else {
-            Core.network.prefixEntityPacket(dos, containingEntity, MessageType.DataHelperEditOnEntity);
+            Core.network.prefixEntityPacket(buf, containingEntity, MessageType.DataHelperEditOnEntity);
             ids.serialize("", dop);
-            Core.network.broadcastPacket(mc.thePlayer, here, Core.network.entityPacket(baos));
+            Core.network.broadcastPacket(mc.thePlayer, here, Core.network.entityPacket(buf));
         }
     }
 }

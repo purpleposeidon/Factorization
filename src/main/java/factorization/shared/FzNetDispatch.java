@@ -1,6 +1,7 @@
 package factorization.shared;
 
 import factorization.api.Coord;
+import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufOutputStream;
 import io.netty.buffer.Unpooled;
 
@@ -21,15 +22,19 @@ import cpw.mods.fml.common.network.internal.FMLProxyPacket;
 public class FzNetDispatch {
     
     public static FMLProxyPacket generate(byte[] data) {
-        return new FMLProxyPacket(Unpooled.wrappedBuffer(data), FzNetEventHandler.channelName);
+        return generate(Unpooled.wrappedBuffer(data));
     }
     
     public static FMLProxyPacket generate(ByteBufOutputStream buf) {
-        return new FMLProxyPacket(buf.buffer(), FzNetEventHandler.channelName);
+        return generate(buf.buffer());
     }
     
     public static FMLProxyPacket generate(ByteArrayOutputStream baos) {
-        return new FMLProxyPacket(Unpooled.wrappedBuffer(baos.toByteArray()), FzNetEventHandler.channelName);
+        return generate(Unpooled.wrappedBuffer(baos.toByteArray()));
+    }
+
+    public static FMLProxyPacket generate(ByteBuf buf) {
+        return new FMLProxyPacket(buf, FzNetEventHandler.channelName);
     }
     
     public static void addPacket(FMLProxyPacket packet, EntityPlayer player) {

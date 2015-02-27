@@ -1,7 +1,11 @@
 package factorization.shared;
 
+import cpw.mods.fml.common.network.ByteBufUtils;
+import cpw.mods.fml.relauncher.Side;
+import factorization.api.datahelpers.DataInByteBuf;
 import factorization.util.DataUtil;
 import io.netty.buffer.ByteBuf;
+import io.netty.buffer.ByteBufAllocator;
 import io.netty.buffer.ByteBufOutputStream;
 import io.netty.buffer.Unpooled;
 
@@ -33,7 +37,7 @@ import factorization.utiligoo.ItemGoo;
 public class NetworkFactorization {
     public static final ItemStack EMPTY_ITEMSTACK = new ItemStack(Blocks.air);
     
-    private void writeObjects(ByteArrayOutputStream outputStream, DataOutputStream output, Object... items) throws IOException {
+    private void writeObjects(ByteBuf output, Object... items) throws IOException {
         for (Object item : items) {
             if (item == null) {
                 throw new RuntimeException("Argument is null!");
@@ -45,7 +49,7 @@ public class NetworkFactorization {
             } else if (item instanceof Short) {
                 output.writeShort((Short) item);
             } else if (item instanceof String) {
-                output.writeUTF((String) item);
+                ByteBufUtils.writeUTF8String(output, (String) item);
             } else if (item instanceof Boolean) {
                 output.writeBoolean((Boolean) item);
             } else if (item instanceof Float) {
@@ -54,7 +58,7 @@ public class NetworkFactorization {
                 ItemStack is = (ItemStack) item;
                 NBTTagCompound tag = new NBTTagCompound();
                 is.writeToNBT(tag);
-                CompressedStreamTools.write(tag, output);
+                ByteBufUtils.writeTag(output, tag);
             } else if (item instanceof VectorUV) {
                 VectorUV v = (VectorUV) item;
                 output.writeFloat((float) v.x);
@@ -68,20 +72,20 @@ public class NetworkFactorization {
                 q.write(output);
             } else if (item instanceof byte[]) {
                 byte[] b = (byte[]) item;
-                output.write(b, 0, b.length);
+                output.writeBytes(b);
             } else if (item instanceof MessageType) {
                 MessageType mt = (MessageType) item;
                 mt.write(output);
             } else if (item instanceof NBTTagCompound) {
                 NBTTagCompound tag = (NBTTagCompound) item;
-                CompressedStreamTools.write(tag, output);
+                ByteBufUtils.writeTag(output, tag);
             } else {
                 throw new RuntimeException("Don't know how to serialize " + item.getClass() + " (" + item + ")");
             }
         }
     }
     
-    public void prefixTePacket(DataOutputStream output, Coord src, MessageType messageType) throws IOException {
+    public void prefixTePacket(ByteBuf output, Coord src, MessageType messageType) throws IOException {
         messageType.write(output);
         output.writeInt(src.x);
         output.writeInt(src.y);
@@ -90,34 +94,31 @@ public class NetworkFactorization {
     
     public FMLProxyPacket TEmessagePacket(Coord src, MessageType messageType, Object... items) {
         try {
-            ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-            DataOutputStream output = new DataOutputStream(outputStream);
+            ByteBuf output = Unpooled.buffer();
             prefixTePacket(output, src, messageType);
-            writeObjects(outputStream, output, items);
-            return FzNetDispatch.generate(outputStream);
+            writeObjects(output, items);
+            return FzNetDispatch.generate(output);
         } catch (IOException e) {
             e.printStackTrace();
             return null;
         }
     }
     
-    public void prefixEntityPacket(DataOutputStream output, Entity to, MessageType messageType) throws IOException {
+    public void prefixEntityPacket(ByteBuf output, Entity to, MessageType messageType) throws IOException {
         messageType.write(output);
         output.writeInt(to.getEntityId());
     }
     
-    public FMLProxyPacket entityPacket(ByteArrayOutputStream outputStream) throws IOException {
-        outputStream.flush();
-        return FzNetDispatch.generate(outputStream);
+    public FMLProxyPacket entityPacket(ByteBuf output) throws IOException {
+        return FzNetDispatch.generate(output);
     }
     
     public FMLProxyPacket entityPacket(Entity to, MessageType messageType, Object ...items) {
         try {
-            ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-            DataOutputStream output = new DataOutputStream(outputStream);
+            ByteBuf output = Unpooled.buffer();
             prefixEntityPacket(output, to, messageType);
-            writeObjects(outputStream, output, items);
-            return entityPacket(outputStream);
+            writeObjects(output, output, items);
+            return entityPacket(output);
         } catch (IOException e) {
             e.printStackTrace();
             return null;
@@ -125,16 +126,11 @@ public class NetworkFactorization {
     }
     
     public void sendCommand(EntityPlayer player, Command cmd, byte arg) {
-        try {
-            ByteBuf buf = Unpooled.buffer();
-            ByteBufOutputStream bo = new ByteBufOutputStream(buf);
-            MessageType.factorizeCmdChannel.write(bo);
-            bo.writeByte(cmd.id);
-            bo.writeByte(arg);
-            FzNetDispatch.addPacket(FzNetDispatch.generate(bo), player);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        ByteBuf out = Unpooled.buffer();
+        MessageType.factorizeCmdChannel.write(out);
+        out.writeByte(cmd.id);
+        out.writeByte(arg);
+        FzNetDispatch.addPacket(FzNetDispatch.generate(out), player);
     }
 
     public void broadcastMessage(EntityPlayer who, Coord src, MessageType messageType, Object... msg) {
@@ -155,7 +151,7 @@ public class NetworkFactorization {
         }
     }
 
-    void handleTE(DataInput input, MessageType messageType, EntityPlayer player) {
+    void handleTE(ByteBuf input, MessageType messageType, EntityPlayer player) {
         try {
             World world = player.worldObj;
             int x = input.readInt();
@@ -186,16 +182,11 @@ public class NetworkFactorization {
                 return;
             }
 
-            if ((messageType == MessageType.FactoryType || messageType == MessageType.FactoryTypeWithSecondMessage) && world.isRemote) {
+            if (messageType == MessageType.FactoryType && world.isRemote) {
                 //create a Tile Entity of that type there.
-                FactoryType ft = FactoryType.fromMd(input.readInt());
-                byte extraData = input.readByte();
-                byte extraData2 = input.readByte();
-                if (messageType == MessageType.FactoryTypeWithSecondMessage) {
-                    messageType = MessageType.read(input);
-                } else {
-                    messageType = null;
-                }
+
+                byte ftId = input.readByte();
+                FactoryType ft = FactoryType.fromMd(ftId);
                 TileEntityCommon spawn = here.getTE(TileEntityCommon.class);
                 if (spawn != null && spawn.getFactoryType() != ft) {
                     world.removeTileEntity(x, y, z);
@@ -208,8 +199,8 @@ public class NetworkFactorization {
                     here.redraw();
                 }
 
-                spawn.useExtraInfo(extraData);
-                spawn.useExtraInfo2(extraData2);
+                DataInByteBuf data = new DataInByteBuf(input, Side.CLIENT);
+                spawn.putData(data);
             }
 
             if (messageType == null) {
@@ -235,7 +226,7 @@ public class NetworkFactorization {
         }
     }
 
-    void handleForeignMessage(World world, int x, int y, int z, TileEntity ent, MessageType messageType, DataInput input) throws IOException {
+    void handleForeignMessage(World world, int x, int y, int z, TileEntity ent, MessageType messageType, ByteBuf input) throws IOException {
         if (!world.isRemote) {
             //Nothing for the server to deal with
         } else {
@@ -257,7 +248,7 @@ public class NetworkFactorization {
 
     }
     
-    boolean handleForeignEntityMessage(Entity ent, MessageType messageType, DataInput input) throws IOException {
+    boolean handleForeignEntityMessage(Entity ent, MessageType messageType, ByteBuf input) throws IOException {
         if (messageType == MessageType.EntityParticles) {
             Random rand = new Random();
             double px = rand.nextGaussian() * 0.02;
@@ -265,7 +256,7 @@ public class NetworkFactorization {
             double pz = rand.nextGaussian() * 0.02;
             
             byte count = input.readByte();
-            String type = input.readUTF();
+            String type = ByteBufUtils.readUTF8String(input);
             for (int i = 0; i < count; i++) {
                 ent.worldObj.spawnParticle(type,
                         ent.posX + rand.nextFloat() * ent.width * 2.0 - ent.width,
@@ -281,13 +272,13 @@ public class NetworkFactorization {
         return false;
     }
     
-    void handleCmd(DataInput data, EntityPlayer player) throws IOException {
+    void handleCmd(ByteBuf data, EntityPlayer player) {
         byte s = data.readByte();
         byte arg = data.readByte();
         Command.fromNetwork(player, s, arg);
     }
     
-    void handleEntity(MessageType messageType, DataInput input, EntityPlayer player) {
+    void handleEntity(MessageType messageType, ByteBuf input, EntityPlayer player) {
         try {
             World world = player.worldObj;
             int entityId = input.readInt();
@@ -337,7 +328,7 @@ public class NetworkFactorization {
         factorizeCmdChannel,
         PlaySound, EntityParticles(true),
         
-        DrawActive, FactoryType, FactoryTypeWithSecondMessage, DescriptionRequest, DataHelperEdit, RedrawOnClient, DataHelperEditOnEntity(true), OpenDataHelperGui, OpenDataHelperGuiOnEntity(true),
+        DrawActive, FactoryType, DescriptionRequest, DataHelperEdit, RedrawOnClient, DataHelperEditOnEntity(true), OpenDataHelperGui, OpenDataHelperGuiOnEntity(true),
         TileEntityMessageOnEntity(true),
         BarrelDescription, BarrelItem, BarrelCount, BarrelDoubleClickHack,
         BatteryLevel, LeydenjarLevel,
@@ -381,16 +372,12 @@ public class NetworkFactorization {
             return valuesCache[id];
         }
         
-        public static MessageType read(DataInput in) throws IOException {
+        public static MessageType read(ByteBuf in) {
             byte b = in.readByte();
-            MessageType mt = fromId(b);
-            if (mt == null) {
-                throw new IOException("Unknown type: " + b);
-            }
-            return mt;
+            return fromId(b);
         }
-        
-        public void write(DataOutput out) throws IOException {
+
+        public void write(ByteBuf out) {
             out.writeByte(id);
         }
         

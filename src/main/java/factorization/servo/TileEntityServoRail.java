@@ -1,14 +1,26 @@
 package factorization.servo;
 
-import java.io.ByteArrayOutputStream;
-import java.io.DataInput;
-import java.io.DataOutputStream;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-
-import factorization.shared.*;
+import cpw.mods.fml.common.FMLCommonHandler;
+import cpw.mods.fml.common.network.ByteBufUtils;
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
+import factorization.api.Charge;
+import factorization.api.Coord;
+import factorization.api.FzColor;
+import factorization.api.IChargeConductor;
+import factorization.api.datahelpers.DataHelper;
+import factorization.api.datahelpers.Share;
+import factorization.common.BlockIcons;
+import factorization.common.FactoryType;
+import factorization.notify.Notice;
+import factorization.notify.Style;
+import factorization.shared.BlockClass;
+import factorization.shared.BlockRenderHelper;
+import factorization.shared.Core;
+import factorization.shared.NetworkFactorization.MessageType;
+import factorization.shared.TileEntityCommon;
 import factorization.util.ItemUtil;
+import io.netty.buffer.ByteBuf;
 import net.minecraft.block.Block;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
@@ -17,28 +29,13 @@ import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.AxisAlignedBB;
-import net.minecraft.util.EnumChatFormatting;
-import net.minecraft.util.IIcon;
-import net.minecraft.util.MovingObjectPosition;
-import net.minecraft.util.Vec3;
+import net.minecraft.util.*;
 import net.minecraftforge.common.util.ForgeDirection;
-
 import org.apache.commons.lang3.StringUtils;
 
-import cpw.mods.fml.common.FMLCommonHandler;
-import cpw.mods.fml.common.network.internal.FMLProxyPacket;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
-import factorization.api.Charge;
-import factorization.api.Coord;
-import factorization.api.FzColor;
-import factorization.api.IChargeConductor;
-import factorization.common.BlockIcons;
-import factorization.common.FactoryType;
-import factorization.notify.Notice;
-import factorization.notify.Style;
-import factorization.shared.NetworkFactorization.MessageType;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 public class TileEntityServoRail extends TileEntityCommon implements IChargeConductor {
     public static final float width = 7F/16F;
@@ -75,38 +72,23 @@ public class TileEntityServoRail extends TileEntityCommon implements IChargeCond
     }
     
     private String decor_tag_key = "decor";
-    
+
     @Override
-    public void writeToNBT(NBTTagCompound tag) {
-        super.writeToNBT(tag);
-        charge.writeToNBT(tag);
-        tag.setByte("priority", priority);
-        tag.setByte("color", color.toOrdinal());
-        tag.setString("rem", comment);
-        if (decoration != null) {
-            NBTTagCompound decor = new NBTTagCompound();
-            decoration.save(decor);
-            tag.setTag(decor_tag_key, decor);
-        }
-    }
-    
-    @Override
-    public void readFromNBT(NBTTagCompound tag) {
-        super.readFromNBT(tag);
-        charge.readFromNBT(tag);
-        priority = tag.getByte("priority");
-        if (tag.hasKey("color")) {
-            color = FzColor.fromOrdinal(tag.getByte("color"));
-        } else {
-            color = FzColor.NO_COLOR;
-        }
-        comment = tag.getString("rem");
-        if (tag.hasKey(decor_tag_key)) {
-            NBTTagCompound dtag = tag.getCompoundTag(decor_tag_key);
+    public void putData(DataHelper data) throws IOException {
+        charge.serialize("", data);
+        priority = data.as(Share.VISIBLE, "priority").putByte(priority);
+        color = data.as(Share.VISIBLE, "color").putEnum(color);
+        comment = data.as(Share.VISIBLE, "rem").putString(comment);
+        if (data.isReader()) {
+            NBTTagCompound dtag = data.as(Share.VISIBLE, decor_tag_key).putTag(new NBTTagCompound());
             ServoComponent component = ServoComponent.load(dtag);
             if (component instanceof Decorator) {
                 decoration = (Decorator) component;
             }
+        } else {
+            NBTTagCompound decor = new NBTTagCompound();
+            decoration.save(decor);
+            data.as(Share.VISIBLE, decor_tag_key).putTag(decor);
         }
     }
     
@@ -299,7 +281,7 @@ public class TileEntityServoRail extends TileEntityCommon implements IChargeCond
     
     @Override
     @SideOnly(Side.CLIENT)
-    public boolean handleMessageFromServer(MessageType messageType, DataInput input) throws IOException {
+    public boolean handleMessageFromServer(MessageType messageType, ByteBuf input) throws IOException {
         if (super.handleMessageFromServer(messageType, input)) {
             return true;
         }
@@ -319,7 +301,7 @@ public class TileEntityServoRail extends TileEntityCommon implements IChargeCond
             return true;
         }
         if (messageType == MessageType.ServoRailEditComment) {
-            comment = input.readUTF();
+            comment = ByteBufUtils.readUTF8String(input);
             FMLCommonHandler.instance().showGuiScreen(new GuiCommentEditor(this));
             return true;
         }
@@ -327,34 +309,12 @@ public class TileEntityServoRail extends TileEntityCommon implements IChargeCond
     }
     
     @Override
-    public boolean handleMessageFromClient(MessageType messageType, DataInput input) throws IOException {
+    public boolean handleMessageFromClient(MessageType messageType, ByteBuf input) throws IOException {
         if (messageType == MessageType.ServoRailEditComment) {
-            comment = input.readUTF();
+            comment = ByteBufUtils.readUTF8String(input);
             return true;
         }
         return super.handleMessageFromClient(messageType, input);
-    }
-    
-    @Override
-    public FMLProxyPacket getDescriptionPacket() {
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        DataOutputStream dos = new DataOutputStream(baos);
-        try {
-            byte c = color.toOrdinal();
-            dos.writeByte(c);
-            dos.writeBoolean(comment != null && comment.length() > 0);
-            dos.writeBoolean(decoration != null);
-            if (decoration != null) {
-                decoration.writeToPacket(dos);
-            }
-        } catch (Throwable e) {
-            Core.logWarning("Component packet error at %s %s:", this, getCoord());
-            e.printStackTrace();
-            decoration = null;
-            new Notice(this, "Component packet error!\nSee console log.").withStyle(Style.FORCE, Style.LONG).sendToAll();
-            return super.getDescriptionPacket();
-        }
-        return getDescriptionPacketWith(MessageType.ServoRailDecor, baos.toByteArray());
     }
     
     @Override

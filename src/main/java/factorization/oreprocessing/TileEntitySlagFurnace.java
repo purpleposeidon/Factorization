@@ -1,14 +1,16 @@
 package factorization.oreprocessing;
 
-import java.io.DataInput;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Random;
 
+import factorization.api.datahelpers.DataHelper;
+import factorization.api.datahelpers.Share;
 import factorization.shared.*;
 import factorization.util.DataUtil;
 import factorization.util.ItemUtil;
 import factorization.util.SpaceUtil;
+import io.netty.buffer.ByteBuf;
 import net.minecraft.block.Block;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
@@ -104,19 +106,11 @@ public class TileEntitySlagFurnace extends TileEntityFactorization {
     }
 
     @Override
-    public void readFromNBT(NBTTagCompound tag) {
-        super.readFromNBT(tag);
-        readSlotsFromNBT(tag);
-        furnaceBurnTime = tag.getInteger("burnTime");
-        furnaceCookTime = tag.getInteger("cookTime");
-    }
-
-    @Override
-    public void writeToNBT(NBTTagCompound tag) {
-        super.writeToNBT(tag);
-        writeSlotsToNBT(tag);
-        tag.setInteger("burnTime", furnaceBurnTime);
-        tag.setInteger("cookTime", furnaceCookTime);
+    public void putData(DataHelper data) throws IOException {
+        super.putData(data);
+        putSlots(data);
+        furnaceBurnTime = data.as(Share.VISIBLE, "burnTime").putInt(furnaceBurnTime);
+        furnaceCookTime = data.as(Share.VISIBLE, "cookTime").putInt(furnaceCookTime);
     }
 
     public boolean isBurning() {
@@ -317,7 +311,7 @@ public class TileEntitySlagFurnace extends TileEntityFactorization {
     }
 
     @Override
-    public boolean handleMessageFromServer(MessageType messageType, DataInput input) throws IOException {
+    public boolean handleMessageFromServer(MessageType messageType, ByteBuf input) throws IOException {
         if (super.handleMessageFromServer(messageType, input)) {
             if (messageType == MessageType.DrawActive) {
                 getCoord().updateLight();

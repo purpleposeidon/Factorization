@@ -8,10 +8,12 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Random;
 
+import cpw.mods.fml.common.network.ByteBufUtils;
 import factorization.shared.*;
 import factorization.util.DataUtil;
 import factorization.util.InvUtil;
 import factorization.util.ItemUtil;
+import io.netty.buffer.ByteBuf;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockSlab;
 import net.minecraft.block.BlockStairs;
@@ -447,8 +449,8 @@ public class ItemGoo extends ItemFactorization {
     }
     
     @SideOnly(Side.CLIENT)
-    public static void handlePacket(DataInput input) throws IOException {
-        NBTTagCompound dataTag = DataUtil.readTag(input);
+    public static void handlePacket(ByteBuf input) throws IOException {
+        NBTTagCompound dataTag = ByteBufUtils.readTag(input);
         World world = Minecraft.getMinecraft().theWorld;
         GooData data = new GooData(dataTag.getString("mapname")); // NOTE: this resets data.last_traced_index to -1. We might have to reset it manually if networking gets more complicated.
         data.readFromNBT(dataTag);

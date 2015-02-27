@@ -1,6 +1,7 @@
 package factorization.shared;
 
 import factorization.shared.NetworkFactorization.MessageType;
+import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufInputStream;
 
 import java.io.IOException;
@@ -35,25 +36,19 @@ public class FzNetEventHandler {
     }
     
     private void handlePacket(CustomPacketEvent event, boolean isServer, EntityPlayer player) {
-        ByteBufInputStream input = new ByteBufInputStream(event.packet.payload()); //TODO: Actually, can't we just switch to using the ByteBuf directly?
-        try {
-            MessageType mt = MessageType.read(input);
-            if (mt.isEntityMessage) {
-                Core.network.handleEntity(mt, input, player);
-            } else {
-                switch (mt) {
+        ByteBuf input = event.packet.payload();
+        MessageType mt = MessageType.read(input);
+        if (mt.isEntityMessage) {
+            Core.network.handleEntity(mt, input, player);
+        } else {
+            switch (mt) {
                 case factorizeCmdChannel:
                     Core.network.handleCmd(input, player);
                     break;
                 default:
                     Core.network.handleTE(input, mt, player);
                     break;
-                }
             }
-        } catch (IOException e) {
-            e.printStackTrace();
-        } finally {
-            closeByteBuffer(input);
         }
     }
     

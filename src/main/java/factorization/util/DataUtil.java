@@ -1,5 +1,7 @@
 package factorization.util;
 
+import cpw.mods.fml.common.network.ByteBufUtils;
+import io.netty.buffer.ByteBuf;
 import net.minecraft.block.Block;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -45,15 +47,22 @@ public final class DataUtil {
         return is;
     }
 
-    @Deprecated // Provide an NBTSizeTracker!
-    static public NBTTagCompound readTag(DataInput input) throws IOException {
+    public static NBTTagCompound readTag(DataInput input) throws IOException {
         return readTag(input, NBTSizeTracker.field_152451_a);
     }
 
-    @Deprecated // Provide an NBTSizeTracker!
-    static public ItemStack readStack(DataInput input) throws IOException {
+    public static ItemStack readStack(DataInput input) throws IOException {
         return readStack(input, NBTSizeTracker.field_152451_a);
     }
+
+    static public NBTTagCompound readTag(ByteBuf input) throws IOException {
+        return ByteBufUtils.readTag(input);
+    }
+
+    static public ItemStack readStack(ByteBuf input) throws IOException {
+        return ByteBufUtils.readItemStack(input);
+    }
+
 
     public static NBTTagCompound item2tag(ItemStack is) {
         NBTTagCompound tag = new NBTTagCompound();

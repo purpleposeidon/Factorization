@@ -1,9 +1,12 @@
 package factorization.crafting;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import factorization.api.datahelpers.DataHelper;
+import factorization.api.datahelpers.Share;
 import factorization.shared.*;
 import factorization.util.CraftUtil;
 import factorization.util.ItemUtil;
@@ -78,19 +81,18 @@ public class TileEntityStamper extends TileEntityFactorization {
     }
 
     @Override
-    public void writeToNBT(NBTTagCompound tag) {
-        super.writeToNBT(tag);
-        saveItem("input", tag, input);
-        saveItem("output", tag, output);
-        writeBuffer("buffer", tag, outputBuffer);
-    }
-
-    @Override
-    public void readFromNBT(NBTTagCompound tag) {
-        super.readFromNBT(tag);
-        input = readItem("input", tag);
-        output = readItem("output", tag);
-        readBuffer("buffer", tag, outputBuffer);
+    public void putData(DataHelper data) throws IOException {
+        super.putData(data);
+        input = data.as(Share.PRIVATE, "input").putItemStack(input);
+        output = data.as(Share.PRIVATE, "output").putItemStack(output);
+        if (data.isNBT()) {
+            NBTTagCompound tag = data.getTag();
+            if (data.isWriter()) {
+                writeBuffer("buffer", tag, outputBuffer);
+            } else {
+                readBuffer("buffer", tag, outputBuffer);
+            }
+        }
     }
 
     boolean canMerge(List<ItemStack> items) {

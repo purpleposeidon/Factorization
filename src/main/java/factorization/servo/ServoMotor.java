@@ -1,5 +1,6 @@
 package factorization.servo;
 
+import factorization.api.datahelpers.*;
 import factorization.shared.*;
 import factorization.util.DataUtil;
 import factorization.util.InvUtil;
@@ -9,12 +10,13 @@ import io.netty.buffer.ByteBufInputStream;
 import io.netty.buffer.ByteBufOutputStream;
 
 import java.io.ByteArrayOutputStream;
-import java.io.DataInput;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
+import io.netty.buffer.Unpooled;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
@@ -41,13 +43,6 @@ import factorization.api.FzColor;
 import factorization.api.FzOrientation;
 import factorization.api.IChargeConductor;
 import factorization.api.IEntityMessage;
-import factorization.api.datahelpers.DataHelper;
-import factorization.api.datahelpers.DataInNBT;
-import factorization.api.datahelpers.DataInPacket;
-import factorization.api.datahelpers.DataInPacketClientEdited;
-import factorization.api.datahelpers.DataOutNBT;
-import factorization.api.datahelpers.DataOutPacket;
-import factorization.api.datahelpers.Share;
 import factorization.common.FactoryType;
 import factorization.util.InvUtil.FzInv;
 import factorization.shared.NetworkFactorization.MessageType;
@@ -139,7 +134,7 @@ public class ServoMotor extends Entity implements IEntityAdditionalSpawnData, IE
             ItemStack is = inv[i] == null ? EMPTY_ITEM : inv[i];
             is = data.as(Share.VISIBLE, "inv" + i).putItemStack(is);
             if (is == null) {
-                inv[i] = is;
+                inv[i] = null;
             } else {
                 inv[i] = is.getItem() == null ? null : is;
             }
@@ -182,9 +177,9 @@ public class ServoMotor extends Entity implements IEntityAdditionalSpawnData, IE
     }
     
     @Override
-    public boolean handleMessageFromClient(MessageType messageType, DataInput input) throws IOException {
+    public boolean handleMessageFromClient(MessageType messageType, ByteBuf input) throws IOException {
         if (messageType == MessageType.DataHelperEditOnEntity) {
-            DataInPacketClientEdited di = new DataInPacketClientEdited(input);
+            DataInByteBufClientEdited di = new DataInByteBufClientEdited(input);
             socket.serialize("", di);
             markDirty();
             return true;
@@ -194,13 +189,13 @@ public class ServoMotor extends Entity implements IEntityAdditionalSpawnData, IE
     
     @Override
     @SideOnly(Side.CLIENT)
-    public boolean handleMessageFromServer(MessageType messageType, DataInput input) throws IOException {
+    public boolean handleMessageFromServer(MessageType messageType, ByteBuf input) throws IOException {
         switch (messageType) {
         case OpenDataHelperGuiOnEntity:
             if (!worldObj.isRemote) {
                 return false;
             } else {
-                DataInPacket dip = new DataInPacket(input, Side.CLIENT);
+                DataHelper dip = new DataInByteBuf(input, Side.CLIENT);
                 socket.serialize("", dip);
                 Minecraft.getMinecraft().displayGuiScreen(new GuiDataConfig(socket, this));
             }
@@ -235,7 +230,7 @@ public class ServoMotor extends Entity implements IEntityAdditionalSpawnData, IE
             return true;
         case servo_complete:
             try {
-                DataHelper data = new DataInPacket(input, Side.CLIENT);
+                DataHelper data = new DataInByteBuf(input, Side.CLIENT);
                 putData(data);
             } catch (IOException e) {
                 e.printStackTrace();
@@ -282,12 +277,11 @@ public class ServoMotor extends Entity implements IEntityAdditionalSpawnData, IE
             if (executioner.stacks_changed) {
                 try {
                     executioner.stacks_changed = false;
-                    ByteArrayOutputStream baos = new ByteArrayOutputStream();
-                    DataOutputStream dos = new DataOutputStream(baos);
-                    Core.network.prefixEntityPacket(dos, this, MessageType.servo_complete);
-                    DataHelper data = new DataOutPacket(dos, Side.SERVER);
+                    ByteBuf buf = Unpooled.buffer();
+                    Core.network.prefixEntityPacket(buf, this, MessageType.servo_complete);
+                    DataHelper data = new DataOutByteBuf(buf, Side.SERVER);
                     putData(data);
-                    FMLProxyPacket toSend = Core.network.entityPacket(baos);
+                    FMLProxyPacket toSend = Core.network.entityPacket(buf);
                     Core.network.broadcastPacket(null, getCurrentPos(), toSend);
                 } catch (IOException e) {
                     e.printStackTrace();
@@ -489,9 +483,7 @@ public class ServoMotor extends Entity implements IEntityAdditionalSpawnData, IE
         }
         ArrayList<ItemStack> toDrop = new ArrayList();
         toDrop.add(new ItemStack(Core.registry.servo_placer));
-        for (ItemStack is : inv) {
-            toDrop.add(is);
-        }
+        toDrop.addAll(Arrays.asList(inv));
         if (socket != null) {
             socket.uninstall();
             FactoryType ft = socket.getFactoryType();

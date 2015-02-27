@@ -1,10 +1,12 @@
 package factorization.charge;
 
-import java.io.DataInput;
 import java.io.IOException;
 
+import factorization.api.datahelpers.DataHelper;
+import factorization.api.datahelpers.Share;
 import factorization.shared.*;
 import factorization.util.ItemUtil;
+import io.netty.buffer.ByteBuf;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
@@ -55,17 +57,9 @@ public class TileEntityBattery extends TileEntityCommon implements IChargeConduc
     }
 
     @Override
-    public void readFromNBT(NBTTagCompound tag) {
-        super.readFromNBT(tag);
-        charge.readFromNBT(tag, "charge");
-        storage = tag.getInteger("storage");
-    }
-
-    @Override
-    public void writeToNBT(NBTTagCompound tag) {
-        super.writeToNBT(tag);
-        charge.writeToNBT(tag, "charge");
-        tag.setInteger("storage", storage);
+    public void putData(DataHelper data) throws IOException {
+        charge.serialize("", data);
+        storage = data.as(Share.VISIBLE, "storage").putInt(storage);
     }
 
     public static float getFullness(int value) {
@@ -114,7 +108,7 @@ public class TileEntityBattery extends TileEntityCommon implements IChargeConduc
     }
 
     @Override
-    public boolean handleMessageFromServer(MessageType messageType, DataInput input) throws IOException {
+    public boolean handleMessageFromServer(MessageType messageType, ByteBuf input) throws IOException {
         if (super.handleMessageFromServer(messageType, input)) {
             return true;
         }
@@ -137,20 +131,6 @@ public class TileEntityBattery extends TileEntityCommon implements IChargeConduc
         }
     }
 
-    @Override
-    protected byte getExtraInfo() {
-        float perc = storage / (float) max_storage;
-        byte ret = (byte) (perc * 127);
-        return ret;
-    }
-
-    @Override
-    protected void useExtraInfo(byte b) {
-        float perc = (b / 127F);
-        int new_storage = (int) (max_storage * perc);
-        storage = new_storage;
-    }
-    
     @Override
     public ItemStack getDroppedBlock() {
         ItemStack is = new ItemStack(Core.registry.battery);

@@ -1,18 +1,18 @@
 package factorization.api;
 
-import java.io.DataInput;
-import java.io.DataOutput;
-import java.io.IOException;
 import com.google.common.base.Splitter;
-
 import factorization.api.datahelpers.DataHelper;
 import factorization.api.datahelpers.IDataSerializable;
-
+import io.netty.buffer.ByteBuf;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraftforge.common.util.ForgeDirection;
 
+import java.io.IOException;
+
 public class DeltaCoord implements IDataSerializable {
     public int x, y, z;
+
+    public static final DeltaCoord ZERO = new DeltaCoord();
 
     public DeltaCoord() {
         x = y = z = 0;
@@ -163,11 +163,11 @@ public class DeltaCoord implements IDataSerializable {
         return new DeltaCoord(tag.getInteger(prefix + "dx"), tag.getInteger(prefix + "dy"), tag.getInteger(prefix + "dz"));
     }
     
-    public static DeltaCoord read(DataInput di) throws IOException {
+    public static DeltaCoord read(ByteBuf di) throws IOException {
         return new DeltaCoord(di.readInt(), di.readInt(), di.readInt());
     }
     
-    public void write(DataOutput out) throws IOException {
+    public void write(ByteBuf out) throws IOException {
         for (int i = 0; i < 3; i++) {
             out.writeInt(get(i));
         }

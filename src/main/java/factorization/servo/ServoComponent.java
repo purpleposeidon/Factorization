@@ -1,14 +1,15 @@
 package factorization.servo;
 
-import java.io.DataInput;
-import java.io.DataOutputStream;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-
+import com.google.common.collect.BiMap;
+import com.google.common.collect.ImmutableBiMap;
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
+import factorization.api.Coord;
+import factorization.api.datahelpers.*;
+import factorization.servo.instructions.*;
+import factorization.shared.Core;
 import factorization.util.RenderUtil;
+import io.netty.buffer.ByteBuf;
 import net.minecraft.client.renderer.RenderBlocks;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.entity.player.EntityPlayer;
@@ -16,45 +17,12 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraftforge.common.util.ForgeDirection;
 
-import com.google.common.collect.BiMap;
-import com.google.common.collect.ImmutableBiMap;
-
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
-import factorization.api.Coord;
-import factorization.api.datahelpers.DataInNBT;
-import factorization.api.datahelpers.DataInPacket;
-import factorization.api.datahelpers.DataOutNBT;
-import factorization.api.datahelpers.DataOutPacket;
-import factorization.api.datahelpers.IDataSerializable;
-import factorization.api.datahelpers.Share;
-import factorization.servo.instructions.BooleanValue;
-import factorization.servo.instructions.Compare;
-import factorization.servo.instructions.CountItems;
-import factorization.servo.instructions.Drop;
-import factorization.servo.instructions.Dup;
-import factorization.servo.instructions.EntryControl;
-import factorization.servo.instructions.GlassServoGrate;
-import factorization.servo.instructions.InstructionGroup;
-import factorization.servo.instructions.IntegerValue;
-import factorization.servo.instructions.IronServoGrate;
-import factorization.servo.instructions.Jump;
-import factorization.servo.instructions.Product;
-import factorization.servo.instructions.RedstonePulse;
-import factorization.servo.instructions.RotateTop;
-import factorization.servo.instructions.ScanColor;
-import factorization.servo.instructions.ReadRedstone;
-import factorization.servo.instructions.SetDirection;
-import factorization.servo.instructions.SetEntryAction;
-import factorization.servo.instructions.SetRepeatedInstruction;
-import factorization.servo.instructions.SetSpeed;
-import factorization.servo.instructions.ShifterControl;
-import factorization.servo.instructions.SocketCtrl;
-import factorization.servo.instructions.Spin;
-import factorization.servo.instructions.Sum;
-import factorization.servo.instructions.Trap;
-import factorization.servo.instructions.WoodenServoGrate;
-import factorization.shared.Core;
+import java.io.DataOutputStream;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
 
 public abstract class ServoComponent implements IDataSerializable {
     private static HashMap<String, Class<? extends ServoComponent>> componentMap = new HashMap<String, Class<? extends ServoComponent>>(50, 0.5F);
@@ -143,7 +111,7 @@ public abstract class ServoComponent implements IDataSerializable {
         (new DataOutPacket(dos, Side.SERVER)).as(Share.VISIBLE, "sc").put(this);
     }
     
-    static ServoComponent readFromPacket(DataInput dis) throws IOException {
+    static ServoComponent readFromPacket(ByteBuf dis) throws IOException {
         short id = dis.readShort();
         Class<? extends ServoComponent> componentClass = getPacketIdMap().get(id);
         if (componentClass == null) {
@@ -152,7 +120,7 @@ public abstract class ServoComponent implements IDataSerializable {
         }
         try {
             ServoComponent decor = componentClass.newInstance();
-            (new DataInPacket(dis, Side.CLIENT)).as(Share.VISIBLE, "sc").put(decor);
+            (new DataInByteBuf(dis, Side.CLIENT)).as(Share.VISIBLE, "sc").put(decor);
             return decor;
         } catch (IOException e) {
             throw e;

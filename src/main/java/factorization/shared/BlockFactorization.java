@@ -176,7 +176,7 @@ public class BlockFactorization extends BlockContainer {
         }
         // This shouldn't be called when rendering in the world.
         // Is used for inventory!
-        FactoryType ft = FactoryType.fromMd(md);
+        FactoryType ft = FactoryType.fromMd((byte) md);
         if (ft == null) {
             return BlockIcons.default_icon;
             //return BlockIcons.error;

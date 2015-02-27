@@ -198,7 +198,7 @@ public enum FactoryType {
         return md == this.md;
     }
 
-    public static FactoryType fromMd(int md) {
+    public static FactoryType fromMd(short md) {
         if (md < 0) {
             return null;
         }

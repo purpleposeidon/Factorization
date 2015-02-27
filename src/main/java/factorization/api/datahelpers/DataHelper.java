@@ -9,6 +9,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.Vec3;
 import factorization.api.FzOrientation;
+import net.minecraftforge.fluids.FluidTank;
 
 public abstract class DataHelper {
     /***
@@ -160,6 +161,18 @@ for t in "Boolean Byte Short Int Long Float Double String FzOrientation ItemStac
     }
     public final NBTTagCompound putTag(NBTTagCompound value) throws IOException {
         return (NBTTagCompound)put(value);
+    }
+    public final FluidTank putTank(FluidTank tank) throws IOException {
+        if (isReader()) {
+            NBTTagCompound tag = new NBTTagCompound();
+            tank.writeToNBT(tag);
+            putTag(tag);
+            return tank;
+        } else {
+            NBTTagCompound tag = putTag(new NBTTagCompound());
+            tank.readFromNBT(tag);
+            return tank;
+        }
     }
     
     public Vec3 putVec3(Vec3 val) throws IOException {

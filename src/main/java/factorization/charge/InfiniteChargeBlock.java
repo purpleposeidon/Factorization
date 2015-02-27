@@ -1,5 +1,6 @@
 package factorization.charge;
 
+import factorization.api.datahelpers.DataHelper;
 import net.minecraft.init.Blocks;
 import net.minecraft.util.IIcon;
 import net.minecraftforge.common.util.ForgeDirection;
@@ -9,6 +10,8 @@ import factorization.common.BlockIcons;
 import factorization.common.FactoryType;
 import factorization.shared.BlockClass;
 import factorization.shared.TileEntityCommon;
+
+import java.io.IOException;
 
 public class InfiniteChargeBlock extends TileEntityCommon implements IChargeConductor {
     Charge charge = new Charge(this);
@@ -28,6 +31,11 @@ public class InfiniteChargeBlock extends TileEntityCommon implements IChargeCond
     @Override
     public FactoryType getFactoryType() {
         return FactoryType.CREATIVE_CHARGE;
+    }
+
+    @Override
+    public void putData(DataHelper data) throws IOException {
+
     }
 
     @Override

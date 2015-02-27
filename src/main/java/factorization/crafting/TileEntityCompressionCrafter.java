@@ -1,14 +1,16 @@
 package factorization.crafting;
 
-import java.io.DataInput;
 import java.io.IOException;
 import java.util.ArrayList;
 
+import factorization.api.datahelpers.DataHelper;
+import factorization.api.datahelpers.Share;
 import factorization.notify.Notice;
 import factorization.shared.*;
 import factorization.util.InvUtil;
 import factorization.util.ItemUtil;
 import factorization.util.SpaceUtil;
+import io.netty.buffer.ByteBuf;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
@@ -73,25 +75,14 @@ public class TileEntityCompressionCrafter extends TileEntityCommon {
     public boolean isPrimaryCrafter() {
         return isCrafterRoot && progress > 0;
     }
-    
+
     @Override
-    public void writeToNBT(NBTTagCompound tag) {
-        super.writeToNBT(tag);
-        tag.setByte("prog", progress);
-        tag.setByte("dir", b_facing);
-        tag.setBoolean("root", isCrafterRoot);
-        tag.setBoolean("rs", powered);
-        writeBuffer("buff", tag, buffer);
-    }
-    
-    @Override
-    public void readFromNBT(NBTTagCompound tag) {
-        super.readFromNBT(tag);
-        progress = tag.getByte("prog");
-        b_facing = tag.getByte("dir");
-        isCrafterRoot = tag.getBoolean("root");
-        powered = tag.getBoolean("rs");
-        readBuffer("buff", tag, buffer);
+    public void putData(DataHelper data) throws IOException {
+        progress = data.as(Share.PRIVATE, "prog").putByte(progress);
+        b_facing = data.as(Share.VISIBLE, "dir").putByte(b_facing);
+        isCrafterRoot = data.as(Share.VISIBLE, "root").putBoolean(isCrafterRoot);
+        powered = data.as(Share.PRIVATE, "rs").putBoolean(powered);
+        buffer = data.as(Share.PRIVATE, "buff").putItemArray(buffer);
     }
     
     @Override
@@ -198,7 +189,7 @@ public class TileEntityCompressionCrafter extends TileEntityCommon {
     
     
     @Override
-    public boolean handleMessageFromServer(MessageType messageType, DataInput input) throws IOException {
+    public boolean handleMessageFromServer(MessageType messageType, ByteBuf input) throws IOException {
         if (super.handleMessageFromServer(messageType, input)) {
             return true;
         }
@@ -225,11 +216,6 @@ public class TileEntityCompressionCrafter extends TileEntityCommon {
             return true;
         }
         return false;
-    }
-    
-    @Override
-    public FMLProxyPacket getDescriptionPacket() {
-        return getDescriptionPacketWith(MessageType.CompressionCrafter, b_facing, progress);
     }
     
     void informClient() {

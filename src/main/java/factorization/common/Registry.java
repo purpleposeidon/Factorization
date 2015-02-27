@@ -550,7 +550,7 @@ public class Registry {
         //Sculpture combiniation recipe
         IRecipe sculptureMergeRecipe = new IRecipe() {
             ArrayList<ItemStack> merge(InventoryCrafting inv) {
-                ArrayList<ItemStack> match = new ArrayList<ItemStack>(2);
+                ArrayList<ItemStack> match = null;
                 int part_count = 0;
                 for (int i = 0; i < inv.getSizeInventory(); i++) {
                     ItemStack is = inv.getStackInSlot(i);
@@ -562,12 +562,13 @@ public class Registry {
                     }
                     Item item = is.getItem();
                     if (ItemUtil.similar(Core.registry.greenware_item, is)) {
+                        if (match == null) match = new ArrayList<ItemStack>(2);
                         match.add(is);
                     } else {
                         return null;
                     }
                 }
-                if (match.size() != 2) {
+                if (match == null || match.size() != 2) {
                     return null;
                 }
                 return match;
@@ -582,7 +583,7 @@ public class Registry {
                 int partCount = 0;
                 TileEntityGreenware rep = (TileEntityGreenware) FactoryType.CERAMIC.getRepresentative();
                 for (ItemStack is : matching) {
-                    rep.loadParts(is.getTagCompound());
+                    rep.loadFromStack(is);
                     if (rep.getState() != ClayState.WET) {
                         return false;
                     }
@@ -610,7 +611,7 @@ public class Registry {
                 TileEntityGreenware target = new TileEntityGreenware();
                 for (ItemStack is : matching) {
                     TileEntityGreenware rep = (TileEntityGreenware) FactoryType.CERAMIC.getRepresentative();
-                    rep.loadParts(is.getTagCompound());
+                    rep.loadFromStack(is);
                     target.parts.addAll(rep.parts);
                 }
                 return target.getItem();

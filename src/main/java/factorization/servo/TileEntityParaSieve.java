@@ -1,8 +1,10 @@
 package factorization.servo;
 
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.HashMap;
 
+import factorization.api.datahelpers.DataHelper;
 import factorization.shared.*;
 import factorization.util.DataUtil;
 import factorization.util.InvUtil;
@@ -56,28 +58,27 @@ public class TileEntityParaSieve extends TileEntityFactorization implements ISid
     public BlockClass getBlockClass() {
         return BlockClass.Machine;
     }
-    
+
     @Override
-    public void writeToNBT(NBTTagCompound tag) {
-        super.writeToNBT(tag);
-        putting_nbt = true;
-        writeSlotsToNBT(tag);
-        putting_nbt = false;
-    }
-    
-    @Override
-    public void readFromNBT(NBTTagCompound tag) {
-        super.readFromNBT(tag);
-        putting_nbt = true;
-        readSlotsFromNBT(tag);
-        putting_nbt = false;
+    public void putData(DataHelper data) throws IOException {
+        super.putData(data);
+        try {
+            putting_nbt = true;
+            putSlots(data);
+        } finally {
+            putting_nbt = false;
+        }
+        super.putData(data);
     }
     
     @Override
     public void dropContents() {
-        putting_nbt = true;
-        super.dropContents();
-        putting_nbt = false;
+        try {
+            putting_nbt = true;
+            super.dropContents();
+        } finally {
+            putting_nbt = false;
+        }
     }
     
     public ForgeDirection getFacing() {

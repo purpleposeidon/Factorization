@@ -1,8 +1,9 @@
 package factorization.charge;
 
-import java.io.DataInput;
 import java.io.IOException;
 
+import factorization.api.datahelpers.DataHelper;
+import io.netty.buffer.ByteBuf;
 import net.minecraft.block.Block;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
@@ -43,22 +44,12 @@ public class TileEntityMirror extends TileEntityCommon {
     }
 
     @Override
-    public void writeToNBT(NBTTagCompound tag) {
-        super.writeToNBT(tag);
-        if (reflection_target != null) {
-            reflection_target.writeToNBT("target", tag);
-        }
-    }
-
-    @Override
-    public void readFromNBT(NBTTagCompound tag) {
-        super.readFromNBT(tag);
-        if (tag.hasKey("targetx")) {
+    public void putData(DataHelper data) throws IOException {
+        if (reflection_target == null) {
             reflection_target = getCoord();
-            reflection_target.readFromNBT("target", tag);
-            updateRotation();
         }
-        else {
+        reflection_target.serialize("target", data);
+        if (reflection_target.equals(getCoord())) {
             reflection_target = null;
         }
     }
@@ -126,12 +117,7 @@ public class TileEntityMirror extends TileEntityCommon {
     }
 
     @Override
-    public FMLProxyPacket getDescriptionPacket() {
-        return getDescriptionPacketWith(MessageType.MirrorDescription, target_rotation, getTargetInfo());
-    }
-
-    @Override
-    public boolean handleMessageFromServer(MessageType messageType, DataInput input) throws IOException {
+    public boolean handleMessageFromServer(MessageType messageType, ByteBuf input) throws IOException {
         if (super.handleMessageFromServer(messageType, input)) {
             return true;
         }

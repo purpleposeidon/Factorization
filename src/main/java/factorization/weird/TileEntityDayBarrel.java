@@ -1,14 +1,15 @@
 package factorization.weird;
 
-import java.io.DataInput;
 import java.io.IOException;
 import java.util.ArrayList;
 
+import cpw.mods.fml.common.network.ByteBufUtils;
 import factorization.shared.*;
 import factorization.util.DataUtil;
 import factorization.util.InvUtil;
 import factorization.util.ItemUtil;
 import factorization.util.SpaceUtil;
+import io.netty.buffer.ByteBuf;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockRailBase;
 import net.minecraft.client.Minecraft;
@@ -100,65 +101,30 @@ public class TileEntityDayBarrel extends TileEntityFactorization {
     public BlockClass getBlockClass() {
         return BlockClass.Barrel;
     }
-    
-    @Override
-    protected byte getExtraInfo() {
-        return (byte) orientation.ordinal();
-    }
-    
-    @Override
-    protected void useExtraInfo(byte b) {
-        orientation = FzOrientation.getOrientation(b);
-    }
 
-    @Override
-    protected byte getExtraInfo2() {
-        return (byte) type.ordinal();
-    }
     
     @Override
-    protected void useExtraInfo2(byte b) {
-        type = Type.valueOf(b);
-    }
-    
-    
-    
-    //Saving
-    @Override
-    public void writeToNBT(NBTTagCompound tag) {
-        super.writeToNBT(tag);
-        putData(new DataOutNBT(tag));
-    }
-    
-    @Override
-    public void readFromNBT(NBTTagCompound tag) {
-        super.readFromNBT(tag);
-        putData(new DataInNBT(tag));
-        last_mentioned_count = getItemCount();
-    }
-    
-    void putData(DataHelper data) {
-        try {
-            if (data.isReader()) {
-                item = new ItemStack((Item) null);
-            }
-            item = data.as(Share.VISIBLE, "item").putItemStack(item);
-            int count = data.as(Share.VISIBLE, "count").putInt(getItemCount());
-            orientation = data.as(Share.VISIBLE, "dir").putFzOrientation(orientation);
-            if (data.isReader()) {
-                setItemCount(count);
-            }
-            woodLog = data.as(Share.VISIBLE, "log").putItemStack(woodLog);
-            woodSlab = data.as(Share.VISIBLE, "slab").putItemStack(woodSlab);
-            type = data.as(Share.VISIBLE, "type").putEnum(type);
-            if (woodLog == null) {
-                woodLog = DEFAULT_LOG;
-            }
-            if (woodSlab == null) {
-                woodSlab = DEFAULT_SLAB;
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
+    public void putData(DataHelper data) throws IOException {
+        if (data.isReader()) {
+            item = new ItemStack((Item) null);
+        }
+        item = data.as(Share.VISIBLE, "item").putItemStack(item);
+        int count = data.as(Share.VISIBLE, "count").putInt(getItemCount());
+        orientation = data.as(Share.VISIBLE, "dir").putFzOrientation(orientation);
+        if (data.isReader()) {
+            setItemCount(count);
+        }
+        woodLog = data.as(Share.VISIBLE, "log").putItemStack(woodLog);
+        woodSlab = data.as(Share.VISIBLE, "slab").putItemStack(woodSlab);
+        type = data.as(Share.VISIBLE, "type").putEnum(type);
+        if (woodLog == null) {
+            woodLog = DEFAULT_LOG;
+        }
+        if (woodSlab == null) {
+            woodSlab = DEFAULT_SLAB;
+        }
+        if (data.isReader() && data.isNBT()) {
+            last_mentioned_count = getItemCount();
         }
     }
     
@@ -424,21 +390,8 @@ public class TileEntityDayBarrel extends TileEntityFactorization {
     }
     
     @Override
-    public FMLProxyPacket getDescriptionPacket() {
-        int count = getItemCount();
-        ItemStack theItem = item;
-        return getDescriptionPacketWith(MessageType.BarrelDescription,
-                NetworkFactorization.nullItem(theItem),
-                count,
-                woodLog,
-                woodSlab,
-                (byte) orientation.ordinal(),
-                (byte) type.ordinal());
-    }
-    
-    @Override
     @SideOnly(Side.CLIENT)
-    public boolean handleMessageFromServer(MessageType messageType, DataInput input) throws IOException {
+    public boolean handleMessageFromServer(MessageType messageType, ByteBuf input) throws IOException {
         if (super.handleMessageFromServer(messageType, input)) {
             return true;
         }

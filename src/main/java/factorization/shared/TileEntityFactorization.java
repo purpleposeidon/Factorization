@@ -1,10 +1,12 @@
 package factorization.shared;
 
-import java.io.DataInput;
 import java.io.IOException;
 
+import factorization.api.datahelpers.DataHelper;
+import factorization.api.datahelpers.Share;
 import factorization.util.InvUtil;
 import factorization.util.ItemUtil;
+import io.netty.buffer.ByteBuf;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
@@ -100,30 +102,6 @@ public abstract class TileEntityFactorization extends TileEntityCommon
     @Override
     public final Coord getCoord() {
         return new Coord(this);
-    }
-
-    @Override
-    protected byte getExtraInfo() {
-        return facing_direction;
-    }
-
-    @Override
-    protected byte getExtraInfo2() {
-        return draw_active > Byte.MAX_VALUE ? Byte.MAX_VALUE : draw_active;
-    }
-
-    @Override
-    protected void useExtraInfo(byte b) {
-        if (worldObj.isRemote) {
-            facing_direction = b;
-        }
-    }
-
-    @Override
-    protected void useExtraInfo2(byte b) {
-        if (worldObj.isRemote) {
-            draw_active = b;
-        }
     }
 
     @Override
@@ -259,20 +237,22 @@ public abstract class TileEntityFactorization extends TileEntityCommon
     }
 
     @Override
-    public void writeToNBT(NBTTagCompound tag) {
-        super.writeToNBT(tag);
-        tag.setByte("draw_active_byte", draw_active);
-        tag.setByte("facing", facing_direction);
+    public void putData(DataHelper data) throws IOException {
+        draw_active = data.as(Share.VISIBLE, "draw_active_byte").putByte(draw_active);
+        facing_direction = data.as(Share.VISIBLE, "facing").putByte(facing_direction);
     }
 
-    @Override
-    public void readFromNBT(NBTTagCompound tag) {
-        super.readFromNBT(tag);
-        draw_active = tag.getByte("draw_active_byte");
-        facing_direction = tag.getByte("facing");
+    public final void putSlots(DataHelper data) {
+        if (!data.isNBT()) return;
+        NBTTagCompound tag = data.getTag();
+        if (data.isWriter()) {
+            writeSlotsToNBT(tag);
+        } else {
+            readSlotsFromNBT(tag);
+        }
     }
 
-    public final void readSlotsFromNBT(NBTTagCompound tag) {
+    private void readSlotsFromNBT(NBTTagCompound tag) {
         NBTTagList invlist = tag.getTagList("Items", Constants.NBT.TAG_COMPOUND);
         for (int i = 0; i < invlist.tagCount(); i++) {
             NBTTagCompound comp = invlist.getCompoundTagAt(i);
@@ -280,7 +260,7 @@ public abstract class TileEntityFactorization extends TileEntityCommon
         }
     }
 
-    public final void writeSlotsToNBT(NBTTagCompound tag) {
+    private void writeSlotsToNBT(NBTTagCompound tag) {
         NBTTagList invlist = new NBTTagList();
         for (int i = 0; i < getSizeInventory(); i++) {
             ItemStack stack = getStackInSlot(i);
@@ -361,7 +341,7 @@ public abstract class TileEntityFactorization extends TileEntityCommon
     }
 
     @Override
-    public boolean handleMessageFromServer(MessageType messageType, DataInput input) throws IOException {
+    public boolean handleMessageFromServer(MessageType messageType, ByteBuf input) throws IOException {
         if (super.handleMessageFromServer(messageType, input)) {
             return true;
         }

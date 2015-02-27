@@ -1,9 +1,11 @@
 package factorization.charge;
 
-import java.io.DataInput;
 import java.io.IOException;
 import java.util.ArrayList;
 
+import factorization.api.datahelpers.DataHelper;
+import factorization.api.datahelpers.Share;
+import io.netty.buffer.ByteBuf;
 import net.minecraft.block.BlockFurnace;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.FurnaceRecipes;
@@ -57,17 +59,9 @@ public class TileEntityHeater extends TileEntityCommon implements IChargeConduct
     }
 
     @Override
-    public void writeToNBT(NBTTagCompound tag) {
-        super.writeToNBT(tag);
-        charge.writeToNBT(tag);
-        tag.setByte("heat", heat);
-    }
-
-    @Override
-    public void readFromNBT(NBTTagCompound tag) {
-        super.readFromNBT(tag);
-        charge.readFromNBT(tag);
-        heat = tag.getByte("heat");
+    public void putData(DataHelper data) throws IOException {
+        charge.serialize("", data);
+        heat = data.as(Share.VISIBLE, "heat").putByte(heat);
     }
     
     int charge2heat(int i) {
@@ -85,17 +79,7 @@ public class TileEntityHeater extends TileEntityCommon implements IChargeConduct
     }
 
     @Override
-    protected byte getExtraInfo() {
-        return heat;
-    }
-
-    @Override
-    protected void useExtraInfo(byte b) {
-        heat = b;
-    }
-
-    @Override
-    public boolean handleMessageFromServer(MessageType messageType, DataInput input) throws IOException {
+    public boolean handleMessageFromServer(MessageType messageType, ByteBuf input) throws IOException {
         if (super.handleMessageFromServer(messageType, input)) {
             return true;
         }

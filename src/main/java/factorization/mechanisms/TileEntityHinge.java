@@ -36,26 +36,7 @@ public class TileEntityHinge extends TileEntityCommon {
     }
 
     @Override
-    public void writeToNBT(NBTTagCompound tag) {
-        super.writeToNBT(tag);
-        try {
-            putData(new DataOutNBT(tag));
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-    @Override
-    public void readFromNBT(NBTTagCompound tag) {
-        super.readFromNBT(tag);
-        try {
-            putData(new DataInNBT(tag));
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-    void putData(DataHelper data) throws IOException {
+    public void putData(DataHelper data) throws IOException {
         mate = data.as(Share.VISIBLE, "mate").put(mate);
         facing = data.as(Share.VISIBLE, "facing").put(facing);
     }

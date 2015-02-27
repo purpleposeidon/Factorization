@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.relauncher.Side;
 
+import io.netty.buffer.ByteBuf;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.tileentity.TileEntity;
@@ -70,18 +71,13 @@ public enum Sound {
         Core.network.broadcastMessage(null, new Coord(w, x, y, z), MessageType.PlaySound, index);
     }
 
-    public static void receive(Coord coord, DataInput input) {
-        //TODO: We can pass a coord here anyways!
-        try {
-            int index = input.readInt();
-            EntityPlayer player = Core.proxy.getClientPlayer();
-            if (player == null) {
-                return;
-            }
-            sound.list.get(index).playAt(coord);
-        } catch (IOException e) {
+    public static void receive(Coord coord, ByteBuf input) {
+        int index = input.readInt();
+        EntityPlayer player = Core.proxy.getClientPlayer();
+        if (player == null) {
             return;
         }
+        sound.list.get(index).playAt(coord);
     }
     
     public void playAt(Coord c) {

@@ -1,6 +1,5 @@
 package factorization.crafting;
 
-import java.io.DataInput;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -8,11 +7,14 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 
+import factorization.api.datahelpers.DataHelper;
+import factorization.api.datahelpers.Share;
 import factorization.shared.*;
 import factorization.util.CraftUtil;
 import factorization.util.InvUtil;
 import factorization.util.ItemUtil;
 import factorization.util.PlayerUtil;
+import io.netty.buffer.ByteBuf;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Items;
 import net.minecraft.inventory.IInventory;
@@ -59,40 +61,13 @@ public class TileEntityMixer extends TileEntityFactorization implements
     }
 
     @Override
-    public void writeToNBT(NBTTagCompound tag) {
-        super.writeToNBT(tag);
-        charge.writeToNBT(tag);
-        tag.setInteger("progress", progress);
-        tag.setInteger("speed", speed);
-        writeSlotsToNBT(tag);
-        NBTTagList buffer = new NBTTagList();
-        for (ItemStack is : outputBuffer) {
-            NBTTagCompound itag = new NBTTagCompound(); 
-            is.writeToNBT(itag);
-            buffer.appendTag(itag);
-        }
-        
-        tag.setTag("outBuffer", buffer);
-    }
-
-    @Override
-    public void readFromNBT(NBTTagCompound tag) {
-        super.readFromNBT(tag);
-        charge.readFromNBT(tag);
-        progress = tag.getInteger("progress");
-        speed = tag.getInteger("speed");
-        readSlotsFromNBT(tag);
-        NBTTagList outBuffer = tag.getTagList("outBuffer", Constants.NBT.TAG_COMPOUND);
-        if (outBuffer != null) {
-            for (int i = 0; i < outBuffer.tagCount(); i++) {
-                NBTTagCompound base = outBuffer.getCompoundTagAt(i);
-                if (!(base instanceof NBTTagCompound)) {
-                    continue;
-                }
-                ItemStack is = ItemStack.loadItemStackFromNBT((NBTTagCompound)base);
-                outputBuffer.add(is);
-            }
-        }
+    public void putData(DataHelper data) throws IOException {
+        super.putData(data);
+        charge.serialize("", data);
+        progress = data.as(Share.PRIVATE, "progress").putInt(progress);
+        speed = data.as(Share.VISIBLE, "speed").putInt(speed);
+        outputBuffer = data.as(Share.PRIVATE, "outBuffer").putItemArray(outputBuffer);
+        putSlots(data);
     }
     
     @Override
@@ -204,7 +179,7 @@ public class TileEntityMixer extends TileEntityFactorization implements
     }
 
     @Override
-    public boolean handleMessageFromServer(MessageType messageType, DataInput input) throws IOException {
+    public boolean handleMessageFromServer(MessageType messageType, ByteBuf input) throws IOException {
         if (super.handleMessageFromServer(messageType, input)) {
             return true;
         }
@@ -678,15 +653,5 @@ public class TileEntityMixer extends TileEntityFactorization implements
 
     public int getMixProgressScaled(int scale) {
         return (progress * scale) / (progress + getRemainingProgress());
-    }
-
-    @Override
-    protected byte getExtraInfo2() {
-        return (byte) speed;
-    }
-
-    @Override
-    protected void useExtraInfo(byte b) {
-        speed = b;
     }
 }

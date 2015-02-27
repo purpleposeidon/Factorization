@@ -32,31 +32,24 @@ public class ItemFactorizationBlock extends ItemBlock {
             World w, int x, int y, int z, int side, float hitX, float hitY,
             float hitZ, int md) {
         Coord here = new Coord(w, x, y, z);
-        FactoryType f = FactoryType.fromMd(is.getItemDamage());
+        FactoryType f = FactoryType.fromMd((byte) is.getItemDamage());
         if (f == null) {
             is.stackSize = 0;
             return false;
         }
-        TileEntity te = f.makeTileEntity();
-        if (te instanceof TileEntityCommon) {
-            int oppositeSide = ForgeDirection.getOrientation(side).getOpposite().ordinal();
-            boolean good = ((TileEntityCommon) te).canPlaceAgainst(player, here.copy().towardSide(oppositeSide), side);
-            if (!good) {
-                return false;
-            }
+        TileEntityCommon tec = f.makeTileEntity();
+        if (tec == null) return false;
+        int oppositeSide = ForgeDirection.getOrientation(side).getOpposite().ordinal();
+        boolean good = tec.canPlaceAgainst(player, here.copy().towardSide(oppositeSide), side);
+        if (!good) {
+            return false;
         }
         if (super.placeBlockAt(is, player, w, x, y, z, side, hitX, hitY, hitZ, md)) {
-            //create our TileEntityFactorization
-            //Coord c = new Coord(w, x, y, z).towardSide(side);
-
-            if (te instanceof TileEntityCommon) {
-                TileEntityCommon tec = (TileEntityCommon) te;
-                here.setAsTileEntityLocation(tec);
-                tec.onPlacedBy(player, is, side, hitX, hitY, hitZ);
-                tec.getBlockClass().enforce(here);
-            }
-            if (!(te instanceof TileEntityRocketEngine)) {
-                w.setTileEntity(here.x, here.y, here.z, te);
+            here.setAsTileEntityLocation(tec);
+            tec.onPlacedBy(player, is, side, hitX, hitY, hitZ);
+            tec.getBlockClass().enforce(here);
+            if (!(tec instanceof TileEntityRocketEngine)) {
+                w.setTileEntity(here.x, here.y, here.z, tec);
             }
             
             here.markBlockForUpdate();
@@ -79,7 +72,7 @@ public class ItemFactorizationBlock extends ItemBlock {
     @Override
     public String getUnlocalizedName(ItemStack is) {
         int md = is.getItemDamage();
-        FactoryType ft = FactoryType.fromMd(md);
+        FactoryType ft = FactoryType.fromMd((byte) md);
         return "factorization.factoryBlock." + ft;
     }
 

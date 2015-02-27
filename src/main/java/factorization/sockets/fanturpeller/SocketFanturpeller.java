@@ -1,10 +1,10 @@
 package factorization.sockets.fanturpeller;
 
-import java.io.DataInput;
 import java.io.IOException;
 
 import factorization.shared.*;
 import factorization.util.NumUtil;
+import io.netty.buffer.ByteBuf;
 import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.Tessellator;
@@ -278,7 +278,7 @@ public abstract class SocketFanturpeller extends TileEntitySocketBase implements
     
     @Override
     @SideOnly(Side.CLIENT)
-    public boolean handleMessageFromServer(MessageType messageType, DataInput input) throws IOException {
+    public boolean handleMessageFromServer(MessageType messageType, ByteBuf input) throws IOException {
         if (super.handleMessageFromServer(messageType, input)) {
             return true;
         }
@@ -289,11 +289,6 @@ public abstract class SocketFanturpeller extends TileEntitySocketBase implements
             return true;
         }
         return false;
-    }
-    
-    @Override
-    public FMLProxyPacket getDescriptionPacket() {
-        return getDescriptionPacketWith(MessageType.FanturpellerSpeed, fanω, isSucking, target_speed);
     }
     
     @Override

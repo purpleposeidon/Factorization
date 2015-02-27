@@ -1,10 +1,11 @@
 package factorization.charge;
 
-import java.io.DataInput;
 import java.io.IOException;
 
+import factorization.api.datahelpers.DataHelper;
+import factorization.api.datahelpers.Share;
+import io.netty.buffer.ByteBuf;
 import net.minecraft.block.Block;
-import net.minecraft.init.Blocks;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
@@ -55,27 +56,9 @@ public class TileEntityWire extends TileEntityCommon implements IChargeConductor
     }
 
     @Override
-    protected byte getExtraInfo() {
-        return supporting_side;
-    }
-
-    @Override
-    protected void useExtraInfo(byte b) {
-        supporting_side = b;
-    }
-
-    @Override
-    public void writeToNBT(NBTTagCompound tag) {
-        super.writeToNBT(tag);
-        tag.setByte("side", supporting_side);
-        charge.writeToNBT(tag, "charge");
-    }
-
-    @Override
-    public void readFromNBT(NBTTagCompound tag) {
-        super.readFromNBT(tag);
-        charge.readFromNBT(tag, "charge");
-        supporting_side = tag.getByte("side");
+    public void putData(DataHelper data) throws IOException {
+        supporting_side = data.as(Share.VISIBLE, "side").putByte(supporting_side);
+        charge.serialize("", data);
     }
 
     boolean find_support() {
@@ -236,7 +219,7 @@ public class TileEntityWire extends TileEntityCommon implements IChargeConductor
     }
 
     @Override
-    public boolean handleMessageFromServer(MessageType messageType, DataInput input) throws IOException {
+    public boolean handleMessageFromServer(MessageType messageType, ByteBuf input) throws IOException {
         if (super.handleMessageFromServer(messageType, input)) {
             return true;
         }

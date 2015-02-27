@@ -1,9 +1,11 @@
 package factorization.wrath;
 
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.PriorityQueue;
 
+import factorization.api.datahelpers.DataHelper;
 import net.minecraft.block.Block;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
@@ -432,6 +434,11 @@ public class TileEntityWrathLamp extends TileEntityCommon {
     @Override
     public FactoryType getFactoryType() {
         return FactoryType.LAMP;
+    }
+
+    @Override
+    public void putData(DataHelper data) throws IOException {
+
     }
 
     @Override

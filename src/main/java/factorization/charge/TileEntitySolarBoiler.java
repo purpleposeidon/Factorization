@@ -1,5 +1,7 @@
 package factorization.charge;
 
+import factorization.api.datahelpers.DataHelper;
+import factorization.api.datahelpers.Share;
 import factorization.shared.*;
 import factorization.util.DataUtil;
 import factorization.util.FluidUtil;
@@ -19,6 +21,8 @@ import factorization.api.IReflectionTarget;
 import factorization.common.BlockIcons;
 import factorization.common.FactoryType;
 import factorization.common.FzConfig;
+
+import java.io.IOException;
 
 public class TileEntitySolarBoiler extends TileEntityCommon implements IReflectionTarget, IFluidHandler, IMeterInfo {
     public static Fluid steam;
@@ -59,20 +63,14 @@ public class TileEntitySolarBoiler extends TileEntityCommon implements IReflecti
     public BlockClass getBlockClass() {
         return BlockClass.Machine;
     }
-    
+
     @Override
-    public void writeToNBT(NBTTagCompound tag) {
-        super.writeToNBT(tag);
-        DataUtil.writeTank(tag, waterTank, "water");
-        DataUtil.writeTank(tag, steamTank, "steam");
-    }
-    
-    @Override
-    public void readFromNBT(NBTTagCompound tag) {
-        super.readFromNBT(tag);
-        DataUtil.readTank(tag, waterTank, "water");
-        DataUtil.readTank(tag, steamTank, "steam");
-        sanitize();
+    public void putData(DataHelper data) throws IOException {
+        waterTank = data.as(Share.PRIVATE, "water").putTank(waterTank);
+        steamTank = data.as(Share.PRIVATE, "steam").putTank(steamTank);
+        if (data.isReader()) {
+            sanitize();
+        }
     }
     
     private FluidTank getTank(ForgeDirection from) {

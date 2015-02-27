@@ -1,6 +1,5 @@
 package factorization.astro;
 
-import java.io.DataInput;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -9,8 +8,11 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 
+import factorization.api.datahelpers.DataHelper;
+import factorization.api.datahelpers.Share;
 import factorization.shared.*;
 import factorization.util.SpaceUtil;
+import io.netty.buffer.ByteBuf;
 import net.minecraft.block.Block;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLiving;
@@ -59,29 +61,17 @@ public class TileEntityRocketEngine extends TileEntityCommon {
     public BlockClass getBlockClass() {
         return BlockClass.DarkIron;
     }
-    
+
     @Override
-    public void writeToNBT(NBTTagCompound tag) {
-        super.writeToNBT(tag);
-        tag.setBoolean("inSlice", inSlice);
-        tag.setBoolean("isLeaderEngine", isLeaderEngine);
-        tag.setBoolean("isFiring", isFiring);
-        tag.setInteger("availableFuel", availableFuel);
-        tag.setInteger("nonfuelMass", nonfuelMass);
-        tag.setBoolean("lastValidationStatus", lastValidationStatus);
-    };
-    
-    @Override
-    public void readFromNBT(NBTTagCompound tag) {
-        super.readFromNBT(tag);
-        inSlice = tag.getBoolean("inSlice");
-        isLeaderEngine = tag.getBoolean("isLeaderEngine");
-        isFiring = tag.getBoolean("isFiring");
-        availableFuel = tag.getInteger("availableFuel");
-        nonfuelMass = tag.getInteger("nonfuelMass");
-        lastValidationStatus = tag.getBoolean("lastValidationStatus");
-    };
-    
+    public void putData(DataHelper data) throws IOException {
+        inSlice = data.as(Share.VISIBLE, "inSlice").putBoolean(inSlice);
+        isLeaderEngine = data.as(Share.PRIVATE, "isLeaderEngine").putBoolean(isLeaderEngine);
+        isFiring = data.as(Share.VISIBLE, "isFiring").putBoolean(isFiring);
+        availableFuel = data.as(Share.PRIVATE, "availableFuel").putInt(availableFuel);
+        nonfuelMass = data.as(Share.PRIVATE, "nonfuelMass").putInt(nonfuelMass);
+        lastValidationStatus = data.as(Share.VISIBLE, "lastValidationStatus").putBoolean(lastValidationStatus);
+    }
+
     List<Coord> getArea() {
         return getArea(getCoord(), new DeltaCoord(1, 1, 1) /* this is dependent on the behavior of Coord.isSubmissive; onPlacedBy determines the lowest coord */);
     }
@@ -433,12 +423,7 @@ for x in range(0, len(d[0])):
     }
     
     @Override
-    public FMLProxyPacket getDescriptionPacket() {
-        return getDescriptionPacketWith(MessageType.RocketState, lastValidationStatus, isFiring);
-    }
-    
-    @Override
-    public boolean handleMessageFromServer(MessageType messageType, DataInput input) throws IOException {
+    public boolean handleMessageFromServer(MessageType messageType, ByteBuf input) throws IOException {
         if (super.handleMessageFromServer(messageType, input)) {
             return true;
         }

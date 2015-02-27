@@ -1,13 +1,20 @@
 package factorization.shared;
 
-import java.io.DataInput;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
-
+import cpw.mods.fml.common.event.FMLModIdMappingEvent;
+import cpw.mods.fml.common.network.internal.FMLProxyPacket;
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
+import factorization.api.*;
+import factorization.api.datahelpers.DataHelper;
+import factorization.api.datahelpers.DataOutByteBuf;
+import factorization.common.BlockIcons;
+import factorization.common.FactoryType;
 import factorization.migration.MigrationHelper;
+import factorization.shared.NetworkFactorization.MessageType;
 import factorization.util.ItemUtil;
+import io.netty.buffer.ByteBuf;
+import io.netty.buffer.ByteBufAllocator;
+import io.netty.buffer.Unpooled;
 import net.minecraft.block.Block;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
@@ -24,18 +31,13 @@ import net.minecraft.util.MovingObjectPosition;
 import net.minecraft.util.Vec3;
 import net.minecraftforge.common.util.Constants;
 import net.minecraftforge.common.util.ForgeDirection;
-import cpw.mods.fml.common.event.FMLModIdMappingEvent;
-import cpw.mods.fml.common.network.internal.FMLProxyPacket;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
-import factorization.api.Coord;
-import factorization.api.FzColor;
-import factorization.api.IChargeConductor;
-import factorization.api.ICoord;
-import factorization.api.IFactoryType;
-import factorization.common.BlockIcons;
-import factorization.common.FactoryType;
-import factorization.shared.NetworkFactorization.MessageType;
+
+import java.io.ByteArrayOutputStream;
+import java.io.DataInput;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
 
 public abstract class TileEntityCommon extends TileEntity implements ICoord, IFactoryType {
     public static final short serialization_version = 1;
@@ -45,6 +47,8 @@ public abstract class TileEntityCommon extends TileEntity implements ICoord, IFa
     public String customName = null;
 
     public abstract BlockClass getBlockClass();
+
+    public abstract void putData(DataHelper data) throws IOException;
     
     @SideOnly(Side.CLIENT)
     public IIcon getIcon(ForgeDirection dir) {
@@ -53,28 +57,28 @@ public abstract class TileEntityCommon extends TileEntity implements ICoord, IFa
 
     @Override
     public FMLProxyPacket getDescriptionPacket() {
-        FMLProxyPacket p = Core.network.TEmessagePacket(getCoord(), MessageType.FactoryType, getFactoryType().md, getExtraInfo(), getExtraInfo2());
-        return p;
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        ByteBuf buf = Unpooled.buffer();
+        DataOutByteBuf data = new DataOutByteBuf(buf, Side.SERVER);
+        try {
+            MessageType.FactoryType.write(buf);
+            buf.writeInt(xCoord);
+            buf.writeInt(yCoord);
+            buf.writeInt(zCoord);
+            int ftId = getFactoryType().md;
+            buf.writeByte(ftId);
+            putData(data);
+            return FzNetDispatch.generate(buf);
+        } catch (IOException e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 
     protected void onRemove() {
         if (this instanceof IChargeConductor) {
             ((IChargeConductor) this).getCharge().remove();
         }
-    }
-
-    protected byte getExtraInfo() {
-        return 0;
-    }
-
-    protected byte getExtraInfo2() {
-        return 0;
-    }
-
-    protected void useExtraInfo(byte b) {
-    }
-
-    protected void useExtraInfo2(byte b) {
     }
 
     protected void sendFullDescription(EntityPlayer player) {
@@ -144,18 +148,6 @@ public abstract class TileEntityCommon extends TileEntity implements ICoord, IFa
         b.setBlockBounds(0, 0, 0, 1, 1, 1);
     }
 
-    protected FMLProxyPacket getDescriptionPacketWith(Object... args) {
-        Object[] suffix = new Object[args.length + 3];
-        suffix[0] = getFactoryType().md;
-        suffix[1] = getExtraInfo();
-        suffix[2] = getExtraInfo2();
-        for (int i = 0; i < args.length; i++) {
-            suffix[i + 3] = args[i];
-        }
-        FMLProxyPacket p = Core.network.TEmessagePacket(getCoord(), MessageType.FactoryTypeWithSecondMessage, suffix);
-        return p;
-    }
-
     @Override
     public Coord getCoord() {
         return new Coord(this);
@@ -183,7 +175,7 @@ public abstract class TileEntityCommon extends TileEntity implements ICoord, IFa
     }
 
     @Override
-    public void writeToNBT(NBTTagCompound tag) {
+    public final void writeToNBT(NBTTagCompound tag) {
         super.writeToNBT(tag);
         tag.setShort(serialization_version_key, serialization_version);
         if (customName != null) {
@@ -195,7 +187,7 @@ public abstract class TileEntityCommon extends TileEntity implements ICoord, IFa
     }
     
     @Override
-    public void readFromNBT(NBTTagCompound tag) {
+    public final void readFromNBT(NBTTagCompound tag) {
         super.readFromNBT(tag);
         if (tag.hasKey("customName")) {
             customName = tag.getString("customName");
@@ -206,7 +198,7 @@ public abstract class TileEntityCommon extends TileEntity implements ICoord, IFa
         short v = tag.getShort(serialization_version_key);
         if (v < serialization_version) {
             MigrationHelper.migrate(v, this.getFactoryType(), this, tag);
-            markDirty();
+            markDirty(); // Make sure we get saved
         }
     }
 
@@ -239,11 +231,11 @@ public abstract class TileEntityCommon extends TileEntity implements ICoord, IFa
         }
     }
     
-    public boolean handleMessageFromServer(MessageType messageType, DataInput input) throws IOException {
+    public boolean handleMessageFromServer(MessageType messageType, ByteBuf input) throws IOException {
         return false;
     }
 
-    public boolean handleMessageFromClient(MessageType messageType, DataInput input) throws IOException {
+    public boolean handleMessageFromClient(MessageType messageType, ByteBuf input) throws IOException {
         // There are no base attributes a client can edit
         return false;
     }
@@ -298,7 +290,7 @@ public abstract class TileEntityCommon extends TileEntity implements ICoord, IFa
     
     @Override
     public String toString() {
-        return super.toString() + " a " + getFactoryType() + " at " + getCoord();
+        return getFactoryType() + " at " + getCoord();
     }
     
     

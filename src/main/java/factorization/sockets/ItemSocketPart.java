@@ -82,7 +82,7 @@ public class ItemSocketPart extends ItemFactorization {
     @Override
     public String getUnlocalizedName(ItemStack is) {
         int md = is.getItemDamage();
-        String ret = getUnlocalizedName() + FactoryType.fromMd(md);
+        String ret = getUnlocalizedName() + FactoryType.fromMd((byte) md);
         return ret;
     }
     

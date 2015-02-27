@@ -197,7 +197,7 @@ public class ItemSculptingTool extends ItemFactorization {
                 inv.pull(new ItemStack(Items.clay_ball), gw.parts.size(), false);
             }
             TileEntityGreenware rep = (TileEntityGreenware) FactoryType.CERAMIC.getRepresentative();
-            rep.loadParts(gw.getItem().getTagCompound());
+            rep.loadFromStack(gw.getItem());
             rep.totalHeat = 0;
             rep.glazesApplied = false;
             rep.lastTouched = 0;

@@ -1,12 +1,14 @@
 package factorization.oreprocessing;
 
-import java.io.DataInput;
 import java.io.IOException;
 import java.util.ArrayList;
 
+import factorization.api.datahelpers.DataHelper;
+import factorization.api.datahelpers.Share;
 import factorization.shared.*;
 import factorization.util.DataUtil;
 import factorization.util.ItemUtil;
+import io.netty.buffer.ByteBuf;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.IIcon;
@@ -33,19 +35,11 @@ public class TileEntityCrystallizer extends TileEntityFactorization {
     }
 
     @Override
-    public void writeToNBT(NBTTagCompound tag) {
-        super.writeToNBT(tag);
-        writeSlotsToNBT(tag);
-        tag.setInteger("heat", heat);
-        tag.setInteger("progress", progress);
-    }
-
-    @Override
-    public void readFromNBT(NBTTagCompound tag) {
-        super.readFromNBT(tag);
-        readSlotsFromNBT(tag);
-        heat = tag.getInteger("heat");
-        progress = tag.getInteger("progress");
+    public void putData(DataHelper data) throws IOException {
+        super.putData(data);
+        putSlots(data);
+        heat = data.as(Share.PRIVATE, "heat").putInt(heat);
+        progress = data.as(Share.VISIBLE, "progress").putInt(progress);
     }
 
     @Override
@@ -306,14 +300,7 @@ public class TileEntityCrystallizer extends TileEntityFactorization {
     }
 
     @Override
-    public FMLProxyPacket getDescriptionPacket() {
-        ItemStack crys = NetworkFactorization.nullItem(growing_crystal);
-        ItemStack sol = NetworkFactorization.nullItem(solution);
-        return getDescriptionPacketWith(MessageType.CrystallizerInfo, crys, sol, progress);
-    }
-
-    @Override
-    public boolean handleMessageFromServer(MessageType messageType, DataInput input) throws IOException {
+    public boolean handleMessageFromServer(MessageType messageType, ByteBuf input) throws IOException {
         if (super.handleMessageFromServer(messageType, input)) {
             return true;
         }

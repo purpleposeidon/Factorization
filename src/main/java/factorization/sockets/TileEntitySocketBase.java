@@ -3,23 +3,24 @@ package factorization.sockets;
 import static org.lwjgl.opengl.GL11.*;
 
 import java.io.ByteArrayOutputStream;
-import java.io.DataInput;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.List;
 
+import factorization.api.datahelpers.*;
 import factorization.shared.*;
 import factorization.util.FzUtil;
 import factorization.util.InvUtil;
 import factorization.util.ItemUtil;
 import factorization.util.PlayerUtil;
+import io.netty.buffer.ByteBuf;
+import io.netty.buffer.Unpooled;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.IIcon;
@@ -34,12 +35,6 @@ import cpw.mods.fml.relauncher.SideOnly;
 import factorization.api.Coord;
 import factorization.api.FzOrientation;
 import factorization.api.IChargeConductor;
-import factorization.api.datahelpers.DataInNBT;
-import factorization.api.datahelpers.DataInPacket;
-import factorization.api.datahelpers.DataInPacketClientEdited;
-import factorization.api.datahelpers.DataOutNBT;
-import factorization.api.datahelpers.DataOutPacket;
-import factorization.api.datahelpers.IDataSerializable;
 import factorization.common.BlockIcons;
 import factorization.common.FactoryType;
 import factorization.common.FzConfig;
@@ -64,43 +59,17 @@ public abstract class TileEntitySocketBase extends TileEntityCommon implements I
     }
 
     @Override
-    public final byte getExtraInfo() {
-        return (byte) facing.ordinal();
-    }
-
-    @Override
-    public final void useExtraInfo(byte b) {
-        facing = ForgeDirection.getOrientation(b);
-    }
-
-    @Override
     public void onPlacedBy(EntityPlayer player, ItemStack is, int side, float hitX, float hitY, float hitZ) {
         super.onPlacedBy(player, is, side, hitX, hitY, hitZ);
         facing = ForgeDirection.getOrientation(side);
     }
-    
+
     @Override
-    public void readFromNBT(NBTTagCompound tag) {
-        super.readFromNBT(tag);
-        facing = ForgeDirection.getOrientation(tag.getByte("fc"));
-        try {
-            serialize("", new DataInNBT(tag));
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+    public final void putData(DataHelper data) throws IOException {
+        facing = data.as(Share.VISIBLE, "fc").putEnum(facing);
+        serialize("", data);
     }
-    
-    @Override
-    public void writeToNBT(NBTTagCompound tag) {
-        super.writeToNBT(tag);
-        tag.setByte("fc", (byte) facing.ordinal());
-        try {
-            serialize("", new DataOutNBT(tag));
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-    
+
     /**
      * @return false if clean; true if there was something wrong
      */
@@ -355,7 +324,7 @@ public abstract class TileEntitySocketBase extends TileEntityCommon implements I
     
     @SideOnly(Side.CLIENT)
     @Override
-    public boolean handleMessageFromServer(MessageType messageType, DataInput input) throws IOException {
+    public boolean handleMessageFromServer(MessageType messageType, ByteBuf input) throws IOException {
         if (super.handleMessageFromServer(messageType, input)) {
             return true;
         }
@@ -363,7 +332,7 @@ public abstract class TileEntitySocketBase extends TileEntityCommon implements I
             if (!worldObj.isRemote) {
                 return false;
             }
-            DataInPacket dip = new DataInPacket(input, Side.CLIENT);
+            DataInByteBuf dip = new DataInByteBuf(input, Side.CLIENT);
             serialize("", dip);
             Minecraft.getMinecraft().displayGuiScreen(new GuiDataConfig(this));
             return true;
@@ -372,12 +341,12 @@ public abstract class TileEntitySocketBase extends TileEntityCommon implements I
     }
     
     @Override
-    public boolean handleMessageFromClient(MessageType messageType, DataInput input) throws IOException {
+    public boolean handleMessageFromClient(MessageType messageType, ByteBuf input) throws IOException {
         if (super.handleMessageFromClient(messageType, input)) {
             return true;
         }
         if (messageType == MessageType.DataHelperEdit) {
-            DataInPacketClientEdited di = new DataInPacketClientEdited(input);
+            DataInByteBufClientEdited di = new DataInByteBufClientEdited(input);
             this.serialize("", di);
             markDirty();
             return true;
@@ -414,14 +383,13 @@ public abstract class TileEntitySocketBase extends TileEntityCommon implements I
             if (worldObj.isRemote) {
                 return true;
             }
-            ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            DataOutputStream dos = new DataOutputStream(baos);
-            DataOutPacket dop = new DataOutPacket(dos, Side.SERVER);
+            ByteBuf buf = Unpooled.buffer();
+            DataOutByteBuf dop = new DataOutByteBuf(buf, Side.SERVER);
             try {
                 Coord coord = getCoord();
-                Core.network.prefixTePacket(dos, coord, MessageType.OpenDataHelperGui);
+                Core.network.prefixTePacket(buf, coord, MessageType.OpenDataHelperGui);
                 serialize("", dop);
-                Core.network.broadcastPacket(player, coord, FzNetDispatch.generate(baos));
+                Core.network.broadcastPacket(player, coord, FzNetDispatch.generate(buf));
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -501,14 +469,13 @@ public abstract class TileEntitySocketBase extends TileEntityCommon implements I
         if (!getFactoryType().hasGui) {
             return false;
         }
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        DataOutputStream dos = new DataOutputStream(baos);
-        DataOutPacket dop = new DataOutPacket(dos, Side.SERVER);
+        ByteBuf buf = Unpooled.buffer();
+        DataOutByteBuf dop = new DataOutByteBuf(buf, Side.SERVER);
         try {
             Coord coord = getCoord();
-            Core.network.prefixEntityPacket(dos, motor, MessageType.OpenDataHelperGuiOnEntity);
+            Core.network.prefixEntityPacket(buf, motor, MessageType.OpenDataHelperGuiOnEntity);
             serialize("", dop);
-            Core.network.broadcastPacket(player, coord, Core.network.entityPacket(baos));
+            Core.network.broadcastPacket(player, coord, Core.network.entityPacket(buf));
         } catch (IOException e) {
             e.printStackTrace();
         }

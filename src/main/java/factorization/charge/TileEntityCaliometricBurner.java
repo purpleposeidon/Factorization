@@ -25,7 +25,7 @@ import factorization.common.BlockIcons;
 import factorization.common.FactoryType;
 import factorization.notify.Notice;
 
-public class TileEntityCaliometricBurner extends TileEntityFactorization implements IDataSerializable {
+public class TileEntityCaliometricBurner extends TileEntityFactorization {
     ItemStack stomache;
     int foodQuality = 0;
     int ticksUntilNextDigestion = 0;
@@ -44,29 +44,13 @@ public class TileEntityCaliometricBurner extends TileEntityFactorization impleme
     public BlockClass getBlockClass() {
         return BlockClass.Machine;
     }
-    
+
     @Override
-    public IDataSerializable serialize(String prefix, DataHelper data) throws IOException {
-        stomache = data.as(Share.PRIVATE, prefix + "stomache").putItemStack(stomache);
-        foodQuality = data.as(Share.PRIVATE, prefix + "food").putInt(foodQuality);
-        ticksUntilNextDigestion = data.as(Share.PRIVATE, prefix + "digest").putInt(ticksUntilNextDigestion);
-        return this;
-    }
-    
-    @Override
-    public void writeToNBT(NBTTagCompound tag) {
-        super.writeToNBT(tag);
-        try {
-            (new DataOutNBT(tag)).as(Share.PRIVATE, "").put(this);
-        } catch (IOException e) { e.printStackTrace(); }
-    }
-    
-    @Override
-    public void readFromNBT(NBTTagCompound tag) {
-        super.readFromNBT(tag);
-        try {
-            (new DataInNBT(tag)).as(Share.PRIVATE, "").put(this);
-        } catch (IOException e) { e.printStackTrace(); }
+    public void putData(DataHelper data) throws IOException {
+        super.putData(data);
+        stomache = data.as(Share.PRIVATE, "stomache").putItemStack(stomache);
+        foodQuality = data.as(Share.PRIVATE, "food").putInt(foodQuality);
+        ticksUntilNextDigestion = data.as(Share.PRIVATE, "digest").putInt(ticksUntilNextDigestion);
     }
     
     @Override

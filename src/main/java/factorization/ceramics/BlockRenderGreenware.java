@@ -47,7 +47,7 @@ public class BlockRenderGreenware extends FactorizationBlockRender {
             boolean stand = true;
             boolean rescale = false;
             if (is.hasTagCompound()) {
-                loader.loadParts(is.getTagCompound());
+                loader.loadFromStack(is);
                 int minX = 32, minY = 32, minZ = 32;
                 int maxX = 0, maxY = 32, maxZ = 32;
                 for (ClayLump cl : loader.parts) {

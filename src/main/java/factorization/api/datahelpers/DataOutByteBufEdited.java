@@ -1,18 +1,18 @@
 package factorization.api.datahelpers;
 
-import java.io.DataInput;
+import java.io.DataOutput;
 
 import cpw.mods.fml.relauncher.Side;
+import io.netty.buffer.ByteBuf;
 
-public class DataInPacketClientEdited extends DataInPacket {
+public class DataOutByteBufEdited extends DataOutByteBuf {
 
-    public DataInPacketClientEdited(DataInput dis) {
-        super(dis, Side.CLIENT);
+    public DataOutByteBufEdited(ByteBuf buf) {
+        super(buf, Side.CLIENT);
     }
-    
+
     @Override
     protected boolean shouldStore(Share share) {
         return share.is_public && share.client_can_edit;
     }
-
 }

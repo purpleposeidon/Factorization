@@ -1,12 +1,12 @@
 package factorization.api;
 
-import java.io.DataInput;
-import java.io.IOException;
-
 import factorization.shared.NetworkFactorization.MessageType;
+import io.netty.buffer.ByteBuf;
+
+import java.io.IOException;
 
 
 public interface IEntityMessage {
-    boolean handleMessageFromServer(MessageType messageType, DataInput input) throws IOException;
-    boolean handleMessageFromClient(MessageType messageType, DataInput input) throws IOException;
+    boolean handleMessageFromServer(MessageType messageType, ByteBuf input) throws IOException;
+    boolean handleMessageFromClient(MessageType messageType, ByteBuf input) throws IOException;
 }

@@ -1,6 +1,5 @@
 package factorization.sockets;
 
-import java.io.DataInput;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -10,6 +9,7 @@ import factorization.shared.*;
 import factorization.util.InvUtil;
 import factorization.util.ItemUtil;
 import factorization.util.NumUtil;
+import io.netty.buffer.ByteBuf;
 import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.particle.EffectRenderer;
@@ -220,7 +220,7 @@ public class SocketLacerator extends TileEntitySocketBase implements IChargeCond
     }
     
     @Override
-    public boolean handleMessageFromServer(MessageType messageType, DataInput input) throws IOException {
+    public boolean handleMessageFromServer(MessageType messageType, ByteBuf input) throws IOException {
         if (super.handleMessageFromServer(messageType, input)) {
             return true;
         }
@@ -229,16 +229,6 @@ public class SocketLacerator extends TileEntitySocketBase implements IChargeCond
             return true;
         }
         return false;
-    }
-    
-    @Override
-    protected byte getExtraInfo2() {
-        return (byte) (Byte.MAX_VALUE*speed/max_speed);
-    }
-    
-    @Override
-    protected void useExtraInfo2(byte b) {
-        speed = (short) (b*max_speed/Byte.MAX_VALUE);
     }
     
     void processCollectedItem(ItemStack is) {

@@ -1,11 +1,13 @@
 package factorization.charge;
 
-import java.io.DataInput;
 import java.io.IOException;
 
+import factorization.api.datahelpers.DataHelper;
+import factorization.api.datahelpers.Share;
 import factorization.shared.*;
 import factorization.util.DataUtil;
 import factorization.util.NumUtil;
+import io.netty.buffer.ByteBuf;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.IIcon;
 import net.minecraftforge.common.util.ForgeDirection;
@@ -45,21 +47,12 @@ public class TileEntitySteamTurbine extends TileEntityCommon implements IFluidHa
     public BlockClass getBlockClass() {
         return BlockClass.Machine;
     }
-    
+
     @Override
-    public void writeToNBT(NBTTagCompound tag) {
-        super.writeToNBT(tag);
-        DataUtil.writeTank(tag, steamTank, "steam");
-        charge.writeToNBT(tag);
-        tag.setInteger("fan", fan_speed);
-    }
-    
-    @Override
-    public void readFromNBT(NBTTagCompound tag) {
-        super.readFromNBT(tag);
-        DataUtil.readTank(tag, steamTank, "steam");
-        charge.readFromNBT(tag);
-        fan_speed = tag.getInteger("fan");
+    public void putData(DataHelper data) throws IOException {
+        charge.serialize("", data);
+        fan_speed = data.as(Share.VISIBLE, "fan").putInt(fan_speed);
+        steamTank = data.as(Share.PRIVATE, "steam").putTank(steamTank);
     }
 
     @Override
@@ -154,7 +147,7 @@ public class TileEntitySteamTurbine extends TileEntityCommon implements IFluidHa
     }
     
     @Override
-    public boolean handleMessageFromServer(MessageType messageType, DataInput input) throws IOException {
+    public boolean handleMessageFromServer(MessageType messageType, ByteBuf input) throws IOException {
         if (super.handleMessageFromServer(messageType, input)) {
             return true;
         }

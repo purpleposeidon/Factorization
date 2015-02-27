@@ -18,6 +18,7 @@ import factorization.shared.*;
 import factorization.shared.NetworkFactorization.MessageType;
 import factorization.util.InvUtil;
 import factorization.util.ItemUtil;
+import io.netty.buffer.ByteBuf;
 import net.minecraft.block.*;
 import net.minecraft.block.material.Material;
 import net.minecraft.client.Minecraft;
@@ -34,7 +35,6 @@ import net.minecraftforge.common.util.ForgeDirection;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL12;
 
-import java.io.DataInput;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -58,6 +58,7 @@ public class SocketScissors extends TileEntitySocketBase implements ICaptureDrop
     public FactoryType getFactoryType() {
         return FactoryType.SOCKET_SCISSORS;
     }
+
     @Override
     public IDataSerializable serialize(String prefix, DataHelper data) throws IOException {
         wasPowered = data.as(Share.PRIVATE, "pow").putBoolean(wasPowered);
@@ -346,16 +347,10 @@ public class SocketScissors extends TileEntitySocketBase implements ICaptureDrop
         piston_base = new ObjectModel(Core.getResource("models/mini_piston/mini_piston_base.obj"));
         piston_head = new ObjectModel(Core.getResource("models/mini_piston/mini_piston_head.obj"));
     }
-    
-    
-    @Override
-    public FMLProxyPacket getDescriptionPacket() {
-        return getDescriptionPacketWith(MessageType.ScissorState, openCount, sound);
-    }
 
     @Override
     @SideOnly(Side.CLIENT)
-    public boolean handleMessageFromServer(MessageType messageType, DataInput input) throws IOException {
+    public boolean handleMessageFromServer(MessageType messageType, ByteBuf input) throws IOException {
         if (super.handleMessageFromServer(messageType, input)) {
             return true;
         }

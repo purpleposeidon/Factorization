@@ -6,10 +6,13 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import factorization.api.datahelpers.DataHelper;
+import factorization.api.datahelpers.Share;
 import factorization.shared.*;
 import factorization.util.DataUtil;
 import factorization.util.InvUtil;
 import factorization.util.SpaceUtil;
+import io.netty.buffer.ByteBuf;
 import net.minecraft.block.Block;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.entity.Entity;
@@ -75,7 +78,7 @@ public class TileEntityGreenware extends TileEntityCommon {
 
         public int raw_color = -1;
 
-        void write(ByteArrayDataOutput out) {
+        void write(ByteBuf out) {
             out.writeByte(minX);
             out.writeByte(minY);
             out.writeByte(minZ);
@@ -118,7 +121,7 @@ public class TileEntityGreenware extends TileEntityCommon {
             out.add(quat);
         }
 
-        ClayLump read(DataInput in) throws IOException {
+        ClayLump read(ByteBuf in) throws IOException {
             minX = in.readByte();
             minY = in.readByte();
             minZ = in.readByte();
@@ -293,31 +296,36 @@ public class TileEntityGreenware extends TileEntityCommon {
         touch();
     }
 
-    void writeParts(NBTTagCompound tag) {
+    @Override
+    public void putData(DataHelper data) throws IOException {
+        lastTouched = data.as(Share.VISIBLE, "touch").putInt(lastTouched);
+        totalHeat = data.as(Share.VISIBLE, "heat").putInt(totalHeat);
+        glazesApplied = data.as(Share.PRIVATE, "glazed").putBoolean(glazesApplied);
+        front = data.as(Share.VISIBLE, "front").putEnum(front);
+        rotation = data.as(Share.VISIBLE, "rot").putByte(rotation);
+        NBTTagCompound tag;
+        if (data.isNBT()) {
+            tag = data.getTag();
+        } else {
+            tag = data.as(Share.VISIBLE, "partList").putTag(new NBTTagCompound());
+        }
+        if (data.isReader()) {
+            loadParts(tag);
+        } else {
+            writeParts(tag);
+        }
+    }
+
+    private void writeParts(NBTTagCompound tag) {
         NBTTagList l = new NBTTagList();
         for (ClayLump lump : parts) {
             NBTTagCompound rc_tag = new NBTTagCompound();
             lump.write(rc_tag);
             l.appendTag(rc_tag);
         }
-        tag.setTag("parts", l);
-        tag.setInteger("touch", lastTouched);
-        tag.setInteger("heat", totalHeat);
-        tag.setBoolean("glazed", glazesApplied);
-        tag.setByte("front", (byte)front.ordinal());
-        tag.setByte("rot", rotation);
     }
 
-    @Override
-    public void writeToNBT(NBTTagCompound tag) {
-        super.writeToNBT(tag);
-        writeParts(tag);
-        if (parts.size() == 0) {
-            getCoord().setAir();
-        }
-    }
-
-    public void loadParts(NBTTagCompound tag) {
+    private void loadParts(NBTTagCompound tag) {
         if (tag == null) {
             initialize();
             return;
@@ -333,37 +341,11 @@ public class TileEntityGreenware extends TileEntityCommon {
             NBTTagCompound rc_tag = partList.getCompoundTagAt(i);
             parts.add(new ClayLump().read(rc_tag));
         }
-        lastTouched = tag.getInteger("touch");
-        totalHeat = tag.getInteger("heat");
-        glazesApplied = tag.getBoolean("glazed");
-        if (tag.hasKey("front")) {
-            front = ForgeDirection.getOrientation(tag.getByte("front"));
-            setRotation(tag.getByte("rot"));
-        }
     }
 
-    @Override
-    public void readFromNBT(NBTTagCompound tag) {
-        super.readFromNBT(tag);
-        loadParts(tag);
-    }
-    
     public void setRotation(byte newRotation) {
         rotation = newRotation;
         rotation_quat = Quaternion.getRotationQuaternionRadians(Math.PI*newRotation/2, ForgeDirection.UP);
-    }
-
-    @Override
-    public FMLProxyPacket getDescriptionPacket() {
-        ArrayList<Object> args = new ArrayList(2 + parts.size() * 9);
-        args.add(MessageType.SculptDescription);
-        args.add(getState().ordinal());
-        args.add((byte)front.ordinal());
-        args.add(rotation);
-        for (ClayLump lump : parts) {
-            lump.write(args);
-        }
-        return getDescriptionPacketWith(args.toArray());
     }
 
     @Override
@@ -667,7 +649,7 @@ public class TileEntityGreenware extends TileEntityCommon {
     }
 
     @Override
-    public boolean handleMessageFromServer(MessageType messageType, DataInput input) throws IOException {
+    public boolean handleMessageFromServer(MessageType messageType, ByteBuf input) throws IOException {
         if (super.handleMessageFromServer(messageType, input)) {
             return true;
         }
@@ -708,7 +690,7 @@ public class TileEntityGreenware extends TileEntityCommon {
         return true;
     }
 
-    private void readStateChange(DataInput input) throws IOException {
+    private void readStateChange(ByteBuf input) throws IOException {
         switch (ClayState.values()[input.readInt()]) {
         case WET:
             lastTouched = 0;

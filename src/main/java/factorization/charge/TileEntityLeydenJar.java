@@ -1,13 +1,12 @@
 package factorization.charge;
 
-import java.io.DataInput;
 import java.io.IOException;
 import java.util.Random;
 
 import factorization.shared.*;
 import factorization.util.ItemUtil;
 import factorization.util.NumUtil;
-import net.minecraft.entity.player.EntityPlayer;
+import io.netty.buffer.ByteBuf;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.IIcon;
@@ -170,7 +169,7 @@ public class TileEntityLeydenJar extends TileEntityCommon implements IChargeCond
     }
     
     @Override
-    public boolean handleMessageFromServer(MessageType messageType, DataInput input) throws IOException {
+    public boolean handleMessageFromServer(MessageType messageType, ByteBuf input) throws IOException {
         if (super.handleMessageFromServer(messageType, input)) {
             return true;
         }
@@ -180,29 +179,10 @@ public class TileEntityLeydenJar extends TileEntityCommon implements IChargeCond
         }
         return false;
     }
-    
-    void handleData(DataHelper data) throws IOException {
+
+    @Override
+    public void putData(DataHelper data) throws IOException {
         storage = data.as(Share.VISIBLE, "store").putInt(storage);
-    }
-    
-    @Override
-    public void writeToNBT(NBTTagCompound tag) {
-        super.writeToNBT(tag);
-        try {
-            handleData(new DataOutNBT(tag));
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-    
-    @Override
-    public void readFromNBT(NBTTagCompound tag) {
-        super.readFromNBT(tag);
-        try {
-            handleData(new DataInNBT(tag));
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
     }
     
     @Override
@@ -215,11 +195,6 @@ public class TileEntityLeydenJar extends TileEntityCommon implements IChargeCond
     public void loadFromStack(ItemStack is) {
         super.loadFromStack(is);
         storage = ItemUtil.getTag(is).getInteger("storage");
-    }
-    
-    @Override
-    public FMLProxyPacket getDescriptionPacket() {
-        return super.getDescriptionPacketWith(MessageType.LeydenjarLevel, storage);
     }
     
     @Override

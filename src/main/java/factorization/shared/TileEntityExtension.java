@@ -1,9 +1,10 @@
 package factorization.shared;
 
-import java.io.DataInput;
 import java.io.IOException;
 import java.util.List;
 
+import factorization.api.datahelpers.DataHelper;
+import io.netty.buffer.ByteBuf;
 import net.minecraft.block.Block;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
@@ -83,21 +84,18 @@ public class TileEntityExtension extends TileEntityCommon {
         this._parent = newParent;
         pc = newParent.getCoord().difference(this.getCoord());
     }
-    
+
     @Override
-    public void writeToNBT(NBTTagCompound tag) {
-        super.writeToNBT(tag);
-        if (pc != null) {
-            pc.writeToTag("p", tag);
+    public void putData(DataHelper data) throws IOException {
+        if (pc == null) {
+            pc = new DeltaCoord();
+        }
+        pc.serialize("", data);
+        if (pc.equals(DeltaCoord.ZERO)) {
+            pc = null;
         }
     }
-    
-    @Override
-    public void readFromNBT(NBTTagCompound tag) {
-        super.readFromNBT(tag);
-        pc = DeltaCoord.readFromTag("p", tag);
-    }
-    
+
     @Override
     public AxisAlignedBB getCollisionBoundingBoxFromPool() {
         TileEntityCommon p = getParent();
@@ -125,15 +123,7 @@ public class TileEntityExtension extends TileEntityCommon {
     }
     
     @Override
-    public FMLProxyPacket getDescriptionPacket() {
-        if (pc == null) {
-            return super.getDescriptionPacket();
-        }
-        return getDescriptionPacketWith(MessageType.ExtensionInfo, pc);
-    }
-    
-    @Override
-    public boolean handleMessageFromServer(MessageType messageType, DataInput input) throws IOException {
+    public boolean handleMessageFromServer(MessageType messageType, ByteBuf input) throws IOException {
         if (super.handleMessageFromServer(messageType, input)) {
             return true;
         }
