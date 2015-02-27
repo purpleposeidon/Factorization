@@ -345,26 +345,26 @@ public class TileEntitySlagFurnace extends TileEntityFactorization {
         if (draw_active <= 0) {
             return;
         }
-        int var6 = facing_direction;
+        int direction = facing_direction;
         World w = worldObj;
-        float var7 = (float) xCoord + 0.5F;
-        float var8 = (float) yCoord + 0.0F + rand.nextFloat() * 6.0F / 16.0F;
-        float var9 = (float) zCoord + 0.5F;
-        float var10 = 0.52F;
-        float var11 = rand.nextFloat() * 0.6F - 0.3F;
+        float px = xCoord + 0.5F;
+        float py = yCoord + 0.0F + rand.nextFloat() * 6.0F / 16.0F;
+        float pz = zCoord + 0.5F;
+        float d = 0.52F;
+        float rng = rand.nextFloat() * 0.6F - 0.3F;
         
-        if (var6 == 4) {
-            w.spawnParticle("smoke", (double) (var7 - var10), (double) var8, (double) (var9 + var11), 0.0D, 0.0D, 0.0D);
-            w.spawnParticle("flame", (double) (var7 - var10), (double) var8, (double) (var9 + var11), 0.0D, 0.0D, 0.0D);
-        } else if (var6 == 5) {
-            w.spawnParticle("smoke", (double) (var7 + var10), (double) var8, (double) (var9 + var11), 0.0D, 0.0D, 0.0D);
-            w.spawnParticle("flame", (double) (var7 + var10), (double) var8, (double) (var9 + var11), 0.0D, 0.0D, 0.0D);
-        } else if (var6 == 2) {
-            w.spawnParticle("smoke", (double) (var7 + var11), (double) var8, (double) (var9 - var10), 0.0D, 0.0D, 0.0D);
-            w.spawnParticle("flame", (double) (var7 + var11), (double) var8, (double) (var9 - var10), 0.0D, 0.0D, 0.0D);
-        } else if (var6 == 3) {
-            w.spawnParticle("smoke", (double) (var7 + var11), (double) var8, (double) (var9 + var10), 0.0D, 0.0D, 0.0D);
-            w.spawnParticle("flame", (double) (var7 + var11), (double) var8, (double) (var9 + var10), 0.0D, 0.0D, 0.0D);
+        if (direction == 4) {
+            w.spawnParticle("smoke", px - d, py, pz + rng, 0, 0, 0);
+            w.spawnParticle("flame", px - d, py, pz + rng, 0, 0, 0);
+        } else if (direction == 5) {
+            w.spawnParticle("smoke", px + d, py, pz + rng, 0, 0, 0);
+            w.spawnParticle("flame", px + d, py, pz + rng, 0, 0, 0);
+        } else if (direction == 2) {
+            w.spawnParticle("smoke", px + rng, py, pz - d, 0, 0, 0);
+            w.spawnParticle("flame", px + rng, py, pz - d, 0, 0, 0);
+        } else if (direction == 3) {
+            w.spawnParticle("smoke", px + rng, py, pz + d, 0, 0, 0);
+            w.spawnParticle("flame", px + rng, py, pz + d, 0, 0, 0);
         }
     }
 

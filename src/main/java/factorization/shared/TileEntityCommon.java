@@ -291,7 +291,7 @@ public abstract class TileEntityCommon extends TileEntity implements ICoord, IFa
     
     public int getComparatorValue(ForgeDirection side) {
         if (this instanceof IInventory) {
-            return Container.calcRedstoneFromInventory((IInventory)this);
+            return Container.calcRedstoneFromInventory((IInventory) this);
         }
         return 0;
     }

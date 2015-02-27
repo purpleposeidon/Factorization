@@ -70,7 +70,7 @@ public class BlockFactorization extends BlockContainer {
     }
 
     @Override
-    public boolean hasTileEntity() {
+    public boolean hasTileEntity(int metadata) {
         return true;
     }
 
@@ -90,14 +90,11 @@ public class BlockFactorization extends BlockContainer {
     }
     
     @Override
-    public void onNeighborBlockChange(World w, int x, int y, int z, Block l) {
+    public void onNeighborBlockChange(World w, int x, int y, int z, Block neighbor) {
         int md = w.getBlockMetadata(x, y, z);
-        TileEntity ent = w.getTileEntity(x, y, z);
-        if (ent == null) {
-            return;
-        }
-        if (ent instanceof TileEntityCommon) {
-            TileEntityCommon tec = (TileEntityCommon) ent;
+        TileEntity te = w.getTileEntity(x, y, z);
+        if (te instanceof TileEntityCommon) {
+            TileEntityCommon tec = (TileEntityCommon) te;
             tec.neighborChanged();
         }
     }
@@ -105,53 +102,44 @@ public class BlockFactorization extends BlockContainer {
     //TODO: Ctrl/alt clicking!
 
     @Override
-    public boolean onBlockActivated(World world, int x, int y, int z, EntityPlayer entityplayer,
-            int side, float vecx, float vecy, float vecz) {
+    public boolean onBlockActivated(World w, int x, int y, int z, EntityPlayer player, int side, float vecx, float vecy, float vecz) {
         // right click
-        Coord here = new Coord(world, x, y, z);
+        Coord here = new Coord(w, x, y, z);
         TileEntityCommon t = here.getTE(TileEntityCommon.class);
-        if (t == null && world.isRemote) {
+        if (t == null && w.isRemote) {
             Core.network.broadcastMessage(null, here, MessageType.DescriptionRequest);
         }
-        if (entityplayer.isSneaking()) {
-            ItemStack cur = entityplayer.getCurrentEquippedItem();
+        if (player.isSneaking()) {
+            ItemStack cur = player.getCurrentEquippedItem();
             if (cur == null || cur.getItem() != Core.registry.logicMatrixProgrammer) {
                 return false;
             }
         }
 
-        
-
         if (t != null) {
-            return t.activate(entityplayer, ForgeDirection.getOrientation(side));
-        } else {
-            //info message
-            if (world.isRemote) {
-                if (here.getTE() == null) {
-                    //we may be about to get a GUI, incidentally...
-                    Core.network.broadcastMessage(null, here, MessageType.DescriptionRequest);
-                    return false;
-                }
-                return false; //...?
-            }
-            entityplayer.addChatMessage(new ChatComponentText("This block is missing its TileEntity, possibly due to a bug in Factorization."));
-            entityplayer.addChatMessage(new ChatComponentText("The block and its contents can not be recovered without cheating."));
-            return true;
+            return t.activate(player, ForgeDirection.getOrientation(side));
         }
+        if (w.isRemote) {
+            if (here.getTE() == null) {
+                //we may be about to get a GUI, incidentally...
+                Core.network.broadcastMessage(null, here, MessageType.DescriptionRequest);
+                return false;
+            }
+            return false; //...?
+        }
+        player.addChatMessage(new ChatComponentText("This block is missing its TileEntity, possibly due to a bug in Factorization."));
+        player.addChatMessage(new ChatComponentText("The block and its contents can not be recovered without cheating."));
+        return true;
     }
 
     @Override
-    public void onBlockClicked(World world, int x, int y, int z,
-            EntityPlayer entityplayer) {
+    public void onBlockClicked(World w, int x, int y, int z, EntityPlayer player) {
         // left click
+        if (w.isRemote) return;
 
-        if (world.isRemote) {
-            return;
-        }
-
-        TileEntity t = world.getTileEntity(x, y, z);
+        TileEntity t = w.getTileEntity(x, y, z);
         if (t instanceof TileEntityCommon) {
-            ((TileEntityCommon) t).click(entityplayer);
+            ((TileEntityCommon) t).click(player);
         }
     }
     
@@ -169,9 +157,10 @@ public class BlockFactorization extends BlockContainer {
         if (force_texture != null) {
             return force_texture;
         }
-        TileEntity t = w.getTileEntity(x, y, z);
-        if (t instanceof TileEntityCommon) {
-            return ((TileEntityCommon) t).getIcon(ForgeDirection.getOrientation(side));
+        TileEntity te = w.getTileEntity(x, y, z);
+        if (te instanceof TileEntityCommon) {
+            TileEntityCommon tec = (TileEntityCommon) te;
+            return tec.getIcon(ForgeDirection.getOrientation(side));
         }
         return BlockIcons.error;
     }
@@ -262,11 +251,6 @@ public class BlockFactorization extends BlockContainer {
             Coord destr = destroyedTE.getCoord();
             if (!destr.equals(here)) {
                 Core.logWarning("Last saved destroyed TE wasn't for this location");
-                destroyedTE = null;
-                return ret;
-            }
-            if (!(destroyedTE instanceof IFactoryType)) {
-                Core.logWarning("TileEntity isn't an IFT! It's " + here.getTE());
                 destroyedTE = null;
                 return ret;
             }
@@ -494,13 +478,6 @@ public class BlockFactorization extends BlockContainer {
     //Maybe we should only give weak power?
     @Override
     public int isProvidingStrongPower(IBlockAccess w, int x, int y, int z, int side) {
-        /*if (side < 2) {
-            return 0;
-        }
-        TileEntity te = w.getTileEntity(x, y, z);
-        if (te instanceof TileEntityCommon) {
-            return ((TileEntityCommon) te).power() ? 15 : 0;
-        }*/
         return 0;
     }
     
@@ -556,8 +533,6 @@ public class BlockFactorization extends BlockContainer {
         return false;
     }
     
-    static final Random rand = new Random();
-    
     @Override
     @SideOnly(Side.CLIENT)
     public boolean addDestroyEffects(World world, int x, int y, int z, int meta, EffectRenderer effectRenderer) {
@@ -566,20 +541,18 @@ public class BlockFactorization extends BlockContainer {
             return false;
         }
         TileEntityCommon tec = (TileEntityCommon) te;
-        IIcon theIIcon = (tec == null) ? BlockIcons.default_icon : tec.getIcon(ForgeDirection.DOWN);
+        IIcon theIIcon =  tec.getIcon(ForgeDirection.DOWN);
         
         //copied & modified from EffectRenderer.addDestroyEffects
-        byte b0 = 4;
-        for (int j1 = 0; j1 < b0; ++j1)
-        {
-            for (int k1 = 0; k1 < b0; ++k1)
-            {
-                for (int l1 = 0; l1 < b0; ++l1)
-                {
-                    double d0 = (double)x + ((double)j1 + 0.5D) / (double)b0;
-                    double d1 = (double)y + ((double)k1 + 0.5D) / (double)b0;
-                    double d2 = (double)z + ((double)l1 + 0.5D) / (double)b0;
-                    EntityDiggingFX fx = (new EntityDiggingFX(world, d0, d1, d2, d0 - (double)x - 0.5D, d1 - (double)y - 0.5D, d2 - (double)z - 0.5D, this, meta)).applyColourMultiplier(x, y, z);
+        byte range = 4;
+        for (int dx = 0; dx < range; ++dx) {
+            for (int dy = 0; dy < range; ++dy) {
+                for (int dz = 0; dz < range; ++dz) {
+                    double px = x + (dx + 0.5) / range;
+                    double py = y + (dy + 0.5) / range;
+                    double pz = z + (dz + 0.5) / range;
+                    EntityDiggingFX fx = new EntityDiggingFX(world, px, py, pz, px - x - 0.5, py - y - 0.5, pz - z - 0.5, this, meta);
+                    fx.applyColourMultiplier(x, y, z);
                     fx.setParticleIcon(theIIcon);
                     effectRenderer.addEffect(fx);
                 }
