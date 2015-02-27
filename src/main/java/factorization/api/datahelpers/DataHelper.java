@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.UUID;
 
+import factorization.util.DataUtil;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
@@ -17,7 +18,7 @@ public abstract class DataHelper {
      */
     protected String name;
     /***
-     * If true, whatever is getting put needs to be saved/loaded. Set by {@link DataHelper.as}.
+     * If true, whatever is getting put needs to be saved/loaded. Set by {@link DataHelper#as}.
      */
     protected boolean valid;
     
@@ -48,13 +49,13 @@ public abstract class DataHelper {
     
     
     /**
-     * The put function will save or load a value. 
-     * First call {@link DataHelper.as} to set the name that should be used and how it should be Shared.
+     * The put function will save or load a value.
+     * First call {@link DataHelper#as} to set the name that should be used and how it should be Shared.
      * For the {@link IDataSerializable}, the name will be used as a prefix.
      * If writing, the original will be returned. If reading, the loaded value will be returned.
      * Must be able to handle these types: Boolean, Byte, Short, Integer, Float, Double, String, ItemStack, IDataSerializable, Enum
-     * @param An object. It must never be null.
-     * @return o if isWriter(); else the read value
+     * @param o An object. It must never be null.
+     * @return The original value if isWriter() or the sharing does not permit write access; else the read value
      * @throws IOException
      */
     public <E> E put(E o) throws IOException {
@@ -138,12 +139,31 @@ for t in "Boolean Byte Short Int Long Float Double String FzOrientation ItemStac
     public final String putString(String value) throws IOException { return (String)put(value); }
     public final FzOrientation putFzOrientation(FzOrientation value) throws IOException { return (FzOrientation)put(value); }
     public final ItemStack putItemStack(ItemStack value) throws IOException {
-        if (isReader() && value == null) {
-            value = new ItemStack((Item)null);
+        if (value == null) {
+            value = DataUtil.NULL_ITEM;
         }
-        return (ItemStack)put(value);
+        ItemStack ret = put(value);
+        if (ret != null && ret.getItem() == null) {
+            return null;
+        }
+        return ret;
     }
+
     public final ArrayList<ItemStack> putItemArray(ArrayList<ItemStack> value) throws IOException {
+        if (!valid) return value;
+        if (isReader() && hasLegacy(name + "_len")) {
+            return putItemArray_legacy(value);
+        }
+        return putItemArray_efficient(value);
+    }
+
+    protected ArrayList<ItemStack> putItemArray_efficient(ArrayList<ItemStack> value) throws IOException {
+        return putItemArray_legacy(value);
+    }
+
+
+    @Deprecated
+    public final ArrayList<ItemStack> putItemArray_legacy(ArrayList<ItemStack> value) throws IOException {
         String prefix = name;
         int len = asSameShare(prefix + "_len").putInt(value.size());
         if (isReader()) {
@@ -159,11 +179,13 @@ for t in "Boolean Byte Short Int Long Float Double String FzOrientation ItemStac
         }
         return value;
     }
+
     public final NBTTagCompound putTag(NBTTagCompound value) throws IOException {
         return (NBTTagCompound)put(value);
     }
+
     public final FluidTank putTank(FluidTank tank) throws IOException {
-        if (isReader()) {
+        if (isWriter()) {
             NBTTagCompound tag = new NBTTagCompound();
             tank.writeToNBT(tag);
             putTag(tag);

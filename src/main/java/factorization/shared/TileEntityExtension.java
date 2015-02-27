@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.List;
 
 import factorization.api.datahelpers.DataHelper;
+import factorization.api.datahelpers.Share;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.block.Block;
 import net.minecraft.entity.Entity;
@@ -90,7 +91,7 @@ public class TileEntityExtension extends TileEntityCommon {
         if (pc == null) {
             pc = new DeltaCoord();
         }
-        pc.serialize("", data);
+        pc.serialize("p", data.as(Share.VISIBLE, "p"));
         if (pc.equals(DeltaCoord.ZERO)) {
             pc = null;
         }

@@ -71,7 +71,7 @@ public class TileEntityServoRail extends TileEntityCommon implements IChargeCond
         charge.update();
     }
     
-    private String decor_tag_key = "decor";
+    private static final String decor_tag_key = "decor";
 
     @Override
     public void putData(DataHelper data) throws IOException {
@@ -87,7 +87,9 @@ public class TileEntityServoRail extends TileEntityCommon implements IChargeCond
             }
         } else {
             NBTTagCompound decor = new NBTTagCompound();
-            decoration.save(decor);
+            if (decoration != null) {
+                decoration.save(decor);
+            }
             data.as(Share.VISIBLE, decor_tag_key).putTag(decor);
         }
     }

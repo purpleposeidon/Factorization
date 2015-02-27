@@ -68,7 +68,6 @@ public class TileEntityParaSieve extends TileEntityFactorization implements ISid
         } finally {
             putting_nbt = false;
         }
-        super.putData(data);
     }
     
     @Override

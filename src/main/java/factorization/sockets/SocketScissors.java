@@ -1,6 +1,5 @@
 package factorization.sockets;
 
-import cpw.mods.fml.common.network.internal.FMLProxyPacket;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import factorization.api.Coord;
@@ -33,14 +32,11 @@ import net.minecraft.util.*;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.ForgeDirection;
 import org.lwjgl.opengl.GL11;
-import org.lwjgl.opengl.GL12;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
-
-import static org.lwjgl.opengl.GL11.*;
 
 public class SocketScissors extends TileEntitySocketBase implements ICaptureDrops {
     private boolean wasPowered = false;
@@ -63,7 +59,7 @@ public class SocketScissors extends TileEntitySocketBase implements ICaptureDrop
     public IDataSerializable serialize(String prefix, DataHelper data) throws IOException {
         wasPowered = data.as(Share.PRIVATE, "pow").putBoolean(wasPowered);
         buffer = data.as(Share.PRIVATE, "buf").putItemArray(buffer);
-        openCount = data.as(Share.PRIVATE, "open").putByte(openCount);
+        openCount = data.as(Share.VISIBLE, "open").putByte(openCount);
         return this;
     }
 
@@ -317,9 +313,6 @@ public class SocketScissors extends TileEntitySocketBase implements ICaptureDrop
 
         TextureManager tex = Minecraft.getMinecraft().renderEngine;
         tex.bindTexture(Core.blockAtlas);
-        glEnable(GL_LIGHTING);
-        glDisable(GL11.GL_CULL_FACE);
-        glEnable(GL12.GL_RESCALE_NORMAL);
         
         piston_base.render(BlockIcons.socket$mini_piston);
         GL11.glTranslatef(0, 0, -6f/16f);
@@ -330,8 +323,6 @@ public class SocketScissors extends TileEntitySocketBase implements ICaptureDrop
         GL11.glTranslatef(0, 0, 6f/16f);
         piston_head.render(BlockIcons.socket$mini_piston);
 
-        glEnable(GL11.GL_CULL_FACE);
-        glEnable(GL_LIGHTING);
         GL11.glPopMatrix();
     }
 

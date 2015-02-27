@@ -1,10 +1,15 @@
 package factorization.api.datahelpers;
 
 import java.io.IOException;
+import java.util.ArrayList;
 
 import factorization.shared.Core;
 
+import factorization.util.DataUtil;
+import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.NBTTagList;
+import net.minecraftforge.common.util.Constants;
 
 public class DataInNBT extends DataHelperNBT {	
     public DataInNBT(NBTTagCompound theTag) {
@@ -59,4 +64,17 @@ public class DataInNBT extends DataHelperNBT {
         return tag.hasKey(name);
     }
 
+    @Override
+    protected ArrayList<ItemStack> putItemArray_efficient(ArrayList<ItemStack> value) throws IOException {
+        NBTTagList buffer = tag.getTagList(name, Constants.NBT.TAG_COMPOUND);
+        final int size = buffer.tagCount();
+        value.clear();
+        value.ensureCapacity(size);
+        for (int i = 0; i < size; i++) {
+            NBTTagCompound it = buffer.getCompoundTagAt(i);
+            ItemStack is = ItemStack.loadItemStackFromNBT(it);
+            value.add(is);
+        }
+        return value;
+    }
 }

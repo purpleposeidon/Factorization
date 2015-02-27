@@ -6,7 +6,9 @@ import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import factorization.api.*;
 import factorization.api.datahelpers.DataHelper;
+import factorization.api.datahelpers.DataInNBT;
 import factorization.api.datahelpers.DataOutByteBuf;
+import factorization.api.datahelpers.DataOutNBT;
 import factorization.common.BlockIcons;
 import factorization.common.FactoryType;
 import factorization.migration.MigrationHelper;
@@ -40,7 +42,7 @@ import java.util.List;
 import java.util.Random;
 
 public abstract class TileEntityCommon extends TileEntity implements ICoord, IFactoryType {
-    public static final short serialization_version = 1;
+    public static final byte serialization_version = 1;
     public static final String serialization_version_key = ".";
 
     protected static Random rand = new Random();
@@ -177,12 +179,18 @@ public abstract class TileEntityCommon extends TileEntity implements ICoord, IFa
     @Override
     public final void writeToNBT(NBTTagCompound tag) {
         super.writeToNBT(tag);
-        tag.setShort(serialization_version_key, serialization_version);
+        tag.setByte(serialization_version_key, serialization_version);
         if (customName != null) {
             tag.setString("customName", customName);
         }
         if (worldObj != null && power()) {
             tag.setLong("rps", pulseTime);
+        }
+        try {
+            DataHelper data = new DataOutNBT(tag);
+            putData(data);
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
     
@@ -195,10 +203,16 @@ public abstract class TileEntityCommon extends TileEntity implements ICoord, IFa
         if (tag.hasKey("rps")) {
             pulseTime = tag.getLong("rps");
         }
-        short v = tag.getShort(serialization_version_key);
+        byte v = tag.getByte(serialization_version_key);
         if (v < serialization_version) {
             MigrationHelper.migrate(v, this.getFactoryType(), this, tag);
             markDirty(); // Make sure we get saved
+        }
+        try {
+            DataHelper data = new DataInNBT(tag);
+            putData(data);
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 

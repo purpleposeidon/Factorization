@@ -601,7 +601,7 @@ public class ServoMotor extends Entity implements IEntityAdditionalSpawnData, IE
         return 64;
     }
 
-    private static final ItemStack EMPTY_ITEM = new ItemStack((Item)null);
+    private static final ItemStack EMPTY_ITEM = DataUtil.NULL_ITEM;
     
     @Override
     public void markDirty() {

@@ -105,9 +105,6 @@ public class TileEntityDayBarrel extends TileEntityFactorization {
     
     @Override
     public void putData(DataHelper data) throws IOException {
-        if (data.isReader()) {
-            item = new ItemStack((Item) null);
-        }
         item = data.as(Share.VISIBLE, "item").putItemStack(item);
         int count = data.as(Share.VISIBLE, "count").putInt(getItemCount());
         orientation = data.as(Share.VISIBLE, "dir").putFzOrientation(orientation);

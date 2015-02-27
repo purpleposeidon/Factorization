@@ -117,7 +117,7 @@ public class NetworkFactorization {
         try {
             ByteBuf output = Unpooled.buffer();
             prefixEntityPacket(output, to, messageType);
-            writeObjects(output, output, items);
+            writeObjects(output, items);
             return entityPacket(output);
         } catch (IOException e) {
             e.printStackTrace();

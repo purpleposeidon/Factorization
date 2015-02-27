@@ -303,12 +303,19 @@ public class TileEntityGreenware extends TileEntityCommon {
         glazesApplied = data.as(Share.PRIVATE, "glazed").putBoolean(glazesApplied);
         front = data.as(Share.VISIBLE, "front").putEnum(front);
         rotation = data.as(Share.VISIBLE, "rot").putByte(rotation);
-        NBTTagCompound tag;
         if (data.isNBT()) {
-            tag = data.getTag();
+            putParts(data, data.getTag());
+        } else if (data.isReader()) {
+            NBTTagCompound tag = data.as(Share.VISIBLE, "partList").putTag(new NBTTagCompound());
+            putParts(data, tag);
         } else {
-            tag = data.as(Share.VISIBLE, "partList").putTag(new NBTTagCompound());
+            NBTTagCompound tag = new NBTTagCompound();
+            putParts(data, tag);
+            tag = data.as(Share.VISIBLE, "partList").putTag(tag);
         }
+    }
+
+    private void putParts(DataHelper data, NBTTagCompound tag) {
         if (data.isReader()) {
             loadParts(tag);
         } else {
@@ -323,6 +330,7 @@ public class TileEntityGreenware extends TileEntityCommon {
             lump.write(rc_tag);
             l.appendTag(rc_tag);
         }
+        tag.setTag("parts", l);
     }
 
     private void loadParts(NBTTagCompound tag) {
