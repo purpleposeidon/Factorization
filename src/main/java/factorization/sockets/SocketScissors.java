@@ -30,6 +30,7 @@ import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.*;
 import net.minecraft.world.World;
+import net.minecraftforge.common.IShearable;
 import net.minecraftforge.common.util.ForgeDirection;
 import org.lwjgl.opengl.GL11;
 
@@ -199,8 +200,17 @@ public class SocketScissors extends TileEntitySocketBase implements ICaptureDrop
             EntityPlayer player = getFakePlayer();
             if (canCutBlock(player, worldObj, block, mop.blockX, mop.blockY, mop.blockZ)) {
                 player.inventory.mainInventory[0] = shears;
+                boolean sheared = false;
+                if (block instanceof IShearable) {
+                    IShearable shearable = (IShearable) block;
+                    if (shearable.isShearable(shears, worldObj, mop.blockX, mop.blockY, mop.blockZ)) {
+                        Collection<ItemStack> drops = shearable.onSheared(shears, worldObj, mop.blockX, mop.blockY, mop.blockZ, 0);
+                        processCollectedItems(drops);
+                        sheared = true;
+                    }
+                }
                 boolean didRemove = removeBlock(player, block, metadata, mop.blockX, mop.blockY, mop.blockZ);
-                if (didRemove) {
+                if (didRemove && !sheared) {
                     block.harvestBlock(worldObj, player, mop.blockX, mop.blockY, mop.blockZ, metadata);
                 }
             } else {
