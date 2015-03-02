@@ -276,6 +276,7 @@ public class HammerNet {
     }
     
     InteractionLiason getLiason(WorldServer shadowWorld, EntityPlayer real_player) {
+        // NORELEASE: Cache. Constructing fake players is muy expensivo
         InteractionLiason liason = new InteractionLiason(shadowWorld, new ItemInWorldManager(shadowWorld));
         liason.inventory = real_player.inventory;
         liason.setSprinting(real_player.isSprinting());

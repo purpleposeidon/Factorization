@@ -55,4 +55,9 @@ public class HammerWorldProvider extends WorldProvider {
     public boolean getWorldHasVoidParticles() {
         return false;
     }
+
+    @Override
+    public ChunkCoordinates getRandomizedSpawnPoint() {
+        return new ChunkCoordinates(0, 0, 0);
+    }
 }
