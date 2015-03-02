@@ -56,9 +56,8 @@ public class NetworkFactorization {
                 output.writeFloat((Float) item);
             } else if (item instanceof ItemStack) {
                 ItemStack is = (ItemStack) item;
-                NBTTagCompound tag = new NBTTagCompound();
-                is.writeToNBT(tag);
-                ByteBufUtils.writeTag(output, tag);
+                if (is == EMPTY_ITEMSTACK) is = null;
+                ByteBufUtils.writeItemStack(output, is);
             } else if (item instanceof VectorUV) {
                 VectorUV v = (VectorUV) item;
                 output.writeFloat((float) v.x);
