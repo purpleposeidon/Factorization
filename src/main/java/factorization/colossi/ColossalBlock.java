@@ -270,15 +270,9 @@ public class ColossalBlock extends Block {
     public void breakBlock(World world, int x, int y, int z, Block block, int md) {
         super.breakBlock(world, x, y, z, block, md);
         if (world.isRemote) return;
+        if (world == DeltaChunk.getServerShadowWorld()) return;
         Coord at = new Coord(world, x, y, z);
-        if (world == DeltaChunk.getServerShadowWorld()) {
-            if (md == MD_BODY_CRACKED || md == MD_MASK_CRACKED) {
-                ColossusController controller = findController(at);
-                if (controller != null) {
-                    controller.crackBroken();
-                }
-            }
-        } else if (md == MD_BODY_CRACKED || md == MD_MASK_CRACKED) {
+        if (md == MD_BODY_CRACKED || md == MD_MASK_CRACKED) {
             for (Coord neighbor : at.getNeighborsAdjacent()) {
                 if (neighbor.getBlock() == this && neighbor.getMd() == MD_BODY) {
                     int air = 0;

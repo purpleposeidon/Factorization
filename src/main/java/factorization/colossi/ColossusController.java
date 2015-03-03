@@ -6,12 +6,14 @@ import factorization.api.Quaternion;
 import factorization.api.datahelpers.DataHelper;
 import factorization.api.datahelpers.Share;
 import factorization.fzds.interfaces.DeltaCapability;
+import factorization.fzds.interfaces.IDCController;
 import factorization.fzds.interfaces.IDeltaChunk;
 import factorization.fzds.interfaces.Interpolation;
 import factorization.shared.Core;
 import factorization.shared.EntityFz;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.boss.IBossDisplayData;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.ChatComponentTranslation;
 import net.minecraft.util.IChatComponent;
 import net.minecraft.world.World;
@@ -20,7 +22,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.EnumSet;
 
-public class ColossusController extends EntityFz implements IBossDisplayData {
+public class ColossusController extends EntityFz implements IBossDisplayData, IDCController {
     static enum BodySide { LEFT, RIGHT, CENTER, UNKNOWN_BODY_SIDE };
     static enum LimbType {
         BODY, ARM, LEG, UNKNOWN_LIMB_TYPE;
@@ -455,5 +457,30 @@ public class ColossusController extends EntityFz implements IBossDisplayData {
         if (getDistanceSqToEntity(player) > max_dist) return false;
         if (getHome().distanceSq(new Coord(player)) > max_home_dist) return false;
         return true;
+    }
+
+    @Override
+    public boolean placeBlock(IDeltaChunk idc, EntityPlayer player, Coord at, byte sideHit) {
+        return false;
+    }
+
+    @Override
+    public boolean breakBlock(IDeltaChunk idc, EntityPlayer player, Coord at, byte sideHit) {
+        if (at.getBlock() != Core.registry.colossal_block) return false;
+        int md = at.getMd();
+        if (md == ColossalBlock.MD_MASK_CRACKED || md == ColossalBlock.MD_BODY_CRACKED) {
+            crackBroken();
+        }
+        return false;
+    }
+
+    @Override
+    public boolean hitBlock(IDeltaChunk idc, EntityPlayer player, Coord at, byte sideHit) {
+        return false;
+    }
+
+    @Override
+    public boolean useBlock(IDeltaChunk idc, EntityPlayer player, Coord at, byte sideHit) {
+        return false;
     }
 }

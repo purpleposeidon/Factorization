@@ -1,5 +1,6 @@
 package factorization.fzds;
 
+import factorization.fzds.interfaces.*;
 import factorization.util.PlayerUtil;
 import factorization.util.SpaceUtil;
 import io.netty.buffer.ByteBuf;
@@ -37,10 +38,6 @@ import cpw.mods.fml.common.network.NetworkRegistry;
 import cpw.mods.fml.common.network.internal.FMLProxyPacket;
 import factorization.api.Coord;
 import factorization.api.Quaternion;
-import factorization.fzds.interfaces.DeltaCapability;
-import factorization.fzds.interfaces.IDeltaChunk;
-import factorization.fzds.interfaces.IFzdsShenanigans;
-import factorization.fzds.interfaces.Interpolation;
 import factorization.shared.Core;
 
 
@@ -171,7 +168,7 @@ public class HammerNet {
                 return;
             }
         }
-        
+
         if (type == HammerNetType.digFinish || type == HammerNetType.digProgress || type == HammerNetType.digStart) {
             if (!idc.can(DeltaCapability.BLOCK_MINE)) {
                 Core.logWarning("%s tried to mine IDC that doesn't permit that %s", player, idc);
@@ -216,9 +213,7 @@ public class HammerNet {
             float vecX = dis.readFloat();
             float vecY = dis.readFloat();
             float vecZ = dis.readFloat();
-            World world = idc.getCorner().w;
-            Block block = world.getBlock(x, y, z);
-            block.onBlockClicked(world, x, y, z, player);
+            leftClickBlock(idc, player, dis, x, y, z, sideHit, vecX, vecY, vecZ);
         } else {
             Core.logWarning("%s tried to send an unknown packet %s to IDC %s", player, type, idc);
         }
@@ -254,6 +249,7 @@ public class HammerNet {
         Coord at = new Coord(DeltaChunk.getServerShadowWorld(), x, y, z);
         if (at.isAir()) return;
         if (!blockInReach(idc, player, at)) return;
+        if (idc.getController().breakBlock(idc, player, at, sideHit)) return;
         World origWorld = player.theItemInWorldManager.theWorld;
         player.theItemInWorldManager.theWorld = DeltaChunk.getServerShadowWorld();
         try {
@@ -268,11 +264,22 @@ public class HammerNet {
         Coord at = new Coord(DeltaChunk.getServerShadowWorld(), x, y, z);
         if (at.isAir()) return;
         if (!blockInReach(idc, player, at)) return;
+        if (idc.getController().hitBlock(idc, player, at, sideHit)) return;
         Block block = at.getBlock();
         WorldServer shadow_world = (WorldServer) DeltaChunk.getServerShadowWorld();
         InteractionLiason liason = getLiason(shadow_world, player);
         block.onBlockClicked(shadow_world, x, y, z, liason);
         liason.finishUsingLiason();
+    }
+
+    void leftClickBlock(IDeltaChunk idc, EntityPlayerMP player, ByteBuf dis, int x, int y, int z, byte sideHit, float vecX, float vecY, float vecZ) {
+        Coord at = new Coord(DeltaChunk.getServerShadowWorld(), x, y, z);
+        if (at.isAir()) return;
+        if (!blockInReach(idc, player, at)) return;
+        if (idc.getController().hitBlock(idc, player, at, sideHit)) return;
+        // TODO: Liason?
+        Block block = at.getBlock();
+        block.onBlockClicked(at.w, x, y, z, player);
     }
     
     InteractionLiason getLiason(WorldServer shadowWorld, EntityPlayer real_player) {
@@ -348,6 +355,7 @@ public class HammerNet {
         Coord at = new Coord(shadowWorld, x, y, z);
         if (at.isAir()) return;
         if (!blockInReach(idc, real_player, at)) return;
+        if (idc.getController().useBlock(idc, real_player, at, sideHit)) return;
         
         InteractionLiason liason = getLiason(shadowWorld, real_player);
         try {

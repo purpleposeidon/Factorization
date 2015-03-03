@@ -165,9 +165,7 @@ abstract public class FactorizationBlockRender implements ICoord {
             rb.enableAO = origAO;
         } else {
             GL11.glDisable(GL11.GL_CULL_FACE);
-            //GL11.glDisable(GL11.GL_LIGHTING);
             block.renderForInventory(rb);
-            //GL11.glEnable(GL11.GL_LIGHTING);
             GL11.glEnable(GL11.GL_CULL_FACE);
         }
     }

@@ -178,7 +178,6 @@ public abstract class IDeltaChunk extends EntityFz {
                 ROTATE,
                 DRAG,
                 REMOVE_EXTERIOR_ENTITIES,
-                TRANSPARENT,
                 INTERACT,
                 BLOCK_PLACE,
                 BLOCK_MINE,
@@ -250,19 +249,20 @@ public abstract class IDeltaChunk extends EntityFz {
         return ret;
     }
     
-    private Object controller;
+    private IDCController controller;
     
     /**
      * @return the object set by setController. May be null.
      */
-    public Object getController() {
+    public IDCController getController() {
+        if (controller == null) return IDCController.default_controller;
         return controller;
     }
     
     /**
      * @param controller The controller responsible for this IDC. It is the responsibility of the controller to set this value when deserialized.
      */
-    public void setController(Object controller) {
+    public void setController(IDCController controller) {
         this.controller = controller;
     }
 

@@ -1,5 +1,8 @@
 package factorization.common;
 
+import factorization.mechanisms.BlockRenderHinge;
+import factorization.mechanisms.TileEntityHinge;
+import factorization.mechanisms.TileEntityHingeRenderer;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.audio.ISound;
 import net.minecraft.client.audio.PositionedSoundRecord;
@@ -175,12 +178,12 @@ public class FactorizationClientProxy extends FactorizationProxy {
         ClientRegistry.bindTileEntitySpecialRenderer(clazz, r);
     }
 
+    @SuppressWarnings("ResultOfObjectAllocationIgnored")
     @Override
     public void registerRenderers() {
         setTileEntityRendererDispatcher(TileEntityDayBarrel.class, new TileEntityDayBarrelRenderer());
         setTileEntityRendererDispatcher(TileEntityGreenware.class, new TileEntityGreenwareRender());
         if (FzConfig.renderTEs) {
-            // This is entirely Azanor's fault.
             setTileEntityRendererDispatcher(TileEntityHeater.class, new TileEntityHeaterRenderer());
             setTileEntityRendererDispatcher(TileEntityMixer.class, new TileEntityMixerRenderer());
             setTileEntityRendererDispatcher(TileEntityCrystallizer.class, new TileEntityCrystallizerRender());
@@ -190,7 +193,7 @@ public class FactorizationClientProxy extends FactorizationProxy {
             setTileEntityRendererDispatcher(SocketScissors.class, new TileEntitySocketRenderer());
             setTileEntityRendererDispatcher(SocketLacerator.class, new TileEntitySocketRenderer());
             setTileEntityRendererDispatcher(SocketFanturpeller.class, new TileEntitySocketRenderer());
-            // End section that is azanor's fault
+            setTileEntityRendererDispatcher(TileEntityHinge.class, new TileEntityHingeRenderer());
         }
 
         RenderingRegistry.registerEntityRenderingHandler(TileEntityWrathLamp.RelightTask.class, new EmptyRender());
@@ -213,6 +216,7 @@ public class FactorizationClientProxy extends FactorizationProxy {
         new BlockRenderGreenware().setup();
         //NORELEASE new BlockRenderRocketEngine();
         new BlockRenderServoRail();
+        new BlockRenderHinge();
         for (FactoryType ft : new FactoryType[] {
                 FactoryType.SOCKET_EMPTY,
                 FactoryType.SOCKET_LACERATOR,

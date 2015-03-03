@@ -131,7 +131,7 @@ public class ServoMotor extends Entity implements IEntityAdditionalSpawnData, IE
         final byte invSize = data.as(Share.VISIBLE, "inv#").putByte((byte) inv.length);
         resizeInventory(invSize);
         for (int i = 0; i < invSize; i++) {
-            ItemStack is = inv[i] == null ? EMPTY_ITEM : inv[i];
+            ItemStack is = NetworkFactorization.nullItem(inv[i]);
             is = data.as(Share.VISIBLE, "inv" + i).putItemStack(is);
             if (is == null) {
                 inv[i] = null;
@@ -600,8 +600,6 @@ public class ServoMotor extends Entity implements IEntityAdditionalSpawnData, IE
     public int getInventoryStackLimit() {
         return 64;
     }
-
-    private static final ItemStack EMPTY_ITEM = DataUtil.NULL_ITEM;
     
     @Override
     public void markDirty() {
@@ -611,7 +609,7 @@ public class ServoMotor extends Entity implements IEntityAdditionalSpawnData, IE
                 continue;
             }
             toSend.add(i);
-            toSend.add(inv[i] == null ? EMPTY_ITEM : inv[i]);
+            toSend.add(NetworkFactorization.nullItem(inv[i]));
             inv_last_sent[i] = inv[i];
         }
         if (toSend.isEmpty()) {
