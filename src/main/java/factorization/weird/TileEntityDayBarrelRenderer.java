@@ -157,8 +157,11 @@ public class TileEntityDayBarrelRenderer extends TileEntitySpecialRenderer {
         "89*+",
         "i!  " // 'i' stands in for ∞, '!' stands in for '!!'
     };
+
+    boolean disableText = Boolean.parseBoolean(System.getProperty("fz.barrel.disableText", "false")); // NORELEASE: Ask SoundLogic how this worked out
     
     boolean renderItemCount(ItemStack item, TileEntityDayBarrel barrel) {
+        if (disableText) return false;
         final String t = getCountLabel(item, barrel);
         if (t.isEmpty()) {
             return false;
