@@ -1,3 +1,6 @@
+0.8.89
+  The enormous scissors can shear leaves again
+
 0.8.88.8.8888g
   Compat bugfix: Mapwriter doesn't open the wrong dimension anymore
   Compat bugfix: Don't crash when RFTools generates a dimension

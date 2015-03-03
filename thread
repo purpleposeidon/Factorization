@@ -26,6 +26,7 @@ First, you must find the Lost Treasure Map. It was last seen near diamond ore. T
 The Logic Matrix Programmer can then be used in the recipe below to create the Factorization Manual, which can teach you everything worth knowing!
 [img]http://i.imgur.com/3GMNpTx.png[/img]
 
+Or [url=http://purpleposeidon.github.io/FzDocs/]here's an outside-of-Minecraft copy of the manual[/url].
 
 [header=2][anchor=DOWNLOAD]Download[/anchor][/header]
 
@@ -34,6 +35,14 @@ See the License? Read the License. Love the License? Let the License be your gui
 
 You can encourage further development of Factorization through my [url="http://www.patreon.com/neptunepink"][img]http://i.imgur.com/srYEtgV.png[/img]Patreon[/url].
 
+Factorization 1.7.10-0.8.88.8.8888g
+[url="http://adf.ly/2137658/https://www.mediafire.com/?th3f72w2zl82p10"]adfly + MediaFire[/url], or
+[url="http://adf.ly/2137658/http://dl.dropbox.com/u/76265666/old/Factorization-1.7.10-0.8.88.8.8888g.jar"]adfly + DropBox[/url]
+Built on 2015-02-23 against Minecraft Forge 1.7.10-10.13.2.1230
+[url="http://dl.dropbox.com/u/76265666/changelogs/Changelog-1.7.10-0.8.88.8.8888g.txt"]Changelog[/url]
+[url="http://dl.dropbox.com/u/76265666/old/Factorization-1.7.10-0.8.88.8.8888g-dev.jar"]Deobf for Mod Authors[/url]
+
+[spoiler]
 Factorization 1.7.10-0.8.88.8.8888f
 [url="http://adf.ly/2137658/https://www.mediafire.com/?kbdyg13lbjny71c"]adfly + MediaFire[/url], or
 [url="http://adf.ly/2137658/http://dl.dropbox.com/u/76265666/old/Factorization-1.7.10-0.8.88.8.8888f.jar"]adfly + DropBox[/url]
@@ -41,7 +50,6 @@ Built on 2015-02-20 against Minecraft Forge 1.7.10-10.13.2.1230
 [url="http://dl.dropbox.com/u/76265666/changelogs/Changelog-1.7.10-0.8.88.8.8888f.txt"]Changelog[/url]
 [url="http://dl.dropbox.com/u/76265666/old/Factorization-1.7.10-0.8.88.8.8888f-dev.jar"]Deobf for Mod Authors[/url]
 
-[spoiler]
 Factorization 1.7.10-0.8.88.8.8888e
 [url="http://adf.ly/2137658/https://www.mediafire.com/?x6v7xfqpqk714r1"]adfly + MediaFire[/url], or
 [url="http://adf.ly/2137658/http://dl.dropbox.com/u/76265666/old/Factorization-1.7.10-0.8.88.8.8888e.jar"]adfly + DropBox[/url]
@@ -104,18 +112,19 @@ If something seems like it should be easier than it is, let me know; I tend to h
 
 [header=2][anchor=LICENSE]License[/anchor][/header][spoiler]
 [pre]
-This is the "Post Something Interesting License", 2nd revision.
+This is the "[b]Post Something Interesting License[/b]", 3rd revision.
 
-[u]All redistribution permissions granted prior to Feb 16, 2015 by any means other than the PSIL do not apply to further updates of Factorization.[/u]
+[b]All distribution permissions granted prior to Feb 16, 2015 by any means other than the PSIL do not apply to further updates of Factorization.[/b]
 
-Factorization may be downloaded and copied as much as you like for personal use. It may be decompiled for the purposes of education, interoperability, and/or security.
+Factorization may be downloaded and copied as much as you like for personal use. It may be decompiled for the purposes of education, interoperability, bug-fixing, and/or security.
 
-[b]Factorization may not be distributed in any way[/b], [i]unless one[/i] of the following lettered conditions are met:
+[b]You may not distribute Factorization in any way[/b], [i]unless each act of distribution satisfies [u]one[/u] of these conditions[/i]:
 A. It is being distributed as part of a mod pack for a specific private Minecraft server, and the mod pack is inaccessible to the public.
 B. It is being transferred privately between mod developers solely for the purposes of bug-fixing or compatibility.
 C. It is being distributed to a modpack from a modpack platform where:
    1) the modpack is hosted on that platform
-   2) AND the modpack has permission to distribute Factorization.
+   2) AND the modpack has permission to distribute Factorization
+   3) AND the modpack platform is not otherwise distributing Factorization.
 D. It is being distributed as part of a public mod pack, where:
    1) A post has been made to either: the Factorization Minecraft Forum thread, or the #factorization IRC channel on irc.esper.net
    2) AND said post demonstrates a usage of Factorization, such that it is either:
@@ -125,17 +134,22 @@ D. It is being distributed as part of a public mod pack, where:
    3) AND said post makes no mention, hint, or reference to this license, or to licensing, or to mod packs.
    4) AND the mod pack has a publicly accessible list of the mods used in that pack, and that list must:
         • include a link to the Factorization forum thread
-        • AND a link to said post if it is on MCF, or a link to a log if on IRC.
+        • AND a link to said post if it is on MCF, or a link to the chat log of the post if it is on IRC.
    5) AND said post is not shared with any other modpack.
+E. It is being distributed as part of a source code repository for the purpose of mod development, where the Factorization being distributed is a deobf release.
 
 
 This license does not apply to certain other works included in Factorization as specified by CREDITS.txt in the jar file.
 
-End of License.
+End of license text.
 [/pre]
 
 [list]
-  [*]Note that the license doesn't apply retroactively if you've already downloaded the mod under a different license. That would be absurd.[/*]
+  [*]The modpack distributor doesn't actually personally have to make the post. However, it would be Inadvisable to use some unrelated person's post.[/*]
+  [*]If your favorite modpack is removing or not updating FZ as a result of the license's cataclysmically onerous requirements, you can make a post for their behalf. (But a link to that post from the pack is still required.)[/*]
+  [*]"Novel" is more for "not the same thing being posted over and over" than "absolutely certain that it has never before been seen in the history of time". If you secretly suspect I might not think it's novel, then perhaps it isn't.[/*]
+  [*]If you're writing a script to download it through adfly with minimal intervention, fine, whatever, if you really want to try that hard, go ahead. But wouldn't it be easier & funner to just... post something interesting?[/*]
+  [*]Note that the license doesn't apply retroactively if you've already downloaded the mod under a different license/permission. That would be absurd.[/*]
   [*]Note that sending me PMs does not count as a posting to this thread.[/*]
   [*]Note that "installers" are not allowed.[/*]
   [*]Note that "hi i am using factorisation in my modpack kthxbai" is not a post that gives you license to distribute Factorization. Did you just make that post? I anticipate that there will be a great momentum of that. Read the license. Are you covered under condition A?[/*]
@@ -161,10 +175,13 @@ You can contribute localizations at the [url="https://github.com/purpleposeidon/
 [/list]
 
 [header=2][anchor=CREDITS]Credits[/anchor][/header]
-FZ includes uses Creative Commons sound assets from freesound.org, including:
+FZ includes uses Creative Commons sound assets, including:
 [list]
   [*][url=http://www.freesound.org/people/digifishmusic/sounds/66417/]"Old Metal", by digifishmusic[/url]. Unmodified. [url=http://creativecommons.org/licenses/by/3.0/]CC-BY[/url].[/*]
   [*][url=http://www.freesound.org/people/sandyrb/sounds/95078/]"THE CRASH", by sandyrb[/url]. Cropped and combined with other work. [url=http://creativecommons.org/licenses/by/3.0/]CC-BY[/url][/*]
   [*][url=http://www.freesound.org/people/mystiscool/sounds/7141/]"Avalanche", by mystiscool[/url]. Cropped and combined with other work. [url=http://creativecommons.org/licenses/by/3.0/]CC-BY[/url][/*]
   [*][url=http://www.freesound.org/people/suonho/sounds/56364/]"Ambienta Soundtrack: Crystal Airlines", by suonho[/url]. Cropped and filtered. [url=http://creativecommons.org/licenses/by/3.0/]CC-BY[/url][/*]
 [/list]
+
+[header=2][anchor=HAMMER]Hammer[/anchor][/header]
+Hammer (or FZDS, for FactoriZation Dimensional Slices) is a WIP engine upgrade for Minecraft that gives it the ability to move and rotate chunks arbitrarily. 

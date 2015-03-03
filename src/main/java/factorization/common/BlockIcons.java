@@ -75,6 +75,8 @@ public class BlockIcons {
     public static IIcon socket$corkscrew;
     public static IIcon socket$mini_piston;
 
+    public static IIcon mechanism$hinge_bottom, mechanism$hinge_side, mechanism$hinge_uvs;
+
     
     public static IIcon utiligoo$invasion;
     

@@ -10,10 +10,10 @@ public class BlockRenderHinge extends FactorizationBlockRender {
     @Override
     public boolean render(RenderBlocks rb) {
         BlockRenderHelper block = BlockRenderHelper.instance;
+        block.useTexture(Blocks.iron_block.getIcon(0, 0));
         if (world_mode) {
             TileEntityHinge hinge = (TileEntityHinge) te;
             hinge.setBlockBounds(block);
-            block.useTexture(Blocks.planks.getIcon(0, 0));
             block.render(rb, getCoord());
         } else {
             getFactoryType().getRepresentative().setBlockBounds(block);
