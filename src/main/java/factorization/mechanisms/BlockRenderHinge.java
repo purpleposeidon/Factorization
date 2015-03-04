@@ -13,11 +13,14 @@ public class BlockRenderHinge extends FactorizationBlockRender {
         block.useTexture(Blocks.iron_block.getIcon(0, 0));
         if (world_mode) {
             TileEntityHinge hinge = (TileEntityHinge) te;
-            hinge.setBlockBounds(block);
+            hinge.setSlabBounds(block);
             block.render(rb, getCoord());
         } else {
             getFactoryType().getRepresentative().setBlockBounds(block);
             block.renderForInventory(rb);
+            TileEntityHinge hinge = (TileEntityHinge) FactoryType.HINGE.getRepresentative();
+            hinge.ticks = 20;
+            hinge.renderTesr(0);
         }
         return true;
     }

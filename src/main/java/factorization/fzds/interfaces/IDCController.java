@@ -8,6 +8,7 @@ public interface IDCController {
     boolean breakBlock(IDeltaChunk idc, EntityPlayer player, Coord at, byte sideHit);
     boolean hitBlock(IDeltaChunk idc, EntityPlayer player, Coord at, byte sideHit);
     boolean useBlock(IDeltaChunk idc, EntityPlayer player, Coord at, byte sideHit);
+    void idcDied(IDeltaChunk idc);
 
     static final IDCController default_controller = new IDCController() {
         // Has to be a do-nothing, 'cause if it were a do-something then something might get overridden.
@@ -15,5 +16,6 @@ public interface IDCController {
         @Override public boolean breakBlock(IDeltaChunk idc, EntityPlayer player, Coord at, byte sideHit) { return false; }
         @Override public boolean hitBlock(IDeltaChunk idc, EntityPlayer player, Coord at, byte sideHit) { return false; }
         @Override public boolean useBlock(IDeltaChunk idc, EntityPlayer player, Coord at, byte sideHit) { return false; }
+        @Override public void idcDied(IDeltaChunk idc) { }
     };
 }

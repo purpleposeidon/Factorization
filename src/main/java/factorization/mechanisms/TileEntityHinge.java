@@ -45,15 +45,7 @@ import static org.lwjgl.opengl.GL11.glEnable;
 
 public class TileEntityHinge extends TileEntityCommon implements IDCController {
     FzOrientation facing = FzOrientation.FACE_EAST_POINT_DOWN;
-    EntityReference<IDeltaChunk> idcRef;
-
-    @Override
-    public void setWorldObj(World world) {
-        super.setWorldObj(world);
-        if (idcRef == null) {
-            idcRef = new EntityReference<IDeltaChunk>(world);
-        }
-    }
+    final EntityReference<IDeltaChunk> idcRef = new EntityReference<IDeltaChunk>();
 
     @Override
     public FactoryType getFactoryType() {
@@ -66,27 +58,49 @@ public class TileEntityHinge extends TileEntityCommon implements IDCController {
     }
 
     @Override
+    public void setWorldObj(World w) {
+        super.setWorldObj(w);
+        idcRef.setWorld(w);
+    }
+
+    @Override
     public void onPlacedBy(EntityPlayer player, ItemStack is, int side, float hitX, float hitY, float hitZ) {
         facing = SpaceUtil.getOrientation(player, side, hitX, hitY, hitZ);
         initHinge();
     }
 
     @Override
-    public void onNeighborTileChanged(int tilex, int tiley, int tilez) {
+    public void neighborChanged() {
         initHinge();
     }
 
     private void initHinge() {
-        if (idcRef != null) return;
-        Coord target = getCoord().add(facing.facing);
+        if (idcRef.trackedAndAlive()) {
+            return;
+        }
+        final Coord target = getCoord().add(facing.facing);
         if (target.isReplacable()) return;
         DeltaCoord size = new DeltaCoord(16, 16, 16);
-        IDeltaChunk idc = DeltaChunk.allocateSlice(this.worldObj, MechanismsFeature.deltachunk_channel, size);
+        Coord min = getCoord().add(size);
+        Coord max = getCoord().add(size.reverse());
+        IDeltaChunk idc = DeltaChunk.makeSlice(MechanismsFeature.deltachunk_channel, min, max, new DeltaChunk.AreaMap() {
+            @Override
+            public void fillDse(DeltaChunk.DseDestination destination) {
+                destination.include(target);
+            }
+        }, true);
+
         idc.loadUsualCapabilities();
         idc.permit(DeltaCapability.COLLIDE_WITH_WORLD);
+        idc.permit(DeltaCapability.DIE_WHEN_EMPTY);
         Coord dest = idc.getCenter();
         TransferLib.move(target, dest, true, true);
         DeltaCoord hingePoint = dest.difference(idc.getCorner());
+        worldObj.spawnEntityInWorld(idc);
+        idc.setController(this);
+        idcRef.trackEntity(idc);
+        markDirty();
+        getCoord().syncTE();
     }
 
     @Override
@@ -97,8 +111,7 @@ public class TileEntityHinge extends TileEntityCommon implements IDCController {
         }
     }
 
-    @Override
-    public void setBlockBounds(Block b) {
+    void setSlabBounds(Block b) {
         float d = 0.5F;
         switch (facing.facing) {
             case DOWN:
@@ -124,38 +137,53 @@ public class TileEntityHinge extends TileEntityCommon implements IDCController {
     }
 
     @Override public boolean placeBlock(IDeltaChunk idc, EntityPlayer player, Coord at, byte sideHit) { return false; }
-    @Override public boolean breakBlock(IDeltaChunk idc, EntityPlayer player, Coord at, byte sideHit) { return false; }
+    @Override public boolean breakBlock(IDeltaChunk idc, EntityPlayer player, Coord at, byte sideHit) { return hitBlock(idc, player, at, sideHit); }
     @Override public boolean useBlock(IDeltaChunk idc, EntityPlayer player, Coord at, byte sideHit) { return false; }
 
     @Override
     public boolean hitBlock(IDeltaChunk idc, EntityPlayer player, Coord at, byte sideHit) {
         if (!player.isSprinting()) return false;
-        return false;
+        return true;
+    }
+
+    @Override
+    public void idcDied(IDeltaChunk idc) {
+        idcRef.trackEntity(null);
+        getCoord().syncTE();
     }
 
     IDeltaChunk getIdc() {
-        if (idcRef == null) return null;
         return idcRef.getEntity();
     }
 
+    @Override
+    public boolean canUpdate() {
+        if (idcRef.trackingEntity() && !idcRef.entityFound()) {
+            IDeltaChunk idc = idcRef.getEntity();
+            if (idc != null) {
+                idc.setController(this);
+            }
+        }
+        return worldObj.isRemote;
+    }
+
     @SideOnly(Side.CLIENT)
-    private long ticks;
+    long ticks;
 
     @SideOnly(Side.CLIENT)
     @Override
     public void updateEntity() {
         // Client-only!
+        if (idcRef.trackingEntity()) {
+            ticks = 0;
+            return;
+        }
         ticks++;
         MovingObjectPosition mop = Minecraft.getMinecraft().getObjectMouseOver();
         if (mop == null || mop.typeOfHit != MovingObjectPosition.MovingObjectType.BLOCK) return;
         if (mop.blockX == xCoord && mop.blockY == yCoord && mop.blockZ == zCoord) {
             ticks = 0;
         }
-    }
-
-    @Override
-    public boolean canUpdate() {
-        return worldObj.isRemote;
     }
 
     @SideOnly(Side.CLIENT)
@@ -170,13 +198,15 @@ public class TileEntityHinge extends TileEntityCommon implements IDCController {
 
     @SideOnly(Side.CLIENT)
     public void renderTesr(float partial) {
-        IDeltaChunk idc = getIdc();
         BlockRenderHelper block = BlockRenderHelper.instance;
 
         setupHingeRotation2();
 
-        if (idc != null) {
-            idc.getRotation().glRotate();
+        if (idcRef.trackingEntity()) {
+            IDeltaChunk idc = getIdc();
+            if (idc != null) {
+                idc.getRotation().glRotate();
+            }
         } else {
             float nowish = ticks + partial;
             double now = (Math.cos(nowish / 24.0) - 1) * -6;

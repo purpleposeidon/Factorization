@@ -483,4 +483,7 @@ public class ColossusController extends EntityFz implements IBossDisplayData, ID
     public boolean useBlock(IDeltaChunk idc, EntityPlayer player, Coord at, byte sideHit) {
         return false;
     }
+
+    @Override
+    public void idcDied(IDeltaChunk idc) { }
 }
