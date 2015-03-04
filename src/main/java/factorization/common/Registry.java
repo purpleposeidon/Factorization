@@ -105,7 +105,7 @@ public class Registry {
 
     public ItemStack servorail_item;
     public ItemStack empty_socket_item, socket_lacerator, socket_robot_hand, socket_shifter;
-    public ItemStack hinge, anchor;
+    //public ItemStack hinge, anchor;
     
     public ItemStack stamper_item, packager_item,
             daybarrel_item_hidden,
@@ -294,8 +294,8 @@ public class Registry {
         if (FzConfig.enable_rocketry) {
             rocket_engine_item_hidden = FactoryType.ROCKETENGINE.itemStack();
         }
-        hinge = FactoryType.HINGE.itemStack();
-        anchor = FactoryType.ANCHOR.itemStack();
+        //hinge = FactoryType.HINGE.itemStack();
+        //anchor = FactoryType.ANCHOR.itemStack();
 
         //BlockResource stuff
         silver_ore_item = ResourceType.SILVERORE.itemStack("Silver Ore");
