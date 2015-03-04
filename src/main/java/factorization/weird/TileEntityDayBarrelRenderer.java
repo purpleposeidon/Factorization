@@ -1,6 +1,16 @@
 package factorization.weird;
 
+import factorization.api.Coord;
+import factorization.api.FzOrientation;
+import factorization.api.Quaternion;
+import factorization.common.BlockIcons;
+import factorization.common.FactoryType;
+import factorization.common.FzConfig;
+import factorization.common.ItemIcons;
+import factorization.shared.Core;
+import factorization.shared.NetworkFactorization;
 import factorization.util.RenderUtil;
+import factorization.weird.TileEntityDayBarrel.Type;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.renderer.GLAllocation;
@@ -12,24 +22,13 @@ import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
 import net.minecraft.client.resources.IResourceManager;
 import net.minecraft.client.settings.GameSettings;
 import net.minecraft.entity.item.EntityItem;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.IIcon;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.common.util.ForgeDirection;
-
 import org.lwjgl.opengl.GL11;
-
-import factorization.api.Coord;
-import factorization.api.FzOrientation;
-import factorization.api.Quaternion;
-import factorization.common.BlockIcons;
-import factorization.common.FactoryType;
-import factorization.common.FzConfig;
-import factorization.common.ItemIcons;
-import factorization.shared.Core;
-import factorization.shared.NetworkFactorization;
-import factorization.weird.TileEntityDayBarrel.Type;
 
 public class TileEntityDayBarrelRenderer extends TileEntitySpecialRenderer {
 
@@ -91,10 +90,18 @@ public class TileEntityDayBarrelRenderer extends TileEntitySpecialRenderer {
         Core.profileStart("barrel");
         GL11.glPushMatrix();
         GL11.glTranslated(x, y, z);
-        
-        
+
         if (FzConfig.render_barrel_use_displaylists && barrel.type != Type.HOPPING && barrel.should_use_display_list && barrel != FactoryType.DAYBARREL.getRepresentative()) {
             if (barrel.display_list == -1) {
+                Item item = is.getItem();
+                boolean crazyItem = item.hasEffect(is, 0) && item.requiresMultipleRenderPasses();
+                if (crazyItem) {
+                    // FIXME: If a potion-barrel draws before a nether-star barrel, shit goes wonky
+                    // There may be other situations where it pops up.
+                    barrel.should_use_display_list = false;
+                    doDraw(barrel, is);
+                    return;
+                }
                 RenderUtil.checkGLError("FZ -- before barrel display list update. Someone left us a mess!");
                 if (barrel.display_list == -1) {
                     barrel.display_list = GLAllocation.generateDisplayLists(1);
@@ -157,11 +164,8 @@ public class TileEntityDayBarrelRenderer extends TileEntitySpecialRenderer {
         "89*+",
         "i!  " // 'i' stands in for ∞, '!' stands in for '!!'
     };
-
-    boolean disableText = Boolean.parseBoolean(System.getProperty("fz.barrel.disableText", "false")); // NORELEASE: Ask SoundLogic how this worked out
     
     boolean renderItemCount(ItemStack item, TileEntityDayBarrel barrel) {
-        if (disableText) return false;
         final String t = getCountLabel(item, barrel);
         if (t.isEmpty()) {
             return false;
