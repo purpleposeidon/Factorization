@@ -1,6 +1,7 @@
 package factorization.fzds;
 
 import net.minecraft.util.ChunkCoordinates;
+import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.chunk.IChunkProvider;
 import net.minecraft.world.WorldProvider;
 
@@ -59,5 +60,25 @@ public class HammerWorldProvider extends WorldProvider {
     @Override
     public ChunkCoordinates getRandomizedSpawnPoint() {
         return new ChunkCoordinates(0, 0, 0);
+    }
+
+    @Override
+    public boolean canBlockFreeze(int x, int y, int z, boolean byWater) {
+        return false;
+    }
+
+    @Override
+    public boolean canSnowAt(int x, int y, int z, boolean checkLight) {
+        return false;
+    }
+
+    @Override
+    public boolean canDoRainSnowIce(Chunk chunk) {
+        return false;
+    }
+
+    @Override
+    public boolean canDoLightning(Chunk chunk) {
+        return false;
     }
 }

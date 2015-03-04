@@ -31,6 +31,7 @@ public class HammerChunkProvider implements IChunkProvider {
         chunk.generateSkylightMap();
         byte[] biomes = chunk.getBiomeArray();
         Arrays.fill(biomes, (byte) BiomeGenBase.plains.biomeID);
+        chunk.isTerrainPopulated = true;
         return chunk;
     }
 
