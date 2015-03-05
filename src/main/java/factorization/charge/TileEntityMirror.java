@@ -3,6 +3,7 @@ package factorization.charge;
 import java.io.IOException;
 
 import factorization.api.datahelpers.DataHelper;
+import factorization.api.datahelpers.Share;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.block.Block;
 import net.minecraft.entity.player.EntityPlayer;
@@ -48,12 +49,22 @@ public class TileEntityMirror extends TileEntityCommon {
         if (reflection_target == null) {
             reflection_target = getCoord();
         }
-        reflection_target.serialize("target", data);
+        reflection_target = data.as(Share.VISIBLE, "target").put(reflection_target);
         if (reflection_target.equals(getCoord())) {
             reflection_target = null;
+        } else if (data.isReader()) {
+            updateRotation();
         }
     }
-    
+
+    @Override
+    public void setWorldObj(World w) {
+        super.setWorldObj(w);
+        if (reflection_target != null) {
+            reflection_target.w = w;
+        }
+    }
+
     @Override
     public boolean activate(EntityPlayer entityplayer, ForgeDirection side) {
         neighborChanged();
