@@ -188,7 +188,7 @@ public class TileEntityLeydenJar extends TileEntityCommon implements IChargeCond
     @Override
     @SideOnly(Side.CLIENT)
     public IIcon getIcon(ForgeDirection dir) {
-        return BlockIcons.leyden_metal;
+        return BlockIcons.leyden.bottom;
     }
 
     @Override

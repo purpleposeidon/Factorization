@@ -57,7 +57,7 @@ public class BlockRenderLeydenJar extends FactorizationBlockRender {
         }
         
         
-        IIcon leyden_metal = BlockIcons.leyden_metal;
+        IIcon leyden_metal = BlockIcons.leyden.bottom;
         renderCauldron(rb, BlockIcons.leyden, metal_height);
         block.useTextures(null, airAbove ? null : leyden_metal, leyden_metal, leyden_metal, leyden_metal, leyden_metal);
         block.setBlockBounds(post_in, 1F/16F, post_in, 1 - post_in, jarHeight, 1 - post_in);
