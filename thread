@@ -21,7 +21,7 @@ This mod adds minimalist parts for expanding vanilla redstone automation, and ma
 
 [header=2][anchor=START]Getting Started[/anchor][/header]
 
-First, you must find the Lost Treasure Map. It was last seen near diamond ore. Treasure maps are very rare and very fragile, so treat it gently. Right-click the map once, and follow it to find a well-guarded stash somewhere on the surface. This stash will contain a Logic Matrix Programmer, and occasionally a few other useful materials.
+First, you must discover the Lost Treasure Map. It was last seen near diamond ore. Treasure maps are very rare and very fragile, so treat it gently. Right-click the map once, and follow it to find a well-guarded stash somewhere on the surface. This stash will contain a Logic Matrix Programmer, and occasionally a few other useful materials.
 
 The Logic Matrix Programmer can then be used in the recipe below to create the Factorization Manual, which can teach you everything worth knowing!
 [img]http://i.imgur.com/3GMNpTx.png[/img]
@@ -30,11 +30,20 @@ Or [url=http://purpleposeidon.github.io/FzDocs/]here's an outside-of-Minecraft c
 
 [header=2][anchor=DOWNLOAD]Download[/anchor][/header]
 
-[b]The license has changed. Read, understand, and accept the license before downloading.[/b][spoiler]
-See the License? Read the License. Love the License? Let the License be your guide.
+[b]The license has changed; you must post something interesting to make a modpack. Read, understand, and accept the license before downloading.[/b]
 
-You can encourage further development of Factorization through my [url="http://www.patreon.com/neptunepink"][img]http://i.imgur.com/srYEtgV.png[/img]Patreon[/url].
+You can encourage and guide further development of Factorization through my [url="http://www.patreon.com/neptunepink"][img]http://i.imgur.com/srYEtgV.png[/img]Patreon[/url].
 
+[spoiler]
+Factorization 1.7.10-0.8.88.8.8888h
+[url="http://adf.ly/2137658/https://www.mediafire.com/?9lz4lzxm653a52f"]adfly + MediaFire[/url], or
+[url="http://adf.ly/2137658/http://dl.dropbox.com/u/76265666/old/Factorization-1.7.10-0.8.88.8.8888h.jar"]adfly + DropBox[/url]
+Built on 2015-03-04 against Minecraft Forge 1.7.10-10.13.2.1230
+[url="http://dl.dropbox.com/u/76265666/changelogs/Changelog-1.7.10-0.8.88.8.8888h.txt"]Changelog[/url]
+[url="http://dl.dropbox.com/u/76265666/old/Factorization-1.7.10-0.8.88.8.8888h-dev.jar"]Deobf for Mod Authors[/url]
+
+
+[spoiler]
 Factorization 1.7.10-0.8.88.8.8888g
 [url="http://adf.ly/2137658/https://www.mediafire.com/?th3f72w2zl82p10"]adfly + MediaFire[/url], or
 [url="http://adf.ly/2137658/http://dl.dropbox.com/u/76265666/old/Factorization-1.7.10-0.8.88.8.8888g.jar"]adfly + DropBox[/url]
@@ -42,7 +51,6 @@ Built on 2015-02-23 against Minecraft Forge 1.7.10-10.13.2.1230
 [url="http://dl.dropbox.com/u/76265666/changelogs/Changelog-1.7.10-0.8.88.8.8888g.txt"]Changelog[/url]
 [url="http://dl.dropbox.com/u/76265666/old/Factorization-1.7.10-0.8.88.8.8888g-dev.jar"]Deobf for Mod Authors[/url]
 
-[spoiler]
 Factorization 1.7.10-0.8.88.8.8888f
 [url="http://adf.ly/2137658/https://www.mediafire.com/?kbdyg13lbjny71c"]adfly + MediaFire[/url], or
 [url="http://adf.ly/2137658/http://dl.dropbox.com/u/76265666/old/Factorization-1.7.10-0.8.88.8.8888f.jar"]adfly + DropBox[/url]
@@ -71,14 +79,12 @@ Built on 2015-02-16 against Minecraft Forge 1.7.10-10.13.2.1230
 [url="http://dl.dropbox.com/u/76265666/changelogs/Changelog-1.7.10-0.8.88.8.8888c.txt"]Changelog[/url]
 [url="http://dl.dropbox.com/u/76265666/old/Factorization-1.7.10-0.8.88.8.8888c-dev.jar"]Deobf for Mod Authors[/url]
 
-
 Factorization 1.7.10-0.8.88.8.8888b
 [url="http://adf.ly/2137658/https://www.mediafire.com/?z5pgyrpjxdrpljs"]adfly + MediaFire[/url], or
 [url="http://adf.ly/2137658/http://dl.dropbox.com/u/76265666/old/Factorization-1.7.10-0.8.88.8.8888b.jar"]adfly + DropBox[/url]
 Built on 2015-02-16 against Minecraft Forge 1.7.10-10.13.2.1230
 [url="http://dl.dropbox.com/u/76265666/changelogs/Changelog-1.7.10-0.8.88.8.8888b.txt"]Changelog[/url]
 [url="http://dl.dropbox.com/u/76265666/old/Factorization-1.7.10-0.8.88.8.8888b-dev.jar"]Deobf for Mod Authors[/url]
-
 
 Factorization 1.7.10-0.8.88.8.8888a
 [url="http://adf.ly/2137658/https://www.mediafire.com/?2t5bj3utds5inw1"]adfly + MediaFire[/url], or
@@ -144,20 +150,19 @@ This license does not apply to certain other works included in Factorization as 
 End of license text.
 [/pre]
 
+License hints:
 [list]
   [*]The modpack distributor doesn't actually personally have to make the post. However, it would be Inadvisable to use some unrelated person's post.[/*]
   [*]If your favorite modpack is removing or not updating FZ as a result of the license's cataclysmically onerous requirements, you can make a post for their behalf. (But a link to that post from the pack is still required.)[/*]
   [*]"Novel" is more for "not the same thing being posted over and over" than "absolutely certain that it has never before been seen in the history of time". If you secretly suspect I might not think it's novel, then perhaps it isn't.[/*]
   [*]If you're writing a script to download it through adfly with minimal intervention, fine, whatever, if you really want to try that hard, go ahead. But wouldn't it be easier & funner to just... post something interesting?[/*]
-  [*]Note that the license doesn't apply retroactively if you've already downloaded the mod under a different license/permission. That would be absurd.[/*]
-  [*]Note that sending me PMs does not count as a posting to this thread.[/*]
+  [*]The license doesn't apply retroactively if you've already downloaded the mod under a different license/permission. That would be absurd. However, if you downloaded Factorization after the PSIL has been posted, then the PSIL applies.[/*]
+  [*]Sending me PMs does not count as a posting to this thread.[/*]
   [*]Note that "installers" are not allowed.[/*]
-  [*]Note that "hi i am using factorisation in my modpack kthxbai" is not a post that gives you license to distribute Factorization. Did you just make that post? I anticipate that there will be a great momentum of that. Read the license. Are you covered under condition A?[/*]
-  [*]Note that modpack platforms are not modpacks, and so can not get umbrella permissions for every modpack ever.[/*]
-  [*]Note that a modpack with a password posted somewhere public counts as being accessible to the public.[/*]
-  [*]And also note that clause D.3 is a thing. Did you read it? Read it again. Here's what it says: "Said post makes no mention, hint, or reference to this license, or to licensing, or to mod packs". If your post says "im posting this for my modpack" then you have not earned permission. And then you should feel embarrassed. And fall into a well of deep shame. But, like, don't go overboard with it, okay? You could probably edit your post if I haven't noticed it yet (but you can never [i]really[/i] be sure that I haven't). If I have noticed it, then you'd best make a new post.[/*]
-  [*]Posts to other sites don't count.[/*]
-  [*]Licensing Discussion Annoys Me And I Will Be Annoyed If Ya'll Discuss It Where I Can See It.[/*]
+  [*]Please do not tell me that you are using FZ in a mod pack, or ask if you can use FZ in a mod pack. This will indicate to me that you did not comprehend the license, and so I will yell at you.[/*]
+  [*]"hi i am using factorisation in my modpack kthxbai" is not a post that gives you license to distribute Factorization. Did you just make that post? I anticipate that there will be a great momentum of that. You do not have permission to use FZ in your mod pack. Read the license. Are you covered under condition A?[/*]
+  [*]A modpack with a password posted somewhere public counts as being accessible to the public.[/*]
+  [*]Clause D.3 is a thing. Did you read it? Read it again. Here's what it says: "Said post makes no mention, hint, or reference to this license, or to licensing, or to mod packs". If your post says "im posting this for my modpack" then you have not earned permission. And then you should feel embarrassed. And fall into a well of deep shame. But, like, don't go overboard with it, okay? You could probably edit your post if I haven't noticed it yet (but you can never [i]really[/i] be sure that I haven't). If I have noticed it, then you'd best make a new post.[/*]
 [/list]
 [/spoiler]
 
@@ -184,4 +189,4 @@ FZ includes uses Creative Commons sound assets, including:
 [/list]
 
 [header=2][anchor=HAMMER]Hammer[/anchor][/header]
-Hammer (or FZDS, for FactoriZation Dimensional Slices) is a WIP engine upgrade for Minecraft that gives it the ability to move and rotate chunks arbitrarily. 
+Hammer (or FZDS, for FactoriZation Dimensional Slices) is a WIP engine upgrade for Minecraft that gives it the ability to move and rotate chunks arbitrarily. It is used to implement the Colossi and the Twisting Block, with more things to come. Unfortunately there are some bugs that happen with Optifine & bukkit/spigot/cauldron right now, and I'm not really able to fix them. However there will also be bugs with other mods, so please let me know about them.

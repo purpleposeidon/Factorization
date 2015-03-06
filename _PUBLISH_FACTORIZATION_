@@ -27,6 +27,8 @@ open("src/main/resources/assets/factorization/lang/en_US.lang").close()
 
 exp = os.path.expanduser
 
+run("./extract_license.py > src/main/resources/LICENSE.txt")
+
 run("rm -f last_fz")
 
 version = open("fzversion").read().strip()

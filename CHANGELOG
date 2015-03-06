@@ -1,6 +1,7 @@
 0.8.88.8.8888h
   Fixed the infamous barrel render bug
-  The enormous scissors can shear leaves again
+  The enormous scissors can shear tall grass again
+  Refactored serialization code. My tests have found no issues, but you should be certain to make a backup just in case!
 
 0.8.88.8.8888g
   Compat bugfix: Mapwriter doesn't open the wrong dimension anymore
