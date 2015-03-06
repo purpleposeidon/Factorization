@@ -314,8 +314,8 @@ public class BlockFactorization extends BlockContainer {
         itemList.add(reg.compression_crafter_item);
 
         //mechanisms
-        //itemList.add(reg.hinge);
-        //itemList.add(reg.anchor);
+        itemList.add(reg.hinge);
+        itemList.add(reg.anchor);
         
         //Barrels
         if (reg.daybarrel != null) {

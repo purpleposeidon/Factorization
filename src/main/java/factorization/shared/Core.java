@@ -1,13 +1,56 @@
 package factorization.shared;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+import factorization.mechanisms.MechanismsFeature;
+import factorization.util.DataUtil;
+import factorization.util.FzUtil;
+import net.minecraft.block.Block;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.texture.IIconRegister;
+import net.minecraft.client.renderer.texture.TextureManager;
+import net.minecraft.command.ICommandSender;
+import net.minecraft.creativetab.CreativeTabs;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.init.Blocks;
+import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
+import net.minecraft.launchwrapper.Launch;
+import net.minecraft.util.ChatComponentText;
+import net.minecraft.util.ChatComponentTranslation;
+import net.minecraft.util.EnumChatFormatting;
+import net.minecraft.util.IIcon;
+import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.StatCollector;
+import net.minecraftforge.common.MinecraftForge;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.Mod;
 import cpw.mods.fml.common.Mod.EventHandler;
 import cpw.mods.fml.common.SidedProxy;
-import cpw.mods.fml.common.event.*;
+import cpw.mods.fml.common.event.FMLInitializationEvent;
+import cpw.mods.fml.common.event.FMLInterModComms;
 import cpw.mods.fml.common.event.FMLInterModComms.IMCMessage;
+import cpw.mods.fml.common.event.FMLMissingMappingsEvent;
 import cpw.mods.fml.common.event.FMLMissingMappingsEvent.Action;
 import cpw.mods.fml.common.event.FMLMissingMappingsEvent.MissingMapping;
+import cpw.mods.fml.common.event.FMLModIdMappingEvent;
+import cpw.mods.fml.common.event.FMLPostInitializationEvent;
+import cpw.mods.fml.common.event.FMLPreInitializationEvent;
+import cpw.mods.fml.common.event.FMLServerStartingEvent;
 import cpw.mods.fml.common.network.NetworkRegistry;
 import cpw.mods.fml.common.registry.EntityRegistry;
 import cpw.mods.fml.common.registry.GameRegistry;
@@ -32,31 +75,7 @@ import factorization.docs.RecipeViewer;
 import factorization.fzds.Hammer;
 import factorization.oreprocessing.FactorizationOreProcessingHandler;
 import factorization.servo.ServoMotor;
-import factorization.util.DataUtil;
-import factorization.util.FzUtil;
 import factorization.wrath.TileEntityWrathLamp;
-import net.minecraft.block.Block;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.texture.IIconRegister;
-import net.minecraft.client.renderer.texture.TextureManager;
-import net.minecraft.command.ICommandSender;
-import net.minecraft.creativetab.CreativeTabs;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.init.Blocks;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.launchwrapper.Launch;
-import net.minecraft.util.*;
-import net.minecraftforge.common.MinecraftForge;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.net.URL;
-import java.util.*;
 
 @Mod(modid = Core.modId, name = Core.name, version = Core.version, acceptedMinecraftVersions = "1.7.10", dependencies = "required-after: " + Hammer.modId)
 public class Core {
@@ -127,7 +146,7 @@ public class Core {
             FMLCommonHandler.instance().bus().register(dd);
         }
 
-        //MechanismsFeature.initialize();
+        MechanismsFeature.initialize();
         
         FzConfig.config.save();
         if (FMLCommonHandler.instance().getSide() == Side.CLIENT) {

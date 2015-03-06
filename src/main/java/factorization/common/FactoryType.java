@@ -1,9 +1,21 @@
 package factorization.common;
 
+import factorization.mechanisms.TileEntityAnchor;
+import factorization.mechanisms.SocketHandCrank;
+import factorization.mechanisms.TileEntityHinge;
+import net.minecraft.item.ItemStack;
 import cpw.mods.fml.common.registry.GameRegistry;
 import factorization.astro.TileEntityRocketEngine;
 import factorization.ceramics.TileEntityGreenware;
-import factorization.charge.*;
+import factorization.charge.InfiniteChargeBlock;
+import factorization.charge.TileEntityBattery;
+import factorization.charge.TileEntityCaliometricBurner;
+import factorization.charge.TileEntityHeater;
+import factorization.charge.TileEntityLeydenJar;
+import factorization.charge.TileEntityMirror;
+import factorization.charge.TileEntitySolarBoiler;
+import factorization.charge.TileEntitySteamTurbine;
+import factorization.charge.TileEntityWire;
 import factorization.crafting.TileEntityCompressionCrafter;
 import factorization.crafting.TileEntityMixer;
 import factorization.crafting.TileEntityPackager;
@@ -16,12 +28,16 @@ import factorization.shared.Core;
 import factorization.shared.TileEntityCommon;
 import factorization.shared.TileEntityExtension;
 import factorization.shared.TileEntityFactorization;
-import factorization.sockets.*;
+import factorization.sockets.SocketBareMotor;
+import factorization.sockets.SocketEmpty;
+import factorization.sockets.SocketLacerator;
+import factorization.sockets.SocketRobotHand;
+import factorization.sockets.SocketScissors;
+import factorization.sockets.SocketShifter;
 import factorization.sockets.fanturpeller.BlowEntities;
 import factorization.sockets.fanturpeller.PumpLiquids;
 import factorization.weird.TileEntityDayBarrel;
 import factorization.wrath.TileEntityWrathLamp;
-import net.minecraft.item.ItemStack;
 
 public enum FactoryType {
     //Traced here is the history of Factorization.
@@ -69,9 +85,9 @@ public enum FactoryType {
     SOCKET_BARE_MOTOR(41, false, SocketBareMotor.class, "fzsock_motor"),
     SOCKET_SCISSORS(42, false, SocketScissors.class, "fzsock_scissors"),
     CREATIVE_CHARGE(43, false, InfiniteChargeBlock.class, "factory_creative_charge"),
-    //HINGE(44, false, TileEntityHinge.class, "factory_hinge"),
-    //ANCHOR(45, false, TileEntityAnchor.class, "factory_anchor"),
-    //SOCKET_HAND_CRANK(46, false, SocketHandCrank.class, "fzsock_hand_crank"),
+    HINGE(44, false, TileEntityHinge.class, "factory_hinge"),
+    ANCHOR(45, false, TileEntityAnchor.class, "factory_anchor"),
+    SOCKET_HAND_CRANK(46, false, SocketHandCrank.class, "fzsock_hand_crank"),
     //SOCKET_POWERED_CRANK(47, true, SocketPoweredCrank.class, "factory_powered_crank"),
 
     POCKETCRAFTGUI(101, true)
