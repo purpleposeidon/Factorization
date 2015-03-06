@@ -41,6 +41,9 @@ public class BlockIcons {
         turbine_top, turbine_bottom, turbine_side,
         leyden_metal, leyden_rim, leyden_glass, leyden_glass_side, leyden_knob,
         caliometric_side, caliometric_top;
+
+    @Directory("charge")
+    public static CauldronTextureset leyden;
     
     @Directory("craft")
     public static BlockIcons.ActivatingMachineIIcon stamper, packager;
@@ -50,11 +53,17 @@ public class BlockIcons {
     
     @Directory("machine")
     public static IIcon
-        cauldron_side, cauldron_top,
         generic_metal,
         grinder_bottom, grinder_top, grinder_side, grinder_bottom_top_edge,
         heater_heat, heater_spiral,
         parasieve_front, parasieve_side, parasieve_back;
+
+    @Directory("machine")
+    public static CauldronTextureset crystallizer, mixer;
+
+    public static class CauldronTextureset extends IIconGroup {
+        public IIcon side, top, bottom;
+    }
     
     @Directory("machine")
     public static SimpleMachine slag_furnace;

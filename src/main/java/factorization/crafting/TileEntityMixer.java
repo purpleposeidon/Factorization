@@ -55,8 +55,9 @@ public class TileEntityMixer extends TileEntityFactorization implements
     @Override
     public IIcon getIcon(ForgeDirection dir) {
         switch (dir) {
-        case UP: return BlockIcons.cauldron_top;
-        default: return BlockIcons.cauldron_side;
+        case UP: return BlockIcons.mixer.top;
+        case DOWN: return BlockIcons.mixer.bottom;
+        default: return BlockIcons.mixer.side;
         }
     }
 

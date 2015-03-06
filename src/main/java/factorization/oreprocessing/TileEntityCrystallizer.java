@@ -29,8 +29,9 @@ public class TileEntityCrystallizer extends TileEntityFactorization {
     @Override
     public IIcon getIcon(ForgeDirection dir) {
         switch (dir) {
-        case UP: return BlockIcons.cauldron_top;
-        default: return BlockIcons.cauldron_side;
+            case UP: return BlockIcons.crystallizer.top;
+            case DOWN: return BlockIcons.crystallizer.bottom;
+            default: return BlockIcons.crystallizer.side;
         }
     }
 

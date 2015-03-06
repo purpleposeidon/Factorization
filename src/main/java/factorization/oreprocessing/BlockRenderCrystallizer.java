@@ -14,7 +14,7 @@ public class BlockRenderCrystallizer extends FactorizationBlockRender {
         int metal = 14, wood = 8 + 16, hollow = 10 + 16;
         float width = 2F / 16F;
         float mheight = 1 - 0;
-        renderCauldron(rb, BlockIcons.cauldron_top, BlockIcons.cauldron_side);
+        renderCauldron(rb, BlockIcons.crystallizer);
 
         float start = 7F / 16F;
         float sheight = 1 - width;

@@ -14,7 +14,7 @@ public class BlockRenderMixer extends FactorizationBlockRender {
         if (world_mode) {
             renderMotor(rb, 1F / 16F);
         }
-        renderCauldron(rb, BlockIcons.cauldron_top, BlockIcons.cauldron_side);
+        renderCauldron(rb, BlockIcons.mixer);
         if (!world_mode) {
             GL11.glPushMatrix();
             GL11.glTranslatef(-0.5F, 0.65F, 0.5F);
