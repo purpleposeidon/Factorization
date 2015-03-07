@@ -486,4 +486,10 @@ public class ColossusController extends EntityFz implements IBossDisplayData, ID
 
     @Override
     public void idcDied(IDeltaChunk idc) { }
+
+    @Override
+    public void beforeUpdate(IDeltaChunk idc) { }
+
+    @Override
+    public void afterUpdate(IDeltaChunk idc) { }
 }

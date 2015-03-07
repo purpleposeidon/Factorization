@@ -1,14 +1,14 @@
 package factorization.fzds.interfaces;
 
-import static factorization.fzds.interfaces.DeltaCapability.*;
-
-import java.util.ArrayList;
-
-import net.minecraft.util.Vec3;
-import net.minecraft.world.World;
 import factorization.api.Coord;
 import factorization.api.Quaternion;
 import factorization.shared.EntityFz;
+import net.minecraft.util.Vec3;
+import net.minecraft.world.World;
+
+import java.util.List;
+
+import static factorization.fzds.interfaces.DeltaCapability.*;
 
 public abstract class IDeltaChunk extends EntityFz {
     //This would be an actual interface, but it needs to extend Entity.
@@ -16,8 +16,9 @@ public abstract class IDeltaChunk extends EntityFz {
     
     /***
      * Sets the parent. The parent can be null. Reparenting probably isn't synchronized, so set it before spawning in the IDC.
-     * Attatches the slice to its parent. When the parent translates & rotates, the child follows, *and* the does the same physics calculations as if it had native motion.
+     * Attatches the slice to its parent. When the parent translates & rotates, the child follows, *and* does the same physics calculations as if it had native motion.
      * The child can rotate independently of the parent.
+     * The child can not translate locally at this time.
      * 
      * @param parent
      * @param jointPositionAtParent Specifies a location to attatch to in the parent's local entity space, relative to parent.getCorner()
@@ -37,38 +38,44 @@ public abstract class IDeltaChunk extends EntityFz {
     
     public abstract Vec3 getParentJoint();
     
-    public abstract ArrayList<IDeltaChunk> getChildren();
+    public abstract List<IDeltaChunk> getChildren();
     
     /***
      * @return the {@link Quaternion} representing the rotation (theta). This is the global rotation.
      */
     public abstract Quaternion getRotation();
+
     /***
      * @return the rotational offset. This is relative to getCorner().
      */
     public abstract Vec3 getRotationalCenterOffset();
+
     /***
      * @return the {@link Quaternion} representing the rotational velocity (omega).
      * 
      * This does not take into account setTargetRotation
      */
     public abstract Quaternion getRotationalVelocity();
+
     /***
      * Sets the rotation (theta), relative to the world. The default Quaternion represents zero rotation.
      * @param r A {@link Quaternion}
      */
     public abstract void setRotation(Quaternion r);
+
     /***
      * Sets the rotational velocity (omega), relative to the world. The default Quaternion represents zero angular velocity.
+     * The IDC's Entity position is the origin of the rotation, and the getRotationalCenterOffset defines the center of mass.
      * @param w A {@link Quaternion}
      */
     public abstract void setRotationalVelocity(Quaternion w);
     
     /**
      * Orders the IDC to move to a target rotation. This will set the rotational velocity to 0.
-     * If setTargetRotation is called before a previous order has completed, the old order will be interrupted.
+     * If setTargetRotation is called before a previous order has completed, the old order will be interrupted,
+     * and rotation will continue to the new order from whatever rotation it was at when interrupted.
      * 
-     * This method causes the DIC to sweep its rotation between its current rotation, and the target rotation.
+     * This method causes the IDC to sweep its rotation between its current rotation, and the target rotation.
      * The target rotation is *NOT* globally relative; it is instead relative to the rotation of its parent.
      * Consider a carousel with a grandfather clock standing on it. The cabinet and the carousel would be represented with 1 IDC,
      * and the hands of the clock would be each represented with an IDC. Let the carousel be still and at its default position,
@@ -93,7 +100,7 @@ public abstract class IDeltaChunk extends EntityFz {
     public abstract int getRemainingRotationTime();
     
     /**
-     * Interrupts the rotation order. The rotation will remain at wherever it was when this method is called.
+     * Interrupts the rotation order. The rotation will stop at wherever it was when this method is called.
      */
     public abstract void cancelOrderedRotation();
     
@@ -101,7 +108,7 @@ public abstract class IDeltaChunk extends EntityFz {
     
     /**
      * Helper function.
-     * @return
+     * @return the ordered rotation target, else the current rotation.
      */
     public Quaternion getEventualRotation() {
         if (hasOrderedRotation()) return getOrderedRotationTarget();
@@ -111,7 +118,8 @@ public abstract class IDeltaChunk extends EntityFz {
     
     
     /***
-     * @param newOffset The new rotational offset. This is relative to getCorner().
+     * @param newOffset The new rotational offset. This is relative to getCorner(). Calling this method after the entity has been
+     *                  spawned is untested.
      */
     public abstract void setRotationalCenterOffset(Vec3 newOffset);
     
@@ -155,12 +163,14 @@ public abstract class IDeltaChunk extends EntityFz {
      * @return true if enabled
      */
     public abstract boolean can(DeltaCapability cap);
+
     /***
      * Enables a {@link DeltaCapability}. This should be done before spawning the entity, as clients will not get updates to this.
      * @param cap A {@link DeltaCapability}
      * @return this
      */
     public abstract IDeltaChunk permit(DeltaCapability cap);
+
     /***
      * Disables a {@link DeltaCapability}. This should be done before spawning the entity, as clients will not get updates to this.
      * @param cap A {@link DeltaCapability}
@@ -195,15 +205,18 @@ public abstract class IDeltaChunk extends EntityFz {
      * @return a new {@link Vec3} in shadow coordinates with translations & rotations applied.
      */
     public abstract Vec3 real2shadow(final Vec3 realVector);
+
     /***
      * @param shadowVector A {@link Vec3} in shadow coordinates
      * @return a new {@link Vec3} in real-world coordinates with translations & rotations unapplied
      */
     public abstract Vec3 shadow2real(final Vec3 shadowVector);
+
     /***
      * @param realCoord A {@link Coord} in real world coordinates that will be mutated into shadow coordinates.
      */
     public abstract void real2shadow(Coord realCoord);
+
     /***
      * @param shadowCoord A {@link Coord} in shadow coordinates that will be mutated into real coordinates
      */
@@ -215,12 +228,14 @@ public abstract class IDeltaChunk extends EntityFz {
      * @return the lower corner, in shadow coordinates.
      */
     public abstract Coord getCorner();
+
     /***
      * @return the center, in shadow coordinates. (Justs averages getCorner() and getFarCorner())
      */
     public Coord getCenter() {
         return getCorner().center(getFarCorner());
     }
+
     /***
      * @return the upper corner, in shadow coordinates
      */
@@ -236,7 +251,7 @@ public abstract class IDeltaChunk extends EntityFz {
     @Override
     public String toString() {
         String ret;
-        if (partName != "") {
+        if (partName != null && !partName.isEmpty()) {
             ret = "[DSE " + partName + " " + getEntityId() + "]";
         } else {
             ret = super.toString() + " - from " + getCorner() + "  to  " + getFarCorner() +
@@ -249,20 +264,20 @@ public abstract class IDeltaChunk extends EntityFz {
         return ret;
     }
     
-    private IDCController controller;
+    protected IDCController controller = IDCController.default_controller;
     
     /**
-     * @return the object set by setController. May be null.
+     * @return the object set by setController.
      */
     public IDCController getController() {
-        if (controller == null) return IDCController.default_controller;
         return controller;
     }
     
     /**
-     * @param controller The controller responsible for this IDC. It is the responsibility of the controller to set this value when deserialized.
+     * @param controller The controller responsible for this IDC. The IDC will not track this value across serializations; it is the controller's responsibility to set it.
      */
     public void setController(IDCController controller) {
+        if (controller == null) controller = IDCController.default_controller;
         this.controller = controller;
     }
 

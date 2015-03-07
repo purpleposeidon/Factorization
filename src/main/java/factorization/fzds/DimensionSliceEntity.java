@@ -603,7 +603,7 @@ public class DimensionSliceEntity extends IDeltaChunk implements IFzdsEntryContr
                 rotation.incrMultiply(rotationalVelocity);
                 rotationalVelocity.incrConjugate();
                 setVelocity(0, 0, 0);
-                rotationalVelocity.update(0, 0, 0, 0);
+                rotationalVelocity.update(1, 0, 0, 0);
                 moved = false;
             }
         }
@@ -849,6 +849,7 @@ public class DimensionSliceEntity extends IDeltaChunk implements IFzdsEntryContr
             updateUniversalCollisions(); // TODO: Do it properly
         }
         Core.profileEnd();
+        if (!worldObj.isRemote) controller.beforeUpdate(this);
         if (!parent.trackingEntity()) {
             Core.profileStart("updateMotion");
             updateMotion(Vec3.createVectorHelper(0, 0, 0), new Quaternion());
@@ -860,6 +861,7 @@ public class DimensionSliceEntity extends IDeltaChunk implements IFzdsEntryContr
             }
         }
         if (!worldObj.isRemote) {
+            controller.afterUpdate(this);
             shareDisplacementInfo();
             if (can(DeltaCapability.ROTATE)) {
                 shareRotationInfo();

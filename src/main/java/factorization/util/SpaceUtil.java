@@ -231,6 +231,13 @@ public final class SpaceUtil {
         return ret;
     }
 
+    public static Vec3 incrComponentMultiply(Vec3 base, Vec3 scale) {
+        base.xCoord *= scale.xCoord;
+        base.yCoord *= scale.yCoord;
+        base.zCoord *= scale.zCoord;
+        return base;
+    }
+
     public static AxisAlignedBB createAABB(Vec3 min, Vec3 max) {
         double minX = Math.min(min.xCoord, max.xCoord);
         double minY = Math.min(min.yCoord, max.yCoord);

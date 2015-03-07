@@ -8,12 +8,15 @@ import io.netty.channel.ChannelOutboundHandlerAdapter;
 import io.netty.channel.ChannelPromise;
 import io.netty.channel.embedded.EmbeddedChannel;
 import net.minecraft.command.ICommandSender;
+import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.network.NetHandlerPlayServer;
 import net.minecraft.network.NetworkManager;
 import net.minecraft.network.Packet;
 import net.minecraft.network.rcon.RConConsoleSource;
+import net.minecraft.potion.Potion;
+import net.minecraft.potion.PotionEffect;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.management.ServerConfigurationManager;
 import net.minecraft.stats.StatisticsFile;
@@ -94,6 +97,34 @@ public final class PlayerUtil {
         if (server == null) return null;
         ServerConfigurationManager cm = server.getConfigurationManager();
         return cm.func_152602_a(player);
+    }
+
+    public static int getPuntStrengthOrWeakness(EntityPlayer player) {
+        if (player == null) return 1;
+        //strength * knocback
+        int strength = 0;
+        PotionEffect p_str = player.getActivePotionEffect(Potion.damageBoost);
+        PotionEffect p_wea = player.getActivePotionEffect(Potion.weakness);
+        if (p_str != null) {
+            strength += p_str.getAmplifier() + 1;
+        }
+        if (p_wea != null) {
+            strength -= p_wea.getAmplifier() + 1;
+        }
+        int knockback = EnchantmentHelper.getKnockbackModifier(player, null);
+        return strength * knockback;
+    }
+
+    public static int getPuntStrengthInt(EntityPlayer player) {
+        int str = getPuntStrengthOrWeakness(player);
+        return Math.min(1, str);
+    }
+
+    public static double getPuntStrengthMultiplier(EntityPlayer player) {
+        int str = getPuntStrengthOrWeakness(player);
+        if (str == 0) return 1;
+        if (str < 1) return 1.0 / -str;
+        return str;
     }
 
     private static class FakeNetManager extends NetworkManager {

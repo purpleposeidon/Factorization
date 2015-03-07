@@ -3,12 +3,8 @@ package factorization.weird;
 import java.io.IOException;
 import java.util.ArrayList;
 
-import cpw.mods.fml.common.network.ByteBufUtils;
 import factorization.shared.*;
-import factorization.util.DataUtil;
-import factorization.util.InvUtil;
-import factorization.util.ItemUtil;
-import factorization.util.SpaceUtil;
+import factorization.util.*;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockRailBase;
@@ -23,11 +19,8 @@ import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
 import net.minecraft.inventory.IInventory;
-import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.potion.Potion;
-import net.minecraft.potion.PotionEffect;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.IIcon;
@@ -51,8 +44,6 @@ import cpw.mods.fml.relauncher.SideOnly;
 import factorization.api.Coord;
 import factorization.api.FzOrientation;
 import factorization.api.datahelpers.DataHelper;
-import factorization.api.datahelpers.DataInNBT;
-import factorization.api.datahelpers.DataOutNBT;
 import factorization.api.datahelpers.Share;
 import factorization.common.FactoryType;
 import factorization.notify.Notice;
@@ -686,22 +677,7 @@ public class TileEntityDayBarrel extends TileEntityFactorization {
         }
         last_hit_side = event.face;
     }
-    
-    int getPuntStrength(EntityPlayer player) {
-        //strength * knocback
-        int strength = 0;
-        PotionEffect p_str = player.getActivePotionEffect(Potion.damageBoost);
-        PotionEffect p_wea = player.getActivePotionEffect(Potion.weakness);
-        if (p_str != null) {
-            strength += p_str.getAmplifier() + 1;
-        }
-        if (p_wea != null) {
-            strength -= p_wea.getAmplifier() + 1;
-        }
-        int knockback = EnchantmentHelper.getKnockbackModifier(player, null);
-        return Math.min(1, strength*knockback);
-    }
-    
+
     static boolean isStairish(Coord c) {
         Block b = c.getBlock();
         if (b == null) {
@@ -722,7 +698,7 @@ public class TileEntityDayBarrel extends TileEntityFactorization {
     }
     
     boolean punt(EntityPlayer player) {
-        int distance = getPuntStrength(player);
+        int distance = PlayerUtil.getPuntStrengthInt(player);
         if (distance <= 0) {
             return false;
         }
