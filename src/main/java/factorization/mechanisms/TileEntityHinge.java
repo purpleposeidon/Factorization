@@ -169,7 +169,7 @@ public class TileEntityHinge extends TileEntityCommon implements IDCController {
         dirtyInertia();
         return false;
     }
-    
+
     @Override public boolean useBlock(IDeltaChunk idc, EntityPlayer player, Coord at, byte sideHit) { return false; }
 
     double getInertia(IDeltaChunk idc, Vec3 rotationAxis) {
@@ -277,7 +277,7 @@ public class TileEntityHinge extends TileEntityCommon implements IDCController {
             return;
         }
         ticks++;
-        MovingObjectPosition mop = Minecraft.getMinecraft().getObjectMouseOver();
+        MovingObjectPosition mop = Minecraft.getMinecraft().objectMouseOver;
         if (mop == null || mop.typeOfHit != MovingObjectPosition.MovingObjectType.BLOCK) return;
         if (mop.blockX == xCoord && mop.blockY == yCoord && mop.blockZ == zCoord) {
             ticks = 0;
