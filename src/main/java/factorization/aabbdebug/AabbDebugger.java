@@ -129,7 +129,7 @@ public enum AabbDebugger {
         GL11.glColor4f(1, 1, 1, 0.5F);
         
         GL11.glDisable(GL11.GL_TEXTURE_2D);
-        GL11.glLineWidth(1);
+        GL11.glLineWidth(4);
         for (AxisAlignedBB box : boxes) {
             RenderGlobal.drawOutlinedBoundingBox(box, 0x800000);
         }

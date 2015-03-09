@@ -8,6 +8,7 @@ import cpw.mods.fml.common.gameevent.TickEvent.ClientTickEvent;
 import cpw.mods.fml.common.gameevent.TickEvent.Phase;
 import cpw.mods.fml.common.network.FMLNetworkEvent.ClientDisconnectionFromServerEvent;
 import cpw.mods.fml.relauncher.Side;
+import factorization.aabbdebug.AabbDebugger;
 import factorization.api.Coord;
 import factorization.api.Quaternion;
 import factorization.coremodhooks.HookTargetsClient;
@@ -332,6 +333,7 @@ public class HammerClientProxy extends HammerProxy {
         DimensionSliceEntity dse = _hitSlice;
         Coord corner = dse.getCorner();
         Quaternion rotation = dse.prevTickRotation.slerp(dse.getRotation(), event.partialTicks);
+        rotation.incrNormalize();
         try {
             GL11.glPushMatrix();
             setShadowWorld();
@@ -344,9 +346,7 @@ public class HammerClientProxy extends HammerProxy {
                     NumUtil.interp(dse.lastTickPosX - player.lastTickPosX, dse.posX - player.posX, partialTicks),
                     NumUtil.interp(dse.lastTickPosY - player.lastTickPosY, dse.posY - player.posY, partialTicks),
                     NumUtil.interp(dse.lastTickPosZ - player.lastTickPosZ, dse.posZ - player.posZ, partialTicks));
-            Quaternion rot = new Quaternion(rotation);
-            rot.incrNormalize();
-            rot.glRotate();
+            rotation.glRotate();
             Vec3 centerOffset = dse.getRotationalCenterOffset();
             GL11.glTranslated(
                     -centerOffset.xCoord - corner.x,
@@ -400,6 +400,8 @@ public class HammerClientProxy extends HammerProxy {
         double xz_len = Math.hypot(shadowLook.xCoord, shadowLook.zCoord);
         double shadow_pitch = -Math.toDegrees(Math.atan2(shadowLook.yCoord, xz_len)); // erm, negative? Dunno.
         double shadow_yaw = Math.toDegrees(Math.atan2(-shadowLook.xCoord, shadowLook.zCoord)); // Another weird negative!
+
+        boolean got_hit = false;
         
         try {
             MovingObjectPosition mop = null;
@@ -438,17 +440,17 @@ public class HammerClientProxy extends HammerProxy {
                 restoreRealWorld();
             }
             if (mopBox == null) {
-                ray.setPosition(0, -1000, 0);
                 return;
             }
             // Create a realbox that contains the entirety of the shadowbox
             Vec3 min, max;
             {
+                final DimensionSliceEntity rayParent = ray.parent;
                 Vec3 corners[] = SpaceUtil.getCorners(mopBox);
-                min = ray.parent.shadow2real(corners[0]);
-                max = min.addVector(0, 0, 0);
+                min = rayParent.shadow2real(corners[0]);
+                max = SpaceUtil.copy(min);
                 for (int i = 1; i < corners.length; i++) {
-                    Vec3 c = ray.parent.shadow2real(corners[i]);
+                    Vec3 c = rayParent.shadow2real(corners[i]);
                     min.xCoord = Math.min(c.xCoord, min.xCoord);
                     min.yCoord = Math.min(c.yCoord, min.yCoord);
                     min.zCoord = Math.min(c.zCoord, min.zCoord);
@@ -460,9 +462,14 @@ public class HammerClientProxy extends HammerProxy {
             ray.setPosition((min.xCoord + max.xCoord) / 2, (min.yCoord + max.yCoord) / 2, (min.zCoord + max.zCoord) / 2);
             SpaceUtil.setMin(ray.boundingBox, min);
             SpaceUtil.setMax(ray.boundingBox, max);
+            //AabbDebugger.addBox(ray.boundingBox); // It's always nice to see this.
             offerHit(mop, ray, mopBox);
+            got_hit = true;
         } finally {
             mc.objectMouseOver = origMouseOver;
+            if (!got_hit) {
+                ray.setPosition(0, -1000, 0);
+            }
         }
     }
     

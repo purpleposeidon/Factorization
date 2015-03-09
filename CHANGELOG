@@ -1,5 +1,8 @@
 0.8.89
-  Added hinges
+  Furnace heaters can now cook entities
+  Add WIP hinges
+  Position selection bounding box properly on moving DSEs
+  Selection bounding box of rotated blocks won't obscure selection of normal blocks
 
 0.8.88.8.8888h
   Fixed the infamous barrel render bug
