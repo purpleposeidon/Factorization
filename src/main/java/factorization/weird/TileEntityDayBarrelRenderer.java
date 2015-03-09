@@ -27,8 +27,11 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.IIcon;
 import net.minecraft.util.ResourceLocation;
+import net.minecraftforge.client.MinecraftForgeClient;
 import net.minecraftforge.common.util.ForgeDirection;
 import org.lwjgl.opengl.GL11;
+
+import static net.minecraftforge.client.IItemRenderer.ItemRenderType.INVENTORY;
 
 public class TileEntityDayBarrelRenderer extends TileEntitySpecialRenderer {
 
@@ -95,6 +98,9 @@ public class TileEntityDayBarrelRenderer extends TileEntitySpecialRenderer {
             if (barrel.display_list == -1) {
                 Item item = is.getItem();
                 boolean crazyItem = item.hasEffect(is, 0) && item.requiresMultipleRenderPasses();
+                if (!crazyItem) {
+                    crazyItem = itemHasCustomRender(is);
+                }
                 if (crazyItem) {
                     // FIXME: If a potion-barrel draws before a nether-star barrel, shit goes wonky
                     // There may be other situations where it pops up.
@@ -128,7 +134,11 @@ public class TileEntityDayBarrelRenderer extends TileEntitySpecialRenderer {
         GL11.glPopMatrix();
         Core.profileEnd();
     }
-    
+
+    private boolean itemHasCustomRender(ItemStack item) {
+        return MinecraftForgeClient.getItemRenderer(item, INVENTORY) != null;
+    }
+
     String getCountLabel(ItemStack item, TileEntityDayBarrel barrel) {
         int ms = item.getMaxStackSize();
         int count = barrel.getItemCount();
