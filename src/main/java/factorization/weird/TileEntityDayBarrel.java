@@ -925,7 +925,7 @@ public class TileEntityDayBarrel extends TileEntityFactorization {
     }
     
     public boolean canLose() {
-        return item == null ? false : getItemCount() > maxStackDrop*item.getMaxStackSize();
+        return item != null && getItemCount() > maxStackDrop * item.getMaxStackSize();
     }
     
     public static ItemStack makeBarrel(Type type, ItemStack log, ItemStack slab) {
@@ -934,7 +934,7 @@ public class TileEntityDayBarrel extends TileEntityFactorization {
         NBTTagCompound tag = ItemUtil.getTag(barrel_item);
         tag.setTag("log", DataUtil.item2tag(log));
         tag.setTag("slab", DataUtil.item2tag(slab));
-        int dmg = DataUtil.getId(log)*16 + log.getItemDamage();
+        int dmg = DataUtil.getName(log).hashCode() * 16 + log.getItemDamage();
         dmg %= 1000;
         dmg *= 10;
         dmg += type.ordinal();
@@ -974,28 +974,9 @@ public class TileEntityDayBarrel extends TileEntityFactorization {
                 "WWW",
                 'W', objLog,
                 '-', objSlab);
-        
-        //Note: Don't add creative. That'd be bad.
-        Core.registry.oreRecipe(make(Type.SILKY, log, slab),
-                "XXX",
-                "XOX",
-                "XXX",
-                'X', Blocks.web,
-                'O', normal);
-        Core.registry.oreRecipe(make(Type.HOPPING, log, slab),
-                "Y",
-                "0",
-                "Y",
-                'Y', Blocks.hopper,
-                '0', normal);
-        Core.registry.oreRecipe(make(Type.STICKY, log, slab),
-                "*",
-                "0",
-                '*', Items.slime_ball,
-                '0', normal);
     }
     
-    static Type getUpgrade(ItemStack is) {
+    public static Type getUpgrade(ItemStack is) {
         if (is == null) {
             return Type.NORMAL;
         }
@@ -1004,7 +985,7 @@ public class TileEntityDayBarrel extends TileEntityFactorization {
             return Type.NORMAL;
         }
         String name = tag.getString("type");
-        if (name == null || name == "") {
+        if (name == null || name.equals("")) {
             return Type.NORMAL;
         }
         try {
@@ -1102,7 +1083,7 @@ public class TileEntityDayBarrel extends TileEntityFactorization {
         return true;
     }
     
-    static ArrayList<Integer> finalizedDisplayLists = new ArrayList();
+    static final ArrayList<Integer> finalizedDisplayLists = new ArrayList();
     
     public static void addFinalizedDisplayList(int display_list) {
         if (display_list <= 0) return;
@@ -1117,7 +1098,7 @@ public class TileEntityDayBarrel extends TileEntityFactorization {
         super.finalize();
         if (display_list != -1) {
             if (Core.dev_environ) {
-                Core.logFine("Barrel finalized"); // dev environ, it's fine!
+                Core.logFine("Barrel display list released via finalization"); // dev environ, it's fine!
             }
             addFinalizedDisplayList(display_list);
             display_list = -1;
@@ -1252,4 +1233,6 @@ public class TileEntityDayBarrel extends TileEntityFactorization {
         GL11.glEnable(GL11.GL_DEPTH_TEST);
         GL11.glEnable(GL11.GL_ALPHA_TEST);
     }
+
+
 }

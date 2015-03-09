@@ -1,22 +1,51 @@
 package factorization.common;
 
-import java.lang.reflect.Field;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Random;
-import java.util.regex.Matcher;
-
+import cpw.mods.fml.common.FMLCommonHandler;
+import cpw.mods.fml.common.event.FMLInterModComms;
+import cpw.mods.fml.common.eventhandler.SubscribeEvent;
+import cpw.mods.fml.common.gameevent.PlayerEvent;
+import cpw.mods.fml.common.gameevent.TickEvent.Phase;
+import cpw.mods.fml.common.gameevent.TickEvent.ServerTickEvent;
+import cpw.mods.fml.common.registry.ExistingSubstitutionException;
+import cpw.mods.fml.common.registry.GameRegistry;
+import cpw.mods.fml.common.registry.GameRegistry.Type;
+import cpw.mods.fml.relauncher.Side;
+import factorization.api.IActOnCraft;
+import factorization.ceramics.ItemGlazeBucket;
+import factorization.ceramics.ItemSculptingTool;
+import factorization.ceramics.TileEntityGreenware;
+import factorization.ceramics.TileEntityGreenware.ClayState;
+import factorization.charge.ItemAcidBottle;
+import factorization.charge.ItemBattery;
+import factorization.charge.ItemChargeMeter;
+import factorization.charge.TileEntityLeydenJar;
+import factorization.colossi.*;
+import factorization.darkiron.BlockDarkIronOre;
+import factorization.docs.ItemDocBook;
+import factorization.oreprocessing.ItemOreProcessing;
+import factorization.oreprocessing.ItemOreProcessing.OreType;
+import factorization.oreprocessing.TileEntityCrystallizer;
+import factorization.oreprocessing.TileEntityGrinder;
+import factorization.oreprocessing.TileEntitySlagFurnace;
+import factorization.servo.*;
 import factorization.shared.*;
+import factorization.shared.Core.TabType;
+import factorization.sockets.ItemSocketPart;
+import factorization.twistedblock.ItemTwistedBlock;
 import factorization.util.CraftUtil;
 import factorization.util.DataUtil;
 import factorization.util.FzUtil;
 import factorization.util.ItemUtil;
+import factorization.utiligoo.ItemGoo;
+import factorization.weird.BarrelUpgradeRecipes;
+import factorization.weird.ItemDayBarrel;
+import factorization.weird.ItemPocketTable;
+import factorization.weird.TileEntityDayBarrel;
+import factorization.wrath.BlockLightAir;
+import factorization.wrath.TileEntityWrathLamp;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.MapColor;
 import net.minecraft.block.material.Material;
-import net.minecraft.entity.passive.EntityVillager;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
@@ -28,11 +57,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.FurnaceRecipes;
 import net.minecraft.item.crafting.IRecipe;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.util.Tuple;
-import net.minecraft.util.WeightedRandomChestContent;
-import net.minecraft.village.MerchantRecipeList;
 import net.minecraft.world.World;
-import net.minecraftforge.common.ChestGenHooks;
 import net.minecraftforge.event.entity.player.EntityItemPickupEvent;
 import net.minecraftforge.fluids.Fluid;
 import net.minecraftforge.fluids.FluidRegistry;
@@ -41,54 +66,13 @@ import net.minecraftforge.oredict.RecipeSorter;
 import net.minecraftforge.oredict.RecipeSorter.Category;
 import net.minecraftforge.oredict.ShapedOreRecipe;
 import net.minecraftforge.oredict.ShapelessOreRecipe;
-import cpw.mods.fml.common.FMLCommonHandler;
-import cpw.mods.fml.common.event.FMLInterModComms;
-import cpw.mods.fml.common.eventhandler.SubscribeEvent;
-import cpw.mods.fml.common.gameevent.PlayerEvent;
-import cpw.mods.fml.common.gameevent.TickEvent.Phase;
-import cpw.mods.fml.common.gameevent.TickEvent.ServerTickEvent;
-import cpw.mods.fml.common.registry.ExistingSubstitutionException;
-import cpw.mods.fml.common.registry.GameRegistry;
-import cpw.mods.fml.common.registry.GameRegistry.Type;
-import cpw.mods.fml.common.registry.VillagerRegistry;
-import cpw.mods.fml.common.registry.VillagerRegistry.IVillageTradeHandler;
-import cpw.mods.fml.relauncher.Side;
-import factorization.api.IActOnCraft;
-import factorization.ceramics.ItemGlazeBucket;
-import factorization.ceramics.ItemSculptingTool;
-import factorization.ceramics.TileEntityGreenware;
-import factorization.ceramics.TileEntityGreenware.ClayState;
-import factorization.charge.ItemAcidBottle;
-import factorization.charge.ItemBattery;
-import factorization.charge.ItemChargeMeter;
-import factorization.charge.TileEntityLeydenJar;
-import factorization.colossi.ColossalBlock;
-import factorization.colossi.ColossalBlockItem;
-import factorization.colossi.GargantuanBlock;
-import factorization.colossi.ItemColossusGuide;
-import factorization.colossi.ItemGargantuanBlock;
-import factorization.colossi.TileEntityColossalHeart;
-import factorization.darkiron.BlockDarkIronOre;
-import factorization.docs.ItemDocBook;
-import factorization.oreprocessing.ItemOreProcessing;
-import factorization.oreprocessing.ItemOreProcessing.OreType;
-import factorization.oreprocessing.TileEntityCrystallizer;
-import factorization.oreprocessing.TileEntityGrinder;
-import factorization.oreprocessing.TileEntitySlagFurnace;
-import factorization.servo.ItemCommenter;
-import factorization.servo.ItemMatrixProgrammer;
-import factorization.servo.ItemServoMotor;
-import factorization.servo.ItemServoRailWidget;
-import factorization.servo.ServoComponent;
-import factorization.shared.Core.TabType;
-import factorization.sockets.ItemSocketPart;
-import factorization.twistedblock.ItemTwistedBlock;
-import factorization.utiligoo.ItemGoo;
-import factorization.weird.ItemDayBarrel;
-import factorization.weird.ItemPocketTable;
-import factorization.weird.TileEntityDayBarrel;
-import factorization.wrath.BlockLightAir;
-import factorization.wrath.TileEntityWrathLamp;
+
+import java.lang.reflect.Field;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.regex.Matcher;
 
 public class Registry {
     public ItemFactorizationBlock item_factorization;
@@ -707,6 +691,10 @@ public class Registry {
 
         // Barrel
         // Add the recipes for vanilla woods.
+
+        final ItemStack oakLog = new ItemStack(Blocks.log);
+        final ItemStack oakPlank = new ItemStack(Blocks.wooden_slab);
+        final ItemStack oakBarrel = TileEntityDayBarrel.makeBarrel(TileEntityDayBarrel.Type.NORMAL, oakLog, oakPlank);
         for (int i = 0; i < 4; i++) {
             ItemStack log = new ItemStack(Blocks.log, 1, i);
             ItemStack slab = new ItemStack(Blocks.wooden_slab, 1, i);
@@ -717,6 +705,8 @@ public class Registry {
             ItemStack slab = new ItemStack(Blocks.wooden_slab, 1, 4 + i);
             TileEntityDayBarrel.makeRecipe(log, slab);
         }
+
+        new BarrelUpgradeRecipes().addUpgradeRecipes();
         
         // Craft stamper
         oreRecipe(stamper_item,

@@ -308,24 +308,38 @@ public class BlockFactorization extends BlockContainer {
         itemList.add(reg.anchor);
         
         //Barrels
-        if (reg.daybarrel != null) {
-            //itemList.add(new ItemStack(reg.daybarrel));
-            int count = 0;
-            int added = 0;
-            
-            int types = TileEntityDayBarrel.Type.TYPE_COUNT - 1 /* exclude creative */ - 1 /* exclude larger */;
+        if (todaysBarrels != null) {
+            itemList.addAll(todaysBarrels);
+        } else if (reg.daybarrel != null) {
             Calendar cal = Calendar.getInstance();
             int doy = cal.get(Calendar.DAY_OF_YEAR) - 1 /* start at 0, not 1 */;
-            int wood_types = (TileEntityDayBarrel.barrel_items.size() - 1)/types;
-            int wood_of_the_day = doy % wood_types;
-            for (int i = 0; i < types; i++) {
-                ItemStack is = TileEntityDayBarrel.barrel_items.get(1 + /* skip creative barrel */ i + types*wood_of_the_day);
-                itemList.add(is);
+
+            ReservoirSampler<ItemStack> barrelPool = new ReservoirSampler<ItemStack>(1, new Random(doy));
+            todaysBarrels = new ArrayList<ItemStack>();
+
+            for (ItemStack barrel : TileEntityDayBarrel.barrel_items) {
+                TileEntityDayBarrel.Type type = TileEntityDayBarrel.getUpgrade(barrel);
+                if (type == TileEntityDayBarrel.Type.NORMAL) {
+                    barrelPool.give(barrel);
+                } else if (type == TileEntityDayBarrel.Type.CREATIVE) {
+                    todaysBarrels.add(barrel);
+                }
             }
-            //ugly; the first item in the list is the creative barrel; it oughta be separate
-            itemList.add(TileEntityDayBarrel.barrel_items.get(0));
+
+            TileEntityDayBarrel rep = new TileEntityDayBarrel();
+            for (ItemStack barrel : barrelPool.getSamples()) {
+                rep.loadFromStack(barrel);
+                for (TileEntityDayBarrel.Type type : TileEntityDayBarrel.Type.values()) {
+                    if (type == TileEntityDayBarrel.Type.CREATIVE) continue;
+                    if (type == TileEntityDayBarrel.Type.LARGER) continue;
+                    rep.type = type;
+                    todaysBarrels.add(rep.getPickedBlock());
+                }
+            }
         }
     }
+
+    ArrayList<ItemStack> todaysBarrels = null;
 
     @Override
     public boolean canConnectRedstone(IBlockAccess world, int x, int y, int z, int dir) {
