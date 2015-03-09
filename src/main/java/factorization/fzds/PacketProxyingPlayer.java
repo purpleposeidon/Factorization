@@ -1,6 +1,7 @@
 package factorization.fzds;
 
 import factorization.api.ICoordFunction;
+import factorization.shared.Core;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
@@ -21,7 +22,6 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.management.ItemInWorldManager;
 import net.minecraft.server.management.ServerConfigurationManager;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.DamageSource;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;
 import net.minecraft.world.chunk.Chunk;
@@ -43,7 +43,7 @@ public class PacketProxyingPlayer extends EntityPlayerMP implements
     WeakReference<DimensionSliceEntity> dimensionSlice = new WeakReference<DimensionSliceEntity>(null);
     static boolean useShortViewRadius = true; // true doesn't actually change the view radius
 
-    private HashSet<EntityPlayerMP> trackedPlayers = new HashSet();
+    private HashSet<EntityPlayerMP> listeningPlayers = new HashSet();
     
     
     
@@ -74,13 +74,11 @@ public class PacketProxyingPlayer extends EntityPlayerMP implements
         }
     };
     
-    static final Throwable generic_future_failure = new UnsupportedOperationException("Sorry!");
-    
     class WrappedMulticastHandler extends ChannelOutboundHandlerAdapter implements IFzdsShenanigans {
         @Override
         public void write(ChannelHandlerContext ctx, Object msg, ChannelPromise promise) throws Exception {
             PacketProxyingPlayer.this.addNettyMessage(proxiedChannel, msg);
-            //promise.setFailure(generic_future_failure); // Nooooope, causes spam.
+            //promise.setFailure(new UnsupportedOperationException("Sorry!")); // Nooooope, causes spam.
         }
     }
     
@@ -185,13 +183,13 @@ public class PacketProxyingPlayer extends EntityPlayerMP implements
                 }
                 EntityPlayerMP player = (EntityPlayerMP) o;
                 if (isPlayerInUpdateRange(player)) {
-                    boolean new_player = trackedPlayers.add(player);
+                    boolean new_player = listeningPlayers.add(player);
                     if (new_player && shouldShareChunks()) {
                         // welcome to the club. This may net-lag a bit. (Well, it depends on the chunk's contents. Air compresses well tho.)
                         sendChunkMapDataToPlayer(player);
                     }
                 } else {
-                    trackedPlayers.remove(player);
+                    listeningPlayers.remove(player);
                 }
             }
         }
@@ -256,7 +254,6 @@ public class PacketProxyingPlayer extends EntityPlayerMP implements
     boolean canDie = false;
 
     public void endProxy() {
-        releaseChunkLoading();
         // From playerNetServerHandler.mcServer.getConfigurationManager().playerLoggedOut(this);
         WorldServer var2 = getServerForPlayer();
         var2.removeEntity(this); // setEntityDead
@@ -269,7 +266,7 @@ public class PacketProxyingPlayer extends EntityPlayerMP implements
     }
 
     boolean shouldForceChunkLoad() { //TODO: Chunk loading!
-        return !trackedPlayers.isEmpty();
+        return !listeningPlayers.isEmpty();
     }
     
     FMLEmbeddedChannel wrapper_channel = new FMLEmbeddedChannel("?", Side.SERVER, new ChannelHandler() {
@@ -288,7 +285,7 @@ public class PacketProxyingPlayer extends EntityPlayerMP implements
     
     public void addNettyMessage(Channel sourceChannel, Object msg) {
         // Return a future?
-        if (trackedPlayers.isEmpty()) {
+        if (listeningPlayers.isEmpty()) {
             return;
         }
         DimensionSliceEntity dse = dimensionSlice.get();
@@ -297,7 +294,7 @@ public class PacketProxyingPlayer extends EntityPlayerMP implements
             return;
         }
         Object wrappedMsg = wrapMessage(msg);
-        Iterator<EntityPlayerMP> it = trackedPlayers.iterator();
+        Iterator<EntityPlayerMP> it = listeningPlayers.iterator();
         while (it.hasNext()) {
             EntityPlayerMP player = it.next();
             if (player.isDead || player.worldObj != dse.worldObj) {
@@ -319,7 +316,10 @@ public class PacketProxyingPlayer extends EntityPlayerMP implements
     @Override
     public void setDead() {
         if (canDie) {
+            releaseChunkLoading();
             super.setDead();
+        } else {
+            Core.logWarning("Denying PacketProxingPlayer.setDead at " + new Coord(this));
         }
     }
 
