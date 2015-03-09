@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import factorization.shared.NORELEASE;
 import factorization.util.NumUtil;
 import factorization.util.RenderUtil;
 import net.minecraft.block.Block;
@@ -191,12 +192,12 @@ public class RenderDimensionSliceEntity extends Render implements IFzdsShenaniga
         }
         
         void renderTerrain() {
+            GL11.glPushAttrib(GL11.GL_COLOR_BUFFER_BIT | GL11.GL_LIGHTING_BIT);
             RenderHelper.disableStandardItemLighting();
             Minecraft mc = Minecraft.getMinecraft();
             if (Minecraft.isAmbientOcclusionEnabled() && FzConfig.dimension_slice_allow_smooth) {
                 GL11.glShadeModel(GL11.GL_SMOOTH);
             }
-            GL11.glPushAttrib(GL11.GL_COLOR_BUFFER_BIT);
             for (int pass = 0; pass < 2; pass++) {
                 if (pass == 1) {
                     //setup transparency
