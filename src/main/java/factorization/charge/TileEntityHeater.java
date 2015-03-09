@@ -1,22 +1,10 @@
 package factorization.charge;
 
-import java.io.IOException;
-import java.util.ArrayList;
-
-import factorization.api.datahelpers.DataHelper;
-import factorization.api.datahelpers.Share;
-import io.netty.buffer.ByteBuf;
-import net.minecraft.block.BlockFurnace;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.crafting.FurnaceRecipes;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.tileentity.TileEntityFurnace;
-import net.minecraft.util.IIcon;
-import net.minecraftforge.common.util.ForgeDirection;
 import factorization.api.Charge;
 import factorization.api.Coord;
 import factorization.api.IChargeConductor;
+import factorization.api.datahelpers.DataHelper;
+import factorization.api.datahelpers.Share;
 import factorization.ceramics.TileEntityGreenware;
 import factorization.ceramics.TileEntityGreenware.ClayState;
 import factorization.common.BlockIcons;
@@ -27,6 +15,22 @@ import factorization.shared.BlockClass;
 import factorization.shared.NetworkFactorization.MessageType;
 import factorization.shared.TileEntityCommon;
 import factorization.shared.TileEntityExtension;
+import io.netty.buffer.ByteBuf;
+import net.minecraft.block.Block;
+import net.minecraft.block.BlockFurnace;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.item.ItemStack;
+import net.minecraft.item.crafting.FurnaceRecipes;
+import net.minecraft.tileentity.TileEntity;
+import net.minecraft.tileentity.TileEntityFurnace;
+import net.minecraft.util.AxisAlignedBB;
+import net.minecraft.util.IIcon;
+import net.minecraftforge.common.util.ForgeDirection;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 public class TileEntityHeater extends TileEntityCommon implements IChargeConductor {
     Charge charge = new Charge(this);
@@ -281,5 +285,23 @@ public class TileEntityHeater extends TileEntityCommon implements IChargeConduct
             int result = diss.getStackInSlot(2).stackSize + var1.stackSize;
             return (result <= diss.getInventoryStackLimit() && result <= var1.getMaxStackSize());
         }
+    }
+
+    void cookEntity(Entity ent) {
+        if (worldObj.isRemote) return;
+        if (ent == null) return;
+        if (heat <= 8) return;
+        if (ent.isBurning()) return;
+        if (!ent.canBePushed()) return;
+        if (!(ent instanceof EntityLivingBase)) return;
+        if (getCoord().isPowered()) return;
+        heat -= 8;
+        ent.setFire(1);
+    }
+
+    @Override
+    public boolean addCollisionBoxesToList(Block block, AxisAlignedBB aabb, List list, Entity entity) {
+        cookEntity(entity);
+        return super.addCollisionBoxesToList(block, aabb, list, entity);
     }
 }

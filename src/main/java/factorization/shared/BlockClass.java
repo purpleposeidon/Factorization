@@ -1,9 +1,7 @@
 package factorization.shared;
 
-import net.minecraft.block.Block;
-import net.minecraft.init.Blocks;
-import net.minecraftforge.common.MinecraftForge;
 import factorization.api.Coord;
+import net.minecraft.block.Block;
 
 /**
  * This associates various block properties with metadata.

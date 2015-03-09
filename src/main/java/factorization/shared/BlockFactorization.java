@@ -1,12 +1,15 @@
 package factorization.shared;
 
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Random;
-
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
+import factorization.api.Coord;
+import factorization.api.FzColor;
+import factorization.common.BlockIcons;
+import factorization.common.FactoryType;
+import factorization.common.Registry;
+import factorization.notify.Notice;
+import factorization.shared.NetworkFactorization.MessageType;
+import factorization.weird.TileEntityDayBarrel;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockContainer;
 import net.minecraft.client.particle.EffectRenderer;
@@ -18,25 +21,12 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.AxisAlignedBB;
-import net.minecraft.util.ChatComponentText;
-import net.minecraft.util.IIcon;
-import net.minecraft.util.MovingObjectPosition;
-import net.minecraft.util.Vec3;
+import net.minecraft.util.*;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.ForgeDirection;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
-import factorization.api.Coord;
-import factorization.api.FzColor;
-import factorization.api.IFactoryType;
-import factorization.common.BlockIcons;
-import factorization.common.FactoryType;
-import factorization.common.Registry;
-import factorization.notify.Notice;
-import factorization.shared.NetworkFactorization.MessageType;
-import factorization.weird.TileEntityDayBarrel;
+
+import java.util.*;
 
 public class BlockFactorization extends BlockContainer {
     public boolean fake_normal_render = false;
@@ -624,5 +614,4 @@ public class BlockFactorization extends BlockContainer {
         }
         return false;
     }
-
 }
