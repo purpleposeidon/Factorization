@@ -44,6 +44,7 @@ import static org.lwjgl.opengl.GL11.*;
 public class TileEntityHinge extends TileEntityCommon implements IDCController {
     FzOrientation facing = FzOrientation.FACE_EAST_POINT_DOWN;
     final EntityReference<IDeltaChunk> idcRef = new EntityReference<IDeltaChunk>();
+    double inertia = -1.0;
     transient boolean idc_ticking = false;
 
     @Override
@@ -129,6 +130,7 @@ public class TileEntityHinge extends TileEntityCommon implements IDCController {
         if (data.as(Share.VISIBLE, "hasRef").putBoolean(idcRef != null)) {
             data.as(Share.VISIBLE, "ref").put(idcRef);
         }
+        inertia = data.as(Share.PRIVATE, "inertia").putDouble(inertia);
     }
 
     void setSlabBounds(Block b) {
@@ -156,9 +158,30 @@ public class TileEntityHinge extends TileEntityCommon implements IDCController {
         }
     }
 
-    @Override public boolean placeBlock(IDeltaChunk idc, EntityPlayer player, Coord at, byte sideHit) { return false; }
-    @Override public boolean breakBlock(IDeltaChunk idc, EntityPlayer player, Coord at, byte sideHit) { return hitBlock(idc, player, at, sideHit); }
+    @Override
+    public boolean placeBlock(IDeltaChunk idc, EntityPlayer player, Coord at, byte sideHit) {
+        dirtyInertia();
+        return false;
+    }
+
+    @Override
+    public boolean breakBlock(IDeltaChunk idc, EntityPlayer player, Coord at, byte sideHit) {
+        dirtyInertia();
+        return false;
+    }
+    
     @Override public boolean useBlock(IDeltaChunk idc, EntityPlayer player, Coord at, byte sideHit) { return false; }
+
+    double getInertia(IDeltaChunk idc, Vec3 rotationAxis) {
+        if (inertia >= 0) return inertia;
+        IntertiaCalculator ic = new IntertiaCalculator(idc, rotationAxis);
+        inertia = ic.calculate();
+        return inertia;
+    }
+
+    void dirtyInertia() {
+        inertia = -1;
+    }
 
     @Override
     public boolean hitBlock(IDeltaChunk idc, EntityPlayer player, Coord at, byte sideHit) {
@@ -175,9 +198,7 @@ public class TileEntityHinge extends TileEntityCommon implements IDCController {
         Vec3 topVec = SpaceUtil.fromDirection(facing.top);
         Vec3 faceVec = SpaceUtil.fromDirection(facing.facing);
         Vec3 rotationAxis = topVec.crossProduct(faceVec);
-        IntertiaCalculator ic = new IntertiaCalculator(idc, rotationAxis);
-        NORELEASE.fixme("Cache & optimize");
-        double I = ic.calculate();
+        double I = getInertia(idc, rotationAxis);
 
         Vec3 force = player.getLookVec().normalize();
 
