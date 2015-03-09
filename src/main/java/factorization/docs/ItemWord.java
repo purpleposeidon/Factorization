@@ -53,7 +53,12 @@ public class ItemWord extends Word {
         if (ItemUtil.isWildcard(is, false)) {
             List<ItemStack> out = ItemUtil.getSubItems(is);
             entries = out.toArray(new ItemStack[out.size()]); // If you give me a wildcard here, then it's your own damn fault if that causes a crash
-            is = null;
+            if (entries.length == 0) {
+                is = is.copy();
+                is.setItemDamage(0);
+            } else {
+                is = null;
+            }
         } else if (entries != null) {
             // Probably an OD list, which may contain wildcards, which will have to be expanded
             List<ItemStack> wildingChildren = null;
@@ -103,7 +108,7 @@ public class ItemWord extends Word {
     ItemStack getItem() {
         active_index = 0;
         if (is != null) return is;
-        if (entries == null) return null;
+        if (entries == null || entries.length == 0) return null;
         long now = System.currentTimeMillis() / 1000;
         now %= entries.length;
         active_index = (int) now;
