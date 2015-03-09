@@ -331,8 +331,7 @@ public class HammerClientProxy extends HammerProxy {
         float partialTicks = event.partialTicks;
         DimensionSliceEntity dse = _hitSlice;
         Coord corner = dse.getCorner();
-        Quaternion rotation = dse.prevTickRotation;
-        // I tried it with interpolation between the current rotation, but it works fine this way. Very strange.
+        Quaternion rotation = dse.prevTickRotation.slerp(dse.getRotation(), event.partialTicks);
         try {
             GL11.glPushMatrix();
             setShadowWorld();
