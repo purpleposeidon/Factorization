@@ -65,7 +65,6 @@ public class TileEntityHinge extends TileEntityCommon implements IDCController {
     @Override
     public void onPlacedBy(EntityPlayer player, ItemStack is, int side, float hitX, float hitY, float hitZ) {
         facing = SpaceUtil.getOrientation(player, side, hitX, hitY, hitZ);
-        initHinge();
     }
 
     @Override
@@ -76,11 +75,19 @@ public class TileEntityHinge extends TileEntityCommon implements IDCController {
     static ThreadLocal<Boolean> initializing = new ThreadLocal<Boolean>();
 
     private void initHinge() {
+        if (initializing.get() == Boolean.TRUE) return;
+        initializing.set(Boolean.TRUE);
+        try {
+            initHinge0();
+        } finally {
+            initializing.remove();
+        }
+    }
+
+    private void initHinge0() {
         if (idcRef.trackedAndAlive()) {
             return;
         }
-        if (initializing.get() != null) return;
-        initializing.set(true);
         final Coord target = getCoord().add(facing.facing);
         if (target.isReplacable()) return;
         DeltaCoord size = new DeltaCoord(16, 16, 16);
@@ -114,7 +121,6 @@ public class TileEntityHinge extends TileEntityCommon implements IDCController {
         idcRef.trackEntity(idc);
         markDirty();
         getCoord().syncTE();
-        initializing.remove();
     }
 
     @Override
