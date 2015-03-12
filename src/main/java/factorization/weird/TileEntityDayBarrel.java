@@ -1185,7 +1185,7 @@ public class TileEntityDayBarrel extends TileEntityFactorization {
         
         {
             ForgeDirection face = orientation.facing;
-            if (face.offsetX + face.offsetY + face.offsetZ == 1) {
+            if (SpaceUtil.sign(face) == 1) {
                 GL11.glTranslated(face.offsetX, face.offsetY, face.offsetZ);
             }
             float d = -2F;

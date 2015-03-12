@@ -388,4 +388,8 @@ public final class SpaceUtil {
         }
         return fo;
     }
+
+    public static int sign(ForgeDirection dir) {
+        return dir.offsetX + dir.offsetY + dir.offsetZ;
+    }
 }

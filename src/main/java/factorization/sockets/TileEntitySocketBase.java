@@ -9,10 +9,7 @@ import java.util.List;
 
 import factorization.api.datahelpers.*;
 import factorization.shared.*;
-import factorization.util.FzUtil;
-import factorization.util.InvUtil;
-import factorization.util.ItemUtil;
-import factorization.util.PlayerUtil;
+import factorization.util.*;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import net.minecraft.client.Minecraft;
@@ -100,8 +97,8 @@ public abstract class TileEntitySocketBase extends TileEntityCommon implements I
             ab.maxX += d;
             ab.maxY += d;
             ab.maxZ += d;
-            
-            if (top.offsetX + top.offsetY + top.offsetZ > 1) {
+
+            if (top.offsetX + top.offsetY + top.offsetZ > 1) { // NORELEASE: What? This never happens. SpaceUtil.sign(top)
                 ab.minX += d*top.offsetX;
                 ab.minY += d*top.offsetY;
                 ab.minZ += d*top.offsetZ;

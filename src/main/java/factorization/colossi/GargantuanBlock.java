@@ -2,6 +2,7 @@ package factorization.colossi;
 
 import java.util.ArrayList;
 
+import factorization.util.SpaceUtil;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.client.renderer.IconFlipped;
@@ -58,7 +59,7 @@ public class GargantuanBlock extends Block {
                 child.setAir();
                 good = true;
             } else {
-                good = dir.offsetX + dir.offsetY + dir.offsetZ > 0;
+                good = SpaceUtil.sign(dir) > 0;
             }
         }
         return super.removedByPlayer(world, player, x, y, z, willHarvest) && good;
@@ -98,7 +99,7 @@ public class GargantuanBlock extends Block {
     @Override
     public ArrayList<ItemStack> getDrops(World world, int x, int y, int z, int metadata, int fortune) {
         /*ForgeDirection dir = getDir(metadata);
-        if (dir.offsetX + dir.offsetY + dir.offsetZ < 0) {
+        if (SpaceUtil.sign(dir) < 0) {
             Coord mate = new Coord(world, x, y, z).add(dir);
             if (mate.getBlock() != this || getDir(mate.getMd()) != dir.getOpposite()) return new ArrayList<ItemStack>();
         }*/

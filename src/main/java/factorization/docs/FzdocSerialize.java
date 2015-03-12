@@ -3,6 +3,7 @@ package factorization.docs;
 import java.util.List;
 
 import factorization.util.PlayerUtil;
+import factorization.util.SpaceUtil;
 import net.minecraft.block.Block;
 import net.minecraft.command.ICommand;
 import net.minecraft.command.ICommandSender;
@@ -152,6 +153,6 @@ final class FzdocSerialize implements ICommand {
             at.adjust(d);
             size++;
         }
-        return size*(d.offsetX + d.offsetY + d.offsetZ);
+        return size * SpaceUtil.sign(d);
     }
 }

@@ -10,6 +10,7 @@ import factorization.common.ItemIcons;
 import factorization.shared.Core;
 import factorization.shared.NetworkFactorization;
 import factorization.util.RenderUtil;
+import factorization.util.SpaceUtil;
 import factorization.weird.TileEntityDayBarrel.Type;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
@@ -38,7 +39,7 @@ public class TileEntityDayBarrelRenderer extends TileEntitySpecialRenderer {
     void doDraw(TileEntityDayBarrel barrel, ItemStack is) {
         FzOrientation bo = barrel.orientation;
         ForgeDirection face = bo.facing;
-        if (face.offsetX + face.offsetY + face.offsetZ == 1) {
+        if (SpaceUtil.sign(face) == 1) {
             GL11.glTranslated(face.offsetX, face.offsetY, face.offsetZ);
         }
         GL11.glTranslated(
