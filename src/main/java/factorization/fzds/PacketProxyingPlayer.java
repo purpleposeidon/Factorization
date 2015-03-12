@@ -254,13 +254,13 @@ public class PacketProxyingPlayer extends EntityPlayerMP implements
     boolean canDie = false;
 
     public void endProxy() {
+        canDie = true;
         // From playerNetServerHandler.mcServer.getConfigurationManager().playerLoggedOut(this);
-        WorldServer var2 = getServerForPlayer();
-        var2.removeEntity(this); // setEntityDead
-        var2.getPlayerManager().removePlayer(this); // No comod?
+        WorldServer world = getServerForPlayer();
+        //world.removeEntity(this); // setEntityDead
+        world.getPlayerManager().removePlayer(this); // No comod?
         MinecraftServer.getServer().getConfigurationManager().playerEntityList.remove(playerNetServerHandler);
         // The stuff above might not be necessary.
-        canDie = true;
         setDead();
         dimensionSlice.clear();
     }
@@ -290,7 +290,7 @@ public class PacketProxyingPlayer extends EntityPlayerMP implements
         }
         DimensionSliceEntity dse = dimensionSlice.get();
         if (dse == null || dse.isDead) {
-            setDead();
+            endProxy();
             return;
         }
         Object wrappedMsg = wrapMessage(msg);
@@ -312,15 +312,24 @@ public class PacketProxyingPlayer extends EntityPlayerMP implements
         }
         player.playerNetServerHandler.sendPacket((Packet) packet);
     }
-    
+
+    /**
+     * use endProxy()
+     */
     @Override
+    @Deprecated
     public void setDead() {
-        if (canDie) {
-            releaseChunkLoading();
+        if (worldObj.isRemote) {
             super.setDead();
-        } else {
-            Core.logWarning("Denying PacketProxingPlayer.setDead at " + new Coord(this));
+            return;
         }
+        if (!canDie) {
+            Core.logWarning("Unexpected PacketProxingPlayer death at " + new Coord(this));
+            Thread.dumpStack();
+            canDie = true;
+        }
+        releaseChunkLoading();
+        super.setDead();
     }
 
     // IFzdsEntryControl implementation
