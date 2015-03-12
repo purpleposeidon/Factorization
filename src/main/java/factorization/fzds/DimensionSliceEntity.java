@@ -756,6 +756,7 @@ public class DimensionSliceEntity extends IDeltaChunk implements IFzdsEntryContr
     
     void shareRotationInfo() {
         boolean d0 = !rotation.equals(last_shared_rotation), d1 = !rotationalVelocity.equals(last_shared_rotational_velocity);
+        if (d1) d0 = true;
         if (parent.trackingEntity()) {
             d0 = false;
         }
@@ -1050,6 +1051,7 @@ public class DimensionSliceEntity extends IDeltaChunk implements IFzdsEntryContr
     void endSlice() {
         DeltaChunk.getSlices(worldObj).remove(this);
         deregisterUniversalCollisionsForDeath();
+        getController().idcDied(this);
         //TODO: teleport entities/blocks into the real world?
     }
     

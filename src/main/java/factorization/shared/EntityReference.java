@@ -39,7 +39,7 @@ public class EntityReference<E extends Entity> implements IDataSerializable {
         }
         if (ent != null && ent.isDead) ent = null;
         tracked_entity = ent;
-        if (ent == null) {
+        if (tracked_entity == null) {
             entity_uuid = null_uuid;
         } else {
             entity_uuid = ent.getUniqueID();
@@ -64,7 +64,11 @@ public class EntityReference<E extends Entity> implements IDataSerializable {
     
     @Override
     public IDataSerializable serialize(String prefix, DataHelper data) throws IOException {
+        UUID orig_id = entity_uuid;
         entity_uuid = data.asSameShare(prefix + "entity_uuid").putUUID(entity_uuid);
+        if (data.isReader() && tracked_entity != null && !orig_id.equals(entity_uuid)) {
+            tracked_entity = null;
+        }
         return this;
     }
 

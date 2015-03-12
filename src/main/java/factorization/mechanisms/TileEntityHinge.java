@@ -76,6 +76,7 @@ public class TileEntityHinge extends TileEntityCommon implements IDCController {
     static ThreadLocal<Boolean> initializing = new ThreadLocal<Boolean>();
 
     private void initHinge() {
+        if (idcRef.trackingEntity()) return;
         if (initializing.get() == Boolean.TRUE) return;
         initializing.set(Boolean.TRUE);
         try {
@@ -86,14 +87,11 @@ public class TileEntityHinge extends TileEntityCommon implements IDCController {
     }
 
     private void initHinge0() {
-        if (idcRef.trackedAndAlive()) {
-            return;
-        }
         final Coord target = getCoord().add(facing.facing);
         if (target.isReplacable()) return;
         DeltaCoord size = new DeltaCoord(16, 16, 16);
-        Coord min = getCoord().add(size);
-        Coord max = getCoord().add(size.reverse());
+        Coord min = getCoord().add(size.reverse());
+        Coord max = getCoord().add(size);
         IDeltaChunk idc = DeltaChunk.makeSlice(MechanismsFeature.deltachunk_channel, min, max, new DeltaChunk.AreaMap() {
             @Override
             public void fillDse(DeltaChunk.DseDestination destination) {
@@ -109,11 +107,26 @@ public class TileEntityHinge extends TileEntityCommon implements IDCController {
         idc.permit(DeltaCapability.CONSERVE_MOMENTUM);
         // idc.forbid(DeltaCapability.COLLIDE_WITH_WORLD);
 
+        Vec3 idcPos = SpaceUtil.fromEntPos(idc);
         Vec3 com = idc.getRotationalCenterOffset();
-        Vec3 half = SpaceUtil.scale(SpaceUtil.fromDirection(facing.facing), 0.5);
+
+        double s;
+        int topSign = SpaceUtil.sign(facing.top);
+        if (topSign == -1) {
+            s = 0;
+        } else {
+            s = 0.5;
+        }
+
+        Vec3 half = SpaceUtil.scale(SpaceUtil.fromDirection(facing.facing), s);
+        //SpaceUtil.toEntPos(idc, idcPos);
+
+        if (topSign == 1) {
+            half.zCoord += 1.0;
+        }
         com = SpaceUtil.add(com, half);
         idc.setRotationalCenterOffset(com);
-        SpaceUtil.toEntPos(idc, SpaceUtil.add(SpaceUtil.fromEntPos(idc), half));
+        SpaceUtil.toEntPos(idc, SpaceUtil.add(idcPos, half));
 
         Coord dest = idc.getCenter();
         DeltaCoord hingePoint = dest.difference(idc.getCorner());
@@ -127,9 +140,7 @@ public class TileEntityHinge extends TileEntityCommon implements IDCController {
     @Override
     public void putData(DataHelper data) throws IOException {
         facing = data.as(Share.VISIBLE, "facing").putEnum(facing);
-        if (data.as(Share.VISIBLE, "hasRef").putBoolean(idcRef != null)) {
-            data.as(Share.VISIBLE, "ref").put(idcRef);
-        }
+        data.as(Share.VISIBLE, "ref").put(idcRef);
         inertia = data.as(Share.PRIVATE, "inertia").putDouble(inertia);
     }
 
@@ -176,6 +187,7 @@ public class TileEntityHinge extends TileEntityCommon implements IDCController {
         if (inertia >= 0) return inertia;
         IntertiaCalculator ic = new IntertiaCalculator(idc, rotationAxis);
         inertia = ic.calculate();
+        if (inertia < 20) inertia = 20; // Don't go too crazy
         return inertia;
     }
 
@@ -236,6 +248,8 @@ public class TileEntityHinge extends TileEntityCommon implements IDCController {
     @Override
     public void idcDied(IDeltaChunk idc) {
         idcRef.trackEntity(null);
+        inertia = -1;
+        markDirty();
         getCoord().syncTE();
     }
 
@@ -249,7 +263,7 @@ public class TileEntityHinge extends TileEntityCommon implements IDCController {
         Quaternion rotVel = idc.getRotationalVelocity();
         if (rotVel.isZero()) return;
         Quaternion dampened = rotVel.slerp(new Quaternion(1, 0, 0, 0), 0.05);
-        idc.setRotationalVelocity(dampened);
+        //idc.setRotationalVelocity(dampened);
     }
 
     @Override
@@ -340,12 +354,18 @@ public class TileEntityHinge extends TileEntityCommon implements IDCController {
         if (idcRef.trackingEntity()) {
             IDeltaChunk idc = getIdc();
             if (idc != null) {
-                float d = 0.5F;
-                ForgeDirection v = facing.facing;
-                GL11.glTranslatef(v.offsetX * d, v.offsetY * d, v.offsetZ * d);
+                ForgeDirection face = facing.facing, top = facing.top;
+                float faced = 0.5F, topd = 0.0F;
+
+                if (SpaceUtil.sign(facing.top) == +1) topd = 1;
+
+                float dx = face.offsetX * faced + top.offsetX * topd;
+                float dy = face.offsetY * faced + top.offsetY * topd;
+                float dz = face.offsetZ * faced + top.offsetZ * topd;
+
+                GL11.glTranslatef(dx, dy, dz);
                 idc.getRotation().glRotate();
-                d = -0.5F;
-                GL11.glTranslatef(v.offsetX * d, v.offsetY * d, v.offsetZ * d);
+                GL11.glTranslatef(-dx, -dy, -dz);
             }
             setupHingeRotation2();
         } else {

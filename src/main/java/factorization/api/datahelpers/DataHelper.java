@@ -89,9 +89,6 @@ public abstract class DataHelper {
             if (isReader()) {
                 long msb = asSameShare(base_name + "MSB").putLong(0);
                 long lsb = asSameShare(base_name + "LSB").putLong(0);
-                if (msb == 0 && lsb == 0) {
-                    return o;
-                }
                 return (E) new UUID(msb, lsb);
             } else {
                 asSameShare(base_name + "MSB").putLong(uuid.getMostSignificantBits());
