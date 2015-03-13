@@ -44,7 +44,7 @@ import factorization.shared.NetworkFactorization.MessageType;
 
 // Note: The rules for holding on to references to Coord are the same as for holding on to World.
 // Don't keep references to them outside of things that are in worlds to avoid mem-leaks; or be careful about it.
-public class Coord implements IDataSerializable, ISaneCoord, Comparable<Coord> {
+public final class Coord implements IDataSerializable, ISaneCoord, Comparable<Coord> {
     public World w;
     public int x, y, z;
     static private Random rand = new Random();
