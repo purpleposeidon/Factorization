@@ -323,7 +323,7 @@ public class FZDSCommand extends CommandBase {
         if (cmd.needCoord && cmd.user == null) {
             throw new CommandException("No coordinate specified");
         }
-        if (cmd.needOp && cmd.op == false) {
+        if (cmd.needOp && cmd.op == false && !Core.dev_environ) {
             throw new CommandException("Insufficient permissions");
         }
         if (cmd.needSelection && cmd.selected == null) {
