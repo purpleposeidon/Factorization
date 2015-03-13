@@ -66,7 +66,14 @@ public class TileEntityHinge extends TileEntityCommon implements IDCController {
 
     @Override
     public void neighborChanged() {
-        initHinge();
+        if (idcRef.trackingEntity()) {
+            IDeltaChunk idc = idcRef.getEntity();
+            if (idc != null && getCoord().isPowered()) {
+                idc.setRotationalVelocity(new Quaternion());
+            }
+        } else {
+            initHinge();
+        }
     }
 
     static ThreadLocal<Boolean> initializing = new ThreadLocal<Boolean>();
@@ -250,12 +257,23 @@ public class TileEntityHinge extends TileEntityCommon implements IDCController {
         return idcRef.getEntity();
     }
 
+    static final double min_velocity = Math.PI / 20 / 20 / 20;
+
+    boolean isBasicallyStopped(Quaternion rotVel) {
+        return rotVel.isZero() || rotVel.getAngleRadians() /* Opportunity to algebra our way out of a call to acos here */ < min_velocity;
+    }
+
     @Override
     public void beforeUpdate(IDeltaChunk idc) {
         idc_ticking = true;
         Quaternion rotVel = idc.getRotationalVelocity();
         if (rotVel.isZero()) return;
-        Quaternion dampened = rotVel.slerp(new Quaternion(1, 0, 0, 0), 0.05);
+        Quaternion dampened;
+        if (isBasicallyStopped(rotVel)) {
+            dampened = new Quaternion();
+        } else {
+            dampened = rotVel.slerp(new Quaternion(1, 0, 0, 0), 0.05);
+        }
         idc.setRotationalVelocity(dampened);
     }
 
@@ -313,7 +331,7 @@ public class TileEntityHinge extends TileEntityCommon implements IDCController {
         Quaternion w = idc.getRotationalVelocity();
         if (!w.isZero()) {
             double theta = w.getAngleBetween(new Quaternion());
-            if (theta > 0.001) return;
+            if (theta > Math.PI * 0.05) return;
             idc.setRotationalVelocity(new Quaternion());
         }
         Quaternion rot = idc.getRotation();
@@ -406,5 +424,11 @@ public class TileEntityHinge extends TileEntityCommon implements IDCController {
             dleft += fsign;
         }
         GL11.glTranslatef(0, 0.5F * fsign, dleft);
+    }
+
+    @Override
+    public AxisAlignedBB getRenderBoundingBox() {
+        int a = -2, b = +3;
+        return AxisAlignedBB.getBoundingBox(xCoord + a, yCoord + a, zCoord + a, xCoord + b, yCoord + b, zCoord + b);
     }
 }

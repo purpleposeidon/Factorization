@@ -47,8 +47,8 @@ import factorization.shared.NetworkFactorization.MessageType;
 public final class Coord implements IDataSerializable, ISaneCoord, Comparable<Coord> {
     public World w;
     public int x, y, z;
-    static private Random rand = new Random();
-    static private ThreadLocal<Coord> staticCoord = new ThreadLocal<Coord>();
+    private static final Random rand = new Random();
+    private static final ThreadLocal<Coord> staticCoord = new ThreadLocal<Coord>();
     
     public static final Coord ZERO = new Coord(null, 0, 0, 0);
 
