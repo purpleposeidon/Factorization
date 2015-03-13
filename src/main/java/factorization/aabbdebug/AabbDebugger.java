@@ -94,10 +94,11 @@ public enum AabbDebugger {
         if (event.phase == Phase.START) {
             if (freeze) {
                 if (!boxes.isEmpty() || !lines.isEmpty()) {
-                    freeze = false;
+                    frozen.clear();
+                    frozen_lines.clear();
+                    frozen.addAll(boxes);
+                    frozen_lines.addAll(lines);
                 }
-                frozen.addAll(boxes);
-                frozen_lines.addAll(lines);
             }
             boxes.clear();
             lines.clear();
