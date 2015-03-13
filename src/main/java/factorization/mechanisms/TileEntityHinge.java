@@ -11,7 +11,6 @@ import factorization.api.datahelpers.Share;
 import factorization.common.BlockIcons;
 import factorization.common.FactoryType;
 import factorization.fzds.DeltaChunk;
-import factorization.fzds.TransferLib;
 import factorization.fzds.interfaces.DeltaCapability;
 import factorization.fzds.interfaces.IDCController;
 import factorization.fzds.interfaces.IDeltaChunk;
@@ -22,12 +21,9 @@ import factorization.util.SpaceUtil;
 import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.texture.TextureManager;
-import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
-import net.minecraft.potion.PotionHealth;
-import net.minecraft.potion.PotionHelper;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.MovingObjectPosition;
 import net.minecraft.util.Vec3;
@@ -39,6 +35,8 @@ import org.lwjgl.opengl.GL12;
 import java.io.IOException;
 import java.util.List;
 
+import static factorization.util.SpaceUtil.*;
+import static factorization.util.SpaceUtil.fromDirection;
 import static org.lwjgl.opengl.GL11.*;
 
 public class TileEntityHinge extends TileEntityCommon implements IDCController {
@@ -110,20 +108,14 @@ public class TileEntityHinge extends TileEntityCommon implements IDCController {
         Vec3 idcPos = SpaceUtil.fromEntPos(idc);
         Vec3 com = idc.getRotationalCenterOffset();
 
-        double s;
-        int topSign = SpaceUtil.sign(facing.top);
-        if (topSign == -1) {
-            s = 0;
-        } else {
-            s = 0.5;
+        final int faceSign = sign(facing.facing);
+        final int topSign = sign(facing.top);
+        Vec3 half = fromDirection(facing.facing);
+        half = scale(half, 0.5 * faceSign);
+        if (topSign > 0) {
+            half = add(half, fromDirection(facing.top));
         }
 
-        Vec3 half = SpaceUtil.scale(SpaceUtil.fromDirection(facing.facing), s);
-        //SpaceUtil.toEntPos(idc, idcPos);
-
-        if (topSign == 1) {
-            half.zCoord += 1.0;
-        }
         com = SpaceUtil.add(com, half);
         idc.setRotationalCenterOffset(com);
         SpaceUtil.toEntPos(idc, SpaceUtil.add(idcPos, half));
@@ -199,6 +191,7 @@ public class TileEntityHinge extends TileEntityCommon implements IDCController {
     public boolean hitBlock(IDeltaChunk idc, EntityPlayer player, Coord at, byte sideHit) {
         if (player.isSneaking()) return false;
         if (worldObj.isRemote) return false;
+        if (getCoord().isPowered()) return false;
         double forceMultiplier = 1;
         if (player.isSprinting()) {
             forceMultiplier *= 2;
@@ -263,7 +256,7 @@ public class TileEntityHinge extends TileEntityCommon implements IDCController {
         Quaternion rotVel = idc.getRotationalVelocity();
         if (rotVel.isZero()) return;
         Quaternion dampened = rotVel.slerp(new Quaternion(1, 0, 0, 0), 0.05);
-        //idc.setRotationalVelocity(dampened);
+        idc.setRotationalVelocity(dampened);
     }
 
     @Override
