@@ -175,7 +175,7 @@ public class TileEntityHinge extends TileEntityCommon implements IDCController {
 
     double getInertia(IDeltaChunk idc, Vec3 rotationAxis) {
         if (inertia >= 0) return inertia;
-        IntertiaCalculator ic = new IntertiaCalculator(idc, rotationAxis); // NORELEASE: Spelling. Derp.
+        InertiaCalculator ic = new InertiaCalculator(idc, rotationAxis);
         inertia = ic.calculate();
         if (inertia < 20) inertia = 20; // Don't go too crazy
         return inertia;
