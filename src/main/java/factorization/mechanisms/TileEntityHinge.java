@@ -17,7 +17,6 @@ import factorization.fzds.interfaces.IDeltaChunk;
 import factorization.fzds.interfaces.Interpolation;
 import factorization.shared.*;
 import factorization.util.PlayerUtil;
-import factorization.util.SpaceUtil;
 import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.texture.TextureManager;
@@ -36,7 +35,6 @@ import java.io.IOException;
 import java.util.List;
 
 import static factorization.util.SpaceUtil.*;
-import static factorization.util.SpaceUtil.fromDirection;
 import static org.lwjgl.opengl.GL11.*;
 
 public class TileEntityHinge extends TileEntityCommon implements IDCController {
@@ -63,7 +61,7 @@ public class TileEntityHinge extends TileEntityCommon implements IDCController {
 
     @Override
     public void onPlacedBy(EntityPlayer player, ItemStack is, int side, float hitX, float hitY, float hitZ) {
-        facing = SpaceUtil.getOrientation(player, side, hitX, hitY, hitZ);
+        facing = getOrientation(player, side, hitX, hitY, hitZ);
     }
 
     @Override
@@ -105,7 +103,7 @@ public class TileEntityHinge extends TileEntityCommon implements IDCController {
         idc.permit(DeltaCapability.CONSERVE_MOMENTUM);
         // idc.forbid(DeltaCapability.COLLIDE_WITH_WORLD);
 
-        Vec3 idcPos = SpaceUtil.fromEntPos(idc);
+        Vec3 idcPos = fromEntPos(idc);
         Vec3 com = idc.getRotationalCenterOffset();
 
         final int faceSign = sign(facing.facing);
@@ -116,9 +114,9 @@ public class TileEntityHinge extends TileEntityCommon implements IDCController {
             half = add(half, fromDirection(facing.top));
         }
 
-        com = SpaceUtil.add(com, half);
+        com = add(com, half);
         idc.setRotationalCenterOffset(com);
-        SpaceUtil.toEntPos(idc, SpaceUtil.add(idcPos, half));
+        toEntPos(idc, add(idcPos, half));
 
         Coord dest = idc.getCenter();
         DeltaCoord hingePoint = dest.difference(idc.getCorner());
@@ -177,7 +175,7 @@ public class TileEntityHinge extends TileEntityCommon implements IDCController {
 
     double getInertia(IDeltaChunk idc, Vec3 rotationAxis) {
         if (inertia >= 0) return inertia;
-        IntertiaCalculator ic = new IntertiaCalculator(idc, rotationAxis);
+        IntertiaCalculator ic = new IntertiaCalculator(idc, rotationAxis); // NORELEASE: Spelling. Derp.
         inertia = ic.calculate();
         if (inertia < 20) inertia = 20; // Don't go too crazy
         return inertia;
@@ -200,29 +198,31 @@ public class TileEntityHinge extends TileEntityCommon implements IDCController {
             forceMultiplier /= 3;
         }
         forceMultiplier *= PlayerUtil.getPuntStrengthMultiplier(player);
-        Vec3 topVec = SpaceUtil.fromDirection(facing.top);
-        Vec3 faceVec = SpaceUtil.fromDirection(facing.facing);
+        Vec3 topVec = fromDirection(facing.top);
+        Vec3 faceVec = fromDirection(facing.facing);
         Vec3 rotationAxis = topVec.crossProduct(faceVec);
         double I = getInertia(idc, rotationAxis);
 
         Vec3 force = player.getLookVec().normalize();
+        idc.getRotation().applyReverseRotation(force);
 
         Vec3 hitBlock = at.createVector();
 
         Vec3 idcCorner = idc.getCorner().createVector();
-        Vec3 idcRot = SpaceUtil.add(idcCorner, idc.getRotationalCenterOffset());
+        Vec3 idcRot = add(idcCorner, idc.getRotationalCenterOffset());
 
-        Vec3 leverArm = SpaceUtil.subtract(hitBlock, idcRot);
+        Vec3 leverArm = subtract(hitBlock, idcRot);
 
-        SpaceUtil.incrScale(force, 2.0 * forceMultiplier / I);
+        incrScale(force, 2.0 * forceMultiplier / I);
 
         Vec3 torque = leverArm.crossProduct(force);
+        idc.getRotation().applyRotation(torque);
 
         if (rotationAxis.xCoord + rotationAxis.yCoord + rotationAxis.zCoord < 0) {
-            SpaceUtil.incrScale(rotationAxis, -1);
+            incrScale(rotationAxis, -1);
         }
 
-        SpaceUtil.incrComponentMultiply(torque, rotationAxis);
+        incrComponentMultiply(torque, rotationAxis);
 
         Quaternion qx = Quaternion.getRotationQuaternionRadians(torque.xCoord, ForgeDirection.EAST);
         Quaternion qy = Quaternion.getRotationQuaternionRadians(torque.yCoord, ForgeDirection.UP);
@@ -350,7 +350,8 @@ public class TileEntityHinge extends TileEntityCommon implements IDCController {
                 ForgeDirection face = facing.facing, top = facing.top;
                 float faced = 0.5F, topd = 0.0F;
 
-                if (SpaceUtil.sign(facing.top) == +1) topd = 1;
+                if (sign(facing.top) == +1) topd = 1;
+                if (sign(facing.facing) == -1) faced *= -1;
 
                 float dx = face.offsetX * faced + top.offsetX * topd;
                 float dy = face.offsetY * faced + top.offsetY * topd;
