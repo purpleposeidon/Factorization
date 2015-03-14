@@ -64,6 +64,11 @@ public class TileEntityHinge extends TileEntityCommon implements IDCController {
     }
 
     @Override
+    public boolean isBlockSolidOnSide(int side) {
+        return ForgeDirection.getOrientation(side) == facing.facing.getOpposite();
+    }
+
+    @Override
     public void neighborChanged() {
         if (idcRef.trackingEntity()) {
             IDeltaChunk idc = idcRef.getEntity();
@@ -130,6 +135,7 @@ public class TileEntityHinge extends TileEntityCommon implements IDCController {
         worldObj.spawnEntityInWorld(idc);
         idc.setController(this);
         idcRef.trackEntity(idc);
+        updateComparators();
         markDirty();
         getCoord().syncTE();
     }
@@ -255,6 +261,7 @@ public class TileEntityHinge extends TileEntityCommon implements IDCController {
     public void idcDied(IDeltaChunk idc) {
         idcRef.trackEntity(null);
         inertia = -1;
+        updateComparators();
         markDirty();
         getCoord().syncTE();
     }
@@ -320,6 +327,13 @@ public class TileEntityHinge extends TileEntityCommon implements IDCController {
     @Override
     public void afterUpdate(IDeltaChunk idc) {
         idc_ticking = false;
+        if (!idc.getRotationalVelocity().isZero()) {
+            updateComparators();
+        }
+        if (executing_order && !idc.hasOrderedRotation()) {
+            executing_order = false;
+            updateComparators();
+        }
     }
 
     @Override
@@ -354,6 +368,8 @@ public class TileEntityHinge extends TileEntityCommon implements IDCController {
             IDeltaChunk idc = idcRef.getEntity();
             if (idc != null) {
                 idc.setController(this);
+                executing_order = idc.hasOrderedRotation();
+                updateComparators();
             }
         }
     }
@@ -387,6 +403,7 @@ public class TileEntityHinge extends TileEntityCommon implements IDCController {
             align = rot.slerp(new Quaternion(), t);
         }
         idc.orderTargetRotation(align, 10, Interpolation.SQUARE);
+        executing_order = true;
     }
 
     @Override
@@ -522,5 +539,32 @@ public class TileEntityHinge extends TileEntityCommon implements IDCController {
     public AxisAlignedBB getRenderBoundingBox() {
         int a = -2, b = +3;
         return AxisAlignedBB.getBoundingBox(xCoord + a, yCoord + a, zCoord + a, xCoord + b, yCoord + b, zCoord + b);
+    }
+
+    private transient byte comparator_cache = 0;
+    private transient boolean executing_order = false;
+
+    @Override
+    public int getComparatorValue(ForgeDirection side) {
+        return comparator_cache;
+    }
+
+    private void updateComparators() {
+        byte new_val = comparatorMeasure();
+        if (new_val == comparator_cache) return;
+        comparator_cache = new_val;
+        markDirty();
+    }
+
+    private byte comparatorMeasure() {
+        if (!idcRef.trackingEntity()) {
+            return 0;
+        }
+        IDeltaChunk idc = idcRef.getEntity();
+        if (idc == null) return comparator_cache;
+        double angle = Math.toDegrees(idc.getRotation().getAngleBetween(new Quaternion()));
+        angle /= 90;
+        angle = 1 - angle;
+        return (byte) (0xF * angle);
     }
 }

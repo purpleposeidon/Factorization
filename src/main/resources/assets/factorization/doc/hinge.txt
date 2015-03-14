@@ -13,6 +13,8 @@ A redstone signal will lock the hinge.
 
 Giving the hinge itself a good smack will make it close.
 
+Comparators will measure how far open a hinge is.
+
 
 
 
