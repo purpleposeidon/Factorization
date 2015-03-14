@@ -392,4 +392,8 @@ public final class SpaceUtil {
     public static int sign(ForgeDirection dir) {
         return dir.offsetX + dir.offsetY + dir.offsetZ;
     }
+
+    public static double sum(Vec3 vec) {
+        return vec.xCoord + vec.yCoord + vec.zCoord;
+    }
 }

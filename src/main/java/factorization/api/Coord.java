@@ -412,6 +412,10 @@ public final class Coord implements IDataSerializable, ISaneCoord, Comparable<Co
     public Coord add(int x, int y, int z) {
         return new Coord(w, this.x + x, this.y + y, this.z + z);
     }
+
+    public Coord add(Vec3 v) {
+        return new Coord(w, this.x + v.xCoord, this.y + v.yCoord, this.z + v.zCoord);
+    }
     
     public Coord center(Coord o) {
         return new Coord(w, (x + o.x)/2, (y + o.y)/2, (z + o.z)/2);
@@ -602,6 +606,10 @@ public final class Coord implements IDataSerializable, ISaneCoord, Comparable<Co
             return 0;
         }
         return b.getBlockHardness(w, x, y, z);
+    }
+
+    public boolean isBedrock() {
+        return getHardness() < 0;
     }
 
     /** Let's try to use Orientation */

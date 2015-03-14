@@ -159,7 +159,7 @@ public class DimensionSliceEntity extends IDeltaChunk implements IFzdsEntryContr
     
     @Override
     public void shadow2real(Coord c) {
-        double d = 0.5;
+        double d = 1.0;
         workVec.xCoord = c.x + d;
         workVec.yCoord = c.y + d;
         workVec.zCoord = c.z + d;
