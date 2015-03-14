@@ -25,3 +25,9 @@
 % I/ADU9bdPwAAAAAAAAAAAAAAAAAA0MnyEODR+jFv0UE2kUmAAAA=
 % }
 
+\newpage
+\title{New!}
+
+\index{twistingblock}{\#{item.factorization:twistedBlock}Twisted Block of Dark Iron}
+\index{hinge}{\#{factorization.factoryBlock.HINGE}Hinge}
+

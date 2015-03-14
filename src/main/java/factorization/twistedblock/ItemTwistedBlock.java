@@ -58,7 +58,7 @@ public class ItemTwistedBlock extends ItemBlockProxy {
             tag.setInteger("turns", turns);
             double angle = (2 * Math.PI) * turns / 16.0;
             Quaternion newRotation = Quaternion.getRotationQuaternionRadians(angle, orig);
-            idc.orderTargetRotation(newRotation, 60, Interpolation.SMOOTH3);
+            idc.orderTargetRotation(newRotation, 40, Interpolation.SMOOTH);
             return false;
         }
         DeltaCoord size = new DeltaCoord(16, 16, 16);
@@ -100,7 +100,8 @@ public class ItemTwistedBlock extends ItemBlockProxy {
         idc.worldObj.spawnEntityInWorld(idc);
 
         Quaternion rotation = Quaternion.getRotationQuaternionRadians(amount, axis);
-        idc.orderTargetRotation(rotation, 60, Interpolation.SMOOTH3);
+        idc.orderTargetRotation(rotation, 40, Interpolation.SMOOTH);
+        at.add(ForgeDirection.getOrientation(side)).spawnItem(Core.registry.dark_iron_sprocket.copy());
 
         return true;
     }

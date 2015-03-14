@@ -55,7 +55,9 @@ item.factorization:diamond_shard	ores
 item.factorization:tool/matrix_programmer	lmp
 tile.factorization.ResourceBlock.SILVERORE	ores
 item.factorization:servo/component.fz.instruction.jmp	instructions/compute
+factorization.factoryBlock.HINGE	hinge
 item.factorization:fan	pressurizer
+item.factorization:twistedBlock	twistingblock
 tile.pistonStickyBase	piston
 item.factorization:socket/SOCKET_ROBOTHAND	arm
 item.factorization:servo/component.fz.instruction.cmp	instructions/value

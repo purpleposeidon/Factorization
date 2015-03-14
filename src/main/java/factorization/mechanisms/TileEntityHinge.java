@@ -92,7 +92,7 @@ public class TileEntityHinge extends TileEntityCommon implements IDCController {
         final Coord target = getCoord().add(facing.facing);
         if (target.isReplacable()) return;
         if (target.isBedrock()) return;
-        DeltaCoord size = new DeltaCoord(16, 16, 16);
+        DeltaCoord size = new DeltaCoord(8, 8, 8);
         Coord min = getCoord().add(size.reverse());
         Coord max = getCoord().add(size);
         IDeltaChunk idc = DeltaChunk.makeSlice(MechanismsFeature.deltachunk_channel, min, max, new DeltaChunk.AreaMap() {
@@ -365,6 +365,7 @@ public class TileEntityHinge extends TileEntityCommon implements IDCController {
 
     @Override
     public void click(EntityPlayer entityplayer) {
+        if (getCoord().isWeaklyPowered()) return;
         IDeltaChunk idc = idcRef.getEntity();
         if (idc == null) return;
         if (idc.hasOrderedRotation()) return;
@@ -400,6 +401,7 @@ public class TileEntityHinge extends TileEntityCommon implements IDCController {
         } else if (idcRef.trackingEntity()) {
             return false;
         }
+        if (getCoord().isWeaklyPowered()) return false;
         if (worldObj.isRemote) return true;
         boolean ret = super.removedByPlayer(player, willHarvest);
         if (ret && unload) dropHingeBlocks(idc);

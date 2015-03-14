@@ -1,0 +1,20 @@
+\title{Twisted Block of Dark Iron}
+
+Dark Iron is the only block in the known universe
+that can be bent against the alignment of reality with minimal fuss.
+Simply slap a sprocket on, and give it a twist!
+
+Other blocks can be placed against the dark iron block
+(up to a point),
+and the original block can be removed if desired.
+
+Placing a Twisted Block against another turned dark iron block will not,
+as some have feared,
+form a world-devlouring black hole;
+instead it will merely twist the original block slightly.
+It's perfectly safe!
+
+The same may not be true of all \i{other} blocks;
+it would be wise to keep bold experimentation well away from any planet you have fondness for.
+
+\topic{item.factorization:twistedBlock}

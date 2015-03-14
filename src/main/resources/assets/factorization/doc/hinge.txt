@@ -1,0 +1,19 @@
+\title{The Hinge}
+
+This hinge contraption may be your best invention yet!
+It resembles an ordinary iron block when closed,
+but a narrow bolt of dark iron allows the two heavy slabs to rotate up to 180°.
+
+Blocks can be placed on one end of the hinge,
+and then rotated by punching the attatched blocks.
+
+Its heftiness allows you to build doors much grander than those rinky-dink wooden ones.
+
+A redstone signal will lock the hinge.
+
+Giving the hinge itself a good smack will make it close.
+
+
+
+
+\topic{factorization.factoryBlock.HINGE}

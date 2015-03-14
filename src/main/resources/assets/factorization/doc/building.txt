@@ -6,6 +6,10 @@ Arbitrary shapes and statues can be built using \link{sculpture}{Ceramic Sculptu
 
 \link{goo}{Goo} is very helpful for construction and excavation.
 
+The \link{twistingblock}{Twisted Block of Dark Iron} allows you to place blocks at angles.
+
+The \link{hinge}{Hinge} can be used to make enormous doors.
+
 \newpage
 The "pick block" button (middle click) has been made more useful.
 If pick a block that is not on your hotbar,
