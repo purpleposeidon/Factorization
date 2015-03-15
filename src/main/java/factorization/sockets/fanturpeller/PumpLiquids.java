@@ -21,6 +21,7 @@ import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemBucket;
 import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.ForgeDirection;
 import net.minecraftforge.fluids.BlockFluidFinite;
@@ -51,12 +52,13 @@ import factorization.sockets.ISocketHolder;
 public class PumpLiquids extends SocketFanturpeller implements IFluidHandler {
     protected static final int BUCKET = FluidContainerRegistry.BUCKET_VOLUME;
     protected FluidTank buffer = new FluidTank(BUCKET);
+    protected FluidTank auxBuffer = new FluidTank(BUCKET);
     protected boolean isDrainingTank = false;
     protected boolean isFloodingTank = false;
     private static FluidTankInfo[] no_info = new FluidTankInfo[0];
     
     {
-        isSucking = false;
+        super.isSucking = false;
     }
     
 
@@ -203,6 +205,9 @@ public class PumpLiquids extends SocketFanturpeller implements IFluidHandler {
             queue.add(seed);
             delay = 20*3;
             foundContainers.clear();
+            if (buffer.getFluidAmount() > 0 && buffer.getFluidAmount() < buffer.getCapacity()) {
+                FluidUtil.transfer(auxBuffer, buffer);
+            }
         }
         
         @Override
@@ -272,6 +277,7 @@ public class PumpLiquids extends SocketFanturpeller implements IFluidHandler {
             if (pc == null) {
                 FoundFluidHandler foundIfh = foundContainers.poll();
                 if (foundIfh == null) {
+                    auxBuffer.fill(buffer.drain(BUCKET, true), true);
                     reset();
                     return;
                 }
@@ -357,13 +363,14 @@ public class PumpLiquids extends SocketFanturpeller implements IFluidHandler {
             if (isSucking) return; //don't run backwards
             if (!foundContainers.isEmpty() && buffer.getFluidAmount() > 0) {
                 FoundFluidHandler foundIfh = foundContainers.poll();
-                FluidStack work = buffer.getFluid().copy();
+                FluidTank buff = auxBuffer.getFluidAmount() > 0 ? auxBuffer : buffer;
+                FluidStack work = buff.getFluid().copy();
                 if (work.amount > 25) {
                     work.amount = 25;
                 }
                 int amount = foundIfh.te.fill(foundIfh.dir, work, true);
-                buffer.drain(amount, true);
-                if (buffer.getFluidAmount() <= 0) {
+                buff.drain(amount, true);
+                if (buffer /* NOT buff; we could be using auxBuff*/.getFluidAmount() <= 0) {
                     reset();
                 } else {
                     if (amount > 0) {
@@ -371,11 +378,15 @@ public class PumpLiquids extends SocketFanturpeller implements IFluidHandler {
                     }
                     delay = 0;
                 }
-                isFloodingTank = (buffer.getFluidAmount() % 1000) != 0;
+                isFloodingTank = (buffer /* also could be using auxBuff? */.getFluidAmount() % 1000) != 0;
                 return;
             }
             if (buffer.getFluidAmount() < BUCKET) {
-                if (isFloodingTank) updateFrontier();
+                if (isFloodingTank) {
+                    if (!updateFrontier()) {
+                        reset();
+                    }
+                }
                 return;
             }
             FluidStack fs = buffer.getFluid();
@@ -578,16 +589,25 @@ public class PumpLiquids extends SocketFanturpeller implements IFluidHandler {
         if (obj == null) return "None";
         return obj.getClass().getSimpleName();
     }
+
+    String nameTank(FluidTank buff) {
+        FluidStack fs = buff.getFluid();
+        if (fs == null || fs.amount == 0) return "";
+        String unit;
+        if (fs.amount % BUCKET == 0) {
+            int n = (fs.amount / BUCKET);
+            String bucket = n == 1 ? "bucket" : "buckets"; // >_>
+            unit = n + " " + bucket + " of ";
+        } else {
+            unit = fs.amount + "mb of ";
+        }
+        return "\n" + unit + fs.getFluid().getName();
+    }
     
     @Override
     public String getInfo() {
         FluidStack fs = buffer.getFluid();
-        String fluid;
-        if (fs == null) {
-            fluid = "";
-        } else {
-            fluid = "\n" + fs.amount + "mB of " + fs.getFluid().getName();
-        }
+        String fluid = nameTank(buffer) + nameTank(auxBuffer);
         float targetSpeed = getTargetSpeed();
         String speed = "";
         if (Math.abs(targetSpeed) > 1) {
@@ -656,13 +676,8 @@ public class PumpLiquids extends SocketFanturpeller implements IFluidHandler {
     @Override
     public IDataSerializable serialize(String prefix, DataHelper data) throws IOException {
         super.serialize(prefix, data);
-        if (data.isNBT()) { // Lame, but only just this once.
-            if (data.isReader()) {
-                buffer.readFromNBT(data.getTag());
-            } else {
-                buffer.writeToNBT(data.getTag());
-            }
-        }
+        data.as(Share.PRIVATE, "buff").putTank(buffer);
+        data.as(Share.PRIVATE, "auxBuff").putTank(auxBuffer);
         isDrainingTank = data.as(Share.PRIVATE, "drainTank").putBoolean(isDrainingTank);
         isFloodingTank = data.as(Share.PRIVATE, "floodTank").putBoolean(isFloodingTank);
         

@@ -45,4 +45,10 @@ public class FluidUtil {
         if (fs == null || fs.amount <= 0) return null;
         return fs;
     }
+
+    public static int transfer(IFluidTank dst, IFluidTank src) {
+        int free = dst.getCapacity() - dst.getFluidAmount();
+        int use = dst.fill(src.drain(free, false), false);
+        return dst.fill(src.drain(use, true), true);
+    }
 }
