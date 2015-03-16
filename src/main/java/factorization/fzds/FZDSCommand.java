@@ -3,6 +3,7 @@ package factorization.fzds;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map.Entry;
 
@@ -715,13 +716,39 @@ public class FZDSCommand extends CommandBase {
                     new Notice(selected, "Selection").send(player);
                 }
             }} /* needs nothing */);
-        add(new SubCommand("remove") {
+        add(new SubCommand("remove", "[part]") {
             @Override
-            String details() { return "Destroys the selection"; }
+            String details() { return "Destroys the selection and everything attatched, unless 'part' is given"; }
             @Override
             void call(String[] args) {
-                selected.setDead();
-                clearDseArea(selected);
+                boolean recursive = true;
+                if (args.length == 1 && args[0].equalsIgnoreCase("part")) {
+                    recursive = false;
+                }
+                HashSet<IDeltaChunk> toKill = new HashSet<IDeltaChunk>();
+                toKill.add(selected);
+                if (recursive) {
+                    boolean any = true;
+                    while (any) {
+                        any = false;
+                        ArrayList<IDeltaChunk> toAdd = new ArrayList<IDeltaChunk>();
+                        for (IDeltaChunk idc : toKill) {
+                            IDeltaChunk parent = idc.getParent();
+                            if (parent != null) toAdd.add(parent);
+                            List<IDeltaChunk> children = idc.getChildren();
+                            if (children == null) continue;
+                            toAdd.addAll(children);
+                        }
+                        int firstSize = toKill.size();
+                        toKill.addAll(toAdd);
+                        any = firstSize != toKill.size();
+                    }
+                }
+
+                for (IDeltaChunk idc : toKill) {
+                    idc.setDead();
+                    clearDseArea(idc);
+                }
                 setSelection(null);
                 sendChat("Made dead");
             }}, Requires.SLICE_SELECTED);
