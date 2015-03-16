@@ -21,8 +21,10 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.texture.TextureManager;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.AxisAlignedBB;
+import net.minecraft.util.IIcon;
 import net.minecraft.util.MovingObjectPosition;
 import net.minecraft.util.Vec3;
 import net.minecraft.world.World;
@@ -40,6 +42,7 @@ public class TileEntityHinge extends TileEntityCommon implements IDCController {
     FzOrientation facing = FzOrientation.FACE_EAST_POINT_DOWN;
     final EntityReference<IDeltaChunk> idcRef = new EntityReference<IDeltaChunk>();
     double inertia = -1.0;
+    Vec3 dseOffset = SpaceUtil.newVec();
     transient boolean idc_ticking = false;
 
     @Override
@@ -116,7 +119,6 @@ public class TileEntityHinge extends TileEntityCommon implements IDCController {
         // idc.forbid(DeltaCapability.COLLIDE_WITH_WORLD);
 
         Vec3 idcPos = fromEntPos(idc);
-        Vec3 com = idc.getRotationalCenterOffset();
 
         final int faceSign = sign(facing.facing);
         final int topSign = sign(facing.top);
@@ -126,6 +128,7 @@ public class TileEntityHinge extends TileEntityCommon implements IDCController {
             half = add(half, fromDirection(facing.top));
         }
 
+        Vec3 com = idc.getRotationalCenterOffset();
         com = add(com, half);
         idc.setRotationalCenterOffset(com);
         toEntPos(idc, add(idcPos, half));
@@ -138,6 +141,15 @@ public class TileEntityHinge extends TileEntityCommon implements IDCController {
         updateComparators();
         markDirty();
         getCoord().syncTE();
+        dseOffset.xCoord = idc.posX - xCoord;
+        dseOffset.yCoord = idc.posY - yCoord;
+        dseOffset.zCoord = idc.posZ - zCoord;
+    }
+
+    void setProperPosition(IDeltaChunk idc) {
+        idc.posX = dseOffset.xCoord + xCoord;
+        idc.posY = dseOffset.yCoord + yCoord;
+        idc.posZ = dseOffset.zCoord + zCoord;
     }
 
     @Override
@@ -145,6 +157,7 @@ public class TileEntityHinge extends TileEntityCommon implements IDCController {
         facing = data.as(Share.VISIBLE, "facing").putEnum(facing);
         data.as(Share.VISIBLE, "ref").put(idcRef);
         inertia = data.as(Share.PRIVATE, "inertia").putDouble(inertia);
+        dseOffset = data.as(Share.PRIVATE, "dseOffset").putVec3(dseOffset);
     }
 
     void setSlabBounds(Block b) {
@@ -174,7 +187,7 @@ public class TileEntityHinge extends TileEntityCommon implements IDCController {
 
     @Override
     public boolean placeBlock(IDeltaChunk idc, EntityPlayer player, Coord at, byte sideHit) {
-        NORELEASE.fixme("This doesn't actually get called!");
+        //NORELEASE.fixme("This doesn't actually get called!");
         dirtyInertia();
         return false;
     }
@@ -185,7 +198,13 @@ public class TileEntityHinge extends TileEntityCommon implements IDCController {
         return false;
     }
 
-    @Override public boolean useBlock(IDeltaChunk idc, EntityPlayer player, Coord at, byte sideHit) { return false; }
+    @Override public boolean useBlock(IDeltaChunk idc, EntityPlayer player, Coord at, byte sideHit) {
+        if (player.isSneaking()) return false;
+        if (worldObj.isRemote) return false;
+        final ItemStack held = player.getHeldItem();
+        if (held != null && held.getMaxStackSize() > 1) return false;
+        return applyForce(idc, player, at, -1);
+    }
 
     double getInertia(IDeltaChunk idc, Vec3 rotationAxis) {
         if (inertia >= 0) return inertia;
@@ -203,8 +222,11 @@ public class TileEntityHinge extends TileEntityCommon implements IDCController {
     public boolean hitBlock(IDeltaChunk idc, EntityPlayer player, Coord at, byte sideHit) {
         if (player.isSneaking()) return false;
         if (worldObj.isRemote) return false;
-        if (getCoord().isWeaklyPowered()) return false;
-        double forceMultiplier = 1;
+        return applyForce(idc, player, at, 1);
+    }
+
+    private boolean applyForce(IDeltaChunk idc, EntityPlayer player, Coord at, double forceMultiplier) {
+        if (getCoord().isWeaklyPowered()) return true;
         if (player.isSprinting()) {
             forceMultiplier *= 2;
         }
@@ -291,12 +313,20 @@ public class TileEntityHinge extends TileEntityCommon implements IDCController {
         limitBend(idc);
     }
 
+    private boolean bendMode() {
+        return sign(facing.facing.getRotation(facing.top)) == -1;
+    }
+
     private void limitBend(IDeltaChunk idc) {
         final Quaternion nextRotation = idc.getRotation().multiply(idc.getRotationalVelocity());
         final Vec3 nrrv = nextRotation.toRotationVector();
         final double nextAngle = wrapAngle(SpaceUtil.sum(nrrv));
-        final double maxBend = Math.PI;
-        final double minBend = 0;
+        double maxBend = Math.PI;
+        double minBend = 0;
+        if (bendMode()) {
+            maxBend -= Math.PI;
+            minBend -= Math.PI;
+        }
 
         if (nextAngle <= maxBend && nextAngle >= minBend) return;
 
@@ -319,21 +349,23 @@ public class TileEntityHinge extends TileEntityCommon implements IDCController {
         idc.setRotationalVelocity(limitedVelocity);
     }
 
-    static double wrapAngle(double d) {
-        if (d < -Math.PI / 2) d += Math.PI * 2;
+    double wrapAngle(double d) {
+        if (!bendMode() && d < -Math.PI / 2) {
+            d += Math.PI * 2;
+        }
         return d;
     }
 
     @Override
     public void afterUpdate(IDeltaChunk idc) {
         idc_ticking = false;
-        if (!idc.getRotationalVelocity().isZero()) {
+        if (!idc.getRotationalVelocity().isZero() || idc.hasOrderedRotation()) {
             updateComparators();
         }
         if (executing_order && !idc.hasOrderedRotation()) {
             executing_order = false;
-            updateComparators();
         }
+        if (worldObj.getTotalWorldTime() % 60 == 0) setProperPosition(idc); // Blame pistons
     }
 
     @Override
@@ -566,5 +598,10 @@ public class TileEntityHinge extends TileEntityCommon implements IDCController {
         angle /= 90;
         angle = 1 - angle;
         return (byte) (0xF * angle);
+    }
+
+    @Override
+    public IIcon getIcon(ForgeDirection dir) {
+        return Blocks.iron_block.getIcon(0, 0);
     }
 }
