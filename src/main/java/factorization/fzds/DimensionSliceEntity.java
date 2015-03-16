@@ -587,7 +587,8 @@ public class DimensionSliceEntity extends IDeltaChunk implements IFzdsEntryContr
             AxisAlignedBB collision = null;
             for (int i = 0; i < collisions.size(); i++) {
                 AxisAlignedBB solid = collisions.get(i);
-                if (solid != metaAABB && metaAABB.intersectsWith(solid)) {
+                if (solid.getClass() != AxisAlignedBB.class) continue;
+                if (metaAABB.intersectsWith(solid)) {
                     collision = solid;
                     break;
                 }
