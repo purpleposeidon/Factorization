@@ -267,7 +267,7 @@ public class HammerNet {
         if (idc.getController().hitBlock(idc, player, at, sideHit)) return;
         Block block = at.getBlock();
         WorldServer shadow_world = (WorldServer) DeltaChunk.getServerShadowWorld();
-        InteractionLiason liason = getLiason(shadow_world, player);
+        InteractionLiason liason = getLiason(shadow_world, player, idc);
         block.onBlockClicked(shadow_world, x, y, z, liason);
         liason.finishUsingLiason();
     }
@@ -282,27 +282,36 @@ public class HammerNet {
         block.onBlockClicked(at.w, x, y, z, player);
     }
     
-    InteractionLiason getLiason(WorldServer shadowWorld, EntityPlayer real_player) {
+    InteractionLiason getLiason(WorldServer shadowWorld, EntityPlayer real_player, IDeltaChunk idc) {
         // NORELEASE: Cache. Constructing fake players is muy expensivo
-        InteractionLiason liason = new InteractionLiason(shadowWorld, new ItemInWorldManager(shadowWorld));
-        liason.inventory = real_player.inventory;
-        liason.setSprinting(real_player.isSprinting());
-        liason.setSneaking(real_player.isSneaking());
-        liason.capabilities = real_player.capabilities;
+        InteractionLiason liason = new InteractionLiason(shadowWorld, new ItemInWorldManager(shadowWorld), real_player, idc);
+        liason.initializeFor(real_player, idc);
         return liason;
     }
     
     static class InteractionLiason extends EntityPlayerMP implements IFzdsShenanigans {
         private static final GameProfile liasonGameProfile = new GameProfile(null /*UUID.fromString("69f64f91-665e-457d-ad32-f6082d0b8a71")*/ , "[FzdsInteractionLiason]");
-        InventoryPlayer original_inventory;
-        public InteractionLiason(WorldServer world, ItemInWorldManager itemManager) {
+        private final InventoryPlayer original_inventory;
+        private ShadowPlayerAligner aligner;
+
+        public InteractionLiason(WorldServer world, ItemInWorldManager itemManager, EntityPlayer realPlayer, IDeltaChunk idc) {
             super(MinecraftServer.getServer(), world, liasonGameProfile, itemManager);
             original_inventory = this.inventory;
+        }
+
+        void initializeFor(EntityPlayer realPlayer, IDeltaChunk idc) {
+            this.inventory = realPlayer.inventory;
+            this.setSprinting(realPlayer.isSprinting());
+            this.setSneaking(realPlayer.isSneaking());
+            this.capabilities = realPlayer.capabilities;
+            aligner = new ShadowPlayerAligner(realPlayer, this, idc);
+            aligner.apply();
         }
         
         void finishUsingLiason() {
             // Stuff? Drop our items? Die?
             this.inventory = original_inventory;
+            aligner.unapply();
         }
     }
     
@@ -357,7 +366,7 @@ public class HammerNet {
         if (!blockInReach(idc, real_player, at)) return;
         if (idc.getController().useBlock(idc, real_player, at, sideHit)) return;
         
-        InteractionLiason liason = getLiason(shadowWorld, real_player);
+        InteractionLiason liason = getLiason(shadowWorld, real_player, idc);
         try {
             do_click(shadowWorld, liason, x, y, z, sideHit, vecX, vecY, vecZ);
         } catch (Throwable t) {

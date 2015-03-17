@@ -220,7 +220,7 @@ public class HammerClientProxy extends HammerProxy {
         if (fake_player == null || w != fake_player.worldObj) {
             fake_player = new EntityClientPlayerMP(
                     mc,
-                    mc.theWorld /* why is this real world? */,
+                    mc.theWorld /* why is this real world? NORELEASE: world leakage? */,
                     mc.getSession(), real_player.sendQueue /* not sure about this one. */,
                     real_player.getStatFileWriter());
             fake_player.movementInput = real_player.movementInput;
@@ -386,34 +386,17 @@ public class HammerClientProxy extends HammerProxy {
         MovingObjectPosition origMouseOver = mc.objectMouseOver;
         mc.objectMouseOver = null; // The ray trace function will do the wrong thing if this isn't nulled.
         
-        // Change the player's look to shadow rotation
-        // (Hmm, this could probably be done better)
-        EntityPlayer player = mc.thePlayer;
-        Vec3 realPos = player.getPosition(1);
-        Vec3 tmp = player.getLookVec();
-        SpaceUtil.incrAdd(tmp, realPos);
-        Vec3 realLookEnd = tmp;
-        Vec3 shadowPos = ray.parent.real2shadow(realPos); // This used to be the raw ent pos, which isn't the same.
-        Vec3 tmp_shadowLookEnd = ray.parent.real2shadow(realLookEnd);
-        SpaceUtil.incrSubtract(tmp_shadowLookEnd, shadowPos);
-        Vec3 shadowLook = tmp_shadowLookEnd;
-        double xz_len = Math.hypot(shadowLook.xCoord, shadowLook.zCoord);
-        double shadow_pitch = -Math.toDegrees(Math.atan2(shadowLook.yCoord, xz_len)); // erm, negative? Dunno.
-        double shadow_yaw = Math.toDegrees(Math.atan2(-shadowLook.xCoord, shadowLook.zCoord)); // Another weird negative!
-
         boolean got_hit = false;
         
         try {
             MovingObjectPosition mop = null;
             AxisAlignedBB mopBox = null;
+            EntityPlayer realPlayer = mc.thePlayer;
             setShadowWorld();
+            EntityPlayer fakePlayer = mc.thePlayer;
             try {
-                mc.thePlayer.posX = shadowPos.xCoord;
-                mc.thePlayer.posY = shadowPos.yCoord;
-                mc.thePlayer.posZ = shadowPos.zCoord;
-                mc.thePlayer.rotationPitch = (float) shadow_pitch;
-                mc.thePlayer.rotationYaw = (float) shadow_yaw;
-                
+                ShadowPlayerAligner aligner = new ShadowPlayerAligner(realPlayer, fakePlayer, ray.parent);
+                aligner.apply(); // Change the player's look to shadow rotation
                 WorldSettings.GameType origType = mc.playerController.currentGameType;
                 mc.playerController.currentGameType = WorldSettings.GameType.CREATIVE;
                 try {
@@ -421,6 +404,7 @@ public class HammerClientProxy extends HammerProxy {
                 } finally {
                     mc.playerController.currentGameType = origType;
                 }
+                aligner.unapply();
                 mop = mc.objectMouseOver;
                 if (mop == null) {
                     return;
