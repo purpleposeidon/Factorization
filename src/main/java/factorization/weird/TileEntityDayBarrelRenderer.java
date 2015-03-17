@@ -76,9 +76,6 @@ public class TileEntityDayBarrelRenderer extends TileEntitySpecialRenderer {
         
     }
 
-    // NOTE TODO: This could be optimized by using a custom font renderer.
-    //Create a font icon digits, '+', '*', '!', and '∞'; add it to both atlases.
-    //This would let the barrel render with a single texture binding for standard items.
     //Another optimization: don't render if the barrel's facing a solid block
     //(A third optimization: somehow get the SBRH to cull faces. Complicated & expensive?)
     @Override
@@ -241,11 +238,10 @@ public class TileEntityDayBarrelRenderer extends TileEntitySpecialRenderer {
     
     private static final ResourceLocation RES_ITEM_GLINT = new ResourceLocation("textures/misc/enchanted_item_glint.png");
     
-    RenderItem renderItem = new RenderItem();
-
+    final RenderItem renderItem = new RenderItem();
+    final TextureManager realGuy = Minecraft.getMinecraft().renderEngine;
     
     class Intercepter extends TextureManager {
-        TextureManager realGuy = Minecraft.getMinecraft().renderEngine;
         public Intercepter(IResourceManager par1ResourceManager) {
             super(par1ResourceManager);
         }
@@ -258,7 +254,6 @@ public class TileEntityDayBarrelRenderer extends TileEntitySpecialRenderer {
             if (RES_ITEM_GLINT.equals(res)) {
                 Tessellator.instance = voidTessellator;
             } else {
-                //Minecraft.getMinecraft().renderEngine.bindTexture(res);
                 realGuy.bindTexture(res);
             }
         }
@@ -271,8 +266,12 @@ public class TileEntityDayBarrelRenderer extends TileEntitySpecialRenderer {
         GL11.glPushMatrix();
         GL11.glRotatef(180, 0, 0, 1);
         float labelD = hasLabel ? 0F : -1F/16F;
-        boolean multi = is.getItem().requiresMultipleRenderPasses();
-        if (multi) {
+        boolean useEntityRenderer = is.getItem().requiresMultipleRenderPasses();
+        boolean useInterceptionRenderer = is.hasEffect(0);
+        if (FzConfig.render_barrel_force_entity_render) useEntityRenderer = true;
+        if (FzConfig.render_barrel_force_no_intercept) useInterceptionRenderer = false;
+
+        if (useEntityRenderer) {
             GL11.glRotatef(180, 1, 0, 0);
             GL11.glTranslatef(-12F/16F, -6.75F/16F - labelD, 0);
             if (entityitem == null) {
@@ -294,15 +293,15 @@ public class TileEntityDayBarrelRenderer extends TileEntitySpecialRenderer {
             GL11.glScalef(1, 1, -0.02F);
             TextureManager re = Minecraft.getMinecraft().renderEngine;
             FontRenderer fr = func_147498_b();
-            if (!is.hasEffect(0)) {
-                renderItem.renderItemAndEffectIntoGUI(fr, re, is, 0, 0);
-            } else {
+            if (useInterceptionRenderer) {
                 if (interception == null) {
                     interception = new Intercepter(Minecraft.getMinecraft().getResourceManager());
                 }
                 Tessellator orig = Tessellator.instance;
                 renderItem.renderItemAndEffectIntoGUI(fr, interception, is, 0, 0);
                 Tessellator.instance = orig;
+            } else {
+                renderItem.renderItemAndEffectIntoGUI(fr, re, is, 0, 0);
             }
         }
         GL11.glPopMatrix();
