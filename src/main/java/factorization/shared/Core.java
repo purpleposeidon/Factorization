@@ -12,6 +12,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import cpw.mods.fml.client.event.ConfigChangedEvent;
+import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import factorization.mechanisms.MechanismsFeature;
 import factorization.util.DataUtil;
 import factorization.util.FzUtil;
@@ -77,7 +79,14 @@ import factorization.oreprocessing.FactorizationOreProcessingHandler;
 import factorization.servo.ServoMotor;
 import factorization.wrath.TileEntityWrathLamp;
 
-@Mod(modid = Core.modId, name = Core.name, version = Core.version, acceptedMinecraftVersions = "1.7.10", dependencies = "required-after: " + Hammer.modId)
+@Mod(
+        modid = Core.modId,
+        name = Core.name,
+        version = Core.version,
+        acceptedMinecraftVersions = "1.7.10",
+        dependencies = "required-after: " + Hammer.modId,
+        guiFactory = "factorization.common.FzConfigGuiFactory"
+)
 public class Core {
     //We should repackage stuff. And rename the API package possibly.
     public static final String modId = "factorization";
