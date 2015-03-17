@@ -1040,7 +1040,7 @@ public class Registry {
                 "*",
                 "#",
                 '*', dark_iron_sprocket,
-                'O', this.dark_iron_block_item);
+                '#', this.dark_iron_block_item);
         oreRecipe(hinge.copy(),
                 "|##",
                 "|  ",
