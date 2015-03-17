@@ -74,6 +74,7 @@ public class FzConfig {
     public ArrayList<Property> editable_runtime = new ArrayList<Property>();
 
     private boolean can_edit_main = false, can_edit_runtime = false;
+    private boolean loaded_once = false;
 
     FzConfig editMain() {
         can_edit_main = true;
@@ -103,22 +104,22 @@ public class FzConfig {
     
     private int getIntConfig(String name, String category, int defaultValue, String comment) {
         Property prop = putProp(config.get(category, name, defaultValue), comment);
-        return prop.getInt(defaultValue);
+        return putProp(prop, comment).getInt(defaultValue);
     }
 
     private boolean getBoolConfig(String name, String category, boolean defaultValue, String comment) {
         Property prop = putProp(config.get(category, name, defaultValue), comment);
-        return prop.getBoolean(defaultValue);
+        return putProp(prop, comment).getBoolean(defaultValue);
     }
     
     private double getDoubleConfig(String name, String category, double defaultValue, String comment) {
         Property prop = putProp(config.get(category, name, defaultValue), comment);
-        return prop.getDouble(defaultValue);
+        return putProp(prop, comment).getDouble(defaultValue);
     }
 
     private String getStringConfig(String name, String category, String defaultValue, String comment) {
         Property prop = putProp(config.get(category, name, defaultValue), comment);
-        return prop.getString();
+        return putProp(prop, comment).getString();
     }
 
 
@@ -145,6 +146,7 @@ public class FzConfig {
 
         readConfigSettings();
         saveConfigSettings();
+        loaded_once = true;
     }
 
     public void saveConfigSettings() {
@@ -155,7 +157,7 @@ public class FzConfig {
 
     public void readConfigSettings() {
         {
-            debug_light_air =  getBoolConfig("debugLightAir", "client", debug_light_air, "Show invisible lamp-air");
+            debug_light_air = getBoolConfig("debugLightAir", "client", debug_light_air, "Show invisible lamp-air");
             pocket_craft_anywhere = editRun().getBoolConfig("anywherePocketCraft", "client", pocket_craft_anywhere, "Lets you open the pocket crafting table from GUIs");
             render_barrel_item = editMain().getBoolConfig("renderBarrelItem", "client", render_barrel_item, null);
             render_barrel_item = editMain().getBoolConfig("renderBarrelText", "client", render_barrel_text, null);
