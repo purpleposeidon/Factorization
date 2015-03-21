@@ -1,5 +1,6 @@
 package factorization.fzds;
 
+import factorization.api.DeltaCoord;
 import factorization.api.ICoordFunction;
 import factorization.shared.Core;
 import io.netty.channel.Channel;
@@ -134,11 +135,15 @@ public class PacketProxyingPlayer extends EntityPlayerMP implements
         this.dimensionSlice = new WeakReference<DimensionSliceEntity>(dimensionSlice);
         Coord c = dimensionSlice.getCenter();
         c.y = -8; // lurk in the void; we should catch most mod's packets.
+        DeltaCoord size = dimensionSlice.getFarCorner().difference(dimensionSlice.getCorner());
+        size.y = 0;
+        double blockRadius = size.magnitude() / 2;
+        int chunkRadius = (int) ((blockRadius / 16) + 1);
         c.setAsEntityLocation(this);
         ServerConfigurationManager scm = MinecraftServer.getServer().getConfigurationManager();
         if (useShortViewRadius) {
             int orig = savePlayerViewRadius();
-            restorePlayerViewRadius(3);
+            restorePlayerViewRadius(chunkRadius);
             try {
                 scm.func_72375_a(this, null);
             } finally {
@@ -148,7 +153,6 @@ public class PacketProxyingPlayer extends EntityPlayerMP implements
         } else {
             scm.func_72375_a(this, null);
         }
-        ticks_since_last_update = (int) (Math.random() * 20);
     }
     
     int savePlayerViewRadius() {
@@ -162,38 +166,34 @@ public class PacketProxyingPlayer extends EntityPlayerMP implements
         getServerForPlayer().getPlayerManager().playerViewRadius = orig;
     }
 
-    private int ticks_since_last_update = 0;
-
     @Override
     public void onUpdate() {
         DimensionSliceEntity dse = dimensionSlice.get();
         if (dse == null || dse.isDead) {
             endProxy();
-        } else if (ticks_since_last_update > 0) {
-            ticks_since_last_update--;
-        } else if (worldObj.isRemote) {
-            // Just call super
-        } else {
-            ticks_since_last_update = 20;
-            List playerList = getTargetablePlayers();
-            for (int i = 0; i < playerList.size(); i++) {
-                Object o = playerList.get(i);
-                if (!(o instanceof EntityPlayerMP)) {
-                    continue;
-                }
-                EntityPlayerMP player = (EntityPlayerMP) o;
-                if (isPlayerInUpdateRange(player)) {
-                    boolean new_player = listeningPlayers.add(player);
-                    if (new_player && shouldShareChunks()) {
-                        // welcome to the club. This may net-lag a bit. (Well, it depends on the chunk's contents. Air compresses well tho.)
-                        sendChunkMapDataToPlayer(player);
-                    }
-                } else {
-                    listeningPlayers.remove(player);
-                }
-            }
+            return;
         }
         super.onUpdate(); // we probably want to keep this one, just for the EntityMP stuff
+        if (worldObj.isRemote) return; // Won't happen.
+        boolean should_update = ticksExisted % 20 == 1;
+        if (!should_update) return;
+        List playerList = getTargetablePlayers();
+        for (int i = 0; i < playerList.size(); i++) {
+            Object o = playerList.get(i);
+            if (!(o instanceof EntityPlayerMP)) {
+                continue;
+            }
+            EntityPlayerMP player = (EntityPlayerMP) o;
+            if (isPlayerInUpdateRange(player)) {
+                boolean new_player = listeningPlayers.add(player);
+                if (new_player && shouldShareChunks()) {
+                    // welcome to the club. This may net-lag a bit. (Well, it depends on the chunk's contents. Air compresses well tho.)
+                    sendChunkMapDataToPlayer(player);
+                }
+            } else {
+                listeningPlayers.remove(player);
+            }
+        }
     }
 
     static final ArrayList empty = new ArrayList();
