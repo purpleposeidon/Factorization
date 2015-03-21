@@ -304,4 +304,9 @@ public class ColossalBlock extends Block {
         }
         return null;
     }
+
+    @Override
+    public int getLightValue(IBlockAccess world, int x, int y, int z) {
+        return 8;
+    }
 }
