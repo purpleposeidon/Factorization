@@ -96,6 +96,9 @@ public class WrappedPacket extends Packet implements IFzdsShenanigans {
         } finally {
             Hammer.proxy.restoreRealWorld(); //You do.
         }
+        // Could alternatively make a short buffer so that we don't swap worlds so often.
+        // Maybe 32 packets long, gets flushed at the end of every tick?
+        // Presumably it wouldn't be a problem if packets to different shadow/real arrive at different times.
     }
 
 }

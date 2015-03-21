@@ -239,9 +239,9 @@ public class TileEntityDayBarrelRenderer extends TileEntitySpecialRenderer {
     private static final ResourceLocation RES_ITEM_GLINT = new ResourceLocation("textures/misc/enchanted_item_glint.png");
     
     final RenderItem renderItem = new RenderItem();
-    final TextureManager realGuy = Minecraft.getMinecraft().renderEngine;
     
     class Intercepter extends TextureManager {
+        final TextureManager realGuy = Minecraft.getMinecraft().renderEngine;
         public Intercepter(IResourceManager par1ResourceManager) {
             super(par1ResourceManager);
         }
