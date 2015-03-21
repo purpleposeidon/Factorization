@@ -293,6 +293,7 @@ public class TileEntityHinge extends TileEntityCommon implements IDCController {
     }
 
     static final double min_velocity = Math.PI / 20 / 20 / 20;
+    static final double max_velocity = Math.PI / 20;
 
     boolean isBasicallyZero(Quaternion rotVel) {
         return rotVel.isZero() || rotVel.getAngleRadians() /* Opportunity to algebra our way out of a call to acos here */ < min_velocity;
@@ -307,7 +308,13 @@ public class TileEntityHinge extends TileEntityCommon implements IDCController {
         if (isBasicallyZero(rotVel)) {
             dampened = new Quaternion();
         } else {
-            dampened = rotVel.slerp(new Quaternion(1, 0, 0, 0), 0.05);
+            double angle = rotVel.getAngleRadians();
+            if (angle > max_velocity) {
+                Vec3 axis = rotVel.toVector().normalize();
+                dampened = Quaternion.getRotationQuaternionRadians(max_velocity, axis);
+            } else {
+                dampened = rotVel.slerp(new Quaternion(), 0.05);
+            }
         }
         idc.setRotationalVelocity(dampened);
         limitBend(idc);
