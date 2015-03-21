@@ -33,7 +33,7 @@ public abstract class ServoComponent implements IDataSerializable {
         ServoComponent decor;
         try {
             decor = componentClass.getConstructor().newInstance();
-        } catch (ReflectiveOperationException e) {
+        } catch (/*ReflectiveOperationException Java 7 */ Throwable e) {
             Core.logSevere("Unable to instantiate %s: %s", componentClass, e);
             e.printStackTrace();
             throw new IllegalArgumentException(e);

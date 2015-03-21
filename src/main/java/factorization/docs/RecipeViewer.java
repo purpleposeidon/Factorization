@@ -143,7 +143,7 @@ public class RecipeViewer implements IDocGenerator {
     }
     
     static TreeMap<String, Iterable> customRecipes = new TreeMap();
-    public static void handleImc(IMCMessage message) throws ReflectiveOperationException {
+    public static void handleImc(IMCMessage message) throws ClassNotFoundException, NoSuchFieldException, IllegalAccessException {
         if (!message.key.equals("AddRecipeCategory")) return;
         String[] cmd = message.getStringValue().split("\\|");
         String key = cmd[0];
