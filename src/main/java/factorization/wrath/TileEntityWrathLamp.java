@@ -173,10 +173,6 @@ public class TileEntityWrathLamp extends TileEntityCommon {
     @Override
     public void invalidate() {
         super.invalidate();
-        if (worldObj.getBlock(xCoord, yCoord, zCoord) != Core.registry.factory_block) {
-            Core.logSevere("TileEntityWrathLamp.invalidate() called, but the block is not factory_block! " + new factorization.api.Coord(this));
-            return;
-        }
         if (invalidating.get() != null) return;
         invalidating.set(Boolean.TRUE);
         try {
