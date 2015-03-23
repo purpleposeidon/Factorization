@@ -12,7 +12,6 @@ import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import cpw.mods.fml.common.network.FMLNetworkEvent;
 import cpw.mods.fml.common.registry.EntityRegistry;
 import cpw.mods.fml.relauncher.Side;
-import factorization.common.FzConfig;
 import factorization.fzds.network.FzdsPacketRegistry;
 import factorization.fzds.network.WrappedPacket;
 import factorization.shared.Core;
@@ -53,9 +52,10 @@ public class Hammer {
     public static int max_dse_collidable_chunk_area = 9*9*9;
     
     static DeltaChunkMap serverSlices = new DeltaChunkMap(), clientSlices = new DeltaChunkMap();
-    
+
     public Hammer() {
         Hammer.instance = this;
+        if (!DeltaChunk.enabled()) return;
         Hammer.net = new HammerNet();
         Core.loadBus(this);
     }
@@ -66,6 +66,7 @@ public class Hammer {
     @EventHandler
     public void setup(FMLPreInitializationEvent event) {
         event.getModMetadata().parent = Core.modId;
+        if (!DeltaChunk.enabled()) return;
         final File configFile = event.getSuggestedConfigurationFile();
         File base = configFile.getParentFile();
         hammerInfo.setConfigFile(new File(base, "hammerChannels.cfg"));
@@ -96,11 +97,13 @@ public class Hammer {
 
     @EventHandler
     public void finishLoad(FMLPostInitializationEvent event) {
+        if (!DeltaChunk.enabled()) return;
         hammerInfo.saveChannelConfig();
     }
     
     @EventHandler
     public void serverStart(FMLServerStartingEvent event) {
+        if (!DeltaChunk.enabled()) return;
         event.registerServerCommand(new FZDSCommand());
         DimensionManager.initDimension(getDimensionId());
         if (!DimensionManager.shouldLoadSpawn(getDimensionId())) {
@@ -116,6 +119,7 @@ public class Hammer {
     
     @EventHandler
     public void saveInfo(FMLServerStoppingEvent event) {
+        if (!DeltaChunk.enabled()) return;
         hammerInfo.saveCellAllocations();
         serverSlices.clear();
         clientSlices.clear();
@@ -123,6 +127,7 @@ public class Hammer {
 
     @SubscribeEvent
     public void clearSlicesBeforeConnect(FMLNetworkEvent.ClientConnectedToServerEvent event) {
+        if (!DeltaChunk.enabled()) return;
         proxy.cleanupClientWorld();
     }
     
@@ -154,6 +159,7 @@ public class Hammer {
     }
 
     public static int getDimensionId() {
+        DeltaChunk.assertEnabled();
         return HammerInfo.dimension_slice_dimid;
     }
 }

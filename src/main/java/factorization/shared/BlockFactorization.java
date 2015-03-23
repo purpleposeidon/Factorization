@@ -252,61 +252,60 @@ public class BlockFactorization extends BlockContainer {
         return ret;
     }
 
+    private static void put(List itemList, ItemStack item) {
+        if (item == null) return;
+        itemList.add(item);
+    }
+    
     @Override
     public void getSubBlocks(Item me, CreativeTabs tab, List itemList) {
-        if (this != Core.registry.factory_block) {
-            return;
-        }
         if (this != Core.registry.factory_block) {
             return;
         }
         Registry reg = Core.registry;
         //common
         
-        itemList.add(reg.stamper_item);
-        itemList.add(reg.packager_item);
-        itemList.add(reg.slagfurnace_item);
-        itemList.add(reg.parasieve_item);
+        put(itemList, reg.stamper_item);
+        put(itemList, reg.packager_item);
+        put(itemList, reg.slagfurnace_item);
+        put(itemList, reg.parasieve_item);
 
         //electric
-        //itemList.add(reg.battery_item_hidden);
+        //put(itemList, reg.battery_item_hidden);
         if (reg.battery != null) {
             //These checks are for buildcraft, which is hatin'.
-            itemList.add(new ItemStack(reg.battery, 1, 2));
+            put(itemList, new ItemStack(reg.battery, 1, 2));
         }
-        itemList.add(reg.leydenjar_item);
-        if (reg.leydenjar_item_full != null) {
-            itemList.add(reg.leydenjar_item_full);
-        }
-        itemList.add(FactoryType.CREATIVE_CHARGE.itemStack());
-        itemList.add(reg.caliometric_burner_item);
-        itemList.add(reg.solarboiler_item);
-        itemList.add(reg.steamturbine_item);
-        //itemList.add(reg.mirror_item_hidden);
+        put(itemList, reg.leydenjar_item);
+        put(itemList, reg.leydenjar_item_full);
+        put(itemList, FactoryType.CREATIVE_CHARGE.itemStack());
+        put(itemList, reg.caliometric_burner_item);
+        put(itemList, reg.solarboiler_item);
+        put(itemList, reg.steamturbine_item);
         if (reg.mirror != null) {
-            itemList.add(new ItemStack(reg.mirror));
+            put(itemList, new ItemStack(reg.mirror));
         }
-        itemList.add(reg.heater_item);
-        itemList.add(reg.leadwire_item);
-        itemList.add(reg.mixer_item);
-        itemList.add(reg.crystallizer_item);
+        put(itemList, reg.heater_item);
+        put(itemList, reg.leadwire_item);
+        put(itemList, reg.mixer_item);
+        put(itemList, reg.crystallizer_item);
 
-        itemList.add(reg.greenware_item);
-        
+        put(itemList, reg.greenware_item);
+
         if (reg.rocket_engine != null) {
-            itemList.add(new ItemStack(reg.rocket_engine));
+            put(itemList, new ItemStack(reg.rocket_engine));
         }
-        
+
         //dark
-        itemList.add(reg.empty_socket_item);
-        itemList.add(reg.servorail_item);
-        itemList.add(reg.lamp_item);
-        itemList.add(reg.compression_crafter_item);
+        put(itemList, reg.empty_socket_item);
+        put(itemList, reg.servorail_item);
+        put(itemList, reg.lamp_item);
+        put(itemList, reg.compression_crafter_item);
 
         //mechanisms
-        itemList.add(reg.hinge);
-        itemList.add(reg.anchor);
-        
+        put(itemList, reg.hinge);
+        put(itemList, reg.anchor);
+
         //Barrels
         if (todaysBarrels != null) {
             itemList.addAll(todaysBarrels);

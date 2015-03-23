@@ -19,6 +19,16 @@ import factorization.fzds.interfaces.IDeltaChunk;
 import gnu.trove.set.hash.THashSet;
 
 public class DeltaChunk {
+    public static boolean enabled() {
+        return HammerEnabled.ENABLED;
+    }
+
+    public static void assertEnabled() {
+        if (!enabled()) {
+            throw new AssertionError("Hammer has been disabled by configuration");
+        }
+    }
+
     static DeltaChunkMap getSlices(World w) {
         if (w == null) {
             if (FMLCommonHandler.instance().getEffectiveSide() == Side.CLIENT) {

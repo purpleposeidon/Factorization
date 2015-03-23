@@ -8,6 +8,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.Random;
 
+import factorization.fzds.DeltaChunk;
 import factorization.util.NumUtil;
 import gnu.trove.impl.hash.TIntByteHash;
 import gnu.trove.impl.hash.TIntHash;
@@ -40,6 +41,7 @@ import net.minecraftforge.event.terraingen.PopulateChunkEvent.Populate.EventType
 public class WorldGenColossus implements IWorldGenerator {
     {
         if (FzConfig.gen_colossi) {
+            DeltaChunk.assertEnabled();
             Core.loadBus(this);
             MinecraftForge.TERRAIN_GEN_BUS.register(this);
         }

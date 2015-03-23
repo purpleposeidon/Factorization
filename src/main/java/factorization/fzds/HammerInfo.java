@@ -43,6 +43,7 @@ public class HammerInfo {
         if (worldState != null) {
             return;
         }
+        DeltaChunk.assertEnabled();
         WorldServer world = (WorldServer) DeltaChunk.getServerShadowWorld();
         world_loaded = true;
         File saveDir = world.getChunkSaveLocation();
@@ -53,6 +54,7 @@ public class HammerInfo {
     }
     
     public int makeChannelFor(String modName, String channelName, int default_channel_id, int padding, String comment) {
+        DeltaChunk.assertEnabled();
         if (padding < 0) {
             padding = defaultPadding;
         }

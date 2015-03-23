@@ -1,5 +1,16 @@
 package factorization.coremod;
 
+import cpw.mods.fml.relauncher.FMLRelaunchLog;
+import factorization.fzds.HammerEnabled;
+import net.minecraft.launchwrapper.IClassTransformer;
+import net.minecraft.launchwrapper.Launch;
+import net.minecraft.launchwrapper.LaunchClassLoader;
+import org.objectweb.asm.ClassReader;
+import org.objectweb.asm.ClassWriter;
+import org.objectweb.asm.Opcodes;
+import org.objectweb.asm.tree.*;
+import org.objectweb.asm.util.TraceClassVisitor;
+
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -7,24 +18,6 @@ import java.io.PrintWriter;
 import java.lang.reflect.Field;
 import java.util.HashMap;
 import java.util.List;
-
-import net.minecraft.launchwrapper.IClassTransformer;
-import net.minecraft.launchwrapper.Launch;
-import net.minecraft.launchwrapper.LaunchClassLoader;
-
-import net.minecraft.world.World;
-import org.objectweb.asm.ClassReader;
-import org.objectweb.asm.ClassWriter;
-import org.objectweb.asm.Opcodes;
-import org.objectweb.asm.tree.AbstractInsnNode;
-import org.objectweb.asm.tree.ClassNode;
-import org.objectweb.asm.tree.JumpInsnNode;
-import org.objectweb.asm.tree.LabelNode;
-import org.objectweb.asm.tree.MethodNode;
-import org.objectweb.asm.util.CheckClassAdapter;
-import org.objectweb.asm.util.TraceClassVisitor;
-
-import cpw.mods.fml.relauncher.FMLRelaunchLog;
 
 public class ASMTransformer implements IClassTransformer {
     public static boolean dev_environ = Launch.blackboard != null ? (Boolean) Launch.blackboard.get("fml.deobfuscatedEnvironment") : false;
@@ -56,7 +49,7 @@ public class ASMTransformer implements IClassTransformer {
 
             // Add an event to cancel attack/use key presses before anything else
             // (Should go in Forge)
-            if (transformedName.equals("net.minecraft.client.Minecraft")) {
+            if (transformedName.equals("net.minecraft.client.Minecraft") && HammerEnabled.ENABLED) {
                 return applyTransform(basicClass,
                         new AbstractAsmMethodTransform.Prepend(name, transformedName, "func_147116_af", "func_147116_af"), // "attack key pressed" function (first handler), MCPBot name clickMouse
                         new AbstractAsmMethodTransform.Prepend(name, transformedName, "func_147121_ag", "func_147121_ag") // "use key pressed" function, MCPBot name rightClickMouse
@@ -64,7 +57,7 @@ public class ASMTransformer implements IClassTransformer {
             }
             // Make the camera take UCs into account in 3rd-person view
             // (Could go in forge, but is implemented specifically for FZDS)
-            if (transformedName.equals("net.minecraft.client.renderer.EntityRenderer")) {
+            if (transformedName.equals("net.minecraft.client.renderer.EntityRenderer") && HammerEnabled.ENABLED) {
                 return applyTransform(basicClass,
                         new AbstractAsmMethodTransform.MutateCall(name, transformedName, "func_78467_g", "orientCamera")
                                 .setOwner("net.minecraft.client.multiplayer.WorldClient")
@@ -74,26 +67,26 @@ public class ASMTransformer implements IClassTransformer {
             }
             // Add "Universal Colliders". Adds a list of entities to the chunk that are added to every collision query.
             // The alternative to this is setting World.MAX_ENTITY_RADIUS to a large value, and putting collodier-entities everywhere, which is slow & ugly
-            if (transformedName.equals("net.minecraft.world.chunk.Chunk")) {
+            if (transformedName.equals("net.minecraft.world.chunk.Chunk") && HammerEnabled.ENABLED) {
                 return applyTransform(basicClass,
                         new AbstractAsmClassTransform.Mixin("factorization.coremodhooks.MixinExtraChunkData", "Lfactorization/coremodhooks/MixinExtraChunkData;"),
                         new AbstractAsmMethodTransform.Append(name, transformedName, "func_76588_a", "getEntitiesWithinAABBForEntity")
                 );
             }
             // Allow the player to stand on a UC without getting kicked from the server
-            if (transformedName.equals("net.minecraft.world.World")) {
+            if (transformedName.equals("net.minecraft.world.World") && HammerEnabled.ENABLED) {
                 return applyTransform(basicClass,
                         new AbstractAsmMethodTransform.Append(name, transformedName, "func_72829_c", "checkBlockCollision"));
             }
             // (This... might not be entirely necessary. I didn't test this problem enough!)
             // Something about limiting the velocity of an entity when it's being influenced by multiple IDCs moving in the same direction...
             // Is this just vestigial? Shouldn't cause too much trouble tho.
-            if (transformedName.equals("net.minecraft.entity.Entity")) {
+            if (transformedName.equals("net.minecraft.entity.Entity") && HammerEnabled.ENABLED) {
                 return applyTransform(basicClass,
                         new AbstractAsmClassTransform.Mixin("factorization.coremodhooks.MixinEntityKinematicsTracker", "Lfactorization/coremodhooks/MixinEntityKinematicsTracker;"));
             }
             // Don't let IDCs be knocked backwards; fixes a vanilla bugor
-            if (transformedName.equals("net.minecraft.world.Explosion")) {
+            if (transformedName.equals("net.minecraft.world.Explosion") && HammerEnabled.ENABLED) {
                 return applyTransform(basicClass,
                         new AbstractAsmMethodTransform.MutateCall(name, transformedName, "func_77278_a", "doExplosionA")
                                 // find(String owner, String srg_name, String mcp_name, String notch_name, String find_notch_desc)
@@ -103,7 +96,7 @@ public class ASMTransformer implements IClassTransformer {
                 );
             }
             // Sigh. :/ needed to keep minimap mods happy...
-            if (transformedName.equals("net.minecraft.client.multiplayer.WorldClient")) {
+            if (transformedName.equals("net.minecraft.client.multiplayer.WorldClient") && HammerEnabled.ENABLED) {
                 return applyTransform(basicClass,
                         new AbstractAsmMethodTransform.MutateCall(name, transformedName, "<init>", "<init>")
                                 .setOwner("cpw.mods.fml.common.eventhandler.EventBus")

@@ -31,6 +31,7 @@ public class ItemTwistedBlock extends ItemBlockProxy {
 
     public ItemTwistedBlock() {
         super(Core.registry.dark_iron_block_item.copy(), "twistedBlock", TabType.ART);
+        DeltaChunk.assertEnabled();
     }
     
     final int channel = Hammer.instance.hammerInfo.makeChannelFor(Core.name, "twistedBlocks", 10, 64, "Allows placement of blocks at angles");

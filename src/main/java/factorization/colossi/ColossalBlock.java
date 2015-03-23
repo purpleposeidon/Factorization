@@ -51,6 +51,7 @@ public class ColossalBlock extends Block {
         setStepSound(soundTypePiston);
         setBlockName("factorization:colossalBlock");
         Core.tab(this, TabType.BLOCKS);
+        DeltaChunk.assertEnabled();
     }
     
 

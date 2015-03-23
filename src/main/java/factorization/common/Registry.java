@@ -10,6 +10,7 @@ import cpw.mods.fml.common.registry.ExistingSubstitutionException;
 import cpw.mods.fml.common.registry.GameRegistry;
 import cpw.mods.fml.common.registry.GameRegistry.Type;
 import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.repackage.com.nothome.delta.Delta;
 import factorization.api.IActOnCraft;
 import factorization.ceramics.ItemGlazeBucket;
 import factorization.ceramics.ItemSculptingTool;
@@ -22,6 +23,7 @@ import factorization.charge.TileEntityLeydenJar;
 import factorization.colossi.*;
 import factorization.darkiron.BlockDarkIronOre;
 import factorization.docs.ItemDocBook;
+import factorization.fzds.DeltaChunk;
 import factorization.oreprocessing.ItemOreProcessing;
 import factorization.oreprocessing.ItemOreProcessing.OreType;
 import factorization.oreprocessing.TileEntityCrystallizer;
@@ -167,7 +169,9 @@ public class Registry {
         dark_iron_ore = new BlockDarkIronOre().setBlockName("factorization:darkIronOre").setBlockTextureName("stone").setCreativeTab(Core.tabFactorization).setHardness(3.0F).setResistance(5.0F);
         fractured_bedrock_block = new FracturedBedrock();
         blasted_bedrock_block = new BlastedBedrock();
-        colossal_block = new ColossalBlock();
+        if (DeltaChunk.enabled()) {
+            colossal_block = new ColossalBlock();
+        }
         gargantuan_block = new GargantuanBlock().setBlockName("factorization:gargantuanBrick").setCreativeTab(Core.tabFactorization);
         
         GameRegistry.registerBlock(factory_block, ItemFactorizationBlock.class, "FzBlock");
@@ -176,9 +180,11 @@ public class Registry {
         GameRegistry.registerBlock(dark_iron_ore, "DarkIronOre");
         GameRegistry.registerBlock(fractured_bedrock_block, "FracturedBedrock");
         GameRegistry.registerBlock(blasted_bedrock_block, "BlastedBedrock");
-        GameRegistry.registerBlock(colossal_block, ColossalBlockItem.class, "ColossalBlock");
         GameRegistry.registerBlock(gargantuan_block, ItemGargantuanBlock.class, "GargantuanBlock");
-        GameRegistry.registerTileEntity(TileEntityColossalHeart.class, "fz_colossal_heart");
+        if (DeltaChunk.enabled()) {
+            GameRegistry.registerBlock(colossal_block, ColossalBlockItem.class, "ColossalBlock");
+            GameRegistry.registerTileEntity(TileEntityColossalHeart.class, "fz_colossal_heart");
+        }
         
         
         is_factory = new ItemStack(factory_block);
@@ -278,8 +284,10 @@ public class Registry {
         if (FzConfig.enable_rocketry) {
             rocket_engine_item_hidden = FactoryType.ROCKETENGINE.itemStack();
         }
-        hinge = FactoryType.HINGE.itemStack();
-        anchor = FactoryType.ANCHOR.itemStack();
+        if (DeltaChunk.enabled()) {
+            hinge = FactoryType.HINGE.itemStack();
+            anchor = FactoryType.ANCHOR.itemStack();
+        }
 
         //BlockResource stuff
         silver_ore_item = ResourceType.SILVERORE.itemStack("Silver Ore");
@@ -341,7 +349,7 @@ public class Registry {
         
         //Rocketry
         nether_powder = new ItemCraftingComponent("nether_powder");
-        if (FzConfig.enable_rocketry) {
+        if (FzConfig.enable_rocketry && DeltaChunk.enabled()) {
             rocket_fuel = new ItemCraftingComponent("rocket/rocket_fuel");
             rocket_engine = new ItemBlockProxy(rocket_engine_item_hidden, "rocket/rocket_engine", TabType.ROCKETRY);
             rocket_engine.setMaxStackSize(1);
@@ -369,8 +377,10 @@ public class Registry {
         daybarrel = new ItemDayBarrel("daybarrel");
         docbook = new ItemDocBook("docbook", TabType.TOOLS);
         utiligoo = new ItemGoo("utiligoo", TabType.TOOLS);
-        colossusGuide = new ItemColossusGuide("colossusGuide", TabType.TOOLS);
-        twistedBlock = new ItemTwistedBlock();
+        if (DeltaChunk.enabled()) {
+            colossusGuide = new ItemColossusGuide("colossusGuide", TabType.TOOLS);
+            twistedBlock = new ItemTwistedBlock();
+        }
         postMakeItems();
     }
 
@@ -1036,17 +1046,19 @@ public class Registry {
                 "F",
                 '#', Blocks.stone,
                 'F', Blocks.fire);
-        oreRecipe(new ItemStack(twistedBlock),
-                "*",
-                "#",
-                '*', dark_iron_sprocket,
-                '#', this.dark_iron_block_item);
-        oreRecipe(hinge.copy(),
-                "|##",
-                "|  ",
-                "|##",
-                '|', dark_iron,
-                '#', Blocks.iron_block);
+        if (DeltaChunk.enabled()) {
+            oreRecipe(new ItemStack(twistedBlock),
+                    "*",
+                    "#",
+                    '*', dark_iron_sprocket,
+                    '#', this.dark_iron_block_item);
+            oreRecipe(hinge.copy(),
+                    "|##",
+                    "|  ",
+                    "|##",
+                    '|', dark_iron,
+                    '#', Blocks.iron_block);
+        }
     }
     
     private void makeServoRecipes() {

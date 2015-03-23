@@ -1,5 +1,6 @@
 package factorization.common;
 
+import factorization.fzds.DeltaChunk;
 import factorization.mechanisms.TileEntityAnchor;
 import factorization.mechanisms.SocketHandCrank;
 import factorization.mechanisms.TileEntityHinge;
@@ -101,6 +102,11 @@ public enum FactoryType {
         if (!FzConfig.enable_rocketry) {
             ROCKETENGINE.disable();
         }
+        if (!DeltaChunk.enabled()) {
+            HINGE.disable();
+            ANCHOR.disable();
+            ROCKETENGINE.disable();
+        }
     }
     
     final public int md;
@@ -113,7 +119,7 @@ public enum FactoryType {
     private boolean disabled = false;
 
     public TileEntityCommon getRepresentative() {
-        if (!can_represent) {
+        if (!can_represent || disabled) {
             return null;
         }
         if (representative == null) {

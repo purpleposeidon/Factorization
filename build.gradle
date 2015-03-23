@@ -11,6 +11,7 @@ buildscript {
         }
     }
     dependencies {
+        // Can change this line to point to a specific version if ForgeGradle breaks itself
         classpath 'net.minecraftforge.gradle:ForgeGradle:1.2-SNAPSHOT'
     }
 }

@@ -1,5 +1,7 @@
 package factorization.coremod;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Map;
 
@@ -16,7 +18,10 @@ import cpw.mods.fml.relauncher.IFMLLoadingPlugin.TransformerExclusions;
 public class LoadingPlugin implements IFMLLoadingPlugin {
     public static boolean pluginInvoked = false;
     public static boolean deobfuscatedEnvironment = true;
+
+    private static File mcLocation = null;
     private boolean inspect_air = false;
+
     @Override public String getSetupClass() { return null; }
     @Override public String getModContainerClass() { return null; } // We use the FMLCorePluginContainsFMLMod manifest attribute
     
@@ -39,6 +44,16 @@ public class LoadingPlugin implements IFMLLoadingPlugin {
     public void injectData(Map<String, Object> data) {
         deobfuscatedEnvironment = !(Boolean) data.get("runtimeDeobfuscationEnabled");
         inspect_air = "true".equalsIgnoreCase(System.getProperty("factorization.inspectAir"));
+        try {
+            mcLocation = ((File) data.get("mcLocation")).getCanonicalFile();
+        } catch (IOException e) {
+            throw new RuntimeException("Unable to get mcLocation", e);
+        }
         pluginInvoked = true;
+    }
+
+    public static File getMcLocation() {
+        if (mcLocation == null) throw new IllegalStateException("LoadingPlugin failed");
+        return mcLocation;
     }
 }

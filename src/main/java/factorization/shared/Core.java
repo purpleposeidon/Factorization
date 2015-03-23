@@ -14,6 +14,7 @@ import java.util.Set;
 
 import cpw.mods.fml.client.event.ConfigChangedEvent;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
+import factorization.fzds.DeltaChunk;
 import factorization.mechanisms.MechanismsFeature;
 import factorization.util.DataUtil;
 import factorization.util.FzUtil;
@@ -215,7 +216,9 @@ public class Core {
         isMainServerThread.set(true);
         serverStarted = true;
         DocumentationModule.instance.serverStarts(event);
-        event.registerServerCommand(new BuildColossusCommand());
+        if (DeltaChunk.enabled()) {
+            event.registerServerCommand(new BuildColossusCommand());
+        }
     }
     
     @EventHandler

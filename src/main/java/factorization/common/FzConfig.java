@@ -3,7 +3,9 @@ package factorization.common;
 import java.io.File;
 import java.util.ArrayList;
 
+import factorization.fzds.DeltaChunk;
 import factorization.shared.Graylist;
+import factorization.shared.NORELEASE;
 import net.minecraft.block.Block;
 import net.minecraftforge.common.config.Configuration;
 import net.minecraftforge.common.config.Property;
@@ -220,7 +222,7 @@ public class FzConfig {
         mushroomalize = getBoolConfig("mushroomNormalize", "server", mushroomalize, "Textures giant mushroom blocks when placed");
         proper_projectile_physics = getBoolConfig("properProjectilePhysics", "server", proper_projectile_physics, "Makes projectiles start with the velocity of the thrower");
         buffed_nametags = getBoolConfig("buffedNametags", "server", buffed_nametags, "Naming entities gives them +5 hearts");
-        players_discover_colossus_guides = getBoolConfig("playersDiscoverColossusGuides", "server", players_discover_colossus_guides, "If set to true, players will find a lost map after getting the diamonds achievement");
+        players_discover_colossus_guides = getBoolConfig("playersDiscoverColossusGuides", "server", players_discover_colossus_guides, "If set to true, players will find a lost map after getting the diamonds achievement. If colossi are disabled, they'll get an LMP instead.");
         infinite_guide_usage = getBoolConfig("infiniteGuideUse", "server", infinite_guide_usage, "If set to true, the Lost Map won't take damage");
         //invasiveCharge = getBoolConfig("invasiveCharge", "server", invasiveCharge, "Set to true to prevent charge from connecting over metal blocks.");
         //Broken. Doesn't work.
@@ -229,5 +231,11 @@ public class FzConfig {
         sockets_ignore_front_redstone = getBoolConfig("socketsIgnoreFacePower", "server", sockets_ignore_front_redstone, "Set to false to let socket blocks detect redstone from their front; provided for legacy worlds.");
         require_book_for_manual = getBoolConfig("requireBookForManual", "general", require_book_for_manual, "If set to true, then you must have a manual in your inventory to look up items");
         lacerator_block_graylist = Graylist.ofBlocks(getStringConfig("laceratorBlockGraylist", "server", "-minecraft:bedrock,minecraft:end_portal", "Comma-separated list of block names. In front of the list must be either a +, for white-listing, or a -, for black-listing."));
+
+        if (!DeltaChunk.enabled()) {
+            gen_colossi = false;
+            enable_rocketry = false;
+            NORELEASE.fixme("using manual w/o manual?");
+        }
     }
 }

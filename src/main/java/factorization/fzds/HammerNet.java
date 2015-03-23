@@ -1,6 +1,7 @@
 package factorization.fzds;
 
 import factorization.fzds.interfaces.*;
+import factorization.shared.NORELEASE;
 import factorization.util.PlayerUtil;
 import factorization.util.SpaceUtil;
 import io.netty.buffer.ByteBuf;
@@ -80,7 +81,7 @@ public class HammerNet {
         if (ent instanceof DimensionSliceEntity) {
             dse = (DimensionSliceEntity) ent;
         } else {
-            Core.logWarning("Packet %s to non-DSE (ID=%s) %s", type, dse_id, ent);
+            Core.logWarning("Packet %s to non-DSE (ID=%s) %s %s", type, dse_id, ent, System.currentTimeMillis()); NORELEASE.fixme("remove time");
             return;
         }
         switch (type) {
