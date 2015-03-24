@@ -92,21 +92,9 @@ class ShadowRenderGlobal implements IWorldAccess {
         }
     }
 
-    private boolean sfx_recur = false;
-
     @Override
     public void playAuxSFX(EntityPlayer player, int soundType, int x, int y, int z, int soundData) {
-        final World shadowWorld = DeltaChunk.getClientShadowWorld();
-        if (2000 <= soundType && soundType < 3000 && !sfx_recur && Hammer.proxy.isInShadowWorld()) {
-            try {
-                sfx_recur = true;
-                Minecraft.getMinecraft().renderGlobal.playAuxSFX(player, soundType, x, y, z, soundData);
-            } finally {
-                sfx_recur = false;
-            }
-            return;
-        }
-        final Coord here = new Coord(shadowWorld, x, y, z);
+        final Coord here = new Coord(DeltaChunk.getClientShadowWorld(), x, y, z);
         for (IDeltaChunk idc : DeltaChunk.getSlicesContainingPoint(here)) {
             Coord at = here.copy();
             idc.shadow2real(at);

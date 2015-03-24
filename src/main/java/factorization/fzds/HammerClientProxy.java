@@ -8,13 +8,13 @@ import cpw.mods.fml.common.gameevent.TickEvent.ClientTickEvent;
 import cpw.mods.fml.common.gameevent.TickEvent.Phase;
 import cpw.mods.fml.common.network.FMLNetworkEvent.ClientDisconnectionFromServerEvent;
 import cpw.mods.fml.relauncher.Side;
+import factorization.aabbdebug.AabbDebugger;
 import factorization.api.Coord;
 import factorization.api.Quaternion;
 import factorization.coremodhooks.HookTargetsClient;
 import factorization.coremodhooks.IExtraChunkData;
 import factorization.fzds.interfaces.IDeltaChunk;
-import factorization.shared.BlockRenderHelper;
-import factorization.shared.Core;
+import factorization.shared.*;
 import factorization.util.NumUtil;
 import factorization.util.SpaceUtil;
 import net.minecraft.block.Block;
@@ -23,7 +23,6 @@ import net.minecraft.client.entity.EntityClientPlayerMP;
 import net.minecraft.client.multiplayer.ChunkProviderClient;
 import net.minecraft.client.multiplayer.WorldClient;
 import net.minecraft.client.network.NetHandlerPlayClient;
-import net.minecraft.client.particle.EffectRenderer;
 import net.minecraft.client.renderer.RenderGlobal;
 import net.minecraft.client.renderer.entity.RenderManager;
 import net.minecraft.client.renderer.tileentity.TileEntityRendererDispatcher;
@@ -194,7 +193,6 @@ public class HammerClientProxy extends HammerProxy {
     private EntityClientPlayerMP real_player = null;
     private WorldClient real_world = null;
     private EntityClientPlayerMP fake_player = null;
-    private EffectRenderer real_effect_renderer = null;
     
     @Override
     public void setShadowWorld() {
@@ -227,9 +225,6 @@ public class HammerClientProxy extends HammerProxy {
                     real_player.getStatFileWriter());
             fake_player.movementInput = real_player.movementInput;
         }
-        real_effect_renderer = mc.effectRenderer;
-        mc.effectRenderer = new ShadowEffectRenderer(w, mc.getTextureManager(), real_effect_renderer, real_world, mc.renderViewEntity);
-
         setWorldAndPlayer((WorldClient) w, fake_player);
     }
     
@@ -239,7 +234,6 @@ public class HammerClientProxy extends HammerProxy {
         setWorldAndPlayer(real_world, real_player);
         real_world = null;
         real_player = null;
-        mc.effectRenderer = real_effect_renderer;
     }
     
     @Override
