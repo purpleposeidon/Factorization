@@ -453,22 +453,25 @@ public final class Coord implements IDataSerializable, ISaneCoord, Comparable<Co
         return this;
     }
     
-    public void adjust(DeltaCoord dc) {
+    public Coord adjust(DeltaCoord dc) {
         x += dc.x;
         y += dc.y;
         z += dc.z;
+        return this;
     }
     
-    public void adjust(ForgeDirection dc) {
+    public Coord adjust(ForgeDirection dc) {
         x += dc.offsetX;
         y += dc.offsetY;
         z += dc.offsetZ;
+        return this;
     }
     
-    public void adjust(int dx, int dy, int dz) {
+    public Coord adjust(int dx, int dy, int dz) {
         x += dx;
         y += dy;
         z += dz;
+        return this;
     }
     
     //Methods on the world
