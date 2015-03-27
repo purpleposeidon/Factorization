@@ -91,7 +91,7 @@ public class Registry {
 
     public ItemStack servorail_item;
     public ItemStack empty_socket_item, socket_lacerator, socket_robot_hand, socket_shifter;
-    public ItemStack hinge, anchor;
+    public ItemStack hinge; //, anchor;
     
     public ItemStack stamper_item, packager_item,
             daybarrel_item_hidden,
@@ -286,7 +286,7 @@ public class Registry {
         }
         if (DeltaChunk.enabled()) {
             hinge = FactoryType.HINGE.itemStack();
-            anchor = FactoryType.ANCHOR.itemStack();
+            //anchor = FactoryType.ANCHOR.itemStack();
         }
 
         //BlockResource stuff

@@ -304,7 +304,7 @@ public class BlockFactorization extends BlockContainer {
 
         //mechanisms
         put(itemList, reg.hinge);
-        put(itemList, reg.anchor);
+        //put(itemList, reg.anchor);
 
         //Barrels
         if (todaysBarrels != null) {
