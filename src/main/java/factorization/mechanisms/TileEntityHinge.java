@@ -426,8 +426,6 @@ public class TileEntityHinge extends TileEntityCommon implements IDCController {
         if (idc.hasOrderedRotation()) return;
         Quaternion w = idc.getRotationalVelocity();
         if (!w.isZero()) {
-            double theta = w.getAngleBetween(new Quaternion());
-            if (theta > Math.PI * 0.05) return;
             idc.setRotationalVelocity(new Quaternion());
         }
         Quaternion rot = idc.getRotation();
