@@ -223,14 +223,27 @@ public class HammerNet {
     private IDeltaChunk active_idc = null;
     
     @SubscribeEvent
-    public void cancelOutOfRangePlacements(PlaceEvent event) {
+    public void handlePlace(PlaceEvent event) {
         if (dont_check_range) return;
         if (active_idc == null) return;
+        cancelOutOfRangePlacements(event);
+        if (!event.isCanceled()) {
+            askController(event);
+        }
+    }
+
+    void cancelOutOfRangePlacements(PlaceEvent event) {
         Coord min = active_idc.getCorner();
         if (event.world != min.w) return;
         Coord max = active_idc.getFarCorner();
         if (in(min.x, event.x, max.x) && in(min.y, event.y, max.y) && in(min.z, event.z, max.z)) return;
         event.setCanceled(true);
+    }
+
+    void askController(PlaceEvent event) {
+        if (active_idc.getController().placeBlock(active_idc, event.player, new Coord(event.world, event.x, event.y, event.z))) {
+            event.setCanceled(true);
+        }
     }
     
     boolean in(int low, int i, int high) {

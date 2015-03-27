@@ -460,7 +460,7 @@ public class ColossusController extends EntityFz implements IBossDisplayData, ID
     }
 
     @Override
-    public boolean placeBlock(IDeltaChunk idc, EntityPlayer player, Coord at, byte sideHit) {
+    public boolean placeBlock(IDeltaChunk idc, EntityPlayer player, Coord at) {
         return false;
     }
 

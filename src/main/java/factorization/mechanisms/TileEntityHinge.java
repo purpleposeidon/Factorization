@@ -186,8 +186,7 @@ public class TileEntityHinge extends TileEntityCommon implements IDCController {
     }
 
     @Override
-    public boolean placeBlock(IDeltaChunk idc, EntityPlayer player, Coord at, byte sideHit) {
-        //NORELEASE.fixme("This doesn't actually get called!");
+    public boolean placeBlock(IDeltaChunk idc, EntityPlayer player, Coord at) {;
         dirtyInertia();
         return false;
     }
