@@ -389,7 +389,7 @@ public final class Coord implements IDataSerializable, ISaneCoord, Comparable<Co
         return y < o.y || x < o.x || z < o.z;
     }
     
-    public boolean inside(Coord lower, Coord upper) {
+    public boolean inside(Coord lower, Coord upper) { // "within"
         return lower.lesserOrEqual(this) && lesserOrEqual(upper);
     }
     

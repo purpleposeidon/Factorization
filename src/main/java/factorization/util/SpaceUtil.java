@@ -1,5 +1,6 @@
 package factorization.util;
 
+import factorization.api.Coord;
 import factorization.api.DeltaCoord;
 import factorization.api.FzOrientation;
 import net.minecraft.entity.Entity;
@@ -246,6 +247,11 @@ public final class SpaceUtil {
         double maxY = Math.max(min.yCoord, max.yCoord);
         double maxZ = Math.max(min.zCoord, max.zCoord);
         return AxisAlignedBB.getBoundingBox(minX, minY, minZ, maxX, maxY, maxZ);
+    }
+
+    public static AxisAlignedBB createAABB(Coord min, Coord max) {
+        return AxisAlignedBB.getBoundingBox(min.x, min.y, min.z,
+                max.x, max.y, max.z);
     }
 
     public static void updateAABB(AxisAlignedBB box, Vec3 min, Vec3 max) {
