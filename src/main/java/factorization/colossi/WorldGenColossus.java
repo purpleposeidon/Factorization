@@ -83,8 +83,14 @@ public class WorldGenColossus implements IWorldGenerator {
         boolean z = (((chunkZ % GENERATION_SPACING) + GENERATION_SPACING) % GENERATION_SPACING) == GENERATION_START_Z;
         return x && z;
     }
+
+    static class LocationException extends Exception {
+        public LocationException(Throwable t) {
+            super(t);
+        }
+    }
     
-    public static ArrayList<Coord> getCandidatesNear(final Coord player, int chunkSearchDistance, boolean forceLoad) {
+    public static ArrayList<Coord> getCandidatesNear(final Coord player, int chunkSearchDistance, boolean forceLoad) throws LocationException {
         ArrayList<Coord> ret = new ArrayList<Coord>();
         ChunkCoordIntPair chunkAt = player.getChunk().getChunkCoordIntPair();
         for (int dx = -chunkSearchDistance; dx <= chunkSearchDistance; dx++) {
@@ -93,9 +99,23 @@ public class WorldGenColossus implements IWorldGenerator {
                 int cz = chunkAt.chunkZPos + dz;
                 if (isGenChunk(cx, cz)) {
                     Chunk chunk = player.w.getChunkFromChunkCoords(cx, cz);
+                    if (forceLoad && !chunk.isTerrainPopulated) {
+                        int r = 1;
+                        for (int rx = -r; rx <= +r; rx++) {
+                            for (int rz = -r; rz <= +r; rz++) {
+                                if (rx == 0 && rz == 0) continue;
+                                player.w.getChunkFromChunkCoords(cx + rx, cz + rz);
+                            }
+                        }
+                    }
                     boolean unload = false;
                     if (forceLoad && !chunk.isTerrainPopulated) {
-                        forceLoadChunk(player.w, cx, cz);
+                        try {
+                            forceLoadChunk(player.w, cx, cz);
+                        } catch (Throwable t) {
+                            t.printStackTrace();
+                            throw new LocationException(t);
+                        }
                         chunk = player.w.getChunkFromChunkCoords(cx, cz);
                         unload = true;
                     }

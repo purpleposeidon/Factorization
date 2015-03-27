@@ -45,7 +45,13 @@ public class ItemColossusGuide extends ItemFactorization {
             range = WorldGenColossus.GENERATION_SPACING * 5 / 2;
         }
         Coord playerPos = new Coord(player);
-        ArrayList<Coord> nearby = WorldGenColossus.getCandidatesNear(playerPos, range, true);
+        ArrayList<Coord> nearby;
+        try {
+            nearby = WorldGenColossus.getCandidatesNear(playerPos, range, true);
+        } catch (WorldGenColossus.LocationException e) {
+            Notice.chat(player, msgKey, new ChatComponentTranslation("colossus.is.worldgen_crash"));
+            return is;
+        }
         if (nearby.isEmpty()) {
             Notice.chat(player, msgKey, new ChatComponentTranslation("colossus.is.no_nearby"));
             return is;
