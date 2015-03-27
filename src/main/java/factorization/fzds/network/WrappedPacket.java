@@ -11,6 +11,8 @@ import net.minecraft.network.EnumConnectionState;
 import net.minecraft.network.INetHandler;
 import net.minecraft.network.Packet;
 import net.minecraft.network.PacketBuffer;
+import net.minecraft.network.play.server.S21PacketChunkData;
+import net.minecraft.network.play.server.S26PacketMapChunkBulk;
 
 public class WrappedPacket extends Packet implements IFzdsShenanigans {
     /**
@@ -83,6 +85,9 @@ public class WrappedPacket extends Packet implements IFzdsShenanigans {
     @Override
     public void processPacket(INetHandler netHandler) {
         if (wrapped == null) return;
+        if (Hammer.log_client_chunking && (wrapped instanceof S21PacketChunkData || wrapped instanceof S26PacketMapChunkBulk)) {
+            Hammer.logInfo("Packet " + wrapped.serialize());
+        }
         if (Minecraft.getMinecraft().thePlayer == null) {
             return; // :/
         }

@@ -5,6 +5,7 @@ import net.minecraft.util.MovingObjectPosition;
 import net.minecraft.world.World;
 
 public class HammerProxy {
+    // Clients should use DeltaChunk
     public World getClientRealWorld() { return null; }
     
     public void setShadowWorld() {

@@ -50,6 +50,7 @@ public class Hammer {
     public static int fzds_command_channel = 0;
     public static int max_fzds_grab_area = 16*16*80*4;
     public static int max_dse_collidable_chunk_area = 9*9*9;
+    public static boolean log_client_chunking = Boolean.parseBoolean(System.getProperty("fzds.logClientChunks", "false"));
     
     static DeltaChunkMap serverSlices = new DeltaChunkMap(), clientSlices = new DeltaChunkMap();
 
@@ -93,6 +94,9 @@ public class Hammer {
         }
         WrappedPacket.registerPacket();
         ForgeChunkManager.setForcedChunkLoadingCallback(this, new PPPChunkLoader());
+        if (log_client_chunking && FMLCommonHandler.instance().getSide() == Side.CLIENT) {
+            Core.loadBus(new ChunkLogger());
+        }
     }
 
     @EventHandler

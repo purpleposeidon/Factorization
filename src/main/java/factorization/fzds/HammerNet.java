@@ -1,14 +1,25 @@
 package factorization.fzds;
 
-import factorization.fzds.interfaces.*;
-import factorization.shared.NORELEASE;
+import com.google.common.io.ByteArrayDataOutput;
+import com.google.common.io.ByteStreams;
+import com.mojang.authlib.GameProfile;
+import cpw.mods.fml.common.eventhandler.SubscribeEvent;
+import cpw.mods.fml.common.network.FMLEventChannel;
+import cpw.mods.fml.common.network.FMLNetworkEvent.ClientCustomPacketEvent;
+import cpw.mods.fml.common.network.FMLNetworkEvent.ServerCustomPacketEvent;
+import cpw.mods.fml.common.network.NetworkRegistry;
+import cpw.mods.fml.common.network.internal.FMLProxyPacket;
+import factorization.api.Coord;
+import factorization.api.Quaternion;
+import factorization.fzds.interfaces.DeltaCapability;
+import factorization.fzds.interfaces.IDeltaChunk;
+import factorization.fzds.interfaces.IFzdsShenanigans;
+import factorization.fzds.interfaces.Interpolation;
+import factorization.shared.Core;
 import factorization.util.PlayerUtil;
 import factorization.util.SpaceUtil;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
-
-import java.io.IOException;
-
 import net.minecraft.block.Block;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
@@ -27,19 +38,7 @@ import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.entity.player.PlayerDestroyItemEvent;
 import net.minecraftforge.event.world.BlockEvent.PlaceEvent;
 
-import com.google.common.io.ByteArrayDataOutput;
-import com.google.common.io.ByteStreams;
-import com.mojang.authlib.GameProfile;
-
-import cpw.mods.fml.common.eventhandler.SubscribeEvent;
-import cpw.mods.fml.common.network.FMLEventChannel;
-import cpw.mods.fml.common.network.FMLNetworkEvent.ClientCustomPacketEvent;
-import cpw.mods.fml.common.network.FMLNetworkEvent.ServerCustomPacketEvent;
-import cpw.mods.fml.common.network.NetworkRegistry;
-import cpw.mods.fml.common.network.internal.FMLProxyPacket;
-import factorization.api.Coord;
-import factorization.api.Quaternion;
-import factorization.shared.Core;
+import java.io.IOException;
 
 
 public class HammerNet {
@@ -81,7 +80,7 @@ public class HammerNet {
         if (ent instanceof DimensionSliceEntity) {
             dse = (DimensionSliceEntity) ent;
         } else {
-            Core.logWarning("Packet %s to non-DSE (ID=%s) %s %s", type, dse_id, ent, System.currentTimeMillis()); NORELEASE.fixme("remove time");
+            Core.logWarning("Packet %s to non-DSE (ID=%s) %s", type, dse_id, ent);
             return;
         }
         switch (type) {
