@@ -1,12 +1,15 @@
 package factorization.ceramics;
 
+import java.io.IOException;
 import java.util.Random;
 
+import factorization.api.datahelpers.DataInNBT;
 import factorization.common.ResourceType;
 import net.minecraft.block.Block;
 import net.minecraft.client.renderer.RenderBlocks;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.init.Blocks;
+import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.IIcon;
 import net.minecraftforge.common.util.ForgeDirection;
 
@@ -46,8 +49,13 @@ public class BlockRenderGreenware extends FactorizationBlockRender {
             GL11.glPushMatrix();
             boolean stand = true;
             boolean rescale = false;
-            if (is.hasTagCompound()) {
-                loader.loadFromStack(is);
+            if (is.hasTagCompound() && is.getTagCompound().hasKey("parts")) {
+                try {
+                    loader.putData(new DataInNBT(is.getTagCompound()));
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    is.setTagCompound(new NBTTagCompound());
+                }
                 int minX = 32, minY = 32, minZ = 32;
                 int maxX = 0, maxY = 32, maxZ = 32;
                 for (ClayLump cl : loader.parts) {

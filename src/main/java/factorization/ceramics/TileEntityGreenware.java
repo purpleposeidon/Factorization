@@ -1,14 +1,22 @@
 package factorization.ceramics;
 
-import java.io.DataInput;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-
+import cpw.mods.fml.common.FMLCommonHandler;
+import cpw.mods.fml.common.eventhandler.SubscribeEvent;
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
+import factorization.api.Coord;
+import factorization.api.Quaternion;
 import factorization.api.datahelpers.DataHelper;
+import factorization.api.datahelpers.DataInNBT;
+import factorization.api.datahelpers.DataOutNBT;
 import factorization.api.datahelpers.Share;
+import factorization.common.BlockIcons;
+import factorization.common.FactoryType;
+import factorization.common.FzConfig;
+import factorization.common.ResourceType;
+import factorization.notify.Notice;
 import factorization.shared.*;
+import factorization.shared.NetworkFactorization.MessageType;
 import factorization.util.DataUtil;
 import factorization.util.InvUtil;
 import factorization.util.SpaceUtil;
@@ -31,24 +39,13 @@ import net.minecraft.util.Vec3;
 import net.minecraftforge.client.event.DrawBlockHighlightEvent;
 import net.minecraftforge.common.util.Constants;
 import net.minecraftforge.common.util.ForgeDirection;
-
 import org.lwjgl.opengl.GL11;
 
-import com.google.common.io.ByteArrayDataOutput;
-
-import cpw.mods.fml.common.FMLCommonHandler;
-import cpw.mods.fml.common.eventhandler.SubscribeEvent;
-import cpw.mods.fml.common.network.internal.FMLProxyPacket;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
-import factorization.api.Coord;
-import factorization.api.Quaternion;
-import factorization.common.BlockIcons;
-import factorization.common.FactoryType;
-import factorization.common.FzConfig;
-import factorization.common.ResourceType;
-import factorization.notify.Notice;
-import factorization.shared.NetworkFactorization.MessageType;
+import java.io.DataInput;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 
 public class TileEntityGreenware extends TileEntityCommon {
     public static int MAX_PARTS = 32;
@@ -302,7 +299,7 @@ public class TileEntityGreenware extends TileEntityCommon {
         totalHeat = data.as(Share.VISIBLE, "heat").putInt(totalHeat);
         glazesApplied = data.as(Share.PRIVATE, "glazed").putBoolean(glazesApplied);
         front = data.as(Share.VISIBLE, "front").putEnum(front);
-        rotation = data.as(Share.VISIBLE, "rot").putByte(rotation);
+        setRotation(data.as(Share.VISIBLE, "rot").putByte(rotation));
         if (data.isNBT()) {
             putParts(data, data.getTag());
         } else if (data.isReader()) {
@@ -359,8 +356,17 @@ public class TileEntityGreenware extends TileEntityCommon {
     @Override
     public void onPlacedBy(EntityPlayer player, ItemStack is, int side, float hitX, float hitY, float hitZ) {
         super.onPlacedBy(player, is, side, hitX, hitY, hitZ);
-        NBTTagCompound tag = is.getTagCompound();
-        loadParts(tag);
+        NBTTagCompound tag = null;
+        if (is.hasTagCompound()) {
+            tag = is.getTagCompound();
+            try {
+                putData(new DataInNBT(tag));
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        } else {
+            addLump();
+        }
         ForgeDirection placement = ForgeDirection.getOrientation(SpaceUtil.determineFlatOrientation(player));
         if (tag == null || !tag.hasKey("front")) {
             front = placement;
@@ -388,7 +394,14 @@ public class TileEntityGreenware extends TileEntityCommon {
     public ItemStack getItem() {
         ItemStack ret = Core.registry.greenware_item.copy();
         NBTTagCompound tag = new NBTTagCompound();
-        writeParts(tag);
+        byte r = rotation;
+        setRotation((byte) 0);
+        try {
+            putData(new DataOutNBT(tag));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        setRotation(r);
         tag.setByte("front", (byte)front.ordinal());
         ret.setTagCompound(tag);
         if (customName != null) {
@@ -939,5 +952,12 @@ public class TileEntityGreenware extends TileEntityCommon {
     @Override
     public ItemStack getDroppedBlock() {
         return getItem();
+    }
+
+    @Override
+    public void neighborChanged() {
+        if (!worldObj.isRemote && parts.isEmpty()) {
+            getCoord().setAir();
+        }
     }
 }
