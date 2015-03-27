@@ -1,16 +1,15 @@
 package factorization.common;
 
-import java.io.File;
-import java.util.ArrayList;
-
+import cpw.mods.fml.common.registry.EntityRegistry;
 import factorization.fzds.DeltaChunk;
+import factorization.shared.Core;
 import factorization.shared.Graylist;
-import factorization.shared.NORELEASE;
 import net.minecraft.block.Block;
 import net.minecraftforge.common.config.Configuration;
 import net.minecraftforge.common.config.Property;
-import cpw.mods.fml.common.registry.EntityRegistry;
-import factorization.shared.Core;
+
+import java.io.File;
+import java.util.ArrayList;
 
 public class FzConfig {
 
@@ -235,7 +234,6 @@ public class FzConfig {
         if (!DeltaChunk.enabled()) {
             gen_colossi = false;
             enable_rocketry = false;
-            NORELEASE.fixme("using manual w/o manual?");
         }
     }
 }

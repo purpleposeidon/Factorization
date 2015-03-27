@@ -221,7 +221,8 @@ public class DocumentationModule {
         if (is == null) return false;
         Minecraft mc = Minecraft.getMinecraft();
         EntityPlayer player = mc.thePlayer;
-        if (!player.capabilities.isCreativeMode && !FzConfig.require_book_for_manual) {
+        if (!player.capabilities.isCreativeMode && FzConfig.require_book_for_manual) {
+            // TODO: Add manwiches
             boolean found = false;
             for (ItemStack manual : player.inventory.mainInventory) {
                 if (manual == null) continue;
