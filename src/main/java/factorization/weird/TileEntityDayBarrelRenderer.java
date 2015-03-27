@@ -174,6 +174,7 @@ public class TileEntityDayBarrelRenderer extends TileEntitySpecialRenderer {
     };
     
     boolean renderItemCount(ItemStack item, TileEntityDayBarrel barrel) {
+        if (!FzConfig.render_barrel_text) return false;
         final String t = getCountLabel(item, barrel);
         if (t.isEmpty()) {
             return false;
@@ -262,6 +263,7 @@ public class TileEntityDayBarrelRenderer extends TileEntitySpecialRenderer {
     EntityItem entityitem;
     
     public void handleRenderItem(ItemStack is, TileEntityDayBarrel barrel, boolean hasLabel) {
+        if (!FzConfig.render_barrel_item) return;
         //Got problems? Consider looking at ForgeHooksClient.renderInventoryItem, that might be better than this here.
         GL11.glPushMatrix();
         GL11.glRotatef(180, 0, 0, 1);

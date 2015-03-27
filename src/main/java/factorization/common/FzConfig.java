@@ -165,10 +165,10 @@ public class FzConfig {
             render_barrel_close = editMain().getBoolConfig("renderBarrelClose", "client", render_barrel_close, "If true, render barrel info only when nearby");
             render_barrel_use_displaylists = editMain().getBoolConfig("renderBarrelUseDisplayLists", "client", render_barrel_use_displaylists, "If true, use OpenGL display lists for rendering barrels. Setting to false may fix some render issues, at the cost of making barrels render less efficiently");
             render_barrel_force_no_intercept = editMain().getBoolConfig("renderBarrelForceNoIntercept", "client", render_barrel_force_no_intercept, "If true, don't use hacks to avoid enchantment effect rendering issues. Setting to false may fix some render issues, at the cost of making the enchantment effect from, eg, enchanted books visible through walls.");
-            render_barrel_force_entity_render = editMain().getBoolConfig("renderBarrelForceItemFrameStyle", "client", render_barrel_force_entity_render, "If true, render barrels the same way as item frames. Setting to false may fix some render issues, at the cost of looking lame..");
+            render_barrel_force_entity_render = editMain().getBoolConfig("renderBarrelForceItemFrameStyle", "client", render_barrel_force_entity_render, "If true, render barrels the same way as item frames. Setting to false may fix some render issues, at the cost of looking lame.");
             renderTEs = editMain().getBoolConfig("renderOtherTileEntities", "client", renderTEs, "If false, most TEs won't draw, making everything look broken but possibly improving FPS");
             renderAO = editMain().getBoolConfig("renderAmbientOcclusion", "client", renderAO, "If false, never use smooth lighting for drawing sculptures");
-            String attempt = getStringConfig("pocketCraftingActionKeys", "client", pocketActions, "3 keys for: removing (x), cycling (c), balancing (b)");
+            String attempt = getStringConfig("pocketCraftingActionKeys", "client", pocketActions, "4 keys for: removing (x), cycling (c), balancing (b), filling (f)");
             if (attempt.length() == pocketActions.length()) {
                 pocketActions = attempt;
             } else {
