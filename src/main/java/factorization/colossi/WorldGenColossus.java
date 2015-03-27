@@ -114,6 +114,7 @@ public class WorldGenColossus implements IWorldGenerator {
                             forceLoadChunk(player.w, cx, cz);
                         } catch (Throwable t) {
                             t.printStackTrace();
+                            Core.logSevere("Failed to load chunk at (block coords)" + cx * 16 + " " + cz * 16);
                             throw new LocationException(t);
                         }
                         chunk = player.w.getChunkFromChunkCoords(cx, cz);
