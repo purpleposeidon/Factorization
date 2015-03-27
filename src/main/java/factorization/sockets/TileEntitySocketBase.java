@@ -94,19 +94,9 @@ public abstract class TileEntitySocketBase extends TileEntityCommon implements I
             ab.minX -= d;
             ab.minY -= d;
             ab.minZ -= d;
-            ab.maxX += d;
-            ab.maxY += d;
-            ab.maxZ += d;
-
-            if (top.offsetX + top.offsetY + top.offsetZ > 1) { // NORELEASE: What? This never happens. SpaceUtil.sign(top)
-                ab.minX += d*top.offsetX;
-                ab.minY += d*top.offsetY;
-                ab.minZ += d*top.offsetZ;
-            } else {
-                ab.maxX -= d*top.offsetX;
-                ab.maxY -= d*top.offsetY;
-                ab.maxZ -= d*top.offsetZ;
-            }
+            ab.maxX += d - d * top.offsetX;
+            ab.maxY += d - d * top.offsetY;
+            ab.maxZ += d - d * top.offsetZ;
         }
         return (Iterable<Entity>)worldObj.getEntitiesWithinAABBExcludingEntity(ent, ab);
     }
