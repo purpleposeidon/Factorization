@@ -137,8 +137,11 @@ public class PacketProxyingPlayer extends EntityPlayerMP implements
         c.y = -8; // lurk in the void; we should catch most mod's packets.
         DeltaCoord size = dimensionSlice.getFarCorner().difference(dimensionSlice.getCorner());
         size.y = 0;
-        double blockRadius = size.magnitude() / 2;
-        int chunkRadius = (int) ((blockRadius / 16) + 1);
+        int width = Math.abs(size.x);
+        int depth = Math.abs(size.z);
+        double blockRadius = Math.max(width, depth) / 2;
+        int chunkRadius = (int) ((blockRadius / 16) + 2);
+        chunkRadius = Math.max(3, chunkRadius);
         c.setAsEntityLocation(this);
         ServerConfigurationManager scm = MinecraftServer.getServer().getConfigurationManager();
         if (useShortViewRadius) {
@@ -255,13 +258,13 @@ public class PacketProxyingPlayer extends EntityPlayerMP implements
 
     public void endProxy() {
         canDie = true;
+        setDead();
         // From playerNetServerHandler.mcServer.getConfigurationManager().playerLoggedOut(this);
         WorldServer world = getServerForPlayer();
         //world.removeEntity(this); // setEntityDead
+        world.playerEntities.remove(this);
         world.getPlayerManager().removePlayer(this); // No comod?
         MinecraftServer.getServer().getConfigurationManager().playerEntityList.remove(playerNetServerHandler);
-        // The stuff above might not be necessary.
-        setDead();
         dimensionSlice.clear();
     }
 
