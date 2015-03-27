@@ -556,7 +556,14 @@ public class TileEntityParaSieve extends TileEntityFactorization implements ISid
             if (item == null) {
                 continue;
             }
-            UniqueIdentifier ui = GameRegistry.findUniqueIdentifierFor(item);
+            UniqueIdentifier ui;
+            try {
+                ui = GameRegistry.findUniqueIdentifierFor(item);
+            } catch (Throwable e) {
+                Core.logWarning("Error looking up item: " + item);
+                e.printStackTrace();
+                continue;
+            }
             String modName = null;
             if (ui != null) {
                 modName = ui.modId;
