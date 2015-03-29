@@ -28,6 +28,10 @@ minecraft {
     replace '@FZVERSION@', (project.version.split("-")[1])
 }
 
+// Target java 1.6
+targetCompatibility = '1.6'
+sourceCompatibility = '1.6'
+
 repositories {
     maven {   
         name = "ChickenBones"
