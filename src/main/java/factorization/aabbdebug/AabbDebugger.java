@@ -114,10 +114,10 @@ public enum AabbDebugger {
         if (!hasBoxes()) return;
         World w = Minecraft.getMinecraft().theWorld;
         if (w == null) return;
-        EntityLivingBase camera = Minecraft.getMinecraft().renderViewEntity;
-        double cx = camera.lastTickPosX + (camera.posX - camera.lastTickPosX) * (double) event.partialTicks;
-        double cy = camera.lastTickPosY + (camera.posY - camera.lastTickPosY) * (double) event.partialTicks;
-        double cz = camera.lastTickPosZ + (camera.posZ - camera.lastTickPosZ) * (double) event.partialTicks;
+        EntityLivingBase eyePos = Minecraft.getMinecraft().renderViewEntity;
+        double cx = eyePos.lastTickPosX + (eyePos.posX - eyePos.lastTickPosX) * (double) event.partialTicks;
+        double cy = eyePos.lastTickPosY + (eyePos.posY - eyePos.lastTickPosY) * (double) event.partialTicks;
+        double cz = eyePos.lastTickPosZ + (eyePos.posZ - eyePos.lastTickPosZ) * (double) event.partialTicks;
         
         GL11.glPushAttrib(GL11.GL_ENABLE_BIT | GL11.GL_COLOR_BUFFER_BIT);
         GL11.glPushMatrix();
@@ -127,6 +127,7 @@ public enum AabbDebugger {
         //GL11.glDisable(GL11.GL_DEPTH_TEST);
         GL11.glEnable(GL11.GL_BLEND);
         GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
+        GL11.glDisable(GL11.GL_LIGHTING);
         GL11.glColor4f(1, 1, 1, 0.5F);
         
         GL11.glDisable(GL11.GL_TEXTURE_2D);
