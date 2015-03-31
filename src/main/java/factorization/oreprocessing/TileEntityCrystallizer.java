@@ -3,6 +3,7 @@ package factorization.oreprocessing;
 import java.io.IOException;
 import java.util.ArrayList;
 
+import factorization.api.IFurnaceHeatable;
 import factorization.api.datahelpers.DataHelper;
 import factorization.api.datahelpers.Share;
 import factorization.shared.*;
@@ -18,7 +19,7 @@ import factorization.common.BlockIcons;
 import factorization.common.FactoryType;
 import factorization.shared.NetworkFactorization.MessageType;
 
-public class TileEntityCrystallizer extends TileEntityFactorization {
+public class TileEntityCrystallizer extends TileEntityFactorization implements IFurnaceHeatable {
     ItemStack inputs[] = new ItemStack[6];
     ItemStack output;
 
@@ -206,7 +207,27 @@ public class TileEntityCrystallizer extends TileEntityFactorization {
     }
 
     public static ArrayList<CrystalRecipe> recipes = new ArrayList();
-    
+
+    @Override
+    public boolean acceptsHeat() {
+        return needHeat();
+    }
+
+    @Override
+    public void giveHeat() {
+        heat++;
+    }
+
+    @Override
+    public boolean hasLaggyStart() {
+        return false;
+    }
+
+    @Override
+    public boolean isStarted() {
+        return heat + progress > 0;
+    }
+
     public static class CrystalRecipe {
         public ItemStack input, output, solution;
         public float output_count;

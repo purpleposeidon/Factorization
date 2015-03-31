@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Random;
 
+import factorization.api.IFurnaceHeatable;
 import factorization.api.datahelpers.DataHelper;
 import factorization.api.datahelpers.Share;
 import factorization.shared.*;
@@ -12,6 +13,7 @@ import factorization.util.ItemUtil;
 import factorization.util.SpaceUtil;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.block.Block;
+import net.minecraft.block.BlockFurnace;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -24,7 +26,7 @@ import factorization.common.BlockIcons;
 import factorization.common.FactoryType;
 import factorization.shared.NetworkFactorization.MessageType;
 
-public class TileEntitySlagFurnace extends TileEntityFactorization {
+public class TileEntitySlagFurnace extends TileEntityFactorization implements IFurnaceHeatable {
     ItemStack furnaceItemStacks[] = new ItemStack[4];
     public int furnaceBurnTime;
     public int currentFuelItemBurnTime;
@@ -253,6 +255,34 @@ public class TileEntitySlagFurnace extends TileEntityFactorization {
         }
 
         return this.furnaceBurnTime * par1 / this.currentFuelItemBurnTime;
+    }
+
+    @Override
+    public boolean acceptsHeat() {
+        return canSmelt();
+    }
+
+    @Override
+    public void giveHeat() {
+        TileEntitySlagFurnace furnace = this;
+        final boolean needStart = !isStarted();
+        final int topBurnTime = 200;
+        if (furnace.furnaceBurnTime < topBurnTime) {
+            furnace.furnaceBurnTime += 1;
+        } else {
+            furnace.furnaceCookTime += 1;
+            furnace.furnaceCookTime = Math.min(furnace.furnaceCookTime, 200 - 1);
+        }
+    }
+
+    @Override
+    public boolean hasLaggyStart() {
+        return true;
+    }
+
+    @Override
+    public boolean isStarted() {
+        return isBurning();
     }
 
     public static class SmeltingResult {

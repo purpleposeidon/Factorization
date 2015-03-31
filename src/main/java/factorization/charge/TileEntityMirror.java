@@ -243,7 +243,7 @@ public class TileEntityMirror extends TileEntityCommon {
         for (int x = xCoord - search_distance; x <= xCoord + search_distance; x++) {
             for (int z = zCoord - search_distance; z <= zCoord + search_distance; z++) {
                 Coord here = new Coord(worldObj, x, yCoord, z);
-                IReflectionTarget target = here.getTE(IReflectionTarget.class);
+                IReflectionTarget target = here.getTE(IReflectionTarget.class); // FIXME: Iterate the chunk hash maps instead... get a nice helper function perhaps
                 if (target == null) {
                     continue;
                 }

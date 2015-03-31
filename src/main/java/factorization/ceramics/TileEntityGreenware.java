@@ -5,6 +5,7 @@ import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import factorization.api.Coord;
+import factorization.api.IFurnaceHeatable;
 import factorization.api.Quaternion;
 import factorization.api.datahelpers.DataHelper;
 import factorization.api.datahelpers.DataInNBT;
@@ -47,7 +48,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-public class TileEntityGreenware extends TileEntityCommon {
+public class TileEntityGreenware extends TileEntityCommon implements IFurnaceHeatable {
     public static int MAX_PARTS = 32;
     ForgeDirection front = ForgeDirection.UNKNOWN;
     byte rotation = 0;
@@ -61,6 +62,33 @@ public class TileEntityGreenware extends TileEntityCommon {
     @Override
     public BlockClass getBlockClass() {
         return BlockClass.Ceramic;
+    }
+
+    @Override
+    public boolean acceptsHeat() {
+        ClayState state = getState();
+        return state == ClayState.DRY || state == ClayState.UNFIRED_GLAZED || state == ClayState.WET;
+    }
+
+    @Override
+    public void giveHeat() {
+        ClayState state = getState();
+        if (state == ClayState.DRY || state == ClayState.UNFIRED_GLAZED) {
+            totalHeat += 1;
+        }
+        if (state == ClayState.WET) {
+            lastTouched += 1;
+        }
+    }
+
+    @Override
+    public boolean hasLaggyStart() {
+        return false;
+    }
+
+    @Override
+    public boolean isStarted() {
+        return false; // eh, not really necessary
     }
 
     public static class ClayLump {

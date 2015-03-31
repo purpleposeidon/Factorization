@@ -1,8 +1,6 @@
 package factorization.charge;
 
-import factorization.api.Charge;
-import factorization.api.Coord;
-import factorization.api.IChargeConductor;
+import factorization.api.*;
 import factorization.api.datahelpers.DataHelper;
 import factorization.api.datahelpers.Share;
 import factorization.ceramics.TileEntityGreenware;
@@ -116,37 +114,40 @@ public class TileEntityHeater extends TileEntityCommon implements IChargeConduct
         }
         charge.update();
 
-        if (heat <= 0) {
-            return;
-        }
+        if (!canSendHeat()) return;
         int recurs = 0, action = 0;
         ArrayList<Coord> randomNeighbors = here.getRandomNeighborsAdjacent();
+        ArrayList<TileEntityHeater> heaters = null;
         for (Coord c : randomNeighbors) {
-            TileEntity te = c.getTE();
-            if (te == null) {
+            if (action == 0 && c.getBlock() == this.blockType && c.getTE() instanceof TileEntityHeater) {
+                if (heaters == null) heaters = new ArrayList<TileEntityHeater>();
+                heaters.add(c.getTE(TileEntityHeater.class));
                 continue;
             }
-            if (te instanceof TileEntityHeater) {
-                recurs++;
-                continue;
-            }
-            if (sendHeat(te, false)) {
+            IFurnaceHeatable furnace = HeatConverters.convert(c.w, c.x, c.y, c.z);
+            if (furnace != null && sendHeat(furnace)) {
                 action++;
-                if (heat <= 0) {
-                    return;
-                }
+                if (!canSendHeat()) return;
             }
         }
-        if (recurs > 0 && action == 0) {
-            for (Coord c : randomNeighbors) {
-                TileEntity te = c.getTE();
-                if (te == null) {
-                    continue;
-                }
-                if (te instanceof TileEntityHeater) {
-                    sendHeat(te, true);
-                    continue;
-                }
+        if (action == 0 && heaters != null) {
+            for (TileEntityHeater heater : heaters) {
+                recursiveHeat(heater);
+            }
+        }
+    }
+
+    void recursiveHeat(TileEntityHeater heater) {
+        int to_take = 2;
+        if (heat < to_take) {
+            return;
+        }
+        for (Coord c : heater.getCoord().getRandomNeighborsAdjacent()) {
+            IFurnaceHeatable adj = HeatConverters.convert(c.w, c.x, c.y, c.z);
+            if (adj == null) continue;
+            if (heater.sendHeat(adj)) {
+                heat -= to_take;
+                return;
             }
         }
     }
@@ -158,133 +159,24 @@ public class TileEntityHeater extends TileEntityCommon implements IChargeConduct
         return cookTime > 0;
     }
 
-    int addGraceHeat(int burnTime) {
-        return Math.max(4, burnTime);
+    boolean canSendHeat() {
+        return heat > maxHeat / 2;
     }
 
-    private class ProxiedHeatingResult {
-        int burnTime, cookTime, topBurnTime;
-
-        public ProxiedHeatingResult(Coord furnace, int burnTime, int cookTime) {
-            this.burnTime = burnTime;
-            this.cookTime = cookTime;
-            this.topBurnTime = 200;
-            if (burnTime == 0 && heat < maxHeat*0.95) {
-                return;
-            }
-            calculate(furnace);
+    boolean sendHeat(IFurnaceHeatable furnace) {
+        if (!furnace.acceptsHeat()) return false;
+        if (furnace.hasLaggyStart()) {
+            boolean can_jumpstart = heat >= maxHeat * 0.95;
+            if (!can_jumpstart && !furnace.isStarted()) return false;
         }
-
-        private void calculate(Coord furnace) {
-            for (int i = 1; i <= 2; i++) {
-                if (heat <= maxHeat / 2) {
-                    return;
-                }
-                int mul = 1;
-                if (burnTime < topBurnTime) {
-                    burnTime += 1;
-                } else {
-                    cookTime += 1;
-                    mul = 2;
-                }
-                heat -= mul*i;
-                if (burnTime > topBurnTime / 2) {
-                    break;
-                }
-            }
+        boolean any = false;
+        for (int i = 1; i <= 2; i++) {
+            furnace.giveHeat();
+            heat -= i;
+            any = true;
+            if (!canSendHeat()) return true;
         }
-    }
-    
-    boolean sendHeat(TileEntity te, boolean canRecurse) {
-        if (te instanceof TileEntityExtension) {
-            te = ((TileEntityExtension) te).getParent();
-            if (te == null) {
-                return false;
-            }
-        }
-        //TODO FIXME: Interface!
-        if (te instanceof TileEntityFurnace) {
-            TileEntityFurnace furnace = (TileEntityFurnace) te;
-            if (!TEF_canSmelt(furnace)) {
-                return false;
-            }
-            ProxiedHeatingResult pf = new ProxiedHeatingResult(new Coord(te), furnace.furnaceBurnTime, furnace.furnaceCookTime);
-            furnace.furnaceBurnTime = pf.burnTime;
-            furnace.furnaceCookTime = Math.min(pf.cookTime, 200 - 1);
-            BlockFurnace.updateFurnaceBlockState(furnace.furnaceCookTime > 0, worldObj, te.xCoord, te.yCoord, te.zCoord);
-            return true;
-        }
-        if (te instanceof TileEntitySlagFurnace) {
-            TileEntitySlagFurnace furnace = (TileEntitySlagFurnace) te;
-            if (!furnace.canSmelt()) {
-                return false;
-            }
-            ProxiedHeatingResult pf = new ProxiedHeatingResult(new Coord(te), furnace.furnaceBurnTime, furnace.furnaceCookTime);
-            furnace.furnaceBurnTime = pf.burnTime;
-            furnace.furnaceCookTime = pf.cookTime;
-            return true;
-        } 
-        if (te instanceof TileEntityCrystallizer) {
-            TileEntityCrystallizer crys = (TileEntityCrystallizer) te;
-            if (!crys.needHeat()) {
-                return false;
-            }
-            crys.heat++;
-            heat--;
-            return true;
-        }
-        if (te instanceof TileEntityGreenware) {
-            TileEntityGreenware teg = (TileEntityGreenware) te;
-            ClayState state = teg.getState();
-            if (state == ClayState.DRY || state == ClayState.UNFIRED_GLAZED) {
-                teg.totalHeat += 1;
-                heat -= 3;
-                return true;
-            }
-            if (state == ClayState.WET) {
-                teg.lastTouched += 1;
-                heat -= 6;
-                return true;
-            }
-            return false;
-        }
-        if (canRecurse && te instanceof TileEntityHeater) {
-            int to_take = 2;
-            if (heat < to_take) {
-                return false;
-            }
-            TileEntityHeater heater = ((TileEntityHeater) te);
-            for (Coord c : heater.getCoord().getRandomNeighborsAdjacent()) {
-                TileEntity it = c.getTE();
-                if (it == this || it == null || it instanceof TileEntityHeater) {
-                    continue;
-                }
-                if (heater.sendHeat(it, false)) {
-                    heat -= to_take;
-                    return true;
-                }
-            }
-            return false;
-        }
-        return false;
-    }
-
-    boolean TEF_canSmelt(TileEntityFurnace diss) {
-        //private function for TileEntityFurnace.canSmelt, boooo
-        //NOTE: We can get rid of this now, thanks to those nice changes FML makes.
-        if (diss.getStackInSlot(0) == null) {
-            return false;
-        } else {
-            ItemStack var1 = FurnaceRecipes.smelting().getSmeltingResult(diss.getStackInSlot(0));
-            if (var1 == null)
-                return false;
-            if (diss.getStackInSlot(2) == null)
-                return true;
-            if (!diss.getStackInSlot(2).isItemEqual(var1) /* no NBT okay (vanilla source) */ )
-                return false;
-            int result = diss.getStackInSlot(2).stackSize + var1.stackSize;
-            return (result <= diss.getInventoryStackLimit() && result <= var1.getMaxStackSize());
-        }
+        return true;
     }
 
     void cookEntity(Entity ent) {
