@@ -47,4 +47,23 @@ colossus_rise.ogg
         http://creativecommons.org/licenses/by/3.0/
     Cropped and filtered
 
+winch_powered1.ogg
+winch_powered2.ogg
+winch_powered3.ogg
+    "BMW 1150 GS Motorcycle: NZP BMW 1150GS Fuel pump", by Noizemaker
+        www.freesound.org/people/Noizemaker/sounds/23216/
+    Creative Commons, Sampling+ License
+        http://creativecommons.org/licenses/sampling+/1.0/
+    Cropped, equalized, and mixed with other work.
 
+winch_powered1.ogg
+winch_powered2.ogg
+winch_powered3.ogg
+winch_powered1.ogg
+winch_powered2.ogg
+winch_powered3.ogg
+    "MontagnesRusses", by davidou
+        http://www.freesound.org/people/davidou/sounds/88468/
+    Creative Commons, Zero License
+        http://creativecommons.org/publicdomain/zero/1.0/
+    Cropped and mixed with other work.

@@ -12,12 +12,16 @@ import factorization.servo.ServoMotor;
 import factorization.shared.Core;
 import factorization.shared.EntityReference;
 import factorization.shared.FactorizationBlockRender;
+import factorization.shared.NORELEASE;
 import factorization.sockets.ISocketHolder;
 import factorization.sockets.SocketBareMotor;
 import factorization.sockets.TileEntitySocketBase;
 import factorization.util.SpaceUtil;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.audio.MovingSound;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.Vec3;
 import net.minecraft.world.World;
 
@@ -104,6 +108,12 @@ public class SocketPoweredCrank extends TileEntitySocketBase implements IChargeC
     }
 
     @Override
+    public void uninstall() {
+        if (!isChained()) return;
+        new Coord(this).spawnItem(Core.registry.darkIronChain);
+    }
+
+    @Override
     public void renderStatic(ServoMotor motor, Tessellator tess) {
         SocketBareMotor sbm = (SocketBareMotor) FactoryType.SOCKET_BARE_MOTOR.getRepresentative();
         sbm.renderStatic(motor, tess);
@@ -111,15 +121,50 @@ public class SocketPoweredCrank extends TileEntitySocketBase implements IChargeC
 
 
     ChainLink chainDraw;
+    double chainLen, prevChainLen;
+    double chainDelta = 0;
+    boolean soundActive;
     void updateHookDrawPos(ISocketHolder socket) {
         IDeltaChunk idc = hookedIdc.getEntity();
         if (idc == null) return;
+        boolean first = false;
         if (chainDraw == null) {
             chainDraw = ChainRender.instance.add();
+            first = true;
         }
         Vec3 realHookLocation = idc.shadow2real(hookLocation);
         Vec3 selfPos = socket.getPos();
-        chainDraw.update(selfPos.addVector(0, 1, 0), realHookLocation.addVector(0, 1, 0));
+        chainDraw.update(selfPos, realHookLocation);
+        double len = SpaceUtil.lineDistance(selfPos, realHookLocation);
+        if (first) {
+            chainLen = prevChainLen = len;
+        } else {
+            chainDelta += len - prevChainLen;
+            prevChainLen = chainLen;
+            chainLen = len;
+        }
+        if (soundActive) {
+            chainDelta /= 2;
+            if (Math.abs(chainDelta) < 0.0001) chainDelta = 0;
+            return;
+        }
+
+        double min = 0.15;
+        byte direction = 0;
+        if (chainDelta < -min) {
+            direction = -1;
+        } else if (chainDelta > min) {
+            direction = +1;
+        } else {
+            return;
+        }
+        Minecraft.getMinecraft().getSoundHandler().playSound(new WinchSound(direction, this));
+    }
+
+    @Override
+    public Vec3 getPos() {
+        double d = 0.5;
+        return Vec3.createVectorHelper(xCoord + d, yCoord + d, zCoord + d);
     }
 
     @Override
@@ -133,7 +178,9 @@ public class SocketPoweredCrank extends TileEntitySocketBase implements IChargeC
 
     @Override
     public void renderTesr(ServoMotor motor, float partial) {
-        FactorizationBlockRender.renderItemIIcon(getCreatingItem().getItem().getIconFromDamage(0));
         super.renderTesr(motor, partial);
+        FactorizationBlockRender.renderItemIIcon(getCreatingItem().getItem().getIconFromDamage(0));
+        if (chainDraw == null) return;
+
     }
 }
