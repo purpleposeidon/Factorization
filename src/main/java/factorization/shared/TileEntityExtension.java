@@ -3,6 +3,8 @@ package factorization.shared;
 import java.io.IOException;
 import java.util.List;
 
+import factorization.api.HeatConverters;
+import factorization.api.IFurnaceHeatable;
 import factorization.api.datahelpers.DataHelper;
 import factorization.api.datahelpers.Share;
 import io.netty.buffer.ByteBuf;
@@ -11,10 +13,12 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.IIcon;
 import net.minecraft.util.MovingObjectPosition;
 import net.minecraft.util.Vec3;
+import net.minecraft.world.World;
 import net.minecraftforge.common.util.ForgeDirection;
 import cpw.mods.fml.common.network.internal.FMLProxyPacket;
 import cpw.mods.fml.relauncher.Side;
@@ -24,7 +28,7 @@ import factorization.ceramics.TileEntityGreenware;
 import factorization.common.FactoryType;
 import factorization.shared.NetworkFactorization.MessageType;
 
-public class TileEntityExtension extends TileEntityCommon {
+public class TileEntityExtension extends TileEntityCommon implements IFurnaceHeatable {
     private TileEntityCommon _parent = null;
     private DeltaCoord pc;
     
@@ -187,6 +191,58 @@ public class TileEntityExtension extends TileEntityCommon {
             return null;
         }
         return p.getDroppedBlock();
+    }
+
+    @Override
+    public void representYoSelf() {
+        HeatConverters.addConverter(new HeatConverters.IHeatConverter() {
+            @Override
+            public IFurnaceHeatable convert(World w, int x, int y, int z) {
+                TileEntity te = w.getTileEntity(x, y, z);
+                if (te instanceof TileEntityExtension) {
+                    TileEntityExtension ex = (TileEntityExtension) te;
+                    TileEntityCommon parent = ex.getParent();
+                    if (parent instanceof IFurnaceHeatable) {
+                        return (IFurnaceHeatable) parent;
+                    }
+                }
+                return null;
+            }
+        });
+    }
+
+    IFurnaceHeatable heatableParent() {
+        TileEntityCommon parent = getParent();
+        if (parent instanceof IFurnaceHeatable) return (IFurnaceHeatable) parent;
+        return null;
+    }
+
+    @Override
+    public boolean acceptsHeat() {
+        IFurnaceHeatable p = heatableParent();
+        if (p == null) return false;
+        return p.acceptsHeat();
+    }
+
+    @Override
+    public void giveHeat() {
+        IFurnaceHeatable p = heatableParent();
+        if (p == null) return;
+        p.giveHeat();
+    }
+
+    @Override
+    public boolean hasLaggyStart() {
+        IFurnaceHeatable p = heatableParent();
+        if (p == null) return false;
+        return p.hasLaggyStart();
+    }
+
+    @Override
+    public boolean isStarted() {
+        IFurnaceHeatable p = heatableParent();
+        if (p == null) return false;
+        return p.isStarted();
     }
 }
 
