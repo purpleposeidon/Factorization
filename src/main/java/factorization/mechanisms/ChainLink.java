@@ -10,6 +10,7 @@ import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.culling.ICamera;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.IIcon;
+import net.minecraft.util.MathHelper;
 import net.minecraft.util.Vec3;
 
 public class ChainLink {
@@ -49,39 +50,54 @@ public class ChainLink {
     }
 
     @SideOnly(Side.CLIENT)
-    void draw(Tessellator tess, ICamera camera, float partial, IIcon icon,
+    void draw(Tessellator tess, ICamera camera, float partial,
                      AxisAlignedBB workBox, Vec3 workStart, Vec3 workEnd) {
         Vec3 forward = SpaceUtil.subtract(workStart, workEnd);
+        double length = forward.lengthVector();
         Vec3 side1 = forward.crossProduct(Vec3.createVectorHelper(1, 0, 1));
         if (SpaceUtil.isZero(side1)) {
             side1 = forward.crossProduct(Vec3.createVectorHelper(-1, 0, -1));
         }
         side1 = side1.normalize();
         Vec3 side2 = forward.crossProduct(side1).normalize();
-        double d = 0.125;
+        final double d = 0.25;
+        final double iconLength = 2 * d;
         SpaceUtil.incrScale(side1, d);
         SpaceUtil.incrScale(side2, d);
-        drawPlane(tess, workStart, workEnd, side1, icon);
-        drawPlane(tess, workStart, workEnd, side2, icon);
+
+        double linkCount = length / 2 / iconLength;
+        Vec3 normForward = forward.normalize();
+
+        double extraLinkage = length % iconLength;
+        extraLinkage *= -1;
+        extraLinkage += 0.5;
+        SpaceUtil.incrAdd(workStart, SpaceUtil.scale(normForward, extraLinkage));
+        linkCount += extraLinkage;
+
+
+        double g = 9F/32F;
+        double h = g + 0.5;
+        drawPlane(tess, workStart, workEnd, side1, g - linkCount, 1 + g);
+        drawPlane(tess, workStart, workEnd, side2, h - linkCount, 1 + h);
     }
 
-    void drawPlane(Tessellator tess, Vec3 workStart, Vec3 workEnd, Vec3 right, IIcon icon) {
+    void drawPlane(Tessellator tess, Vec3 workStart, Vec3 workEnd, Vec3 right, double uStart, double uEnd) {
         tess.addVertexWithUV(workStart.xCoord + right.xCoord,
                 workStart.yCoord + right.yCoord,
                 workStart.zCoord + right.zCoord,
-                icon.getMinU(), icon.getMaxV());
+                uStart, 1);
         tess.addVertexWithUV(workStart.xCoord - right.xCoord,
                 workStart.yCoord - right.yCoord,
                 workStart.zCoord - right.zCoord,
-                icon.getMinU(), icon.getMinV());
+                uStart, 0);
         tess.addVertexWithUV(workEnd.xCoord - right.xCoord,
                 workEnd.yCoord - right.yCoord,
                 workEnd.zCoord - right.zCoord,
-                icon.getMaxU(), icon.getMinV());
+                uEnd, 0);
         tess.addVertexWithUV(workEnd.xCoord + right.xCoord,
                 workEnd.yCoord + right.yCoord,
                 workEnd.zCoord + right.zCoord,
-                icon.getMaxU(), icon.getMaxV());
+                uEnd, 1);
     }
 
     public void release() {

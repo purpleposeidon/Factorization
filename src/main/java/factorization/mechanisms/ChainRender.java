@@ -12,6 +12,7 @@ import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.init.Blocks;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.IIcon;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.Vec3;
 import net.minecraftforge.client.event.RenderWorldLastEvent;
 import net.minecraftforge.event.world.WorldEvent;
@@ -66,18 +67,17 @@ public class ChainRender {
             GL11.glVertex3d(workStart.xCoord, workStart.yCoord, workStart.zCoord);
             GL11.glVertex3d(workEnd.xCoord, workEnd.yCoord + 1, workEnd.zCoord);
             GL11.glEnd();
-            chain.draw(tess, camera, partial, icon, workBox, workStart, workEnd);
+            chain.draw(tess, camera, partial, workBox, workStart, workEnd);
         }
         if (!setup) return;
 
-        GL11.glPushMatrix();
+        Minecraft.getMinecraft().getTextureManager().bindTexture(new ResourceLocation("factorization", "textures/chain.png"));
         GL11.glDisable(GL11.GL_LIGHTING);
         GL11.glDisable(GL11.GL_CULL_FACE);
         tess.draw();
-        tess.setTranslation(0, 0, 0);
         GL11.glEnable(GL11.GL_CULL_FACE);
         GL11.glEnable(GL11.GL_LIGHTING);
-        GL11.glPopMatrix();
+        tess.setTranslation(0, 0, 0);
     }
 
     @SubscribeEvent

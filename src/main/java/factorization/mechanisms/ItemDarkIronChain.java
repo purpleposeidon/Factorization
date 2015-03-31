@@ -44,6 +44,7 @@ public class ItemDarkIronChain extends ItemFactorization {
         if (world == DeltaChunk.getServerShadowWorld()) {
             for (IDeltaChunk idc : DeltaChunk.getSlicesContainingPoint(at)) {
                 if (!acceptableIDC(idc)) continue;
+                if (!at.isSolid()) continue;
                 setPos(is, "shadow", at, dir);
                 if (bothSet(is)) {
                     connectChain(player, is);
