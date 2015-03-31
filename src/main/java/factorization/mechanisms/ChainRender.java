@@ -72,11 +72,11 @@ public class ChainRender {
         if (!setup) return;
 
         Minecraft.getMinecraft().getTextureManager().bindTexture(new ResourceLocation("factorization", "textures/chain.png"));
+        GL11.glPushAttrib(GL11.GL_ENABLE_BIT);
         GL11.glDisable(GL11.GL_LIGHTING);
         GL11.glDisable(GL11.GL_CULL_FACE);
         tess.draw();
-        GL11.glEnable(GL11.GL_CULL_FACE);
-        GL11.glEnable(GL11.GL_LIGHTING);
+        GL11.glPopAttrib();
         tess.setTranslation(0, 0, 0);
     }
 

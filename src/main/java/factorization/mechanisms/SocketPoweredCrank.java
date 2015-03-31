@@ -1,8 +1,6 @@
 package factorization.mechanisms;
 
-import factorization.api.Charge;
-import factorization.api.Coord;
-import factorization.api.IChargeConductor;
+import factorization.api.*;
 import factorization.api.datahelpers.DataHelper;
 import factorization.api.datahelpers.IDataSerializable;
 import factorization.api.datahelpers.Share;
@@ -12,18 +10,17 @@ import factorization.servo.ServoMotor;
 import factorization.shared.Core;
 import factorization.shared.EntityReference;
 import factorization.shared.FactorizationBlockRender;
-import factorization.shared.NORELEASE;
 import factorization.sockets.ISocketHolder;
 import factorization.sockets.SocketBareMotor;
 import factorization.sockets.TileEntitySocketBase;
+import factorization.util.NumUtil;
 import factorization.util.SpaceUtil;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.audio.MovingSound;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.Vec3;
 import net.minecraft.world.World;
+import org.lwjgl.opengl.GL11;
 
 import java.io.IOException;
 
@@ -31,6 +28,8 @@ public class SocketPoweredCrank extends TileEntitySocketBase implements IChargeC
     private Charge charge = new Charge(this);
     final EntityReference<IDeltaChunk> hookedIdc = new EntityReference<IDeltaChunk>();
     Vec3 hookLocation = SpaceUtil.newVec();
+
+    static final float sprocketRadius = 8F / 16F;
 
 
     @Override
@@ -116,14 +115,19 @@ public class SocketPoweredCrank extends TileEntitySocketBase implements IChargeC
     @Override
     public void renderStatic(ServoMotor motor, Tessellator tess) {
         SocketBareMotor sbm = (SocketBareMotor) FactoryType.SOCKET_BARE_MOTOR.getRepresentative();
+        getCoord().setAsTileEntityLocation(sbm);
+        sbm.facing = facing;
         sbm.renderStatic(motor, tess);
+        sbm.setWorldObj(null); // Don't leak the world (TODO: Unset all worldObj for all representitives when the world unload?)
     }
 
 
     ChainLink chainDraw;
-    double chainLen, prevChainLen;
+    float chainLen, prevChainLen;
     double chainDelta = 0;
     boolean soundActive;
+    byte spinSign = +1;
+
     void updateHookDrawPos(ISocketHolder socket) {
         IDeltaChunk idc = hookedIdc.getEntity();
         if (idc == null) return;
@@ -134,8 +138,13 @@ public class SocketPoweredCrank extends TileEntitySocketBase implements IChargeC
         }
         Vec3 realHookLocation = idc.shadow2real(hookLocation);
         Vec3 selfPos = socket.getPos();
+        Vec3 point = SpaceUtil.fromDirection(facing);
+        Vec3 chainVec = SpaceUtil.subtract(realHookLocation, selfPos);
+        Vec3 right = SpaceUtil.scale(point.crossProduct(chainVec).normalize(), sprocketRadius);
+        spinSign = (byte) (SpaceUtil.sum(right) > 0 ? +1 : -1);
+        SpaceUtil.incrAdd(selfPos, right);
         chainDraw.update(selfPos, realHookLocation);
-        double len = SpaceUtil.lineDistance(selfPos, realHookLocation);
+        float len = (float) SpaceUtil.lineDistance(selfPos, realHookLocation);
         if (first) {
             chainLen = prevChainLen = len;
         } else {
@@ -179,8 +188,24 @@ public class SocketPoweredCrank extends TileEntitySocketBase implements IChargeC
     @Override
     public void renderTesr(ServoMotor motor, float partial) {
         super.renderTesr(motor, partial);
-        FactorizationBlockRender.renderItemIIcon(getCreatingItem().getItem().getIconFromDamage(0));
-        if (chainDraw == null) return;
+        float sprocketTheta = 0;
+        if (chainDraw != null) {
+            float len = NumUtil.interp(prevChainLen, chainLen, partial);
+            sprocketTheta = len / sprocketRadius;
+        }
 
+
+        float d = 0.5F;
+        GL11.glTranslatef(d, d, d);
+        Quaternion.fromOrientation(FzOrientation.fromDirection(facing.getOpposite())).glRotate();
+        GL11.glTranslatef(0, -5F/64F, 0);
+        GL11.glScalef(1, 2.5F, 1);
+
+
+        GL11.glRotated(Math.toDegrees(sprocketTheta), 0, 1, 0);
+        //TileEntityGrinderRender.renderGrindHead();
+        GL11.glRotatef(90, 1, 0, 0);
+        GL11.glTranslatef(-0.5F, -0.5F, -0F);
+        FactorizationBlockRender.renderItemIIcon(getCreatingItem().getItem().getIconFromDamage(0));
     }
 }
