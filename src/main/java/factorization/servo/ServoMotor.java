@@ -5,6 +5,7 @@ import factorization.shared.*;
 import factorization.util.DataUtil;
 import factorization.util.InvUtil;
 import factorization.util.ItemUtil;
+import factorization.util.SpaceUtil;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufInputStream;
 import io.netty.buffer.ByteBufOutputStream;
@@ -723,5 +724,10 @@ public class ServoMotor extends Entity implements IEntityAdditionalSpawnData, IE
         buff[0] = msgType;
         FMLProxyPacket toSend = Core.network.entityPacket(this, MessageType.TileEntityMessageOnEntity, buff);
         Core.network.broadcastPacket(null, getCurrentPos(), toSend); 
+    }
+
+    @Override
+    public Vec3 getPos() {
+        return SpaceUtil.fromEntPos(this);
     }
 }

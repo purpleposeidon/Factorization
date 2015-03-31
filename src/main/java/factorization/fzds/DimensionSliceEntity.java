@@ -1,18 +1,25 @@
 package factorization.fzds;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-
+import cpw.mods.fml.common.network.NetworkRegistry;
+import cpw.mods.fml.common.network.internal.FMLProxyPacket;
+import factorization.aabbdebug.AabbDebugger;
+import factorization.api.Coord;
+import factorization.api.DeltaCoord;
 import factorization.api.ICoordFunction;
-import factorization.shared.*;
+import factorization.api.Quaternion;
+import factorization.api.datahelpers.DataHelper;
+import factorization.api.datahelpers.Share;
+import factorization.common.FzConfig;
+import factorization.coremodhooks.IExtraChunkData;
+import factorization.coremodhooks.IKinematicTracker;
+import factorization.fzds.interfaces.*;
+import factorization.shared.Core;
+import factorization.shared.EntityReference;
+import factorization.shared.TortoiseAndHare;
 import factorization.util.SpaceUtil;
 import net.minecraft.block.Block;
 import net.minecraft.command.IEntitySelector;
 import net.minecraft.enchantment.Enchantment;
-import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityList;
 import net.minecraft.entity.EntityLivingBase;
@@ -29,25 +36,13 @@ import net.minecraft.util.Vec3;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;
 import net.minecraft.world.chunk.Chunk;
-
 import org.apache.commons.lang3.ArrayUtils;
 
-import cpw.mods.fml.common.network.NetworkRegistry;
-import cpw.mods.fml.common.network.internal.FMLProxyPacket;
-import factorization.aabbdebug.AabbDebugger;
-import factorization.api.Coord;
-import factorization.api.DeltaCoord;
-import factorization.api.Quaternion;
-import factorization.api.datahelpers.DataHelper;
-import factorization.api.datahelpers.Share;
-import factorization.common.FzConfig;
-import factorization.coremodhooks.IExtraChunkData;
-import factorization.coremodhooks.IKinematicTracker;
-import factorization.fzds.interfaces.DeltaCapability;
-import factorization.fzds.interfaces.IDeltaChunk;
-import factorization.fzds.interfaces.IFzdsCustomTeleport;
-import factorization.fzds.interfaces.IFzdsEntryControl;
-import factorization.fzds.interfaces.Interpolation;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
 
 public class DimensionSliceEntity extends IDeltaChunk implements IFzdsEntryControl {
     //Dang, this class is a mess! Code folding, activate!

@@ -18,7 +18,7 @@ public class ShadowPlayerAligner {
 
     public void apply() {
         // (Hmm, this could probably be done better)
-        Vec3 realPos = real.getPosition(1);
+        Vec3 realPos = SpaceUtil.fromPlayerEyePos(real);
         Vec3 tmp = real.getLookVec();
         SpaceUtil.incrAdd(tmp, realPos);
         Vec3 realLookEnd = tmp;

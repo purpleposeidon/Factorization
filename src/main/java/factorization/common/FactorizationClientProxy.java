@@ -1,6 +1,7 @@
 package factorization.common;
 
 import factorization.mechanisms.BlockRenderHinge;
+import factorization.mechanisms.SocketPoweredCrank;
 import factorization.mechanisms.TileEntityHinge;
 import factorization.mechanisms.TileEntityHingeRenderer;
 import net.minecraft.client.Minecraft;
@@ -194,6 +195,7 @@ public class FactorizationClientProxy extends FactorizationProxy {
             setTileEntityRendererDispatcher(SocketLacerator.class, new TileEntitySocketRenderer());
             setTileEntityRendererDispatcher(SocketFanturpeller.class, new TileEntitySocketRenderer());
             setTileEntityRendererDispatcher(TileEntityHinge.class, new TileEntityHingeRenderer());
+            setTileEntityRendererDispatcher(SocketPoweredCrank.class, new TileEntitySocketRenderer());
         }
 
         RenderingRegistry.registerEntityRenderingHandler(TileEntityWrathLamp.RelightTask.class, new EmptyRender());
@@ -225,7 +227,8 @@ public class FactorizationClientProxy extends FactorizationProxy {
                 FactoryType.SOCKET_BLOWER,
                 FactoryType.SOCKET_PUMP,
                 FactoryType.SOCKET_BARE_MOTOR,
-                FactoryType.SOCKET_SCISSORS
+                FactoryType.SOCKET_SCISSORS,
+                FactoryType.SOCKET_POWERED_CRANK
         }) {
             new BlockRenderSocketBase(ft);
         }

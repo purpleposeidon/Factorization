@@ -156,6 +156,11 @@ public final class Coord implements IDataSerializable, ISaneCoord, Comparable<Co
         }
         return ret;
     }
+
+    public String toShortString() {
+        String ws = w == null ? "(null)" : ("[" + FzUtil.getWorldDimension(w) + "]");
+        return ws + " " + x + "," + y + "," + z;
+    }
     
     public void set(World w, int x, int y, int z) {
         this.w = w;
@@ -556,6 +561,11 @@ public final class Coord implements IDataSerializable, ISaneCoord, Comparable<Co
             return null;
         }
         return w.getTileEntity(x, y, z);
+        // Could check blockHasTE() first. Might only be needed for TE-scanning, which is often better done w/ hashmap iteration instead
+    }
+
+    public boolean blockHasTE() {
+        return getBlock().hasTileEntity(getMd());
     }
 
     @SuppressWarnings("unchecked")
@@ -790,6 +800,10 @@ public final class Coord implements IDataSerializable, ISaneCoord, Comparable<Co
         }
         w.spawnEntityInWorld(ent);
         return ent;
+    }
+
+    public Entity spawnItem(Item it) {
+        return spawnItem(new ItemStack(it));
     }
     
     public AxisAlignedBB getCollisionBoundingBoxFromPool() {

@@ -5,6 +5,7 @@ import cpw.mods.fml.relauncher.SideOnly;
 import factorization.shared.Core;
 import net.minecraft.entity.Entity;
 import net.minecraft.world.World;
+import net.minecraftforge.common.DimensionManager;
 
 import java.awt.*;
 import java.awt.datatransfer.StringSelection;
@@ -33,6 +34,10 @@ public class FzUtil {
 
     public static int getWorldDimension(World world) {
         return world.provider.dimensionId;
+    }
+
+    public static World getWorld(int dimensionId) {
+        return DimensionManager.getWorld(dimensionId);
     }
 
     @SideOnly(Side.CLIENT)

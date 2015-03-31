@@ -66,6 +66,10 @@ public final class SpaceUtil {
         return Vec3.createVectorHelper(ent.posX, ent.posY, ent.posZ);
     }
 
+    public static Vec3 fromPlayerEyePos(EntityPlayer ent) {
+        return Vec3.createVectorHelper(ent.posX, ent.posY + (ent.getEyeHeight() - ent.getDefaultEyeHeight()), ent.posZ);
+    }
+
     public static void toEntPos(Entity ent, Vec3 pos) {
         ent.posX = pos.xCoord;
         ent.posY = pos.yCoord;
@@ -115,6 +119,15 @@ public final class SpaceUtil {
         v.xCoord = (ab.minX + ab.maxX)/2;
         v.yCoord = (ab.minY + ab.maxY)/2;
         v.zCoord = (ab.minZ + ab.maxZ)/2;
+    }
+
+    public static void incrContract(AxisAlignedBB box, double dx, double dy, double dz) {
+        box.minX += dx;
+        box.minY += dy;
+        box.minZ += dz;
+        box.maxX -= dx;
+        box.maxY -= dy;
+        box.maxZ -= dz;
     }
 
     public static AxisAlignedBB newBox() {
@@ -200,7 +213,7 @@ public final class SpaceUtil {
     }
 
     public static Vec3 subtract(Vec3 a, Vec3 b) {
-        Vec3 ret = Vec3.createVectorHelper(a.xCoord, a.yCoord, a.zCoord);
+        Vec3 ret = copy(a);
         incrSubtract(ret, b);
         return ret;
     }

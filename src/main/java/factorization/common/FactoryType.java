@@ -10,6 +10,7 @@ import factorization.crafting.TileEntityPackager;
 import factorization.crafting.TileEntityStamper;
 import factorization.fzds.DeltaChunk;
 import factorization.mechanisms.SocketHandCrank;
+import factorization.mechanisms.SocketPoweredCrank;
 import factorization.mechanisms.TileEntityHinge;
 import factorization.oreprocessing.TileEntityCrystallizer;
 import factorization.oreprocessing.TileEntitySlagFurnace;
@@ -74,8 +75,9 @@ public enum FactoryType {
     CREATIVE_CHARGE(43, false, InfiniteChargeBlock.class, "factory_creative_charge"),
     HINGE(44, false, TileEntityHinge.class, "factory_hinge"),
     //ANCHOR(45, false, TileEntityAnchor.class, "factory_anchor"),
-    SOCKET_HAND_CRANK(46, false, SocketHandCrank.class, "fzsock_hand_crank"),
-    //SOCKET_POWERED_CRANK(47, true, SocketPoweredCrank.class, "factory_powered_crank"),
+    //SOCKET_HAND_CRANK(46, false, SocketHandCrank.class, "fzsock_hand_crank"),
+    SOCKET_POWERED_CRANK(47, true, SocketPoweredCrank.class, "factory_powered_crank"),
+    //SOCKET_CONTROLLED_CRANK(48, true, SocketControlledCrank.class, "factory_controlled_crank"),
 
     POCKETCRAFTGUI(101, true)
     ;

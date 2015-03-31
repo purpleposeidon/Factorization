@@ -68,6 +68,7 @@ public class EntityReference<E extends Entity> implements IDataSerializable {
         entity_uuid = data.asSameShare(prefix + "entity_uuid").putUUID(entity_uuid);
         if (data.isReader() && tracked_entity != null && !orig_id.equals(entity_uuid)) {
             tracked_entity = null;
+            fails = 0;
         }
         return this;
     }

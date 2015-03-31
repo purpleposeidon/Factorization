@@ -3,7 +3,6 @@ package factorization.fzds;
 import factorization.api.DeltaCoord;
 import factorization.api.ICoordFunction;
 import factorization.shared.Core;
-import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelOutboundHandlerAdapter;
@@ -78,7 +77,7 @@ public class PacketProxyingPlayer extends EntityPlayerMP implements
     class WrappedMulticastHandler extends ChannelOutboundHandlerAdapter implements IFzdsShenanigans {
         @Override
         public void write(ChannelHandlerContext ctx, Object msg, ChannelPromise promise) throws Exception {
-            PacketProxyingPlayer.this.addNettyMessage(proxiedChannel, msg);
+            PacketProxyingPlayer.this.addNettyMessage(msg);
             //promise.setFailure(new UnsupportedOperationException("Sorry!")); // Nooooope, causes spam.
         }
     }
@@ -272,21 +271,21 @@ public class PacketProxyingPlayer extends EntityPlayerMP implements
         return !listeningPlayers.isEmpty();
     }
     
-    FMLEmbeddedChannel wrapper_channel = new FMLEmbeddedChannel("?", Side.SERVER, new ChannelHandler() {
+    private static final FMLEmbeddedChannel wrapped_packet_channel = new FMLEmbeddedChannel("[FZDS Packet Wrapping Channel]", Side.SERVER, new ChannelHandler() {
         @Override public void handlerRemoved(ChannelHandlerContext ctx) throws Exception { }
         @Override public void handlerAdded(ChannelHandlerContext ctx) throws Exception { }
         @Override @Deprecated public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception { }
     });
     
-    public Packet wrapMessage(Object msg) {
+    public static Packet wrapMessage(Object msg) {
         if (msg instanceof Packet) {
             return new WrappedPacket((Packet) msg);
         }
-        Packet pkt = wrapper_channel.generatePacketFrom(msg);
+        Packet pkt = wrapped_packet_channel.generatePacketFrom(msg);
         return new WrappedPacket(pkt);
     }
     
-    public void addNettyMessage(Channel sourceChannel, Object msg) {
+    public void addNettyMessage(Object msg) {
         // Return a future?
         if (listeningPlayers.isEmpty()) {
             return;

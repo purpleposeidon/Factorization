@@ -10,7 +10,6 @@ import cpw.mods.fml.common.registry.ExistingSubstitutionException;
 import cpw.mods.fml.common.registry.GameRegistry;
 import cpw.mods.fml.common.registry.GameRegistry.Type;
 import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.repackage.com.nothome.delta.Delta;
 import factorization.api.IActOnCraft;
 import factorization.ceramics.ItemGlazeBucket;
 import factorization.ceramics.ItemSculptingTool;
@@ -24,6 +23,7 @@ import factorization.colossi.*;
 import factorization.darkiron.BlockDarkIronOre;
 import factorization.docs.ItemDocBook;
 import factorization.fzds.DeltaChunk;
+import factorization.mechanisms.ItemDarkIronChain;
 import factorization.oreprocessing.ItemOreProcessing;
 import factorization.oreprocessing.ItemOreProcessing.OreType;
 import factorization.oreprocessing.TileEntityCrystallizer;
@@ -140,6 +140,7 @@ public class Registry {
     public ItemGoo utiligoo;
     public ItemColossusGuide colossusGuide;
     public ItemTwistedBlock twistedBlock;
+    public ItemDarkIronChain darkIronChain;
 
     public Material materialMachine = new Material(MapColor.ironColor);
     
@@ -380,6 +381,7 @@ public class Registry {
         if (DeltaChunk.enabled()) {
             colossusGuide = new ItemColossusGuide("colossusGuide", TabType.TOOLS);
             twistedBlock = new ItemTwistedBlock();
+            darkIronChain = new ItemDarkIronChain("darkIronChain", TabType.TOOLS);
         }
         postMakeItems();
     }

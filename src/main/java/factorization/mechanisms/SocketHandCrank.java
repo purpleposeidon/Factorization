@@ -12,7 +12,8 @@ import java.io.IOException;
 public class SocketHandCrank extends TileEntitySocketBase {
     @Override
     public FactoryType getFactoryType() {
-        return FactoryType.SOCKET_HAND_CRANK;
+        return null;
+        //return FactoryType.SOCKET_HAND_CRANK;
     }
 
     @Override

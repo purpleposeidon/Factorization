@@ -1,5 +1,7 @@
 package factorization.util;
 
+import net.minecraft.util.Vec3;
+
 import java.util.Random;
 
 public final class NumUtil {
@@ -36,6 +38,12 @@ public final class NumUtil {
 
     public static double interp(double oldValue, double newValue, double partial) {
         return oldValue * (1 - partial) + newValue * partial;
+    }
+
+    public static void interp(Vec3 oldVal, Vec3 newVal, float partial, Vec3 dest) {
+        dest.xCoord = interp(oldVal.xCoord, newVal.xCoord, partial);
+        dest.yCoord = interp(oldVal.yCoord, newVal.yCoord, partial);
+        dest.zCoord = interp(oldVal.zCoord, newVal.zCoord, partial);
     }
 
     public static float uninterp(float lowValue, float highValue, float currentValue) {

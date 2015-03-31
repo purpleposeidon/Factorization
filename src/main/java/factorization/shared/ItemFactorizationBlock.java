@@ -39,8 +39,8 @@ public class ItemFactorizationBlock extends ItemBlock {
         }
         TileEntityCommon tec = f.makeTileEntity();
         if (tec == null) return false;
-        int oppositeSide = ForgeDirection.getOrientation(side).getOpposite().ordinal();
-        boolean good = tec.canPlaceAgainst(player, here.copy().towardSide(oppositeSide), side);
+        Coord placedAgainst = here.add(ForgeDirection.getOrientation(side).getOpposite());
+        boolean good = tec.canPlaceAgainst(player, placedAgainst, side);
         if (!good) {
             return false;
         }
@@ -48,9 +48,7 @@ public class ItemFactorizationBlock extends ItemBlock {
             here.setAsTileEntityLocation(tec);
             tec.onPlacedBy(player, is, side, hitX, hitY, hitZ);
             tec.getBlockClass().enforce(here);
-            if (!(tec instanceof TileEntityRocketEngine)) {
-                w.setTileEntity(here.x, here.y, here.z, tec);
-            }
+            here.setTE(tec);
             
             here.markBlockForUpdate();
             return true;

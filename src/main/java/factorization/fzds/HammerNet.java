@@ -2,7 +2,6 @@ package factorization.fzds;
 
 import com.google.common.io.ByteArrayDataOutput;
 import com.google.common.io.ByteStreams;
-import com.mojang.authlib.GameProfile;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import cpw.mods.fml.common.network.FMLEventChannel;
 import cpw.mods.fml.common.network.FMLNetworkEvent.ClientCustomPacketEvent;
@@ -13,7 +12,6 @@ import factorization.api.Coord;
 import factorization.api.Quaternion;
 import factorization.fzds.interfaces.DeltaCapability;
 import factorization.fzds.interfaces.IDeltaChunk;
-import factorization.fzds.interfaces.IFzdsShenanigans;
 import factorization.fzds.interfaces.Interpolation;
 import factorization.shared.Core;
 import factorization.util.PlayerUtil;
@@ -24,11 +22,9 @@ import net.minecraft.block.Block;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
-import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.NetHandlerPlayServer;
-import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.management.ItemInWorldManager;
 import net.minecraft.util.MovingObjectPosition;
 import net.minecraft.util.Vec3;
@@ -295,39 +291,13 @@ public class HammerNet {
         block.onBlockClicked(at.w, x, y, z, player);
     }
     
-    InteractionLiason getLiason(WorldServer shadowWorld, EntityPlayer real_player, IDeltaChunk idc) {
+    InteractionLiason getLiason(WorldServer shadowWorld, EntityPlayerMP real_player, IDeltaChunk idc) {
         // NORELEASE: Cache. Constructing fake players is muy expensivo
         InteractionLiason liason = new InteractionLiason(shadowWorld, new ItemInWorldManager(shadowWorld), real_player, idc);
         liason.initializeFor(real_player, idc);
         return liason;
     }
-    
-    static class InteractionLiason extends EntityPlayerMP implements IFzdsShenanigans {
-        private static final GameProfile liasonGameProfile = new GameProfile(null /*UUID.fromString("69f64f91-665e-457d-ad32-f6082d0b8a71")*/ , "[FzdsInteractionLiason]");
-        private final InventoryPlayer original_inventory;
-        private ShadowPlayerAligner aligner;
 
-        public InteractionLiason(WorldServer world, ItemInWorldManager itemManager, EntityPlayer realPlayer, IDeltaChunk idc) {
-            super(MinecraftServer.getServer(), world, liasonGameProfile, itemManager);
-            original_inventory = this.inventory;
-        }
-
-        void initializeFor(EntityPlayer realPlayer, IDeltaChunk idc) {
-            this.inventory = realPlayer.inventory;
-            this.setSprinting(realPlayer.isSprinting());
-            this.setSneaking(realPlayer.isSneaking());
-            this.capabilities = realPlayer.capabilities;
-            aligner = new ShadowPlayerAligner(realPlayer, this, idc);
-            aligner.apply();
-        }
-        
-        void finishUsingLiason() {
-            // Stuff? Drop our items? Die?
-            this.inventory = original_inventory;
-            aligner.unapply();
-        }
-    }
-    
     private boolean do_click(WorldServer world, EntityPlayerMP player, int x, int y, int z, byte sideHit, float vecX, float vecY, float vecZ) {
         // Copy of PlayerControllerMP.onPlayerRightClick
         ItemStack is = player.getHeldItem();

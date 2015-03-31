@@ -296,7 +296,12 @@ public abstract class TileEntitySocketBase extends TileEntityCommon implements I
         }
         return false;
     }
-    
+
+    @Override
+    public Vec3 getPos() {
+        return getCoord().createVector();
+    }
+
     //Overridable code
     
     public void genericUpdate(ISocketHolder socket, Coord coord, boolean powered) { }
