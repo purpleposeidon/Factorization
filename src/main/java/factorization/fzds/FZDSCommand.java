@@ -38,7 +38,6 @@ import factorization.api.Coord;
 import factorization.api.DeltaCoord;
 import factorization.api.ICoordFunction;
 import factorization.api.Quaternion;
-import factorization.common.FzConfig;
 import factorization.fzds.DeltaChunk.AreaMap;
 import factorization.fzds.DeltaChunk.DseDestination;
 import factorization.fzds.interfaces.DeltaCapability;
@@ -716,6 +715,20 @@ public class FZDSCommand extends CommandBase {
                     new Notice(selected, "Selection").send(player);
                 }
             }} /* needs nothing */);
+        add(new SubCommand("select-nearest") {
+            @Override
+            void call(String[] args) {
+                IDeltaChunk selected = null;
+                double dist = Double.POSITIVE_INFINITY;
+                for (IDeltaChunk idc : DeltaChunk.getAllSlices(user.w)) {
+                    double d = user.distanceSq(new Coord(idc));
+                    if (d > dist) continue;
+                    dist = d;
+                    selected = idc;
+                }
+                setSelection(selected);
+            }
+        }, Requires.COORD);
         add(new SubCommand("remove", "[part]") {
             @Override
             String details() { return "Destroys the selection and everything attatched, unless 'part' is given"; }

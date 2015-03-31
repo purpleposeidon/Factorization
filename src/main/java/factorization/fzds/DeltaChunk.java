@@ -1,9 +1,6 @@
 package factorization.fzds;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 import net.minecraft.entity.Entity;
 import net.minecraft.util.Vec3;
@@ -38,6 +35,16 @@ public class DeltaChunk {
             }
         }
         return w.isRemote ? Hammer.clientSlices : Hammer.serverSlices;
+    }
+
+    static Iterable<IDeltaChunk> getAllSlices(World w) {
+        DeltaChunkMap dm = getSlices(w);
+        ArrayList<IDeltaChunk> ret = new ArrayList<IDeltaChunk>();
+        if (dm == null) return ret;
+        for (IDeltaChunk[] array : dm.getIdcs()) {
+            Collections.addAll(ret, array);
+        }
+        return ret;
     }
     
     public static IDeltaChunk[] getSlicesContainingPoint(Coord at) {

@@ -83,4 +83,8 @@ public class DeltaChunkMap {
     public void clear() {
         values.clear();
     }
+
+    public Iterable<IDeltaChunk[]> getIdcs() {
+        return values.values();
+    }
 }
