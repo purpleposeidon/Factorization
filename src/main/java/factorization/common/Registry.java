@@ -141,6 +141,7 @@ public class Registry {
     public ItemColossusGuide colossusGuide;
     public ItemTwistedBlock twistedBlock;
     public ItemDarkIronChain darkIronChain;
+    public ItemCraftingComponent chainLink, shortChain;
 
     public Material materialMachine = new Material(MapColor.ironColor);
     
@@ -382,6 +383,8 @@ public class Registry {
             colossusGuide = new ItemColossusGuide("colossusGuide", TabType.TOOLS);
             twistedBlock = new ItemTwistedBlock();
             darkIronChain = new ItemDarkIronChain("darkIronChain", TabType.TOOLS);
+            chainLink = new ItemCraftingComponent("chainLink", TabType.MATERIALS);
+            shortChain = new ItemCraftingComponent("shortChain", TabType.MATERIALS);
         }
         postMakeItems();
     }
@@ -1060,6 +1063,22 @@ public class Registry {
                     "|##",
                     '|', dark_iron,
                     '#', Blocks.iron_block);
+            oreRecipe(new ItemStack(chainLink, 15),
+                    "DD ",
+                    "D L",
+                    "DD ",
+                    'D', dark_iron,
+                    'L', "ingotLead");
+            oreRecipe(new ItemStack(shortChain),
+                    "LLL",
+                    "LLL",
+                    "LLL",
+                    'L', chainLink);
+            oreRecipe(new ItemStack(darkIronChain),
+                    "L  ",
+                    "LLL",
+                    "  L",
+                    'L', shortChain);
         }
     }
     
