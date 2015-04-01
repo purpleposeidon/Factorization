@@ -1014,7 +1014,7 @@ public class DimensionSliceEntity extends IDeltaChunk implements IFzdsEntryContr
     
     void transferEntity(Entity ent, World newWorld, Vec3 newPosition) {
         if (ent instanceof IFzdsCustomTeleport) {
-            ((IFzdsCustomTeleport) ent).transferEntity(worldObj, newPosition);
+            ((IFzdsCustomTeleport) ent).transferEntity(this, worldObj, newPosition);
             return;
         }
         if (ent instanceof EntityPlayerMP) {

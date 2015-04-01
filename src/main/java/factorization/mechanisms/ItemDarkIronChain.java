@@ -1,8 +1,8 @@
 package factorization.mechanisms;
 
-import com.sun.org.apache.bcel.internal.generic.FDIV;
 import factorization.api.Coord;
 import factorization.common.ItemIcons;
+import factorization.fzds.ControllerMulticast;
 import factorization.fzds.DeltaChunk;
 import factorization.fzds.interfaces.DeltaCapability;
 import factorization.fzds.interfaces.IDeltaChunk;
@@ -22,6 +22,7 @@ import net.minecraft.world.World;
 import net.minecraftforge.common.DimensionManager;
 import net.minecraftforge.common.util.ForgeDirection;
 
+import java.util.Arrays;
 import java.util.List;
 
 public class ItemDarkIronChain extends ItemFactorization {
@@ -76,6 +77,7 @@ public class ItemDarkIronChain extends ItemFactorization {
     }
 
     boolean acceptableIDC(IDeltaChunk idc) {
+        if (!ControllerMulticast.usable(idc)) return false;
         for (DeltaCapability req : new DeltaCapability[] {
                 DeltaCapability.INTERACT,
                 DeltaCapability.BLOCK_MINE,
@@ -169,6 +171,12 @@ public class ItemDarkIronChain extends ItemFactorization {
         } else {
             is.stackSize--;
         }
+        Coord fake = shadow.copy();
+        toHook.shadow2real(fake);
+        for (Coord at : Arrays.asList(real, fake)) {
+            at.w.playSound(at.x, at.y, at.z, "factorization:winch.unwind", 1F, 1F, false);
+        }
+
     }
 
     void killChain(EntityPlayer player, ItemStack is) {

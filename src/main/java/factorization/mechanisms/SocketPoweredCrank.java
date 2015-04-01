@@ -5,6 +5,8 @@ import factorization.api.datahelpers.DataHelper;
 import factorization.api.datahelpers.IDataSerializable;
 import factorization.api.datahelpers.Share;
 import factorization.common.FactoryType;
+import factorization.fzds.ControllerMulticast;
+import factorization.fzds.interfaces.IDCController;
 import factorization.fzds.interfaces.IDeltaChunk;
 import factorization.servo.ServoMotor;
 import factorization.shared.Core;
@@ -17,6 +19,7 @@ import factorization.util.NumUtil;
 import factorization.util.SpaceUtil;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.Tessellator;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.Vec3;
 import net.minecraft.world.World;
@@ -24,7 +27,7 @@ import org.lwjgl.opengl.GL11;
 
 import java.io.IOException;
 
-public class SocketPoweredCrank extends TileEntitySocketBase implements IChargeConductor {
+public class SocketPoweredCrank extends TileEntitySocketBase implements IChargeConductor, IDCController {
     private Charge charge = new Charge(this);
     final EntityReference<IDeltaChunk> hookedIdc = new EntityReference<IDeltaChunk>();
     Vec3 hookLocation = SpaceUtil.newVec();
@@ -100,6 +103,7 @@ public class SocketPoweredCrank extends TileEntitySocketBase implements IChargeC
         hookedIdc.trackEntity(idc);
         this.hookLocation = hookLocation;
         getCoord().syncTE();
+        ControllerMulticast.register(idc, this);
     }
 
     public boolean isChained() {
@@ -207,5 +211,40 @@ public class SocketPoweredCrank extends TileEntitySocketBase implements IChargeC
         GL11.glRotatef(90, 1, 0, 0);
         GL11.glTranslatef(-0.5F, -0.5F, -0F);
         FactorizationBlockRender.renderItemIIcon(getCreatingItem().getItem().getIconFromDamage(0));
+    }
+
+    @Override
+    public boolean placeBlock(IDeltaChunk idc, EntityPlayer player, Coord at) {
+        return false;
+    }
+
+    @Override
+    public boolean breakBlock(IDeltaChunk idc, EntityPlayer player, Coord at, byte sideHit) {
+        return false;
+    }
+
+    @Override
+    public boolean hitBlock(IDeltaChunk idc, EntityPlayer player, Coord at, byte sideHit) {
+        return false;
+    }
+
+    @Override
+    public boolean useBlock(IDeltaChunk idc, EntityPlayer player, Coord at, byte sideHit) {
+        return false;
+    }
+
+    @Override
+    public void idcDied(IDeltaChunk idc) {
+
+    }
+
+    @Override
+    public void beforeUpdate(IDeltaChunk idc) {
+
+    }
+
+    @Override
+    public void afterUpdate(IDeltaChunk idc) {
+
     }
 }

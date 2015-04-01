@@ -2,13 +2,16 @@ package factorization.mechanisms;
 
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
-import factorization.api.*;
+import factorization.api.Coord;
+import factorization.api.DeltaCoord;
+import factorization.api.FzOrientation;
+import factorization.api.Quaternion;
 import factorization.api.datahelpers.DataHelper;
 import factorization.api.datahelpers.Share;
 import factorization.common.BlockIcons;
 import factorization.common.FactoryType;
+import factorization.fzds.ControllerMulticast;
 import factorization.fzds.DeltaChunk;
-import factorization.fzds.TransferLib;
 import factorization.fzds.interfaces.DeltaCapability;
 import factorization.fzds.interfaces.IDCController;
 import factorization.fzds.interfaces.IDeltaChunk;
@@ -41,7 +44,6 @@ import static org.lwjgl.opengl.GL11.*;
 public class TileEntityHinge extends TileEntityCommon implements IDCController {
     FzOrientation facing = FzOrientation.FACE_EAST_POINT_DOWN;
     final EntityReference<IDeltaChunk> idcRef = new EntityReference<IDeltaChunk>();
-    double inertia = -1.0;
     Vec3 dseOffset = SpaceUtil.newVec();
     transient boolean idc_ticking = false;
 
@@ -136,7 +138,7 @@ public class TileEntityHinge extends TileEntityCommon implements IDCController {
         Coord dest = idc.getCenter();
         DeltaCoord hingePoint = dest.difference(idc.getCorner());
         worldObj.spawnEntityInWorld(idc);
-        idc.setController(this);
+        ControllerMulticast.register(idc, this);
         idcRef.trackEntity(idc);
         updateComparators();
         markDirty();
@@ -156,7 +158,6 @@ public class TileEntityHinge extends TileEntityCommon implements IDCController {
     public void putData(DataHelper data) throws IOException {
         facing = data.as(Share.VISIBLE, "facing").putEnum(facing);
         data.as(Share.VISIBLE, "ref").put(idcRef);
-        inertia = data.as(Share.PRIVATE, "inertia").putDouble(inertia);
         dseOffset = data.as(Share.PRIVATE, "dseOffset").putVec3(dseOffset);
     }
 
@@ -206,15 +207,15 @@ public class TileEntityHinge extends TileEntityCommon implements IDCController {
     }
 
     double getInertia(IDeltaChunk idc, Vec3 rotationAxis) {
-        if (inertia >= 0) return inertia;
-        InertiaCalculator ic = new InertiaCalculator(idc, rotationAxis);
-        inertia = ic.calculate();
+        double inertia = InertiaCalculator.getInertia(idc, rotationAxis);
         if (inertia < 20) inertia = 20; // Don't go too crazy
         return inertia;
     }
 
     void dirtyInertia() {
-        inertia = -1;
+        IDeltaChunk idc = idcRef.getEntity();
+        if (idc == null) return;
+        InertiaCalculator.dirty(idc);
     }
 
     @Override
@@ -233,10 +234,18 @@ public class TileEntityHinge extends TileEntityCommon implements IDCController {
             forceMultiplier /= 3;
         }
         forceMultiplier *= PlayerUtil.getPuntStrengthMultiplier(player);
+        Vec3 force = player.getLookVec().normalize();
+        incrScale(force, forceMultiplier);
+
+        applyForce(idc, at, force);
+        return false;
+    }
+
+    void applyForce(IDeltaChunk idc, Coord at, Vec3 force) {
         Vec3 rotationAxis = getRotationAxis();
         double I = getInertia(idc, rotationAxis);
 
-        Vec3 force = player.getLookVec().normalize();
+
         idc.getRotation().applyReverseRotation(force);
 
         Vec3 hitBlock = at.createVector();
@@ -246,7 +255,7 @@ public class TileEntityHinge extends TileEntityCommon implements IDCController {
 
         Vec3 leverArm = subtract(hitBlock, idcRot);
 
-        incrScale(force, 2.0 * forceMultiplier / I);
+        incrScale(force, 2.0 / I);
 
         Vec3 torque = leverArm.crossProduct(force);
         idc.getRotation().applyRotation(torque);
@@ -269,7 +278,6 @@ public class TileEntityHinge extends TileEntityCommon implements IDCController {
 
         idc.setRotationalVelocity(newOmega);
         limitBend(idc);
-        return false;
     }
 
     private Vec3 getRotationAxis() {
@@ -281,7 +289,6 @@ public class TileEntityHinge extends TileEntityCommon implements IDCController {
     @Override
     public void idcDied(IDeltaChunk idc) {
         idcRef.trackEntity(null);
-        inertia = -1;
         updateComparators();
         markDirty();
         getCoord().syncTE();
@@ -405,7 +412,7 @@ public class TileEntityHinge extends TileEntityCommon implements IDCController {
         if (!idcRef.entityFound() && idcRef.trackingEntity()) {
             IDeltaChunk idc = idcRef.getEntity();
             if (idc != null) {
-                idc.setController(this);
+                ControllerMulticast.register(idc, this);
                 executing_order = idc.hasOrderedRotation();
                 updateComparators();
             }
@@ -457,40 +464,10 @@ public class TileEntityHinge extends TileEntityCommon implements IDCController {
         if (getCoord().isWeaklyPowered()) return false;
         if (worldObj.isRemote) return true;
         boolean ret = super.removedByPlayer(player, willHarvest);
-        if (ret && unload) dropHingeBlocks(idc);
+        if (ret && unload) {
+            ControllerMulticast.deregister(idc, this);
+        }
         return ret;
-    }
-
-    private void dropHingeBlocks(final IDeltaChunk idc) {
-        idc.setRotation(new Quaternion());
-        idc.setRotationalVelocity(new Quaternion());
-        final Coord min = idc.getCorner();
-        final Coord max = idc.getFarCorner();
-        final Coord real = new Coord(this);
-        Coord.iterateCube(min, max, new ICoordFunction() {
-            @Override
-            public void handle(Coord shadow) {
-                if (shadow.isAir()) return;
-                real.set(shadow);
-                idc.shadow2real(real);
-                real.x--;
-                real.y--;
-                real.z--;
-                if (real.isReplacable()) {
-                    TransferLib.move(shadow, real, true, true);
-                    real.markBlockForUpdate();
-                } else {
-                    shadow.breakBlock();
-                }
-            }
-        });
-        Coord.iterateCube(min, max, new ICoordFunction() {
-            @Override
-            public void handle(Coord here) {
-                here.setAir();
-            }
-        });
-        idc.setDead();
     }
 
     @SideOnly(Side.CLIENT)

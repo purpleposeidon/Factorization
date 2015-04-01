@@ -1,14 +1,13 @@
 package factorization.fzds.interfaces;
 
 public enum DeltaCapability {
-    //TODO: Implement SCALE, TRANSPARENT, REMOVE_ALL_ENTITIES
     /** The player can collide with the blocks contained in the DSE. */
     COLLIDE,
     /** The DSE can translate linearly */
     MOVE,
     /** The DSE can rotate */
     ROTATE,
-    /** When the DSE moves, entities (that are outside of hammer space) will move with it */
+    /** When the DSE moves, entities standing on it in real space will be moved with it. (Entities in shadow space, of course, will naturally move along.) */
     DRAG,
     /** Entities within the bounds of the DSE will be sucked into hammerspace */
     TAKE_INTERIOR_ENTITIES,
@@ -22,7 +21,7 @@ public enum DeltaCapability {
     DIE_WHEN_EMPTY,
     /** The DSE can be rescaled. (Collisions/interactions unlikely to ever be implemented?) */
     SCALE,
-    /** The DSE will render with a custom opacity. (Not implemented? Should be easy.) */
+    /** The DSE will render with a custom opacity. (Not implemented) */
     TRANSPARENT,
     /** The player can punch and click on blocks & entities. */
     INTERACT,
@@ -38,11 +37,11 @@ public enum DeltaCapability {
     ENTITY_PHYSICS,
     /** Living entities can be hurt by physics */
     PHYSICS_DAMAGE,
-    /** When a DSE hits an entity, an opposing force will be applied to the DSE. (TODO) */
+    /** When a DSE hits an entity, an opposing force will be applied to the DSE. (Not implemented) */
     CONSERVE_MOMENTUM,
     /** When a DSE hits an entity, hurt it & apply knockback */
     VIOLENT_COLLISIONS,
-    /** The DSE stops moving if it hits a block */
+    /** The DSE stops moving if it hits a block. (Hitting other DSEs could be a capability, but is presently disabled.) */
     COLLIDE_WITH_WORLD,
     /** When an ordered rotation completes, recalculate the orientation. For debugging; might also be useful if there are precision issues */
     SNAP_TO_EXACT_ORDERED_ROTATION
