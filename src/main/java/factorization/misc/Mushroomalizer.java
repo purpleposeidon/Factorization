@@ -39,6 +39,7 @@ public class Mushroomalizer {
         if (shroomQueue.isEmpty()) return;
         ForgeDirection[] HORIZONTALS = new ForgeDirection[] { ForgeDirection.NORTH, ForgeDirection.SOUTH, ForgeDirection.EAST, ForgeDirection.WEST };
         for (PlayerInteractEvent event : shroomQueue) {
+            if (event.isCanceled()) continue;
             Coord at = new Coord(event.entityPlayer.worldObj, event.x, event.y, event.z).add(ForgeDirection.getOrientation(event.face));
             if (event.entityPlayer.isSneaking()) {
                 if (event.face > 1) {
