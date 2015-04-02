@@ -200,6 +200,7 @@ public class NetworkFactorization {
 
                 DataInByteBuf data = new DataInByteBuf(input, Side.CLIENT);
                 spawn.putData(data);
+                return;
             }
 
             if (messageType == null) {
