@@ -158,6 +158,13 @@ public class ItemDarkIronChain extends ItemFactorization {
             killChain(player, is);
             return;
         }
+        Coord fake = shadow.copy();
+        toHook.shadow2real(fake);
+        if (real.distance(fake) > SocketPoweredCrank.MAX_CHAIN_LEN - 2) {
+            Notice.onscreen(player, "item.factorization:darkIronChain.tooLong");
+            killChain(player, is);
+            return;
+        }
         double d = 0.5;
         final Vec3 anchorPoint = shadow.createVector().addVector(d, d, d);
         ForgeDirection dir = loadSide(is, "shadow");
@@ -171,8 +178,6 @@ public class ItemDarkIronChain extends ItemFactorization {
         } else {
             is.stackSize--;
         }
-        Coord fake = shadow.copy();
-        toHook.shadow2real(fake);
         for (Coord at : Arrays.asList(real, fake)) {
             at.w.playSound(at.x, at.y, at.z, "factorization:winch.unwind", 1F, 1F, false);
         }

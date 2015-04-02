@@ -22,6 +22,7 @@ import net.minecraft.util.Vec3;
 import net.minecraft.world.World;
 import net.minecraftforge.common.DimensionManager;
 import net.minecraftforge.common.ForgeChunkManager;
+import net.minecraftforge.event.entity.EntityJoinWorldEvent;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -133,6 +134,14 @@ public class Hammer {
     public void clearSlicesBeforeConnect(FMLNetworkEvent.ClientConnectedToServerEvent event) {
         if (!DeltaChunk.enabled()) return;
         proxy.cleanupClientWorld();
+    }
+
+    @SubscribeEvent
+    public void boostStepHeight(EntityJoinWorldEvent event) {
+        Entity ent = event.entity;
+        if (ent == null) return;
+        if (ent.stepHeight <= 0.0F) return;
+        ent.stepHeight += 1F / 128F;
     }
     
     public static Vec3 ent2vec(Entity ent) {

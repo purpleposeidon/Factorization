@@ -6,12 +6,14 @@ import factorization.api.datahelpers.IDataSerializable;
 import factorization.api.datahelpers.Share;
 import factorization.common.FactoryType;
 import factorization.fzds.ControllerMulticast;
+import factorization.fzds.DeltaChunk;
 import factorization.fzds.interfaces.IDCController;
 import factorization.fzds.interfaces.IDeltaChunk;
 import factorization.servo.ServoMotor;
 import factorization.shared.Core;
 import factorization.shared.EntityReference;
 import factorization.shared.FactorizationBlockRender;
+import factorization.shared.NORELEASE;
 import factorization.sockets.ISocketHolder;
 import factorization.sockets.SocketBareMotor;
 import factorization.sockets.TileEntitySocketBase;
@@ -23,13 +25,14 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.Vec3;
 import net.minecraft.world.World;
+import net.minecraftforge.common.util.ForgeDirection;
 import org.lwjgl.opengl.GL11;
 
 import java.io.IOException;
 
 public class SocketPoweredCrank extends TileEntitySocketBase implements IChargeConductor, IDCController {
     private Charge charge = new Charge(this);
-    final EntityReference<IDeltaChunk> hookedIdc = new EntityReference<IDeltaChunk>();
+    final EntityReference<IDeltaChunk> hookedIdc = ControllerMulticast.autoJoin(this);
     Vec3 hookLocation = SpaceUtil.newVec();
 
     static final float sprocketRadius = 8F / 16F;
@@ -74,7 +77,9 @@ public class SocketPoweredCrank extends TileEntitySocketBase implements IChargeC
 
     @Override
     public String getInfo() {
-        return hookedIdc.trackingEntity() ? "Chained" : "Not connected";
+        if (!hookedIdc.trackingEntity()) return "Not connected";
+        if (hookedIdc.getEntity() == null) return "Chained (but IDC not found)";
+        return "Chained";
     }
 
     @Override
@@ -89,11 +94,88 @@ public class SocketPoweredCrank extends TileEntitySocketBase implements IChargeC
         super.updateEntity();
     }
 
+    void shareCharge() {
+        Coord anchorPoint = getAnchorBlock();
+        if (anchorPoint == null) return;
+        IChargeConductor friend = anchorPoint.getTE(IChargeConductor.class);
+        if (friend == null) return;
+        int mine = charge.getValue();
+        int his = friend.getCharge().getValue();
+        int give = mine - his;
+        if (give <= 0) return;
+        charge.deplete(give);
+        friend.getCharge().addValue(give);
+    }
+
+    static final double MAX_CHAIN_LEN = 24;
+    static final double MIN_CHAIN_LEN = 1;
+    static final double BROKEN_CHAIN_LENGTH = MAX_CHAIN_LEN + 4;
+    static final int WINDING_CHARGE_COST = 16;
+    static final double FORCE_PER_TICK = 0.05;
+
     @Override
     public void genericUpdate(ISocketHolder socket, Coord coord, boolean powered) {
+        updateChain(socket == null ? this : socket);
         if (worldObj.isRemote) {
-            updateHookDrawPos(socket == null ? this : socket);
+            return;
         }
+        IDeltaChunk idc = hookedIdc.getEntity();
+        if (idc == null) return;
+        if (chainLen > BROKEN_CHAIN_LENGTH) {
+            breakChain();
+            return;
+        }
+        shareCharge();
+        if (chainLen < MIN_CHAIN_LEN) return;
+        boolean hyperExtended = chainLen >= MAX_CHAIN_LEN;
+        if (!powered && !hyperExtended) return;
+        if (!hyperExtended) {
+            // Consume charge
+            if (charge.tryTake(WINDING_CHARGE_COST) == 0) {
+                return;
+            }
+        }
+        // retract
+        double scale = 1;
+        if (socket == this) {
+            double power = coord.getPowerInput();
+            scale = (1 + power) / 16.0;
+            if (hyperExtended || (power == 0 && powered)) {
+                scale = 1;
+            }
+        } else {
+            scale = 1.0 / 32.0; // Servos aren't very sturdy
+        }
+        Vec3 force = getForce(idc, socket, scale);
+        Coord at = new Coord(DeltaChunk.getServerShadowWorld(), hookLocation);
+        for (IDCController constraint : ControllerMulticast.getControllers(idc)) {
+            if (constraint instanceof TileEntityHinge) { // Sound design!
+                TileEntityHinge hinge = (TileEntityHinge) constraint;
+                if (hinge.getCoord().isWeaklyPowered()) return;
+                hinge.applyForce(idc, at, force);
+                // At the time of this writing, there is always be a hinge (baring the exceptional).
+                return;
+            }
+        }
+
+        double mass = MassCalculator.calculateMass(idc);
+        /* Whereupon St. Isaac Newton did set down the Holy Law of Nature, that
+         * the sum of the forces upon a body is equal to the mass of the body times
+         * the acceleration of the body, and whereupon we have calculated the mass
+         * of the body, let us therefor grant unto our hookedIdc an IMPULSE OF VELOCITY
+         * equal to the force multiplied by the inverse of the mass.
+         */
+        SpaceUtil.incrScale(force, 1 / mass);
+        Vec3 newVel = SpaceUtil.add(force, SpaceUtil.fromEntVel(idc));
+        SpaceUtil.toEntVel(idc, newVel);
+    }
+
+    private Vec3 getForce(IDeltaChunk idc, ISocketHolder socket, double scale) {
+        Vec3 realHookLocation = idc.shadow2real(hookLocation);
+        Vec3 selfPos = socket.getPos();
+        Vec3 chainVec = SpaceUtil.subtract(realHookLocation, selfPos).normalize();
+        SpaceUtil.incrScale(chainVec, -FORCE_PER_TICK * scale);
+        return chainVec;
     }
 
     public void setChain(IDeltaChunk idc, Vec3 hookLocation) {
@@ -104,16 +186,61 @@ public class SocketPoweredCrank extends TileEntitySocketBase implements IChargeC
         this.hookLocation = hookLocation;
         getCoord().syncTE();
         ControllerMulticast.register(idc, this);
+        updateComparator();
     }
 
     public boolean isChained() {
         return hookedIdc.trackingEntity();
     }
 
+    public boolean breakChain() {
+        if (!isChained()) return false;
+        IDeltaChunk idc = hookedIdc.getEntity();
+        if (idc == null) {
+            return true;
+        }
+        ControllerMulticast.deregister(idc, this);
+        hookedIdc.trackEntity(null);
+        final Coord at = getCoord();
+        at.spawnItem(new ItemStack(Core.registry.darkIronChain));
+        at.syncTE();
+        updateComparator();
+        return false;
+    }
+
     @Override
     public void uninstall() {
-        if (!isChained()) return;
-        new Coord(this).spawnItem(Core.registry.darkIronChain);
+        breakChain();
+    }
+
+    void updateComparator() {
+        int orig = compareValue;
+        calcComparator();
+        if (compareValue != orig) {
+            markDirty();
+        }
+    }
+
+    void calcComparator() {
+        if (!isChained()) {
+            compareValue = 0;
+            return;
+        }
+        if (chainLen >= MAX_CHAIN_LEN - 1) {
+            compareValue = 0xF;
+        } else {
+            int l = (int) (chainLen / 2);
+            compareValue = l;
+            if (compareValue < 0) compareValue = 1;
+            if (compareValue > 0xE) compareValue = 0xE;
+            compareValue = 0xE - compareValue;
+        }
+    }
+
+    int compareValue;
+    @Override
+    public int getComparatorValue(ForgeDirection side) {
+        return compareValue;
     }
 
     @Override
@@ -132,23 +259,32 @@ public class SocketPoweredCrank extends TileEntitySocketBase implements IChargeC
     boolean soundActive;
     byte spinSign = +1;
 
-    void updateHookDrawPos(ISocketHolder socket) {
+    void updateChain(ISocketHolder socket) {
         IDeltaChunk idc = hookedIdc.getEntity();
         if (idc == null) return;
+        Vec3 realHookLocation = idc.shadow2real(hookLocation);
+        Vec3 selfPos = socket.getPos();
+        Vec3 chainVec = SpaceUtil.subtract(realHookLocation, selfPos);
+        Vec3 point = SpaceUtil.fromDirection(facing);
+        Vec3 right = SpaceUtil.scale(point.crossProduct(chainVec).normalize(), sprocketRadius);
+        spinSign = (byte) (SpaceUtil.sum(right) > 0 ? +1 : -1);
+        SpaceUtil.incrAdd(selfPos, right);
+        float len = (float) SpaceUtil.lineDistance(selfPos, realHookLocation);
+        if (worldObj.isRemote) {
+            setChainDraw(realHookLocation, selfPos, len);
+        } else {
+            chainLen = len;
+        }
+    }
+
+    private void setChainDraw(Vec3 realHookLocation, Vec3 selfPos, float len) {
+        NORELEASE.fixme("How's this gonna work on the server?");
         boolean first = false;
         if (chainDraw == null) {
             chainDraw = ChainRender.instance.add();
             first = true;
         }
-        Vec3 realHookLocation = idc.shadow2real(hookLocation);
-        Vec3 selfPos = socket.getPos();
-        Vec3 point = SpaceUtil.fromDirection(facing);
-        Vec3 chainVec = SpaceUtil.subtract(realHookLocation, selfPos);
-        Vec3 right = SpaceUtil.scale(point.crossProduct(chainVec).normalize(), sprocketRadius);
-        spinSign = (byte) (SpaceUtil.sum(right) > 0 ? +1 : -1);
-        SpaceUtil.incrAdd(selfPos, right);
         chainDraw.update(selfPos, realHookLocation);
-        float len = (float) SpaceUtil.lineDistance(selfPos, realHookLocation);
         if (first) {
             chainLen = prevChainLen = len;
         } else {
@@ -213,13 +349,26 @@ public class SocketPoweredCrank extends TileEntitySocketBase implements IChargeC
         FactorizationBlockRender.renderItemIIcon(getCreatingItem().getItem().getIconFromDamage(0));
     }
 
+    Coord getAnchorBlock() {
+        IDeltaChunk idc = hookedIdc.getEntity();
+        if (idc == null) return null;
+        return new Coord(idc.worldObj, hookLocation);
+    }
+
     @Override
     public boolean placeBlock(IDeltaChunk idc, EntityPlayer player, Coord at) {
+        InertiaCalculator.dirty(idc);
         return false;
     }
 
     @Override
     public boolean breakBlock(IDeltaChunk idc, EntityPlayer player, Coord at, byte sideHit) {
+        Coord anchorPoint = getAnchorBlock();
+        if (anchorPoint == null) return false;
+        if (anchorPoint.equals(at)) {
+            breakChain();
+        }
+        InertiaCalculator.dirty(idc);
         return false;
     }
 
@@ -245,6 +394,8 @@ public class SocketPoweredCrank extends TileEntitySocketBase implements IChargeC
 
     @Override
     public void afterUpdate(IDeltaChunk idc) {
-
+        if (idc.hasOrderedRotation() || !idc.getRotationalVelocity().isZero() || idc.motionX != 0 || idc.motionY != 0 || idc.motionZ != 0) {
+            updateComparator();
+        }
     }
 }

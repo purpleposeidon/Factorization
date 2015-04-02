@@ -883,6 +883,10 @@ public final class Coord implements IDataSerializable, ISaneCoord, Comparable<Co
     public boolean isWeaklyPowered() {
         return w.isBlockIndirectlyGettingPowered(x, y, z);
     }
+
+    public int getPowerInput() {
+        return w.getBlockPowerInput(x, y, z);
+    }
     
     public static void iterateCube(Coord a, Coord b, ICoordFunction func) {
         a = a.copy();

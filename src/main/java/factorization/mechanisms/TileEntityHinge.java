@@ -43,7 +43,7 @@ import static org.lwjgl.opengl.GL11.*;
 
 public class TileEntityHinge extends TileEntityCommon implements IDCController {
     FzOrientation facing = FzOrientation.FACE_EAST_POINT_DOWN;
-    final EntityReference<IDeltaChunk> idcRef = new EntityReference<IDeltaChunk>();
+    final EntityReference<IDeltaChunk> idcRef = ControllerMulticast.autoJoin(this);
     Vec3 dseOffset = SpaceUtil.newVec();
     transient boolean idc_ticking = false;
 
@@ -203,6 +203,7 @@ public class TileEntityHinge extends TileEntityCommon implements IDCController {
         if (worldObj.isRemote) return false;
         final ItemStack held = player.getHeldItem();
         if (held != null && held.getMaxStackSize() > 1) return false;
+        if (getCoord().isWeaklyPowered()) return false;
         return applyForce(idc, player, at, -1);
     }
 

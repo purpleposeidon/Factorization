@@ -66,6 +66,16 @@ public final class SpaceUtil {
         return Vec3.createVectorHelper(ent.posX, ent.posY, ent.posZ);
     }
 
+    public static Vec3 fromEntVel(Entity ent) {
+        return Vec3.createVectorHelper(ent.motionX, ent.motionY, ent.motionZ);
+    }
+
+    public static void toEntVel(Entity ent, Vec3 vec) {
+        ent.motionX = vec.xCoord;
+        ent.motionY = vec.yCoord;
+        ent.motionZ = vec.zCoord;
+    }
+
     public static Vec3 fromPlayerEyePos(EntityPlayer ent) {
         return Vec3.createVectorHelper(ent.posX, ent.posY + (ent.getEyeHeight() - ent.getDefaultEyeHeight()), ent.posZ);
     }
