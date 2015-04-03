@@ -2,12 +2,12 @@ package factorization.sockets;
 
 import static org.lwjgl.opengl.GL11.*;
 
-import java.io.ByteArrayOutputStream;
-import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.List;
 
 import factorization.api.datahelpers.*;
+import factorization.fzds.DeltaChunk;
+import factorization.fzds.interfaces.IDeltaChunk;
 import factorization.shared.*;
 import factorization.util.*;
 import io.netty.buffer.ByteBuf;
@@ -23,6 +23,7 @@ import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.IIcon;
 import net.minecraft.util.MovingObjectPosition;
 import net.minecraft.util.Vec3;
+import net.minecraft.world.World;
 import net.minecraftforge.common.util.ForgeDirection;
 
 import org.lwjgl.opengl.GL11;
@@ -80,15 +81,11 @@ public abstract class TileEntitySocketBase extends TileEntityCommon implements I
         }
         return dh.hadError;
     }
-    
-    protected Iterable<Entity> getEntities(ISocketHolder socket, Coord c, ForgeDirection top, int d) {
-        Entity ent = null;
-        if (socket instanceof Entity) {
-            ent = (Entity) socket;
-        }
+
+    protected AxisAlignedBB getEntityBox(ISocketHolder socket, Coord c, ForgeDirection top, int d) {
         int one = 1;
         AxisAlignedBB ab = AxisAlignedBB.getBoundingBox(
-                c.x + top.offsetX, c.y + top.offsetY, c.z + top.offsetZ,  
+                c.x + top.offsetX, c.y + top.offsetY, c.z + top.offsetZ,
                 c.x + one + top.offsetX, c.y + one + top.offsetY, c.z + one + top.offsetZ);
         if (d != 0) {
             ab.minX -= d;
@@ -98,44 +95,7 @@ public abstract class TileEntitySocketBase extends TileEntityCommon implements I
             ab.maxY += d - d * top.offsetY;
             ab.maxZ += d - d * top.offsetZ;
         }
-        return (Iterable<Entity>)worldObj.getEntitiesWithinAABBExcludingEntity(ent, ab);
-    }
-    
-    protected final boolean rayTrace(final ISocketHolder socket, final Coord coord, final FzOrientation orientation, final boolean powered, final boolean lookAround, final boolean onlyFirst) {
-        final ForgeDirection top = orientation.top;
-        final ForgeDirection face = orientation.facing;
-        final ForgeDirection right = face.getRotation(top);
-        
-        for (Entity entity : getEntities(socket, coord, top, 0)) {
-            if (entity == socket) {
-                continue;
-            }
-            if (handleRay(socket, new MovingObjectPosition(entity), false, powered)) {
-                return true;
-            }
-        }
-        
-        nullVec.xCoord = nullVec.yCoord = nullVec.zCoord = 0;
-        Coord targetBlock = coord.add(top);
-        if (mopBlock(targetBlock, top.getOpposite(), socket, false, powered)) return true; //nose-to-nose with the servo
-        if (onlyFirst) return false;
-        if (mopBlock(targetBlock.add(top), top.getOpposite(), socket, false, powered)) return true; //a block away
-        if (mopBlock(coord, top, socket, true, powered)) return true;
-        if (!lookAround) return false;
-        if (mopBlock(targetBlock.add(face), face.getOpposite(), socket, false, powered)) return true; //running forward
-        if (mopBlock(targetBlock.add(face.getOpposite()), face, socket, false, powered)) return true; //running backward
-        if (mopBlock(targetBlock.add(right), right.getOpposite(), socket, false, powered)) return true; //to the servo's right
-        if (mopBlock(targetBlock.add(right.getOpposite()), right, socket, false, powered)) return true; //to the servo's left
-        return false;
-    }
-    
-    private static final Vec3 nullVec = Vec3.createVectorHelper(0, 0, 0);
-    boolean mopBlock(Coord target, ForgeDirection side, ISocketHolder socket, boolean mopIsThis, boolean powered) {
-        nullVec.xCoord = xCoord + side.offsetX;
-        nullVec.yCoord = yCoord + side.offsetY;
-        nullVec.zCoord = zCoord + side.offsetZ;
-        
-        return handleRay(socket, target.createMop(side, nullVec), mopIsThis, powered);
+        return ab;
     }
     
     @Override
@@ -349,7 +309,7 @@ public abstract class TileEntitySocketBase extends TileEntityCommon implements I
     /**
      * return true if mop-searching should stop
      */
-    public boolean handleRay(ISocketHolder socket, MovingObjectPosition mop, boolean mopIsThis, boolean powered) {
+    public boolean handleRay(ISocketHolder socket, MovingObjectPosition mop, World mopWorld, boolean mopIsThis, boolean powered) {
         return true;
     }
     

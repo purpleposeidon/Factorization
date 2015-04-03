@@ -12,7 +12,6 @@ import net.minecraft.crash.CrashReportCategory;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.MinecraftError;
 import net.minecraft.util.MovingObjectPosition;
 import net.minecraft.util.MovingObjectPosition.MovingObjectType;
 import net.minecraft.util.ReportedException;
@@ -78,7 +77,8 @@ public class SocketRobotHand extends TileEntitySocketBase {
         firstTry = true;
         FzOrientation orientation = FzOrientation.fromDirection(facing).getSwapped();
         fakePlayer = null;
-        rayTrace(socket, coord, orientation, powered, true, false);
+        RayTracer tracer = new RayTracer(this, socket, coord, orientation, powered).lookAround();
+        tracer.trace();
         if (fakePlayer != null) {
             fakePlayer.isDead = true; // Avoid mob retribution
         }
@@ -88,7 +88,7 @@ public class SocketRobotHand extends TileEntitySocketBase {
     EntityPlayer fakePlayer;
     
     @Override
-    public boolean handleRay(ISocketHolder socket, MovingObjectPosition mop, boolean mopIsThis, boolean powered) {
+    public boolean handleRay(ISocketHolder socket, MovingObjectPosition mop, World mopWorld, boolean mopIsThis, boolean powered) {
         boolean ret = doHandleRay(socket, mop, mopIsThis, powered);
         if (!ret && !mopIsThis && mop.typeOfHit == MovingObjectType.BLOCK) {
             return !worldObj.isAirBlock(mop.blockX, mop.blockY, mop.blockZ);

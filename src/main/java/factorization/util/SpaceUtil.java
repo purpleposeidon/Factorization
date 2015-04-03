@@ -231,7 +231,12 @@ public final class SpaceUtil {
 
 
     public static double getAngle(Vec3 a, Vec3 b) {
-        return Math.abs(a.dotProduct(b));
+        double dot = a.dotProduct(b);
+        double mags = a.lengthVector() * b.lengthVector();
+        double div = dot / mags;
+        if (div > 1) div = 1;
+        if (div < -1) div = -1;
+        return Math.acos(div);
     }
 
     public static void setAABB(AxisAlignedBB target, Vec3 min, Vec3 max) {
@@ -424,5 +429,24 @@ public final class SpaceUtil {
 
     public static double sum(Vec3 vec) {
         return vec.xCoord + vec.yCoord + vec.zCoord;
+    }
+
+    public static ForgeDirection round(Vec3 vec, ForgeDirection not) {
+        if (isZero(vec)) return ForgeDirection.UNKNOWN;
+        Vec3 work = newVec();
+        double bestAngle = Double.POSITIVE_INFINITY;
+        ForgeDirection closest = ForgeDirection.UNKNOWN;
+        for (ForgeDirection dir : ForgeDirection.VALID_DIRECTIONS) {
+            if (dir == not) continue;
+            work.xCoord = dir.offsetX;
+            work.yCoord = dir.offsetY;
+            work.zCoord = dir.offsetZ;
+            double dot = getAngle(vec, work);
+            if (dot < bestAngle) {
+                bestAngle = dot;
+                closest = dir;
+            }
+        }
+        return closest;
     }
 }

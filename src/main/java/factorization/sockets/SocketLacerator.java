@@ -17,7 +17,6 @@ import net.minecraft.client.particle.EntityFX;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.texture.TextureManager;
 import net.minecraft.enchantment.Enchantment;
-import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
@@ -195,26 +194,22 @@ public class SocketLacerator extends TileEntitySocketBase implements IChargeCond
         if (powered) {
             slowDown();
             progress = 0;
-        } else if (!rayTrace(socket, coord, orientation, powered, false, true)) {
-            slowDown();
-            progress = 0;
+        } else {
+            RayTracer tracer = new RayTracer(this, socket, coord, orientation, powered).onlyFrontBlock();
+            if (!tracer.trace()) {
+                slowDown();
+                progress = 0;
+            }
         }
         if (grab_items) {
             grab_items = false;
             
-            for (Entity entity : getEntities(socket, coord, orientation.top, 1)) {
-                if (entity.isDead) {
-                    continue;
-                }
-                if (entity instanceof EntityItem) {
-                    EntityItem ei = (EntityItem) entity;
-                    if (ei.ticksExisted > 1) {
-                        continue;
-                    }
-                    ItemStack is = ei.getEntityItem();
-                    processCollectedItem(is);
-                    ei.setDead();
-                }
+            for (EntityItem ei : (Iterable<EntityItem>)worldObj.getEntitiesWithinAABB(EntityItem.class, getEntityBox(socket, coord, orientation.top, 1))) {
+                if (ei.isDead) continue;
+                if (ei.ticksExisted > 1) continue;
+                ItemStack is = ei.getEntityItem();
+                processCollectedItem(ItemUtil.normalize(is));
+                ei.setDead();
             }
         }
     }
@@ -296,25 +291,17 @@ public class SocketLacerator extends TileEntitySocketBase implements IChargeCond
     };
     
     @Override
-    public boolean handleRay(ISocketHolder socket, MovingObjectPosition mop, boolean mopIsThis, boolean powered) {
-        DropCaptureHandler.startCapture(this);
+    public boolean handleRay(ISocketHolder socket, MovingObjectPosition mop, World mopWorld, boolean mopIsThis, boolean powered) {
+        DropCaptureHandler.startCapture(this, new Coord(mopWorld, mop), 3);
         try {
-            return _handleRay(socket, mop, mopIsThis, powered);
+            return _handleRay(socket, mop, mopWorld, mopIsThis, powered);
         } finally {
             DropCaptureHandler.endCapture();
         }
     }
     
     @Override
-    public boolean captureDrops(int x, int y, int z, ArrayList<ItemStack> stacks) {
-        final int maxDist = 3*3;
-        double dx = xCoord + 0.5 - x;
-        double dy = yCoord + 0.5 - y;
-        double dz = zCoord + 0.5 - z;
-        double dist = dx * dx + dy * dy + dz * dz;
-        if (dist > maxDist) {
-            return false;
-        }
+    public boolean captureDrops(ArrayList<ItemStack> stacks) {
         for (int i = 0; i < stacks.size(); i++) {
             ItemStack is = stacks.get(i);
             processCollectedItem(is.copy());
@@ -323,7 +310,7 @@ public class SocketLacerator extends TileEntitySocketBase implements IChargeCond
         return true;
     }
     
-    private boolean _handleRay(ISocketHolder socket, MovingObjectPosition mop, boolean mopIsThis, boolean powered) {
+    private boolean _handleRay(ISocketHolder socket, MovingObjectPosition mop, World mopWorld, boolean mopIsThis, boolean powered) {
         if (mop == null) return false;
         if (mopIsThis) return false;
         
@@ -333,7 +320,7 @@ public class SocketLacerator extends TileEntitySocketBase implements IChargeCond
             }
             EntityLivingBase elb = (EntityLivingBase) mop.entityHit;
             if (elb.isDead || elb.getHealth() <= 0) return false;
-            if (cantDoWork(socket)) return true && !grab_items;
+            if (cantDoWork(socket)) return !grab_items;
             socket.extractCharge(1); //It's fine if it fails
             float damage = 4F*speed/max_speed;
             if (elb.getHealth() <= damage && rand.nextInt(20) == 1) { 
@@ -348,11 +335,11 @@ public class SocketLacerator extends TileEntitySocketBase implements IChargeCond
             progress = 0;
             return true;
         } else if (mop.typeOfHit == MovingObjectPosition.MovingObjectType.BLOCK) {
-            Block block = worldObj.getBlock(mop.blockX, mop.blockY, mop.blockZ);
-            if (block == null || block.isAir(worldObj, mop.blockX, mop.blockY, mop.blockZ)) {
+            Block block = mopWorld.getBlock(mop.blockX, mop.blockY, mop.blockZ);
+            if (block == null || block.isAir(mopWorld, mop.blockX, mop.blockY, mop.blockZ)) {
                 return false;
             }
-            int md = worldObj.getBlockMetadata(mop.blockX, mop.blockY, mop.blockZ);
+            int md = mopWorld.getBlockMetadata(mop.blockX, mop.blockY, mop.blockZ);
             if (!block.canCollideCheck(md, false)) {
                 return false;
             }
@@ -362,7 +349,7 @@ public class SocketLacerator extends TileEntitySocketBase implements IChargeCond
             TileEntity te = null;
             TileEntityDayBarrel barrel = null;
             if (block == Core.registry.factory_block) {
-                te = worldObj.getTileEntity(mop.blockX, mop.blockY, mop.blockZ);
+                te = mopWorld.getTileEntity(mop.blockX, mop.blockY, mop.blockZ);
                 if (te instanceof TileEntityDayBarrel) {
                     barrel = (TileEntityDayBarrel) te;
                     if (barrel.item == null) {
@@ -375,7 +362,7 @@ public class SocketLacerator extends TileEntitySocketBase implements IChargeCond
             
             //Below: A brief demonstration of why Coord exists
             long foundHash = (mop.blockX) + (mop.blockY << 2) + (mop.blockZ << 4);
-            float hardness = block.getBlockHardness(worldObj, mop.blockX, mop.blockY, mop.blockZ);
+            float hardness = block.getBlockHardness(mopWorld, mop.blockX, mop.blockY, mop.blockZ);
             if (hardness < 0) {
                 speed -= max_speed/5;
                 return true;
@@ -391,7 +378,7 @@ public class SocketLacerator extends TileEntitySocketBase implements IChargeCond
                 progress++;
                 if (socket == this && rand.nextInt(4) == 0) {
                     // Torsion!?
-                    TileEntity partner = worldObj.getTileEntity(mop.blockX + facing.offsetX, mop.blockY + facing.offsetY, mop.blockZ + facing.offsetZ);
+                    TileEntity partner = mopWorld.getTileEntity(mop.blockX + facing.offsetX, mop.blockY + facing.offsetY, mop.blockZ + facing.offsetZ);
                     if (partner instanceof SocketLacerator) {
                         SocketLacerator pardner = (SocketLacerator) partner;
                         if (pardner.workCheck()) {
@@ -404,16 +391,20 @@ public class SocketLacerator extends TileEntitySocketBase implements IChargeCond
             if (barrel == null && !doBreak) {
                 float perc = progress/((float)grind_time*hardness);
                 int breakage = (int) (perc*10);
-                destroyPartially(mop, breakage);
+                if (mopWorld == worldObj) {
+                    destroyPartially(mop, breakage);
+                }
                 present_breaking_target = mop;
             } else if (doBreak) {
-                destroyPartially(mop, 99);
+                if (mopWorld == worldObj) {
+                    destroyPartially(mop, 99);
+                }
             }
             if (doBreak) {
                 grab_items = true;
                 grind_items = true;
                 if (barrel == null) {
-                    worldObj.playAuxSFX(2001, mop.blockX, mop.blockY, mop.blockZ, Block.getIdFromBlock(block) + md << 12);
+                    mopWorld.playAuxSFX(2001, mop.blockX, mop.blockY, mop.blockZ, Block.getIdFromBlock(block) + md << 12);
                     
                     EntityPlayer player = getFakePlayer();
                     ItemStack pick = new ItemStack(Items.diamond_pickaxe);
@@ -421,20 +412,18 @@ public class SocketLacerator extends TileEntitySocketBase implements IChargeCond
                     player.inventory.mainInventory[0] = pick;
                     {
                         boolean canHarvest = false;
-                        if (block != null) {
-                            canHarvest = block.canHarvestBlock(player, md);
-                        }
+                        canHarvest = block.canHarvestBlock(player, md);
                         canHarvest = true; //Hack-around for cobalt/ardite. Hmm.
 
-                        boolean didRemove = removeBlock(player, block, md, mop.blockX, mop.blockY, mop.blockZ);
-                        if (didRemove && canHarvest) {
-                            block.harvestBlock(worldObj, player, mop.blockX, mop.blockY, mop.blockZ, md);
+                        boolean didRemove = removeBlock(player, block, md, mopWorld, mop.blockX, mop.blockY, mop.blockZ);
+                        if (didRemove) {
+                            block.harvestBlock(mopWorld, player, mop.blockX, mop.blockY, mop.blockZ, md);
                         }
                     }
-                    block.onBlockHarvested(worldObj, mop.blockX, mop.blockY, mop.blockZ, md, player);
-                    if (block.removedByPlayer(worldObj, player, mop.blockX, mop.blockY, mop.blockZ, true)) {
-                        block.onBlockDestroyedByPlayer(worldObj, mop.blockX, mop.blockY, mop.blockZ, md);
-                        block.harvestBlock(worldObj, player, mop.blockX, mop.blockY, mop.blockZ, 0);
+                    block.onBlockHarvested(mopWorld, mop.blockX, mop.blockY, mop.blockZ, md, player);
+                    if (block.removedByPlayer(mopWorld, player, mop.blockX, mop.blockY, mop.blockZ, true)) {
+                        block.onBlockDestroyedByPlayer(mopWorld, mop.blockX, mop.blockY, mop.blockZ, md);
+                        block.harvestBlock(mopWorld, player, mop.blockX, mop.blockY, mop.blockZ, 0);
                     }
                     player.inventory.mainInventory[0] = null;
                 } else if (barrel.getItemCount() > 0) {
@@ -452,11 +441,11 @@ public class SocketLacerator extends TileEntitySocketBase implements IChargeCond
         }
     }
     
-    private boolean removeBlock(EntityPlayer thisPlayerMP, Block block, int md, int x, int y, int z) {
+    private boolean removeBlock(EntityPlayer thisPlayerMP, Block block, int md, World mopWorld, int x, int y, int z) {
         if (block == null) return false;
-        block.onBlockHarvested(worldObj, x, y, z, md, thisPlayerMP);
-        if (block.removedByPlayer(worldObj, thisPlayerMP, x, y, z, false)) {
-            block.onBlockDestroyedByPlayer(worldObj, x, y, z, md);
+        block.onBlockHarvested(mopWorld, x, y, z, md, thisPlayerMP);
+        if (block.removedByPlayer(mopWorld, thisPlayerMP, x, y, z, false)) {
+            block.onBlockDestroyedByPlayer(mopWorld, x, y, z, md);
             return true;
         }
         return false;

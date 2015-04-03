@@ -149,7 +149,14 @@ public class DimensionSliceEntity extends IDeltaChunk implements IFzdsEntryContr
         buffer.zCoord += posZ;
         return buffer;
     }
-    
+
+    @Override
+    public AxisAlignedBB shadow2real(AxisAlignedBB shadowBox) {
+        Vec3 min = SpaceUtil.getMin(shadowBox);
+        Vec3 max = SpaceUtil.getMax(shadowBox);
+        return SpaceUtil.createAABB(shadow2real(min), shadow2real(max));
+    }
+
     private Vec3 workVec = Vec3.createVectorHelper(0, 0, 0);
     
     @Override
@@ -167,6 +174,13 @@ public class DimensionSliceEntity extends IDeltaChunk implements IFzdsEntryContr
     public void real2shadow(Coord c) {
         c.set(real2shadow(c.createVector()));
         c.w = DeltaChunk.getWorld(worldObj);
+    }
+
+    @Override
+    public AxisAlignedBB real2shadow(AxisAlignedBB shadowBox) {
+        Vec3 min = SpaceUtil.getMin(shadowBox);
+        Vec3 max = SpaceUtil.getMax(shadowBox);
+        return SpaceUtil.createAABB(real2shadow(min), real2shadow(max));
     }
     
     @Override

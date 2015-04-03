@@ -2,14 +2,20 @@ package factorization.sockets;
 
 import java.io.IOException;
 
+import factorization.aabbdebug.AabbDebugger;
+import factorization.fzds.DeltaChunk;
+import factorization.fzds.interfaces.IDeltaChunk;
 import factorization.shared.*;
 import factorization.util.InvUtil;
 import factorization.util.ItemUtil;
+import factorization.util.SpaceUtil;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.Vec3;
 import net.minecraftforge.common.util.ForgeDirection;
 
 import org.lwjgl.opengl.GL11;
@@ -133,24 +139,10 @@ public class SocketShifter extends TileEntitySocketBase {
         if (localInv == null) {
             return;
         }
-        coord.adjust(facing);
-        foreignInv = InvUtil.openInventory(coord.getTE(IInventory.class), back);
-        coord.adjust(back);
+        foreignInv = openForeignInv(socket, coord, back);
+
         if (foreignInv == null) {
-            final ForgeDirection top = facing;
-            
-            for (Entity entity : getEntities(socket, coord, top, 0)) {
-                if (!(entity instanceof IInventory)) {
-                    continue;
-                }
-                foreignInv = InvUtil.openInventory(entity, false);
-                if (foreignInv != null) {
-                    break;
-                }
-            }
-            if (foreignInv == null) {
-                return;
-            }
+            return;
         }
         
         FzInv pullInv, pushInv;
@@ -278,7 +270,44 @@ public class SocketShifter extends TileEntitySocketBase {
         }
         cooldown = (byte) (mode == ShifterMode.MODE_STREAM ? 8 : 1);
     }
-    
+
+    private FzInv openForeignInv(ISocketHolder socket, Coord coord, ForgeDirection back) {
+        coord.adjust(facing);
+        FzInv foreignInv = InvUtil.openInventory(coord.getTE(IInventory.class), back);
+        coord.adjust(back);
+        if (foreignInv != null) return foreignInv;
+        final ForgeDirection top = facing;
+
+        for (Entity entity : (Iterable<EntityItem>)worldObj.getEntitiesWithinAABB(IInventory.class, getEntityBox(socket, coord, top, 0))) {
+            foreignInv = InvUtil.openInventory(entity, false);
+            if (foreignInv != null) {
+                break;
+            }
+        }
+        if (foreignInv != null) return foreignInv;
+        if (worldObj != DeltaChunk.getServerShadowWorld()) return null;
+        Coord target = coord.add(facing);
+        for (IDeltaChunk idc : DeltaChunk.getSlicesContainingPoint(target)) {
+            final ForgeDirection realBack = idc.shadow2real(back);
+
+            Vec3 v = SpaceUtil.newVec();
+            target.setAsVector(v);
+            v.xCoord += 0.5;
+            v.yCoord += 0.5;
+            v.zCoord += 0.5;
+
+            v = idc.shadow2real(v);
+
+            Coord real = new Coord(idc.worldObj, (int) Math.floor(v.xCoord), (int) Math.floor(v.yCoord), (int) Math.floor(v.zCoord));
+
+            //Coord real = idc.shadow2realCoord(target);
+            foreignInv = InvUtil.openInventory(real.getTE(IInventory.class), realBack);
+            AabbDebugger.addBox(real);
+            if (foreignInv != null) return foreignInv;
+        }
+        return null;
+    }
+
     int countItem(FzInv inv, int start, int minimum, boolean[] visitedSlots) {
         if (visitedSlots[start]) {
             return 0;

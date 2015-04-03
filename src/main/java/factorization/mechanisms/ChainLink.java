@@ -101,6 +101,11 @@ public class ChainLink {
     }
 
     public void release() {
+        if (bagIndex == -1) {
+            Core.logWarning("Already released");
+            Thread.dumpStack();
+            return;
+        }
         ChainRender.instance.release(this);
         bagIndex = -1;
     }

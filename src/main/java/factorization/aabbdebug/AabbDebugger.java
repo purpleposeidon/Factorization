@@ -1,8 +1,11 @@
 package factorization.aabbdebug;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
+import com.sun.org.apache.xerces.internal.impl.xpath.XPath;
+import factorization.api.Coord;
 import factorization.util.SpaceUtil;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.RenderGlobal;
@@ -72,16 +75,25 @@ public enum AabbDebugger {
     private static class Line {
         Vec3 start, end;
     }
+
+    static <T> List<T> list() {
+        return Collections.synchronizedList(new ArrayList<T>());
+    }
     
-    static ArrayList<AxisAlignedBB> boxes = new ArrayList(), frozen = new ArrayList();
-    static ArrayList<Line> lines = new ArrayList(), frozen_lines = new ArrayList();
+    static final List<AxisAlignedBB> boxes = list(), frozen = list();
+    static final List<Line> lines = list(), frozen_lines = list();
     static boolean freeze = false;
     
     public static void addBox(AxisAlignedBB box) {
         if (box == null) return;
         boxes.add(box.copy());
     }
-    
+
+    public static void addBox(Coord c) {
+        if (c == null) return;
+        addBox(SpaceUtil.createAABB(c, c.add(1, 1, 1)));
+    }
+
     public static void addLine(Vec3 start, Vec3 end) {
         Line line = new Line();
         line.start = SpaceUtil.copy(start);
@@ -132,25 +144,33 @@ public enum AabbDebugger {
         
         GL11.glDisable(GL11.GL_TEXTURE_2D);
         GL11.glLineWidth(4);
-        for (AxisAlignedBB box : boxes) {
-            RenderGlobal.drawOutlinedBoundingBox(box, 0x800000);
+        synchronized (boxes) {
+            for (AxisAlignedBB box : boxes) {
+                RenderGlobal.drawOutlinedBoundingBox(box, 0x800000);
+            }
         }
-        for (AxisAlignedBB box : frozen) {
-            RenderGlobal.drawOutlinedBoundingBox(box, 0x4040B0);
+        synchronized (frozen) {
+            for (AxisAlignedBB box : frozen) {
+                RenderGlobal.drawOutlinedBoundingBox(box, 0x4040B0);
+            }
         }
         GL11.glLineWidth(2);
         GL11.glColor4f(1, 1, 0, 1);
         GL11.glBegin(GL11.GL_LINES);
-        for (Line line : lines) {
-            GL11.glVertex3d(line.start.xCoord, line.start.yCoord, line.start.zCoord);
-            GL11.glVertex3d(line.end.xCoord, line.end.yCoord, line.end.zCoord);
+        synchronized (lines) {
+            for (Line line : lines) {
+                GL11.glVertex3d(line.start.xCoord, line.start.yCoord, line.start.zCoord);
+                GL11.glVertex3d(line.end.xCoord, line.end.yCoord, line.end.zCoord);
+            }
         }
         GL11.glEnd();
         GL11.glColor4f(0, 1, 1, 1);
         GL11.glBegin(GL11.GL_LINES);
-        for (Line line : frozen_lines) {
-            GL11.glVertex3d(line.start.xCoord, line.start.yCoord, line.start.zCoord);
-            GL11.glVertex3d(line.end.xCoord, line.end.yCoord, line.end.zCoord);
+        synchronized (frozen_lines) {
+            for (Line line : frozen_lines) {
+                GL11.glVertex3d(line.start.xCoord, line.start.yCoord, line.start.zCoord);
+                GL11.glVertex3d(line.end.xCoord, line.end.yCoord, line.end.zCoord);
+            }
         }
         GL11.glEnd();
         GL11.glDepthMask(true);

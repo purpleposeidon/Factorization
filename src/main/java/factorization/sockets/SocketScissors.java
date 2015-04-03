@@ -113,7 +113,8 @@ public class SocketScissors extends TileEntitySocketBase implements ICaptureDrop
             FzOrientation orientation = FzOrientation.fromDirection(facing).getSwapped();
             if (openCount == 0 && getBackingInventory(socket) != null) {
                 blocked = false;
-                rayTrace(socket, coord, orientation, powered, false, true);
+                RayTracer tracer = new RayTracer(this, socket, coord, orientation, powered).onlyFrontBlock();
+                tracer.trace();
                 if (!blocked) {
                     sound = true;
                     openCount = openTime;
@@ -136,8 +137,8 @@ public class SocketScissors extends TileEntitySocketBase implements ICaptureDrop
     }
     
     @Override
-    public boolean handleRay(ISocketHolder socket, MovingObjectPosition mop, boolean mopIsThis, boolean powered) {
-        DropCaptureHandler.startCapture(this);
+    public boolean handleRay(ISocketHolder socket, MovingObjectPosition mop, World mopWorld, boolean mopIsThis, boolean powered) {
+        DropCaptureHandler.startCapture(this, new Coord(mopWorld, mop), 3);
         try {
             return _handleRay(socket, mop, mopIsThis, powered);
         } finally {
@@ -253,15 +254,7 @@ public class SocketScissors extends TileEntitySocketBase implements ICaptureDrop
     }
 
     @Override
-    public boolean captureDrops(int x, int y, int z, ArrayList<ItemStack> stacks) {
-        final int maxDist = 3*3;
-        double dx = xCoord + 0.5 - x;
-        double dy = yCoord + 0.5 - y;
-        double dz = zCoord + 0.5 - z;
-        double dist = dx * dx + dy * dy + dz * dz;
-        if (dist > maxDist) {
-            return false;
-        }
+    public boolean captureDrops(ArrayList<ItemStack> stacks) {
         processCollectedItems(stacks);
         return true;
     }

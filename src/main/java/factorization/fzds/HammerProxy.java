@@ -1,5 +1,6 @@
 package factorization.fzds;
 
+import cpw.mods.fml.common.network.handshake.NetworkDispatcher;
 import factorization.fzds.interfaces.IDeltaChunk;
 import net.minecraft.util.MovingObjectPosition;
 import net.minecraft.world.World;
@@ -31,4 +32,8 @@ public class HammerProxy {
     public void createClientShadowWorld() { }
 
     public void cleanupClientWorld() { }
+
+    public NetworkDispatcher getDispatcher() {
+        return null;
+    }
 }

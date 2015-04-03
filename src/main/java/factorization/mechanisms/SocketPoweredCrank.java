@@ -34,6 +34,7 @@ public class SocketPoweredCrank extends TileEntitySocketBase implements IChargeC
     private Charge charge = new Charge(this);
     final EntityReference<IDeltaChunk> hookedIdc = ControllerMulticast.autoJoin(this);
     Vec3 hookLocation = SpaceUtil.newVec();
+    DeltaCoord hookDelta = new DeltaCoord();
 
     static final float sprocketRadius = 8F / 16F;
 
@@ -66,7 +67,10 @@ public class SocketPoweredCrank extends TileEntitySocketBase implements IChargeC
         hookLocation = data.as(Share.VISIBLE, "hookLocation").putVec3(hookLocation);
         if (data.isReader() && chainDraw != null) {
             chainDraw.release();
+            chainDraw = null;
+            chainDelta = 0;
         }
+        hookDelta = data.as(Share.PRIVATE, "hookDelta").put(hookDelta);
         return this;
     }
 
@@ -140,11 +144,11 @@ public class SocketPoweredCrank extends TileEntitySocketBase implements IChargeC
         if (socket == this) {
             double power = coord.getPowerInput();
             scale = (1 + power) / 16.0;
-            if (hyperExtended || (power == 0 && powered)) {
+            if (hyperExtended || power == 0 /* getting indrect power */) {
                 scale = 1;
             }
         } else {
-            scale = 1.0 / 32.0; // Servos aren't very sturdy
+            scale = 1.0 / 32.0; // Servos don't look very sturdy
         }
         Vec3 force = getForce(idc, socket, scale);
         Coord at = new Coord(DeltaChunk.getServerShadowWorld(), hookLocation);
@@ -178,12 +182,13 @@ public class SocketPoweredCrank extends TileEntitySocketBase implements IChargeC
         return chainVec;
     }
 
-    public void setChain(IDeltaChunk idc, Vec3 hookLocation) {
+    public void setChain(IDeltaChunk idc, Vec3 hookLocation, Coord hookedBlock) {
         if (hookedIdc.trackingEntity()) {
             getCoord().spawnItem(Core.registry.darkIronChain);
         }
         hookedIdc.trackEntity(idc);
         this.hookLocation = hookLocation;
+        hookDelta = hookedBlock.asDeltaCoord();
         getCoord().syncTE();
         ControllerMulticast.register(idc, this);
         updateComparator();
@@ -205,6 +210,7 @@ public class SocketPoweredCrank extends TileEntitySocketBase implements IChargeC
         at.spawnItem(new ItemStack(Core.registry.darkIronChain));
         at.syncTE();
         updateComparator();
+        chainDelta = 0;
         return false;
     }
 
@@ -322,6 +328,7 @@ public class SocketPoweredCrank extends TileEntitySocketBase implements IChargeC
         if (chainDraw != null) {
             chainDraw.release();
             chainDraw = null;
+            chainDelta = 0;
         }
     }
 
@@ -352,7 +359,7 @@ public class SocketPoweredCrank extends TileEntitySocketBase implements IChargeC
     Coord getAnchorBlock() {
         IDeltaChunk idc = hookedIdc.getEntity();
         if (idc == null) return null;
-        return new Coord(idc.worldObj, hookLocation);
+        return new Coord(idc.getCorner().w, 0, 0, 0).add(hookDelta);
     }
 
     @Override

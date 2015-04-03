@@ -1060,4 +1060,8 @@ public final class Coord implements IDataSerializable, ISaneCoord, Comparable<Co
         int md = getMd();
         b.dropBlockAsItem(w, x, y, z, md, 0 /* fortune */);
     }
+
+    public boolean isAt(TileEntity te) {
+        return x == te.xCoord && y == te.yCoord && z == te.zCoord && w == te.getWorldObj();
+    }
 }

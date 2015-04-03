@@ -171,7 +171,7 @@ public class ItemDarkIronChain extends ItemFactorization {
         Vec3 dv = SpaceUtil.scale(SpaceUtil.fromDirection(dir), 0.5);
         SpaceUtil.incrAdd(anchorPoint, dv);
 
-        crank.setChain(toHook, anchorPoint);
+        crank.setChain(toHook, anchorPoint, shadow);
         Notice.onscreen(player, "item.factorization:darkIronChain.finish"); // Not really necessary, since you should be able to see the chain
         if (player.capabilities.isCreativeMode) {
             is.setTagCompound(new NBTTagCompound());

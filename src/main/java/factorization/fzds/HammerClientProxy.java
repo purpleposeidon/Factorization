@@ -7,16 +7,23 @@ import cpw.mods.fml.common.gameevent.TickEvent;
 import cpw.mods.fml.common.gameevent.TickEvent.ClientTickEvent;
 import cpw.mods.fml.common.gameevent.TickEvent.Phase;
 import cpw.mods.fml.common.network.FMLNetworkEvent.ClientDisconnectionFromServerEvent;
+import cpw.mods.fml.common.network.handshake.NetworkDispatcher;
 import cpw.mods.fml.relauncher.Side;
 import factorization.api.Coord;
 import factorization.api.Quaternion;
 import factorization.coremodhooks.HookTargetsClient;
 import factorization.coremodhooks.IExtraChunkData;
 import factorization.fzds.interfaces.IDeltaChunk;
+import factorization.fzds.interfaces.IFzdsShenanigans;
 import factorization.shared.BlockRenderHelper;
 import factorization.shared.Core;
+import factorization.shared.NORELEASE;
 import factorization.util.NumUtil;
 import factorization.util.SpaceUtil;
+import io.netty.channel.ChannelHandlerContext;
+import io.netty.channel.ChannelOutboundHandlerAdapter;
+import io.netty.channel.ChannelPromise;
+import io.netty.channel.embedded.EmbeddedChannel;
 import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityClientPlayerMP;
@@ -29,8 +36,10 @@ import net.minecraft.client.renderer.tileentity.TileEntityRendererDispatcher;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
+import net.minecraft.network.NetworkManager;
 import net.minecraft.profiler.Profiler;
 import net.minecraft.util.AxisAlignedBB;
+import net.minecraft.util.IChatComponent;
 import net.minecraft.util.MovingObjectPosition;
 import net.minecraft.util.Vec3;
 import net.minecraft.world.EnumDifficulty;
@@ -476,5 +485,39 @@ public class HammerClientProxy extends HammerProxy {
         Entity[] objs = ed.getConstantColliders();
         if (objs == null) return;
         event.left.add("uc: " + objs.length);
+    }
+
+    static class WrappedNetworkDispatcher extends NetworkDispatcher implements IFzdsShenanigans {
+        public WrappedNetworkDispatcher(NetworkManager manager) {
+            super(manager);
+        }
+    }
+
+    static class WrappedNetworkManager extends NetworkManager implements IFzdsShenanigans {
+        public WrappedNetworkManager() {
+            super(true /* isRemote */);
+            channel = new EmbeddedChannel(new WrappedHandler());
+        }
+
+        @Override
+        public void closeChannel(IChatComponent msg) {
+            Minecraft.getMinecraft().getNetHandler().getNetworkManager().closeChannel(msg);
+        }
+    }
+
+    static class WrappedHandler extends ChannelOutboundHandlerAdapter implements IFzdsShenanigans {
+        @Override
+        public void write(ChannelHandlerContext ctx, Object msg, ChannelPromise promise) throws Exception {
+            NORELEASE.println("WrappedHandler.write:", msg);
+            super.write(ctx, msg, promise);
+        }
+    }
+
+    WrappedNetworkManager wrapperManager = new WrappedNetworkManager();
+    NetworkDispatcher wrapperDispatcher = new WrappedNetworkDispatcher(wrapperManager);
+
+    @Override
+    public NetworkDispatcher getDispatcher() {
+        return wrapperDispatcher;
     }
 }

@@ -56,6 +56,7 @@ public class ChainRender {
             if (!setup) {
                 setup = true;
                 tess.startDrawingQuads();
+                tess.setColorRGBA(0xFF, 0xFF, 0xFF, 0xFF);
 
                 EntityLivingBase eyePos = Minecraft.getMinecraft().renderViewEntity;
                 double cx = eyePos.lastTickPosX + (eyePos.posX - eyePos.lastTickPosX) * (double) event.partialTicks;

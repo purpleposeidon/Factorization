@@ -1,6 +1,5 @@
 package factorization.utiligoo;
 
-import java.io.DataInput;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -10,7 +9,6 @@ import java.util.Random;
 
 import cpw.mods.fml.common.network.ByteBufUtils;
 import factorization.shared.*;
-import factorization.util.DataUtil;
 import factorization.util.InvUtil;
 import factorization.util.ItemUtil;
 import io.netty.buffer.ByteBuf;
@@ -141,7 +139,7 @@ public class ItemGoo extends ItemFactorization {
                     final FzInv playerInv = InvUtil.openInventory(player, true);
                     DropCaptureHandler.startCapture(new ICaptureDrops() {
                         @Override
-                        public boolean captureDrops(int x, int y, int z, ArrayList<ItemStack> stacks) {
+                        public boolean captureDrops(ArrayList<ItemStack> stacks) {
                             boolean any = false;
                             for (ItemStack is : stacks) {
                                 if (ItemUtil.normalize(is) == null) continue;
@@ -150,7 +148,7 @@ public class ItemGoo extends ItemFactorization {
                             }
                             return any;
                         }
-                    });
+                    }, new Coord(player), Double.MAX_VALUE);
                     try {
                         if (command == Command.gooLeftClick) {
                             leftClick(player, data, is, held, mop);

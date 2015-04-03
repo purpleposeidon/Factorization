@@ -3,8 +3,11 @@ package factorization.fzds.interfaces;
 import factorization.api.Coord;
 import factorization.api.Quaternion;
 import factorization.shared.EntityFz;
+import factorization.util.SpaceUtil;
+import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.Vec3;
 import net.minecraft.world.World;
+import net.minecraftforge.common.util.ForgeDirection;
 
 import java.util.List;
 
@@ -14,7 +17,7 @@ public abstract class IDeltaChunk extends EntityFz {
     //This would be an actual interface, but it needs to extend Entity.
     public IDeltaChunk(World w) { super(w); }
     
-    /***
+    /**
      * Sets the parent. The parent can be null. Reparenting probably isn't synchronized, so set it before spawning in the IDC.
      * Attatches the slice to its parent. When the parent translates & rotates, the child follows, *and* does the same physics calculations as if it had native motion.
      * The child can rotate independently of the parent.
@@ -40,30 +43,30 @@ public abstract class IDeltaChunk extends EntityFz {
     
     public abstract List<IDeltaChunk> getChildren();
     
-    /***
+    /**
      * @return the {@link Quaternion} representing the rotation (theta). This is the global rotation.
      */
     public abstract Quaternion getRotation();
 
-    /***
+    /**
      * @return the rotational offset. This is relative to getCorner().
      */
     public abstract Vec3 getRotationalCenterOffset();
 
-    /***
+    /**
      * @return the {@link Quaternion} representing the rotational velocity (omega).
      * 
      * This does not take into account setTargetRotation
      */
     public abstract Quaternion getRotationalVelocity();
 
-    /***
+    /**
      * Sets the rotation (theta), relative to the world. The default Quaternion represents zero rotation.
      * @param r A {@link Quaternion}
      */
     public abstract void setRotation(Quaternion r);
 
-    /***
+    /**
      * Sets the rotational velocity (omega), relative to the world. The default Quaternion represents zero angular velocity.
      * The IDC's Entity position is the origin of the rotation, and the getRotationalCenterOffset defines the center of mass.
      * @param w A {@link Quaternion}
@@ -117,13 +120,13 @@ public abstract class IDeltaChunk extends EntityFz {
     
     
     
-    /***
+    /**
      * @param newOffset The new rotational offset. This is relative to getCorner(). Calling this method after the entity has been
      *                  spawned is untested.
      */
     public abstract void setRotationalCenterOffset(Vec3 newOffset);
     
-    /***
+    /**
      * Helper function.
      * @param newCenter takes a real-world vector, and makes it the center of rotation, preserving the apparent position of the slice. (The IDC's actual position will change, however.)
      * 
@@ -157,21 +160,21 @@ public abstract class IDeltaChunk extends EntityFz {
     }
     
     
-    /***
+    /**
      * Checks if the {@link DeltaCapability} is enabled.
      * @param cap A {@link DeltaCapability}
      * @return true if enabled
      */
     public abstract boolean can(DeltaCapability cap);
 
-    /***
+    /**
      * Enables a {@link DeltaCapability}. This should be done before spawning the entity, as clients will not get updates to this.
      * @param cap A {@link DeltaCapability}
      * @return this
      */
     public abstract IDeltaChunk permit(DeltaCapability cap);
 
-    /***
+    /**
      * Disables a {@link DeltaCapability}. This should be done before spawning the entity, as clients will not get updates to this.
      * @param cap A {@link DeltaCapability}
      * @return this
@@ -200,43 +203,87 @@ public abstract class IDeltaChunk extends EntityFz {
     
     
     
-    /***
+    /**
      * @param realVector A {@link Vec3} in real-world coordinates.
      * @return a new {@link Vec3} in shadow coordinates with translations & rotations applied.
      */
     public abstract Vec3 real2shadow(final Vec3 realVector);
 
-    /***
+    /**
      * @param shadowVector A {@link Vec3} in shadow coordinates
      * @return a new {@link Vec3} in real-world coordinates with translations & rotations unapplied
      */
     public abstract Vec3 shadow2real(final Vec3 shadowVector);
 
-    /***
+    /** NORELEASE: Refactor/rename & deprecate
      * @param realCoord A {@link Coord} in real world coordinates that will be mutated into shadow coordinates.
      */
     public abstract void real2shadow(Coord realCoord);
 
-    /***
+    /** NORELEASE: Refactor/rename & deprecate
      * @param shadowCoord A {@link Coord} in shadow coordinates that will be mutated into real coordinates
      */
     public abstract void shadow2real(Coord shadowCoord);
+
+    public Coord shadow2realCoord(Coord realCoord) {
+        Coord ret = realCoord.copy();
+        shadow2real(ret);
+        return ret;
+    }
+
+    public Coord real2shadowCoord(Coord shadowCoord) {
+        Coord ret = shadowCoord.copy();
+        real2shadow(ret);
+        return ret;
+    }
+
+    /**
+     * @param shadowBox Box to convert from shadow space to real space.
+     * @return The real-space box. Warning: not guaranteed to match MetaAABB's converted collision box!
+     */
+    public abstract AxisAlignedBB shadow2real(AxisAlignedBB shadowBox);
+
+    /**
+     * @param realBox Box to convert from real space to shadow space.
+     * @return The shadow-space box. Warning: Not guaranteed to match MetaAABB's converted collision box!
+     */
+    public abstract AxisAlignedBB real2shadow(AxisAlignedBB realBox);
+
+    /**
+     * Helper method.
+     * @param dir ForgeDirection in shadow space
+     * @return dir with rotation applied. Slight possibility for it to be the UNKNOWN direction.
+     */
+    public ForgeDirection shadow2real(ForgeDirection dir) {
+        Vec3 v = SpaceUtil.fromDirection(dir);
+        getRotation().applyRotation(v);
+        return SpaceUtil.round(v, ForgeDirection.UNKNOWN);
+    }
+
+    /**
+     * Helper method.
+     * @param dir ForgeDirection in real space
+     * @return dir with reverse-rotation applied. Slight possibility for it to be the UNKNOWN direction.
+     */
+    public ForgeDirection real2shadow(ForgeDirection dir) {
+        Vec3 v = SpaceUtil.fromDirection(dir);
+        getRotation().applyReverseRotation(v);
+        return SpaceUtil.round(v, ForgeDirection.UNKNOWN);
+    }
     
-    
-    
-    /***
+    /**
      * @return the lower corner, in shadow coordinates.
      */
     public abstract Coord getCorner();
 
-    /***
+    /**
      * @return the center, in shadow coordinates. (Justs averages getCorner() and getFarCorner())
      */
     public Coord getCenter() {
         return getCorner().center(getFarCorner());
     }
 
-    /***
+    /**
      * @return the upper corner, in shadow coordinates
      */
     public abstract Coord getFarCorner();
