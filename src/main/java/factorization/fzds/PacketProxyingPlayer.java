@@ -1,19 +1,19 @@
 package factorization.fzds;
 
-import cpw.mods.fml.common.network.internal.FMLProxyPacket;
+import com.mojang.authlib.GameProfile;
+import cpw.mods.fml.common.network.FMLEmbeddedChannel;
+import cpw.mods.fml.common.network.handshake.NetworkDispatcher;
+import cpw.mods.fml.relauncher.Side;
+import factorization.api.Coord;
 import factorization.api.DeltaCoord;
 import factorization.api.ICoordFunction;
+import factorization.fzds.interfaces.IDeltaChunk;
+import factorization.fzds.interfaces.IFzdsEntryControl;
+import factorization.fzds.interfaces.IFzdsShenanigans;
+import factorization.fzds.network.WrappedPacket;
 import factorization.shared.Core;
-import factorization.shared.NORELEASE;
-import io.netty.channel.ChannelHandler;
-import io.netty.channel.ChannelHandlerContext;
-import io.netty.channel.ChannelOutboundHandlerAdapter;
-import io.netty.channel.ChannelPromise;
+import io.netty.channel.*;
 import io.netty.channel.embedded.EmbeddedChannel;
-
-import java.lang.ref.WeakReference;
-import java.util.*;
-
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.network.EnumConnectionState;
 import net.minecraft.network.NetHandlerPlayServer;
@@ -27,18 +27,10 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;
 import net.minecraft.world.chunk.Chunk;
-
-import com.mojang.authlib.GameProfile;
-
-import cpw.mods.fml.common.network.FMLEmbeddedChannel;
-import cpw.mods.fml.common.network.handshake.NetworkDispatcher;
-import cpw.mods.fml.relauncher.Side;
-import factorization.api.Coord;
-import factorization.fzds.interfaces.IDeltaChunk;
-import factorization.fzds.interfaces.IFzdsEntryControl;
-import factorization.fzds.interfaces.IFzdsShenanigans;
-import factorization.fzds.network.WrappedPacket;
 import net.minecraftforge.common.ForgeChunkManager;
+
+import java.lang.ref.WeakReference;
+import java.util.*;
 
 public class PacketProxyingPlayer extends EntityPlayerMP implements
         IFzdsEntryControl, IFzdsShenanigans {
@@ -50,31 +42,9 @@ public class PacketProxyingPlayer extends EntityPlayerMP implements
     
     
     EmbeddedChannel proxiedChannel = new EmbeddedChannel(new WrappedMulticastHandler());
-    NetworkManager networkManager = new ProxyingNetworkManager();
-    
-    class ProxyingNetworkManager extends NetworkManager implements IFzdsShenanigans {
-        public ProxyingNetworkManager() {
-            super(false);
-            this.channel = proxiedChannel;
-        }
-        
-        @Override
-        public void channelActive(ChannelHandlerContext ctx) throws Exception {
-            throw new IllegalArgumentException("No, go away");
-        }
-        
-        @Override
-        public void setConnectionState(EnumConnectionState state) {
-            if (state != EnumConnectionState.PLAY) throw new IllegalArgumentException("No solicitors!");
-            super.setConnectionState(state);
-            return;
-        }
-        
-        @Override
-        public void channelInactive(ChannelHandlerContext ctx) {
-            throw new IllegalArgumentException("Blllauergh!");
-        }
-    };
+    NetworkManager networkManager = new CustomChannelNetworkManager(proxiedChannel, false);
+
+    ;
     
     class WrappedMulticastHandler extends ChannelOutboundHandlerAdapter implements IFzdsShenanigans {
         @Override

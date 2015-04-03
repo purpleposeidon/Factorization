@@ -22,7 +22,7 @@ class InteractionLiason extends EntityPlayerMP implements IFzdsShenanigans {
     private static final GameProfile liasonGameProfile = new GameProfile(null /*UUID.fromString("69f64f91-665e-457d-ad32-f6082d0b8a71")*/ , "[FzdsInteractionLiason]");
     private final InventoryPlayer original_inventory;
     private ShadowPlayerAligner aligner;
-    private LiasonNetworkManager networkManager;
+    private NetworkManager networkManager;
     private EntityPlayerMP realPlayer;
 
     private EmbeddedChannel proxiedChannel = new EmbeddedChannel(new LiasonHandler());
@@ -35,9 +35,8 @@ class InteractionLiason extends EntityPlayerMP implements IFzdsShenanigans {
 
     private void initLiason() {
         // We're fairly similar to PacketProxyingPlayer.initWrapping()
-        networkManager = new LiasonNetworkManager(false);
+        networkManager = new CustomChannelNetworkManager(proxiedChannel, false);
         this.playerNetServerHandler = new NetHandlerPlayServer(MinecraftServer.getServer(), networkManager, this);
-        networkManager.channel = proxiedChannel;
         playerNetServerHandler.netManager.channel().attr(NetworkDispatcher.FML_DISPATCHER).set(new NetworkDispatcher(networkManager));
         //Compare cpw.mods.fml.common.network.FMLOutboundHandler.OutboundTarget.PLAYER.{...}.selectNetworks(Object, ChannelHandlerContext, FMLProxyPacket)
         playerNetServerHandler.netManager.setConnectionState(EnumConnectionState.PLAY);
@@ -59,12 +58,6 @@ class InteractionLiason extends EntityPlayerMP implements IFzdsShenanigans {
         realPlayer = null;
         inventory = original_inventory;
         aligner.unapply();
-    }
-
-    private class LiasonNetworkManager extends NetworkManager implements IFzdsShenanigans {
-        public LiasonNetworkManager(boolean isRemote) {
-            super(isRemote);
-        }
     }
 
     private class LiasonHandler extends ChannelOutboundHandlerAdapter implements IFzdsShenanigans {

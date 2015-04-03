@@ -1,11 +1,10 @@
 package factorization.aabbdebug;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-
-import com.sun.org.apache.xerces.internal.impl.xpath.XPath;
+import cpw.mods.fml.common.eventhandler.SubscribeEvent;
+import cpw.mods.fml.common.gameevent.TickEvent.ClientTickEvent;
+import cpw.mods.fml.common.gameevent.TickEvent.Phase;
 import factorization.api.Coord;
+import factorization.shared.Core;
 import factorization.util.SpaceUtil;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.RenderGlobal;
@@ -17,13 +16,11 @@ import net.minecraft.util.Vec3;
 import net.minecraft.world.World;
 import net.minecraftforge.client.ClientCommandHandler;
 import net.minecraftforge.client.event.RenderWorldLastEvent;
-
 import org.lwjgl.opengl.GL11;
 
-import cpw.mods.fml.common.eventhandler.SubscribeEvent;
-import cpw.mods.fml.common.gameevent.TickEvent.ClientTickEvent;
-import cpw.mods.fml.common.gameevent.TickEvent.Phase;
-import factorization.shared.Core;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 public enum AabbDebugger {
     INSTANCE;
