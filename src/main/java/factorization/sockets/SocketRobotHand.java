@@ -77,7 +77,7 @@ public class SocketRobotHand extends TileEntitySocketBase {
         firstTry = true;
         FzOrientation orientation = FzOrientation.fromDirection(facing).getSwapped();
         fakePlayer = null;
-        RayTracer tracer = new RayTracer(this, socket, coord, orientation, powered).lookAround();
+        RayTracer tracer = new RayTracer(this, socket, coord, orientation, powered).lookAround().checkEnts();
         tracer.trace();
         if (fakePlayer != null) {
             fakePlayer.isDead = true; // Avoid mob retribution

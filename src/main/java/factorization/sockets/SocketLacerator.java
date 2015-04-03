@@ -195,7 +195,7 @@ public class SocketLacerator extends TileEntitySocketBase implements IChargeCond
             slowDown();
             progress = 0;
         } else {
-            RayTracer tracer = new RayTracer(this, socket, coord, orientation, powered).onlyFrontBlock();
+            RayTracer tracer = new RayTracer(this, socket, coord, orientation, powered).onlyFrontBlock().checkEnts();
             if (!tracer.trace()) {
                 slowDown();
                 progress = 0;

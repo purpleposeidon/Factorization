@@ -113,7 +113,7 @@ public class SocketScissors extends TileEntitySocketBase implements ICaptureDrop
             FzOrientation orientation = FzOrientation.fromDirection(facing).getSwapped();
             if (openCount == 0 && getBackingInventory(socket) != null) {
                 blocked = false;
-                RayTracer tracer = new RayTracer(this, socket, coord, orientation, powered).onlyFrontBlock();
+                RayTracer tracer = new RayTracer(this, socket, coord, orientation, powered).onlyFrontBlock().checkEnts();
                 tracer.trace();
                 if (!blocked) {
                     sound = true;
