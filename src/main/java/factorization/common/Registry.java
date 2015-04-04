@@ -46,6 +46,7 @@ import factorization.weird.TileEntityDayBarrel;
 import factorization.wrath.BlockLightAir;
 import factorization.wrath.TileEntityWrathLamp;
 import net.minecraft.block.Block;
+import net.minecraft.block.BlockNetherrack;
 import net.minecraft.block.material.MapColor;
 import net.minecraft.block.material.Material;
 import net.minecraft.entity.player.EntityPlayer;
@@ -88,6 +89,7 @@ public class Registry {
     public Block blasted_bedrock_block;
     public Block colossal_block;
     public Block gargantuan_block;
+    public Block mantlerock_block;
 
     public ItemStack servorail_item;
     public ItemStack empty_socket_item, socket_lacerator, socket_robot_hand, socket_shifter;
@@ -175,6 +177,7 @@ public class Registry {
             colossal_block = new ColossalBlock();
         }
         gargantuan_block = new GargantuanBlock().setBlockName("factorization:gargantuanBrick").setCreativeTab(Core.tabFactorization);
+        mantlerock_block = new BlockNetherrack().setBlockName("factorization:mantlerock").setBlockTextureName("factorization:mantlerock").setHardness(1.25F).setResistance(7.0F).setStepSound(Block.soundTypeStone);
         
         GameRegistry.registerBlock(factory_block, ItemFactorizationBlock.class, "FzBlock");
         GameRegistry.registerBlock(lightair_block, "Lightair");
@@ -183,6 +186,7 @@ public class Registry {
         GameRegistry.registerBlock(fractured_bedrock_block, "FracturedBedrock");
         GameRegistry.registerBlock(blasted_bedrock_block, "BlastedBedrock");
         GameRegistry.registerBlock(gargantuan_block, ItemGargantuanBlock.class, "GargantuanBlock");
+        GameRegistry.registerBlock(mantlerock_block, "MantleRock");
         if (DeltaChunk.enabled()) {
             GameRegistry.registerBlock(colossal_block, ColossalBlockItem.class, "ColossalBlock");
             GameRegistry.registerTileEntity(TileEntityColossalHeart.class, "fz_colossal_heart");
@@ -1051,6 +1055,11 @@ public class Registry {
                 "F",
                 '#', Blocks.stone,
                 'F', Blocks.fire);
+        vanillaRecipe(new ItemStack(mantlerock_block, 3),
+                "S#",
+                "#S",
+                'S', Blocks.stone,
+                '#', Blocks.netherrack);
         if (DeltaChunk.enabled()) {
             oreRecipe(new ItemStack(twistedBlock),
                     "*",
