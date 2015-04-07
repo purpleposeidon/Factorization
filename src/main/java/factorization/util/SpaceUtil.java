@@ -58,6 +58,10 @@ public final class SpaceUtil {
         return Vec3.createVectorHelper(a.xCoord, a.yCoord, a.zCoord);
     }
 
+    public static AxisAlignedBB copy(AxisAlignedBB box) {
+        return AxisAlignedBB.getBoundingBox(box.minX, box.minY, box.minZ, box.maxX, box.maxY, box.maxZ);
+    }
+
     public static Vec3 newVec() {
         return Vec3.createVectorHelper(0, 0, 0);
     }
