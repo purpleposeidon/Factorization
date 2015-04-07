@@ -112,9 +112,11 @@ public class SocketPoweredCrank extends TileEntitySocketBase implements IChargeC
 
     static final double MAX_CHAIN_LEN = 24;
     static final double MIN_CHAIN_LEN = 1;
-    static final double BROKEN_CHAIN_LENGTH = MAX_CHAIN_LEN + 4;
+    static final double BROKEN_CHAIN_LENGTH = MAX_CHAIN_LEN + 8;
     static final int WINDING_CHARGE_COST = 16;
     static final double FORCE_PER_TICK = 0.05;
+    static final double RESTORATIVE_FORCE_MIN = 0.05 / FORCE_PER_TICK;
+    static final double RESTORATIVE_FORCE_MAX = 0.10 / FORCE_PER_TICK;
 
     @Override
     public void genericUpdate(ISocketHolder socket, Coord coord, boolean powered) {
@@ -140,10 +142,13 @@ public class SocketPoweredCrank extends TileEntitySocketBase implements IChargeC
         }
         // retract
         double scale = 1;
-        if (socket == this) {
+        if (hyperExtended) {
+            double r = NumUtil.uninterp(MAX_CHAIN_LEN, BROKEN_CHAIN_LENGTH, chainLen);
+            scale = NumUtil.interp(RESTORATIVE_FORCE_MIN, RESTORATIVE_FORCE_MAX, r);
+        } else if (socket == this) {
             double power = coord.getPowerInput();
             scale = (1 + power) / 16.0;
-            if (hyperExtended || power == 0 /* getting indrect power */) {
+            if (power == 0 /* getting indrect power */) {
                 scale = 1;
             }
         } else {
@@ -305,6 +310,11 @@ public class SocketPoweredCrank extends TileEntitySocketBase implements IChargeC
     @Override
     public void invalidate() {
         super.invalidate();
+        onChunkUnload();
+    }
+
+    @Override
+    public void onChunkUnload() {
         if (chainDraw != null) {
             chainDraw.release();
             chainDraw = null;

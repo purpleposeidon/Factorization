@@ -18,6 +18,8 @@ import net.minecraftforge.client.event.RenderWorldLastEvent;
 import net.minecraftforge.event.world.WorldEvent;
 import org.lwjgl.opengl.GL11;
 
+import java.lang.ref.WeakReference;
+
 public class ChainRender {
     public static final ChainRender instance = new ChainRender();
 
@@ -25,12 +27,14 @@ public class ChainRender {
         Core.loadBus(this);
     }
 
-    private FastBag<ChainLink> chains = new FastBag<ChainLink>();
+    private FastBag<WeakReference<ChainLink>> chains = new FastBag<WeakReference<ChainLink>>();
+    boolean needsRebag = true;
 
     public ChainLink add() {
         ChainLink ret = new ChainLink();
         ret.bagIndex = chains.size();
-        chains.add(ret);
+        chains.add(new WeakReference<ChainLink>(ret));
+        rebag();
         return ret;
     }
 
@@ -38,7 +42,31 @@ public class ChainRender {
         final int index = link.bagIndex;
         chains.remove(index);
         if (index >= chains.size()) return;
-        chains.get(index).bagIndex = index;
+        ChainLink newEntry = chains.get(index).get();
+        if (newEntry == null) {
+            rebag();
+            return;
+        }
+        newEntry.bagIndex = index;
+    }
+
+    void rebag() {
+        if (!needsRebag) return;
+        needsRebag = false;
+        for (int i = 0; i < chains.size(); i++) {
+            if (chains.get(i).get() != null) continue;
+            chains.remove(i);
+            i--;
+        }
+        for (int i = 0; i < chains.size(); i++) {
+            WeakReference<ChainLink> ref = chains.get(i);
+            ChainLink chain = ref.get();
+            if (chain == null) {
+                needsRebag = true; // That'd be pretty obnoxious! But would only happen if a GC happened to trigger while this function is running.
+                continue;
+            }
+            chain.bagIndex = i;
+        }
     }
 
     @SubscribeEvent
@@ -51,7 +79,12 @@ public class ChainRender {
         final Vec3 workStart = SpaceUtil.newVec(), workEnd = SpaceUtil.newVec();
         final IIcon icon = Blocks.redstone_lamp.getIcon(0, 0);
         boolean setup = false;
-        for (ChainLink chain : chains) {
+        for (WeakReference<ChainLink> ref : chains) {
+            ChainLink chain = ref.get();
+            if (chain == null) {
+                needsRebag = true;
+                continue;
+            }
             if (!chain.cameraCheck(camera, partial, workBox, workStart, workEnd)) continue;
             if (!setup) {
                 setup = true;
@@ -84,7 +117,9 @@ public class ChainRender {
     @SubscribeEvent
     public void reset(WorldEvent.Unload unload) {
         if (!unload.world.isRemote) return;
-        for (ChainLink chain : chains) {
+        for (WeakReference<ChainLink> ref : chains) {
+            ChainLink chain = ref.get();
+            if (chain == null) continue;
             chain.bagIndex = -1;
         }
         chains.clear();
