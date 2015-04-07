@@ -7,6 +7,7 @@ import factorization.aabbdebug.AabbDebugger;
 import factorization.mechanics.MechanicsController;
 import factorization.fzds.DeltaChunk;
 import factorization.fzds.interfaces.IDeltaChunk;
+import factorization.shared.Core;
 import factorization.shared.NORELEASE;
 import factorization.util.InvUtil;
 import factorization.util.NumUtil;
@@ -164,7 +165,7 @@ public class BlowEntities extends SocketFanturpeller implements IEntitySelector 
 
     private void iterateFzdsEntities(int front_range, double s, ForgeDirection dir, IDeltaChunk idc) {
         iterateEntities(front_range, s, idc.shadow2real(dir), idc.shadow2real(area), idc.shadow2real(death_area), idc.worldObj);
-        if (!worldObj.isRemote && idc.getController() instanceof MechanicsController) {
+        if (!worldObj.isRemote && Core.dev_environ && idc.getController() instanceof MechanicsController) {
             Vec3 force = SpaceUtil.fromDirection(dir);
             double forceScale = target_speed / 20.0;
             if (isSucking) forceScale *= -1;
@@ -176,7 +177,7 @@ public class BlowEntities extends SocketFanturpeller implements IEntitySelector 
     private void iterateEntities(int front_range, double s, ForgeDirection dir, AxisAlignedBB box, AxisAlignedBB deathBox, World w) {
         AabbDebugger.addBox(box);
         for (Entity ent : (Iterable<Entity>)w.getEntitiesWithinAABBExcludingEntity(null, box, this)) {
-            if (isSucking && dir == ForgeDirection.UP) {
+            if (dir.offsetY == (isSucking ? -1 : +1)) {
                 NORELEASE.fixme("Test; is it backwards?");
                 waftEntity(ent);
             }
@@ -187,6 +188,13 @@ public class BlowEntities extends SocketFanturpeller implements IEntitySelector 
             ent.fallDistance *= 0.8F;
             if (!isSucking && found_player && ent instanceof EntityPlayer) {
                 ent.onGround = true;
+                if (!worldObj.isRemote) {
+                    // Need to let the player fly!? Grr.
+                    // See NetHandlerPlayServer.processPlayer
+                    ent.posY += ent.motionY * 10;
+                    /*double floatFuzz = 0.03125;
+                    ent.posY += floatFuzz * 2;*/
+                }
             }
         }
     }
