@@ -6,6 +6,7 @@ import factorization.fzds.interfaces.IDeltaChunk;
 import factorization.util.NumUtil;
 import factorization.util.SpaceUtil;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.Vec3;
 
 class MassCalculator implements ICoordFunction {
@@ -74,9 +75,13 @@ class MassCalculator implements ICoordFunction {
 
     private Vec3 boxMid = SpaceUtil.newVec();
     protected void handle(Coord here, double mass) {
-        SpaceUtil.setMiddle(here.getCollisionBoundingBoxFromPool(), boxMid);
-        double posRatio = mass / (mass + massTotal); // First iteration this will be 1, setting com = boxMid
-        NumUtil.interp(com, boxMid, (float) posRatio, com);
+        final AxisAlignedBB box = here.getCollisionBoundingBoxFromPool();
+        if (box != null) {
+            // Unlikely, my good sir!
+            SpaceUtil.setMiddle(box, boxMid);
+            double posRatio = mass / (mass + massTotal); // First iteration this will be 1, setting com = boxMid
+            NumUtil.interp(com, boxMid, (float) posRatio, com);
+        }
         massTotal += mass;
     }
 

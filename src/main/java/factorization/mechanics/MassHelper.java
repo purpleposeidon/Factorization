@@ -5,12 +5,13 @@ import net.minecraft.block.material.Material;
 import net.minecraft.util.AxisAlignedBB;
 
 public class MassHelper {
-    public static boolean CONSIDER_VOLUME;
+    public static boolean CONSIDER_VOLUME = true;
 
     public static double getBlockMass(Coord at) {
         double density = getMaterialDensity(at);
         if (!CONSIDER_VOLUME) return density;
         AxisAlignedBB box = at.getCollisionBoundingBoxFromPool();
+        if (box == null) return 0;
         return density * getVolume(box);
     }
 
