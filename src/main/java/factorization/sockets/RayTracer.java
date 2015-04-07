@@ -24,6 +24,8 @@ public class RayTracer {
     boolean onlyFirstBlock = false;
     boolean checkEnts = false;
     boolean checkFzds = true;
+    boolean checkFzdsFirst = false;
+    boolean fzdsMovesTe = true;
 
     AxisAlignedBB entBox = null;
 
@@ -50,10 +52,24 @@ public class RayTracer {
         return this;
     }
 
-    public boolean trace() {
-        if (runPass(trueOrientation, trueCoord, null)) return true;
-        if (!checkFzds) return false;
+    public RayTracer checkFzdsFirst() {
+        checkFzdsFirst = true;
+        checkFzds = false;
+        return this;
+    }
+
+    boolean fzdsPass = false;
+
+    boolean checkReal() {
+        fzdsPass = false;
+        return runPass(trueOrientation, trueCoord, null);
+    }
+
+    boolean checkFzds() {
+        fzdsPass = true;
         if (trueCoord.w != DeltaChunk.getServerShadowWorld()) return false;
+
+        Coord shadowBaseLocation = new Coord(base);
 
         for (IDeltaChunk idc : DeltaChunk.getSlicesContainingPoint(trueCoord)) {
             FzOrientation orientation = shadowOrientation(idc);
@@ -73,14 +89,36 @@ public class RayTracer {
             double y = v.yCoord;
             double z = v.zCoord;
             Coord target = new Coord(at.w, (int) Math.floor(x), (int) Math.floor(y), (int) Math.floor(z));
-            if (mopBlock(target, orientation.facing)) {
-                return true;
+            target.adjust(orientation.facing.getOpposite());
+            orientation = orientation.getSwapped();
+
+            try {
+                if (fzdsMovesTe) {
+                    target.setAsTileEntityLocation(base);
+                }
+                if (runPass(orientation, target, idc)) return true;
+            } finally {
+                if (fzdsMovesTe) {
+                    shadowBaseLocation.setAsTileEntityLocation(base);
+                }
             }
+
+            /*if (mopBlock(target, orientation.facing)) {
+                return true;
+            }*/
 
             /*idc.shadow2real(at);
             if (runPass(orientation, at, idc)) return true;*/
         }
         return false;
+    }
+
+    public boolean trace() {
+        if (checkFzdsFirst && checkFzds()) return true;
+        entBox = null;
+        if (checkReal()) return true;
+        entBox = null;
+        return checkFzds && checkFzds();
     }
 
     FzOrientation shadowOrientation(IDeltaChunk idc) {
@@ -111,6 +149,10 @@ public class RayTracer {
         if (checkEnts) {
             if (entBox == null) {
                 entBox = base.getEntityBox(socket, coord, top, 0);
+                if (idc != null) {
+                    entBox = idc.shadow2real(entBox);
+                    AabbDebugger.addBox(entBox);
+                }
             }
             for (Entity entity : getEntities(coord, top, idc)) {
                 if (entity == socket) {
@@ -139,7 +181,7 @@ public class RayTracer {
     boolean mopBlock(Coord target, ForgeDirection side) {
         if (target.w != DeltaChunk.getServerShadowWorld()) {
             AxisAlignedBB debug = Coord.aabbFromRange(target, target.add(1, 1, 1));
-            //AabbDebugger.addBox(debug);
+            AabbDebugger.addBox(debug);
         }
         boolean isThis = base == socket && target.isAt(base);
         Vec3 hitVec = Vec3.createVectorHelper(base.xCoord + side.offsetX, base.yCoord + side.offsetY, base.zCoord + side.offsetZ);
