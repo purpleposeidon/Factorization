@@ -57,6 +57,8 @@ public enum AabbDebugger {
                 if (args[0].equals("freeze")) {
                     freeze = true;
                 } else if (args[0].equals("thaw")) {
+                    freeze = false;
+                } else if (args[0].equals("clean")) {
                     frozen.clear();
                     frozen_lines.clear();
                 }
