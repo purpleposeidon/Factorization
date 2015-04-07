@@ -1,4 +1,4 @@
-package factorization.mechanisms;
+package factorization.mechanics;
 
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import factorization.shared.Core;

@@ -23,7 +23,7 @@ import factorization.colossi.*;
 import factorization.darkiron.BlockDarkIronOre;
 import factorization.docs.ItemDocBook;
 import factorization.fzds.DeltaChunk;
-import factorization.mechanisms.ItemDarkIronChain;
+import factorization.mechanics.ItemDarkIronChain;
 import factorization.oreprocessing.ItemOreProcessing;
 import factorization.oreprocessing.ItemOreProcessing.OreType;
 import factorization.oreprocessing.TileEntityCrystallizer;

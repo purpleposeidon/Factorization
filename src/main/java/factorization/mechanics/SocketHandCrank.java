@@ -1,4 +1,4 @@
-package factorization.mechanisms;
+package factorization.mechanics;
 
 import factorization.api.datahelpers.DataHelper;
 import factorization.api.datahelpers.IDataSerializable;

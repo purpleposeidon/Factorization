@@ -302,7 +302,7 @@ public class BlockFactorization extends BlockContainer {
         put(itemList, reg.lamp_item);
         put(itemList, reg.compression_crafter_item);
 
-        //mechanisms
+        //mechanics
         put(itemList, reg.hinge);
         //put(itemList, reg.anchor);
 

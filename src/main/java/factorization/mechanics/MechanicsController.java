@@ -1,9 +1,8 @@
-package factorization.mechanisms;
+package factorization.mechanics;
 
 import factorization.api.Coord;
 import factorization.api.ICoordFunction;
 import factorization.api.Quaternion;
-import factorization.fzds.DimensionSliceEntity;
 import factorization.fzds.TransferLib;
 import factorization.fzds.interfaces.IDCController;
 import factorization.fzds.interfaces.IDeltaChunk;
@@ -18,7 +17,7 @@ import org.apache.commons.lang3.ArrayUtils;
 /**
  * Allows multiple controllers on an IDC. Nicely sets down the IDC when it has no more controllers.
  */
-public class ControllerMulticast implements IDCController {
+public class MechanicsController implements IDCController {
 
     /**
      * Call this to join/create the listener set. Do not use this method after deserialization.
@@ -45,11 +44,11 @@ public class ControllerMulticast implements IDCController {
     static void rejoin(IDeltaChunk idc, IDCController constraint) {
         IDCController controller = idc.getController();
         if (controller == IDCController.default_controller) {
-            idc.setController(controller = new ControllerMulticast());
-        } else if (!(controller instanceof ControllerMulticast)) {
-            throw new IllegalArgumentException("IDC already had a controller, and it is not a ControllerMulticast! IDC: " + idc + "; controller: " + controller + "; constraint: " + constraint);
+            idc.setController(controller = new MechanicsController());
+        } else if (!(controller instanceof MechanicsController)) {
+            throw new IllegalArgumentException("IDC already had a controller, and it is not a MechanicsController! IDC: " + idc + "; controller: " + controller + "; constraint: " + constraint);
         }
-        ControllerMulticast sys = (ControllerMulticast) controller;
+        MechanicsController sys = (MechanicsController) controller;
         sys.addConstraint(constraint);
     }
 
@@ -61,11 +60,11 @@ public class ControllerMulticast implements IDCController {
      */
     static void deregister(IDeltaChunk idc, IDCController constraint) {
         IDCController controller = idc.getController();
-        if (!(controller instanceof ControllerMulticast)) {
-            Core.logWarning("Tried to deregister constraint for IDC that isn't a ControllerMulticast! IDC: " + idc + "; controller: " + controller + "; constraint: ", constraint);
+        if (!(controller instanceof MechanicsController)) {
+            Core.logWarning("Tried to deregister constraint for IDC that isn't a MechanicsController! IDC: " + idc + "; controller: " + controller + "; constraint: ", constraint);
             return;
         }
-        ControllerMulticast sys = (ControllerMulticast) controller;
+        MechanicsController sys = (MechanicsController) controller;
         sys.removeConstraint(constraint);
         if (changeCount(idc, -1) <= 0) {
             dropIDC(idc);
@@ -74,17 +73,17 @@ public class ControllerMulticast implements IDCController {
 
     /**
      * @param idc The IDC to check
-     * @return true if the IDC's controller is a ControllerMulticast, or it can have one applied.
+     * @return true if the IDC's controller is a MechanicsController, or it can have one applied.
      */
     static boolean usable(IDeltaChunk idc) {
         IDCController controller = idc.getController();
-        return controller == IDCController.default_controller || controller instanceof ControllerMulticast;
+        return controller == IDCController.default_controller || controller instanceof MechanicsController;
     }
 
     static IDCController[] getControllers(IDeltaChunk idc) {
         IDCController controller = idc.getController();
-        if (controller instanceof ControllerMulticast) {
-            ControllerMulticast cm = (ControllerMulticast) controller;
+        if (controller instanceof MechanicsController) {
+            MechanicsController cm = (MechanicsController) controller;
             return cm.constraints;
         }
         return new IDCController[0];
@@ -134,7 +133,7 @@ public class ControllerMulticast implements IDCController {
     }
 
     public static void push(IDeltaChunk idc, Coord at, Vec3 force) {
-        for (IDCController constraint : ControllerMulticast.getControllers(idc)) {
+        for (IDCController constraint : MechanicsController.getControllers(idc)) {
             if (constraint instanceof TileEntityHinge) { // Sound design!
                 TileEntityHinge hinge = (TileEntityHinge) constraint;
                 if (hinge.getCoord().isWeaklyPowered()) return;
@@ -247,9 +246,9 @@ public class ControllerMulticast implements IDCController {
     }
 
     /**
-     * Returns an EntityReference that will call ControllerMulticast.rejoin for you.
+     * Returns an EntityReference that will call MechanicsController.rejoin for you.
      * {@code
-     *     final EntityReference<IDeltaChunk> idcRef = ControllerMulticast.autoJoin(this);
+     *     final EntityReference<IDeltaChunk> idcRef = MechanicsController.autoJoin(this);
      * }
      * @param controller The controller that you want to rejoin.
      * @return The reference
@@ -259,7 +258,7 @@ public class ControllerMulticast implements IDCController {
         ret.whenFound(new EntityReference.OnFound<IDeltaChunk>() {
             @Override
             public void found(IDeltaChunk ent) {
-                ControllerMulticast.rejoin(ent, controller);
+                MechanicsController.rejoin(ent, controller);
             }
         });
         return ret;

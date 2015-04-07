@@ -1,4 +1,4 @@
-package factorization.mechanisms;
+package factorization.mechanics;
 
 import net.minecraft.client.audio.MovingSound;
 import net.minecraft.util.ResourceLocation;

@@ -1,4 +1,4 @@
-package factorization.mechanisms;
+package factorization.mechanics;
 
 import factorization.api.Coord;
 import factorization.api.ICoordFunction;

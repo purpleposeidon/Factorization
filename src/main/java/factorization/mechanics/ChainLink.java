@@ -1,16 +1,13 @@
-package factorization.mechanisms;
+package factorization.mechanics;
 
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import factorization.shared.Core;
-import factorization.shared.NORELEASE;
 import factorization.util.NumUtil;
 import factorization.util.SpaceUtil;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.culling.ICamera;
 import net.minecraft.util.AxisAlignedBB;
-import net.minecraft.util.IIcon;
-import net.minecraft.util.MathHelper;
 import net.minecraft.util.Vec3;
 
 public class ChainLink {

@@ -12,10 +12,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import cpw.mods.fml.client.event.ConfigChangedEvent;
-import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import factorization.fzds.DeltaChunk;
-import factorization.mechanisms.MechanismsFeature;
+import factorization.mechanics.MechanismsFeature;
 import factorization.util.DataUtil;
 import factorization.util.FzUtil;
 import net.minecraft.block.Block;

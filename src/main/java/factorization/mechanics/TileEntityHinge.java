@@ -1,4 +1,4 @@
-package factorization.mechanisms;
+package factorization.mechanics;
 
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
@@ -42,7 +42,7 @@ import static org.lwjgl.opengl.GL11.*;
 
 public class TileEntityHinge extends TileEntityCommon implements IDCController {
     FzOrientation facing = FzOrientation.FACE_EAST_POINT_DOWN;
-    final EntityReference<IDeltaChunk> idcRef = ControllerMulticast.autoJoin(this);
+    final EntityReference<IDeltaChunk> idcRef = MechanicsController.autoJoin(this);
     Vec3 dseOffset = SpaceUtil.newVec();
     transient boolean idc_ticking = false;
 
@@ -137,7 +137,7 @@ public class TileEntityHinge extends TileEntityCommon implements IDCController {
         Coord dest = idc.getCenter();
         DeltaCoord hingePoint = dest.difference(idc.getCorner());
         worldObj.spawnEntityInWorld(idc);
-        ControllerMulticast.register(idc, this);
+        MechanicsController.register(idc, this);
         idcRef.trackEntity(idc);
         updateComparators();
         markDirty();
@@ -412,7 +412,7 @@ public class TileEntityHinge extends TileEntityCommon implements IDCController {
         if (!idcRef.entityFound() && idcRef.trackingEntity()) {
             IDeltaChunk idc = idcRef.getEntity();
             if (idc != null) {
-                ControllerMulticast.register(idc, this);
+                MechanicsController.register(idc, this);
                 executing_order = idc.hasOrderedRotation();
                 updateComparators();
             }
@@ -465,7 +465,7 @@ public class TileEntityHinge extends TileEntityCommon implements IDCController {
         if (worldObj.isRemote) return true;
         boolean ret = super.removedByPlayer(player, willHarvest);
         if (ret && unload) {
-            ControllerMulticast.deregister(idc, this);
+            MechanicsController.deregister(idc, this);
         }
         return ret;
     }

@@ -1,4 +1,4 @@
-package factorization.mechanisms;
+package factorization.mechanics;
 
 import factorization.api.Coord;
 import factorization.common.ItemIcons;
@@ -76,7 +76,7 @@ public class ItemDarkIronChain extends ItemFactorization {
     }
 
     boolean acceptableIDC(IDeltaChunk idc) {
-        if (!ControllerMulticast.usable(idc)) return false;
+        if (!MechanicsController.usable(idc)) return false;
         for (DeltaCapability req : new DeltaCapability[] {
                 DeltaCapability.INTERACT,
                 DeltaCapability.BLOCK_MINE,

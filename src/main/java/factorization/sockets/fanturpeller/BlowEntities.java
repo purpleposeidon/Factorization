@@ -4,7 +4,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 import factorization.aabbdebug.AabbDebugger;
-import factorization.mechanisms.ControllerMulticast;
+import factorization.mechanics.MechanicsController;
 import factorization.fzds.DeltaChunk;
 import factorization.fzds.interfaces.IDeltaChunk;
 import factorization.shared.NORELEASE;
@@ -164,12 +164,12 @@ public class BlowEntities extends SocketFanturpeller implements IEntitySelector 
 
     private void iterateFzdsEntities(int front_range, double s, ForgeDirection dir, IDeltaChunk idc) {
         iterateEntities(front_range, s, idc.shadow2real(dir), idc.shadow2real(area), idc.shadow2real(death_area), idc.worldObj);
-        if (!worldObj.isRemote && idc.getController() instanceof ControllerMulticast) {
+        if (!worldObj.isRemote && idc.getController() instanceof MechanicsController) {
             Vec3 force = SpaceUtil.fromDirection(dir);
             double forceScale = target_speed / 20.0;
             if (isSucking) forceScale *= -1;
             SpaceUtil.incrScale(force, forceScale);
-            ControllerMulticast.push(idc, getCoord(), force);
+            MechanicsController.push(idc, getCoord(), force);
         }
     }
 

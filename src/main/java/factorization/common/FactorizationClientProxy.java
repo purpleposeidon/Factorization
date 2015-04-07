@@ -1,9 +1,9 @@
 package factorization.common;
 
-import factorization.mechanisms.BlockRenderHinge;
-import factorization.mechanisms.SocketPoweredCrank;
-import factorization.mechanisms.TileEntityHinge;
-import factorization.mechanisms.TileEntityHingeRenderer;
+import factorization.mechanics.BlockRenderHinge;
+import factorization.mechanics.SocketPoweredCrank;
+import factorization.mechanics.TileEntityHinge;
+import factorization.mechanics.TileEntityHingeRenderer;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.audio.ISound;
 import net.minecraft.client.audio.PositionedSoundRecord;

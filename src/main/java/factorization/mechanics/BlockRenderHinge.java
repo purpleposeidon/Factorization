@@ -1,4 +1,4 @@
-package factorization.mechanisms;
+package factorization.mechanics;
 
 import factorization.common.FactoryType;
 import factorization.shared.BlockRenderHelper;

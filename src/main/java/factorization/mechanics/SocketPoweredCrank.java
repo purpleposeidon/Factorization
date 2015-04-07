@@ -1,4 +1,4 @@
-package factorization.mechanisms;
+package factorization.mechanics;
 
 import factorization.api.*;
 import factorization.api.datahelpers.DataHelper;
@@ -31,7 +31,7 @@ import java.io.IOException;
 
 public class SocketPoweredCrank extends TileEntitySocketBase implements IChargeConductor, IDCController {
     private Charge charge = new Charge(this);
-    final EntityReference<IDeltaChunk> hookedIdc = ControllerMulticast.autoJoin(this);
+    final EntityReference<IDeltaChunk> hookedIdc = MechanicsController.autoJoin(this);
     Vec3 hookLocation = SpaceUtil.newVec();
     DeltaCoord hookDelta = new DeltaCoord();
 
@@ -156,7 +156,7 @@ public class SocketPoweredCrank extends TileEntitySocketBase implements IChargeC
         }
         Vec3 force = getForce(idc, socket, scale);
         Coord at = new Coord(DeltaChunk.getServerShadowWorld(), hookLocation);
-        ControllerMulticast.push(idc, at, force);
+        MechanicsController.push(idc, at, force);
     }
 
     private Vec3 getForce(IDeltaChunk idc, ISocketHolder socket, double scale) {
@@ -175,7 +175,7 @@ public class SocketPoweredCrank extends TileEntitySocketBase implements IChargeC
         this.hookLocation = hookLocation;
         hookDelta = hookedBlock.asDeltaCoord();
         getCoord().syncTE();
-        ControllerMulticast.register(idc, this);
+        MechanicsController.register(idc, this);
         updateComparator();
     }
 
@@ -189,7 +189,7 @@ public class SocketPoweredCrank extends TileEntitySocketBase implements IChargeC
         if (idc == null) {
             return true;
         }
-        ControllerMulticast.deregister(idc, this);
+        MechanicsController.deregister(idc, this);
         hookedIdc.trackEntity(null);
         final Coord at = getCoord();
         at.spawnItem(new ItemStack(Core.registry.darkIronChain));
