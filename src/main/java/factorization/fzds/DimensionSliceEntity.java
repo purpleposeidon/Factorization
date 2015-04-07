@@ -547,7 +547,10 @@ public class DimensionSliceEntity extends IDeltaChunk implements IFzdsEntryContr
         Vec3 mot = null;
         Quaternion rot = null;
         boolean moved = false;
-        
+
+        double prevX = posX, prevY = posY, prevZ = posZ;
+        Quaternion prevRotation = null;
+
         if (linearMotion) {
             mot = parentTickDisp.addVector(motionX, motionY, motionZ);
             if (realDragArea == null || updateHashMotion() || rotationalMotion) {
@@ -572,6 +575,7 @@ public class DimensionSliceEntity extends IDeltaChunk implements IFzdsEntryContr
                 r1.incrMultiply(r0);
                 rot = r1;
             } else {
+                prevRotation = new Quaternion(rotation);
                 rot = new Quaternion(rotationalVelocity);
             }
             if (parentRotation) {
@@ -605,13 +609,13 @@ public class DimensionSliceEntity extends IDeltaChunk implements IFzdsEntryContr
             if (collision != null) {
                 // XXX TODO: This is lame; should at least iterate closer (or do it properly)
                 if (mot != null) {
-                    posX -= mot.xCoord;
-                    posY -= mot.yCoord;
-                    posZ -= mot.zCoord;
+                    posX = prevX;
+                    posY = prevY;
+                    posZ = prevZ;
                 }
-                rotationalVelocity.incrConjugate();
-                rotation.incrMultiply(rotationalVelocity);
-                rotationalVelocity.incrConjugate();
+                if (prevRotation != null) {
+                    setRotation(prevRotation);
+                }
                 setVelocity(0, 0, 0);
                 rotationalVelocity.update(1, 0, 0, 0);
                 moved = false;
