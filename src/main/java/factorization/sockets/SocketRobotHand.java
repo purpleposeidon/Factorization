@@ -2,6 +2,7 @@ package factorization.sockets;
 
 import java.io.IOException;
 
+import factorization.fzds.DeltaChunk;
 import factorization.shared.*;
 import factorization.util.InvUtil;
 import factorization.util.ItemUtil;
@@ -63,7 +64,9 @@ public class SocketRobotHand extends TileEntitySocketBase {
         wasPowered = data.as(Share.PRIVATE, "pow").putBoolean(wasPowered);
         return this;
     }
-    
+
+    FzInv backingInventory;
+
     @Override
     public void genericUpdate(ISocketHolder socket, Coord coord, boolean powered) {
         if (worldObj.isRemote) {
@@ -77,43 +80,47 @@ public class SocketRobotHand extends TileEntitySocketBase {
         firstTry = true;
         FzOrientation orientation = FzOrientation.fromDirection(facing).getSwapped();
         fakePlayer = null;
-        RayTracer tracer = new RayTracer(this, socket, coord, orientation, powered).lookAround().checkEnts();
+        backingInventory = InvUtil.openInventory(getBackingInventory(socket), facing);
+        RayTracer tracer = new RayTracer(this, socket, coord, orientation, powered).lookAround().checkEnts().checkFzdsFirst();
         tracer.trace();
         if (fakePlayer != null) {
             fakePlayer.isDead = true; // Avoid mob retribution
         }
         fakePlayer = null;
+        backingInventory = null;
     }
     
     EntityPlayer fakePlayer;
     
     @Override
     public boolean handleRay(ISocketHolder socket, MovingObjectPosition mop, World mopWorld, boolean mopIsThis, boolean powered) {
-        boolean ret = doHandleRay(socket, mop, mopIsThis, powered);
-        if (!ret && !mopIsThis && mop.typeOfHit == MovingObjectType.BLOCK) {
+        boolean ret = doHandleRay(socket, mop, mopWorld, mopIsThis, powered);
+        if (!ret && !mopIsThis && mop.typeOfHit == MovingObjectType.BLOCK && worldObj != DeltaChunk.getServerShadowWorld()) {
             return !worldObj.isAirBlock(mop.blockX, mop.blockY, mop.blockZ);
         }
         return ret;
     }
     
-    private boolean doHandleRay(ISocketHolder socket, MovingObjectPosition mop, boolean mopIsThis, boolean powered) {
+    private boolean doHandleRay(ISocketHolder socket, MovingObjectPosition mop, World mopWorld, boolean mopIsThis, boolean powered) {
         if (fakePlayer == null) {
+            fakePlayer = getFakePlayer();
+        } else if (fakePlayer.worldObj != worldObj) {
+            fakePlayer.isDead = true;
             fakePlayer = getFakePlayer();
         }
         EntityPlayer player = fakePlayer;
-        FzInv inv = InvUtil.openInventory(getBackingInventory(socket), facing);
-        if (inv == null) {
+        if (backingInventory == null) {
             return clickWithoutInventory(player, mop);
         }
         boolean foundAny = false;
-        for (int i = 0; i < inv.size(); i++) {
-            ItemStack is = inv.get(i);
-            if (is == null || is.stackSize <= 0 || !inv.canExtract(i, is)) {
+        for (int i = 0; i < backingInventory.size(); i++) {
+            ItemStack is = backingInventory.get(i);
+            if (is == null || is.stackSize <= 0 || !backingInventory.canExtract(i, is)) {
                 continue;
             }
             player.inventory.mainInventory[0] = is;
             foundAny = true;
-            if (clickWithInventory(i, inv, player, is, mop)) {
+            if (clickWithInventory(i, backingInventory, player, is, mop)) {
                 return true;
             }
         }
