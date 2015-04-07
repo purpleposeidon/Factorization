@@ -3,6 +3,7 @@ package factorization.mechanisms;
 import factorization.api.Coord;
 import factorization.api.ICoordFunction;
 import factorization.api.Quaternion;
+import factorization.fzds.DimensionSliceEntity;
 import factorization.fzds.TransferLib;
 import factorization.fzds.interfaces.IDCController;
 import factorization.fzds.interfaces.IDeltaChunk;
@@ -26,7 +27,7 @@ public class ControllerMulticast implements IDCController {
      * @param constraint The controller to add.
      * @throws IllegalArgumentException if the IDC already has a non-multicast controller.
      */
-    public static void register(IDeltaChunk idc, IDCController constraint) {
+    static void register(IDeltaChunk idc, IDCController constraint) {
         rejoin(idc, constraint);
         changeCount(idc, +1);
     }
@@ -41,7 +42,7 @@ public class ControllerMulticast implements IDCController {
      * @throws IllegalArgumentException if the IDC already has a non-multicast controller.
      *
      */
-    public static void rejoin(IDeltaChunk idc, IDCController constraint) {
+    static void rejoin(IDeltaChunk idc, IDCController constraint) {
         IDCController controller = idc.getController();
         if (controller == IDCController.default_controller) {
             idc.setController(controller = new ControllerMulticast());
@@ -58,7 +59,7 @@ public class ControllerMulticast implements IDCController {
      * @param idc        The IDC who is getting the controller removed
      * @param constraint The controller to remove.
      */
-    public static void deregister(IDeltaChunk idc, IDCController constraint) {
+    static void deregister(IDeltaChunk idc, IDCController constraint) {
         IDCController controller = idc.getController();
         if (!(controller instanceof ControllerMulticast)) {
             Core.logWarning("Tried to deregister constraint for IDC that isn't a ControllerMulticast! IDC: " + idc + "; controller: " + controller + "; constraint: ", constraint);
@@ -75,12 +76,12 @@ public class ControllerMulticast implements IDCController {
      * @param idc The IDC to check
      * @return true if the IDC's controller is a ControllerMulticast, or it can have one applied.
      */
-    public static boolean usable(IDeltaChunk idc) {
+    static boolean usable(IDeltaChunk idc) {
         IDCController controller = idc.getController();
         return controller == IDCController.default_controller || controller instanceof ControllerMulticast;
     }
 
-    public static IDCController[] getControllers(IDeltaChunk idc) {
+    static IDCController[] getControllers(IDeltaChunk idc) {
         IDCController controller = idc.getController();
         if (controller instanceof ControllerMulticast) {
             ControllerMulticast cm = (ControllerMulticast) controller;
@@ -212,7 +213,32 @@ public class ControllerMulticast implements IDCController {
 
     @Override
     public void beforeUpdate(IDeltaChunk idc) {
+        updatePhysics(idc);
         for (IDCController c : constraints) c.beforeUpdate(idc);
+    }
+
+    private static final double DAMPENING = 0.98;
+    private static final double GRAVITY = -0.08;
+
+    private void updatePhysics(IDeltaChunk idc) {
+        if (idc.worldObj.isRemote || constraints.length == 0) {
+            return;
+        }
+        if (idc.hasOrderedRotation()) return;
+        boolean lin = idc.motionX != 0 || idc.motionY != 0 || idc.motionZ != 0;
+        boolean rot = lin || idc.getRotationalVelocity().isZero();
+        if (!lin && !rot) {
+            return;
+        }
+        // See EntityLivingBase.moveEntityWithHeading
+        push(idc, MassCalculator.getComCoord(idc), Vec3.createVectorHelper(0, GRAVITY, 0));
+        idc.motionX *= DAMPENING;
+        idc.motionY *= DAMPENING;
+        idc.motionZ *= DAMPENING;
+        Quaternion w = idc.getRotationalVelocity();
+        if (w.isZero()) return;
+        Quaternion wp = w.shortSlerp(new Quaternion(), DAMPENING);
+        idc.setRotationalVelocity(wp);
     }
 
     @Override
@@ -228,7 +254,7 @@ public class ControllerMulticast implements IDCController {
      * @param controller The controller that you want to rejoin.
      * @return The reference
      */
-    public static EntityReference<IDeltaChunk> autoJoin(final IDCController controller) {
+    static EntityReference<IDeltaChunk> autoJoin(final IDCController controller) {
         EntityReference<IDeltaChunk> ret = new EntityReference<IDeltaChunk>();
         ret.whenFound(new EntityReference.OnFound<IDeltaChunk>() {
             @Override
