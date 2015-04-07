@@ -1064,4 +1064,8 @@ public final class Coord implements IDataSerializable, ISaneCoord, Comparable<Co
     public boolean isAt(TileEntity te) {
         return x == te.xCoord && y == te.yCoord && z == te.zCoord && w == te.getWorldObj();
     }
+
+    public boolean isNormalCube() {
+        return w.getBlock(x, y, z).isNormalCube(w, x, y, z);
+    }
 }

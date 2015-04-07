@@ -10,6 +10,7 @@ public class MassHelper {
     public static double getBlockMass(Coord at) {
         double density = getMaterialDensity(at);
         if (!CONSIDER_VOLUME) return density;
+        if (at.isNormalCube()) return density; // Possible shortcut.
         AxisAlignedBB box = at.getCollisionBoundingBoxFromPool();
         if (box == null) return 0;
         return density * getVolume(box);
