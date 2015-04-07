@@ -3,8 +3,15 @@ package factorization.sockets.fanturpeller;
 import java.io.IOException;
 import java.util.ArrayList;
 
+import cpw.mods.fml.repackage.com.nothome.delta.Delta;
+import factorization.aabbdebug.AabbDebugger;
+import factorization.fzds.ControllerMulticast;
+import factorization.fzds.DeltaChunk;
+import factorization.fzds.interfaces.IDeltaChunk;
+import factorization.shared.NORELEASE;
 import factorization.util.InvUtil;
 import factorization.util.NumUtil;
+import factorization.util.SpaceUtil;
 import net.minecraft.command.IEntitySelector;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLiving;
@@ -21,6 +28,7 @@ import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.DamageSource;
+import net.minecraft.world.World;
 import net.minecraftforge.common.util.ForgeDirection;
 
 import org.lwjgl.opengl.GL11;
@@ -125,19 +133,13 @@ public class BlowEntities extends SocketFanturpeller implements IEntitySelector 
         double s = 0.025;
         ForgeDirection dir = isSucking ? facing.getOpposite() : facing;
         found_player = false;
-        for (Entity ent : (Iterable<Entity>)worldObj.getEntitiesWithinAABBExcludingEntity(null, area, this)) {
-            if (isSucking && facing == ForgeDirection.UP) {
-                waftEntity(ent);
-            }
-            suckEntity(ent, front_range, dir, s);
-            if (!worldObj.isRemote && isSucking && ent.boundingBox != null && ent.boundingBox.intersectsWith(death_area)) {
-                murderEntity(ent);
-            }
-            ent.fallDistance *= 0.8F;
-            if (!isSucking && found_player && ent instanceof EntityPlayer) {
-                ent.onGround = true;
+        iterateEntities(front_range, s, dir, area, death_area, worldObj);
+        if (worldObj == DeltaChunk.getWorld(worldObj)) {
+            for (IDeltaChunk idc : DeltaChunk.getSlicesContainingPoint(coord)) {
+                iterateFzdsEntities(front_range, s, dir, idc);
             }
         }
+
         if (worldObj.isRemote) {
             s *= 8;
             if (isSucking) s *= -1;
@@ -159,7 +161,32 @@ public class BlowEntities extends SocketFanturpeller implements IEntitySelector 
             }
         }
     }
-    
+
+    private void iterateFzdsEntities(int front_range, double s, ForgeDirection dir, IDeltaChunk idc) {
+        iterateEntities(front_range, s, idc.shadow2real(dir), idc.shadow2real(area), idc.shadow2real(death_area), idc.worldObj);
+        if (idc.getController() instanceof ControllerMulticast) {
+            NORELEASE.fixme("Add ControllerMulticast.push to figure out the hinge dealio");
+        }
+    }
+
+    private void iterateEntities(int front_range, double s, ForgeDirection dir, AxisAlignedBB box, AxisAlignedBB deathBox, World w) {
+        AabbDebugger.addBox(box);
+        for (Entity ent : (Iterable<Entity>)w.getEntitiesWithinAABBExcludingEntity(null, box, this)) {
+            if (isSucking && dir == ForgeDirection.UP) {
+                NORELEASE.fixme("Test; is it backwards?");
+                waftEntity(ent);
+            }
+            suckEntity(ent, front_range, dir, s);
+            if (!w.isRemote && isSucking && ent.boundingBox != null && ent.boundingBox.intersectsWith(deathBox)) {
+                murderEntity(ent);
+            }
+            ent.fallDistance *= 0.8F;
+            if (!isSucking && found_player && ent instanceof EntityPlayer) {
+                ent.onGround = true;
+            }
+        }
+    }
+
     double pick(double min, double max) {
         double d = max - min;
         return min + d*rand.nextDouble();
