@@ -1,6 +1,3 @@
-NEVER/POSTPONED
----------------
-
 [Wed Jun 11 01:00:26 PDT 2014] Power gen on the nether roof?
 [Tue Jul 01 01:30:52 PDT 2014] mere idea: portal proxy. Fires an entity through a portal. If it lands on an inv, connect
 [Fri Jul 04 17:54:18 PDT 2014] socket blocks don't render so well on servo-item shifter
@@ -30,8 +27,6 @@ Config option for ore processing output
 IMC for adding new Ores to the Ore Processing chain?
 To kill NEI's shift-? cheat: clear out RecipeInfo.overlayMap... or something.  Hmm....
   Might want to just remove instances whose class = DefaultOverlayHandler or BrewingOverlayHandler.
-Redstone signal on furnace heaters -- No. Just don't give it something to heat.
-make a caving-friendly dark iron ore gen? -- Colossi
 
 rainbow chest
   ROY
@@ -93,8 +88,19 @@ Chaos orbs:
 
 
 camo/mutation blocks: when it gets drawn, iterates through the tessellator & replaces textures with other textures
-
-  0 [Wed Oct 15 03:00:00 PDT 2014] click on villager/NPCs w/ held lead to give them pets?
-
-  0 [Thu Nov 13 23:14:37 PST 2014] add workarounds for recipe conflicts? LMP + whatever to re-craft?
+[Wed Oct 15 03:00:00 PDT 2014] click on villager/NPCs w/ held lead to give them pets?
+[Thu Nov 13 23:14:37 PST 2014] add workarounds for recipe conflicts? LMP + whatever to re-craft?
+[Thu Apr 03 20:31:38 PDT 2014] crystalline blocks? :D
+[Tue May 13 21:44:58 PDT 2014] dynamic fog? Would adjust the render distance depending on FPS
+[Tue May 13 22:43:45 PDT 2014] Ethiopian Battle Anvil!
+enhance CrashReport getWittyComment
+Zisteau wants boat elevators back in
+[Wed Jul 02 19:27:02 PDT 2014] getting on a horse while jumping should pick up the lead as well
+hard block candy: 9 sugar -> Block of Sugar; falls like sand; melts in water; crystallizes to "Hard Block Candy" in crystallizer in a solution of water; eaten with a pick to restores .5 hunger & gives speed & jump boost for 1 minute; hard block candy is transparent & a decent glass substitute; also melts in water; can be flavored/colored redstone, lapis, gunpowder, and gold nugget; flavors could give other short-duration buffs (might not be terribly interesting tho); sugar block/hard block candy can be fed to the caliometric burner
+[Thu Apr 03 22:31:02 PDT 2014] and crystalline blocks; could be used for frame-stuff...
+[Thu Apr 03 20:42:51 PDT 2014] ROT instruction?
+[Thu Apr 03 20:16:36 PDT 2014] crystalline weapons & armor
+[Mon Jun 23 01:07:47 PDT 2014] Add a skylight
+[Sun Jul 13 23:31:56 PDT 2014] crystallizing ingots?
+[Mon Jun 23 03:06:23 PDT 2014] might want a notifystyle for drawing the notice on the edge of the screen instead of offscreen
 

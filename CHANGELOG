@@ -1,8 +1,16 @@
 0.8.89
+  Chinese translations by catmunyi!
+  French Canadian translations by DragonsLover!
   Furnace heaters can now cook entities
-  Add WIP hinges
+  Add hinges. Blocks can be placed on them, and clicking will turn them
   Position selection bounding box properly on moving DSEs
   Selection bounding box of rotated blocks won't obscure selection of normal blocks
+  Refactored dark iron ore worldgen to hopefully be involved in less worldgen crashes.
+  (The Colossus still remains as it was, but at least it is fairly rare & usually not too big; silver ore's probably harmless)
+  Fix sculpture bugs that caused bad rotation/cook state
+  The config option for using the manual without the manual was backwards
+  Hammer can be disabled; this will also disable things that require Hammer.
+  
 
 0.8.88.8.8888h
   Fixed the infamous barrel render bug
