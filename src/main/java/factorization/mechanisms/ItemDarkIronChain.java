@@ -2,7 +2,6 @@ package factorization.mechanisms;
 
 import factorization.api.Coord;
 import factorization.common.ItemIcons;
-import factorization.fzds.ControllerMulticast;
 import factorization.fzds.DeltaChunk;
 import factorization.fzds.interfaces.DeltaCapability;
 import factorization.fzds.interfaces.IDeltaChunk;

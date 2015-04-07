@@ -10,7 +10,6 @@ import factorization.api.datahelpers.DataHelper;
 import factorization.api.datahelpers.Share;
 import factorization.common.BlockIcons;
 import factorization.common.FactoryType;
-import factorization.fzds.ControllerMulticast;
 import factorization.fzds.DeltaChunk;
 import factorization.fzds.interfaces.DeltaCapability;
 import factorization.fzds.interfaces.IDCController;

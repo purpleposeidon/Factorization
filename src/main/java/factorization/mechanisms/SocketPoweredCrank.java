@@ -5,7 +5,6 @@ import factorization.api.datahelpers.DataHelper;
 import factorization.api.datahelpers.IDataSerializable;
 import factorization.api.datahelpers.Share;
 import factorization.common.FactoryType;
-import factorization.fzds.ControllerMulticast;
 import factorization.fzds.DeltaChunk;
 import factorization.fzds.interfaces.IDCController;
 import factorization.fzds.interfaces.IDeltaChunk;
@@ -152,26 +151,7 @@ public class SocketPoweredCrank extends TileEntitySocketBase implements IChargeC
         }
         Vec3 force = getForce(idc, socket, scale);
         Coord at = new Coord(DeltaChunk.getServerShadowWorld(), hookLocation);
-        for (IDCController constraint : ControllerMulticast.getControllers(idc)) {
-            if (constraint instanceof TileEntityHinge) { // Sound design!
-                TileEntityHinge hinge = (TileEntityHinge) constraint;
-                if (hinge.getCoord().isWeaklyPowered()) return;
-                hinge.applyForce(idc, at, force);
-                // At the time of this writing, there is always be a hinge (baring the exceptional).
-                return;
-            }
-        }
-
-        double mass = MassCalculator.calculateMass(idc);
-        /* Whereupon St. Isaac Newton did set down the Holy Law of Nature, that
-         * the sum of the forces upon a body is equal to the mass of the body times
-         * the acceleration of the body, and whereupon we have calculated the mass
-         * of the body, let us therefor grant unto our hookedIdc an IMPULSE OF VELOCITY
-         * equal to the force multiplied by the inverse of the mass.
-         */
-        SpaceUtil.incrScale(force, 1 / mass);
-        Vec3 newVel = SpaceUtil.add(force, SpaceUtil.fromEntVel(idc));
-        SpaceUtil.toEntVel(idc, newVel);
+        ControllerMulticast.push(idc, at, force);
     }
 
     private Vec3 getForce(IDeltaChunk idc, ISocketHolder socket, double scale) {

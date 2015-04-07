@@ -1,14 +1,17 @@
-package factorization.fzds;
+package factorization.mechanisms;
 
 import factorization.api.Coord;
 import factorization.api.ICoordFunction;
 import factorization.api.Quaternion;
+import factorization.fzds.TransferLib;
 import factorization.fzds.interfaces.IDCController;
 import factorization.fzds.interfaces.IDeltaChunk;
 import factorization.shared.Core;
 import factorization.shared.EntityReference;
+import factorization.util.SpaceUtil;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.util.Vec3;
 import org.apache.commons.lang3.ArrayUtils;
 
 /**
@@ -129,11 +132,41 @@ public class ControllerMulticast implements IDCController {
         idc.setDead();
     }
 
+    public static void push(IDeltaChunk idc, Coord at, Vec3 force) {
+        for (IDCController constraint : ControllerMulticast.getControllers(idc)) {
+            if (constraint instanceof TileEntityHinge) { // Sound design!
+                TileEntityHinge hinge = (TileEntityHinge) constraint;
+                if (hinge.getCoord().isWeaklyPowered()) return;
+                hinge.applyForce(idc, at, force);
+                return;
+            }
+        }
+
+        double mass = MassCalculator.calculateMass(idc);
+        /* Whereupon St. Isaac Newton did set down the Holy Law of Nature, that
+         * the sum of the forces upon a body is equal to the mass of the body times
+         * the acceleration of the body, and whereupon we have calculated the mass
+         * of the body, let us therefor grant unto our hookedIdc an IMPULSE OF VELOCITY
+         * equal to the force multiplied by the inverse of the mass.
+         */
+        SpaceUtil.incrScale(force, 1 / mass);
+        Vec3 newVel = SpaceUtil.add(force, SpaceUtil.fromEntVel(idc));
+        SpaceUtil.toEntVel(idc, newVel);
+    }
+
     private IDCController[] constraints = new IDCController[0];
 
     void addConstraint(IDCController constraint) {
         if (ArrayUtils.contains(constraints, constraint)) return;
         constraints = ArrayUtils.add(constraints, constraint);
+        if (constraint instanceof TileEntityHinge) {
+            // Or could use Arrays.sort
+            // This is fine so long as there's only 1 hinge
+            int i = constraints.length - 1;
+            IDCController first = constraints[0];
+            constraints[0] = constraint;
+            constraints[i] = first;
+        }
     }
 
     void removeConstraint(IDCController constraint) {
