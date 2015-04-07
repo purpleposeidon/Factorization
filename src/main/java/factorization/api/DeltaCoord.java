@@ -5,6 +5,7 @@ import factorization.api.datahelpers.DataHelper;
 import factorization.api.datahelpers.IDataSerializable;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.util.Vec3;
 import net.minecraftforge.common.util.ForgeDirection;
 
 import java.io.IOException;
@@ -195,5 +196,9 @@ public class DeltaCoord implements IDataSerializable {
     
     public double magnitude() {
         return Math.sqrt(x*x + y*y + z*z);
+    }
+
+    public Vec3 toVector() {
+        return Vec3.createVectorHelper(x, y, z);
     }
 }

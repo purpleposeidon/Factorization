@@ -453,4 +453,16 @@ public final class SpaceUtil {
         }
         return closest;
     }
+
+    public static void incrFloor(Vec3 v) {
+        v.xCoord = Math.floor(v.xCoord);
+        v.yCoord = Math.floor(v.yCoord);
+        v.zCoord = Math.floor(v.zCoord);
+    }
+
+    public static Vec3 floor(Vec3 v) {
+        Vec3 ret = copy(v);
+        incrFloor(ret);
+        return ret;
+    }
 }

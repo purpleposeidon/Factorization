@@ -369,6 +369,35 @@ public class Quaternion implements IDataSerializable {
                 sc1 * this.y + sc2 * other.y,
                 sc1 * this.z + sc2 * other.z);
     }
+
+    public Quaternion shortSlerp(Quaternion other, double t) {
+        // See the other slerp
+        double cosom = this.dotProduct(other);
+        boolean rev = cosom < 0;
+        if (rev) {
+            cosom = -cosom;
+            other.incrScale(-1);
+        }
+        double omega, sinom, sc1, sc2;
+
+        if ((1.0f - cosom) > 0.0001f) {
+            omega = Math.acos(cosom);
+            sinom = Math.sin(omega);
+            sc1 = Math.sin((1 - t) * omega) / sinom;
+            sc2 = Math.sin(t * omega) / sinom;
+        } else {
+            sc1 = 1.0f - t;
+            sc2 = t;
+        }
+
+        Quaternion ret = new Quaternion(
+                sc1 * this.w + sc2 * other.w,
+                sc1 * this.x + sc2 * other.x,
+                sc1 * this.y + sc2 * other.y,
+                sc1 * this.z + sc2 * other.z);
+        if (rev) other.incrScale(-1);
+        return ret;
+    }
     
     
     public double getAngleBetween(Quaternion other) {
