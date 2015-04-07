@@ -10,6 +10,7 @@ import factorization.fzds.interfaces.IDeltaChunk;
 import factorization.shared.NORELEASE;
 import factorization.util.InvUtil;
 import factorization.util.NumUtil;
+import factorization.util.SpaceUtil;
 import net.minecraft.command.IEntitySelector;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLiving;
@@ -26,6 +27,7 @@ import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.DamageSource;
+import net.minecraft.util.Vec3;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.ForgeDirection;
 
@@ -162,8 +164,12 @@ public class BlowEntities extends SocketFanturpeller implements IEntitySelector 
 
     private void iterateFzdsEntities(int front_range, double s, ForgeDirection dir, IDeltaChunk idc) {
         iterateEntities(front_range, s, idc.shadow2real(dir), idc.shadow2real(area), idc.shadow2real(death_area), idc.worldObj);
-        if (idc.getController() instanceof ControllerMulticast) {
-            NORELEASE.fixme("Add ControllerMulticast.push to figure out the hinge dealio");
+        if (!worldObj.isRemote && idc.getController() instanceof ControllerMulticast) {
+            Vec3 force = SpaceUtil.fromDirection(dir);
+            double forceScale = target_speed / 20.0;
+            if (isSucking) forceScale *= -1;
+            SpaceUtil.incrScale(force, forceScale);
+            ControllerMulticast.push(idc, getCoord(), force);
         }
     }
 
