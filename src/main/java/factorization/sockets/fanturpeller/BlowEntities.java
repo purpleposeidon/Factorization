@@ -23,6 +23,7 @@ import net.minecraft.entity.monster.EntityGhast;
 import net.minecraft.entity.passive.EntityBat;
 import net.minecraft.entity.passive.EntityChicken;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.init.Items;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
@@ -176,8 +177,9 @@ public class BlowEntities extends SocketFanturpeller implements IEntitySelector 
 
     private void iterateEntities(int front_range, double s, ForgeDirection dir, AxisAlignedBB box, AxisAlignedBB deathBox, World w) {
         AabbDebugger.addBox(box);
+        boolean rising = dir.offsetY == (isSucking ? -1 : +1);
         for (Entity ent : (Iterable<Entity>)w.getEntitiesWithinAABBExcludingEntity(null, box, this)) {
-            if (dir.offsetY == (isSucking ? -1 : +1)) {
+            if (rising) {
                 NORELEASE.fixme("Test; is it backwards?");
                 waftEntity(ent);
             }
@@ -186,15 +188,10 @@ public class BlowEntities extends SocketFanturpeller implements IEntitySelector 
                 murderEntity(ent);
             }
             ent.fallDistance *= 0.8F;
-            if (!isSucking && found_player && ent instanceof EntityPlayer) {
-                ent.onGround = true;
-                if (!worldObj.isRemote) {
-                    // Need to let the player fly!? Grr.
-                    // See NetHandlerPlayServer.processPlayer
-                    ent.posY += ent.motionY * 10;
-                    /*double floatFuzz = 0.03125;
-                    ent.posY += floatFuzz * 2;*/
-                }
+            if (rising && found_player && ent instanceof EntityPlayerMP) {
+                // Make the server not worry about flying
+                EntityPlayerMP player = (EntityPlayerMP) ent;
+                player.playerNetServerHandler.floatingTickCount = 0;
             }
         }
     }
