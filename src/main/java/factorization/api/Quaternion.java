@@ -599,6 +599,18 @@ public class Quaternion implements IDataSerializable {
         double sat = Math.sin(alphaTheta);
         return new Quaternion(W, x * sat, y * sat, z * sat);
     }
-    
+
+    public boolean hasNaN() {
+        return Double.isNaN(w) || Double.isNaN(x) || Double.isNaN(y) || Double.isNaN(z);
+    }
+
+    public boolean hasInf() {
+        return Double.isInfinite(w) || Double.isInfinite(x) || Double.isInfinite(y) || Double.isInfinite(z);
+    }
+
+    public Quaternion cleanAbnormalNumbers() {
+        if (hasNaN() || hasInf()) return new Quaternion();
+        return this;
+    }
     
 }

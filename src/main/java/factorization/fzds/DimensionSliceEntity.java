@@ -234,6 +234,11 @@ public class DimensionSliceEntity extends IDeltaChunk implements IFzdsEntryContr
         orderTimeStart = data.as(Share.VISIBLE, "rotOrdStart").putLong(orderTimeStart);
         orderTimeEnd = data.as(Share.VISIBLE, "rotOrdEnd").putLong(orderTimeEnd);
         orderInterp = data.as(Share.VISIBLE, "orderInterp").putEnum(orderInterp);
+
+        if (data.isReader() && data.isNBT()) {
+            rotation = rotation.cleanAbnormalNumbers();
+            rotationalVelocity = rotationalVelocity.cleanAbnormalNumbers();
+        }
     }
     
     @Override
