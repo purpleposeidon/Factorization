@@ -180,7 +180,6 @@ public class BlowEntities extends SocketFanturpeller implements IEntitySelector 
         boolean rising = dir.offsetY == (isSucking ? -1 : +1);
         for (Entity ent : (Iterable<Entity>)w.getEntitiesWithinAABBExcludingEntity(null, box, this)) {
             if (rising) {
-                NORELEASE.fixme("Test; is it backwards?");
                 waftEntity(ent);
             }
             suckEntity(ent, front_range, dir, s);
