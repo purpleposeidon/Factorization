@@ -216,7 +216,8 @@ public class MechanicsController implements IDCController {
         for (IDCController c : constraints) c.beforeUpdate(idc);
     }
 
-    private static final double DAMPENING = 0.98;
+    private static final double LINEAR_DAMPENING = 0.98;
+    private static final double ROTATIONAL_DAMPENING = 0.75;
     private static final double GRAVITY = -0.08;
 
     private void updatePhysics(IDeltaChunk idc) {
@@ -231,12 +232,12 @@ public class MechanicsController implements IDCController {
         }
         // See EntityLivingBase.moveEntityWithHeading
         push(idc, MassCalculator.getComCoord(idc), Vec3.createVectorHelper(0, GRAVITY, 0));
-        idc.motionX *= DAMPENING;
-        idc.motionY *= DAMPENING;
-        idc.motionZ *= DAMPENING;
+        idc.motionX *= LINEAR_DAMPENING;
+        idc.motionY *= LINEAR_DAMPENING;
+        idc.motionZ *= LINEAR_DAMPENING;
         Quaternion w = idc.getRotationalVelocity();
         if (w.isZero()) return;
-        Quaternion wp = w.shortSlerp(new Quaternion(), DAMPENING);
+        Quaternion wp = w.shortSlerp(new Quaternion(), ROTATIONAL_DAMPENING);
         idc.setRotationalVelocity(wp);
     }
 
