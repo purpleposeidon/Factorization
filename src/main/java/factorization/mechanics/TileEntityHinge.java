@@ -2,6 +2,7 @@ package factorization.mechanics;
 
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
+import factorization.aabbdebug.AabbDebugger;
 import factorization.api.Coord;
 import factorization.api.DeltaCoord;
 import factorization.api.FzOrientation;
@@ -15,6 +16,7 @@ import factorization.fzds.interfaces.DeltaCapability;
 import factorization.fzds.interfaces.IDCController;
 import factorization.fzds.interfaces.IDeltaChunk;
 import factorization.fzds.interfaces.Interpolation;
+import factorization.notify.Notice;
 import factorization.shared.*;
 import factorization.util.PlayerUtil;
 import factorization.util.SpaceUtil;
@@ -197,7 +199,8 @@ public class TileEntityHinge extends TileEntityCommon implements IDCController {
         return false;
     }
 
-    @Override public boolean useBlock(IDeltaChunk idc, EntityPlayer player, Coord at, byte sideHit) {
+    @Override
+    public boolean useBlock(IDeltaChunk idc, EntityPlayer player, Coord at, byte sideHit) {
         if (player.isSneaking()) return false;
         if (worldObj.isRemote) return false;
         final ItemStack held = player.getHeldItem();
@@ -331,42 +334,20 @@ public class TileEntityHinge extends TileEntityCommon implements IDCController {
     }
 
     private void limitBend(IDeltaChunk idc) {
+        if (idc.hasOrderedRotation()) return;
         final Quaternion nextRotation = idc.getRotation().multiply(idc.getRotationalVelocity());
-        final Vec3 nrrv = nextRotation.toRotationVector();
-        final double nextAngle = wrapAngle(SpaceUtil.sum(nrrv));
-        double maxBend = Math.PI;
-        double minBend = 0;
-        if (bendMode()) {
-            maxBend -= Math.PI;
-            minBend -= Math.PI;
-        }
+        final Vec3 middle = SpaceUtil.fromDirection(facing.top);
+        final Vec3 arm = SpaceUtil.fromDirection(facing.facing);
+        nextRotation.applyRotation(arm);
+        final double angle = SpaceUtil.getAngle(middle, arm);
 
-        if (nextAngle <= maxBend && nextAngle >= minBend) return;
+        final double end = Math.PI / 2;
 
-        final double prevAngle = wrapAngle(SpaceUtil.sum(idc.getRotation().toRotationVector()));
-        if (prevAngle > maxBend || prevAngle < minBend) {
-            double limit = prevAngle > maxBend ? maxBend : minBend;
-            idc.setRotationalVelocity(new Quaternion());
-            idc.setRotation(Quaternion.getRotationQuaternionRadians(limit, getRotationAxis()));
-            return;
-        }
-        double dAngle = nextAngle - prevAngle;
-        double err;
-        if (nextAngle > maxBend) {
-            err = nextAngle - maxBend;
-        } else {
-            err = nextAngle - minBend;
-        }
-        double p = (dAngle - err) / dAngle;
-        Quaternion limitedVelocity = idc.getRotationalVelocity().slerp(new Quaternion(), 1 - p);
-        idc.setRotationalVelocity(limitedVelocity);
-    }
+        if (angle <= end) return;
 
-    double wrapAngle(double d) {
-        if (!bendMode() && d < -Math.PI / 2) {
-            d += Math.PI * 2;
-        }
-        return d;
+        double p = end / angle;
+        idc.setRotationalVelocity(new Quaternion());
+        idc.setRotation(new Quaternion().slerp(nextRotation, p));
     }
 
     @Override
