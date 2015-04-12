@@ -1,5 +1,7 @@
-package factorization.fzds;
+package factorization.fzds.network;
 
+import factorization.fzds.DeltaChunk;
+import factorization.fzds.Hammer;
 import net.minecraft.world.World;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraftforge.common.ForgeChunkManager;
@@ -9,7 +11,7 @@ import java.util.Set;
 
 public class PPPChunkLoader implements ForgeChunkManager.LoadingCallback {
     static PPPChunkLoader instance;
-    PPPChunkLoader() {
+    public PPPChunkLoader() {
         instance = this;
     }
 

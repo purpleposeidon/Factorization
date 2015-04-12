@@ -1,4 +1,4 @@
-package factorization.fzds;
+package factorization.fzds.network;
 
 import factorization.fzds.interfaces.IFzdsShenanigans;
 import io.netty.channel.Channel;

@@ -1,8 +1,9 @@
-package factorization.fzds;
+package factorization.fzds.network;
 
 import com.google.common.io.ByteArrayDataOutput;
 import com.google.common.io.ByteStreams;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
+import cpw.mods.fml.common.gameevent.TickEvent;
 import cpw.mods.fml.common.network.FMLEventChannel;
 import cpw.mods.fml.common.network.FMLNetworkEvent.ClientCustomPacketEvent;
 import cpw.mods.fml.common.network.FMLNetworkEvent.ServerCustomPacketEvent;
@@ -10,6 +11,8 @@ import cpw.mods.fml.common.network.NetworkRegistry;
 import cpw.mods.fml.common.network.internal.FMLProxyPacket;
 import factorization.api.Coord;
 import factorization.api.Quaternion;
+import factorization.fzds.DeltaChunk;
+import factorization.fzds.DimensionSliceEntity;
 import factorization.fzds.interfaces.DeltaCapability;
 import factorization.fzds.interfaces.IDeltaChunk;
 import factorization.fzds.interfaces.Interpolation;
@@ -294,7 +297,7 @@ public class HammerNet {
     InteractionLiason getLiason(WorldServer shadowWorld, EntityPlayerMP real_player, IDeltaChunk idc) {
         // NORELEASE: Cache. Constructing fake players is muy expensivo
         InteractionLiason liason = new InteractionLiason(shadowWorld, new ItemInWorldManager(shadowWorld), real_player, idc);
-        liason.initializeFor(real_player, idc);
+        liason.initializeFor(idc);
         return liason;
     }
 
@@ -366,7 +369,7 @@ public class HammerNet {
          */
     }
     
-    static FMLProxyPacket makePacket(byte type, Object... items) {
+    public static FMLProxyPacket makePacket(byte type, Object... items) {
         ByteArrayDataOutput dos = ByteStreams.newDataOutput();
         dos.writeByte(type);
         for (int i = 0; i < items.length; i++) {
@@ -397,5 +400,11 @@ public class HammerNet {
             }
         }
         return new FMLProxyPacket(Unpooled.wrappedBuffer(dos.toByteArray()), channelName);
+    }
+
+    @SubscribeEvent
+    public void tickLiasons(TickEvent.ServerTickEvent event) {
+        if (event.phase != TickEvent.Phase.END) return;
+        InteractionLiason.updateActiveLiasons();
     }
 }

@@ -1,14 +1,14 @@
-package factorization.fzds;
+package factorization.fzds.network;
 
 import com.mojang.authlib.GameProfile;
 import cpw.mods.fml.common.network.handshake.NetworkDispatcher;
+import factorization.fzds.ShadowPlayerAligner;
 import factorization.fzds.interfaces.IDeltaChunk;
 import factorization.fzds.interfaces.IFzdsShenanigans;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelOutboundHandlerAdapter;
 import io.netty.channel.ChannelPromise;
 import io.netty.channel.embedded.EmbeddedChannel;
-import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.network.EnumConnectionState;
@@ -18,7 +18,13 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.management.ItemInWorldManager;
 import net.minecraft.world.WorldServer;
 
+import java.util.Iterator;
+import java.util.Map;
+import java.util.WeakHashMap;
+
 class InteractionLiason extends EntityPlayerMP implements IFzdsShenanigans {
+    static final WeakHashMap<EntityPlayerMP, InteractionLiason> activeLiasons = new WeakHashMap<EntityPlayerMP, InteractionLiason>();
+
     private static final GameProfile liasonGameProfile = new GameProfile(null /*UUID.fromString("69f64f91-665e-457d-ad32-f6082d0b8a71")*/ , "[FzdsInteractionLiason]");
     private final InventoryPlayer original_inventory;
     private ShadowPlayerAligner aligner;
@@ -27,10 +33,12 @@ class InteractionLiason extends EntityPlayerMP implements IFzdsShenanigans {
 
     private EmbeddedChannel proxiedChannel = new EmbeddedChannel(new LiasonHandler());
 
-    public InteractionLiason(WorldServer world, ItemInWorldManager itemManager, EntityPlayer realPlayer, IDeltaChunk idc) {
+    public InteractionLiason(WorldServer world, ItemInWorldManager itemManager, EntityPlayerMP realPlayer, IDeltaChunk idc) {
         super(MinecraftServer.getServer(), world, liasonGameProfile, itemManager);
         original_inventory = this.inventory;
+        this.realPlayer = realPlayer;
         initLiason();
+        updateFromPlayerStatus();
     }
 
     private void initLiason() {
@@ -42,22 +50,62 @@ class InteractionLiason extends EntityPlayerMP implements IFzdsShenanigans {
         playerNetServerHandler.netManager.setConnectionState(EnumConnectionState.PLAY);
     }
 
-    void initializeFor(EntityPlayerMP realPlayer, IDeltaChunk idc) {
-        if (this.realPlayer != null) throw new IllegalStateException("Player wasn't reset!");
-        this.realPlayer = realPlayer;
+    void updateFromPlayerStatus() {
         this.inventory = realPlayer.inventory;
         this.setSprinting(realPlayer.isSprinting());
         this.setSneaking(realPlayer.isSneaking());
         this.capabilities = realPlayer.capabilities;
+    }
+
+    void initializeFor(IDeltaChunk idc) {
         aligner = new ShadowPlayerAligner(realPlayer, this, idc);
         aligner.apply();
     }
 
     void finishUsingLiason() {
+        if (openContainer == null) {
+            murderLiasonAndShoveHisWretchedBodyOnAPike();
+        } else {
+            keepLiason();
+        }
+    }
+
+    void murderLiasonAndShoveHisWretchedBodyOnAPike() {
         // Stuff? Drop our items? Die?
         realPlayer = null;
         inventory = original_inventory;
         aligner.unapply();
+        setDead();
+    }
+
+    void keepLiason() {
+        activeLiasons.put(realPlayer, this);
+    }
+
+    @Override
+    public void closeContainer() {
+        super.closeContainer();
+        murderLiasonAndShoveHisWretchedBodyOnAPike();
+    }
+
+    @Override
+    public void closeScreen() {
+        super.closeScreen();
+        murderLiasonAndShoveHisWretchedBodyOnAPike();
+    }
+
+    public static void updateActiveLiasons() {
+        for (Iterator<Map.Entry<EntityPlayerMP, InteractionLiason>> it = activeLiasons.entrySet().iterator(); it.hasNext(); ) {
+            Map.Entry<EntityPlayerMP, InteractionLiason> pair = it.next();
+            EntityPlayerMP real = pair.getKey();
+            InteractionLiason liason = pair.getValue();
+            if (real.isDead || liason.openContainer == null || liason.isDead) {
+                liason.murderLiasonAndShoveHisWretchedBodyOnAPike();
+                it.remove();
+                continue;
+            }
+            liason.openContainer.detectAndSendChanges();
+        }
     }
 
     private class LiasonHandler extends ChannelOutboundHandlerAdapter implements IFzdsShenanigans {

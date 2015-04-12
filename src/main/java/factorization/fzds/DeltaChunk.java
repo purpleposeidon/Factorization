@@ -82,7 +82,7 @@ public class DeltaChunk {
     }
     
     public static World getServerShadowWorld() {
-        return DimensionManager.getWorld(Hammer.getDimensionId());
+        return DimensionManager.getWorld(getDimensionId());
     }
     
     public static World getClientRealWorld() {
@@ -142,7 +142,12 @@ public class DeltaChunk {
         Vec3 ret = closest.shadow2real(buffer);
         return ret;
     }
-    
+
+    public static int getDimensionId() {
+        assertEnabled();
+        return HammerInfo.dimension_slice_dimid;
+    }
+
     public static interface AreaMap {
         void fillDse(DseDestination destination);
     }
@@ -295,6 +300,6 @@ public class DeltaChunk {
     }
     
     public static HammerInfo getHammerRegistry() {
-        return Hammer.instance.hammerInfo;
+        return Hammer.hammerInfo;
     }
 }

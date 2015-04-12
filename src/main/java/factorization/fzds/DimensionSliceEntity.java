@@ -13,6 +13,8 @@ import factorization.common.FzConfig;
 import factorization.coremodhooks.IExtraChunkData;
 import factorization.coremodhooks.IKinematicTracker;
 import factorization.fzds.interfaces.*;
+import factorization.fzds.network.HammerNet;
+import factorization.fzds.network.PacketProxyingPlayer;
 import factorization.shared.Core;
 import factorization.shared.EntityReference;
 import factorization.shared.TortoiseAndHare;
@@ -1010,7 +1012,7 @@ public class DimensionSliceEntity extends IDeltaChunk implements IFzdsEntryContr
             }
         }
         World shadowWorld = DeltaChunk.getServerShadowWorld();
-        Vec3 newLocation = real2shadow(Hammer.ent2vec(ent));
+        Vec3 newLocation = real2shadow(SpaceUtil.fromEntPos(ent));
         transferEntity(ent, shadowWorld, newLocation);
         if (ifec != null) {
             ifec.onEnter(this);
@@ -1028,7 +1030,7 @@ public class DimensionSliceEntity extends IDeltaChunk implements IFzdsEntryContr
                 return;
             }
         }
-        Vec3 newLocation = shadow2real(Hammer.ent2vec(ent));
+        Vec3 newLocation = shadow2real(SpaceUtil.fromEntPos(ent));
         transferEntity(ent, worldObj, newLocation);
         if (ifec != null) {
             ifec.onExit(this);

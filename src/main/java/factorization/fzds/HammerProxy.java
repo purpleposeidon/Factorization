@@ -36,4 +36,12 @@ public class HammerProxy {
     public NetworkDispatcher getDispatcher() {
         return null;
     }
+
+    public boolean guiCheckStart() {
+        return false;
+    }
+
+    public void guiCheckEnd(boolean oldState) {
+
+    }
 }

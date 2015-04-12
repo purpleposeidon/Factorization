@@ -1,5 +1,6 @@
 package factorization.fzds;
 
+import factorization.fzds.network.HammerNet;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.client.Minecraft;
@@ -19,7 +20,7 @@ import cpw.mods.fml.common.gameevent.TickEvent.ClientTickEvent;
 import cpw.mods.fml.common.gameevent.TickEvent.Phase;
 import cpw.mods.fml.common.network.internal.FMLProxyPacket;
 import factorization.api.Coord;
-import factorization.fzds.HammerNet.HammerNetType;
+import factorization.fzds.network.HammerNet.HammerNetType;
 import factorization.fzds.interfaces.DeltaCapability;
 
 public class ClickHandler {

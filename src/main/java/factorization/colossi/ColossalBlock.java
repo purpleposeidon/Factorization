@@ -27,7 +27,6 @@ import cpw.mods.fml.relauncher.SideOnly;
 import factorization.api.Coord;
 import factorization.common.BlockIcons;
 import factorization.fzds.DeltaChunk;
-import factorization.fzds.Hammer;
 import factorization.fzds.TransferLib;
 import factorization.fzds.interfaces.IDeltaChunk;
 import factorization.oreprocessing.ItemOreProcessing;
@@ -180,7 +179,7 @@ public class ColossalBlock extends Block {
     
     @Override
     public void randomDisplayTick(World world, int x, int y, int z, Random rand) {
-        if (world.provider.dimensionId != Hammer.getDimensionId()) return;
+        if (world.provider.dimensionId != DeltaChunk.getDimensionId()) return;
         int md = world.getBlockMetadata(x, y, z);
         int r = md == MD_BODY_CRACKED ? 4 : 2;
         float px = x - 0.5F + rand.nextFloat()*r;

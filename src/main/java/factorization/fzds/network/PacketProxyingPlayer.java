@@ -1,16 +1,17 @@
-package factorization.fzds;
+package factorization.fzds.network;
 
 import com.mojang.authlib.GameProfile;
-import cpw.mods.fml.common.network.FMLEmbeddedChannel;
 import cpw.mods.fml.common.network.handshake.NetworkDispatcher;
 import cpw.mods.fml.relauncher.Side;
 import factorization.api.Coord;
 import factorization.api.DeltaCoord;
 import factorization.api.ICoordFunction;
+import factorization.fzds.DeltaChunk;
+import factorization.fzds.DimensionSliceEntity;
+import factorization.fzds.Hammer;
 import factorization.fzds.interfaces.IDeltaChunk;
 import factorization.fzds.interfaces.IFzdsEntryControl;
 import factorization.fzds.interfaces.IFzdsShenanigans;
-import factorization.fzds.network.WrappedPacket;
 import factorization.shared.Core;
 import io.netty.channel.*;
 import io.netty.channel.embedded.EmbeddedChannel;
@@ -43,8 +44,6 @@ public class PacketProxyingPlayer extends EntityPlayerMP implements
     
     EmbeddedChannel proxiedChannel = new EmbeddedChannel(new WrappedMulticastHandler());
     NetworkManager networkManager = new CustomChannelNetworkManager(proxiedChannel, false);
-
-    ;
     
     class WrappedMulticastHandler extends ChannelOutboundHandlerAdapter implements IFzdsShenanigans {
         @Override
@@ -212,7 +211,7 @@ public class PacketProxyingPlayer extends EntityPlayerMP implements
         // NOTE: This has the potential to go badly if there's a large amount of data in the chunks.
         if (!chunks.isEmpty()) {
             Packet toSend = new S26PacketMapChunkBulk(chunks);
-            addNettyMessageForPlayer(target, new WrappedPacket(toSend));
+            addNettyMessageForPlayer(target, new WrappedPacketFromServer(toSend));
         }
         if (!tileEntities.isEmpty()) {
             for (TileEntity te : tileEntities) {
@@ -220,7 +219,7 @@ public class PacketProxyingPlayer extends EntityPlayerMP implements
                 if (description == null) {
                     continue;
                 }
-                addNettyMessageForPlayer(target, new WrappedPacket(description));
+                addNettyMessageForPlayer(target, new WrappedPacketFromServer(description));
             }
         }
     }
@@ -242,19 +241,15 @@ public class PacketProxyingPlayer extends EntityPlayerMP implements
     boolean shouldForceChunkLoad() { //TODO: Chunk loading!
         return !listeningPlayers.isEmpty();
     }
-    
-    private static final FMLEmbeddedChannel wrapped_packet_channel = new FMLEmbeddedChannel("[FZDS Packet Wrapping Channel]", Side.SERVER, new ChannelHandler() {
-        @Override public void handlerRemoved(ChannelHandlerContext ctx) throws Exception { }
-        @Override public void handlerAdded(ChannelHandlerContext ctx) throws Exception { }
-        @Override @Deprecated public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception { }
-    });
+
+    private static final NettyPacketConverter wrapped_packet_channel = new NettyPacketConverter(Side.SERVER);
     
     public static Packet wrapMessage(Object msg) {
         if (msg instanceof Packet) {
-            return new WrappedPacket((Packet) msg);
+            return new WrappedPacketFromServer((Packet) msg);
         }
-        Packet pkt = wrapped_packet_channel.generatePacketFrom(msg);
-        return new WrappedPacket(pkt);
+        Packet pkt = wrapped_packet_channel.convert(msg);
+        return new WrappedPacketFromServer(pkt);
     }
     
     public void addNettyMessage(Object msg) {

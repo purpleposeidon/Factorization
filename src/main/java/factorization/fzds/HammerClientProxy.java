@@ -13,13 +13,17 @@ import factorization.api.Coord;
 import factorization.api.Quaternion;
 import factorization.coremodhooks.HookTargetsClient;
 import factorization.coremodhooks.IExtraChunkData;
+import factorization.fzds.gui.ProxiedGuiContainer;
 import factorization.fzds.interfaces.IDeltaChunk;
 import factorization.fzds.interfaces.IFzdsShenanigans;
+import factorization.fzds.network.NettyPacketConverter;
+import factorization.fzds.network.WrappedPacketFromClient;
 import factorization.shared.BlockRenderHelper;
 import factorization.shared.Core;
 import factorization.shared.NORELEASE;
 import factorization.util.NumUtil;
 import factorization.util.SpaceUtil;
+import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelOutboundHandlerAdapter;
 import io.netty.channel.ChannelPromise;
@@ -27,6 +31,8 @@ import io.netty.channel.embedded.EmbeddedChannel;
 import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityClientPlayerMP;
+import net.minecraft.client.gui.GuiScreen;
+import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.client.multiplayer.ChunkProviderClient;
 import net.minecraft.client.multiplayer.WorldClient;
 import net.minecraft.client.network.NetHandlerPlayClient;
@@ -37,6 +43,8 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.NetworkManager;
+import net.minecraft.network.Packet;
+import net.minecraft.network.play.client.C0EPacketClickWindow;
 import net.minecraft.profiler.Profiler;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.IChatComponent;
@@ -134,7 +142,7 @@ public class HammerClientProxy extends HammerProxy {
             HookTargetsClient.abort.set(Boolean.TRUE);
             Hammer.worldClient = new HammerWorldClient(send_queue,
                     new WorldSettings(wi),
-                    Hammer.getDimensionId(),
+                    DeltaChunk.getDimensionId(),
                     world.difficultySetting,
                     Core.proxy.getProfiler());
         } finally {
@@ -177,16 +185,17 @@ public class HammerClientProxy extends HammerProxy {
         send_queue.clientWorldController = wc;
     }
     
-    private void setWorldAndPlayer(WorldClient wc, EntityClientPlayerMP player) {
+    private void setWorldAndPlayer(WorldClient wc, EntityClientPlayerMP player, Channel channel) {
         Minecraft mc = Minecraft.getMinecraft();
-        if (wc == null) {
-            Core.logSevere("Setting client world to null. PREPARE FOR IMPACT.");
+        if (wc == null || player == null || channel == null) {
+            Core.logSevere("Setting world/player/netty-channel to null! BRACE FOR IMPACT!");
         }
         //For logic
         mc.theWorld = wc;
         mc.thePlayer = player;
         mc.thePlayer.worldObj = wc;
         setSendQueueWorld(wc);
+        mc.getNetHandler().getNetworkManager().channel = channel;
         
         //For rendering
         mc.renderViewEntity = player; //TODO NOTE: This may mess up in third person!
@@ -202,28 +211,27 @@ public class HammerClientProxy extends HammerProxy {
     private EntityClientPlayerMP real_player = null;
     private WorldClient real_world = null;
     private EntityClientPlayerMP fake_player = null;
+    private Channel real_channel = null;
     
     @Override
     public void setShadowWorld() {
-        //System.out.println("Setting world");
         Minecraft mc = Minecraft.getMinecraft();
         WorldClient w = (WorldClient) DeltaChunk.getClientShadowWorld();
         assert w != null;
         if (real_player != null || real_world != null) {
-            Core.logSevere("Tried to switch to Shadow world, but we're already in the shadow world");
-            return;
+            throw new IllegalStateException("Tried to switch to Shadow world, but we're already in the shadow world");
         }
+        real_player = mc.thePlayer;
         if (real_player == null) {
-            real_player = mc.thePlayer;
-            if (real_player == null) {
-                Core.logSevere("Swapping out to hammer world, but thePlayer is null");
-            }
+            throw new IllegalStateException("Swapping out to hammer world, but thePlayer is null");
         }
+        real_world = mc.theWorld;
         if (real_world == null) {
-            real_world = mc.theWorld;
-            if (real_world == null) {
-                Core.logSevere("Swapping out to hammer world, but theWorld is null");
-            }
+            throw new IllegalStateException("Swapping out to hammer world, but theWorld is null");
+        }
+        real_channel = mc.getNetHandler().getNetworkManager().channel;
+        if (real_channel == null) {
+            throw new IllegalStateException("Swapping out to hammer world, but networkChannel is null");
         }
         real_player.worldObj = w;
         if (fake_player == null || w != fake_player.worldObj) {
@@ -234,15 +242,15 @@ public class HammerClientProxy extends HammerProxy {
                     real_player.getStatFileWriter());
             fake_player.movementInput = real_player.movementInput;
         }
-        setWorldAndPlayer((WorldClient) w, fake_player);
+        setWorldAndPlayer(w, fake_player, wrapperChannel);
     }
     
     @Override
     public void restoreRealWorld() {
-        //System.out.println("Restoring world");
-        setWorldAndPlayer(real_world, real_player);
+        setWorldAndPlayer(real_world, real_player, real_channel);
         real_world = null;
         real_player = null;
+        real_channel = null;
     }
     
     @Override
@@ -407,7 +415,7 @@ public class HammerClientProxy extends HammerProxy {
                 ShadowPlayerAligner aligner = new ShadowPlayerAligner(realPlayer, fakePlayer, ray.parent);
                 aligner.apply(); // Change the player's look to shadow rotation
                 WorldSettings.GameType origType = mc.playerController.currentGameType;
-                mc.playerController.currentGameType = WorldSettings.GameType.CREATIVE;
+                // NORELEASE: Can we, uhm, not? mc.playerController.currentGameType = WorldSettings.GameType.CREATIVE;
                 try {
                     mc.entityRenderer.getMouseOver(1F);
                 } finally {
@@ -487,16 +495,16 @@ public class HammerClientProxy extends HammerProxy {
         event.left.add("uc: " + objs.length);
     }
 
-    static class WrappedNetworkDispatcher extends NetworkDispatcher implements IFzdsShenanigans {
+    class WrappedNetworkDispatcher extends NetworkDispatcher implements IFzdsShenanigans {
         public WrappedNetworkDispatcher(NetworkManager manager) {
             super(manager);
         }
     }
 
-    static class WrappedNetworkManager extends NetworkManager implements IFzdsShenanigans {
+    class WrappedNetworkManager extends NetworkManager implements IFzdsShenanigans {
         public WrappedNetworkManager() {
             super(true /* isRemote */);
-            channel = new EmbeddedChannel(new WrappedHandler());
+            channel = wrapperChannel;
         }
 
         @Override
@@ -505,19 +513,46 @@ public class HammerClientProxy extends HammerProxy {
         }
     }
 
-    static class WrappedHandler extends ChannelOutboundHandlerAdapter implements IFzdsShenanigans {
+    class WrappedHandler extends ChannelOutboundHandlerAdapter implements IFzdsShenanigans {
         @Override
         public void write(ChannelHandlerContext ctx, Object msg, ChannelPromise promise) throws Exception {
-            NORELEASE.println("WrappedHandler.write:", msg);
-            super.write(ctx, msg, promise);
+            // NORELEASE: Errr, is this receiving *real* packets somehow!?
+            final Packet packet = wrapMessage(msg);
+            real_channel.write(packet);
+            // NORELEASE: Also this isn't really the right way to send a packet... should be a level up?
+        }
+
+        Packet wrapMessage(Object msg) {
+            if (msg instanceof Packet) {
+                return new WrappedPacketFromClient((Packet) msg);
+            }
+            return new WrappedPacketFromClient(obj2msg.convert(msg));
         }
     }
 
+    EmbeddedChannel wrapperChannel = new EmbeddedChannel(new WrappedHandler());
     WrappedNetworkManager wrapperManager = new WrappedNetworkManager();
     NetworkDispatcher wrapperDispatcher = new WrappedNetworkDispatcher(wrapperManager);
+    NettyPacketConverter obj2msg = new NettyPacketConverter(Side.CLIENT);
 
     @Override
     public NetworkDispatcher getDispatcher() {
         return wrapperDispatcher;
+    }
+
+    @Override
+    public boolean guiCheckStart() {
+        return Minecraft.getMinecraft().currentScreen == null;
+    }
+
+    @Override
+    public void guiCheckEnd(boolean oldState) {
+        if (oldState && !guiCheckStart()) {
+            GuiScreen wrap = Minecraft.getMinecraft().currentScreen;
+            if (wrap instanceof GuiContainer) {
+                GuiContainer gc = (GuiContainer) wrap;
+                Minecraft.getMinecraft().displayGuiScreen(new ProxiedGuiContainer(gc.inventorySlots, gc));
+            }
+        }
     }
 }

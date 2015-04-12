@@ -7,7 +7,6 @@ import factorization.colossi.ColossusController.LimbType;
 import factorization.fzds.DeltaChunk;
 import factorization.fzds.DeltaChunk.AreaMap;
 import factorization.fzds.DeltaChunk.DseDestination;
-import factorization.fzds.Hammer;
 import factorization.fzds.interfaces.DeltaCapability;
 import factorization.fzds.interfaces.IDeltaChunk;
 import factorization.notify.Notice;
@@ -35,7 +34,7 @@ public class Awakener {
         if (is_working) return;
         try {
             is_working = true;
-            if (src.getDimensionID() == Hammer.getDimensionId()) return;
+            if (src.getDimensionID() == DeltaChunk.getDimensionId()) return;
             TileEntityColossalHeart heart = findNearestHeart(src);
             if (heart == null) return;
             msg("Unknown XR10-class entity detected.");

@@ -13,12 +13,13 @@ import cpw.mods.fml.common.network.FMLNetworkEvent;
 import cpw.mods.fml.common.registry.EntityRegistry;
 import cpw.mods.fml.relauncher.Side;
 import factorization.fzds.network.FzdsPacketRegistry;
+import factorization.fzds.network.HammerNet;
+import factorization.fzds.network.PPPChunkLoader;
 import factorization.fzds.network.WrappedPacket;
 import factorization.shared.Core;
 import net.minecraft.entity.Entity;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.management.PlayerManager;
-import net.minecraft.util.Vec3;
 import net.minecraft.world.World;
 import net.minecraftforge.common.DimensionManager;
 import net.minecraftforge.common.ForgeChunkManager;
@@ -77,8 +78,8 @@ public class Hammer {
         EntityRegistry.registerModEntity(DimensionSliceEntity.class, "fzds", 1, this, client_despawn_distance, 1, true);
         
         //Create the hammer dimension
-        DimensionManager.registerProviderType(getDimensionId(), HammerWorldProvider.class, true);
-        DimensionManager.registerDimension(getDimensionId(), getDimensionId());
+        DimensionManager.registerProviderType(DeltaChunk.getDimensionId(), HammerWorldProvider.class, true);
+        DimensionManager.registerDimension(DeltaChunk.getDimensionId(), DeltaChunk.getDimensionId());
         fzds_command_channel = hammerInfo.makeChannelFor(Core.modId, "fzdscmd", fzds_command_channel, -1, "This channel is used for Slices created using the /fzds command");
         FzdsPacketRegistry.init();
         
@@ -110,11 +111,11 @@ public class Hammer {
     public void serverStart(FMLServerStartingEvent event) {
         if (!DeltaChunk.enabled()) return;
         event.registerServerCommand(new FZDSCommand());
-        DimensionManager.initDimension(getDimensionId());
-        if (!DimensionManager.shouldLoadSpawn(getDimensionId())) {
+        DimensionManager.initDimension(DeltaChunk.getDimensionId());
+        if (!DimensionManager.shouldLoadSpawn(DeltaChunk.getDimensionId())) {
             throw new RuntimeException("hammerWorld is not loaded");
         }
-        World hammerWorld = DimensionManager.getWorld(getDimensionId());
+        World hammerWorld = DimensionManager.getWorld(DeltaChunk.getDimensionId());
         hammerWorld.addWorldAccess(new ServerShadowWorldAccess());
         int view_distance = MinecraftServer.getServer().getConfigurationManager().getViewDistance();
         //the undeobfed method comes after "isPlayerWatchingChunk", also in uses of ServerConfigurationManager.getViewDistance()
@@ -143,10 +144,6 @@ public class Hammer {
         if (ent.stepHeight <= 0.0F) return;
         ent.stepHeight += 1F / 128F;
     }
-    
-    public static Vec3 ent2vec(Entity ent) {
-        return Vec3.createVectorHelper(ent.posX, ent.posY, ent.posZ);
-    }
 
     private static Logger hammerLogger = LogManager.getLogger("FZ-Hammer-init");
     private void initializeLogging(Logger logger) {
@@ -171,8 +168,4 @@ public class Hammer {
         }
     }
 
-    public static int getDimensionId() {
-        DeltaChunk.assertEnabled();
-        return HammerInfo.dimension_slice_dimid;
-    }
 }
