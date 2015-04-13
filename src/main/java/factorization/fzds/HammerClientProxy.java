@@ -6,6 +6,7 @@ import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import cpw.mods.fml.common.gameevent.TickEvent;
 import cpw.mods.fml.common.gameevent.TickEvent.ClientTickEvent;
 import cpw.mods.fml.common.gameevent.TickEvent.Phase;
+import cpw.mods.fml.common.network.FMLNetworkEvent;
 import cpw.mods.fml.common.network.FMLNetworkEvent.ClientDisconnectionFromServerEvent;
 import cpw.mods.fml.common.network.handshake.NetworkDispatcher;
 import cpw.mods.fml.relauncher.Side;
@@ -17,13 +18,13 @@ import factorization.fzds.gui.ProxiedGuiContainer;
 import factorization.fzds.interfaces.IDeltaChunk;
 import factorization.fzds.interfaces.IFzdsShenanigans;
 import factorization.fzds.network.NettyPacketConverter;
+import factorization.fzds.network.WrapperAdapter;
 import factorization.fzds.network.WrappedPacketFromClient;
 import factorization.shared.BlockRenderHelper;
 import factorization.shared.Core;
 import factorization.shared.NORELEASE;
 import factorization.util.NumUtil;
 import factorization.util.SpaceUtil;
-import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelOutboundHandlerAdapter;
 import io.netty.channel.ChannelPromise;
@@ -44,7 +45,6 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.NetworkManager;
 import net.minecraft.network.Packet;
-import net.minecraft.network.play.client.C0EPacketClickWindow;
 import net.minecraft.profiler.Profiler;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.IChatComponent;
@@ -185,17 +185,16 @@ public class HammerClientProxy extends HammerProxy {
         send_queue.clientWorldController = wc;
     }
     
-    private void setWorldAndPlayer(WorldClient wc, EntityClientPlayerMP player, Channel channel) {
+    private void setWorldAndPlayer(WorldClient wc, EntityClientPlayerMP player) {
         Minecraft mc = Minecraft.getMinecraft();
-        if (wc == null || player == null || channel == null) {
-            Core.logSevere("Setting world/player/netty-channel to null! BRACE FOR IMPACT!");
+        if (wc == null || player == null) {
+            Core.logSevere("Setting world/player to null! BRACE FOR IMPACT!");
         }
         //For logic
         mc.theWorld = wc;
         mc.thePlayer = player;
         mc.thePlayer.worldObj = wc;
         setSendQueueWorld(wc);
-        mc.getNetHandler().getNetworkManager().channel = channel;
         
         //For rendering
         mc.renderViewEntity = player; //TODO NOTE: This may mess up in third person!
@@ -211,7 +210,6 @@ public class HammerClientProxy extends HammerProxy {
     private EntityClientPlayerMP real_player = null;
     private WorldClient real_world = null;
     private EntityClientPlayerMP fake_player = null;
-    private Channel real_channel = null;
     
     @Override
     public void setShadowWorld() {
@@ -229,10 +227,6 @@ public class HammerClientProxy extends HammerProxy {
         if (real_world == null) {
             throw new IllegalStateException("Swapping out to hammer world, but theWorld is null");
         }
-        real_channel = mc.getNetHandler().getNetworkManager().channel;
-        if (real_channel == null) {
-            throw new IllegalStateException("Swapping out to hammer world, but networkChannel is null");
-        }
         real_player.worldObj = w;
         if (fake_player == null || w != fake_player.worldObj) {
             fake_player = new EntityClientPlayerMP(
@@ -242,15 +236,16 @@ public class HammerClientProxy extends HammerProxy {
                     real_player.getStatFileWriter());
             fake_player.movementInput = real_player.movementInput;
         }
-        setWorldAndPlayer(w, fake_player, wrapperChannel);
+        setWorldAndPlayer(w, fake_player);
+        WrapperAdapter.setShadow(true);
     }
     
     @Override
     public void restoreRealWorld() {
-        setWorldAndPlayer(real_world, real_player, real_channel);
+        setWorldAndPlayer(real_world, real_player);
         real_world = null;
         real_player = null;
-        real_channel = null;
+        WrapperAdapter.setShadow(false);
     }
     
     @Override
@@ -495,49 +490,9 @@ public class HammerClientProxy extends HammerProxy {
         event.left.add("uc: " + objs.length);
     }
 
-    class WrappedNetworkDispatcher extends NetworkDispatcher implements IFzdsShenanigans {
-        public WrappedNetworkDispatcher(NetworkManager manager) {
-            super(manager);
-        }
-    }
-
-    class WrappedNetworkManager extends NetworkManager implements IFzdsShenanigans {
-        public WrappedNetworkManager() {
-            super(true /* isRemote */);
-            channel = wrapperChannel;
-        }
-
-        @Override
-        public void closeChannel(IChatComponent msg) {
-            Minecraft.getMinecraft().getNetHandler().getNetworkManager().closeChannel(msg);
-        }
-    }
-
-    class WrappedHandler extends ChannelOutboundHandlerAdapter implements IFzdsShenanigans {
-        @Override
-        public void write(ChannelHandlerContext ctx, Object msg, ChannelPromise promise) throws Exception {
-            // NORELEASE: Errr, is this receiving *real* packets somehow!?
-            final Packet packet = wrapMessage(msg);
-            real_channel.write(packet);
-            // NORELEASE: Also this isn't really the right way to send a packet... should be a level up?
-        }
-
-        Packet wrapMessage(Object msg) {
-            if (msg instanceof Packet) {
-                return new WrappedPacketFromClient((Packet) msg);
-            }
-            return new WrappedPacketFromClient(obj2msg.convert(msg));
-        }
-    }
-
-    EmbeddedChannel wrapperChannel = new EmbeddedChannel(new WrappedHandler());
-    WrappedNetworkManager wrapperManager = new WrappedNetworkManager();
-    NetworkDispatcher wrapperDispatcher = new WrappedNetworkDispatcher(wrapperManager);
-    NettyPacketConverter obj2msg = new NettyPacketConverter(Side.CLIENT);
-
-    @Override
-    public NetworkDispatcher getDispatcher() {
-        return wrapperDispatcher;
+    @SubscribeEvent
+    public void addWrapperAdapter(FMLNetworkEvent.ClientConnectedToServerEvent event) {
+        WrapperAdapter.addToPipeline(event.manager);
     }
 
     @Override

@@ -1,10 +1,12 @@
 package factorization.fzds.network;
 
+import cpw.mods.fml.common.network.handshake.NetworkDispatcher;
 import cpw.mods.fml.common.network.internal.FMLProxyPacket;
 import cpw.mods.fml.relauncher.Side;
 import factorization.fzds.Hammer;
 import factorization.shared.Core;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.network.NetHandlerPlayClient;
 import net.minecraft.network.INetHandler;
 import net.minecraft.network.Packet;
 import net.minecraft.network.play.server.S21PacketChunkData;
@@ -27,8 +29,10 @@ public class WrappedPacketFromServer extends WrappedPacket {
         boolean needReset = false;
         if (wrapped instanceof FMLProxyPacket) {
             FMLProxyPacket fml = (FMLProxyPacket) wrapped;
+            NetHandlerPlayClient nhpc = (NetHandlerPlayClient) netHandler;
+            NetworkDispatcher dispatcher = nhpc.getNetworkManager().channel.attr(NetworkDispatcher.FML_DISPATCHER).get();
             fml.setTarget(Side.CLIENT);
-            fml.setDispatcher(Hammer.proxy.getDispatcher());
+            fml.setDispatcher(dispatcher);
             if (fml.payload().readerIndex() != 0) {
                 Core.logSevere("Packet double-processing detected! Channel: " + fml.channel());
                 return;

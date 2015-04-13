@@ -33,10 +33,6 @@ public class HammerProxy {
 
     public void cleanupClientWorld() { }
 
-    public NetworkDispatcher getDispatcher() {
-        return null;
-    }
-
     public boolean guiCheckStart() {
         return false;
     }

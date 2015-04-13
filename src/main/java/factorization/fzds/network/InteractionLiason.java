@@ -18,6 +18,7 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.management.ItemInWorldManager;
 import net.minecraft.world.WorldServer;
 
+import java.lang.ref.WeakReference;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.WeakHashMap;
@@ -29,14 +30,14 @@ class InteractionLiason extends EntityPlayerMP implements IFzdsShenanigans {
     private final InventoryPlayer original_inventory;
     private ShadowPlayerAligner aligner;
     private NetworkManager networkManager;
-    private EntityPlayerMP realPlayer;
+    private final WeakReference<EntityPlayerMP> realPlayerRef;
 
     private EmbeddedChannel proxiedChannel = new EmbeddedChannel(new LiasonHandler());
 
     public InteractionLiason(WorldServer world, ItemInWorldManager itemManager, EntityPlayerMP realPlayer, IDeltaChunk idc) {
         super(MinecraftServer.getServer(), world, liasonGameProfile, itemManager);
         original_inventory = this.inventory;
-        this.realPlayer = realPlayer;
+        realPlayerRef = new WeakReference<EntityPlayerMP>(realPlayer);
         initLiason();
         updateFromPlayerStatus();
     }
@@ -51,6 +52,9 @@ class InteractionLiason extends EntityPlayerMP implements IFzdsShenanigans {
     }
 
     void updateFromPlayerStatus() {
+        EntityPlayerMP realPlayer = realPlayerRef.get();
+        if (realPlayer == null) return;
+
         this.inventory = realPlayer.inventory;
         this.setSprinting(realPlayer.isSprinting());
         this.setSneaking(realPlayer.isSneaking());
@@ -58,6 +62,8 @@ class InteractionLiason extends EntityPlayerMP implements IFzdsShenanigans {
     }
 
     void initializeFor(IDeltaChunk idc) {
+        EntityPlayerMP realPlayer = realPlayerRef.get();
+        if (realPlayer == null) return;
         aligner = new ShadowPlayerAligner(realPlayer, this, idc);
         aligner.apply();
     }
@@ -72,13 +78,15 @@ class InteractionLiason extends EntityPlayerMP implements IFzdsShenanigans {
 
     void murderLiasonAndShoveHisWretchedBodyOnAPike() {
         // Stuff? Drop our items? Die?
-        realPlayer = null;
         inventory = original_inventory;
         aligner.unapply();
         setDead();
+        realPlayerRef.clear();
     }
 
     void keepLiason() {
+        EntityPlayerMP realPlayer = realPlayerRef.get();
+        if (realPlayer == null) return;
         activeLiasons.put(realPlayer, this);
     }
 
@@ -117,6 +125,8 @@ class InteractionLiason extends EntityPlayerMP implements IFzdsShenanigans {
     }
 
     void bouncePacket(Object msg) {
+        EntityPlayerMP realPlayer = realPlayerRef.get();
+        if (realPlayer == null) return;
         realPlayer.playerNetServerHandler.sendPacket(PacketProxyingPlayer.wrapMessage(msg));
     }
 }
