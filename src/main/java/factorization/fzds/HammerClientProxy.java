@@ -15,6 +15,7 @@ import factorization.api.Quaternion;
 import factorization.coremodhooks.HookTargetsClient;
 import factorization.coremodhooks.IExtraChunkData;
 import factorization.fzds.gui.ProxiedGuiContainer;
+import factorization.fzds.gui.ProxiedGuiScreen;
 import factorization.fzds.interfaces.IDeltaChunk;
 import factorization.fzds.interfaces.IFzdsShenanigans;
 import factorization.fzds.network.NettyPacketConverter;
@@ -507,6 +508,8 @@ public class HammerClientProxy extends HammerProxy {
             if (wrap instanceof GuiContainer) {
                 GuiContainer gc = (GuiContainer) wrap;
                 Minecraft.getMinecraft().displayGuiScreen(new ProxiedGuiContainer(gc.inventorySlots, gc));
+            } else if (wrap != null) {
+                Minecraft.getMinecraft().displayGuiScreen(new ProxiedGuiScreen(wrap));
             }
         }
     }

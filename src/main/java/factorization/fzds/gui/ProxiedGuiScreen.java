@@ -3,22 +3,18 @@ package factorization.fzds.gui;
 import factorization.fzds.Hammer;
 import factorization.fzds.interfaces.IFzdsShenanigans;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.inventory.GuiContainer;
-import net.minecraft.inventory.Container;
+import net.minecraft.client.gui.GuiScreen;
 
-public class ProxiedGuiContainer extends GuiContainer implements IFzdsShenanigans {
-    // Basically a copy of ProxiedGuiScreen.
-    // This is here for "NEI support" to prevent whiny NEI-dependent n00bs from whining and/or flipping their shit
+public class ProxiedGuiScreen extends GuiScreen implements IFzdsShenanigans {
+    final GuiScreen sub;
 
-    final GuiContainer sub;
-
-    public ProxiedGuiContainer(Container container, GuiContainer sub) {
-        super(container);
+    public ProxiedGuiScreen(GuiScreen sub) {
         this.sub = sub;
-        if (sub instanceof ProxiedGuiContainer) {
+        if (sub instanceof ProxiedGuiContainer || sub instanceof ProxiedGuiScreen) {
             throw new IllegalArgumentException("Nesting has negative socio-economic impact! Not allowed!");
         }
     }
+
 
     private boolean enter() {
         if (!Hammer.proxy.isInShadowWorld()) {
@@ -32,12 +28,6 @@ public class ProxiedGuiContainer extends GuiContainer implements IFzdsShenanigan
         if (do_it) {
             Hammer.proxy.restoreRealWorld();
         }
-    }
-
-
-    @Override
-    protected void drawGuiContainerBackgroundLayer(float partial, int mouseX, int mouseY) {
-        // No-op; sub.drawScreen()'ll make this happen
     }
 
     public void initGui() {

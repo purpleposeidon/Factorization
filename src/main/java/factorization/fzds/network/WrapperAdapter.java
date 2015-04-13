@@ -1,12 +1,13 @@
 package factorization.fzds.network;
 
+import factorization.fzds.interfaces.IFzdsShenanigans;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelOutboundHandlerAdapter;
 import io.netty.channel.ChannelPromise;
 import net.minecraft.network.NetworkManager;
 import net.minecraft.network.Packet;
 
-public class WrapperAdapter extends ChannelOutboundHandlerAdapter {
+public class WrapperAdapter extends ChannelOutboundHandlerAdapter implements IFzdsShenanigans {
     public static void addToPipeline(NetworkManager manager) {
         WrapperAdapter.manager = manager;
         manager.channel.pipeline().addAfter("fml:packet_handler" /* see NetworkDispatcher.insertIntoChannel */, "fzds:wrapper", new WrapperAdapter());
