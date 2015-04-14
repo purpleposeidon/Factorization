@@ -5,13 +5,13 @@ import factorization.shared.Core;
 import factorization.shared.FastBag;
 import factorization.util.SpaceUtil;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.multiplayer.WorldClient;
+import net.minecraft.client.renderer.OpenGlHelper;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.culling.Frustrum;
 import net.minecraft.client.renderer.culling.ICamera;
 import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.init.Blocks;
 import net.minecraft.util.AxisAlignedBB;
-import net.minecraft.util.IIcon;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.Vec3;
 import net.minecraftforge.client.event.RenderWorldLastEvent;
@@ -77,7 +77,7 @@ public class ChainRender {
         final Tessellator tess = Tessellator.instance;
         final AxisAlignedBB workBox = SpaceUtil.newBox();
         final Vec3 workStart = SpaceUtil.newVec(), workEnd = SpaceUtil.newVec();
-        final IIcon icon = Blocks.redstone_lamp.getIcon(0, 0);
+        final WorldClient w = event.context.theWorld;
         boolean setup = false;
         for (WeakReference<ChainLink> ref : chains) {
             ChainLink chain = ref.get();
@@ -97,19 +97,23 @@ public class ChainRender {
                 double cz = eyePos.lastTickPosZ + (eyePos.posZ - eyePos.lastTickPosZ) * (double) event.partialTicks;
                 tess.setTranslation(-cx, -cy, -cz);
             }
-            GL11.glBegin(GL11.GL_LINES);
-            GL11.glVertex3d(workStart.xCoord, workStart.yCoord, workStart.zCoord);
-            GL11.glVertex3d(workEnd.xCoord, workEnd.yCoord + 1, workEnd.zCoord);
-            GL11.glEnd();
-            chain.draw(tess, camera, partial, workBox, workStart, workEnd);
+            chain.draw(w, tess, camera, partial, workBox, workStart, workEnd);
         }
         if (!setup) return;
 
-        Minecraft.getMinecraft().getTextureManager().bindTexture(new ResourceLocation("factorization", "textures/chain.png"));
         GL11.glPushAttrib(GL11.GL_ENABLE_BIT);
+        Minecraft.getMinecraft().getTextureManager().bindTexture(new ResourceLocation("factorization", "textures/chain.png"));
+        OpenGlHelper.setActiveTexture(OpenGlHelper.lightmapTexUnit);
+        GL11.glEnable(GL11.GL_TEXTURE_2D);
+        GL11.glEnable(GL11.GL_BLEND);
         GL11.glDisable(GL11.GL_LIGHTING);
         GL11.glDisable(GL11.GL_CULL_FACE);
         tess.draw();
+
+        // Re-disable the lighting textures. Preettty sure PopAttrib'd take care of it, but the docs isn't explicit about it.
+        OpenGlHelper.setActiveTexture(OpenGlHelper.lightmapTexUnit);
+        GL11.glDisable(GL11.GL_TEXTURE_2D);
+
         GL11.glPopAttrib();
         tess.setTranslation(0, 0, 0);
     }

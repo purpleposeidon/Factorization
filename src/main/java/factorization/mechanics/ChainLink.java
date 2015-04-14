@@ -5,10 +5,14 @@ import cpw.mods.fml.relauncher.SideOnly;
 import factorization.shared.Core;
 import factorization.util.NumUtil;
 import factorization.util.SpaceUtil;
+import net.minecraft.block.Block;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.multiplayer.WorldClient;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.culling.ICamera;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.Vec3;
+import net.minecraft.world.World;
 
 public class ChainLink {
     private Vec3 start, end, prevStart, prevEnd;
@@ -47,7 +51,7 @@ public class ChainLink {
     }
 
     @SideOnly(Side.CLIENT)
-    void draw(Tessellator tess, ICamera camera, float partial,
+    void draw(WorldClient world, Tessellator tess, ICamera camera, float partial,
                      AxisAlignedBB workBox, Vec3 workStart, Vec3 workEnd) {
         Vec3 forward = SpaceUtil.subtract(workStart, workEnd);
         double length = forward.lengthVector();
@@ -74,23 +78,36 @@ public class ChainLink {
 
         double g = 9F/32F;
         double h = g + 0.5;
-        drawPlane(tess, workStart, workEnd, side1, g - linkCount, 1 + g);
-        drawPlane(tess, workStart, workEnd, side2, h - linkCount, 1 + h);
+        drawPlane(world, tess, workStart, workEnd, side1, g - linkCount, 1 + g);
+        drawPlane(world, tess, workStart, workEnd, side2, h - linkCount, 1 + h);
     }
 
-    void drawPlane(Tessellator tess, Vec3 workStart, Vec3 workEnd, Vec3 right, double uStart, double uEnd) {
+    void setupLight(WorldClient world, Tessellator tess, Vec3 at) {
+        int x = (int) at.xCoord;
+        int y = (int) at.yCoord;
+        int z = (int) at.zCoord;
+        Block b = world.getBlock(x, y, z);
+        int brightness = b.getMixedBrightnessForBlock(world, x, y, z);
+        tess.setBrightness(brightness);
+    }
+
+    void drawPlane(WorldClient world, Tessellator tess, Vec3 workStart, Vec3 workEnd, Vec3 right, double uStart, double uEnd) {
+        setupLight(world, tess, workStart);
         tess.addVertexWithUV(workStart.xCoord + right.xCoord,
                 workStart.yCoord + right.yCoord,
                 workStart.zCoord + right.zCoord,
                 uStart, 1);
+        //tess.setBrightness(0); // NORELEASE
         tess.addVertexWithUV(workStart.xCoord - right.xCoord,
                 workStart.yCoord - right.yCoord,
                 workStart.zCoord - right.zCoord,
                 uStart, 0);
+        setupLight(world, tess, workEnd);
         tess.addVertexWithUV(workEnd.xCoord - right.xCoord,
                 workEnd.yCoord - right.yCoord,
                 workEnd.zCoord - right.zCoord,
                 uEnd, 0);
+        //tess.setBrightness(0); // NORELEASE
         tess.addVertexWithUV(workEnd.xCoord + right.xCoord,
                 workEnd.yCoord + right.yCoord,
                 workEnd.zCoord + right.zCoord,
