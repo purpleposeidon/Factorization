@@ -438,26 +438,23 @@ public class DimensionSliceEntity extends IDeltaChunk implements IFzdsEntryContr
         Coord d = getFarCorner();
         AxisAlignedBB start = null;
         // NORELEASE omfg slow!
+        World w = c.w;
         for (int x = c.x; x <= d.x; x++) {
             for (int y = c.y; y <= d.y; y++) {
                 for (int z = c.z; z <= d.z; z++) {
                     Block block = c.w.getBlock(x, y, z);
-                    if (block == null) {
-                        continue;
-                    }
-                    AxisAlignedBB b = block.getCollisionBoundingBoxFromPool(c.w, x, y, z);
-                    if (b == null) {
+                    if (block.isAir(c.w, x, y, z)) {
                         continue;
                     }
                     if (start == null) {
-                        start = b;
+                        start = AxisAlignedBB.getBoundingBox(x, y, z, x + 1, y + 1, z + 1);
                     } else {
-                        start.minX = Math.min(start.minX, b.minX);
-                        start.minY = Math.min(start.minY, b.minY);
-                        start.minZ = Math.min(start.minZ, b.minZ);
-                        start.maxX = Math.max(start.maxX, b.maxX);
-                        start.maxY = Math.max(start.maxY, b.maxY);
-                        start.maxZ = Math.max(start.maxZ, b.maxZ);
+                        start.minX = Math.min(start.minX, x);
+                        start.minY = Math.min(start.minY, y);
+                        start.minZ = Math.min(start.minZ, z);
+                        start.maxX = Math.max(start.maxX, x + 1);
+                        start.maxY = Math.max(start.maxY, y + 1);
+                        start.maxZ = Math.max(start.maxZ, z + 1);
                     }
                 }
             }
