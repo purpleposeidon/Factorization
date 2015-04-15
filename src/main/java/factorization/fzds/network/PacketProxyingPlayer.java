@@ -13,8 +13,13 @@ import factorization.fzds.interfaces.IDeltaChunk;
 import factorization.fzds.interfaces.IFzdsEntryControl;
 import factorization.fzds.interfaces.IFzdsShenanigans;
 import factorization.shared.Core;
+import factorization.util.SpaceUtil;
 import io.netty.channel.*;
 import io.netty.channel.embedded.EmbeddedChannel;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityTracker;
+import net.minecraft.entity.EntityTrackerEntry;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.network.EnumConnectionState;
 import net.minecraft.network.NetHandlerPlayServer;
@@ -25,6 +30,7 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.management.ItemInWorldManager;
 import net.minecraft.server.management.ServerConfigurationManager;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.Vec3;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;
 import net.minecraft.world.chunk.Chunk;
@@ -54,6 +60,7 @@ public class PacketProxyingPlayer extends EntityPlayerMP implements
     }
     
     void initWrapping() {
+        updateListenerList();
         playerNetServerHandler = new NetHandlerPlayServer(mcServer, networkManager, this);
         playerNetServerHandler.netManager.channel().attr(NetworkDispatcher.FML_DISPATCHER).set(new NetworkDispatcher(this.networkManager));
         //Compare cpw.mods.fml.common.network.FMLOutboundHandler.OutboundTarget.PLAYER.{...}.selectNetworks(Object, ChannelHandlerContext, FMLProxyPacket)
@@ -150,6 +157,10 @@ public class PacketProxyingPlayer extends EntityPlayerMP implements
         if (worldObj.isRemote) return; // Won't happen.
         boolean should_update = ticksExisted % 20 == 1;
         if (!should_update) return;
+        updateListenerList();
+    }
+
+    void updateListenerList() {
         List playerList = getTargetablePlayers();
         for (int i = 0; i < playerList.size(); i++) {
             Object o = playerList.get(i);
@@ -220,6 +231,19 @@ public class PacketProxyingPlayer extends EntityPlayerMP implements
                     continue;
                 }
                 addNettyMessageForPlayer(target, new WrappedPacketFromServer(description));
+            }
+        }
+        // Some BS nonsense to get to the entity spawn packet
+        EntityTrackerEntry tracker = new EntityTrackerEntry(target, Integer.MAX_VALUE, 1, true);
+        for (Chunk chunk : chunks) {
+            for (List<Entity> entList : (List<Entity>[]) chunk.entityLists) {
+                for (Entity ent : entList) {
+                    if (ent == this) continue;
+                    if (ent.isDead) continue;
+                    tracker.myEntity = ent;
+                    Packet packet = tracker.func_151260_c();
+                    addNettyMessageForPlayer(target, wrapMessage(packet));
+                }
             }
         }
     }
