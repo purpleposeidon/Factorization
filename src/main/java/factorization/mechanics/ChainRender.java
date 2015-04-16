@@ -6,10 +6,11 @@ import factorization.shared.FastBag;
 import factorization.util.SpaceUtil;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.WorldClient;
-import net.minecraft.client.renderer.OpenGlHelper;
+import net.minecraft.client.renderer.EntityRenderer;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.culling.Frustrum;
 import net.minecraft.client.renderer.culling.ICamera;
+import net.minecraft.client.renderer.texture.TextureManager;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.ResourceLocation;
@@ -74,11 +75,16 @@ public class ChainRender {
         if (chains.isEmpty()) return;
         final float partial = event.partialTicks;
         final ICamera camera = getFrustum(partial);
+
+        final WorldClient w = event.context.theWorld;
+        final Minecraft mc = Minecraft.getMinecraft();
+        final EntityRenderer er = mc.entityRenderer;
+        final TextureManager textureManager = mc.getTextureManager();
         final Tessellator tess = Tessellator.instance;
+
+        boolean setup = false;
         final AxisAlignedBB workBox = SpaceUtil.newBox();
         final Vec3 workStart = SpaceUtil.newVec(), workEnd = SpaceUtil.newVec();
-        final WorldClient w = event.context.theWorld;
-        boolean setup = false;
         for (WeakReference<ChainLink> ref : chains) {
             ChainLink chain = ref.get();
             if (chain == null) {
@@ -91,7 +97,7 @@ public class ChainRender {
                 tess.startDrawingQuads();
                 tess.setColorRGBA(0xFF, 0xFF, 0xFF, 0xFF);
 
-                EntityLivingBase eyePos = Minecraft.getMinecraft().renderViewEntity;
+                EntityLivingBase eyePos = mc.renderViewEntity;
                 double cx = eyePos.lastTickPosX + (eyePos.posX - eyePos.lastTickPosX) * (double) event.partialTicks;
                 double cy = eyePos.lastTickPosY + (eyePos.posY - eyePos.lastTickPosY) * (double) event.partialTicks;
                 double cz = eyePos.lastTickPosZ + (eyePos.posZ - eyePos.lastTickPosZ) * (double) event.partialTicks;
@@ -102,20 +108,16 @@ public class ChainRender {
         if (!setup) return;
 
         GL11.glPushAttrib(GL11.GL_ENABLE_BIT);
-        Minecraft.getMinecraft().getTextureManager().bindTexture(new ResourceLocation("factorization", "textures/chain.png"));
-        OpenGlHelper.setActiveTexture(OpenGlHelper.lightmapTexUnit);
-        GL11.glEnable(GL11.GL_TEXTURE_2D);
+        textureManager.bindTexture(new ResourceLocation("factorization", "textures/chain.png"));
+        er.enableLightmap(0);
         GL11.glEnable(GL11.GL_BLEND);
         GL11.glDisable(GL11.GL_LIGHTING);
         GL11.glDisable(GL11.GL_CULL_FACE);
         tess.draw();
-
-        // Re-disable the lighting textures. Preettty sure PopAttrib'd take care of it, but the docs isn't explicit about it.
-        OpenGlHelper.setActiveTexture(OpenGlHelper.lightmapTexUnit);
-        GL11.glDisable(GL11.GL_TEXTURE_2D);
-
+        er.disableLightmap(0);
         GL11.glPopAttrib();
         tess.setTranslation(0, 0, 0);
+        textureManager.bindTexture(Core.blockAtlas);
     }
 
     @SubscribeEvent
