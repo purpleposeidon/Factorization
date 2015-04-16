@@ -1,7 +1,9 @@
 package factorization.ceramics;
 
+import java.io.IOException;
 import java.util.List;
 
+import factorization.api.datahelpers.DataInNBT;
 import factorization.shared.*;
 import factorization.util.InvUtil;
 import factorization.util.ItemUtil;
@@ -9,6 +11,7 @@ import net.minecraft.client.renderer.texture.IIconRegister;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.EnumChatFormatting;
 import net.minecraft.util.IIcon;
 import net.minecraft.util.MovingObjectPosition;
@@ -172,6 +175,30 @@ public class ItemSculptingTool extends ItemFactorization {
                 new Notice(here, "Not fired").send(player);
                 return true;
             }
+
+            TileEntityGreenware rep = new TileEntityGreenware();
+
+            NBTTagCompound tag = gw.getItem().getTagCompound();
+
+            try {
+                rep.putData(new DataInNBT(tag));
+            } catch (IOException e) {
+                e.printStackTrace();
+                return false;
+            }
+            rep.totalHeat = 0;
+            rep.glazesApplied = false;
+            rep.lastTouched = 0;
+            for (ClayLump part : rep.parts) {
+                part.icon_id = null;
+                part.icon_md = 0;
+                part.icon_side = -1;
+            }
+            ItemStack toDrop = rep.getItem();
+            if (gw.customName != null) {
+                toDrop.setStackDisplayName(gw.customName);
+            }
+
             FzInv inv = InvUtil.openInventory(player.inventory, 0);
             if (!player.capabilities.isCreativeMode) {
                 ItemStack theSlab = null;
@@ -196,20 +223,7 @@ public class ItemSculptingTool extends ItemFactorization {
                 inv.pull(theSlab, 1, false);
                 inv.pull(new ItemStack(Items.clay_ball), gw.parts.size(), false);
             }
-            TileEntityGreenware rep = (TileEntityGreenware) FactoryType.CERAMIC.getRepresentative();
-            rep.loadFromStack(gw.getItem());
-            rep.totalHeat = 0;
-            rep.glazesApplied = false;
-            rep.lastTouched = 0;
-            for (ClayLump part : rep.parts) {
-                part.icon_id = null;
-                part.icon_md = 0;
-                part.icon_side = -1;
-            }
-            ItemStack toDrop = rep.getItem();
-            if (gw.customName != null) {
-                toDrop.setStackDisplayName(gw.customName);
-            }
+
             if (inv.push(toDrop) != null) {
                 player.dropPlayerItemWithRandomChoice(toDrop, false);
             }
