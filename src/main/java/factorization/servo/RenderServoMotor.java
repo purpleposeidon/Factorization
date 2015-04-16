@@ -2,6 +2,8 @@ package factorization.servo;
 
 import java.util.Iterator;
 
+import factorization.fzds.DeltaChunk;
+import factorization.fzds.Hammer;
 import factorization.shared.*;
 import factorization.util.NumUtil;
 import net.minecraft.block.Block;
@@ -64,6 +66,9 @@ public class RenderServoMotor extends RenderEntity {
         Core.profileStartRender("servo");
         //Ugh, there's some state that changes when mousing over an item in the inventory...
         MovingObjectPosition mop = Minecraft.getMinecraft().objectMouseOver;
+        if (DeltaChunk.getClientShadowWorld() == ent.worldObj) {
+            mop = Hammer.proxy.getShadowHit();
+        }
         boolean highlighted = mop != null && mop.entityHit == ent;
         ServoMotor motor = (ServoMotor) ent;
 

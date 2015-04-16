@@ -471,7 +471,7 @@ public class HammerClientProxy extends HammerProxy {
     }
     
     @Override
-    MovingObjectPosition getShadowHit() {
+    public MovingObjectPosition getShadowHit() {
         return _shadowSelected;
     }
     

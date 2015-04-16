@@ -6,13 +6,11 @@ import factorization.shared.Core;
 import factorization.util.NumUtil;
 import factorization.util.SpaceUtil;
 import net.minecraft.block.Block;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.WorldClient;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.culling.ICamera;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.Vec3;
-import net.minecraft.world.World;
 
 public class ChainLink {
     private Vec3 start, end, prevStart, prevEnd;
@@ -97,7 +95,6 @@ public class ChainLink {
                 workStart.yCoord + right.yCoord,
                 workStart.zCoord + right.zCoord,
                 uStart, 1);
-        //tess.setBrightness(0); // NORELEASE
         tess.addVertexWithUV(workStart.xCoord - right.xCoord,
                 workStart.yCoord - right.yCoord,
                 workStart.zCoord - right.zCoord,
@@ -107,7 +104,6 @@ public class ChainLink {
                 workEnd.yCoord - right.yCoord,
                 workEnd.zCoord - right.zCoord,
                 uEnd, 0);
-        //tess.setBrightness(0); // NORELEASE
         tess.addVertexWithUV(workEnd.xCoord + right.xCoord,
                 workEnd.yCoord + right.yCoord,
                 workEnd.zCoord + right.zCoord,

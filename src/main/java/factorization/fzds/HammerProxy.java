@@ -25,7 +25,7 @@ public class HammerProxy {
     
     void updateRayPosition(DseRayTarget ray) { }
     
-    MovingObjectPosition getShadowHit() { return null; }
+    public MovingObjectPosition getShadowHit() { return null; }
     
     IDeltaChunk getHitIDC() { return null; }
 
