@@ -57,7 +57,8 @@ public class ClickHandler {
         FMLProxyPacket toSend = null;
         switch (hit.typeOfHit) {
         case ENTITY:
-            toSend = HammerNet.makePacket(rightClick ? HammerNetType.rightClickEntity : HammerNetType.leftClickEntity, ray.parent.getEntityId());
+            final byte packetId = rightClick ? HammerNetType.rightClickEntity : HammerNetType.leftClickEntity;
+            toSend = HammerNet.makePacket(packetId, parent.getEntityId(), hit.entityHit.getEntityId());
             current_attacking_target = hit;
             break;
         case BLOCK:

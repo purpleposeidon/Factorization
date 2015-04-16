@@ -38,6 +38,7 @@ import net.minecraftforge.event.entity.player.PlayerDestroyItemEvent;
 import net.minecraftforge.event.world.BlockEvent.PlaceEvent;
 
 import java.io.IOException;
+import java.util.Arrays;
 
 
 public class HammerNet {
@@ -213,6 +214,14 @@ public class HammerNet {
             float vecY = dis.readFloat();
             float vecZ = dis.readFloat();
             leftClickBlock(idc, player, dis, x, y, z, sideHit, vecX, vecY, vecZ);
+        } else if (type == HammerNetType.rightClickEntity || type == HammerNetType.leftClickEntity) {
+            int entId = dis.readInt();
+            Entity hitEnt = idc.getCorner().w.getEntityByID(entId);
+            if (hitEnt == null) {
+                Core.logWarning("%s tried clicking a non-existing entity", player);
+                return;
+            }
+            clickEntity(idc, player, hitEnt, type == HammerNetType.leftClickEntity);
         } else {
             Core.logWarning("%s tried to send an unknown packet %s to IDC %s", player, type, idc);
         }
@@ -292,6 +301,16 @@ public class HammerNet {
         // TODO: Liason?
         Block block = at.getBlock();
         block.onBlockClicked(at.w, x, y, z, player);
+    }
+
+    void clickEntity(IDeltaChunk idc, EntityPlayerMP player, Entity hitEnt, boolean leftClick) {
+        InteractionLiason liason = getLiason((WorldServer) idc.getCorner().w, player, idc);
+        if (leftClick) {
+            liason.attackTargetEntityWithCurrentItem(hitEnt);
+        } else {
+            liason.interactWith(hitEnt);
+        }
+        liason.finishUsingLiason();
     }
     
     InteractionLiason getLiason(WorldServer shadowWorld, EntityPlayerMP real_player, IDeltaChunk idc) {

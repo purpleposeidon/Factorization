@@ -35,6 +35,15 @@ public class ShadowPlayerAligner {
         shadow.posZ = shadowPos.zCoord;
         shadow.rotationPitch = (float) shadow_pitch;
         shadow.rotationYaw = (float) shadow_yaw;
+        double hx = shadow.width / 2;
+        double hy = shadow.height / 2;
+        double hz = shadow.width / 2;
+        shadow.boundingBox.minX = shadow.posX - hx;
+        shadow.boundingBox.minY = shadow.posY - hx;
+        shadow.boundingBox.minZ = shadow.posZ - hy;
+        shadow.boundingBox.maxX = shadow.posX + hy;
+        shadow.boundingBox.maxY = shadow.posY + hz;
+        shadow.boundingBox.maxZ = shadow.posZ + hz;
     }
 
     public void unapply() {

@@ -80,7 +80,7 @@ public class DimensionSliceEntity extends IDeltaChunk implements IFzdsEntryContr
     
     Object renderInfo = null; //Client-side
     
-    Entity proxy = null;
+    Entity packetRelay = null;
     HashSet<IExtraChunkData> registered_chunks = new HashSet<IExtraChunkData>();
     UniversalCollider universalCollider;
     
@@ -836,8 +836,6 @@ public class DimensionSliceEntity extends IDeltaChunk implements IFzdsEntryContr
     public void onEntityUpdate() {
         if (isDead) return;
         //We don't want to call super, because it does a bunch of stuff that makes no sense for us.
-        Core.profileStart("FzdsDseTick");
-        Core.profileStart("init");
         prevTickRotation.update(rotation);
         prevPosX = posX;
         prevPosY = posY;
@@ -847,27 +845,25 @@ public class DimensionSliceEntity extends IDeltaChunk implements IFzdsEntryContr
             if (ticksExisted == 1) {
                 DeltaChunk.getSlices(worldObj).add(this);
             }
-        } else if (proxy == null) {
+        } else if (packetRelay == null) {
             boolean isOracle = can(DeltaCapability.ORACLE);
             World target_world = isOracle ? worldObj : DeltaChunk.getServerShadowWorld();
             cornerMin.w = cornerMax.w = target_world;
             if (isOracle) {
-                proxy = this;
+                packetRelay = this;
             } else {
                 DeltaChunk.getSlices(worldObj).add(this);
                 World shadowWorld = DeltaChunk.getServerShadowWorld();
-                proxy = new PacketProxyingPlayer(this, shadowWorld);
-                proxy.worldObj.spawnEntityInWorld(proxy);
+                packetRelay = new PacketProxyingPlayer(this, shadowWorld);
+                packetRelay.worldObj.spawnEntityInWorld(packetRelay);
             }
-            Core.profileEnd();
-            Core.profileEnd(); // Really should be try/finally or nested in another method...
             return;
         }
         if (ticksExisted % 60 == 0) {
             need_recheck = true;
             updateUniversalCollisions(); // TODO: Do it properly
         }
-        Core.profileEnd();
+        Core.profileStart("FzdsDseTick");
         if (!worldObj.isRemote) controller.beforeUpdate(this);
         if (!parent.trackingEntity()) {
             Core.profileStart("updateMotion");

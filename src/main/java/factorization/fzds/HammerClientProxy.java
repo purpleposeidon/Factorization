@@ -8,7 +8,6 @@ import cpw.mods.fml.common.gameevent.TickEvent.ClientTickEvent;
 import cpw.mods.fml.common.gameevent.TickEvent.Phase;
 import cpw.mods.fml.common.network.FMLNetworkEvent;
 import cpw.mods.fml.common.network.FMLNetworkEvent.ClientDisconnectionFromServerEvent;
-import cpw.mods.fml.common.network.handshake.NetworkDispatcher;
 import cpw.mods.fml.relauncher.Side;
 import factorization.api.Coord;
 import factorization.api.Quaternion;
@@ -17,19 +16,11 @@ import factorization.coremodhooks.IExtraChunkData;
 import factorization.fzds.gui.ProxiedGuiContainer;
 import factorization.fzds.gui.ProxiedGuiScreen;
 import factorization.fzds.interfaces.IDeltaChunk;
-import factorization.fzds.interfaces.IFzdsShenanigans;
-import factorization.fzds.network.NettyPacketConverter;
 import factorization.fzds.network.WrapperAdapter;
-import factorization.fzds.network.WrappedPacketFromClient;
 import factorization.shared.BlockRenderHelper;
 import factorization.shared.Core;
-import factorization.shared.NORELEASE;
 import factorization.util.NumUtil;
 import factorization.util.SpaceUtil;
-import io.netty.channel.ChannelHandlerContext;
-import io.netty.channel.ChannelOutboundHandlerAdapter;
-import io.netty.channel.ChannelPromise;
-import io.netty.channel.embedded.EmbeddedChannel;
 import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityClientPlayerMP;
@@ -38,17 +29,15 @@ import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.client.multiplayer.ChunkProviderClient;
 import net.minecraft.client.multiplayer.WorldClient;
 import net.minecraft.client.network.NetHandlerPlayClient;
+import net.minecraft.client.renderer.EntityRenderer;
 import net.minecraft.client.renderer.RenderGlobal;
 import net.minecraft.client.renderer.entity.RenderManager;
 import net.minecraft.client.renderer.tileentity.TileEntityRendererDispatcher;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
-import net.minecraft.network.NetworkManager;
-import net.minecraft.network.Packet;
 import net.minecraft.profiler.Profiler;
 import net.minecraft.util.AxisAlignedBB;
-import net.minecraft.util.IChatComponent;
 import net.minecraft.util.MovingObjectPosition;
 import net.minecraft.util.Vec3;
 import net.minecraft.world.EnumDifficulty;
@@ -119,7 +108,6 @@ public class HammerClientProxy extends HammerProxy {
     
     @SubscribeEvent
     public void tick(ClientTickEvent event) {
-        if (event.phase != Phase.START) return;
         checkForWorldChange(); // Is there an event for this?
         runShadowTick();
         if (shadowRenderGlobal != null) {
@@ -192,6 +180,9 @@ public class HammerClientProxy extends HammerProxy {
             Core.logSevere("Setting world/player to null! BRACE FOR IMPACT!");
         }
         //For logic
+        if (mc.renderViewEntity == mc.thePlayer) {
+            mc.renderViewEntity = player;
+        }
         mc.theWorld = wc;
         mc.thePlayer = player;
         mc.thePlayer.worldObj = wc;
@@ -239,6 +230,7 @@ public class HammerClientProxy extends HammerProxy {
         }
         setWorldAndPlayer(w, fake_player);
         WrapperAdapter.setShadow(true);
+        fake_player.inventory = real_player.inventory;
     }
     
     @Override
@@ -301,6 +293,10 @@ public class HammerClientProxy extends HammerProxy {
     @SubscribeEvent
     public void resetTracing(ClientTickEvent event) {
         if (event.phase != TickEvent.Phase.START) return;
+        /*_shadowSelected = null;
+        _rayTarget = null;
+        _selectionBlockBounds = null;
+        _hitSlice = null;*/
         _distance = Double.POSITIVE_INFINITY;
     }
     
@@ -413,6 +409,7 @@ public class HammerClientProxy extends HammerProxy {
                 WorldSettings.GameType origType = mc.playerController.currentGameType;
                 // NORELEASE: Can we, uhm, not? mc.playerController.currentGameType = WorldSettings.GameType.CREATIVE;
                 try {
+                    EntityRenderer.debug = null;
                     mc.entityRenderer.getMouseOver(1F);
                 } finally {
                     mc.playerController.currentGameType = origType;
