@@ -1,7 +1,9 @@
 package factorization.util;
 
 import com.mojang.authlib.GameProfile;
+import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import factorization.api.Coord;
+import factorization.shared.Core;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelOutboundHandlerAdapter;
@@ -25,6 +27,7 @@ import net.minecraft.util.StringUtils;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;
 import net.minecraftforge.common.util.FakePlayer;
+import net.minecraftforge.event.world.WorldEvent;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -66,6 +69,19 @@ public final class PlayerUtil {
             FzFakePlayer p = (FzFakePlayer) player;
             p.where = null;
         }
+    }
+
+    private static class PlayerRecycler {
+        @SubscribeEvent
+        public void clearOldPlayers(WorldEvent.Unload event) {
+            for (WeakHashMap<World, FzFakePlayer> map : usedPlayerCache.values()) {
+                map.remove(event.world);
+            }
+        }
+    }
+
+    static {
+        Core.loadBus(new PlayerRecycler());
     }
 
     private static GameProfile makeProfile(String name) {
