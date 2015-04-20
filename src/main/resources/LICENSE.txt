@@ -1,0 +1,102 @@
+eader]
+This mod adds minimalist parts for expanding vanilla redstone automation, and many other things.
+
+Command small robots!
+[img]http://i.imgur.com/eJ2hdsU.png[/img]
+Build terracotta armies!
+[img]http://i.imgur.com/bmrAPXz.png[/img]
+Spinning blades of death!
+[img]http://i.imgur.com/x6a5b1r.png[/img]
+Twist the very fabric of reality!
+[img]http://i.imgur.com/8b9R0ZD.png[/img]
+Giant killer robots!
+[img]http://i.imgur.com/oopsies-looks-like-this-link-is-a-404.png[/img]
+
+
+
+[header=2][anchor=INSTALL]Installation[/anchor][/header]
+1. Download and run the [url="http://files.minecraftforge.net/"]Minecraft Forge Installer[/url]. The version of Forge that I'm using is given by the download link. Anything newer will usually work, and sometimes older versions will work as well.
+2. Check that the forge install worked by running the client (or the server). Forge information should be on the title screen (or in the server's logs). Close Minecraft.
+3. Put Factorization.jar into the mods folder.
+
+[header=2][anchor=START]Getting Started[/anchor][/header]
+
+First, you must discover the Lost Treasure Map. It was last seen near diamond ore. Treasure maps are very rare and very fragile, so treat it gently. Right-click the map once, and follow it to find a well-guarded stash somewhere on the surface. This stash will contain a Logic Matrix Programmer, and occasionally a few other useful materials.
+
+The Logic Matrix Programmer can then be used in the recipe below to create the Factorization Manual, which can teach you everything worth knowing!
+[img]http://i.imgur.com/3GMNpTx.png[/img]
+
+Or [url=http://purpleposeidon.github.io/FzDocs/]here's an outside-of-Minecraft copy of the manual[/url].
+
+[header=2][anchor=DOWNLOAD]Download[/anchor][/header]
+
+The license has changed; you must post something interesting to make a modpack. Read, understand, and accept the license before downloading.
+
+You can encourage and guide further development of Factorization through my [url="http://www.patreon.com/neptunepink"][img]http://i.imgur.com/srYEtgV.png[/img]Patreon[/url].
+
+[spoiler]
+Factorization 1.7.10-0.8.88.8.8888h
+[url="http://adf.ly/2137658/https://www.mediafire.com/?9lz4lzxm653a52f"]adfly + MediaFire[/url], or
+[url="http://adf.ly/2137658/http://dl.dropbox.com/u/76265666/old/Factorization-1.7.10-0.8.88.8.8888h.jar"]adfly + DropBox[/url]
+Built on 2015-03-04 against Minecraft Forge 1.7.10-10.13.2.1230
+[url="http://dl.dropbox.com/u/76265666/changelogs/Changelog-1.7.10-0.8.88.8.8888h.txt"]Changelog[/url]
+[url="http://dl.dropbox.com/u/76265666/old/Factorization-1.7.10-0.8.88.8.8888h-dev.jar"]Deobf for Mod Authors[/url]
+
+
+[spoiler]
+Factorization 1.7.10-0.8.88.8.8888g
+[url="http://adf.ly/2137658/https://www.mediafire.com/?th3f72w2zl82p10"]adfly + MediaFire[/url], or
+[url="http://adf.ly/2137658/http://dl.dropbox.com/u/76265666/old/Factorization-1.7.10-0.8.88.8.8888g.jar"]adfly + DropBox[/url]
+Built on 2015-02-23 against Minecraft Forge 1.7.10-10.13.2.1230
+[url="http://dl.dropbox.com/u/76265666/changelogs/Changelog-1.7.10-0.8.88.8.8888g.txt"]Changelog[/url]
+[url="http://dl.dropbox.com/u/76265666/old/Factorization-1.7.10-0.8.88.8.8888g-dev.jar"]Deobf for Mod Authors[/url]
+
+Factorization 1.7.10-0.8.88.8.8888f
+[url="http://adf.ly/2137658/https://www.mediafire.com/?kbdyg13lbjny71c"]adfly + MediaFire[/url], or
+[url="http://adf.ly/2137658/http://dl.dropbox.com/u/76265666/old/Factorization-1.7.10-0.8.88.8.8888f.jar"]adfly + DropBox[/url]
+Built on 2015-02-20 against Minecraft Forge 1.7.10-10.13.2.1230
+[url="http://dl.dropbox.com/u/76265666/changelogs/Changelog-1.7.10-0.8.88.8.8888f.txt"]Changelog[/url]
+[url="http://dl.dropbox.com/u/76265666/old/Factorization-1.7.10-0.8.88.8.8888f-dev.jar"]Deobf for Mod Authors[/url]
+
+Factorization 1.7.10-0.8.88.8.8888e
+[url="http://adf.ly/2137658/https://www.mediafire.com/?x6v7xfqpqk714r1"]adfly + MediaFire[/url], or
+[url="http://adf.ly/2137658/http://dl.dropbox.com/u/76265666/old/Factorization-1.7.10-0.8.88.8.8888e.jar"]adfly + DropBox[/url]
+Built on 2015-02-18 against Minecraft Forge 1.7.10-10.13.2.1230
+[url="http://dl.dropbox.com/u/76265666/changelogs/Changelog-1.7.10-0.8.88.8.8888e.txt"]Changelog[/url]
+[url="http://dl.dropbox.com/u/76265666/old/Factorization-1.7.10-0.8.88.8.8888e-dev.jar"]Deobf for Mod Authors[/url]
+
+Factorization 1.7.10-0.8.88.8.8888d
+[url="http://adf.ly/2137658/https://www.mediafire.com/?hou2gr3q90udh66"]adfly + MediaFire[/url], or
+[url="http://adf.ly/2137658/http://dl.dropbox.com/u/76265666/old/Factorization-1.7.10-0.8.88.8.8888d.jar"]adfly + DropBox[/url]
+Built on 2015-02-18 against Minecraft Forge 1.7.10-10.13.2.1230
+[url="http://dl.dropbox.com/u/76265666/changelogs/Changelog-1.7.10-0.8.88.8.8888d.txt"]Changelog[/url]
+[url="http://dl.dropbox.com/u/76265666/old/Factorization-1.7.10-0.8.88.8.8888d-dev.jar"]Deobf for Mod Authors[/url]
+
+Factorization 1.7.10-0.8.88.8.8888c
+[url="http://adf.ly/2137658/https://www.mediafire.com/?dwb3kn7jcj3b9c4"]adfly + MediaFire[/url], or
+[url="http://adf.ly/2137658/http://dl.dropbox.com/u/76265666/old/Factorization-1.7.10-0.8.88.8.8888c.jar"]adfly + DropBox[/url]
+Built on 2015-02-16 against Minecraft Forge 1.7.10-10.13.2.1230
+[url="http://dl.dropbox.com/u/76265666/changelogs/Changelog-1.7.10-0.8.88.8.8888c.txt"]Changelog[/url]
+[url="http://dl.dropbox.com/u/76265666/old/Factorization-1.7.10-0.8.88.8.8888c-dev.jar"]Deobf for Mod Authors[/url]
+
+Factorization 1.7.10-0.8.88.8.8888b
+[url="http://adf.ly/2137658/https://www.mediafire.com/?z5pgyrpjxdrpljs"]adfly + MediaFire[/url], or
+[url="http://adf.ly/2137658/http://dl.dropbox.com/u/76265666/old/Factorization-1.7.10-0.8.88.8.8888b.jar"]adfly + DropBox[/url]
+Built on 2015-02-16 against Minecraft Forge 1.7.10-10.13.2.1230
+[url="http://dl.dropbox.com/u/76265666/changelogs/Changelog-1.7.10-0.8.88.8.8888b.txt"]Changelog[/url]
+[url="http://dl.dropbox.com/u/76265666/old/Factorization-1.7.10-0.8.88.8.8888b-dev.jar"]Deobf for Mod Authors[/url]
+
+Factorization 1.7.10-0.8.88.8.8888a
+[url="http://adf.ly/2137658/https://www.mediafire.com/?2t5bj3utds5inw1"]adfly + MediaFire[/url], or
+[url="http://adf.ly/2137658/http://dl.dropbox.com/u/76265666/old/Factorization-1.7.10-0.8.88.8.8888a.jar"]adfly + DropBox[/url]
+Built on 2015-02-16 against Minecraft Forge 1.7.10-10.13.2.1230
+[url="http://dl.dropbox.com/u/76265666/changelogs/Changelog-1.7.10-0.8.88.8.8888a.txt"]Changelog[/url]
+[url="http://dl.dropbox.com/u/76265666/old/Factorization-1.7.10-0.8.88.8.8888a-dev.jar"]Deobf for Mod Authors[/url]
+
+Factorization 1.7.10-0.8.88.8.8888
+[url="http://adf.ly/2137658/https://www.mediafire.com/?nad03nvoj1cbi9u"]adfly + MediaFire[/url], or
+[url="http://adf.ly/2137658/http://dl.dropbox.com/u/76265666/old/Factorization-1.7.10-0.8.88.8.8888.jar"]adfly + DropBox[/url]
+Built on 2015-02-15 against Minecraft Forge 1.7.10-10.13.2.1230
+[url="http://dl.dropbox.com/u/76265666/changelogs/Changelog-1.7.10-0.8.88.8.8888.txt"]Changelog[/url]
+[url="http://dl.dropbox.com/u/76265666/old/Factorization-1.7.10-0.8.88.8.8888-dev.jar"]Deobf for Mod Authors[/url]
+

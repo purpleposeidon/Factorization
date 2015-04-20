@@ -9,6 +9,7 @@ import factorization.shared.*;
 import factorization.util.InvUtil;
 import factorization.util.ItemUtil;
 import factorization.util.NumUtil;
+import factorization.util.PlayerUtil;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
@@ -426,6 +427,7 @@ public class SocketLacerator extends TileEntitySocketBase implements IChargeCond
                         block.harvestBlock(mopWorld, player, mop.blockX, mop.blockY, mop.blockZ, 0);
                     }
                     player.inventory.mainInventory[0] = null;
+                    PlayerUtil.recycleFakePlayer(player);
                 } else if (barrel.getItemCount() > 0) {
                     ItemStack is = barrel.item.copy();
                     is.stackSize = 1;

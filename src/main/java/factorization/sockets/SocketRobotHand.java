@@ -6,6 +6,7 @@ import factorization.fzds.DeltaChunk;
 import factorization.shared.*;
 import factorization.util.InvUtil;
 import factorization.util.ItemUtil;
+import factorization.util.PlayerUtil;
 import net.minecraft.block.Block;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.crash.CrashReport;
@@ -84,7 +85,7 @@ public class SocketRobotHand extends TileEntitySocketBase {
         RayTracer tracer = new RayTracer(this, socket, coord, orientation, powered).lookAround().checkEnts().checkFzdsFirst();
         tracer.trace();
         if (fakePlayer != null) {
-            fakePlayer.isDead = true; // Avoid mob retribution
+            PlayerUtil.recycleFakePlayer(fakePlayer);
         }
         fakePlayer = null;
         backingInventory = null;

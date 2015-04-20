@@ -409,7 +409,6 @@ public class HammerClientProxy extends HammerProxy {
                 WorldSettings.GameType origType = mc.playerController.currentGameType;
                 // NORELEASE: Can we, uhm, not? mc.playerController.currentGameType = WorldSettings.GameType.CREATIVE;
                 try {
-                    EntityRenderer.debug = null;
                     mc.entityRenderer.getMouseOver(1F);
                 } finally {
                     mc.playerController.currentGameType = origType;

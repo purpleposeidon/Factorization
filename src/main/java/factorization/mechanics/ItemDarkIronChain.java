@@ -8,7 +8,6 @@ import factorization.fzds.interfaces.IDeltaChunk;
 import factorization.notify.Notice;
 import factorization.shared.Core;
 import factorization.shared.ItemFactorization;
-import factorization.shared.NORELEASE;
 import factorization.util.FzUtil;
 import factorization.util.ItemUtil;
 import factorization.util.SpaceUtil;
@@ -202,8 +201,7 @@ public class ItemDarkIronChain extends ItemFactorization {
 
     @Override
     public boolean hasEffect(ItemStack is, int pass) {
-        NORELEASE.fixme("Just temporary");
-        if (is.hasTagCompound() && NORELEASE.on) return true;
+        if (is.hasTagCompound()) return true;
         return super.hasEffect(is, pass);
     }
 

@@ -9,8 +9,11 @@ import factorization.fzds.interfaces.IDeltaChunk;
 import factorization.shared.Core;
 import factorization.shared.EntityReference;
 import factorization.util.SpaceUtil;
+import net.minecraft.block.Block;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.init.Blocks;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.tileentity.TileEntityComparator;
 import net.minecraft.util.Vec3;
 import org.apache.commons.lang3.ArrayUtils;
 
@@ -177,6 +180,10 @@ public class MechanicsController implements IDCController {
     public boolean placeBlock(IDeltaChunk idc, EntityPlayer player, Coord at) {
         for (IDCController c : constraints) {
             if (c.placeBlock(idc, player, at)) return true;
+        }
+        final Block block = at.getBlock();
+        if (block == Blocks.powered_comparator || block == Blocks.unpowered_comparator) {
+            TileEntityComparatorMechanism.replace(at.getTE(TileEntityComparator.class));
         }
         return false;
     }

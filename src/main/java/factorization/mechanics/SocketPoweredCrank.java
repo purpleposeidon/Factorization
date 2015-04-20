@@ -12,7 +12,6 @@ import factorization.servo.ServoMotor;
 import factorization.shared.Core;
 import factorization.shared.EntityReference;
 import factorization.shared.FactorizationBlockRender;
-import factorization.shared.NORELEASE;
 import factorization.sockets.ISocketHolder;
 import factorization.sockets.SocketBareMotor;
 import factorization.sockets.TileEntitySocketBase;
@@ -269,7 +268,6 @@ public class SocketPoweredCrank extends TileEntitySocketBase implements IChargeC
     }
 
     private void setChainDraw(Vec3 realHookLocation, Vec3 selfPos, float len) {
-        NORELEASE.fixme("How's this gonna work on the server?");
         boolean first = false;
         if (chainDraw == null) {
             chainDraw = ChainRender.instance.add();

@@ -17,6 +17,7 @@ import factorization.shared.*;
 import factorization.shared.NetworkFactorization.MessageType;
 import factorization.util.InvUtil;
 import factorization.util.ItemUtil;
+import factorization.util.PlayerUtil;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.block.*;
 import net.minecraft.block.material.Material;
@@ -187,6 +188,7 @@ public class SocketScissors extends TileEntitySocketBase implements ICaptureDrop
                 living.attackEntityFrom(ScissorsDamge, 2);
                 living.recentlyHit = prevRecentlyHit;
                 SocketScissors.lootingPlayer.isDead = true;
+                PlayerUtil.recycleFakePlayer(player);
                 return true;
             }
         }
@@ -217,6 +219,7 @@ public class SocketScissors extends TileEntitySocketBase implements ICaptureDrop
             } else {
                 blocked = true;
             }
+            PlayerUtil.recycleFakePlayer(player);
         }
         return false;
     }

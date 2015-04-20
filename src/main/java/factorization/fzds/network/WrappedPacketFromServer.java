@@ -30,7 +30,7 @@ public class WrappedPacketFromServer extends WrappedPacket {
         if (wrapped instanceof FMLProxyPacket) {
             FMLProxyPacket fml = (FMLProxyPacket) wrapped;
             NetHandlerPlayClient nhpc = (NetHandlerPlayClient) netHandler;
-            NetworkDispatcher dispatcher = nhpc.getNetworkManager().channel.attr(NetworkDispatcher.FML_DISPATCHER).get();
+            NetworkDispatcher dispatcher = nhpc.getNetworkManager().channel().attr(NetworkDispatcher.FML_DISPATCHER).get();
             fml.setTarget(Side.CLIENT);
             fml.setDispatcher(dispatcher);
             if (fml.payload().readerIndex() != 0) {

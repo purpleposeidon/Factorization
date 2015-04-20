@@ -16,6 +16,7 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.IChatComponent;
+import net.minecraft.util.StatCollector;
 import net.minecraft.util.Vec3;
 import net.minecraft.world.World;
 import net.minecraftforge.client.ClientCommandHandler;
@@ -259,7 +260,11 @@ public class RenderMessages extends RenderMessagesProxy {
     @Override
     public void onscreen(String message, String[] formatArgs) {
         Minecraft mc = Minecraft.getMinecraft();
-        String msg = I18n.format(message, (Object[]) formatArgs);
+        Object targs[] = new Object[formatArgs.length];
+        for (int i = 0; i < formatArgs.length; i++) {
+            targs[i] = StatCollector.translateToLocal(formatArgs[i]);
+        }
+        String msg = I18n.format(message, targs);
         mc.ingameGUI.func_110326_a(msg, false);
     }
     

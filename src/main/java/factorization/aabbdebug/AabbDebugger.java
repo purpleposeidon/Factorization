@@ -44,7 +44,7 @@ public enum AabbDebugger {
 
             @Override
             public String getCommandUsage(ICommandSender p_71518_1_) {
-                return "/bxdbg freeze|thaw";
+                return "/bxdbg freeze|thaw|clean";
             }
 
             @Override

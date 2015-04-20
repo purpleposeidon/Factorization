@@ -62,6 +62,6 @@ class InertiaCalculator extends MassCalculator implements ICoordFunction {
     @Override
     protected void save(NBTTagCompound tag) {
         super.save(tag);
-        tag.setDouble(inertiaKey, inertiaSum);
+        tag.setDouble(inertiaKey, round(inertiaSum));
     }
 }

@@ -585,6 +585,7 @@ public class TileEntityMixer extends TileEntityFactorization implements
         CraftUtil.addInventoryToArray(craft, outputBuffer);
         CraftUtil.addInventoryToArray(fakePlayer.inventory, outputBuffer);
         markDirty();
+        PlayerUtil.recycleFakePlayer(fakePlayer);
     }
     
     boolean dumpBuffer() {

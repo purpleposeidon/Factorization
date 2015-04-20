@@ -347,6 +347,7 @@ public class NetworkFactorization {
         
         // Messages to entities; (true) marks that they are entity messages.
         servo_brief(true), servo_item(true), servo_complete(true), servo_stopped(true),
+        entity_sync(true),
         UtilityGooState(true);
         
         public boolean isEntityMessage;

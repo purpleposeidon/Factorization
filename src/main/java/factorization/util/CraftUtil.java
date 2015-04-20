@@ -205,6 +205,7 @@ public final class CraftUtil {
             addInventoryToArray(craft, ret);
         }
         addInventoryToArray(fakePlayer.inventory, ret);
+        PlayerUtil.recycleFakePlayer(fakePlayer);
 
         craft_succeeded = true;
         return ret;

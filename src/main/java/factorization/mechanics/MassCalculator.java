@@ -10,6 +10,8 @@ import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.Vec3;
 
 class MassCalculator implements ICoordFunction {
+    private static final boolean ROUND_RESULTS = true;
+
     static double calculateMass(IDeltaChunk idc) {
         NBTTagCompound tag = idc.getEntityData();
         if (tag.hasKey(massKey)) return tag.getDouble(massKey);
@@ -47,6 +49,13 @@ class MassCalculator implements ICoordFunction {
         tag.removeTag(comKey + ".z");
     }
 
+    protected static double round(double v) {
+        if (!ROUND_RESULTS) return v;
+        int exp = Math.getExponent(v);
+        if (exp < 0) exp = 1;
+        return Math.pow(2, exp);
+    }
+
     private static final String massKey = "IdcMass";
     private static final String comKey = "IdcCOM";
 
@@ -67,7 +76,7 @@ class MassCalculator implements ICoordFunction {
     }
 
     protected void save(final NBTTagCompound tag) {
-        tag.setDouble(massKey, massTotal);
+        tag.setDouble(massKey, round(massTotal));
         tag.setDouble(comKey + ".x", com.xCoord);
         tag.setDouble(comKey + ".y", com.yCoord);
         tag.setDouble(comKey + ".z", com.zCoord);

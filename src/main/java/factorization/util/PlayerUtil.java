@@ -50,12 +50,22 @@ public final class PlayerUtil {
             }
             fakePlayerCache.put(where.w, found);
         }
+        found.isDead = false;
+        found.worldObj = where.w;
         found.where = where;
         where.setAsEntityLocation(found);
         Arrays.fill(found.inventory.armorInventory, null);
         Arrays.fill(found.inventory.mainInventory, null);
-        found.isDead = false;
         return found;
+    }
+
+    public static void recycleFakePlayer(EntityPlayer player) {
+        player.worldObj = null;
+        player.isDead = true; // Avoid mob retribution
+        if (player instanceof FzFakePlayer) {
+            FzFakePlayer p = (FzFakePlayer) player;
+            p.where = null;
+        }
     }
 
     private static GameProfile makeProfile(String name) {

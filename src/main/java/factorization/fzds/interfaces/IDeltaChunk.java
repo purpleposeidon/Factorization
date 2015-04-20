@@ -231,6 +231,15 @@ public abstract class IDeltaChunk extends EntityFz {
         return ret;
     }
 
+    public Coord shadow2realCoordPrecise(Coord real) {
+        Vec3 r = real.toVector();
+        r.xCoord += 0.5;
+        r.yCoord += 0.5;
+        r.zCoord += 0.5;
+        Vec3 s = shadow2real(r);
+        return new Coord(worldObj, (int) Math.floor(s.xCoord), (int) Math.floor(s.yCoord), (int) Math.floor(s.zCoord));
+    }
+
     public Coord real2shadowCoord(Coord shadowCoord) {
         Coord ret = shadowCoord.copy();
         real2shadow(ret);

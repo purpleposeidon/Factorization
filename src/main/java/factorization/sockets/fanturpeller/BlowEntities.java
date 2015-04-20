@@ -1,15 +1,24 @@
 package factorization.sockets.fanturpeller;
 
-import java.io.IOException;
-import java.util.ArrayList;
-
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
 import factorization.aabbdebug.AabbDebugger;
-import factorization.mechanics.MechanicsController;
+import factorization.api.Coord;
+import factorization.api.datahelpers.DataHelper;
+import factorization.api.datahelpers.IDataSerializable;
+import factorization.api.datahelpers.Share;
+import factorization.common.FactoryType;
+import factorization.common.FzConfig;
 import factorization.fzds.DeltaChunk;
 import factorization.fzds.interfaces.IDeltaChunk;
+import factorization.mechanics.MechanicsController;
+import factorization.notify.Notice;
+import factorization.servo.RenderServoMotor;
+import factorization.servo.ServoMotor;
 import factorization.shared.Core;
-import factorization.shared.NORELEASE;
+import factorization.sockets.ISocketHolder;
 import factorization.util.InvUtil;
+import factorization.util.InvUtil.FzInv;
 import factorization.util.NumUtil;
 import factorization.util.SpaceUtil;
 import net.minecraft.command.IEntitySelector;
@@ -32,22 +41,10 @@ import net.minecraft.util.DamageSource;
 import net.minecraft.util.Vec3;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.ForgeDirection;
-
 import org.lwjgl.opengl.GL11;
 
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
-import factorization.api.Coord;
-import factorization.api.datahelpers.DataHelper;
-import factorization.api.datahelpers.IDataSerializable;
-import factorization.api.datahelpers.Share;
-import factorization.common.FactoryType;
-import factorization.common.FzConfig;
-import factorization.notify.Notice;
-import factorization.servo.RenderServoMotor;
-import factorization.servo.ServoMotor;
-import factorization.util.InvUtil.FzInv;
-import factorization.sockets.ISocketHolder;
+import java.io.IOException;
+import java.util.ArrayList;
 
 public class BlowEntities extends SocketFanturpeller implements IEntitySelector {
     short dropDelay = 0;

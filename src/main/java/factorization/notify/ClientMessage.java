@@ -3,6 +3,7 @@ package factorization.notify;
 import java.util.ArrayList;
 import java.util.EnumSet;
 
+import factorization.shared.Core;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.Entity;
@@ -77,7 +78,7 @@ class ClientMessage {
 
         String[] cp = new String[args.length + 3];
         for (int i = 0; i < args.length; i++) {
-            cp[i] = args[i];
+            cp[i] = Core.tryTranslate(args[i], args[i]);
         }
         cp[args.length] = item_name;
         cp[args.length + 1] = item_info;

@@ -3,6 +3,7 @@ package factorization.api;
 import factorization.shared.*;
 import factorization.util.FzUtil;
 import factorization.util.ItemUtil;
+import factorization.util.SpaceUtil;
 import io.netty.buffer.ByteBuf;
 
 import java.io.IOException;
@@ -855,6 +856,12 @@ public final class Coord implements IDataSerializable, ISaneCoord, Comparable<Co
         vec.xCoord = x;
         vec.yCoord = y;
         vec.zCoord = z;
+    }
+
+    public Vec3 toVector() {
+        Vec3 vec = SpaceUtil.newVec();
+        setAsVector(vec);
+        return vec;
     }
     
     public static void sort(Coord lower, Coord upper) {
