@@ -71,7 +71,7 @@ public final class PlayerUtil {
         }
     }
 
-    private static class PlayerRecycler {
+    public static class PlayerRecycler {
         @SubscribeEvent
         public void clearOldPlayers(WorldEvent.Unload event) {
             for (WeakHashMap<World, FzFakePlayer> map : usedPlayerCache.values()) {
