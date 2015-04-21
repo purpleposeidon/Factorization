@@ -2,7 +2,6 @@ package factorization.mechanics;
 
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
-import factorization.aabbdebug.AabbDebugger;
 import factorization.api.Coord;
 import factorization.api.DeltaCoord;
 import factorization.api.FzOrientation;
@@ -16,7 +15,6 @@ import factorization.fzds.interfaces.DeltaCapability;
 import factorization.fzds.interfaces.IDCController;
 import factorization.fzds.interfaces.IDeltaChunk;
 import factorization.fzds.interfaces.Interpolation;
-import factorization.notify.Notice;
 import factorization.shared.*;
 import factorization.util.PlayerUtil;
 import factorization.util.SpaceUtil;

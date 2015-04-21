@@ -1,25 +1,5 @@
 package factorization.sockets;
 
-import java.io.IOException;
-
-import factorization.aabbdebug.AabbDebugger;
-import factorization.fzds.DeltaChunk;
-import factorization.fzds.interfaces.IDeltaChunk;
-import factorization.shared.*;
-import factorization.util.InvUtil;
-import factorization.util.ItemUtil;
-import factorization.util.SpaceUtil;
-import net.minecraft.client.renderer.Tessellator;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.item.EntityItem;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.inventory.IInventory;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.Vec3;
-import net.minecraftforge.common.util.ForgeDirection;
-
-import org.lwjgl.opengl.GL11;
-
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import factorization.api.Coord;
@@ -30,10 +10,28 @@ import factorization.api.datahelpers.IDataSerializable;
 import factorization.api.datahelpers.Share;
 import factorization.common.BlockIcons;
 import factorization.common.FactoryType;
+import factorization.fzds.DeltaChunk;
+import factorization.fzds.interfaces.IDeltaChunk;
 import factorization.notify.Notice;
 import factorization.servo.RenderServoMotor;
 import factorization.servo.ServoMotor;
+import factorization.shared.BlockRenderHelper;
+import factorization.shared.Core;
+import factorization.util.InvUtil;
 import factorization.util.InvUtil.FzInv;
+import factorization.util.ItemUtil;
+import factorization.util.SpaceUtil;
+import net.minecraft.client.renderer.Tessellator;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.item.EntityItem;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.inventory.IInventory;
+import net.minecraft.item.ItemStack;
+import net.minecraft.util.Vec3;
+import net.minecraftforge.common.util.ForgeDirection;
+import org.lwjgl.opengl.GL11;
+
+import java.io.IOException;
 
 public class SocketShifter extends TileEntitySocketBase {
     public static enum ShifterMode {
@@ -302,7 +300,7 @@ public class SocketShifter extends TileEntitySocketBase {
 
             //Coord real = idc.shadow2realCoord(target);
             foreignInv = InvUtil.openInventory(real.getTE(IInventory.class), realBack);
-            AabbDebugger.addBox(real);
+            //AabbDebugger.addBox(real);
             if (foreignInv != null) return foreignInv;
         }
         return null;

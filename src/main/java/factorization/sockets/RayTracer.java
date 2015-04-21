@@ -1,6 +1,5 @@
 package factorization.sockets;
 
-import factorization.aabbdebug.AabbDebugger;
 import factorization.api.Coord;
 import factorization.api.FzOrientation;
 import factorization.api.Quaternion;
@@ -84,7 +83,7 @@ public class RayTracer {
             idc.shadow2real(at);
             AxisAlignedBB box = SpaceUtil.createAABB(v, v);
             box.minY += 2;
-            AabbDebugger.addBox(box);
+            //AabbDebugger.addBox(box);
             double x = v.xCoord;
             double y = v.yCoord;
             double z = v.zCoord;
@@ -151,7 +150,7 @@ public class RayTracer {
                 entBox = base.getEntityBox(socket, coord, top, 0);
                 if (idc != null) {
                     entBox = idc.shadow2real(entBox);
-                    AabbDebugger.addBox(entBox);
+                    //AabbDebugger.addBox(entBox);
                 }
             }
             for (Entity entity : getEntities(coord, top, idc)) {
@@ -181,7 +180,7 @@ public class RayTracer {
     boolean mopBlock(Coord target, ForgeDirection side) {
         if (target.w != DeltaChunk.getServerShadowWorld()) {
             AxisAlignedBB debug = Coord.aabbFromRange(target, target.add(1, 1, 1));
-            AabbDebugger.addBox(debug);
+            //AabbDebugger.addBox(debug);
         }
         boolean isThis = base == socket && target.isAt(base);
         Vec3 hitVec = Vec3.createVectorHelper(base.xCoord + side.offsetX, base.yCoord + side.offsetY, base.zCoord + side.offsetZ);

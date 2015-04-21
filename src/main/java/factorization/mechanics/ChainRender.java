@@ -107,10 +107,11 @@ public class ChainRender {
         }
         if (!setup) return;
 
-        GL11.glPushAttrib(GL11.GL_ENABLE_BIT);
+        GL11.glPushAttrib(GL11.GL_ENABLE_BIT | GL11.GL_COLOR_BUFFER_BIT );
         textureManager.bindTexture(new ResourceLocation("factorization", "textures/chain.png"));
         er.enableLightmap(0);
         GL11.glEnable(GL11.GL_BLEND);
+        GL11.glBlendFunc(GL11.GL_ONE, GL11.GL_ZERO);
         GL11.glDisable(GL11.GL_LIGHTING);
         GL11.glDisable(GL11.GL_CULL_FACE);
         tess.draw();

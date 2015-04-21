@@ -2,7 +2,6 @@ package factorization.sockets.fanturpeller;
 
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
-import factorization.aabbdebug.AabbDebugger;
 import factorization.api.Coord;
 import factorization.api.datahelpers.DataHelper;
 import factorization.api.datahelpers.IDataSerializable;
@@ -173,7 +172,7 @@ public class BlowEntities extends SocketFanturpeller implements IEntitySelector 
     }
 
     private void iterateEntities(int front_range, double s, ForgeDirection dir, AxisAlignedBB box, AxisAlignedBB deathBox, World w) {
-        AabbDebugger.addBox(box);
+        //AabbDebugger.addBox(box);
         boolean rising = dir.offsetY == (isSucking ? -1 : +1);
         for (Entity ent : (Iterable<Entity>)w.getEntitiesWithinAABBExcludingEntity(null, box, this)) {
             if (rising) {
