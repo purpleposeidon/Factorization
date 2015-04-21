@@ -3,7 +3,6 @@ package factorization.mechanics;
 import factorization.api.Coord;
 import factorization.fzds.DeltaChunk;
 import factorization.fzds.interfaces.IDeltaChunk;
-import factorization.shared.NORELEASE;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockDirectional;
 import net.minecraft.init.Blocks;
@@ -67,7 +66,7 @@ public class TileEntityComparatorMechanism extends TileEntityComparator {
                 Coord real = idc.shadow2realCoordPrecise(front);
                 Block b = real.getBlock();
                 if (!(b == Blocks.powered_comparator || b == Blocks.unpowered_comparator)) {
-                    if (NORELEASE.on) real.setId(Blocks.stone);
+                    //if (NORELEASE.on) real.setId(Blocks.stone);
                     continue;
                 }
                 TileEntityComparator comp = real.getTE(TileEntityComparator.class);
