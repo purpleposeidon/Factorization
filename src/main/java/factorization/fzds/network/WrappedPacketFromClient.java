@@ -9,6 +9,7 @@ import net.minecraft.client.network.NetHandlerPlayClient;
 import net.minecraft.network.INetHandler;
 import net.minecraft.network.NetHandlerPlayServer;
 import net.minecraft.network.Packet;
+import net.minecraft.network.play.client.C00PacketKeepAlive;
 
 public class WrappedPacketFromClient extends WrappedPacket {
     public WrappedPacketFromClient(Packet towrap) {
@@ -23,8 +24,14 @@ public class WrappedPacketFromClient extends WrappedPacket {
 
         InteractionLiason liason = InteractionLiason.activeLiasons.get(nhs.playerEntity);
         if (liason == null) {
-            Hammer.logWarning("Recieved wrapped packet from client who does not have a liason: " + wrapped.serialize());
-            return;
+            if (!(wrapped instanceof C00PacketKeepAlive)) {
+                // Seems our system isn't perfect. :/
+                // Keepalives are generated from a different thread I guess.
+                Hammer.logWarning("Liasonless wrapped packet: " + wrapped.getClass().getSimpleName() + " " + wrapped.serialize());
+                return;
+            }
+        } else {
+            handler = liason.playerNetServerHandler;
         }
         if (wrapped instanceof FMLProxyPacket) {
             FMLProxyPacket fml = (FMLProxyPacket) wrapped;
@@ -37,6 +44,6 @@ public class WrappedPacketFromClient extends WrappedPacket {
                 return;
             }
         }
-        wrapped.processPacket(liason.playerNetServerHandler);
+        wrapped.processPacket(handler);
     }
 }
