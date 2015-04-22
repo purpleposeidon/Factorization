@@ -108,6 +108,7 @@ public class HammerClientProxy extends HammerProxy {
     
     @SubscribeEvent
     public void tick(ClientTickEvent event) {
+        if (event.phase == Phase.END) return;
         checkForWorldChange(); // Is there an event for this?
         runShadowTick();
         if (shadowRenderGlobal != null) {

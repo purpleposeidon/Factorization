@@ -1,22 +1,27 @@
 package factorization.servo;
 
+import cpw.mods.fml.common.network.internal.FMLNetworkHandler;
+import cpw.mods.fml.common.network.internal.FMLProxyPacket;
+import cpw.mods.fml.common.registry.IEntityAdditionalSpawnData;
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
+import factorization.api.*;
 import factorization.api.datahelpers.*;
+import factorization.common.FactoryType;
 import factorization.shared.*;
+import factorization.shared.NetworkFactorization.MessageType;
+import factorization.sockets.GuiDataConfig;
+import factorization.sockets.ISocketHolder;
+import factorization.sockets.SocketEmpty;
+import factorization.sockets.TileEntitySocketBase;
 import factorization.util.DataUtil;
 import factorization.util.InvUtil;
+import factorization.util.InvUtil.FzInv;
 import factorization.util.ItemUtil;
 import factorization.util.SpaceUtil;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufInputStream;
 import io.netty.buffer.ByteBufOutputStream;
-
-import java.io.ByteArrayOutputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
 import io.netty.buffer.Unpooled;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
@@ -27,30 +32,14 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.Packet;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.AxisAlignedBB;
-import net.minecraft.util.DamageSource;
-import net.minecraft.util.EntityDamageSourceIndirect;
-import net.minecraft.util.MovingObjectPosition;
-import net.minecraft.util.Vec3;
+import net.minecraft.util.*;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.ForgeDirection;
-import cpw.mods.fml.common.network.internal.FMLNetworkHandler;
-import cpw.mods.fml.common.network.internal.FMLProxyPacket;
-import cpw.mods.fml.common.registry.IEntityAdditionalSpawnData;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
-import factorization.api.Coord;
-import factorization.api.FzColor;
-import factorization.api.FzOrientation;
-import factorization.api.IChargeConductor;
-import factorization.api.IEntityMessage;
-import factorization.common.FactoryType;
-import factorization.util.InvUtil.FzInv;
-import factorization.shared.NetworkFactorization.MessageType;
-import factorization.sockets.GuiDataConfig;
-import factorization.sockets.ISocketHolder;
-import factorization.sockets.SocketEmpty;
-import factorization.sockets.TileEntitySocketBase;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 public class ServoMotor extends Entity implements IEntityAdditionalSpawnData, IEntityMessage, IInventory, ISocketHolder {
     public final MotionHandler motionHandler = new MotionHandler(this);
@@ -256,7 +245,7 @@ public class ServoMotor extends Entity implements IEntityAdditionalSpawnData, IE
     // Main logic
     
     @Override
-    public void onEntityUpdate() {
+    public void onEntityUpdate() { // updateEntity tick
         super.onEntityUpdate();
         if (isDead) {
             return;
