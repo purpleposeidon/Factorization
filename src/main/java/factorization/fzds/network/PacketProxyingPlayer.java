@@ -108,7 +108,6 @@ public class PacketProxyingPlayer extends EntityPlayerMP implements
         super(MinecraftServer.getServer(), (WorldServer) shadowWorld, new GameProfile(proxyUuid, "[FzdsPacket]"), new ItemInWorldManager(shadowWorld));
         invulnerable = true;
         isImmuneToFire = true;
-        initWrapping();
         this.dimensionSlice = new WeakReference<DimensionSliceEntity>(dimensionSlice);
         Coord c = dimensionSlice.getCenter();
         c.y = -8; // lurk in the void; we should catch most mod's packets.
@@ -133,6 +132,7 @@ public class PacketProxyingPlayer extends EntityPlayerMP implements
         } else {
             scm.func_72375_a(this, null);
         }
+        initWrapping();
     }
     
     int savePlayerViewRadius() {
