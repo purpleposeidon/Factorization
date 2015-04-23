@@ -1,0 +1,30 @@
+\title{The Hydroplant}
+
+(NOTE: This doesn't exist.)
+
+Probably a multiblock? 7x3x3?
+http://pages.cs.wisc.edu/~wenger/images/zion_vegas/Full_size/hoover_dam_gens.jpg
+
+Hydroelectric Turbine Plan
+BWL  Book, Water bucket, LMP
+
+Plan must be used in a sufficiently cleared out area.
+Has resource requirements:
+    27 blocks of iron
+    1 motor (or some kind of heavy duty motor?)
+    48 iron plates
+    5 glass blocks
+    3 lead blocks
+    2 gold blocks
+
+The amount of power generated is proportional to the amount of water source blocks in a large area near the turbine.
+Checks every 4³th block in each chunk that is above itself and below the top block. Recursively visits each chunks out to a 8-chunk radius or something.
+May be dependent on rain in some way. If it is, since everyone hates rain, it'll probably only require 1 rainstorm per IRL week or something like that.
+Doesn't actually remove water or anything.
+Probably makes quite the racket.
+
+Must be placed above sealevel. Draining the ocean into the fiery abyss is cheating, and not allowed.
+
+
+Suggested use: https://www.google.com/search?q=Hoover+Dam&tbm=isch
+               https://upload.wikimedia.org/wikipedia/commons/c/c9/Hoover_sm.jpg
