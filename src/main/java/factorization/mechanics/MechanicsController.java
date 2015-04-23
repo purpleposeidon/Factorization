@@ -83,15 +83,6 @@ public class MechanicsController implements IDCController {
         return controller == IDCController.default_controller || controller instanceof MechanicsController;
     }
 
-    static IDCController[] getControllers(IDeltaChunk idc) {
-        IDCController controller = idc.getController();
-        if (controller instanceof MechanicsController) {
-            MechanicsController cm = (MechanicsController) controller;
-            return cm.constraints;
-        }
-        return new IDCController[0];
-    }
-
     private static int changeCount(IDeltaChunk idc, int d) {
         NBTTagCompound tag = idc.getEntityData();
         String key = "KinematicSystemEntries";
@@ -136,7 +127,13 @@ public class MechanicsController implements IDCController {
     }
 
     public static void push(IDeltaChunk idc, Coord at, Vec3 force) {
-        for (IDCController constraint : MechanicsController.getControllers(idc)) {
+        final IDCController idcController = idc.getController();
+        if (!(idcController instanceof MechanicsController)) {
+            return;
+        }
+        final MechanicsController controller = (MechanicsController) idcController;
+        controller.decay_time = RESET;
+        for (IDCController constraint : controller.constraints) {
             if (constraint instanceof TileEntityHinge) { // Sound design!
                 TileEntityHinge hinge = (TileEntityHinge) constraint;
                 if (hinge.getCoord().isWeaklyPowered()) return;
@@ -149,7 +146,7 @@ public class MechanicsController implements IDCController {
         /* Whereupon St. Isaac Newton did set down the Holy Law of Nature, that
          * the sum of the forces upon a body is equal to the mass of the body times
          * the acceleration of the body, and whereupon we have calculated the mass
-         * of the body, let us therefor grant unto our hookedIdc an IMPULSE OF VELOCITY
+         * of the body, let us therefor grant unto our idc an IMPULSE OF VELOCITY
          * equal to the force multiplied by the inverse of the mass.
          */
         SpaceUtil.incrScale(force, 1 / mass);
@@ -217,10 +214,14 @@ public class MechanicsController implements IDCController {
         for (IDCController c : constraints) c.idcDied(idc);
     }
 
+    private int decay_time = 0;
+    private static final int RESET = 8;
+
     @Override
     public void beforeUpdate(IDeltaChunk idc) {
-        updatePhysics(idc);
-        for (IDCController c : constraints) c.beforeUpdate(idc);
+        for (IDCController c : constraints) {
+            c.beforeUpdate(idc);
+        }
     }
 
     private static final double LINEAR_DAMPENING = 0.98;
@@ -232,13 +233,17 @@ public class MechanicsController implements IDCController {
             return;
         }
         if (idc.hasOrderedRotation()) return;
-        boolean lin = idc.motionX != 0 || idc.motionY != 0 || idc.motionZ != 0;
-        boolean rot = lin || idc.getRotationalVelocity().isZero();
-        if (!lin && !rot) {
+        boolean anyMotion = decay_time == RESET || idc.motionX != 0 || idc.motionY != 0 || idc.motionZ != 0 || idc.getRotationalVelocity().isZero();
+        if (anyMotion) {
+            // See EntityLivingBase.moveEntityWithHeading
+            int d = decay_time;
+            push(idc, MassCalculator.getComCoord(idc), Vec3.createVectorHelper(0, GRAVITY, 0));
+            decay_time = d;
+        }
+        if (decay_time > 0) {
+            decay_time--;
             return;
         }
-        // See EntityLivingBase.moveEntityWithHeading
-        push(idc, MassCalculator.getComCoord(idc), Vec3.createVectorHelper(0, GRAVITY, 0));
         idc.motionX *= LINEAR_DAMPENING;
         idc.motionY *= LINEAR_DAMPENING;
         idc.motionZ *= LINEAR_DAMPENING;
@@ -250,7 +255,10 @@ public class MechanicsController implements IDCController {
 
     @Override
     public void afterUpdate(IDeltaChunk idc) {
-        for (IDCController c : constraints) c.afterUpdate(idc);
+        for (IDCController c : constraints) {
+            c.afterUpdate(idc);
+        }
+        updatePhysics(idc);
     }
 
     /**

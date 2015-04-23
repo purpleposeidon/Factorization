@@ -80,7 +80,9 @@ public class HammerNet {
         if (ent instanceof DimensionSliceEntity) {
             dse = (DimensionSliceEntity) ent;
         } else {
-            Core.logWarning("Packet %s to non-DSE (ID=%s) %s", type, dse_id, ent);
+            if (ent != null) {
+                Core.logWarning("Packet %s to non-DSE (ID=%s) %s", type, dse_id, ent);
+            }
             return;
         }
         switch (type) {

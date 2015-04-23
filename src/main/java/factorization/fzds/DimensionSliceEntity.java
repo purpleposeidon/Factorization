@@ -41,10 +41,7 @@ import net.minecraft.world.chunk.Chunk;
 import org.apache.commons.lang3.ArrayUtils;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 
 public class DimensionSliceEntity extends IDeltaChunk implements IFzdsEntryControl {
     //Dang, this class is a mess! Code folding, activate!
@@ -600,6 +597,9 @@ public class DimensionSliceEntity extends IDeltaChunk implements IFzdsEntryContr
         last_shared_rotation.incrMultiply(last_shared_rotational_velocity);
 
         if (moved && !noClip && can(DeltaCapability.COLLIDE_WITH_WORLD)) {
+            // NORELEASE TODO This is too slow. Fuck it. Let's bust out a proper physics library.
+            // Use an IWorldAccess to synchronize collision areas. We'll need to do this for both Real and Shadow, yeah?
+            // MetaAABB will defer to this physics library as well
             List<AxisAlignedBB> collisions = worldObj.getCollidingBoundingBoxes(this, realArea);
             AxisAlignedBB collision = null;
             for (int i = 0; i < collisions.size(); i++) {
@@ -744,6 +744,19 @@ public class DimensionSliceEntity extends IDeltaChunk implements IFzdsEntryContr
         rot.applyRotation(point_b);
         Vec3 rotational = SpaceUtil.incrSubtract(point_b, point_a);
         return SpaceUtil.incrAdd(rotational, linear);
+    }
+
+    public Vec3 getInstantaneousVelocity(Vec3 realPos) {
+        Quaternion rot = new Quaternion(getRotationalVelocity());
+        DimensionSliceEntity here = this;
+        while (true) {
+            DimensionSliceEntity next = (DimensionSliceEntity) here.getParent();
+            if (next == null) break;
+            here = next;
+            rot.incrMultiply(here.getRotationalVelocity());
+        }
+        Vec3 linear = Vec3.createVectorHelper(here.motionX, here.motionY, here.motionZ);
+        return calcInstantVelocityAtRealPoint(realPos, linear, rot);
     }
     
     /**

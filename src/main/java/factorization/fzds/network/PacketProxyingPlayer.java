@@ -60,7 +60,6 @@ public class PacketProxyingPlayer extends EntityPlayerMP implements
     }
     
     void initWrapping() {
-        updateListenerList();
         playerNetServerHandler = new NetHandlerPlayServer(mcServer, networkManager, this);
         playerNetServerHandler.netManager.channel().attr(NetworkDispatcher.FML_DISPATCHER).set(new NetworkDispatcher(this.networkManager));
         //Compare cpw.mods.fml.common.network.FMLOutboundHandler.OutboundTarget.PLAYER.{...}.selectNetworks(Object, ChannelHandlerContext, FMLProxyPacket)
@@ -72,6 +71,7 @@ public class PacketProxyingPlayer extends EntityPlayerMP implements
          * What we really want is its channel.
          */
         registerChunkLoading();
+        updateListenerList();
     }
 
 

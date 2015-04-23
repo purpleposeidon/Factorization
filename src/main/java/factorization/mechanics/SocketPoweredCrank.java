@@ -6,6 +6,7 @@ import factorization.api.datahelpers.IDataSerializable;
 import factorization.api.datahelpers.Share;
 import factorization.common.FactoryType;
 import factorization.fzds.DeltaChunk;
+import factorization.fzds.DimensionSliceEntity;
 import factorization.fzds.interfaces.IDCController;
 import factorization.fzds.interfaces.IDeltaChunk;
 import factorization.servo.ServoMotor;
@@ -99,14 +100,16 @@ public class SocketPoweredCrank extends TileEntitySocketBase implements IChargeC
     void shareCharge() {
         Coord anchorPoint = getAnchorBlock();
         if (anchorPoint == null) return;
-        IChargeConductor friend = anchorPoint.getTE(IChargeConductor.class);
-        if (friend == null) return;
-        int mine = charge.getValue();
-        int his = friend.getCharge().getValue();
-        int give = mine - his;
-        if (give <= 0) return;
-        charge.deplete(give);
-        friend.getCharge().addValue(give);
+        IChargeConductor friendConductor = anchorPoint.getTE(IChargeConductor.class);
+        if (friendConductor == null) return;
+        final Charge friend = friendConductor.getCharge();
+        int total = charge.getValue() + friend.getValue();
+        int split = total / 2;
+        int rem = total % 2;
+        int mine = split + rem;
+        int his = split;
+        charge.setValue(mine);
+        friend.setValue(his);
     }
 
     static final double MAX_CHAIN_LEN = 24;
@@ -133,37 +136,59 @@ public class SocketPoweredCrank extends TileEntitySocketBase implements IChargeC
         if (chainLen < MIN_CHAIN_LEN) return;
         boolean hyperExtended = chainLen >= MAX_CHAIN_LEN;
         if (!powered && !hyperExtended) return;
-        if (!hyperExtended) {
-            // Consume charge
-            if (charge.tryTake(WINDING_CHARGE_COST) == 0) {
-                return;
-            }
+        if (!hyperExtended && charge.tryTake(WINDING_CHARGE_COST) == 0) {
+            // Pull it back if we're hyper-extended, for free.
+            // Used to have extra force for the hyperextended case, but not anymore.
+            return;
         }
         // retract
-        double scale = 1;
-        if (hyperExtended) {
-            double r = NumUtil.uninterp(MAX_CHAIN_LEN, BROKEN_CHAIN_LENGTH, chainLen);
-            scale = NumUtil.interp(RESTORATIVE_FORCE_MIN, RESTORATIVE_FORCE_MAX, r);
-        } else if (socket == this) {
+        double tickTime = 16; // how long it should take to move the chain 1 meter
+        if (socket == this) {
             double power = coord.getPowerInput();
-            scale = (1 + power) / 16.0;
-            if (power == 0 /* getting indrect power */) {
-                scale = 1;
-            }
+            if (power == 0) power = 0xF; // Indirect power... TODO: This is stupid. Just figure out what the indirect power level is
+            tickTime += 0xF - power;
         } else {
-            scale = 1.0 / 32.0; // Servos don't look very sturdy
+            tickTime = 64; // Servos look pretty weak
         }
-        Vec3 force = getForce(idc, socket, scale);
+        double targetSpeed = 1.0 / tickTime;
+        Vec3 force = getForce(idc, socket, targetSpeed);
+        force = limitForce(idc, force, targetSpeed);
         Coord at = new Coord(DeltaChunk.getServerShadowWorld(), hookLocation);
         MechanicsController.push(idc, at, force);
     }
 
-    private Vec3 getForce(IDeltaChunk idc, ISocketHolder socket, double scale) {
+    private Vec3 getForce(IDeltaChunk idc, ISocketHolder socket, double targetSpeed) {
         Vec3 realHookLocation = idc.shadow2real(hookLocation);
         Vec3 selfPos = socket.getPos();
         Vec3 chainVec = SpaceUtil.subtract(realHookLocation, selfPos).normalize();
-        SpaceUtil.incrScale(chainVec, -FORCE_PER_TICK * scale);
+        SpaceUtil.incrScale(chainVec, -targetSpeed);
         return chainVec;
+    }
+
+    private Vec3 limitForce(IDeltaChunk idc, Vec3 force, double targetSpeed) {
+        DimensionSliceEntity dse = (DimensionSliceEntity) idc;
+        Vec3 realHookLocation = idc.shadow2real(hookLocation);
+        Vec3 inst = dse.getInstantaneousRotationalVelocityAtPointInCornerSpace(realHookLocation);
+        return Vec3.createVectorHelper(
+                c(inst.xCoord, force.xCoord),
+                c(inst.yCoord, force.yCoord),
+                c(inst.zCoord, force.zCoord));
+    }
+
+    private static double c(double inst, double force) {
+        if (inst == 0 || force == 0) return force; // Can of course push fully; or we weren't actually going to push.
+        else if (inst > 0 && force > 0) {
+            double d = force - inst;
+            if (d < 0) return 0; // Already moving quite fast. Don't continue to accelerate
+            return d; // Already moving somewhat. Don't accelerate fully.
+        } else if (inst < 0 && force < 0) {
+            double d = inst - force;
+            if (d < 0) return d; // There's already some motion
+            return 0; // There's already too much motion
+        } else {
+            // Pointing in opposite directions. Full throttle.
+            return force;
+        }
     }
 
     public void setChain(IDeltaChunk idc, Vec3 hookLocation, Coord hookedBlock) {
