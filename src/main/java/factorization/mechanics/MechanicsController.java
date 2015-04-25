@@ -132,7 +132,6 @@ public class MechanicsController implements IDCController {
             return;
         }
         final MechanicsController controller = (MechanicsController) idcController;
-        controller.decay_time = RESET;
         for (IDCController constraint : controller.constraints) {
             if (constraint instanceof TileEntityHinge) { // Sound design!
                 TileEntityHinge hinge = (TileEntityHinge) constraint;
@@ -214,9 +213,6 @@ public class MechanicsController implements IDCController {
         for (IDCController c : constraints) c.idcDied(idc);
     }
 
-    private int decay_time = 0;
-    private static final int RESET = 8;
-
     @Override
     public void beforeUpdate(IDeltaChunk idc) {
         for (IDCController c : constraints) {
@@ -225,7 +221,7 @@ public class MechanicsController implements IDCController {
     }
 
     private static final double LINEAR_DAMPENING = 0.98;
-    private static final double ROTATIONAL_DAMPENING = 0.75;
+    private static final double ROTATIONAL_DAMPENING = 0.98;
     private static final double GRAVITY = -0.08;
 
     private void updatePhysics(IDeltaChunk idc) {
@@ -233,23 +229,22 @@ public class MechanicsController implements IDCController {
             return;
         }
         if (idc.hasOrderedRotation()) return;
-        boolean anyMotion = decay_time == RESET || idc.motionX != 0 || idc.motionY != 0 || idc.motionZ != 0 || idc.getRotationalVelocity().isZero();
-        if (anyMotion) {
+        boolean anyMotion = idc.motionX != 0 || idc.motionY != 0 || idc.motionZ != 0 || !idc.getRotationalVelocity().isZero();
+        if (!anyMotion) return;
+        /*if (anyMotion) {
             // See EntityLivingBase.moveEntityWithHeading
-            int d = decay_time;
-            push(idc, MassCalculator.getComCoord(idc), Vec3.createVectorHelper(0, GRAVITY, 0));
-            decay_time = d;
+            //push(idc, MassCalculator.getComCoord(idc), Vec3.createVectorHelper(0, GRAVITY, 0));
         }
         if (decay_time > 0) {
             decay_time--;
             return;
-        }
+        }*/
         idc.motionX *= LINEAR_DAMPENING;
         idc.motionY *= LINEAR_DAMPENING;
         idc.motionZ *= LINEAR_DAMPENING;
         Quaternion w = idc.getRotationalVelocity();
         if (w.isZero()) return;
-        Quaternion wp = w.shortSlerp(new Quaternion(), ROTATIONAL_DAMPENING);
+        Quaternion wp = new Quaternion().shortSlerp(w, ROTATIONAL_DAMPENING);
         idc.setRotationalVelocity(wp);
     }
 

@@ -239,6 +239,7 @@ public class TileEntityHinge extends TileEntityCommon implements IDCController {
         incrScale(force, forceMultiplier);
 
         applyForce(idc, at, force);
+        limitBend(idc);
         return false;
     }
 
@@ -278,7 +279,6 @@ public class TileEntityHinge extends TileEntityCommon implements IDCController {
         newOmega.incrNormalize();
 
         idc.setRotationalVelocity(newOmega);
-        limitBend(idc);
     }
 
     private Vec3 getRotationAxis() {
@@ -333,7 +333,9 @@ public class TileEntityHinge extends TileEntityCommon implements IDCController {
 
     private void limitBend(IDeltaChunk idc) {
         if (idc.hasOrderedRotation()) return;
-        final Quaternion nextRotation = idc.getRotation().multiply(idc.getRotationalVelocity());
+        final Quaternion rotationalVelocity = idc.getRotationalVelocity();
+        if (rotationalVelocity.isZero()) return;
+        final Quaternion nextRotation = idc.getRotation().multiply(rotationalVelocity);
         final Vec3 middle = SpaceUtil.fromDirection(facing.top);
         final Vec3 arm = SpaceUtil.fromDirection(facing.facing);
         nextRotation.applyRotation(arm);
@@ -341,11 +343,15 @@ public class TileEntityHinge extends TileEntityCommon implements IDCController {
 
         final double end = Math.PI / 2;
 
-        if (angle <= end) return;
+        if (angle < end) return;
 
         double p = end / angle;
+        Quaternion armAngle = Quaternion.getRotationQuaternionRadians(0, middle);
         idc.setRotationalVelocity(new Quaternion());
-        idc.setRotation(new Quaternion().slerp(nextRotation, p));
+        double t = nextRotation.getAngleRadians();
+        if (t < 0) t = -end;
+        if (t > Math.PI) t = Math.PI;
+        idc.setRotation(Quaternion.getRotationQuaternionRadians(t, nextRotation.toVector()));
     }
 
     @Override
