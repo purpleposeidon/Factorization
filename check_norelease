@@ -1,6 +1,5 @@
 #!/bin/sh
 
-#TODO: Exclude the NORELEASE file!
-ack-grep NORELEASE src/ QUICK_BUGS TODO
+ack-grep --type-set noreleasejava:is:NORELEASE.java --nonoreleasejava NORELEASE src/ QUICK_BUGS TODO
 ack-grep '%i' src/
 ack-grep scala src/
