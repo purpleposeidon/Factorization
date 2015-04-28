@@ -1,9 +1,6 @@
 package factorization.shared;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -12,6 +9,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import cpw.mods.fml.common.ModContainer;
 import factorization.fzds.DeltaChunk;
 import factorization.mechanics.MechanismsFeature;
 import factorization.util.DataUtil;
@@ -129,10 +127,39 @@ public class Core {
     }
     static public boolean serverStarted = false;
 
+    public static void checkJar() {
+        // Apparently some people somehow manage to get "Factorization.jar.zip", which somehow breaks the coremod.
+        ModContainer mod = FMLCommonHandler.instance().findContainerFor(modId);
+        if (mod == null) {
+            Core.logSevere("I don't have a mod container? Wat?");
+            return;
+        }
+        final File src = mod.getSource();
+        if (src == null || src.isDirectory()) return;
+        final String path = src.getPath();
+        if (!isBadName(path)) return;
+        String correctName = path.replaceAll("\\.zip$", ".jar");
+        if (isBadName(correctName)) return; // Carefully ensure we don't make a loop
+
+        Core.logSevere("The factorization jar is improperly named! Renaming " + path + "  to " + correctName);
+        boolean success = src.renameTo(new File(correctName));
+        if (success) {
+            throw new RuntimeException("The Factorization jar had an improper file extension. It has been renamed. Please restart Minecraft.");
+        } else {
+            throw new RuntimeException("The Factorization jar has an improper file extension; it should be a .jar, not a .zip, and not a .jar.zip.");
+        }
+    }
+
+    private static boolean isBadName(String path) {
+        if (path == null) return false;
+        return path.endsWith(".zip");
+    }
+
     void checkForge() { }
 
     @EventHandler
     public void load(FMLPreInitializationEvent event) {
+        checkJar();
         initializeLogging(event.getModLog());
         checkForge();
         Core.loadBus(registry);

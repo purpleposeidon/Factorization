@@ -59,6 +59,7 @@ public class Hammer {
     static DeltaChunkMap serverSlices = new DeltaChunkMap(), clientSlices = new DeltaChunkMap();
 
     public Hammer() {
+        Core.checkJar();
         Hammer.instance = this;
         if (!DeltaChunk.enabled()) return;
         Hammer.net = new HammerNet();
