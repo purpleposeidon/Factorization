@@ -30,6 +30,10 @@ exp = os.path.expanduser
 run("./extract_license.py > src/main/resources/LICENSE.txt")
 
 run("rm -f last_fz")
+run("rm -f ~/tmp/factorization_last_commit")
+run('git log | head -n 1 | line.py "_.split()[1]" > ~/tmp/factorization_last_commit')
+commit = open(exp("~/tmp/factorization_last_commit")).read().strip()
+run("rm -f ~/tmp/factorization_last_commit")
 
 version = open("fzversion").read().strip()
 mc_forge_version = getMinecraftVersion()
@@ -79,6 +83,7 @@ LOG += '''
 LOG += "Built on " + time.strftime("%F") + " against " + (getForgeVersion() + "\n")
 LOG += '[url="{0}"]Changelog[/url]\n'.format(changelog_url)
 LOG += '[url="{0}"]Deobf for Mod Authors[/url]'.format(devify(dropbox_url))
+LOG += ' ' + commit
 print(LOG)
 
 open("build.log", 'a').write(LOG+ '\n\n')
