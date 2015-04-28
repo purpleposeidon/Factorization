@@ -465,4 +465,13 @@ public final class SpaceUtil {
         incrFloor(ret);
         return ret;
     }
+
+    public static Vec3 normalize(Vec3 v) {
+        // Vanilla's threshold is too low for my purposes.
+        double length = v.lengthVector();
+        if (length == 0) return newVec();
+        double inv = 1.0 / length;
+        if (Double.isNaN(inv) || Double.isInfinite(inv)) return newVec();
+        return scale(v, inv);
+    }
 }

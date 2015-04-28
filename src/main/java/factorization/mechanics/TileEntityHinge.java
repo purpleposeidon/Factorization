@@ -16,6 +16,7 @@ import factorization.fzds.interfaces.IDCController;
 import factorization.fzds.interfaces.IDeltaChunk;
 import factorization.fzds.interfaces.Interpolation;
 import factorization.shared.*;
+import factorization.util.NumUtil;
 import factorization.util.PlayerUtil;
 import factorization.util.SpaceUtil;
 import net.minecraft.block.Block;
@@ -240,6 +241,7 @@ public class TileEntityHinge extends TileEntityCommon implements IDCController {
 
         applyForce(idc, at, force);
         limitBend(idc);
+        limitVelocity(idc);
         return false;
     }
 
@@ -262,7 +264,7 @@ public class TileEntityHinge extends TileEntityCommon implements IDCController {
         Vec3 torque = leverArm.crossProduct(force);
         idc.getRotation().applyRotation(torque);
 
-        if (rotationAxis.xCoord + rotationAxis.yCoord + rotationAxis.zCoord < 0) {
+        if (SpaceUtil.sum(rotationAxis) < 0) {
             incrScale(rotationAxis, -1);
         }
 
@@ -273,6 +275,10 @@ public class TileEntityHinge extends TileEntityCommon implements IDCController {
         Quaternion qz = Quaternion.getRotationQuaternionRadians(torque.zCoord, ForgeDirection.SOUTH);
 
         Quaternion dOmega = qx.multiply(qy).multiply(qz);
+
+        if (dOmega.getAngleRadians() < min_push_force) {
+            dOmega = Quaternion.getRotationQuaternionRadians(min_push_force, SpaceUtil.normalize(dOmega.toVector()));
+        }
 
         Quaternion origOmega = idc.getRotationalVelocity();
         Quaternion newOmega = origOmega.multiply(dOmega);
@@ -300,7 +306,8 @@ public class TileEntityHinge extends TileEntityCommon implements IDCController {
     }
 
     static final double min_velocity = Math.PI / 20 / 20 / 20;
-    static final double max_velocity = Math.PI / 20;
+    static final double max_velocity = min_velocity * 100;
+    static final double min_push_force = NumUtil.interp(min_velocity, max_velocity, 0.01);
 
     boolean isBasicallyZero(Quaternion rotVel) {
         return rotVel.isZero() || rotVel.getAngleRadians() /* Opportunity to algebra our way out of a call to acos here */ < min_velocity;
@@ -325,6 +332,7 @@ public class TileEntityHinge extends TileEntityCommon implements IDCController {
         }
         idc.setRotationalVelocity(dampened);
         limitBend(idc);
+        limitVelocity(idc);
     }
 
     private boolean bendMode() {
@@ -352,6 +360,14 @@ public class TileEntityHinge extends TileEntityCommon implements IDCController {
         if (t < 0) t = -end;
         if (t > Math.PI) t = Math.PI;
         idc.setRotation(Quaternion.getRotationQuaternionRadians(t, nextRotation.toVector()));
+    }
+
+    private void limitVelocity(IDeltaChunk idc) {
+        final Quaternion rot = idc.getRotationalVelocity();
+        double rv = rot.getAngleRadians();
+        if (rv < max_velocity) return;
+        double p = max_velocity / rv;
+        idc.setRotationalVelocity(new Quaternion().slerp(rot, p));
     }
 
     @Override
