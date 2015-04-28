@@ -260,6 +260,9 @@ public class HammerClientProxy extends HammerProxy {
         if (mcPlayer == null) {
             return;
         }
+        if (mc.getNetHandler() == null) {
+            return;
+        }
         HammerWorldClient w = (HammerWorldClient) DeltaChunk.getClientShadowWorld();
         if (w == null) {
             return;
