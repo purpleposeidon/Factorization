@@ -41,7 +41,8 @@ become clogged and will stop operating.
 
 A redstone signal will disable the lacerator.
 
-% \figure{H4sIAAAAAAAAAO3cS04CQRAG4JoZExFM9CgewY0mbjTR6MIN4TE8IgIOaIRbu3GLNBgvgAmafN+i
+% \figure{
+% H4sIAAAAAAAAAO3cS04CQRAG4JoZExFM9CgewY0mbjTR6MIN4TE8IgIOaIRbu3GLNBgvgAmafN+i
 % q3sy3fWfoOoRRWTdiMiPIisjWW/m9fQlj2Ja9SNqkQ+7cdJbziadp+ao1Smr1rzMouhX7diUcRxE
 % MZgNVt+KOO4MWlW/3K7p1SIO26+95qgcp1Mtireyisb55ePDxe3d1c31+brbbNrd5FluL2SLVLPI
 % e51sfXrfpPsTofJNqPgJ1YjsOeJ0+8d+7bs/AAAAAAAAAAAAAAAAAAAA7F0R+SRNBHhJmzQw4KMR
@@ -66,5 +67,12 @@ IrvwlR5d//Dlsi0/Zk1eOp93LhRWvtAmzJXKTpfTWP7qx/dvVnfLae4rt32Hrw+t7hTnk6xx85i0
 Z+bQbbkYm683xjFhjklp/gw1kplJp9pJdDj713Mb7t2IAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAD8
 d6ySdiWlq3iICwN+jmTq680A6/X61z9cfrWrvzqw/kRxVcE2HtRfcXHD4f0BAAAAAAAAAAAAAAAA
 AAAAAAAAAAAAALh1cSFAH+IT/QbaK303x4EAAA==}
+An issue of special mention is that lacerators mounted on \link{servo}{servos} can break
+nearby \link{servorail}{servo rail} when making turns.
+Here are two ways of dealing with this:
+\- Always keep the servo pointed outwards when making turns.
+This will keep it from facing the fragile servo rail.
+\- Use the \link{instructions/interact}{Socket Powered} instruction
+to keep the lacerator safely disabled when it is not needed.
 
 \topic{item.factorization:diamond_cutting_head}

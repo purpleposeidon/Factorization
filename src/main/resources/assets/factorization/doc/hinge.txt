@@ -2,20 +2,57 @@
 
 This hinge contraption may be your best invention yet!
 It resembles an ordinary iron block when closed,
-but a narrow bolt of dark iron allows the two heavy slabs to rotate up to 180°.
+but a narrow bolt of dark iron allows two heavy slabs to rotate up to a half-turn.
 
-Blocks can be placed on one end of the hinge,
-and then rotated by punching the attatched blocks.
+When placed, one half of the hinge will be securely anchored to the world;
+blocks placed on the other half can rotate freely
+when pushed or pulled with an empty hand.
 
-Its heftiness allows you to build doors much grander than those rinky-dink wooden ones.
+Giving a good smack to the hinge block itself will make it slam shut.
 
-A redstone signal will lock the hinge.
-
-Giving the hinge itself a good smack will make it close.
+A redstone signal will lock the hinge in place.
 
 Comparators will measure how far open a hinge is.
 
+\leftpage
+The heftiness of the hinge allows the construction of much grander doors than those
+rinky-dink wooden ones \#{item.doorWood}.
 
+Only the first block you place needs to be attached to the free end of the hinge;
+other blocks may be placed and removed however you desire, but no further than
+8 blocks away from the hinge.
 
+\figure{
+H4sIAAAAAAAAAO3cMU4CURAA0PmgRCEauQi1tbXGwgMQlV3dQkhgSYDKW3kzW9wVjJFoAyTE5L3m
+z87Pn51m2mlHNCMNojpOI2XtKkhRReVndBKNYhBn+f1jORrP+8/F8ClrRWcwyW7zfJKVvVms/cgu
+fs3Ov7JH0R1neTYsi3Len06Lwc3d1Z931993zWhVnVQ9VPF5itRLVeuL1U2qq9ffq446kV4iLmIP
+0j6KAAfR/Ofvge0den7NPwAAAAAAAAAAAAAAAABsaEZjNIs4fquDelXAaydSsd4M0N2l8nK5fN+x
+uZ3+D+zk4Z+/B7Z36Pk1/wAAAAAAAAAAAAAAAACwoV4IMK/Oy/gAjBQG7gOBAAA=}
+
+\leftpage
+Hinged contraptions can be pulled open or closed using \link{winch}{winches}.
+
+\figure{
+H4sIAAAAAAAAAO3cMUoDURAA0PmJimYR9ByKtbW1YuEBgpqNbqFCskJi40G8g8ezjbuJkkS0WVQI
+eQ+GP/uH/cwWU2zzOxHtSL2I2NyJlHeqJEWVldNsO1pFL3b7l9flw2DcvS3ub/KtyHrD/LzfH+bl
+0Sg+LO0+fbs7/tzdiP1B3s/vy6Icdx8fi97ZxcmPtdN5rR1bVSdVD3W3KdJRqlp/mlVSfXr9PJp+
+QRbpLmJvVptHE+3pgc3fB1bX9kIA68X8w/oy/7C6Wl/WJsw+AAAAAAAAAAAAAAD8oXa0HkYRm691
+Ul8V8JxFKj5uBrhaiCZeJpPJW73+UrPA/8kWoonDhQBWi/mH9WX+YX3V/+1ZNP9/P4jZ7B/8WkcA
+AAAAAAAAAAAAAMCS+kKAcbUexztyBX2kA4EAAA==}
+
+\leftpage
+Sockets and servos function on hinge like you would expect, for the most part.
+
+\figure{
+H4sIAAAAAAAAAO3cQW+bMBTA8WcgVZN02vpFet5xmnbctMM+QETBBNQEI0OUkA+3j7Vr9hjJqrVU
+k8rWVur/d7Hj+Pk9bHxlJhKKSUUkmoqxM+0EItptuu58JpPUJs7LuQRFKhdZnDTOtwsfF6tQzpI8
+9kurE3WRSeJWOlEZOa984XzRtBoXervuxsyV0Uz7frJpj+2ua+W/pDFPkyZ4mjThvTT96m9Oq+dF
+ubRnMk9r+zXLattc9dPUH6P7wdH2NBrJpbeZLRstZLHZFOmXbx8f/O/z7X/6YFqJ1tBtwNBpmzuF
+v832tUtuFnVS1LXztZHIVbbUhw4rtx08SW2DLNHO5LiW+b3Fx7XyImt0AburdG6YOX9QOrAq1h80
+wTYumsHD09/R2qW2HxpOMj8myeMyHSgy/FuRp/jrldtOJMrictsf/EXTvRDNoq6sTTX8on9Dbt+T
+QKapd9Unu4rbLiCqN8mNGdqhgeIDLdUv7+76Kk6sjxurD7L01/KrKfWAw7zOD0eDlYR1lQ5fgAc3
+7nQ6dl017dCWDUTOxegFeNflnMo4ZmQ8gOcz9v538eGIeDMyHsDjcf+B14v7DwAAAAAAAAAAAAAA
+AAAAAAAAALxQoQRuJzL53nW6bwa0czFF92WAw+HwY8zKY+MBPJ9/cH8vR64xNh7AI3H/gdeL+w8A
+AAAAAAAAAAAAAAAAAAAAAAC8XN0HAVpt38tPv0I7NsSEAAA=}
 
 \topic{factorization.factoryBlock.HINGE}

@@ -1,0 +1,19 @@
+\title{The Winch}
+
+Combining a \#{factorization.factoryBlock.SOCKET_EMPTY}
+with a \#{item.factorization:motor} and a \#{item.factorization:servo/sprocket}
+creates a winch.
+The winch can be connected to a \link{hinge}{hinged} block using a sturdy chain.
+The block must be solid.
+
+Supplying the winch with sufficient \link{charge}{charge} and a redstone signal
+will reel in the chain.
+
+A comparator will measure how much chain has been let out.
+
+Charge is conducted through the chain, so \link{socket}{various contraptions} can be powered while
+on a hinge.
+
+\topic{item.factorization:darkIronChain}
+\topic{item.factorization:shortChain}
+\topic{item.factorization:chainLink}
