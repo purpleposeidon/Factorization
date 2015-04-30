@@ -46,7 +46,7 @@ public class ItemDocBook extends ItemFactorization {
         if (!world.isRemote) return is;
         Minecraft mc = Minecraft.getMinecraft();
         //HistoryPage ap = DocViewer.popLastPage();
-        mc.displayGuiScreen(new DocViewer(new HistoryPage(DocViewer.current_page, DocViewer.current_index)));
+        mc.displayGuiScreen(new DocViewer("factorization", new HistoryPage(DocViewer.current_page, DocViewer.current_index)));
         return is;
     }
     

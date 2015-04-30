@@ -81,8 +81,8 @@ public class ExportHtml implements ICommand {
         out.println("</head>");
         out.println("<body>");
         try {
-            HtmlConversionTypesetter conv = new HtmlConversionTypesetter(os, root);
-            String text = DocumentationModule.readDocument(filename);
+            HtmlConversionTypesetter conv = new HtmlConversionTypesetter("factorization", os, root);
+            String text = DocumentationModule.readDocument("factorization", filename);
             conv.processText(text);
         } finally {
             out.println("</body>");

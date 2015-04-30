@@ -136,16 +136,16 @@ public class DocumentationModule {
         }
     }
     
-    public static ResourceLocation getResourceForName(String name) {
-        return Core.getResource("doc/" + name + ".txt");
+    public static ResourceLocation getResourceForName(String domain, String name) {
+        return new ResourceLocation(domain, "doc/" + name + ".txt");
     }
     
     public static IResourceManager overrideResourceManager = null;
     
-    public static InputStream getDocumentResource(String name) {
+    public static InputStream getDocumentResource(String domain, String name) {
         try {
             IResourceManager irm = overrideResourceManager != null ? overrideResourceManager : Minecraft.getMinecraft().getResourceManager();
-            IResource src = irm.getResource(getResourceForName(name));
+            IResource src = irm.getResource(getResourceForName(domain, name));
             return src.getInputStream();
         } catch (Throwable e) {
             //FIXME: Compiler disagrees with eclipse!
@@ -157,9 +157,9 @@ public class DocumentationModule {
         }
     }
     
-    public static String readDocument(String name) {
+    public static String readDocument(String domain, String name) {
         try {
-            return dispatchDocument(name);
+            return dispatchDocument(domain, name);
         } catch (Throwable e) {
             e.printStackTrace();
             String txt = e.getMessage();
@@ -183,14 +183,14 @@ public class DocumentationModule {
         return build.toString();
     }
     
-    private static String dispatchDocument(String name) throws IOException {
+    private static String dispatchDocument(String domain, String name) throws IOException {
         //NORELEASE: Okay. The document *really* needs to be cached. Things are getting expensive...
         if (name.startsWith("cgi/")) {
             return "\\generate{" + name.replace("cgi/", "") + "}";
         } else {
             InputStream is = null;
             try {
-                is = DocumentationModule.getDocumentResource(name);
+                is = DocumentationModule.getDocumentResource(domain, name);
                 return DocumentationModule.readContents(name, is);
             } finally {
                 Closeables.close(is, false);
@@ -233,7 +233,7 @@ public class DocumentationModule {
             if (!found) return false;
         }
         String name = is.getUnlocalizedName();
-        InputStream topic_index = getDocumentResource("topic_index");
+        InputStream topic_index = getDocumentResource("factorization", "topic_index");
         if (topic_index == null) return false;
         BufferedReader br = new BufferedReader(new InputStreamReader(topic_index));
         try {
@@ -246,7 +246,7 @@ public class DocumentationModule {
                 if (bits.length >= 2) {
                     if (bits[0].equalsIgnoreCase(name)) {
                         String filename = bits[1];
-                        mc.displayGuiScreen(new DocViewer(filename));
+                        mc.displayGuiScreen(new DocViewer("factorization", filename));
                         return true;
                     }
                 }
@@ -257,7 +257,7 @@ public class DocumentationModule {
             FzUtil.closeNoisily("closing topic_index", topic_index);
         }
         // if (Loader.isModLoaded("NotEnoughItems") || Loader.isModLoaded("craftguide")) return false;
-        mc.displayGuiScreen(new DocViewer("cgi/recipes/" + name));
+        mc.displayGuiScreen(new DocViewer("factorization", "cgi/recipes/" + name));
         return true;
     }
     

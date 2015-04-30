@@ -9,7 +9,8 @@ import com.google.common.base.Strings;
 
 public abstract class AbstractTypesetter {
     // Super-awesome typesetter version π², by neptunepink
-    
+
+    final String domain;
     final FontRenderer font;
     final int pageWidth, pageHeight;
     
@@ -19,7 +20,8 @@ public abstract class AbstractTypesetter {
     private ArrayList<AbstractPage> afterBuffer = new ArrayList();
     protected ArrayList<Word> segmentStart = null;
     
-    public AbstractTypesetter(FontRenderer font, int pageWidth, int pageHeight) {
+    public AbstractTypesetter(String domain, FontRenderer font, int pageWidth, int pageHeight) {
+        this.domain = domain;
         this.font = font;
         this.pageWidth = pageWidth;
         this.pageHeight = pageHeight;
@@ -81,7 +83,7 @@ public abstract class AbstractTypesetter {
                         error("No page name specified");
                         return;
                     }
-                    String subtext = DocumentationModule.readDocument(name);
+                    String subtext = DocumentationModule.readDocument(domain, name);
                     process(subtext, link, style);
                 } else if (cmd.equals("\\lmp")) {
                     process("\\link{lmp}{LMP}", link, style);

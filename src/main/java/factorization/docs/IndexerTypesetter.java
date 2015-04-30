@@ -4,8 +4,8 @@ package factorization.docs;
 public class IndexerTypesetter extends AbstractTypesetter {
     String filename;
     
-    public IndexerTypesetter(String filename) {
-        super(null, 0, 0);
+    public IndexerTypesetter(String domain, String filename) {
+        super(domain, null, 0, 0);
         this.filename = filename;
     }
     

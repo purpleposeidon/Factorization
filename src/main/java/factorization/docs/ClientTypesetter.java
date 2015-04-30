@@ -12,8 +12,8 @@ import cpw.mods.fml.common.Loader;
 
 public class ClientTypesetter extends AbstractTypesetter {
 
-    public ClientTypesetter(FontRenderer font, int pageWidth, int pageHeight) {
-        super(font, pageWidth, pageHeight - WordPage.TEXT_HEIGHT * 2);
+    public ClientTypesetter(String domain, FontRenderer font, int pageWidth, int pageHeight) {
+        super(domain, font, pageWidth, pageHeight - WordPage.TEXT_HEIGHT * 2);
     }
 
     @Override

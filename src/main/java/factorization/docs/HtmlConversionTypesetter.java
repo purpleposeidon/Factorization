@@ -13,8 +13,8 @@ import java.util.ArrayList;
 public class HtmlConversionTypesetter extends AbstractTypesetter {
     PrintStream out;
     final String root;
-    public HtmlConversionTypesetter(OutputStream out, String root) {
-        super(null, 0, 0);
+    public HtmlConversionTypesetter(String domain, OutputStream out, String root) {
+        super(domain, null, 0, 0);
         this.out = new PrintStream(out);
         this.root = root;
     }

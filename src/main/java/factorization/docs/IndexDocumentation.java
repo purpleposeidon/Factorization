@@ -38,6 +38,8 @@ public class IndexDocumentation {
     static ArrayListMultimap<String, String> index = ArrayListMultimap.create();
     static HashSet<String> foundLinks = new HashSet();
     static ArrayList<String> pendingLinks = new ArrayList();
+
+    static String domain;
     
     public static void main(String[] args) throws IOException {
         if (args.length < 2) {
@@ -55,13 +57,16 @@ public class IndexDocumentation {
             } else {
                 String[] d = arg.split("\\=");
                 domains.put(d[0], new File(d[1]));
+                if (domain == null) {
+                    domain = d[0];
+                }
             }
         }
         DocumentationModule.overrideResourceManager = new IResourceManager() {
             @Override
             public Set getResourceDomains() {
                 HashSet<String> ret = new HashSet();
-                ret.add("factorization");
+                ret.add(domain);
                 return ret;
             }
             
@@ -105,8 +110,8 @@ public class IndexDocumentation {
         
         while (!pendingLinks.isEmpty()) {
             String link = pendingLinks.remove(0);
-            String text = DocumentationModule.readDocument(link);
-            IndexerTypesetter ts = new IndexerTypesetter(link);
+            String text = DocumentationModule.readDocument(domain, link);
+            IndexerTypesetter ts = new IndexerTypesetter(domain, link);
             ts.processText(text);
         }
         

@@ -19,6 +19,7 @@ import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL12;
 
 public class DocViewer extends GuiScreen {
+    final String domain;
     final String name;
     int startPageIndex;
     Document doc;
@@ -79,15 +80,17 @@ public class DocViewer extends GuiScreen {
     }
     
     int orig_scale = -1;
-    
-    public DocViewer(HistoryPage hist) {
-        this.name = hist.docName;
-        this.startPageIndex = hist.offset;
-    }
-    
-    public DocViewer(String name) {
+
+    public DocViewer(String domain, String name) {
+        this.domain = domain;
         this.name = name;
         this.startPageIndex = -1;
+    }
+    
+    public DocViewer(String domain, HistoryPage hist) {
+        this.domain = domain;
+        this.name = hist.docName;
+        this.startPageIndex = hist.offset;
     }
     
     @Override
@@ -129,8 +132,8 @@ public class DocViewer extends GuiScreen {
     }
     
     Document getDocument(String name) {
-        AbstractTypesetter ts = new ClientTypesetter(mc.fontRenderer, getPageWidth(0), getPageHeight(0)); 
-        ts.processText(DocumentationModule.readDocument(name));
+        AbstractTypesetter ts = new ClientTypesetter(domain, mc.fontRenderer, getPageWidth(0), getPageHeight(0));
+        ts.processText(DocumentationModule.readDocument(domain, name));
         return new Document(name, ts.getPages());
     }
     
@@ -276,7 +279,7 @@ public class DocViewer extends GuiScreen {
             Word link = p.click(mouseX - getPageLeft(i), mouseY - getPageTop(i));
             if (link != null && link.getLink() != null) {
                 if (link.getLink().equals(name)) return;
-                DocViewer newDoc = new DocViewer(link.getLink());
+                DocViewer newDoc = new DocViewer(domain, link.getLink());
                 addNewHistoryEntry(name, getCurrentPageIndex());
                 mc.displayGuiScreen(newDoc);
                 return;
@@ -310,12 +313,12 @@ public class DocViewer extends GuiScreen {
                 page = n;
             }
         } else if (button == backButton) {
-            DocViewer newDoc = new DocViewer(popLastPage());
+            DocViewer newDoc = new DocViewer(domain, popLastPage());
             mc.displayGuiScreen(newDoc);
         } else if (button == homeButton) {
             if (!name.equals("index")) {
                 addNewHistoryEntry(name, getCurrentPageIndex());
-                mc.displayGuiScreen(new DocViewer("index"));
+                mc.displayGuiScreen(new DocViewer(domain, "index"));
             }
         }
     }
