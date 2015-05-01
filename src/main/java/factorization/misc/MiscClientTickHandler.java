@@ -1,16 +1,15 @@
 package factorization.misc;
 
 import java.text.DateFormat;
-import java.util.Arrays;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
+import factorization.api.ICoordFunction;
 import factorization.util.ItemUtil;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.audio.PositionedSoundRecord;
 import net.minecraft.client.gui.GuiMainMenu;
 import net.minecraft.client.settings.KeyBinding;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ChatComponentText;
@@ -26,6 +25,7 @@ import cpw.mods.fml.common.gameevent.TickEvent.ClientTickEvent;
 import cpw.mods.fml.common.gameevent.TickEvent.Phase;
 import factorization.api.Coord;
 import factorization.common.FzConfig;
+import net.minecraft.world.chunk.Chunk;
 
 public class MiscClientTickHandler {
     private final Minecraft mc = Minecraft.getMinecraft();
@@ -39,6 +39,7 @@ public class MiscClientTickHandler {
         checkSprintKey();
         MiscClientCommands.tick();
         notifyTimeOnFullScreen();
+        fix_mc2713();
     }
     
     int count = 0;
@@ -189,5 +190,51 @@ public class MiscClientTickHandler {
         ChatStyle style = new ChatStyle().setItalic(true).setColor(EnumChatFormatting.GRAY);
         mc.ingameGUI.getChatGUI().printChatMessageWithOptionalDeletion(new ChatComponentText(msg).setChatStyle(style), 20392);
         last_msg = msg;
+    }
+
+    int last_chunk_x = Integer.MAX_VALUE, last_chunk_z = Integer.MAX_VALUE;
+    boolean chunkChanged() {
+        EntityPlayer player = Minecraft.getMinecraft().thePlayer;
+        if (player == null) return false;
+        if (last_chunk_x == player.chunkCoordX && last_chunk_z == player.chunkCoordZ) return false;
+        last_chunk_x = player.chunkCoordX;
+        last_chunk_z = player.chunkCoordZ;
+        return true;
+    }
+
+    private boolean near(Entity ent) {
+        int dx = (last_chunk_x - ent.chunkCoordX);
+        int dz = (last_chunk_z - ent.chunkCoordZ);
+        int dSq = dx * dx + dz * dz;
+        return dSq <= 4;
+    }
+
+    void fix_mc2713() { // NORELEASE: Seems to be fixed in 1.8. Are we in 1.8?
+        if (!chunkChanged()) return;
+        World world = mc.theWorld;
+        int d = 16 * 3 / 2;
+        final HashSet<Entity> properly_known_entities = new HashSet<Entity>();
+        Coord at = new Coord(mc.thePlayer);
+        Coord.iterateChunks(at.add(-d, -d, -d), at.add(d, d, d), new ICoordFunction() {
+            @Override
+            public void handle(Coord here) {
+                for (List l : here.getChunk().entityLists) {
+                    properly_known_entities.addAll((Collection<Entity>) l);
+                }
+            }
+        });
+        nextEntity:
+        for (Entity ent : (Iterable<Entity>) world.loadedEntityList) {
+            if (!near(ent)) continue nextEntity;
+            Chunk chunk = world.getChunkFromChunkCoords(ent.chunkCoordX, ent.chunkCoordZ);
+            if (chunk.entityLists[ent.chunkCoordY].size() < 16) {
+                for (Entity e : (Iterable<Entity>) chunk.entityLists[ent.chunkCoordY]) {
+                    if (e == ent) continue nextEntity;
+                }
+            } else if (properly_known_entities.contains(ent)) {
+                continue nextEntity;
+            }
+            chunk.addEntity(ent);
+        }
     }
 }

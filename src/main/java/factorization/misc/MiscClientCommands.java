@@ -590,8 +590,13 @@ public class MiscClientCommands implements ICommand {
                 failed++;
                 chunk.addEntity(ent);
             }
+            if (failed == 0) {
+                return "No broken entities; neptune thinks he's fixed the bug!";
+            }
             return "Fixed " + failed + " entities";
         }
+
+
         
         @help("Turns your cape on or off")
         public static void cape() {
