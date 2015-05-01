@@ -26,6 +26,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.ChatComponentText;
 import net.minecraft.util.EnumChatFormatting;
+import net.minecraft.util.StringUtils;
 import net.minecraft.world.World;
 import net.minecraft.world.chunk.Chunk;
 
@@ -59,7 +60,7 @@ public class MiscClientCommands implements ICommand {
 
     @Override
     public String getCommandName() {
-        return "f";
+        return FzConfig.f;
     }
 
     @Override
@@ -121,7 +122,7 @@ public class MiscClientCommands implements ICommand {
         @alias({"help", "?"})
         public static void about() {
             player.addChatMessage(new ChatComponentText("Miscellaneous Client Commands; from Factorization, by neptunepink"));
-            player.addChatMessage(new ChatComponentText("Use /f list go see the sub-commands."));
+            player.addChatMessage(new ChatComponentText("Use /" + FzConfig.f + " list go see the sub-commands."));
         }
         
         @help("Lists available subcommands. Can also search the list.")
@@ -279,11 +280,11 @@ public class MiscClientCommands implements ICommand {
         @help("Sets the watchdog waitInterval")
         public static String watchdog() {
             if (LagssieWatchDog.instance == null) {
-                return "Watchdog disabled. Enable in config, or use /f startwatchdog";
+                return "Watchdog disabled. Enable in config, or use /" + FzConfig.f + " startwatchdog";
             }
             
             if (arg1 == null) {
-                return "Usage: /f watchdog [waitInterval=" + LagssieWatchDog.instance.sleep_time + "]";
+                return "Usage: /" + FzConfig.f + " watchdog [waitInterval=" + LagssieWatchDog.instance.sleep_time + "]";
             }
             LagssieWatchDog.instance.sleep_time = Double.parseDouble(arg1);
             return "Set waitInterval to " + LagssieWatchDog.instance.sleep_time;
@@ -358,7 +359,7 @@ public class MiscClientCommands implements ICommand {
         @help("Dump all terrain to a .obj. This can take a while! Watch the console.")
         public static String exportWorld() {
             double maxDist = 256;
-            if (arg1 != null && arg1 != "") {
+            if (!StringUtils.isNullOrEmpty(arg1)) {
                 maxDist = Double.parseDouble(arg1);
             }
             WorldRenderer[] lizt = mc.renderGlobal.sortedWorldRenderers;
@@ -477,7 +478,7 @@ public class MiscClientCommands implements ICommand {
             }
         }
         
-        @help("Pass an /f command to the server (for Factions)")
+        @help("Pass an /f command to the server (for Factions; but see FZ's config)")
         @alias("/f")
         public static void factions() {
             String cmd = "";
@@ -628,7 +629,7 @@ public class MiscClientCommands implements ICommand {
     
     @Override
     public String getCommandUsage(ICommandSender icommandsender) {
-        return "/f <subcommand, such as 'help' or 'list'>";
+        return "/" + FzConfig.f + " <subcommand, such as 'help' or 'list'>";
     }
     
     @Override
@@ -726,7 +727,7 @@ public class MiscClientCommands implements ICommand {
                     }
                 }
             }
-            mc.thePlayer.addChatMessage(new ChatComponentText("Unknown command. Try /f list."));
+            mc.thePlayer.addChatMessage(new ChatComponentText("Unknown command. Try /" + FzConfig.f + " list."));
         } catch (Exception e) {
             mc.thePlayer.addChatMessage(new ChatComponentText("Command failed; see console"));
             e.printStackTrace();
