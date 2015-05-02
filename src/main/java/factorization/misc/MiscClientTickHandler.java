@@ -207,7 +207,10 @@ public class MiscClientTickHandler {
         Coord.iterateChunks(at.add(-d, -d, -d), at.add(d, d, d), new ICoordFunction() {
             @Override
             public void handle(Coord here) {
-                for (List l : here.getChunk().entityLists) {
+                final Chunk chunk = here.getChunk();
+                if (chunk == null) return;
+                for (List l : chunk.entityLists) {
+                    if (l == null) continue;
                     properly_known_entities.addAll((Collection<Entity>) l);
                 }
             }
