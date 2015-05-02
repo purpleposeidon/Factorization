@@ -48,6 +48,8 @@ public class DataOutByteBuf extends DataHelper {
             ByteBufUtils.writeUTF8String(dos, (String) value);
         } else if (value instanceof NBTTagCompound) {
             ByteBufUtils.writeTag(dos, (NBTTagCompound) value);
+        } else if (value == null) {
+            throw new NullPointerException("Can't put null!");
         }
         return (E) value;
     }
