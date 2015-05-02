@@ -12,11 +12,7 @@ import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.ChatComponentText;
-import net.minecraft.util.ChatStyle;
-import net.minecraft.util.EnumChatFormatting;
-import net.minecraft.util.MovingObjectPosition;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.*;
 import net.minecraft.world.World;
 import cpw.mods.fml.client.registry.ClientRegistry;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
@@ -202,13 +198,6 @@ public class MiscClientTickHandler {
         return true;
     }
 
-    private boolean near(Entity ent) {
-        int dx = (last_chunk_x - ent.chunkCoordX);
-        int dz = (last_chunk_z - ent.chunkCoordZ);
-        int dSq = dx * dx + dz * dz;
-        return dSq <= 4;
-    }
-
     void fix_mc2713() { // NORELEASE: Seems to be fixed in 1.8. Are we in 1.8?
         if (!chunkChanged()) return;
         World world = mc.theWorld;
@@ -225,8 +214,15 @@ public class MiscClientTickHandler {
         });
         nextEntity:
         for (Entity ent : (Iterable<Entity>) world.loadedEntityList) {
-            if (!near(ent)) continue nextEntity;
-            Chunk chunk = world.getChunkFromChunkCoords(ent.chunkCoordX, ent.chunkCoordZ);
+            int ecx = MathHelper.floor_double(ent.posX / 16.0D);
+            int ecz = MathHelper.floor_double(ent.posZ / 16.0D);
+            int dx = (last_chunk_x - ecx);
+            int dz = (last_chunk_z - ecz);
+            int dSq = dx * dx + dz * dz;
+            boolean near = dSq <= 4;
+            if (!near) continue nextEntity;
+
+            Chunk chunk = world.getChunkFromChunkCoords(ecx, ecz);
             if (chunk.entityLists[ent.chunkCoordY].size() < 16) {
                 for (Entity e : (Iterable<Entity>) chunk.entityLists[ent.chunkCoordY]) {
                     if (e == ent) continue nextEntity;
