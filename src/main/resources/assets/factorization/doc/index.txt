@@ -34,3 +34,5 @@
 \nl Red stained clay too plain?
 \nl Netherrack too ugly?
 \nl Try Mantlerock! \#{tile.factorization:mantlerock}
+
+\checkmods{all}{ForgeIRC}{Join us in #factorization on irc.esper.net!}{}
