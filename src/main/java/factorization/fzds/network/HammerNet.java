@@ -335,14 +335,6 @@ public class HammerNet {
             ret = world.getBlock(x, y, z).onBlockActivated(world, x, y, z, player, sideHit, vecX, vecY, vecZ);
         }
 
-        if (!ret && is != null && is.getItem() instanceof ItemBlock) {
-            ItemBlock itemblock = (ItemBlock) is.getItem();
-
-            if (!itemblock.func_150936_a(world, x, y, z, sideHit, player, is)) {
-                return false;
-            }
-        }
-
         if (ret) {
             return true;
         } else if (is == null) {

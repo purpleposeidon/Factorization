@@ -1,5 +1,6 @@
 package factorization.fzds.network;
 
+import com.google.common.collect.BiMap;
 import cpw.mods.fml.common.network.handshake.NetworkDispatcher;
 import cpw.mods.fml.common.network.internal.FMLProxyPacket;
 import cpw.mods.fml.relauncher.Side;
@@ -15,6 +16,9 @@ import net.minecraft.network.play.server.S26PacketMapChunkBulk;
 public class WrappedPacketFromServer extends WrappedPacket {
     public WrappedPacketFromServer(Packet towrap) {
         super(towrap);
+    }
+
+    public WrappedPacketFromServer() {
     }
 
     @Override
@@ -71,5 +75,10 @@ public class WrappedPacketFromServer extends WrappedPacket {
             // But unfortunately peeps send packets incorrectly by player-distance instead of properly using the subscription,
             // and Forge doesn't make it reasonable to do it the right way.
         }
+    }
+
+    @Override
+    protected BiMap<Integer, Class> getPacketMap() {
+        return serverPacketMap;
     }
 }

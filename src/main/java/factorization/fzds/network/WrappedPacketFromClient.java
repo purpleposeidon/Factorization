@@ -1,5 +1,6 @@
 package factorization.fzds.network;
 
+import com.google.common.collect.BiMap;
 import cpw.mods.fml.common.network.handshake.NetworkDispatcher;
 import cpw.mods.fml.common.network.internal.FMLProxyPacket;
 import cpw.mods.fml.relauncher.Side;
@@ -14,6 +15,10 @@ import net.minecraft.network.play.client.C00PacketKeepAlive;
 public class WrappedPacketFromClient extends WrappedPacket {
     public WrappedPacketFromClient(Packet towrap) {
         super(towrap);
+    }
+
+    public WrappedPacketFromClient() {
+
     }
 
     @Override
@@ -45,5 +50,10 @@ public class WrappedPacketFromClient extends WrappedPacket {
             }
         }
         wrapped.processPacket(handler);
+    }
+
+    @Override
+    protected BiMap<Integer, Class> getPacketMap() {
+        return clientPacketMap;
     }
 }

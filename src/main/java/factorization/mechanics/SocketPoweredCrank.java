@@ -1,5 +1,7 @@
 package factorization.mechanics;
 
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
 import factorization.api.*;
 import factorization.api.datahelpers.DataHelper;
 import factorization.api.datahelpers.IDataSerializable;
@@ -259,6 +261,7 @@ public class SocketPoweredCrank extends TileEntitySocketBase implements IChargeC
     }
 
     @Override
+    @SideOnly(Side.CLIENT)
     public void renderStatic(ServoMotor motor, Tessellator tess) {
         SocketBareMotor sbm = (SocketBareMotor) FactoryType.SOCKET_BARE_MOTOR.getRepresentative();
         getCoord().setAsTileEntityLocation(sbm);
@@ -292,6 +295,7 @@ public class SocketPoweredCrank extends TileEntitySocketBase implements IChargeC
         }
     }
 
+    @SideOnly(Side.CLIENT)
     private void setChainDraw(Vec3 realHookLocation, Vec3 selfPos, float len) {
         boolean first = false;
         if (chainDraw == null) {
@@ -346,6 +350,7 @@ public class SocketPoweredCrank extends TileEntitySocketBase implements IChargeC
     }
 
     @Override
+    @SideOnly(Side.CLIENT)
     public void renderTesr(ServoMotor motor, float partial) {
         super.renderTesr(motor, partial);
         float sprocketTheta = 0;

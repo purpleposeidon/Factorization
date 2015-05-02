@@ -20,9 +20,15 @@ public abstract class WrappedPacket extends Packet implements IFzdsShenanigans {
     static int server_packet_id = 92;
     static int client_packet_id = 92;
     public static void registerPacket() {
+        if (serverPacketMap.containsKey(server_packet_id)) {
+            throw new RuntimeException("Packet " + server_packet_id + " is already registered!");
+        }
         serverPacketMap.put(server_packet_id, WrappedPacketFromServer.class); //server -> client packets
         EnumConnectionState.PLAY.field_150761_f.put(WrappedPacketFromServer.class, EnumConnectionState.PLAY);
 
+        if (clientPacketMap.containsKey(client_packet_id)) {
+            throw new RuntimeException("Packet " + server_packet_id + " is already registered!");
+        }
         clientPacketMap.put(client_packet_id, WrappedPacketFromClient.class);
         EnumConnectionState.PLAY.field_150761_f.put(WrappedPacketFromClient.class, EnumConnectionState.PLAY);
     }
@@ -43,9 +49,9 @@ public abstract class WrappedPacket extends Packet implements IFzdsShenanigans {
         localPacket = false;
     }
     
-    private static Packet unwrapPacket(PacketBuffer buf) {
+    private Packet unwrapPacket(PacketBuffer buf) {
         int packetId = buf.readVarIntFromBuffer();
-        Packet recieved_packet = Packet.generatePacket(serverPacketMap, packetId);
+        Packet recieved_packet = Packet.generatePacket(getPacketMap(), packetId);
         if (recieved_packet == null) {
             Core.logWarning("Bad packet ID " + packetId);
             return null;
@@ -60,6 +66,8 @@ public abstract class WrappedPacket extends Packet implements IFzdsShenanigans {
         return recieved_packet;
     }
 
+    protected abstract BiMap<Integer, Class> getPacketMap();
+
     @Override
     public void writePacketData(PacketBuffer data) {
         if (wrapped == null) {
@@ -70,7 +78,7 @@ public abstract class WrappedPacket extends Packet implements IFzdsShenanigans {
             wrapped = pp.toS3FPacket();
         }
         PacketBuffer buff = new PacketBuffer(data);
-        Integer packetId = serverPacketMap.inverse().get(wrapped.getClass());
+        Integer packetId = getPacketMap().inverse().get(wrapped.getClass());
         if (packetId == null) {
             throw new IllegalArgumentException("Can't send unregistered packet: " + wrapped.serialize());
         }
