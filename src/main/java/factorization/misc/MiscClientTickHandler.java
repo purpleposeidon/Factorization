@@ -199,8 +199,9 @@ public class MiscClientTickHandler {
     }
 
     void fix_mc2713() { // NORELEASE: Seems to be fixed in 1.8. Are we in 1.8?
-        if (!chunkChanged()) return;
         World world = mc.theWorld;
+        if (world == null || world.loadedEntityList == null) return;
+        if (!chunkChanged()) return;
         int d = 16 * 3 / 2;
         final HashSet<Entity> properly_known_entities = new HashSet<Entity>();
         Coord at = new Coord(mc.thePlayer);
