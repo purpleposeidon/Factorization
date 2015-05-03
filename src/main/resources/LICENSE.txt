@@ -1,102 +1,52 @@
-eader]
-This mod adds minimalist parts for expanding vanilla redstone automation, and many other things.
 
-Command small robots!
-[img]http://i.imgur.com/eJ2hdsU.png[/img]
-Build terracotta armies!
-[img]http://i.imgur.com/bmrAPXz.png[/img]
-Spinning blades of death!
-[img]http://i.imgur.com/x6a5b1r.png[/img]
-Twist the very fabric of reality!
-[img]http://i.imgur.com/8b9R0ZD.png[/img]
-Giant killer robots!
-[img]http://i.imgur.com/oopsies-looks-like-this-link-is-a-404.png[/img]
+Short version: You can use FZ in your modpack if you post pictures of using FZ in an interesting manner in this thread.
 
+Long version: 
 
+This is the "Post Something Interesting License", 3rd revision.
 
-[header=2][anchor=INSTALL]Installation[/anchor][/header]
-1. Download and run the [url="http://files.minecraftforge.net/"]Minecraft Forge Installer[/url]. The version of Forge that I'm using is given by the download link. Anything newer will usually work, and sometimes older versions will work as well.
-2. Check that the forge install worked by running the client (or the server). Forge information should be on the title screen (or in the server's logs). Close Minecraft.
-3. Put Factorization.jar into the mods folder.
+All distribution permissions granted prior to Feb 16, 2015 by any means other than the PSIL do not apply to further updates of Factorization.
 
-[header=2][anchor=START]Getting Started[/anchor][/header]
+Factorization may be downloaded and copied as much as you like for personal use. It may be decompiled for the purposes of education, interoperability, bug-fixing, and/or security.
 
-First, you must discover the Lost Treasure Map. It was last seen near diamond ore. Treasure maps are very rare and very fragile, so treat it gently. Right-click the map once, and follow it to find a well-guarded stash somewhere on the surface. This stash will contain a Logic Matrix Programmer, and occasionally a few other useful materials.
-
-The Logic Matrix Programmer can then be used in the recipe below to create the Factorization Manual, which can teach you everything worth knowing!
-[img]http://i.imgur.com/3GMNpTx.png[/img]
-
-Or [url=http://purpleposeidon.github.io/FzDocs/]here's an outside-of-Minecraft copy of the manual[/url].
-
-[header=2][anchor=DOWNLOAD]Download[/anchor][/header]
-
-The license has changed; you must post something interesting to make a modpack. Read, understand, and accept the license before downloading.
-
-You can encourage and guide further development of Factorization through my [url="http://www.patreon.com/neptunepink"][img]http://i.imgur.com/srYEtgV.png[/img]Patreon[/url].
-
-[spoiler]
-Factorization 1.7.10-0.8.88.8.8888h
-[url="http://adf.ly/2137658/https://www.mediafire.com/?9lz4lzxm653a52f"]adfly + MediaFire[/url], or
-[url="http://adf.ly/2137658/http://dl.dropbox.com/u/76265666/old/Factorization-1.7.10-0.8.88.8.8888h.jar"]adfly + DropBox[/url]
-Built on 2015-03-04 against Minecraft Forge 1.7.10-10.13.2.1230
-[url="http://dl.dropbox.com/u/76265666/changelogs/Changelog-1.7.10-0.8.88.8.8888h.txt"]Changelog[/url]
-[url="http://dl.dropbox.com/u/76265666/old/Factorization-1.7.10-0.8.88.8.8888h-dev.jar"]Deobf for Mod Authors[/url]
+You may not distribute Factorization in any way, unless each act of distribution satisfies one of these conditions:
+A. It is being distributed as part of a mod pack for a specific private Minecraft server, and the mod pack is inaccessible to the public.
+B. It is being transferred privately between mod developers solely for the purposes of bug-fixing or compatibility.
+C. It is being distributed to a modpack from a modpack platform where:
+   1) the modpack is hosted on that platform
+   2) AND the modpack has permission to distribute Factorization
+   3) AND the modpack platform is not otherwise distributing Factorization.
+D. It is being distributed as part of a public mod pack, where:
+   1) A post has been made to either: the Factorization Minecraft Forum thread, or the #factorization IRC channel on irc.esper.net
+   2) AND said post demonstrates a usage of Factorization, such that it is either:
+        • a novel and functional build where Factorization provides critical functionality
+        • OR a novel and aesthetic build dependent on a component added by Factorization
+        • OR a novel and an actionable bug report for Factorization that is reproducible with 8 or fewer other mods installed as counted by the number of primary entries in the mods list accessed from the Minecraft game main menu.
+   3) AND said post makes no mention, hint, or reference to this license, or to licensing, or to mod packs.
+   4) AND the mod pack has a publicly accessible list of the mods used in that pack, and that list must:
+        • include a link to the Factorization forum thread
+        • AND a link to said post if it is on MCF, or a link to the chat log of the post if it is on IRC.
+   5) AND said post is not shared with any other modpack.
+E. It is being distributed as part of a source code repository for the purpose of mod development, where the Factorization being distributed is a deobf release.
 
 
-[spoiler]
-Factorization 1.7.10-0.8.88.8.8888g
-[url="http://adf.ly/2137658/https://www.mediafire.com/?th3f72w2zl82p10"]adfly + MediaFire[/url], or
-[url="http://adf.ly/2137658/http://dl.dropbox.com/u/76265666/old/Factorization-1.7.10-0.8.88.8.8888g.jar"]adfly + DropBox[/url]
-Built on 2015-02-23 against Minecraft Forge 1.7.10-10.13.2.1230
-[url="http://dl.dropbox.com/u/76265666/changelogs/Changelog-1.7.10-0.8.88.8.8888g.txt"]Changelog[/url]
-[url="http://dl.dropbox.com/u/76265666/old/Factorization-1.7.10-0.8.88.8.8888g-dev.jar"]Deobf for Mod Authors[/url]
+This license does not apply to certain other works included in Factorization as specified by CREDITS.txt in the jar file.
 
-Factorization 1.7.10-0.8.88.8.8888f
-[url="http://adf.ly/2137658/https://www.mediafire.com/?kbdyg13lbjny71c"]adfly + MediaFire[/url], or
-[url="http://adf.ly/2137658/http://dl.dropbox.com/u/76265666/old/Factorization-1.7.10-0.8.88.8.8888f.jar"]adfly + DropBox[/url]
-Built on 2015-02-20 against Minecraft Forge 1.7.10-10.13.2.1230
-[url="http://dl.dropbox.com/u/76265666/changelogs/Changelog-1.7.10-0.8.88.8.8888f.txt"]Changelog[/url]
-[url="http://dl.dropbox.com/u/76265666/old/Factorization-1.7.10-0.8.88.8.8888f-dev.jar"]Deobf for Mod Authors[/url]
+End of license text.
 
-Factorization 1.7.10-0.8.88.8.8888e
-[url="http://adf.ly/2137658/https://www.mediafire.com/?x6v7xfqpqk714r1"]adfly + MediaFire[/url], or
-[url="http://adf.ly/2137658/http://dl.dropbox.com/u/76265666/old/Factorization-1.7.10-0.8.88.8.8888e.jar"]adfly + DropBox[/url]
-Built on 2015-02-18 against Minecraft Forge 1.7.10-10.13.2.1230
-[url="http://dl.dropbox.com/u/76265666/changelogs/Changelog-1.7.10-0.8.88.8.8888e.txt"]Changelog[/url]
-[url="http://dl.dropbox.com/u/76265666/old/Factorization-1.7.10-0.8.88.8.8888e-dev.jar"]Deobf for Mod Authors[/url]
 
-Factorization 1.7.10-0.8.88.8.8888d
-[url="http://adf.ly/2137658/https://www.mediafire.com/?hou2gr3q90udh66"]adfly + MediaFire[/url], or
-[url="http://adf.ly/2137658/http://dl.dropbox.com/u/76265666/old/Factorization-1.7.10-0.8.88.8.8888d.jar"]adfly + DropBox[/url]
-Built on 2015-02-18 against Minecraft Forge 1.7.10-10.13.2.1230
-[url="http://dl.dropbox.com/u/76265666/changelogs/Changelog-1.7.10-0.8.88.8.8888d.txt"]Changelog[/url]
-[url="http://dl.dropbox.com/u/76265666/old/Factorization-1.7.10-0.8.88.8.8888d-dev.jar"]Deobf for Mod Authors[/url]
+License hints:
 
-Factorization 1.7.10-0.8.88.8.8888c
-[url="http://adf.ly/2137658/https://www.mediafire.com/?dwb3kn7jcj3b9c4"]adfly + MediaFire[/url], or
-[url="http://adf.ly/2137658/http://dl.dropbox.com/u/76265666/old/Factorization-1.7.10-0.8.88.8.8888c.jar"]adfly + DropBox[/url]
-Built on 2015-02-16 against Minecraft Forge 1.7.10-10.13.2.1230
-[url="http://dl.dropbox.com/u/76265666/changelogs/Changelog-1.7.10-0.8.88.8.8888c.txt"]Changelog[/url]
-[url="http://dl.dropbox.com/u/76265666/old/Factorization-1.7.10-0.8.88.8.8888c-dev.jar"]Deobf for Mod Authors[/url]
+  * The modpack distributor doesn't actually personally have to make the post. However, it would be Inadvisable to use some unrelated person's post.
+  * If your favorite modpack is removing or not updating FZ as a result of the license's cataclysmically onerous requirements, you can make a post for their behalf. (But a link to that post from the pack is still required.)
+  * "Novel" is more for "not the same thing being posted over and over" than "absolutely certain that it has never before been seen in the history of time". If you secretly suspect I might not think it's novel, then perhaps it isn't.
+  * If you're writing a script to download it through adfly with minimal intervention, fine, whatever, if you really want to try that hard, go ahead. But wouldn't it be easier & funner to just... post something interesting?
+  * The license doesn't apply retroactively if you've already downloaded the mod under a different license/permission. That would be absurd. However, if you downloaded Factorization after the PSIL has been posted, then the PSIL applies.
+  * Sending me PMs does not count as a posting to this thread.
+  * Note that "installers" are not allowed.
+  * Please do not tell me that you are using FZ in a mod pack, or ask if you can use FZ in a mod pack. This will indicate to me that you did not comprehend the license, and so I will yell at you.
+  * "hi i am using factorisation in my modpack kthxbai" is not a post that gives you license to distribute Factorization. Did you just make that post? I anticipate that there will be a great momentum of that. You do not have permission to use FZ in your mod pack. Read the license. Are you covered under condition A?
+  * A modpack with a password posted somewhere public counts as being accessible to the public.
+  * Clause D.3 is a thing. Did you read it? Read it again. Here's what it says: "Said post makes no mention, hint, or reference to this license, or to licensing, or to mod packs". If your post says "im posting this for my modpack" then you have not earned permission. And then you should feel embarrassed. And fall into a well of deep shame. But, like, don't go overboard with it, okay? You could probably edit your post if I haven't noticed it yet (but you can never really be sure that I haven't). If I have noticed it, then you'd best make a new post.
 
-Factorization 1.7.10-0.8.88.8.8888b
-[url="http://adf.ly/2137658/https://www.mediafire.com/?z5pgyrpjxdrpljs"]adfly + MediaFire[/url], or
-[url="http://adf.ly/2137658/http://dl.dropbox.com/u/76265666/old/Factorization-1.7.10-0.8.88.8.8888b.jar"]adfly + DropBox[/url]
-Built on 2015-02-16 against Minecraft Forge 1.7.10-10.13.2.1230
-[url="http://dl.dropbox.com/u/76265666/changelogs/Changelog-1.7.10-0.8.88.8.8888b.txt"]Changelog[/url]
-[url="http://dl.dropbox.com/u/76265666/old/Factorization-1.7.10-0.8.88.8.8888b-dev.jar"]Deobf for Mod Authors[/url]
-
-Factorization 1.7.10-0.8.88.8.8888a
-[url="http://adf.ly/2137658/https://www.mediafire.com/?2t5bj3utds5inw1"]adfly + MediaFire[/url], or
-[url="http://adf.ly/2137658/http://dl.dropbox.com/u/76265666/old/Factorization-1.7.10-0.8.88.8.8888a.jar"]adfly + DropBox[/url]
-Built on 2015-02-16 against Minecraft Forge 1.7.10-10.13.2.1230
-[url="http://dl.dropbox.com/u/76265666/changelogs/Changelog-1.7.10-0.8.88.8.8888a.txt"]Changelog[/url]
-[url="http://dl.dropbox.com/u/76265666/old/Factorization-1.7.10-0.8.88.8.8888a-dev.jar"]Deobf for Mod Authors[/url]
-
-Factorization 1.7.10-0.8.88.8.8888
-[url="http://adf.ly/2137658/https://www.mediafire.com/?nad03nvoj1cbi9u"]adfly + MediaFire[/url], or
-[url="http://adf.ly/2137658/http://dl.dropbox.com/u/76265666/old/Factorization-1.7.10-0.8.88.8.8888.jar"]adfly + DropBox[/url]
-Built on 2015-02-15 against Minecraft Forge 1.7.10-10.13.2.1230
-[url="http://dl.dropbox.com/u/76265666/changelogs/Changelog-1.7.10-0.8.88.8.8888.txt"]Changelog[/url]
-[url="http://dl.dropbox.com/u/76265666/old/Factorization-1.7.10-0.8.88.8.8888-dev.jar"]Deobf for Mod Authors[/url]
 
