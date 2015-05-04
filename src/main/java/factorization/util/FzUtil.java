@@ -1,9 +1,15 @@
 package factorization.util;
 
+import com.google.common.collect.Multimap;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import factorization.shared.Core;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.SharedMonsterAttributes;
+import net.minecraft.entity.ai.attributes.BaseAttributeMap;
+import net.minecraft.entity.ai.attributes.IAttributeInstance;
+import net.minecraft.entity.ai.attributes.ServersideAttributeMap;
+import net.minecraft.item.ItemStack;
 import net.minecraft.world.World;
 import net.minecraftforge.common.DimensionManager;
 
@@ -74,6 +80,17 @@ public class FzUtil {
     public static void spawn(Entity ent) {
         if (ent == null) return;
         ent.worldObj.spawnEntityInWorld(ent);
+    }
+
+    public static double rateDamage(ItemStack is) {
+        if (is == null) return 0;
+        Multimap attrs = is.getItem().getAttributeModifiers(is);
+        if (attrs == null) return 0;
+        BaseAttributeMap test = new ServersideAttributeMap();
+        test.applyAttributeModifiers(attrs);
+        IAttributeInstance attr = test.getAttributeInstance(SharedMonsterAttributes.attackDamage);
+        if (attr == null) return 0;
+        return attr.getAttributeValue();
     }
 
 }

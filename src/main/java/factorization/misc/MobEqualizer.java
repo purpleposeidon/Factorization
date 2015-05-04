@@ -1,16 +1,18 @@
 package factorization.misc;
 
-import java.util.ArrayList;
-
+import cpw.mods.fml.common.eventhandler.EventPriority;
+import cpw.mods.fml.common.eventhandler.SubscribeEvent;
+import factorization.shared.Core;
+import factorization.shared.NORELEASE;
+import factorization.util.FzUtil;
 import net.minecraft.entity.IRangedAttackMob;
-import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.entity.monster.EntityMob;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.EnumAction;
 import net.minecraft.item.ItemStack;
-import cpw.mods.fml.common.eventhandler.EventPriority;
-import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.event.entity.living.LivingSpawnEvent;
+
+import java.util.ArrayList;
 
 public class MobEqualizer {
     @SubscribeEvent(priority = EventPriority.LOW)
@@ -22,9 +24,11 @@ public class MobEqualizer {
             return;
         }
         EntityMob ent = (EntityMob) event.entityLiving;
-        if (event.world.rand.nextInt(400) > event.world.difficultySetting.getDifficultyId()) {
+        if (event.world.rand.nextInt(400) > event.world.difficultySetting.getDifficultyId() && !Core.dev_environ) {
+            NORELEASE.fixme("remove dev_environ check");
             return;
         }
+        if (!ent.canPickUpLoot()) return;
         EntityPlayer template = pickNearPlayer(event);
         if (template == null) {
             return;
@@ -44,30 +48,22 @@ public class MobEqualizer {
         }
         ArrayList<ItemStack> weapons = new ArrayList();
         if (!(ent instanceof IRangedAttackMob) || event.world.rand.nextBoolean()) {
-            //float orig_damage = (float)ent.getAttributeInstanceForAttributeType__getEntityAttribute(SharedMonsterAttributes.attackDamage__attackDamage).getDamage__getAttributeValue();
-            float orig_damage = (float)ent.getEntityAttribute(SharedMonsterAttributes.attackDamage).getAttributeValue();
+            ItemStack orig_weapon = ent.getHeldItem();
+            double orig_damage = FzUtil.rateDamage(orig_weapon);
             for (int i = 0; i < 9; i++) {
                 ItemStack is = template.inventory.getStackInSlot(i);
-                if (is == null) {
-                    continue;
-                }
+                if (is == null) continue;
                 if (is.stackSize != 1 || is.getMaxStackSize() != 1) {
                     continue;
                 }
-                is = is.copy();
                 EnumAction act = is.getItemUseAction();
                 if (act != EnumAction.block && act != EnumAction.none && act != EnumAction.bow) {
                     continue;
                 }
-                ItemStack orig_weapon = ent.getHeldItem();
-                ent.setCurrentItemOrArmor(0, is);
-                //float f = (float)ent.getAttributeInstanceForAttributeType__getEntityAttribute(SharedMonsterAttributes.attackDamage__attackDamage).getDamage__getAttributeValue();
-                float f = (float)ent.getEntityAttribute(SharedMonsterAttributes.attackDamage).getAttributeValue();
-                ent.setCurrentItemOrArmor(0, orig_weapon);
-                if (f <= orig_damage) {
-                    continue;
+                double new_damage = FzUtil.rateDamage(is);
+                if (new_damage > orig_damage) {
+                    weapons.add(is.copy());
                 }
-                weapons.add(is);
             }
         }
         if (!weapons.isEmpty()) {
@@ -79,16 +75,14 @@ public class MobEqualizer {
         }
         
         event.setCanceled(true);
-        //ent.initCreature__onSpawnWithEgg(null); // We need to cancel the event so that we can call this before the below happens
         ent.onSpawnWithEgg(null); // We need to cancel the event so that we can call this before the below happens
-        if (!ent.canPickUpLoot()) {
-            return;
-        }
         ent.setCanPickUpLoot(false);
         if (weaponCopy != null) {
             ent.setCurrentItemOrArmor(0, weaponCopy);
         }
         for (int i = 0; i < 4; i++) {
+            // Do we want to set the stacksize to 0?
+            // Perhaps increase the damage?
             ent.setCurrentItemOrArmor(i + 1, armorCopies[i]);
         }
         for (int i = 0; i < 5; i++) {
