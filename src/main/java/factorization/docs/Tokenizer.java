@@ -12,6 +12,7 @@ public class Tokenizer {
     
     private final String src;
     private int scan = 0;
+    private int prevScan = -1;
     
     public Tokenizer(String src) {
         this.src = src;
@@ -24,6 +25,7 @@ public class Tokenizer {
     private int contigSpaces = 0;
     
     public boolean nextToken() {
+        prevScan = scan;
         mainloop: while (true) {
             if (scan >= src.length()) return false;
             char c = src.charAt(scan);
@@ -71,6 +73,11 @@ public class Tokenizer {
         }
     }
 
+    public void prevToken() {
+        if (prevScan == -1) throw new IllegalStateException("No previous token available");
+        scan = prevScan;
+        prevScan = -1;
+    }
     
     private void emit(TokenType type, int start, int end) {
         this.type = type;

@@ -2,9 +2,12 @@ package factorization.docs;
 
 import java.util.ArrayList;
 
+import factorization.util.DataUtil;
+import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.resources.IResource;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumChatFormatting;
 import net.minecraft.util.ResourceLocation;
@@ -88,22 +91,50 @@ public class ClientTypesetter extends AbstractTypesetter {
             if (cmd.equals("\\index")) {
                 getCurrentPage().nl();
             }
-        } else if (cmd.equals("\\#")) {
+        } else if (cmd.equals("\\#") || cmd.equals("\\##")) {
             String itemName = getParameter(cmd, tokenizer);
             if (itemName == null) {
                 error("No item specified");
                 return;
             }
-            ArrayList<ItemStack> items = DocumentationModule.lookup(itemName);
-            if (items == null) {
+            ArrayList<ItemStack> items;
+            if (cmd.equals("\\#")) {
+                items = DocumentationModule.lookup(itemName);
+            } else {
+                String stackSizeS = getOptionalParameter(tokenizer);
+                if (stackSizeS == null) stackSizeS = "1";
+                String dmgS = getOptionalParameter(tokenizer);
+                if (dmgS == null) dmgS = "0";
+                int dmg = Integer.parseInt(dmgS);
+                int stackSize = Integer.parseInt(stackSizeS);
+                items = new ArrayList<ItemStack>();
+                Block b = DataUtil.getBlockFromName(itemName);
+                Item it = DataUtil.getItemFromName(itemName);
+                if (b != null) {
+                    items.add(new ItemStack(b, stackSize, dmg));
+                } else if (it != null) {
+                    items.add(new ItemStack(it, stackSize, dmg));
+                } else {
+                    error("Could not find block or item: " + itemName);
+                }
+            }
+            if (items == null || items.isEmpty()) {
                 error(itemName + " no such item");
                 return;
             }
-            // NOTE: This could miss items. Hrm.
-            if (link == null) {
-                emitWord(new ItemWord(items.get(0)));
+            if (items.size() == 1) {
+                if (link == null) {
+                    emitWord(new ItemWord(items.get(0)));
+                } else {
+                    emitWord(new ItemWord(items.get(0), link));
+                }
             } else {
-                emitWord(new ItemWord(items.get(0), link));
+                ItemStack[] theItems = items.toArray(new ItemStack[items.size()]);
+                if (link == null) {
+                    emitWord(new ItemWord(theItems));
+                } else {
+                    emitWord(new ItemWord(theItems, link));
+                }
             }
         } else if (cmd.equals("\\img")) {
             String imgName = getParameter(cmd, tokenizer);

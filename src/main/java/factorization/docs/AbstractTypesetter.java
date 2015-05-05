@@ -40,13 +40,22 @@ public abstract class AbstractTypesetter {
         process(msg.replace("\\", "\\\\ "), null, "" + EnumChatFormatting.RED + EnumChatFormatting.BOLD);
     }
 
-    String getParameter(final String cmdName, final Tokenizer tokenizer) {
+    public String getParameter(final String cmdName, final Tokenizer tokenizer) {
         if (!tokenizer.nextToken()) {
             error("EOF looking for parameter for " + cmdName);
             return null;
         }
         if (tokenizer.type != tokenizer.type.PARAMETER) {
             error("Expected parameter for " + cmdName);
+            return null;
+        }
+        return tokenizer.token;
+    }
+
+    public String getOptionalParameter(final Tokenizer tokenizer) {
+        if (!tokenizer.nextToken()) return null;
+        if (tokenizer.type != tokenizer.type.PARAMETER) {
+            tokenizer.prevToken();
             return null;
         }
         return tokenizer.token;

@@ -19,7 +19,11 @@ public class ItemWord extends Word {
     }
     
     public ItemWord(ItemStack[] entries) {
-        super(getDefaultHyperlink(entries));
+        this(entries, getDefaultHyperlink(entries));
+    }
+
+    public ItemWord(ItemStack[] entries, String hyperlink) {
+        super(hyperlink);
         if (entries.length == 0) entries = null;
         this.entries = entries;
         cleanWildlings();
