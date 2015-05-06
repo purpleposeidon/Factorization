@@ -2,8 +2,6 @@ package factorization.misc;
 
 import cpw.mods.fml.common.eventhandler.EventPriority;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
-import factorization.shared.Core;
-import factorization.shared.NORELEASE;
 import factorization.util.FzUtil;
 import net.minecraft.entity.IRangedAttackMob;
 import net.minecraft.entity.monster.EntityMob;
@@ -24,8 +22,7 @@ public class MobEqualizer {
             return;
         }
         EntityMob ent = (EntityMob) event.entityLiving;
-        if (event.world.rand.nextInt(400) > event.world.difficultySetting.getDifficultyId() && !Core.dev_environ) {
-            NORELEASE.fixme("remove dev_environ check");
+        if (event.world.rand.nextInt(400) > event.world.difficultySetting.getDifficultyId()) {
             return;
         }
         if (!ent.canPickUpLoot()) return;
