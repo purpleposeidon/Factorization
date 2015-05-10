@@ -162,7 +162,7 @@ public class FzConfig {
             debug_light_air = getBoolConfig("debugLightAir", "client", debug_light_air, "Show invisible lamp-air");
             pocket_craft_anywhere = editRun().getBoolConfig("anywherePocketCraft", "client", pocket_craft_anywhere, "Lets you open the pocket crafting table from GUIs");
             render_barrel_item = editMain().getBoolConfig("renderBarrelItem", "client", render_barrel_item, null);
-            render_barrel_item = editMain().getBoolConfig("renderBarrelText", "client", render_barrel_text, null);
+            render_barrel_text = editMain().getBoolConfig("renderBarrelText", "client", render_barrel_text, null);
             render_barrel_close = editMain().getBoolConfig("renderBarrelClose", "client", render_barrel_close, "If true, render barrel info only when nearby");
             render_barrel_use_displaylists = editMain().getBoolConfig("renderBarrelUseDisplayLists", "client", render_barrel_use_displaylists, "If true, use OpenGL display lists for rendering barrels. Setting to false may fix some render issues, at the cost of making barrels render less efficiently");
             render_barrel_force_no_intercept = editMain().getBoolConfig("renderBarrelForceNoIntercept", "client", render_barrel_force_no_intercept, "If true, don't use hacks to avoid enchantment effect rendering issues. Setting to false may fix some render issues, at the cost of making the enchantment effect from, eg, enchanted books visible through walls.");
