@@ -58,6 +58,7 @@ class ShadowRenderGlobal implements IWorldAccess {
 
     @Override
     public void playSound(String sound, double x, double y, double z, float volume, float pitch) {
+        if (sound == null) return; // Odd. Has happened a few times tho.
         Vec3 realCoords = DeltaChunk.shadow2nearestReal(Minecraft.getMinecraft().thePlayer, x, y, z);
         if (realCoords == null) {
             return;
