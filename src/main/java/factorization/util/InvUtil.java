@@ -36,7 +36,11 @@ public final class InvUtil {
     }
 
     public static ItemStack transferSlotToSlots(EntityPlayer player, Slot clickSlot, Iterable<Slot> destinations) {
-        ItemStack got = tryTransferSlotToSlots(player, clickSlot, destinations);
+        return transferSlotToSlots(player, clickSlot, destinations, 64);
+    }
+
+    public static ItemStack transferSlotToSlots(EntityPlayer player, Slot clickSlot, Iterable<Slot> destinations, int maxTransfer) {
+        ItemStack got = tryTransferSlotToSlots(player, clickSlot, destinations, maxTransfer);
         if (got != null) {
             clickSlot.putStack(got);
         }
@@ -44,10 +48,15 @@ public final class InvUtil {
     }
 
     public static ItemStack tryTransferSlotToSlots(EntityPlayer player, Slot clickSlot, Iterable<Slot> destinations) {
+        return tryTransferSlotToSlots(player, clickSlot, destinations, 64);
+    }
+
+    public static ItemStack tryTransferSlotToSlots(EntityPlayer player, Slot clickSlot, Iterable<Slot> destinations, int maxTransfer) {
         ItemStack clickStack = ItemUtil.normalize(clickSlot.getStack());
         if (clickStack == null) {
             return null;
         }
+        int clickStackSize = Math.min(maxTransfer, clickStack.stackSize);
         clickSlot.onPickupFromSlot(player, clickStack);
         //try to fill up partially filled slots
         for (Slot slot : destinations) {
@@ -55,6 +64,7 @@ public final class InvUtil {
             if (is == null || !ItemUtil.couldMerge(is, clickStack)) {
                 continue;
             }
+            if (maxTransfer <= 0) return null;
             int freeSpace = Math.min(is.getMaxStackSize() - is.stackSize, slot.getSlotStackLimit() - is.stackSize);
             if (freeSpace <= 0) {
                 continue;
@@ -62,11 +72,14 @@ public final class InvUtil {
             if (!slot.isItemValid(clickStack)) {
                 continue;
             }
-            int delta = Math.min(freeSpace, clickStack.stackSize);
+            int delta = Math.min(freeSpace, clickStackSize);
+            delta = Math.min(delta, maxTransfer);
+            if (delta <= 0) continue;
             is.stackSize += delta;
             slot.putStack(is);
             clickStack.stackSize -= delta;
-            if (clickStack.stackSize <= 0) {
+            clickStackSize -= delta;
+            if (clickStackSize <= 0) {
                 clickSlot.putStack(null);
                 return null;
             }
@@ -76,12 +89,16 @@ public final class InvUtil {
             if (slot.getHasStack() || !slot.isItemValid(clickStack)) {
                 continue;
             }
+            if (maxTransfer <= 0) return null;
             int freeSpace = Math.min(slot.getSlotStackLimit(), clickStack.getMaxStackSize());
-            int delta = Math.min(freeSpace, clickStack.stackSize);
+            int delta = Math.min(freeSpace, clickStackSize);
+            delta = Math.min(delta, maxTransfer);
+            if (delta <= 0) continue;
             ItemStack toPut = clickStack.copy();
             toPut.stackSize = delta;
             slot.putStack(toPut);
             clickStack.stackSize -= delta;
+            clickStackSize -= delta;
             clickStack = ItemUtil.normalize(clickStack);
             if (clickStack == null) {
                 clickSlot.putStack(null);
