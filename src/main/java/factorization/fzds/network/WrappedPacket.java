@@ -27,7 +27,7 @@ public abstract class WrappedPacket extends Packet implements IFzdsShenanigans {
         EnumConnectionState.PLAY.field_150761_f.put(WrappedPacketFromServer.class, EnumConnectionState.PLAY);
 
         if (clientPacketMap.containsKey(client_packet_id)) {
-            throw new RuntimeException("Packet " + server_packet_id + " is already registered!");
+            throw new RuntimeException("Packet " + client_packet_id + " is already registered!");
         }
         clientPacketMap.put(client_packet_id, WrappedPacketFromClient.class);
         EnumConnectionState.PLAY.field_150761_f.put(WrappedPacketFromClient.class, EnumConnectionState.PLAY);
@@ -80,7 +80,7 @@ public abstract class WrappedPacket extends Packet implements IFzdsShenanigans {
         PacketBuffer buff = new PacketBuffer(data);
         Integer packetId = getPacketMap().inverse().get(wrapped.getClass());
         if (packetId == null) {
-            throw new IllegalArgumentException("Can't send unregistered packet: " + wrapped.serialize());
+            throw new IllegalArgumentException("Can't send unregistered packet: " + wrapped.getClass() + "; serializes to: " + wrapped.serialize());
         }
         buff.writeVarIntToBuffer(packetId);
         try {
@@ -91,6 +91,8 @@ public abstract class WrappedPacket extends Packet implements IFzdsShenanigans {
         }
     }
 
-
-
+    @Override
+    public String serialize() {
+        return getClass().getSimpleName() + ":" + (wrapped == null ? "NULL" : wrapped.toString());
+    }
 }
