@@ -1,5 +1,6 @@
 package factorization.docs;
 
+import factorization.common.BlockIcons;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.util.IIcon;
@@ -16,6 +17,7 @@ public class IconWord extends Word {
     
     public IconWord(String hyperlink, IIcon icon, int texture) {
         super(hyperlink);
+        if (icon == null) icon = BlockIcons.error;
         this.icon = icon;
         isBlock = texture == BLOCK_TEXTURE;
     }

@@ -84,15 +84,19 @@ public class WordPage extends AbstractPage {
     @Override
     void draw(DocViewer doc, int ox, int oy, String hoveredLink) {
         int y = 0;
-        for (ArrayList<Word> line : text) {
-            int x = 0;
-            int[] padding = getVerticalPadding(line);
-            int paddingTop = padding[0], paddingBottom = padding[1];
-            y += paddingTop;
-            for (Word word : line) {
-                x += word.draw(doc, ox + x, oy + y, hoveredLink != null && hoveredLink.equals(word.getLink()));
+        try {
+            for (ArrayList<Word> line : text) {
+                int x = 0;
+                int[] padding = getVerticalPadding(line);
+                int paddingTop = padding[0], paddingBottom = padding[1];
+                y += paddingTop;
+                for (Word word : line) {
+                    x += word.draw(doc, ox + x, oy + y, hoveredLink != null && hoveredLink.equals(word.getLink()));
+                }
+                y += paddingBottom;
             }
-            y += paddingBottom;
+        } catch (Throwable t) {
+            t.printStackTrace();
         }
     }
 }
