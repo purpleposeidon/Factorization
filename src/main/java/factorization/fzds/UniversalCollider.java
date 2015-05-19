@@ -49,4 +49,9 @@ class UniversalCollider extends Entity implements IFzdsEntryControl {
 
     @Override
     public void onExit(IDeltaChunk dse) { }
+
+    @Override
+    public boolean doesEntityNotTriggerPressurePlate() {
+        return true;
+    }
 }

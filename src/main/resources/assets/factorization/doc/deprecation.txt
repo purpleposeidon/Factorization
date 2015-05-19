@@ -1,0 +1,14 @@
+\title{Deprecation}
+
+% NORELEASE: Link from the index; with a skull item
+
+Removal is part of the process of approaching perfection.
+
+\nl
+
+The Mixer and the Packager will be removed in 0.9,
+since the Compression Crafter can do everything that they can.
+Additional features will be added to make up for them.
+
+
+

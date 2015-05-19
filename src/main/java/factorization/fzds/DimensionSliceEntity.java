@@ -1295,4 +1295,9 @@ public class DimensionSliceEntity extends IDeltaChunk implements IFzdsEntryContr
     public ItemStack[] getLastActiveItems() {
         return blast_protection;
     }
+
+    @Override
+    public boolean doesEntityNotTriggerPressurePlate() {
+        return true;
+    }
 }
