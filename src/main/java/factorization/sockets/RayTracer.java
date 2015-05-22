@@ -4,6 +4,7 @@ import factorization.api.Coord;
 import factorization.api.FzOrientation;
 import factorization.api.Quaternion;
 import factorization.fzds.DeltaChunk;
+import factorization.fzds.HammerEnabled;
 import factorization.fzds.interfaces.IDeltaChunk;
 import factorization.util.SpaceUtil;
 import net.minecraft.entity.Entity;
@@ -65,6 +66,7 @@ public class RayTracer {
     }
 
     boolean checkFzds() {
+        if (!HammerEnabled.ENABLED) return false;
         fzdsPass = true;
         if (trueCoord.w != DeltaChunk.getServerShadowWorld()) return false;
 
@@ -178,10 +180,6 @@ public class RayTracer {
     }
 
     boolean mopBlock(Coord target, ForgeDirection side) {
-        if (target.w != DeltaChunk.getServerShadowWorld()) {
-            AxisAlignedBB debug = Coord.aabbFromRange(target, target.add(1, 1, 1));
-            //AabbDebugger.addBox(debug);
-        }
         boolean isThis = base == socket && target.isAt(base);
         Vec3 hitVec = Vec3.createVectorHelper(base.xCoord + side.offsetX, base.yCoord + side.offsetY, base.zCoord + side.offsetZ);
         return base.handleRay(socket, target.createMop(side, hitVec), target.w, isThis, powered);

@@ -11,6 +11,7 @@ import factorization.api.datahelpers.Share;
 import factorization.common.BlockIcons;
 import factorization.common.FactoryType;
 import factorization.fzds.DeltaChunk;
+import factorization.fzds.HammerEnabled;
 import factorization.fzds.interfaces.IDeltaChunk;
 import factorization.notify.Notice;
 import factorization.servo.RenderServoMotor;
@@ -283,6 +284,7 @@ public class SocketShifter extends TileEntitySocketBase {
             }
         }
         if (foreignInv != null) return foreignInv;
+        if (!HammerEnabled.ENABLED) return null;
         if (worldObj != DeltaChunk.getServerShadowWorld()) return null;
         Coord target = coord.add(facing);
         for (IDeltaChunk idc : DeltaChunk.getSlicesContainingPoint(target)) {

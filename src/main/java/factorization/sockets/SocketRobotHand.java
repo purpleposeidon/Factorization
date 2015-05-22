@@ -3,6 +3,7 @@ package factorization.sockets;
 import java.io.IOException;
 
 import factorization.fzds.DeltaChunk;
+import factorization.fzds.HammerEnabled;
 import factorization.shared.*;
 import factorization.util.InvUtil;
 import factorization.util.ItemUtil;
@@ -96,7 +97,9 @@ public class SocketRobotHand extends TileEntitySocketBase {
     @Override
     public boolean handleRay(ISocketHolder socket, MovingObjectPosition mop, World mopWorld, boolean mopIsThis, boolean powered) {
         boolean ret = doHandleRay(socket, mop, mopWorld, mopIsThis, powered);
-        if (!ret && !mopIsThis && mop.typeOfHit == MovingObjectType.BLOCK && worldObj != DeltaChunk.getServerShadowWorld()) {
+        if (!ret && !mopIsThis
+                && mop.typeOfHit == MovingObjectType.BLOCK
+                && (!HammerEnabled.ENABLED || worldObj != DeltaChunk.getServerShadowWorld())) {
             return !worldObj.isAirBlock(mop.blockX, mop.blockY, mop.blockZ);
         }
         return ret;

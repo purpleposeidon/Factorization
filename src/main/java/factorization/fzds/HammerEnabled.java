@@ -14,6 +14,8 @@ public class HammerEnabled {
         boolean init = true;
         try {
             Class cl = Class.forName("org.bukkit.Bukkit");
+            // Also: net/minecraftforge/cauldron/api/Cauldron.class
+            // However, this "kcauldron" seems to have that Bukkit class anyways.
             if (cl != null) {
                 init = Boolean.parseBoolean(System.getProperty("fz.hammer.forceEnableWithBukkit", "false"));
             }
