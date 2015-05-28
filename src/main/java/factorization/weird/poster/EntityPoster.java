@@ -90,6 +90,7 @@ public class EntityPoster extends EntityFz {
     }
 
     public boolean hitByEntity(Entity ent) {
+        if (worldObj.isRemote) return false;
         if (!(ent instanceof EntityPlayer)) return false;
         EntityPlayer player = (EntityPlayer) ent;
         Coord at = new Coord(this);

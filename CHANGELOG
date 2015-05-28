@@ -1,6 +1,7 @@
 0.8.93
   Fix barrel render config option mix-up
   FZDS crash-fixes
+  Don't allow natural spawns in the hammar dimension
   Added posters
 
 0.8.92
