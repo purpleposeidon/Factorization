@@ -8,7 +8,6 @@ import factorization.api.datahelpers.DataHelper;
 import factorization.api.datahelpers.Share;
 import factorization.shared.Core;
 import factorization.shared.EntityFz;
-import factorization.shared.NORELEASE;
 import factorization.util.ItemUtil;
 import factorization.util.NumUtil;
 import factorization.util.SpaceUtil;
@@ -19,6 +18,7 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.AxisAlignedBB;
+import net.minecraft.util.MovingObjectPosition;
 import net.minecraft.util.Vec3;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.ForgeDirection;
@@ -117,7 +117,6 @@ public class EntityPoster extends EntityFz {
         }
         updateValues();
         syncWithSpawnPacket();
-        NORELEASE.fixme("pick block key support");
         return true;
     }
 
@@ -191,5 +190,10 @@ public class EntityPoster extends EntityFz {
             return true;
         }
         return super.interactFirst(player);
+    }
+
+    @Override
+    public ItemStack getPickedResult(MovingObjectPosition target) {
+        return inv.copy();
     }
 }
