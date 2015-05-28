@@ -7,6 +7,12 @@ import net.minecraft.world.WorldProvider;
 
 public class HammerWorldProvider extends WorldProvider {
     HammerChunkProvider chunkProvider = null;
+
+    @Override
+    protected void registerWorldChunkManager() {
+        super.registerWorldChunkManager();
+        setAllowedSpawnTypes(false, false);
+    }
     
     @Override
     public String getDimensionName() {
