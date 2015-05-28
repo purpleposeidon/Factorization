@@ -291,13 +291,10 @@ public class RenderServoMotor extends RenderEntity {
         GL11.glColor3f(1, 1, 1);
         GL11.glPopMatrix();
     }
-
-    static ItemStack equiped_item = null;
     
     static EntityLiving dummy_entity = new EntityEnderman(null);
 
     public void renderItem(ItemStack is) {
-        equiped_item = is;
         // Copied from RenderBiped.renderEquippedItems
         GL11.glPushMatrix();
         //float s = 0.75F;

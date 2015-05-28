@@ -1,7 +1,5 @@
 package factorization.weird.poster;
 
-import factorization.aabbdebug.AabbDebugger;
-import factorization.shared.NORELEASE;
 import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.RenderBlocks;
@@ -50,16 +48,12 @@ public class RenderPoster extends RenderEntity {
         GL11.glPopMatrix();
     }
 
-    static ItemStack equiped_item = null;
-
     static EntityLiving dummy_entity = new EntityEnderman(null);
 
     public void renderItem(ItemStack is) {
         // ... copied from ServoMotor...
         // but we can't merge them because, again, item rendering code is some mad BS
         // (Well, the dummy classes could get merged.)
-        NORELEASE.fixme("Merge the dummy classes w/ servo motor; add a 'raw entity item render'");
-        equiped_item = is;
         // Copied from RenderBiped.renderEquippedItems
 
         // Pre-emptively undo transformations that the item renderer does so
