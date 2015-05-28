@@ -1,16 +1,16 @@
 package factorization.api.datahelpers;
 
+import factorization.api.FzOrientation;
+import factorization.util.DataUtil;
+import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.util.AxisAlignedBB;
+import net.minecraft.util.Vec3;
+import net.minecraftforge.fluids.FluidTank;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.UUID;
-
-import factorization.util.DataUtil;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.util.Vec3;
-import factorization.api.FzOrientation;
-import net.minecraftforge.fluids.FluidTank;
 
 public abstract class DataHelper {
     /***
@@ -192,6 +192,16 @@ for t in "Boolean Byte Short Int Long Float Double String FzOrientation ItemStac
             tank.readFromNBT(tag);
             return tank;
         }
+    }
+
+    public AxisAlignedBB putBox(AxisAlignedBB box) throws IOException {
+        box.minX = asSameShare(name + ".minX").putDouble(box.minX);
+        box.maxX = asSameShare(name + ".maxX").putDouble(box.maxX);
+        box.minY = asSameShare(name + ".minY").putDouble(box.minY);
+        box.maxY = asSameShare(name + ".maxY").putDouble(box.maxY);
+        box.minZ = asSameShare(name + ".minZ").putDouble(box.minZ);
+        box.maxZ = asSameShare(name + ".maxZ").putDouble(box.maxZ);
+        return box;
     }
     
     public Vec3 putVec3(Vec3 val) throws IOException {

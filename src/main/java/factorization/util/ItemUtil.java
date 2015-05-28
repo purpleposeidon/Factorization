@@ -72,6 +72,18 @@ public final class ItemUtil {
     }
 
     /**
+     * Compare two items; ignores NBT; ignores damage on tools
+     */
+    public static boolean swordSimilar(ItemStack a, ItemStack b) {
+        if (a == null || b == null) {
+            return a == b;
+        }
+        if (a.getItem() != b.getItem()) return false;
+        if (a.getItem().isDamageable()) return true;
+        return a.getItemDamage() == b.getItemDamage();
+    }
+
+    /**
      * Compare only itemIDs and damage value, taking into account that a damage value of -1 matches any
      */
     public static boolean wildcardSimilar(ItemStack template, ItemStack stranger) {

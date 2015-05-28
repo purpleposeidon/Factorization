@@ -1,0 +1,27 @@
+\title{\#{item.factorization:spawnPoster}Poster}
+
+Posters are much cooler than \#{item.frame}Item Frames.
+You can put them on most blocks, including buttons.
+Posters always fit nicely where you put them.
+
+An item can then be stuck to the poster,
+and it will cover up the entire poster.
+Clicking on the poster with a similar item will stretch the poster to be bigger;
+sneak-clicking will shrink it.
+
+Posters can be also be rotated by using another poster or an \lmp .
+How they are rotated depends on whether you are looking at the poster from the side,
+or from straight on, and which tool you're using.
+
+Posters are more resistant to removal than item frames;
+you can take them down with a sneak-punch.
+Punching a poster will knock out changes made to it before it breaks.
+
+The poster will stay in place even if the block behind it has been removed,
+in defiance of ordinary physics.
+Take that, physics!
+
+\topic{item.factorization:spawnPoster}
+
+% NORELEASE: Sculptures. More difficult.
+% NORELEASE: survival-check

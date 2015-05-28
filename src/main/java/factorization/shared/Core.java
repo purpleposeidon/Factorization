@@ -14,6 +14,7 @@ import factorization.fzds.DeltaChunk;
 import factorization.mechanics.MechanismsFeature;
 import factorization.util.DataUtil;
 import factorization.util.FzUtil;
+import factorization.weird.poster.EntityPoster;
 import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.texture.IIconRegister;
@@ -202,6 +203,7 @@ public class Core {
         EntityRegistry.registerModEntity(TileEntityWrathLamp.RelightTask.class, "factory_relight_task", 0, Core.instance, 1, 10, false);
         EntityRegistry.registerModEntity(ServoMotor.class, "factory_servo", 1, Core.instance, 100, 1, true);
         EntityRegistry.registerModEntity(ColossusController.class, "fz_colossal_controller", 2, Core.instance, 256, 20, false);
+        EntityRegistry.registerModEntity(EntityPoster.class, "fz_entity_poster", 3, Core.instance, 160, Integer.MAX_VALUE, false);
     }
     
     @EventHandler

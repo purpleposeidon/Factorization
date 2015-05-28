@@ -1,0 +1,10 @@
+\title{New!}
+
+\include{verynew}
+
+\index{hinge}{\#{factorization.factoryBlock.HINGE}Hinge (more features!)} 
+\index{winch}{\#{item.factorization:servo/sprocket}Winch}
+
+\nl Red stained clay too plain?
+\nl Netherrack too ugly?
+\nl Try Mantlerock! \#{tile.factorization:mantlerock}

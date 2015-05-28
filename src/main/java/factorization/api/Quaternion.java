@@ -213,9 +213,6 @@ public class Quaternion implements IDataSerializable {
     }
     
     public static Quaternion getRotationQuaternion(FzOrientation orient) {
-        if (orient.top == ForgeDirection.UP) {
-            
-        }
         return getRotationQuaternionRadians(Math.toRadians(orient.getRotation()*90), orient.facing);
     }
     

@@ -293,13 +293,6 @@ public class RenderServoMotor extends RenderEntity {
     }
 
     static ItemStack equiped_item = null;
-
-    static EntityLiving item_holder = new EntityLiving(null) {
-        @Override
-        public ItemStack getHeldItem() {
-            return equiped_item;
-        }
-    };
     
     static EntityLiving dummy_entity = new EntityEnderman(null);
 

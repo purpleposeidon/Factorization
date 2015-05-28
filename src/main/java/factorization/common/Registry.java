@@ -43,6 +43,7 @@ import factorization.weird.BarrelUpgradeRecipes;
 import factorization.weird.ItemDayBarrel;
 import factorization.weird.ItemPocketTable;
 import factorization.weird.TileEntityDayBarrel;
+import factorization.weird.poster.ItemSpawnPoster;
 import factorization.wrath.BlockLightAir;
 import factorization.wrath.TileEntityWrathLamp;
 import net.minecraft.block.Block;
@@ -144,6 +145,7 @@ public class Registry {
     public ItemTwistedBlock twistedBlock;
     public ItemDarkIronChain darkIronChain;
     public ItemCraftingComponent chainLink, shortChain;
+    public ItemSpawnPoster spawnPoster;
 
     public Material materialMachine = new Material(MapColor.ironColor);
     
@@ -347,6 +349,7 @@ public class Registry {
         sculpt_tool = new ItemSculptingTool();
         glaze_bucket = new ItemGlazeBucket();
         empty_glaze_bucket = new ItemStack(glaze_bucket, 1, 100);
+        spawnPoster = new ItemSpawnPoster();
 
         //Misc
         pocket_table = new ItemPocketTable();
@@ -707,6 +710,12 @@ public class Registry {
         GameRegistry.addRecipe(mimicryGlazeRecipe);
         RecipeSorter.register("factorization:sculptureMerge", sculptureMergeRecipe.getClass(), Category.SHAPELESS, "");
         RecipeSorter.register("factorization:mimicryGlaze", mimicryGlazeRecipe.getClass(), Category.SHAPELESS, "");
+        oreRecipe(new ItemStack(spawnPoster),
+                "0",
+                "-",
+                "0",
+                '-', Items.paper,
+                '0', "slimeball");
 
         // Barrel
         // Add the recipes for vanilla woods.

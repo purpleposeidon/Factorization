@@ -17,6 +17,7 @@
 \index{projects}{\#{item.minecartChest}Projects}
 \index{misc}{\#{item.fish.salmon.raw}Miscellaneous Nonsense}
 \ifhtml{}{\index{reference}{\#{tile.bookshelf}Reference}}
+\index{deprecation}{\#{item.skull.skeleton}Deprecation}
 
 
 % \figure{
@@ -28,11 +29,9 @@
 \newpage
 \title{New!}
 
-\index{hinge}{\#{factorization.factoryBlock.HINGE}Hinge (more features!)} 
-\index{winch}{\#{item.factorization:servo/sprocket}Winch}
+\include{verynew}
 
-\nl Red stained clay too plain?
-\nl Netherrack too ugly?
-\nl Try Mantlerock! \#{tile.factorization:mantlerock}
+\link{allnew}{\#{item.seeds}Other New Things}
+
 
 \checkmods{all}{ForgeIRC}{Join us in #factorization on irc.esper.net!}{}

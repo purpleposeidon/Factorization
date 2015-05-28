@@ -1,0 +1,1 @@
+\link{poster}{\#{item.factorization:spawnPoster}Poster} sticks items anywhere!

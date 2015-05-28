@@ -35,6 +35,28 @@ Or [url=http://purpleposeidon.github.io/FzDocs/]here's an outside-of-Minecraft c
 You can encourage and guide further development of Factorization through my [url="http://www.patreon.com/neptunepink"][img]http://i.imgur.com/srYEtgV.png[/img]Patreon[/url].
 
 [spoiler]
+Factorization 1.7.10-0.8.92
+[url="http://adf.ly/2137658/https://www.mediafire.com/?p2m1fzt2xtk5eir"]adfly + MediaFire[/url], or
+[url="http://adf.ly/2137658/http://dl.dropbox.com/u/76265666/old/Factorization-1.7.10-0.8.92.jar"]adfly + DropBox[/url]
+Built on 2015-05-03 against Minecraft Forge 1.7.10-10.13.2.1230
+[url="http://dl.dropbox.com/u/76265666/changelogs/Changelog-1.7.10-0.8.92.txt"]Changelog[/url]
+[url="http://dl.dropbox.com/u/76265666/old/Factorization-1.7.10-0.8.92-dev.jar"]Deobf for Mod Authors[/url] d9f9b2d398afa9dace87e2759fc7574479b9acf4
+
+[spoiler]
+Factorization 1.7.10-0.8.91
+[url="http://adf.ly/2137658/https://www.mediafire.com/?a55vucn13ceho3d"]adfly + MediaFire[/url], or
+[url="http://adf.ly/2137658/http://dl.dropbox.com/u/76265666/old/Factorization-1.7.10-0.8.91.jar"]adfly + DropBox[/url]
+Built on 2015-05-02 against Minecraft Forge 1.7.10-10.13.2.1230
+[url="http://dl.dropbox.com/u/76265666/changelogs/Changelog-1.7.10-0.8.91.txt"]Changelog[/url]
+[url="http://dl.dropbox.com/u/76265666/old/Factorization-1.7.10-0.8.91-dev.jar"]Deobf for Mod Authors[/url] d8ed5730bf006c7047aa9e8ab1fd00d0356ed437
+
+Factorization 1.7.10-0.8.90
+[url="http://adf.ly/2137658/https://www.mediafire.com/?3no1412tccb432j"]adfly + MediaFire[/url], or
+[url="http://adf.ly/2137658/http://dl.dropbox.com/u/76265666/old/Factorization-1.7.10-0.8.90.jar"]adfly + DropBox[/url]
+Built on 2015-05-01 against Minecraft Forge 1.7.10-10.13.2.1230
+[url="http://dl.dropbox.com/u/76265666/changelogs/Changelog-1.7.10-0.8.90.txt"]Changelog[/url]
+[url="http://dl.dropbox.com/u/76265666/old/Factorization-1.7.10-0.8.90-dev.jar"]Deobf for Mod Authors[/url] 8ea1cd8a46abbeca6196bc5bdd9008ce477bbec5
+
 Factorization 1.7.10-0.8.89
 [url="http://adf.ly/2137658/https://www.mediafire.com/?07mq9fo0dpfw4sf"]adfly + MediaFire[/url], or
 [url="http://adf.ly/2137658/http://dl.dropbox.com/u/76265666/old/Factorization-1.7.10-0.8.89.jar"]adfly + DropBox[/url]
@@ -42,8 +64,6 @@ Built on 2015-03-27 against Minecraft Forge 1.7.10-10.13.2.1230
 [url="http://dl.dropbox.com/u/76265666/changelogs/Changelog-1.7.10-0.8.89.txt"]Changelog[/url]
 [url="http://dl.dropbox.com/u/76265666/old/Factorization-1.7.10-0.8.89-dev.jar"]Deobf for Mod Authors[/url]
 
-
-[spoiler]
 Factorization 1.7.10-0.8.88.8.8888h
 [url="http://adf.ly/2137658/https://www.mediafire.com/?9lz4lzxm653a52f"]adfly + MediaFire[/url], or
 [url="http://adf.ly/2137658/http://dl.dropbox.com/u/76265666/old/Factorization-1.7.10-0.8.88.8.8888h.jar"]adfly + DropBox[/url]
@@ -198,7 +218,7 @@ FZ includes uses Creative Commons sound assets, including:
   [*][url=http://www.freesound.org/people/sandyrb/sounds/95078/]"THE CRASH", by sandyrb[/url]. Cropped and combined with other work. [url=http://creativecommons.org/licenses/by/3.0/]CC-BY[/url][/*]
   [*][url=http://www.freesound.org/people/mystiscool/sounds/7141/]"Avalanche", by mystiscool[/url]. Cropped and combined with other work. [url=http://creativecommons.org/licenses/by/3.0/]CC-BY[/url][/*]
   [*][url=http://www.freesound.org/people/suonho/sounds/56364/]"Ambienta Soundtrack: Crystal Airlines", by suonho[/url]. Cropped and filtered. [url=http://creativecommons.org/licenses/by/3.0/]CC-BY[/url][/*]
-  [*][url=www.freesound.org/people/Noizemaker/sounds/23216/]"BMW 1150 GS Motorcycle: NZP BMW 1150GS Fuel pump", by Noizemaker[/url]. Cropped, equalized, and mixed with other work.[/*]
+  [*][url=www.freesound.org/people/Noizemaker/sounds/23216/]"BMW 1150 GS Motorcycle: NZP BMW 1150GS Fuel pump", by Noizemaker[/url]. Cropped, equalized, and mixed with other work.[url=http://creativecommons.org/licenses/sampling+/1.0/]Sampling+[/url][/*]
 [/list]
 
 [header=2][anchor=HAMMER]Hammer[/anchor][/header]

@@ -78,4 +78,13 @@ public final class NumUtil {
         }
         return ret;
     }
+
+    /**
+     * Limits the range of x to be between min and max.
+     */
+    public static double clip(double x, double min, double max) {
+        if (x < min) return min;
+        if (x > max) return max;
+        return x;
+    }
 }

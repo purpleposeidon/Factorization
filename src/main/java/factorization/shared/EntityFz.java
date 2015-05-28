@@ -1,11 +1,13 @@
 package factorization.shared;
 
+import cpw.mods.fml.common.network.internal.FMLNetworkHandler;
 import io.netty.buffer.ByteBuf;
 
 import java.io.IOException;
 
 import net.minecraft.entity.Entity;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.network.Packet;
 import net.minecraft.world.World;
 import cpw.mods.fml.common.registry.IEntityAdditionalSpawnData;
 import cpw.mods.fml.relauncher.Side;
@@ -60,7 +62,13 @@ public abstract class EntityFz extends Entity implements IEntityAdditionalSpawnD
             e.printStackTrace();
         }
     }
-    
+
+    public void syncWithSpawnPacket() {
+        if (worldObj.isRemote) return;
+        Packet p = FMLNetworkHandler.getEntitySpawningPacket(this);
+        FzNetDispatch.addPacketFrom(p, this);
+    }
+
     protected abstract void putData(DataHelper data) throws IOException;
 
 }

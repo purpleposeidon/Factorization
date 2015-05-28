@@ -10,6 +10,8 @@ The \link{twistingblock}{Twisted Block of Dark Iron} allows you to place blocks 
 
 The \link{hinge}{Hinge} can be used to make enormous doors.
 
+\link{poster}{Posters} can take your detail to the next level.
+
 \newpage
 The "pick block" button (middle click) has been made more useful.
 If pick a block that is not on your hotbar,

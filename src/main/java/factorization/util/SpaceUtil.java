@@ -62,6 +62,15 @@ public final class SpaceUtil {
         return AxisAlignedBB.getBoundingBox(box.minX, box.minY, box.minZ, box.maxX, box.maxY, box.maxZ);
     }
 
+    public static void copyTo(AxisAlignedBB dst, AxisAlignedBB src) {
+        dst.minX = src.minX;
+        dst.maxX = src.maxX;
+        dst.minY = src.minY;
+        dst.maxY = src.maxY;
+        dst.minZ = src.minZ;
+        dst.maxZ = src.maxZ;
+    }
+
     public static Vec3 newVec() {
         return Vec3.createVectorHelper(0, 0, 0);
     }
@@ -135,6 +144,14 @@ public final class SpaceUtil {
         v.zCoord = (ab.minZ + ab.maxZ)/2;
     }
 
+    public static Vec3 getMiddle(AxisAlignedBB ab) {
+        Vec3 ret = newVec();
+        ret.xCoord = (ab.minX + ab.maxX) / 2;
+        ret.yCoord = (ab.minY + ab.maxY) / 2;
+        ret.zCoord = (ab.minZ + ab.maxZ) / 2;
+        return ret;
+    }
+
     public static void incrContract(AxisAlignedBB box, double dx, double dy, double dz) {
         box.minX += dx;
         box.minY += dy;
@@ -148,6 +165,7 @@ public final class SpaceUtil {
         return AxisAlignedBB.getBoundingBox(0, 0, 0, 0, 0, 0);
     }
 
+    @Deprecated() // Use newVec() instead
     public static Vec3 newVec3() {
         return Vec3.createVectorHelper(0, 0, 0);
     }
@@ -187,6 +205,28 @@ public final class SpaceUtil {
         target.xCoord = xSide ? box.minX : box.maxX;
         target.yCoord = ySide ? box.minY : box.maxY;
         target.zCoord = zSide ? box.minZ : box.maxZ;
+    }
+
+    /**
+     * @param box The box to be flattened
+     * @param face The side of the box that will remain untouched; the opposite face will be brought to it
+     * @return A new box, with a volume of 0. Returns null if face is invalid.
+     */
+    public static AxisAlignedBB flatten(AxisAlignedBB box, ForgeDirection face) {
+        Vec3 min = getMin(box), max = getMax(box);
+        Vec3 mv = sign(face) == +1 ? min : max;
+        Vec3 base = mv == min ? max : min;
+        assert mv != base;
+        if (face.offsetX != 0) {
+            mv.xCoord = base.xCoord;
+        }
+        if (face.offsetY != 0) {
+            mv.yCoord = base.yCoord;
+        }
+        if (face.offsetZ != 0) {
+            mv.zCoord = base.zCoord;
+        }
+        return createAABB(min, max);
     }
 
     public static double getDiagonalLength(AxisAlignedBB ab) {

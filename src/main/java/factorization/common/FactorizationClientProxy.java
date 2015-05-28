@@ -4,6 +4,8 @@ import factorization.mechanics.BlockRenderHinge;
 import factorization.mechanics.SocketPoweredCrank;
 import factorization.mechanics.TileEntityHinge;
 import factorization.mechanics.TileEntityHingeRenderer;
+import factorization.weird.poster.EntityPoster;
+import factorization.weird.poster.RenderPoster;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.audio.ISound;
 import net.minecraft.client.audio.PositionedSoundRecord;
@@ -201,6 +203,7 @@ public class FactorizationClientProxy extends FactorizationProxy {
         RenderingRegistry.registerEntityRenderingHandler(TileEntityWrathLamp.RelightTask.class, new EmptyRender());
         RenderingRegistry.registerEntityRenderingHandler(ServoMotor.class, new RenderServoMotor());
         RenderingRegistry.registerEntityRenderingHandler(ColossusController.class, new ColossusControllerRenderer());
+        RenderingRegistry.registerEntityRenderingHandler(EntityPoster.class, new RenderPoster());
 
         RenderingRegistry.registerBlockHandler(new FactorizationRender());
         BlockRenderBattery renderBattery = new BlockRenderBattery();

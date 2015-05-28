@@ -1,3 +1,34 @@
+0.8.93
+  Fix barrel render config option mix-up
+  FZDS crash-fixes
+  Added posters
+
+0.8.92
+  More of same. Stop breaking things.
+
+0.8.91
+  Fix a couple bugs with the mc2713-fixer
+
+0.8.90 - The Mechanical Update!
+  FZDS:
+    Fixed all FZDS & bukkit/spigot/cauldron issues... The Easy Way™.
+    Sockets parts now work with FZDS (except pressurizer support is incomplete...)
+    GUIs now work with FZDS. (Not extensively tested. All the FZ and vanilla GUIs I've tried work, excepting anvils. There'll probably be trouble with various crazy mod GUIs.)
+    Entities embedded in FZDS can be interacted with
+    Other various minor bugfixes.
+  Added Winches:
+    The winch is made by placing a sprocket on a motor on a socket block.
+    Connect a chain between a winch and a solid block in a hinge system.
+    Apply a redstone signal to pull the chain in.
+    Winches consume charge, of course.
+    Weaker redstone signals don't pull as hard.
+    The length of the chain can be measured with a comparator.
+    The chain conducts charge.
+    Fixed the hinge range-of-motion limiter so that it doesn't freak out... as often.
+  I got tired of running /f mc2713 all the time, so I made it run automagically (https://bugs.mojang.com/browse/MC-2713)
+  Added a config option for renaming /f
+    
+
 0.8.89
   Chinese translations by catmunyi!
   French Canadian translations by DragonsLover!
