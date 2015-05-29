@@ -1,13 +1,10 @@
 package factorization.weird.poster;
 
 import factorization.api.Coord;
-import factorization.api.FzOrientation;
 import factorization.api.Quaternion;
-import factorization.notify.Notice;
 import factorization.shared.Core;
 import factorization.shared.ItemFactorization;
 import factorization.util.SpaceUtil;
-import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.AxisAlignedBB;
@@ -35,13 +32,13 @@ public class ItemSpawnPoster extends ItemFactorization {
             // Determine what the box should be. Ray tracing for multi-box blocks; fallbacks to the selection bounding box.
 
             final ArrayList<AxisAlignedBB> boxes = new ArrayList<AxisAlignedBB>();
-            final AxisAlignedBB query = SpaceUtil.createAABB(at.add(-1, -1, -1), at.add(+1, +1, +1));
+            final AxisAlignedBB query = SpaceUtil.createAABB(at.add(-9, -9, -9), at.add(+9, +9, +9));
             at.getBlock().addCollisionBoxesToList(at.w, at.x, at.y, at.z, query, boxes, player);
 
-            final double reachLen = 10;
             final Vec3 playerEye = SpaceUtil.fromPlayerEyePos(player);
-            final Vec3 reachEnd = Vec3.createVectorHelper(hitX * reachLen, hitY * reachLen, hitZ * reachLen);
-            SpaceUtil.incrAdd(reachEnd, playerEye);
+            final Vec3 look = player.getLookVec();
+            SpaceUtil.incrScale(look, 8);
+            final Vec3 reachEnd = SpaceUtil.add(look, playerEye);
 
             double minDist = Double.POSITIVE_INFINITY;
             for (AxisAlignedBB box : boxes) {
@@ -83,6 +80,7 @@ public class ItemSpawnPoster extends ItemFactorization {
             if (xwidth != 0) bestWidth = xwidth;
             if (ywidth != 0 && ywidth < bestWidth) bestWidth = ywidth;
             if (zwidth != 0 && zwidth < bestWidth) bestWidth = zwidth;
+            if (bestWidth <= 2.0 / 16.0) return false; // Don't be ridiculous
         }
 
         Quaternion rot;

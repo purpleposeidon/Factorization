@@ -153,11 +153,11 @@ public class EntityPoster extends EntityFz {
 
     @Override
     public boolean interactFirst(EntityPlayer player) {
-        if (worldObj.isRemote) return false;
+        if (worldObj.isRemote) return true;
         ItemStack held = player.getHeldItem();
         if (held == null) return false;
         if (inv.getItem() == Core.registry.spawnPoster) {
-            inv = player.getHeldItem();
+            inv = player.getHeldItem().splitStack(1);
             syncWithSpawnPacket();
             return true;
         }
