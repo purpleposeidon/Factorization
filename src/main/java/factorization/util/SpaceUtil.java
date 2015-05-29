@@ -90,7 +90,13 @@ public final class SpaceUtil {
     }
 
     public static Vec3 fromPlayerEyePos(EntityPlayer ent) {
-        return Vec3.createVectorHelper(ent.posX, ent.posY + (ent.getEyeHeight() - ent.getDefaultEyeHeight()), ent.posZ);
+        // This is all iChun's fault. :/
+        // Uh...
+        if (ent.worldObj.isRemote) {
+            return Vec3.createVectorHelper(ent.posX, ent.posY + (ent.getEyeHeight() - ent.getDefaultEyeHeight()), ent.posZ);
+        } else {
+            return Vec3.createVectorHelper(ent.posX, ent.posY + ent.getEyeHeight(), ent.posZ);
+        }
     }
 
     public static void toEntPos(Entity ent, Vec3 pos) {
