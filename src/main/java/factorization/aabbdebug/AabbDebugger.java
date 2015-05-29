@@ -12,6 +12,7 @@ import net.minecraft.command.ICommand;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.util.AxisAlignedBB;
+import net.minecraft.util.ChatComponentText;
 import net.minecraft.util.Vec3;
 import net.minecraft.world.World;
 import net.minecraftforge.client.ClientCommandHandler;
@@ -54,13 +55,16 @@ public enum AabbDebugger {
 
             @Override
             public void processCommand(ICommandSender player, String[] args) {
-                if (args[0].equals("freeze")) {
+                String arg0 = args.length > 0 ? args[0] : "help";
+                if (arg0.equals("freeze")) {
                     freeze = true;
-                } else if (args[0].equals("thaw")) {
+                } else if (arg0.equals("thaw")) {
                     freeze = false;
-                } else if (args[0].equals("clean")) {
+                } else if (arg0.equals("clean")) {
                     frozen.clear();
                     frozen_lines.clear();
+                } else {
+                    player.addChatMessage(new ChatComponentText(getCommandUsage(player)));
                 }
             }
 
