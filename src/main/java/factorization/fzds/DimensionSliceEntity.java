@@ -220,9 +220,13 @@ public class DimensionSliceEntity extends IDeltaChunk implements IFzdsEntryContr
         if (can(DeltaCapability.TRANSPARENT)) {
             opacity = data.as(Share.VISIBLE, "opacity").putFloat(opacity);
         }
-        if (data.isReader() && worldObj.isRemote) {
-            DeltaChunk.getSlices(worldObj).add(this);
-            cornerMax.w = cornerMin.w = DeltaChunk.getClientShadowWorld();
+        if (data.isReader()) {
+            if (worldObj.isRemote) {
+                DeltaChunk.getSlices(worldObj).add(this);
+                cornerMax.w = cornerMin.w = DeltaChunk.getClientShadowWorld();
+            } else if (data.isNBT()) {
+                initCorners();
+            }
         }
         /*parent =*/ data.as(Share.VISIBLE, "parent").put(parent);
         offsetFromParent = data.as(Share.VISIBLE, "parentOffset").putVec3(offsetFromParent);
@@ -844,6 +848,11 @@ public class DimensionSliceEntity extends IDeltaChunk implements IFzdsEntryContr
             }
         });
     }
+
+    private void initCorners() {
+        World target_world = can(DeltaCapability.ORACLE) ? worldObj : DeltaChunk.getServerShadowWorld();
+        cornerMin.w = cornerMax.w = target_world;
+    }
     
     @Override
     public void onEntityUpdate() {
@@ -860,8 +869,7 @@ public class DimensionSliceEntity extends IDeltaChunk implements IFzdsEntryContr
             }
         } else if (packetRelay == null) {
             boolean isOracle = can(DeltaCapability.ORACLE);
-            World target_world = isOracle ? worldObj : DeltaChunk.getServerShadowWorld();
-            cornerMin.w = cornerMax.w = target_world;
+            initCorners();
             if (isOracle) {
                 packetRelay = this;
             } else {

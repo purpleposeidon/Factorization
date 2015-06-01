@@ -1100,6 +1100,10 @@ public class FZDSCommand extends CommandBase {
     private static void clearDseArea(IDeltaChunk idc) {
         Coord a = idc.getCorner();
         Coord b = idc.getFarCorner();
+        if (a.w == null || b.w == null) {
+            Core.logSevere("DSE's area doesn't have the worlds set? Can't wipe its area. " + idc);
+            return;
+        }
         Coord.iterateCube(a, b, new ICoordFunction() {
             @Override
             public void handle(Coord here) {
