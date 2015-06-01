@@ -8,6 +8,8 @@ import net.minecraft.network.EnumConnectionState;
 import net.minecraft.network.Packet;
 import net.minecraft.network.PacketBuffer;
 
+import java.io.IOException;
+
 public abstract class WrappedPacket extends Packet implements IFzdsShenanigans {
     /**
      * These fields hold the packet maps.
@@ -58,8 +60,7 @@ public abstract class WrappedPacket extends Packet implements IFzdsShenanigans {
         }
         try {
             recieved_packet.readPacketData(buf);
-        } catch (Throwable e) {
-            // TODO: This can go away; just to make the compiler happy...
+        } catch (IOException e) {
             e.printStackTrace();
             return null;
         }
@@ -80,7 +81,7 @@ public abstract class WrappedPacket extends Packet implements IFzdsShenanigans {
         PacketBuffer buff = new PacketBuffer(data);
         Integer packetId = getPacketMap().inverse().get(wrapped.getClass());
         if (packetId == null) {
-            throw new IllegalArgumentException("Can't send unregistered packet: " + wrapped.getClass() + "; serializes to: " + wrapped.serialize());
+            throw new IllegalArgumentException("Can't send unregistered packet: " + wrappedToString());
         }
         buff.writeVarIntToBuffer(packetId);
         try {
@@ -91,8 +92,20 @@ public abstract class WrappedPacket extends Packet implements IFzdsShenanigans {
         }
     }
 
+    private String wrappedToString() {
+        if (wrapped == null) return "NULL";
+        String info = wrapped.getClass().getName();
+        if (wrapped instanceof FMLProxyPacket) {
+            FMLProxyPacket p = (FMLProxyPacket) wrapped;
+            info += " channel:" + p.channel();
+        }
+        info += " serializes:" + wrapped.serialize();
+        info += " toString:" + wrapped.toString();
+        return info;
+    }
+
     @Override
     public String serialize() {
-        return getClass().getSimpleName() + ":" + (wrapped == null ? "NULL" : wrapped.toString());
+        return getClass().getSimpleName() + ":" + wrappedToString();
     }
 }
