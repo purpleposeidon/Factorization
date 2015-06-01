@@ -359,7 +359,10 @@ public class BlockFactorization extends BlockContainer {
     public int getFlammability(IBlockAccess world, int x, int y, int z, ForgeDirection face) {
         int md = world.getBlockMetadata(x, y, z);
         if (BlockClass.Barrel.md == md) {
-            return 20;
+            TileEntity te = world.getTileEntity(x, y, z);
+            if (te instanceof TileEntityDayBarrel) {
+                return ((TileEntityDayBarrel) te).getFlamability();
+            }
         }
         return 0;
     }

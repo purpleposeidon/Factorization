@@ -75,8 +75,8 @@ public class BlockRenderDayBarrel extends FactorizationBlockRender {
                 }
                 block.useTexture(set.side);
                 IIcon top = set.top;
-                Block slab = DataUtil.getBlock(barrel.woodSlab);
-                if (slab != null && slab.getMaterial() != Material.wood) {
+                Block log = DataUtil.getBlock(barrel.woodLog);
+                if (log != null && log.getMaterial() != Material.wood) {
                     top = set.top_metal;
                 }
                 block.setTexture(0, top);

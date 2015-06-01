@@ -8,6 +8,7 @@ import factorization.util.*;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockRailBase;
+import net.minecraft.block.material.Material;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.GLAllocation;
 import net.minecraft.enchantment.EnchantmentHelper;
@@ -1234,5 +1235,13 @@ public class TileEntityDayBarrel extends TileEntityFactorization {
         GL11.glEnable(GL11.GL_ALPHA_TEST);
     }
 
+    public boolean isWooden() {
+        Block log = DataUtil.getBlock(woodLog);
+        return log != null && log.getMaterial() == Material.wood;
+    }
 
+    public int getFlamability() {
+        // The creative barrel I give you can't burn, so won't check for CREATIVE.
+        return isWooden() ? 20 : 0;
+    }
 }
