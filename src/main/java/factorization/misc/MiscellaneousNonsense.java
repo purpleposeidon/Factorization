@@ -1,42 +1,5 @@
 package factorization.misc;
 
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-
-import factorization.util.PlayerUtil;
-import net.minecraft.block.Block;
-import net.minecraft.client.Minecraft;
-import net.minecraft.entity.EntityAgeable;
-import net.minecraft.entity.EntityLeashKnot;
-import net.minecraft.entity.item.EntityFireworkRocket;
-import net.minecraft.entity.monster.EntityEnderman;
-import net.minecraft.entity.passive.EntityAnimal;
-import net.minecraft.entity.passive.EntityHorse;
-import net.minecraft.entity.passive.EntityVillager;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.entity.player.EntityPlayerMP;
-import net.minecraft.init.Items;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemAxe;
-import net.minecraft.item.ItemBow;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.ItemSword;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.nbt.NBTTagList;
-import net.minecraft.potion.Potion;
-import net.minecraft.potion.PotionEffect;
-import net.minecraft.server.MinecraftServer;
-import net.minecraft.server.integrated.IntegratedServer;
-import net.minecraft.stats.AchievementList;
-import net.minecraft.stats.StatisticsFile;
-import net.minecraft.util.MathHelper;
-import net.minecraft.world.World;
-import net.minecraft.world.chunk.Chunk;
-import net.minecraftforge.common.DungeonHooks;
-import net.minecraftforge.event.entity.player.EntityInteractEvent;
 import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.Mod;
 import cpw.mods.fml.common.Mod.EventHandler;
@@ -50,9 +13,30 @@ import cpw.mods.fml.common.gameevent.TickEvent;
 import cpw.mods.fml.common.gameevent.TickEvent.Phase;
 import cpw.mods.fml.common.network.internal.FMLProxyPacket;
 import cpw.mods.fml.relauncher.Side;
-import factorization.api.Coord;
 import factorization.common.FzConfig;
 import factorization.shared.Core;
+import factorization.util.PlayerUtil;
+import net.minecraft.block.Block;
+import net.minecraft.client.Minecraft;
+import net.minecraft.entity.EntityAgeable;
+import net.minecraft.entity.EntityLeashKnot;
+import net.minecraft.entity.monster.EntityEnderman;
+import net.minecraft.entity.passive.EntityHorse;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.item.Item;
+import net.minecraft.item.ItemAxe;
+import net.minecraft.item.ItemBow;
+import net.minecraft.item.ItemSword;
+import net.minecraft.potion.Potion;
+import net.minecraft.potion.PotionEffect;
+import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.integrated.IntegratedServer;
+import net.minecraft.stats.AchievementList;
+import net.minecraft.stats.StatisticsFile;
+import net.minecraft.util.MathHelper;
+import net.minecraftforge.common.DungeonHooks;
+import net.minecraftforge.event.entity.player.EntityInteractEvent;
 
 @Mod(modid = MiscellaneousNonsense.modId, name = MiscellaneousNonsense.name, version = Core.version, dependencies = "required-after: " + Core.modId)
 public class MiscellaneousNonsense {
@@ -307,5 +291,6 @@ public class MiscellaneousNonsense {
     public void registerCommands(FMLServerStartingEvent event) {
         event.registerServerCommand(new MC16009());
         event.registerServerCommand(new Deglitch());
+        event.registerServerCommand(new SafeCommandHelp());
     }
 }
