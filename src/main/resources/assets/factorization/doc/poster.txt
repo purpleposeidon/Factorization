@@ -23,5 +23,3 @@ Take that, physics!
 
 \topic{item.factorization:spawnPoster}
 
-% NORELEASE: Sculptures. More difficult.
-% NORELEASE: survival-check

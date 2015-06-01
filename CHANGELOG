@@ -1,8 +1,10 @@
 0.8.93
-  Fix barrel render config option mix-up
-  FZDS crash-fixes
   Don't allow natural spawns in the hammar dimension
+  FZDS crash-fixes
+  Added additional debug information for FZDS-related crashes that still elude me
   Added posters
+  Fix barrel render config option mix-up
+  Now only wooden barrels are flamable
 
 0.8.92
   More of same. Stop breaking things.
