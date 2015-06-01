@@ -82,11 +82,6 @@ public class ItemWord extends Word {
             }
         }
     }
-    
-    @Override
-    public String getLink() {
-        return getDefaultHyperlink(getItem());
-    }
 
     @Override
     public String toString() {
