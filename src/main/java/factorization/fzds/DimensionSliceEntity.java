@@ -600,116 +600,11 @@ public class DimensionSliceEntity extends IDeltaChunk implements IFzdsEntryContr
         }
         last_shared_rotation.incrMultiply(last_shared_rotational_velocity);
 
-        if (moved && !noClip && can(DeltaCapability.COLLIDE_WITH_WORLD)) {
-            // NORELEASE TODO This is too slow. Fuck it. Let's bust out a proper physics library.
-            // Use an IWorldAccess to synchronize collision areas. We'll need to do this for both Real and Shadow, yeah?
-            // MetaAABB will defer to this physics library as well
-            List<AxisAlignedBB> collisions = worldObj.getCollidingBoundingBoxes(this, realArea);
-            AxisAlignedBB collision = null;
-            for (int i = 0; i < collisions.size(); i++) {
-                AxisAlignedBB solid = collisions.get(i);
-                if (solid.getClass() != AxisAlignedBB.class) continue;
-                if (metaAABB.intersectsWith(solid)) {
-                    collision = solid;
-                    break;
-                }
-            }
-            if (collision != null) {
-                // XXX TODO: This is lame; should at least iterate closer (or do it properly)
-                if (mot != null) {
-                    posX = prevX;
-                    posY = prevY;
-                    posZ = prevZ;
-                }
-                if (prevRotation != null) {
-                    setRotation(prevRotation);
-                }
-                setVelocity(0, 0, 0);
-                rotationalVelocity.update(1, 0, 0, 0);
-                moved = false;
-            }
+        if (moved && !noClip && can(DeltaCapability.COLLIDE_WITH_WORLD) && !worldObj.isRemote) {
+            moved = collideWithWorld(mot, moved, prevX, prevY, prevZ, prevRotation);
         }
         if (moved && can(DeltaCapability.DRAG)) {
-            List ents = worldObj.getEntitiesWithinAABBExcludingEntity(this, metaAABB, excludeDseRelatedEntities);
-            float dyaw = 0;
-            dyaw = (float) Math.toDegrees(-rot.toRotationVector().yCoord);
-            if (Float.isNaN(dyaw)) dyaw = 0;
-            long now = worldObj.getTotalWorldTime() + 100 /* Hack around MixinEntityKinematicsTracker.kinematics_last_change not being initialized */;
-            
-            for (int i = 0; i < ents.size(); i++) {
-                Entity e = (Entity) ents.get(i);
-                AxisAlignedBB ebb = e.boundingBox;
-                double expansion = 0;
-                if (mot != null) {
-                    double friction_expansion = 0.05 * mot.lengthVector();
-                    if (mot.yCoord > 0) {
-                        ebb = ebb.expand(-mot.xCoord, -mot.yCoord, -mot.zCoord);
-                    }
-                    if (mot.xCoord != 0 || mot.zCoord != 0) {
-                        expansion = friction_expansion;
-                    }
-                }
-                if (expansion < 0.1) {
-                    expansion = 0.1;
-                }
-                if (expansion != 0) {
-                    ebb = ebb.expand(expansion, expansion, expansion);
-                }
-                // could multiply stuff by velocity
-                if (!metaAABB.intersectsWith(ebb)) {
-                    // NORELEASE metaAABB.intersectsWith is very slow, especially with lots of entities
-                    continue;
-                }
-                
-                if (can(DeltaCapability.ENTITY_PHYSICS)) {
-                    IKinematicTracker kine = (IKinematicTracker) e;
-                    kine.reset(now);
-                    double instant_scale = 1;
-                    double motion_scale = 1;
-                    double vel_scale = 1;
-                    Vec3 entityAt = SpaceUtil.fromEntPos(e);
-                    Vec3 velocity = calcInstantVelocityAtRealPoint(entityAt, mot, rot);
-                    if (can(DeltaCapability.VIOLENT_COLLISIONS) && !worldObj.isRemote) {
-                        double smackSpeed = velocity.lengthVector();
-                        vel_scale = 1;
-                        if (e instanceof EntityLivingBase) {
-                            if (smackSpeed > 0.05) {
-                                EntityLivingBase el = (EntityLivingBase) e;
-                                el.attackEntityFrom(violenceDamage, (float) (20 * smackSpeed));
-                                Vec3 emo = velocity.normalize();
-                                e.motionX += emo.xCoord * vel_scale;
-                                e.motionY += emo.yCoord * vel_scale;
-                                e.motionZ += emo.zCoord * vel_scale;
-                            }
-                        }
-                    }
-                    velocity.xCoord *= instant_scale;
-                    velocity.yCoord *= instant_scale;
-                    velocity.zCoord *= instant_scale;
-                    velocity.xCoord = clipVelocity(velocity.xCoord*motion_scale, e.motionX);
-                    velocity.yCoord = clipVelocity(velocity.yCoord*motion_scale, e.motionY);
-                    velocity.zCoord = clipVelocity(velocity.zCoord*motion_scale, e.motionZ);
-                    e.moveEntity(velocity.xCoord, velocity.yCoord, velocity.zCoord);
-                    // Hrm. Is it needed or not? Seems to cause jitterings with it on
-                    //e.prevPosX += velocity.xCoord;
-                    //e.prevPosY += velocity.yCoord;
-                    //e.prevPosZ += velocity.zCoord;
-                    // TODO FIXME: Jittering rotation when the player is standing on top! Argh! PLEASE FIX!
-                    double origYaw = e.rotationYaw;
-                    e.rotationYaw = (float) addLimitedDelta(kine.getKinematics_yaw(), e.rotationYaw, dyaw);
-                    double yd = e.rotationYaw - origYaw;
-                    e.prevRotationYaw += yd;
-                } else if (mot != null) {
-                    e.moveEntity(mot.xCoord, mot.yCoord, mot.zCoord);
-                    
-                    if (mot.yCoord > 0 && e.motionY < mot.yCoord) {
-                        e.motionY = mot.yCoord;
-                        e.fallDistance += (float) Math.abs(mot.yCoord - e.motionY);
-                    }
-                }
-                e.onGround = true;
-            }
-            updateRealArea();
+            dragEntities(mot, rot);
         }
         if (linearMotion || rotationalMotion) {
             updateUniversalCollisions();
@@ -729,7 +624,121 @@ public class DimensionSliceEntity extends IDeltaChunk implements IFzdsEntryContr
             child.updateMotion(inst, rot);
         }
     }
-    
+
+    private void dragEntities(Vec3 mot, Quaternion rot) {
+        List ents = worldObj.getEntitiesWithinAABBExcludingEntity(this, metaAABB, excludeDseRelatedEntities);
+        float dyaw = 0;
+        dyaw = (float) Math.toDegrees(-rot.toRotationVector().yCoord);
+        if (Float.isNaN(dyaw)) dyaw = 0;
+        long now = worldObj.getTotalWorldTime() + 100 /* Hack around MixinEntityKinematicsTracker.kinematics_last_change not being initialized */;
+
+        for (int i = 0; i < ents.size(); i++) {
+            Entity e = (Entity) ents.get(i);
+            AxisAlignedBB ebb = e.boundingBox;
+            double expansion = 0;
+            if (mot != null) {
+                double friction_expansion = 0.05 * mot.lengthVector();
+                if (mot.yCoord > 0) {
+                    ebb = ebb.expand(-mot.xCoord, -mot.yCoord, -mot.zCoord);
+                }
+                if (mot.xCoord != 0 || mot.zCoord != 0) {
+                    expansion = friction_expansion;
+                }
+            }
+            if (expansion < 0.1) {
+                expansion = 0.1;
+            }
+            if (expansion != 0) {
+                ebb = ebb.expand(expansion, expansion, expansion);
+            }
+            // could multiply stuff by velocity
+            if (!metaAABB.intersectsWith(ebb)) {
+                // NORELEASE metaAABB.intersectsWith is very slow, especially with lots of entities
+                continue;
+            }
+
+            if (can(DeltaCapability.ENTITY_PHYSICS)) {
+                IKinematicTracker kine = (IKinematicTracker) e;
+                kine.reset(now);
+                double instant_scale = 1;
+                double motion_scale = 1;
+                double vel_scale = 1;
+                Vec3 entityAt = SpaceUtil.fromEntPos(e);
+                Vec3 velocity = calcInstantVelocityAtRealPoint(entityAt, mot, rot);
+                if (can(DeltaCapability.VIOLENT_COLLISIONS) && !worldObj.isRemote) {
+                    double smackSpeed = velocity.lengthVector();
+                    vel_scale = 1;
+                    if (e instanceof EntityLivingBase) {
+                        if (smackSpeed > 0.05) {
+                            EntityLivingBase el = (EntityLivingBase) e;
+                            el.attackEntityFrom(violenceDamage, (float) (20 * smackSpeed));
+                            Vec3 emo = velocity.normalize();
+                            e.motionX += emo.xCoord * vel_scale;
+                            e.motionY += emo.yCoord * vel_scale;
+                            e.motionZ += emo.zCoord * vel_scale;
+                        }
+                    }
+                }
+                velocity.xCoord *= instant_scale;
+                velocity.yCoord *= instant_scale;
+                velocity.zCoord *= instant_scale;
+                velocity.xCoord = clipVelocity(velocity.xCoord*motion_scale, e.motionX);
+                velocity.yCoord = clipVelocity(velocity.yCoord*motion_scale, e.motionY);
+                velocity.zCoord = clipVelocity(velocity.zCoord*motion_scale, e.motionZ);
+                e.moveEntity(velocity.xCoord, velocity.yCoord, velocity.zCoord);
+                // Hrm. Is it needed or not? Seems to cause jitterings with it on
+                //e.prevPosX += velocity.xCoord;
+                //e.prevPosY += velocity.yCoord;
+                //e.prevPosZ += velocity.zCoord;
+                // TODO FIXME: Jittering rotation when the player is standing on top! Argh! PLEASE FIX!
+                double origYaw = e.rotationYaw;
+                e.rotationYaw = (float) addLimitedDelta(kine.getKinematics_yaw(), e.rotationYaw, dyaw);
+                double yd = e.rotationYaw - origYaw;
+                e.prevRotationYaw += yd;
+            } else if (mot != null) {
+                e.moveEntity(mot.xCoord, mot.yCoord, mot.zCoord);
+
+                if (mot.yCoord > 0 && e.motionY < mot.yCoord) {
+                    e.motionY = mot.yCoord;
+                    e.fallDistance += (float) Math.abs(mot.yCoord - e.motionY);
+                }
+            }
+            e.onGround = true;
+        }
+        updateRealArea();
+    }
+
+    private boolean collideWithWorld(Vec3 mot, boolean moved, double prevX, double prevY, double prevZ, Quaternion prevRotation) {
+        // NORELEASE TODO This is too slow. Fuck it. Let's bust out a proper physics library.
+        // Use an IWorldAccess to synchronize collision areas. We'll need to do this for both Real and Shadow, yeah?
+        // MetaAABB will defer to this physics library as well
+        List<AxisAlignedBB> collisions = worldObj.getCollidingBoundingBoxes(this, realArea);
+        AxisAlignedBB collision = null;
+        for (int i = 0; i < collisions.size(); i++) {
+            AxisAlignedBB solid = collisions.get(i);
+            if (solid.getClass() != AxisAlignedBB.class) continue;
+            if (metaAABB.intersectsWith(solid)) {
+                collision = solid;
+                break;
+            }
+        }
+        if (collision != null) {
+            // XXX TODO: This is lame; should at least iterate closer (or do it properly)
+            if (mot != null) {
+                posX = prevX;
+                posY = prevY;
+                posZ = prevZ;
+            }
+            if (prevRotation != null) {
+                setRotation(prevRotation);
+            }
+            setVelocity(0, 0, 0);
+            rotationalVelocity.update(1, 0, 0, 0);
+            moved = false;
+        }
+        return moved;
+    }
+
     public Vec3 getInstRotVel(Vec3 real, Quaternion rot) {
         Vec3 dse_space = real.addVector(-posX, -posY, -posZ); // Errm, center offset?
         Vec3 point_a = dse_space;

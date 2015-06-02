@@ -1,13 +1,18 @@
 package factorization.fzds;
 
+import factorization.api.Coord;
+import factorization.api.ICoordFunction;
 import factorization.fzds.interfaces.IFzdsShenanigans;
 import factorization.shared.Core;
+import factorization.shared.NORELEASE;
+import factorization.util.NumUtil;
 import factorization.util.SpaceUtil;
-import net.minecraft.entity.Entity;
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.block.Block;
 import net.minecraft.util.AxisAlignedBB;
+import net.minecraft.util.MathHelper;
 import net.minecraft.util.Vec3;
 import net.minecraft.world.World;
+import net.minecraft.world.chunk.Chunk;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -42,34 +47,83 @@ public class MetaAxisAlignedBB extends AxisAlignedBB implements IFzdsShenanigans
         this.setBB(bb);
         return this;
     }
-    
-    static class AabbHolder extends Entity {
-        public AabbHolder() {
-            super(null);
-        }
-        AxisAlignedBB held = null;
-        public AxisAlignedBB getBoundingBox() {
-            return held;
-        }
-        
-        @Override protected void entityInit() { }
-        @Override protected void readEntityFromNBT(NBTTagCompound var1) { }
-        @Override protected void writeEntityToNBT(NBTTagCompound var1) { }
-    }
-    
-    AabbHolder aabbHolder = new AabbHolder();
+
     private static final List<AxisAlignedBB> EMPTY = new ArrayList<AxisAlignedBB>();
-    
-    List<AxisAlignedBB> getShadowBoxesWithinShadowBox(AxisAlignedBB aabb) {
-        aabbHolder.held = aabb;
-        if (aabb.getAverageEdgeLength() > 1024) {
+
+    List<AxisAlignedBB> getShadowBoxesWithinShadowBox(final AxisAlignedBB box) {
+        final double averageEdgeLength = box.getAverageEdgeLength(); // I've measured the average averageEdgeLength to be about 24.
+        if (averageEdgeLength > 1024) {
             Core.logSevere("Giant MetaAABB!? {}", this);
             Thread.dumpStack();
             return EMPTY;
         }
-        return shadowWorld.getCollidingBoundingBoxes(aabbHolder, aabb);
+
+        // Far too slow: return shadowWorld.getCollidingBoundingBoxes(aabbHolder, aabb);
+        // We could, say, use that if the averageEdgeLength was small, but then there'd be inconsistent behavior w/ ents
+
+        final ArrayList<AxisAlignedBB> ret = new ArrayList<AxisAlignedBB>();
+        final int R = 30000000;
+
+        // Vanilla adds 1 to the max instead of using <=
+        final int boxMinX = NumUtil.clip(MathHelper.floor_double(box.minX + 0), -R, +R);
+        final int boxMaxX = NumUtil.clip(MathHelper.floor_double(box.maxX + 1), -R, +R);
+        final int boxMinY = NumUtil.clip(MathHelper.floor_double(box.minY + 0), 0, 0xFF);
+        final int boxMaxY = NumUtil.clip(MathHelper.floor_double(box.maxY + 1), 0, 0xFF);
+        final int boxMinZ = NumUtil.clip(MathHelper.floor_double(box.minZ + 0), -R, +R);
+        final int boxMaxZ = NumUtil.clip(MathHelper.floor_double(box.maxZ + 1), -R, +R);
+
+        final int chunkMinX = boxMinX >> 4;
+        final int chunkMaxX = (boxMaxX >> 4) + 1;
+        final int chunkMinZ = boxMinZ >> 4;
+        final int chunkMaxZ = (boxMaxZ >> 4) + 1;
+
+        // (Manually inline Coord.iterateChunk)
+        for (int chunkX = chunkMinX; chunkX < chunkMaxX; chunkX++) {
+            for (int chunkZ = chunkMinZ; chunkZ < chunkMaxZ; chunkZ++) {
+                // We could do a shadowWorld.blockExists() check here. Let's not:
+                // { small DSE, large multi-chunk DSE} × { DSE moving, DSE stopped } × { adjacent loaded, adjacent unloaded, adjacent not generated }
+                // If the DSE is stopped, then things may load, but minor.
+                // If the adjacent is loaded, then no issue.
+                // { small DSE, large DSE} × { DSE moving } × { adjacent unloaded, adjacent not generated }
+                // If the DSE is small & moving, then it'll stop ticking once it gets near the edge of ticking area.
+                // If a large moving DSE is exiting loaded area, then ***there may indeed be trouble***
+                // But checking if a chunk is loaded is a bit expensive, yes...
+                // If there was a 'get chunk w/o trying to load', we'd very much want that.
+
+                final Chunk chunk = shadowWorld.getChunkFromChunkCoords(chunkX, chunkZ);
+                final int cornerX = chunk.xPosition << 4, cornerZ = chunk.zPosition << 4;
+                final int lx = NumUtil.clip(boxMinX, cornerX, cornerX + 16);
+                final int hx = NumUtil.clip(boxMaxX + 1, cornerX, cornerX + 16);
+                final int lz = NumUtil.clip(boxMinZ, cornerZ, cornerZ + 16);
+                final int hz = NumUtil.clip(boxMaxZ + 1, cornerZ, cornerZ + 16);
+                /*if (lx >> 4 != chunk.xPosition || (hx-1) >> 4 != chunk.xPosition || lz >> 4 != chunk.zPosition || (hz-1) >> 4 != chunk.zPosition) {
+                        NORELEASE.breakpoint();
+                }*/
+                // Iterate nesting "YZX" to go with the grain of how data is stored in NibbleArrays.
+                // It is well that Y is on the outside, so that the ExtendedBlockStorages get visited one-at-a-time
+                // instead of jumping around constantly.
+                for (int y = boxMinY; y < boxMaxY; y++) {
+                    for (int z = lz; z < hz; z++) {
+                        for (int x = lx; x < hx; x++) {
+                            final Block block = chunk.getBlock(x & 0xF, y, z & 0xF);
+                            /*if (block != shadowWorld.getBlock(x, y, z)) {
+                                int sx = x >> 4, sz = z >> 4;
+                                int cx = chunk.xPosition, cz = chunk.zPosition;
+                                NORELEASE.breakpoint();
+                                chunk.getBlock(x & 0xF, y, z & 0xF);
+                                shadowWorld.getBlock(x, y, z);
+                            }*/
+                            block.addCollisionBoxesToList(shadowWorld, x, y, z, box, ret, idc);
+                        }
+                    }
+                }
+
+                // We could totally do entities here. I choose not to!
+            }
+        }
+        return ret;
     }
-    
+
     List<AxisAlignedBB> getShadowBoxesInRealBox(AxisAlignedBB realBox) {
         double expansion = 0.3660254037844387;
         // It is important that expansion be the right value.
@@ -90,6 +144,7 @@ public class MetaAxisAlignedBB extends AxisAlignedBB implements IFzdsShenanigans
         // Optimization: make the expansion depend on the rotation; so the expansion would
         // range from 0, at no rotation, to <whatever the maximum should be> at the most extreme angles.
         // Could probably be done as a simpleish function depending on rotationQuaternion.w
+        // Or could do it a bit slower & cache it. (And maybe doing it live wouldn't be bad, since this isn't the slow part yet)
         AxisAlignedBB shadowBox = convertRealBoxToShadowBox(realBox);
         if (!idc.getRotation().isZero()) {
             shadowBox = outset(shadowBox, expansion, expansion, expansion);

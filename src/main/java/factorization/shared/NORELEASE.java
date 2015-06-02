@@ -36,13 +36,19 @@ public class NORELEASE {
     
     /**
      * Noise-free logging. (On Posix, at least)
-     * @param msg
      */
     public static void println(Object... msg) {
         String line = Joiner.on(" ").join(msg);
         trace.println(line);
     }
-    
+
+    /**
+     * Just returns a value. Might be better than on/off/one/zero.
+     */
+    public static <E> E value(E v) {
+        return v;
+    }
+
     public static PrintStream trace;
     
     /**

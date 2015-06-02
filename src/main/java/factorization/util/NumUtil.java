@@ -80,11 +80,20 @@ public final class NumUtil {
     }
 
     /**
-     * Limits the range of x to be between min and max.
+     * Limits the range of v to be between min and max.
      */
-    public static double clip(double x, double min, double max) {
-        if (x < min) return min;
-        if (x > max) return max;
-        return x;
+    public static double clip(double v, double min, double max) {
+        if (v < min) return min;
+        if (v > max) return max;
+        return v;
+    }
+
+    /**
+     * Limits the range of v to be between min and max.
+     */
+    public static int clip(int v, int min, int max) {
+        if (v < min) return min;
+        if (v > max) return max;
+        return v;
     }
 }
