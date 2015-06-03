@@ -96,23 +96,20 @@ public class MetaAxisAlignedBB extends AxisAlignedBB implements IFzdsShenanigans
                 final int hx = NumUtil.clip(boxMaxX + 1, cornerX, cornerX + 16);
                 final int lz = NumUtil.clip(boxMinZ, cornerZ, cornerZ + 16);
                 final int hz = NumUtil.clip(boxMaxZ + 1, cornerZ, cornerZ + 16);
-                /*if (lx >> 4 != chunk.xPosition || (hx-1) >> 4 != chunk.xPosition || lz >> 4 != chunk.zPosition || (hz-1) >> 4 != chunk.zPosition) {
-                        NORELEASE.breakpoint();
-                }*/
                 // Iterate nesting "YZX" to go with the grain of how data is stored in NibbleArrays.
                 // It is well that Y is on the outside, so that the ExtendedBlockStorages get visited one-at-a-time
                 // instead of jumping around constantly.
                 for (int y = boxMinY; y < boxMaxY; y++) {
                     for (int z = lz; z < hz; z++) {
                         for (int x = lx; x < hx; x++) {
+                            NORELEASE.fixme("TODO: Check that this is actually helpful! Count total # of blocks visited this way; # that were skipped by this, # that were skipped by the other thing (requiring using list.size()...)");
+                            if (!(NumUtil.intersect(x, x + 1, box.minX, box.maxX)
+                                    && NumUtil.intersect(y, y + 1 /* Or +2 for fences */, box.minY, box.maxY)
+                                    && NumUtil.intersect(z, z + 1, box.minZ, box.maxZ))) {
+                                continue;
+                            }
+
                             final Block block = chunk.getBlock(x & 0xF, y, z & 0xF);
-                            /*if (block != shadowWorld.getBlock(x, y, z)) {
-                                int sx = x >> 4, sz = z >> 4;
-                                int cx = chunk.xPosition, cz = chunk.zPosition;
-                                NORELEASE.breakpoint();
-                                chunk.getBlock(x & 0xF, y, z & 0xF);
-                                shadowWorld.getBlock(x, y, z);
-                            }*/
                             block.addCollisionBoxesToList(shadowWorld, x, y, z, box, ret, idc);
                         }
                     }
