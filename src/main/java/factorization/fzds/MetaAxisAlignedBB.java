@@ -1,10 +1,7 @@
 package factorization.fzds;
 
-import factorization.api.Coord;
-import factorization.api.ICoordFunction;
 import factorization.fzds.interfaces.IFzdsShenanigans;
 import factorization.shared.Core;
-import factorization.shared.NORELEASE;
 import factorization.util.NumUtil;
 import factorization.util.SpaceUtil;
 import net.minecraft.block.Block;
@@ -102,10 +99,14 @@ public class MetaAxisAlignedBB extends AxisAlignedBB implements IFzdsShenanigans
                 for (int y = boxMinY; y < boxMaxY; y++) {
                     for (int z = lz; z < hz; z++) {
                         for (int x = lx; x < hx; x++) {
-                            NORELEASE.fixme("TODO: Check that this is actually helpful! Count total # of blocks visited this way; # that were skipped by this, # that were skipped by the other thing (requiring using list.size()...)");
                             if (!(NumUtil.intersect(x, x + 1, box.minX, box.maxX)
-                                    && NumUtil.intersect(y, y + 1 /* Or +2 for fences */, box.minY, box.maxY)
+                                    && NumUtil.intersect(y, y + 1 /* Or +2 for fences. Nobody loves you, fences. */, box.minY, box.maxY)
                                     && NumUtil.intersect(z, z + 1, box.minZ, box.maxZ))) {
+                                // A simple sampling run while fighting a colossus found:
+                                //   20% of blocks visited collided
+                                //   31% of blocks visited could be excluded by the simple cube check
+                                //   79% of blocks visited did not collide via addCollisionBoxesToList
+                                // Seems worthwhile.
                                 continue;
                             }
 

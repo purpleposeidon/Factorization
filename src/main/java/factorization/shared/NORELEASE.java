@@ -45,7 +45,7 @@ public class NORELEASE {
     /**
      * Just returns a value. Might be better than on/off/one/zero.
      */
-    public static <E> E value(E v) {
+    public static <E> E just(E v) {
         return v;
     }
 
