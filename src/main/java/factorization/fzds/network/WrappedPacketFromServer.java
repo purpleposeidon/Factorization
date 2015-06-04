@@ -23,7 +23,9 @@ public class WrappedPacketFromServer extends WrappedPacket {
 
     @Override
     public void processPacket(INetHandler netHandler) {
-        if (wrapped == null) return;
+        if (wrapped == null) {
+            return;
+        }
         if (Hammer.log_client_chunking && (wrapped instanceof S21PacketChunkData || wrapped instanceof S26PacketMapChunkBulk)) {
             Hammer.logInfo("Packet " + wrapped.serialize());
         }
@@ -80,5 +82,10 @@ public class WrappedPacketFromServer extends WrappedPacket {
     @Override
     protected BiMap<Integer, Class> getPacketMap() {
         return serverPacketMap;
+    }
+
+    @Override
+    protected boolean isServerside() {
+        return true;
     }
 }

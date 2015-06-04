@@ -13,10 +13,7 @@ import cpw.mods.fml.common.network.FMLNetworkEvent;
 import cpw.mods.fml.common.registry.EntityRegistry;
 import cpw.mods.fml.common.registry.GameRegistry;
 import cpw.mods.fml.relauncher.Side;
-import factorization.fzds.network.FzdsPacketRegistry;
-import factorization.fzds.network.HammerNet;
-import factorization.fzds.network.PPPChunkLoader;
-import factorization.fzds.network.WrappedPacket;
+import factorization.fzds.network.*;
 import factorization.mechanics.TileEntityComparatorMechanism;
 import factorization.shared.Core;
 import net.minecraft.entity.Entity;
@@ -79,6 +76,8 @@ public class Hammer {
         
         int client_despawn_distance = 16*10; //NORELEASE: This wants for a config setting. "How far away the a client must be from a DSE before the server will tell the client to forget about it (eg, client side despawn)."
         EntityRegistry.registerModEntity(DimensionSliceEntity.class, "fzds", 1, this, client_despawn_distance, 1, true);
+        // Sigh. Would be nice to kill the velocity update packet noise. :/
+        // EntityRegistry.registerModEntity(PacketProxyingPlayer.class, "fzds", 2, this, 1, Integer.MAX_VALUE, false);
         
         //Create the hammer dimension
         DimensionManager.registerProviderType(DeltaChunk.getDimensionId(), HammerWorldProvider.class, true);

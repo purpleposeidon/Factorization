@@ -7,13 +7,15 @@ import factorization.shared.Core;
 import net.minecraft.network.EnumConnectionState;
 import net.minecraft.network.Packet;
 import net.minecraft.network.PacketBuffer;
+import net.minecraft.network.play.client.C17PacketCustomPayload;
+import net.minecraft.network.play.server.S3FPacketCustomPayload;
 
 import java.io.IOException;
 
 public abstract class WrappedPacket extends Packet implements IFzdsShenanigans {
     /**
      * These fields hold the packet maps.
-     * See {@link net.minecraft.util.MessageDeserializer.decode(ChannelHandlerContext, ByteBuf, List)}
+     * See {@link net.minecraft.util.MessageDeserializer#decode}
      */
     static final BiMap<Integer, Class> serverPacketMap = EnumConnectionState.PLAY.func_150755_b();
     static final BiMap<Integer, Class> clientPacketMap = EnumConnectionState.PLAY.func_150753_a();
@@ -53,6 +55,10 @@ public abstract class WrappedPacket extends Packet implements IFzdsShenanigans {
     
     private Packet unwrapPacket(PacketBuffer buf) {
         int packetId = buf.readVarIntFromBuffer();
+        if (packetId == -1) {
+            Core.logWarning("Recieved null packet");
+            return null;
+        }
         Packet recieved_packet = Packet.generatePacket(getPacketMap(), packetId);
         if (recieved_packet == null) {
             Core.logWarning("Bad packet ID " + packetId);
@@ -64,24 +70,39 @@ public abstract class WrappedPacket extends Packet implements IFzdsShenanigans {
             e.printStackTrace();
             return null;
         }
+        if (recieved_packet instanceof S3FPacketCustomPayload) {
+            return new FMLProxyPacket((S3FPacketCustomPayload) recieved_packet);
+        }
+        if (recieved_packet instanceof C17PacketCustomPayload) {
+            return new FMLProxyPacket((C17PacketCustomPayload) recieved_packet);
+        }
         return recieved_packet;
     }
 
+    protected abstract boolean isServerside();
     protected abstract BiMap<Integer, Class> getPacketMap();
 
     @Override
     public void writePacketData(PacketBuffer data) {
+        PacketBuffer buff = new PacketBuffer(data);
         if (wrapped == null) {
+            buff.writeVarIntToBuffer(-1);
             return;
         }
         if (wrapped instanceof FMLProxyPacket) {
             FMLProxyPacket pp = (FMLProxyPacket) wrapped;
-            wrapped = pp.toS3FPacket();
+            wrapped = this.isServerside() ? pp.toS3FPacket() : pp.toC17Packet();
         }
-        PacketBuffer buff = new PacketBuffer(data);
         Integer packetId = getPacketMap().inverse().get(wrapped.getClass());
-        if (packetId == null) {
-            throw new IllegalArgumentException("Can't send unregistered packet: " + wrappedToString());
+        if (packetId == null || packetId == -1) {
+            if (packetId == null) {
+                Core.logSevere("Can't send unregistered packet: " + wrappedToString());
+            } else {
+                Core.logSevere("I'm using the -1 ID for myself! Can't send this packet: " + wrappedToString());
+            }
+            wrapped = null;
+            buff.writeVarIntToBuffer(-1);
+            return;
         }
         buff.writeVarIntToBuffer(packetId);
         try {

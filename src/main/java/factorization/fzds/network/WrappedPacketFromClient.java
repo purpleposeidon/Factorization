@@ -56,4 +56,9 @@ public class WrappedPacketFromClient extends WrappedPacket {
     protected BiMap<Integer, Class> getPacketMap() {
         return clientPacketMap;
     }
+
+    @Override
+    protected boolean isServerside() {
+        return false;
+    }
 }
