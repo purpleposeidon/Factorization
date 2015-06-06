@@ -21,6 +21,7 @@ public class InfiniteChargeBlock extends TileEntityCommon implements IChargeCond
         if (charge.getValue() < 100) {
             charge.setValue(100);
         }
+        charge.update();
     }
 
     @Override
