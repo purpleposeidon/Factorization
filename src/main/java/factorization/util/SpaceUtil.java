@@ -520,4 +520,31 @@ public final class SpaceUtil {
         if (Double.isNaN(inv) || Double.isInfinite(inv)) return newVec();
         return scale(v, inv);
     }
+
+    public static void include(AxisAlignedBB box, Coord at) {
+        if (at.x < box.minX) box.minX = at.x;
+        if (at.x + 1 > box.maxX) box.maxX = at.x + 1;
+        if (at.y < box.minY) box.minY = at.y;
+        if (at.y + 1 > box.maxY) box.maxY = at.y + 1;
+        if (at.z < box.minZ) box.minZ = at.z;
+        if (at.z + 1 > box.maxZ) box.maxZ = at.z + 1;
+    }
+
+    public static boolean contains(AxisAlignedBB box, Coord at) {
+        return NumUtil.intersect(box.minX, box.maxX, at.x, at.x + 1)
+                && NumUtil.intersect(box.minY, box.maxY, at.y, at.y + 1)
+                && NumUtil.intersect(box.minZ, box.maxZ, at.z, at.z + 1);
+
+    }
+
+    public static double getVolume(AxisAlignedBB box) {
+        if (box == null) return 0;
+        double x = box.maxX - box.minX;
+        double y = box.maxY - box.minY;
+        double z = box.maxZ - box.minZ;
+        double volume = x * y * z;
+
+        if (volume < 0) return 0;
+        return volume;
+    }
 }

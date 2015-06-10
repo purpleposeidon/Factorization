@@ -1,6 +1,7 @@
 package factorization.mechanics;
 
 import factorization.api.Coord;
+import factorization.util.SpaceUtil;
 import net.minecraft.block.material.Material;
 import net.minecraft.util.AxisAlignedBB;
 
@@ -45,14 +46,7 @@ public class MassHelper {
     private static double MAX_VOLUME = 3 * 3 * 3;
 
     private static double getVolume(AxisAlignedBB box) {
-        if (box == null) return 0;
-        double x = box.maxX - box.minX;
-        double y = box.maxY - box.minY;
-        double z = box.maxZ - box.minZ;
-        double volume = x * y * z;
-
-        if (volume < 0) return 0;
-        if (volume > MAX_VOLUME) volume = MAX_VOLUME;
-        return volume;
+        double v = SpaceUtil.getVolume(box);
+        return v > MAX_VOLUME ? MAX_VOLUME : v;
     }
 }

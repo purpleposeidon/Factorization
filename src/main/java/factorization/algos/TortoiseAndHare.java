@@ -1,4 +1,4 @@
-package factorization.shared;
+package factorization.algos;
 
 public class TortoiseAndHare {
     public static interface Advancer<E> {

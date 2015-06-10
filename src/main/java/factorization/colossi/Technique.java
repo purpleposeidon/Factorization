@@ -11,7 +11,7 @@ import factorization.fzds.interfaces.DeltaCapability;
 import factorization.fzds.interfaces.IDeltaChunk;
 import factorization.fzds.interfaces.Interpolation;
 import factorization.shared.Core;
-import factorization.shared.ReservoirSampler;
+import factorization.algos.ReservoirSampler;
 import factorization.util.SpaceUtil;
 import net.minecraft.block.Block;
 import net.minecraft.entity.Entity;

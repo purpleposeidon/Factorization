@@ -2,7 +2,7 @@ package factorization.mechanics;
 
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import factorization.shared.Core;
-import factorization.shared.FastBag;
+import factorization.algos.FastBag;
 import factorization.util.SpaceUtil;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.WorldClient;

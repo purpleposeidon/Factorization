@@ -2,6 +2,7 @@ package factorization.shared;
 
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
+import factorization.algos.ReservoirSampler;
 import factorization.api.Coord;
 import factorization.api.FzColor;
 import factorization.common.BlockIcons;

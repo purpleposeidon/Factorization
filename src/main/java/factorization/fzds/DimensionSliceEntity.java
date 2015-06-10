@@ -17,7 +17,7 @@ import factorization.fzds.network.HammerNet;
 import factorization.fzds.network.PacketProxyingPlayer;
 import factorization.shared.Core;
 import factorization.shared.EntityReference;
-import factorization.shared.TortoiseAndHare;
+import factorization.algos.TortoiseAndHare;
 import factorization.util.SpaceUtil;
 import net.minecraft.block.Block;
 import net.minecraft.command.IEntitySelector;

@@ -1,4 +1,4 @@
-package factorization.shared;
+package factorization.algos;
 
 import java.util.ArrayList;
 import java.util.Iterator;
