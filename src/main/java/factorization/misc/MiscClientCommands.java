@@ -173,6 +173,7 @@ public class MiscClientCommands implements ICommand {
         @help("Erases the chat window")
         public static void clear() {
             queued_action = CLEAR_CHAT;
+            queue_delay = 10;
         }
         
         @sketchy
@@ -235,7 +236,11 @@ public class MiscClientCommands implements ICommand {
                 player.sendChatMessage("/time set " + 20*60);
             }
             clear();
-            queue_delay = 10;
+        }
+
+        @help("Makes it day")
+        public static void day() {
+            player.sendChatMessage("/time set " + 20*60);
         }
 
         @help("Makes it night")
