@@ -2,13 +2,18 @@ package factorization.fzds;
 
 import cpw.mods.fml.common.network.handshake.NetworkDispatcher;
 import factorization.fzds.interfaces.IDeltaChunk;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.MovingObjectPosition;
 import net.minecraft.world.World;
 
-public class HammerProxy {
+public abstract class HammerProxy {
     // Clients should use DeltaChunk
     public World getClientRealWorld() { return null; }
-    
+
+    public EntityPlayer getRealPlayerWhileInShadow() { return null; }
+
+    public EntityPlayer getFakePlayerWhileInShadow() { return null; }
+
     public void setShadowWorld() {
         throw new RuntimeException("Tried to setShadowWorld on server");
     }

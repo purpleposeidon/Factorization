@@ -9,6 +9,7 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelOutboundHandlerAdapter;
 import io.netty.channel.ChannelPromise;
 import io.netty.channel.embedded.EmbeddedChannel;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.network.EnumConnectionState;
@@ -23,7 +24,7 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.WeakHashMap;
 
-class InteractionLiason extends EntityPlayerMP implements IFzdsShenanigans {
+public class InteractionLiason extends EntityPlayerMP implements IFzdsShenanigans {
     static final WeakHashMap<EntityPlayerMP, InteractionLiason> activeLiasons = new WeakHashMap<EntityPlayerMP, InteractionLiason>();
 
     private static final GameProfile liasonGameProfile = new GameProfile(null /*UUID.fromString("69f64f91-665e-457d-ad32-f6082d0b8a71")*/ , "[FzdsInteractionLiason]");
@@ -128,5 +129,9 @@ class InteractionLiason extends EntityPlayerMP implements IFzdsShenanigans {
         EntityPlayerMP realPlayer = realPlayerRef.get();
         if (realPlayer == null) return;
         realPlayer.playerNetServerHandler.sendPacket(PacketProxyingPlayer.wrapMessage(msg));
+    }
+
+    public EntityPlayerMP getRealPlayer() {
+        return realPlayerRef.get();
     }
 }

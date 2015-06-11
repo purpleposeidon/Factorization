@@ -2,11 +2,15 @@ package factorization.fzds;
 
 import java.util.*;
 
+import factorization.fzds.network.InteractionLiason;
+import factorization.fzds.network.PacketProxyingPlayer;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.Vec3;
 import net.minecraft.world.World;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraftforge.common.DimensionManager;
+import net.minecraftforge.common.util.FakePlayer;
 import net.minecraftforge.common.util.ForgeDirection;
 import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.relauncher.Side;
@@ -301,5 +305,23 @@ public class DeltaChunk {
     
     public static HammerInfo getHammerRegistry() {
         return Hammer.hammerInfo;
+    }
+
+    /**
+     * Attempts to get the real player behind a proxing player.
+     * @param player The player object
+     * @return The true player. Might return null. Returns the argument if it is not an FZDS fake player
+     */
+    public static EntityPlayer getRealPlayer(EntityPlayer player) {
+        if (player == Hammer.proxy.getFakePlayerWhileInShadow()) {
+            return Hammer.proxy.getRealPlayerWhileInShadow();
+        }
+        if (player instanceof InteractionLiason) {
+            return ((InteractionLiason) player).getRealPlayer();
+        }
+        if (player instanceof PacketProxyingPlayer) {
+            return null;
+        }
+        return player;
     }
 }

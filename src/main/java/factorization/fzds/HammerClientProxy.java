@@ -29,7 +29,6 @@ import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.client.multiplayer.ChunkProviderClient;
 import net.minecraft.client.multiplayer.WorldClient;
 import net.minecraft.client.network.NetHandlerPlayClient;
-import net.minecraft.client.renderer.EntityRenderer;
 import net.minecraft.client.renderer.RenderGlobal;
 import net.minecraft.client.renderer.entity.RenderManager;
 import net.minecraft.client.renderer.tileentity.TileEntityRendererDispatcher;
@@ -198,6 +197,17 @@ public class HammerClientProxy extends HammerProxy {
             RenderManager.instance.worldObj = wc;
         }
         mc.renderGlobal.theWorld = wc;
+    }
+
+    @Override
+    public EntityPlayer getRealPlayerWhileInShadow() {
+        return real_player;
+    }
+
+    @Override
+    public EntityPlayer getFakePlayerWhileInShadow() {
+        if (real_player != null) return fake_player;
+        return null;
     }
     
     private EntityClientPlayerMP real_player = null;
