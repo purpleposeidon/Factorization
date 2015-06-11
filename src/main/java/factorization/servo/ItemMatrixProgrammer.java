@@ -1,5 +1,11 @@
 package factorization.servo;
 
+import cpw.mods.fml.common.eventhandler.EventPriority;
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
+import factorization.common.ItemIcons;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.entity.EntityClientPlayerMP;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityList;
 import net.minecraft.entity.item.EntityPainting;
@@ -7,6 +13,7 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntityNote;
+import net.minecraft.util.IIcon;
 import net.minecraft.world.World;
 import net.minecraftforge.common.ForgeHooks;
 import net.minecraftforge.event.entity.player.EntityInteractEvent;
@@ -19,6 +26,7 @@ import factorization.shared.Core;
 import factorization.shared.Core.TabType;
 import factorization.util.FzUtil;
 import factorization.shared.ItemFactorization;
+import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 
 public class ItemMatrixProgrammer extends ItemFactorization {
     public ItemMatrixProgrammer() {
@@ -74,16 +82,16 @@ public class ItemMatrixProgrammer extends ItemFactorization {
                 c.redraw();
                 c.syncTE();
             }
-            return false;
+            return true;
         }
         if (!decor.isFreeToPlace() && !player.capabilities.isCreativeMode && !world.isRemote) {
             c.spawnItem(decor.toItem());
         }
         rail.setDecoration(null);
         c.redraw();
-        return false;
+        return true;
     }
-    
+
     @Override
     public boolean isItemTool(ItemStack is) {
         return true;
@@ -122,5 +130,53 @@ public class ItemMatrixProgrammer extends ItemFactorization {
             newPainting.worldObj.spawnEntityInWorld(newPainting);
             break;
         }
+    }
+
+    @Override
+    public boolean isValidArmor(ItemStack stack, int armorType, Entity entity) {
+        return armorType == 0;
+    }
+
+    @Override
+    @SideOnly(Side.CLIENT)
+    public IIcon getIconIndex(ItemStack stack) {
+        final Minecraft mc = Minecraft.getMinecraft();
+        final EntityClientPlayerMP me = mc.thePlayer;
+        if (me != null && stack != null && stack == me.getCurrentArmor(3)) {
+            return ItemIcons.tool$matrix_programmer_tilted;
+        }
+        return super.getIconIndex(stack);
+    }
+
+    @Override
+    public ItemStack onItemRightClick(ItemStack stack, World world, EntityPlayer player) {
+        if (!world.isRemote && player.isSneaking() && player.getCurrentArmor(3) == null) {
+            if (isBowed(player)) {
+                ItemStack mask = stack.splitStack(1);
+                player.setCurrentItemOrArmor(4, mask);
+                return stack;
+            }
+        }
+        return super.onItemRightClick(stack, world, player);
+    }
+
+    @SubscribeEvent(priority = EventPriority.LOW)
+    public void removeMask(PlayerInteractEvent event) {
+        final EntityPlayer player = event.entityPlayer;
+        if (player.worldObj.isRemote) return;
+        if (!player.isSneaking()) return;
+        if (player.getHeldItem() != null) return;
+        final ItemStack helmet = player.getCurrentArmor(3);
+        if (helmet == null || !(helmet.getItem() == this)) return;
+        if (!isBowed(player)) return;
+
+        player.setCurrentItemOrArmor(4, null);
+        player.setCurrentItemOrArmor(0, helmet);
+        event.setCanceled(true);
+        Core.proxy.updatePlayerInventory(player); // Only seems necessary for removal specifically.
+    }
+
+    boolean isBowed(EntityPlayer player) {
+        return player.rotationPitch > 30;
     }
 }

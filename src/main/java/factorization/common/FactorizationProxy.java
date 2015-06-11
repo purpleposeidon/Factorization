@@ -73,6 +73,7 @@ public class FactorizationProxy implements IGuiHandler {
     }
 
     public void updatePlayerInventory(EntityPlayer player) {
+        // TODO: This belongs in a util class
         if (player instanceof EntityPlayerMP && !(player instanceof FakePlayer)) {
             EntityPlayerMP emp = (EntityPlayerMP) player;
             emp.sendContainerToPlayer(emp.inventoryContainer);

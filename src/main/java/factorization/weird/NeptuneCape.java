@@ -23,7 +23,8 @@ public class NeptuneCape {
     }
     
     static boolean hideMask(EntityPlayer player) {
-        return player.getHideCape() || player.getCurrentArmor(3) != null;
+        final ItemStack helmet = player.getCurrentArmor(3);
+        return helmet == null || helmet.getItem() != Core.registry.logicMatrixProgrammer;
     }
     
     static boolean should_render_mask = false;
