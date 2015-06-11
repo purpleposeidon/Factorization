@@ -105,6 +105,15 @@ task deobfJar(type: Jar) {
     from sourceSets.main.output
     from sourceSets.api.output
     classifier = 'dev'
+    
+    // Copied from 'jar'?
+    NORELEASE: Make sure this works!
+    manifest {
+        attributes("FMLCorePlugin": "factorization.coremod.LoadingPlugin",
+                   "FMLCorePluginContainsFMLMod": "true")
+    }
+    exclude "codechicken/**"
+    // End copied from 'jar'?
 }
 
 // runClient { args "--username" "username" }
@@ -121,4 +130,4 @@ task deobfJar(type: Jar) {
 //     classifier = 'api'
 // }
 
- 
+
