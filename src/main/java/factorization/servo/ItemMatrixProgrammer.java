@@ -1,18 +1,24 @@
 package factorization.servo;
 
 import cpw.mods.fml.common.eventhandler.EventPriority;
+import cpw.mods.fml.common.gameevent.PlayerEvent;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import factorization.common.ItemIcons;
+import factorization.util.PlayerUtil;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityClientPlayerMP;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityList;
 import net.minecraft.entity.item.EntityPainting;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.stats.StatBase;
+import net.minecraft.stats.StatisticsFile;
 import net.minecraft.tileentity.TileEntityNote;
+import net.minecraft.util.ChatComponentTranslation;
 import net.minecraft.util.IIcon;
 import net.minecraft.world.World;
 import net.minecraftforge.common.ForgeHooks;
@@ -178,5 +184,45 @@ public class ItemMatrixProgrammer extends ItemFactorization {
 
     boolean isBowed(EntityPlayer player) {
         return player.rotationPitch > 30;
+    }
+
+
+    private static final String authTagName = "fzLmpAuthenticated";
+    private static StatBase authStat = new StatBase("factorization.lmpAuthenticated", new ChatComponentTranslation("factorization.lmpAuthenticated")).registerStat();
+
+    public static boolean isUserAuthenticated(EntityPlayerMP player) {
+        StatisticsFile statsFile = PlayerUtil.getStatsFile(player);
+        return (statsFile != null && statsFile.writeStat(authStat) > 0) || player.getEntityData().hasKey(authTagName);
+    }
+
+    public static void setUserAuthenticated(EntityPlayerMP player) {
+        StatisticsFile statsFile = PlayerUtil.getStatsFile(player);
+        if (statsFile != null) {
+            statsFile.func_150873_a(player, authStat, 1);
+        }
+        player.getEntityData().setBoolean(authTagName, true);
+    }
+
+    @SubscribeEvent
+    public void preserveAuthState(PlayerEvent.PlayerLoggedInEvent event) {
+        final EntityPlayer player = event.player;
+        if (player instanceof EntityPlayerMP) {
+            if (isUserAuthenticated((EntityPlayerMP) player)) {
+                setUserAuthenticated((EntityPlayerMP) player);
+            }
+        }
+    }
+
+    public boolean isAuthenticated(ItemStack is) {
+        if (is == null) return false;
+        return is.getItem() == this && is.getItemDamage() == 2;
+    }
+
+    public boolean setAuthenticated(ItemStack is) {
+        if (is == null) return false;
+        if (is.getItem() != this) return false;
+        if (is.getItemDamage() == 2) return false;
+        is.setItemDamage(2);
+        return true;
     }
 }

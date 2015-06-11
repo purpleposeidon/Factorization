@@ -5,6 +5,9 @@ import java.util.List;
 import java.util.Random;
 import java.util.UUID;
 
+import factorization.citizen.EntityCitizen;
+import factorization.servo.ItemMatrixProgrammer;
+import factorization.util.FzUtil;
 import factorization.util.PlayerUtil;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.MapColor;
@@ -13,6 +16,7 @@ import net.minecraft.client.renderer.texture.IIconRegister;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.IIcon;
@@ -223,15 +227,10 @@ public class ColossalBlock extends Block {
         Coord at = new Coord(world, x, y, z);
         ItemStack held = player.getHeldItem();
         int md = at.getMd();
-        if (held != null && held.getItem() == Core.registry.logicMatrixProgrammer) {
-            if (held.getItemDamage() == 0) {
-                if (md == ColossalBlock.MD_CORE) {
-                    held.setItemDamage(1);
-                }
-                return true;
-            }
-            // player.addChatComponentMessage(new ChatComponentTranslation("tile.factorization:colossalBlock." + md + ".click"));
-            return true;
+        if (held != null && held.getItem() == Core.registry.logicMatrixProgrammer && world == DeltaChunk.getServerShadowWorld()) {
+            if (Core.registry.logicMatrixProgrammer.isAuthenticated(held)) return true;
+            EntityPlayer realPlayer = DeltaChunk.getRealPlayer(player);
+            return giveUserAuthentication(held, realPlayer);
         }
         if (PlayerUtil.isPlayerCreative(player) && md == MD_CORE) {
             TileEntityColossalHeart heart = at.getTE(TileEntityColossalHeart.class);
@@ -250,7 +249,19 @@ public class ColossalBlock extends Block {
         }
         return false;
     }
-    
+
+    private boolean giveUserAuthentication(ItemStack held, EntityPlayer player) {
+        if (player == null) return true;
+        if (player.worldObj == DeltaChunk.getServerShadowWorld()) return true;
+        if (!(player instanceof EntityPlayerMP)) return true;
+        if (ItemMatrixProgrammer.isUserAuthenticated((EntityPlayerMP) player)) {
+            Core.registry.logicMatrixProgrammer.setAuthenticated(held);
+        } else {
+            EntityCitizen.spawnOn((EntityPlayerMP) player);
+        }
+        return true;
+    }
+
     @Override
     public void onBlockPlacedBy(World world, int x, int y, int z, EntityLivingBase player, ItemStack is) {
         super.onBlockPlacedBy(world, x, y, z, player, is);
