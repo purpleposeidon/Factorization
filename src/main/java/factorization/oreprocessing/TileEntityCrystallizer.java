@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 import factorization.api.IFurnaceHeatable;
+import factorization.api.crafting.IVexatiousCrafting;
 import factorization.api.datahelpers.DataHelper;
 import factorization.api.datahelpers.Share;
 import factorization.shared.*;
@@ -25,7 +26,14 @@ public class TileEntityCrystallizer extends TileEntityFactorization implements I
 
     public ItemStack growing_crystal, solution;
     public int heat, progress;
-    public final static int topHeat = 300;
+
+    public static final int default_crystallization_time = Core.cheat ? 20 * 3 : 20 * 60 * 20;
+    public static final int default_heating_amount = 300;
+
+    public int cool_time = default_crystallization_time;
+    public int heating_amount = default_heating_amount;
+
+    CrystalRecipe active_recipe;
     
     @Override
     public IIcon getIcon(ForgeDirection dir) {
@@ -42,6 +50,14 @@ public class TileEntityCrystallizer extends TileEntityFactorization implements I
         putSlots(data);
         heat = data.as(Share.PRIVATE, "heat").putInt(heat);
         progress = data.as(Share.VISIBLE, "progress").putInt(progress);
+        cool_time = data.as(Share.VISIBLE, "cool_time").putInt(cool_time);
+        if (data.isReader() && data.isNBT() && cool_time == 0) {
+            cool_time = default_crystallization_time;
+        }
+        heating_amount = data.as(Share.VISIBLE, "heating_amount").putInt(heating_amount);
+        if (data.isReader() && data.isNBT() && heating_amount > 0) {
+            heating_amount = default_heating_amount;
+        }
     }
 
     @Override
@@ -117,8 +133,8 @@ public class TileEntityCrystallizer extends TileEntityFactorization implements I
     }
 
     public int getProgressRemaining() {
-        //20 ticks per second; 60 seconds per minute; 60 minutes per day
-        return ((20 * 60 * 20) / getLogicSpeed()) - progress;
+        //20 ticks per second; 60 seconds per minute; 20 minutes per day
+        return (cool_time / getLogicSpeed()) - progress;
     }
 
     public float getProgress() {
@@ -126,7 +142,7 @@ public class TileEntityCrystallizer extends TileEntityFactorization implements I
     }
 
     public boolean needHeat() {
-        if (heat >= topHeat) {
+        if (heat >= heating_amount) {
             return false;
         }
         return getMatchingRecipe() != null;
@@ -160,7 +176,7 @@ public class TileEntityCrystallizer extends TileEntityFactorization implements I
             share_delay = 0;
             current_state = 3;
         }
-        if (heat < topHeat) {
+        if (heat < heating_amount) {
             current_state = 4;
             shareState();
             return;
@@ -168,14 +184,15 @@ public class TileEntityCrystallizer extends TileEntityFactorization implements I
         //we're hot enough. Do progress
         needLogic();
         if (progress == 0) {
+            match.onCraftingStart(this);
             share_delay = 0;
             current_state = 5;
         }
         progress += 1;
         if (getProgressRemaining() <= 0 || Core.cheat) {
-            heat = Core.cheat ? topHeat - 20 : 0;
+            heat = Core.cheat ? heat * 6 / 10 : 0;
             progress = 0;
-            match.apply(this);
+            match.onCraftingComplete(this);
             share_delay = 0;
             current_state = 6;
         }
@@ -228,9 +245,10 @@ public class TileEntityCrystallizer extends TileEntityFactorization implements I
         return heat + progress > 0;
     }
 
-    public static class CrystalRecipe {
+    public static class CrystalRecipe implements IVexatiousCrafting<TileEntityCrystallizer> {
         public ItemStack input, output, solution;
         public float output_count;
+        public int heat_amount = default_heating_amount, cool_time = default_crystallization_time;
 
         public CrystalRecipe(ItemStack input, ItemStack output, float output_count, ItemStack solution) {
             this.input = input;
@@ -239,12 +257,10 @@ public class TileEntityCrystallizer extends TileEntityFactorization implements I
             this.solution = solution;
         }
 
-        boolean matches(TileEntityCrystallizer crys) {
+        @Override
+        public boolean matches(TileEntityCrystallizer crys) {
             if (crys.output != null) {
                 if (!ItemUtil.couldMerge(crys.output, output)) {
-                    return false;
-                }
-                if (crys.output.stackSize + output_count > crys.output.getMaxStackSize()) {
                     return false;
                 }
             }
@@ -259,7 +275,31 @@ public class TileEntityCrystallizer extends TileEntityFactorization implements I
                 return true;
             }
         }
-        
+
+        @Override
+        public void onCraftingStart(TileEntityCrystallizer machine) {
+            machine.heating_amount = this.heat_amount;
+            machine.cool_time = this.cool_time;
+        }
+
+        @Override
+        public void onCraftingComplete(TileEntityCrystallizer crys) {
+            for (int i = 0; i < crys.inputs.length; i++) {
+                ItemStack is = crys.inputs[i];
+                if (is != null && ItemUtil.wildcardSimilar(input, is)) {
+                    applyTo(crys, i);
+                }
+            }
+        }
+
+        @Override
+        public boolean isUnblocked(TileEntityCrystallizer crys) {
+            if (crys.output.stackSize + output_count > crys.output.getMaxStackSize()) {
+                return false;
+            }
+            return true;
+        }
+
         private void applyTo(TileEntityCrystallizer crys, int slot) {
             int delta = (int) output_count;
             if (delta != output_count && rand.nextFloat() < (output_count - delta)) {
@@ -281,15 +321,6 @@ public class TileEntityCrystallizer extends TileEntityFactorization implements I
             }
             crys.output.stackSize += delta;
             crys.output = ItemUtil.normalize(crys.output);
-        }
-
-        void apply(TileEntityCrystallizer crys) {
-            for (int i = 0; i < crys.inputs.length; i++) {
-                ItemStack is = crys.inputs[i];
-                if (is != null && ItemUtil.wildcardSimilar(input, is)) {
-                    applyTo(crys, i);
-                }
-            }
         }
     }
 

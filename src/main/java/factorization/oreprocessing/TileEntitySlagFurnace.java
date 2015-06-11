@@ -5,6 +5,8 @@ import java.util.ArrayList;
 import java.util.Random;
 
 import factorization.api.IFurnaceHeatable;
+import factorization.api.crafting.CraftingManagerGeneric;
+import factorization.api.crafting.IVexatiousCrafting;
 import factorization.api.datahelpers.DataHelper;
 import factorization.api.datahelpers.Share;
 import factorization.shared.*;
@@ -13,11 +15,9 @@ import factorization.util.ItemUtil;
 import factorization.util.SpaceUtil;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.block.Block;
-import net.minecraft.block.BlockFurnace;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntityFurnace;
 import net.minecraft.util.IIcon;
 import net.minecraft.world.World;
@@ -27,12 +27,12 @@ import factorization.common.FactoryType;
 import factorization.shared.NetworkFactorization.MessageType;
 
 public class TileEntitySlagFurnace extends TileEntityFactorization implements IFurnaceHeatable {
-    ItemStack furnaceItemStacks[] = new ItemStack[4];
+    ItemStack inv[] = new ItemStack[4];
     public int furnaceBurnTime;
     public int currentFuelItemBurnTime;
     public int furnaceCookTime;
 
-    static final int input = 0, fuel = 1, output = 2;
+    static final int inputSlotIndex = 0, fuelSlotIndex = 1, outputSlotIndex = 2;
 
     @Override
     public int getSizeInventory() {
@@ -55,12 +55,12 @@ public class TileEntitySlagFurnace extends TileEntityFactorization implements IF
 
     @Override
     public ItemStack getStackInSlot(int i) {
-        return furnaceItemStacks[i];
+        return inv[i];
     }
 
     @Override
     public void setInventorySlotContents(int i, ItemStack is) {
-        furnaceItemStacks[i] = is;
+        inv[i] = is;
         markDirty();
     }
 
@@ -69,7 +69,7 @@ public class TileEntitySlagFurnace extends TileEntityFactorization implements IF
         return "Slag Furnace";
     }
 
-    private static final int[] INPUT_s = {input, input + 1}, FUEL_s = {fuel}, OUTPUT_s = {output, output + 1};
+    private static final int[] INPUT_s = {inputSlotIndex, inputSlotIndex + 1}, FUEL_s = {fuelSlotIndex}, OUTPUT_s = {outputSlotIndex, outputSlotIndex + 1};
     
     @Override
     public int[] getAccessibleSlotsFromSide(int s) {
@@ -132,20 +132,23 @@ public class TileEntitySlagFurnace extends TileEntityFactorization implements IF
         boolean invChanged = false;
 
         if (this.furnaceBurnTime <= 0 && this.canSmelt()) {
-            this.currentFuelItemBurnTime = this.furnaceBurnTime = TileEntityFurnace.getItemBurnTime(this.furnaceItemStacks[fuel]) / 2;
+            this.currentFuelItemBurnTime = this.furnaceBurnTime = TileEntityFurnace.getItemBurnTime(this.inv[fuelSlotIndex]) / 2;
 
             if (this.furnaceBurnTime > 0)
             {
                 invChanged = true;
 
-                if (this.furnaceItemStacks[fuel] != null)
+                if (this.inv[fuelSlotIndex] != null)
                 {
-                    --this.furnaceItemStacks[fuel].stackSize;
+                    --this.inv[fuelSlotIndex].stackSize;
 
-                    if (this.furnaceItemStacks[fuel].stackSize == 0) {
-                        this.furnaceItemStacks[fuel] = this.furnaceItemStacks[fuel].getItem().getContainerItem(furnaceItemStacks[fuel]);
+                    if (this.inv[fuelSlotIndex].stackSize == 0) {
+                        this.inv[fuelSlotIndex] = this.inv[fuelSlotIndex].getItem().getContainerItem(inv[fuelSlotIndex]);
                     }
                 }
+            }
+            if (current_recipe != null) {
+                current_recipe.onCraftingStart(this);
             }
         }
 
@@ -174,33 +177,19 @@ public class TileEntitySlagFurnace extends TileEntityFactorization implements IF
         }
     }
 
-    boolean checkFit(ItemStack output, ItemStack res, int resSize) {
-        if (output == null) {
-            return true;
-        }
-        if (!ItemUtil.couldMerge(output, res)) {
-            return false;
-        }
-        if (output.stackSize + resSize <= output.getMaxStackSize()) {
-            return true;
-        }
-        return false;
-    }
-
+    IVexatiousCrafting<TileEntitySlagFurnace> current_recipe = null;
     public boolean canSmelt() {
-        if (this.furnaceItemStacks[input] == null) {
+        if (this.inv[inputSlotIndex] == null) {
             return false;
         }
-        SmeltingResult res = SlagRecipes.getSlaggingResult(this.furnaceItemStacks[input]);
-        if (res == null) {
+        current_recipe = recipes.find(this);
+        if (current_recipe == null) {
             return false;
         }
-
-        return checkFit(furnaceItemStacks[output + 0], res.output1, (int) res.prob1)
-                && checkFit(furnaceItemStacks[output + 1], res.output2, (int) res.prob2);
+        return current_recipe.isUnblocked(this);
     }
 
-    int getRandomSize(float f) {
+    static int getRandomSize(float f) {
         int i = (int) f;
         if (f - i > rand.nextFloat()) {
             i += 1;
@@ -212,37 +201,8 @@ public class TileEntitySlagFurnace extends TileEntityFactorization implements IF
         if (!canSmelt()) {
             return;
         }
-        SmeltingResult res = SlagRecipes.getSlaggingResult(this.furnaceItemStacks[input]);
-        if (furnaceItemStacks[output + 0] == null) {
-            furnaceItemStacks[output + 0] = ItemStack.copyItemStack(res.output1);
-            furnaceItemStacks[output + 0].stackSize = 0;
-        }
-        if (furnaceItemStacks[output + 1] == null) {
-            furnaceItemStacks[output + 1] = ItemStack.copyItemStack(res.output2);
-            furnaceItemStacks[output + 1].stackSize = 0;
-        }
-        ItemStack fo0 = furnaceItemStacks[output + 0];
-        ItemStack fo1 = furnaceItemStacks[output + 1];
-        fo0.stackSize += getRandomSize(res.prob1);
-        fo1.stackSize += getRandomSize(res.prob2);
-        if (fo0.stackSize > fo0.getMaxStackSize()) {
-            fo0.stackSize = fo0.getMaxStackSize();
-        }
-        if (fo1.stackSize > fo1.getMaxStackSize()) {
-            fo1.stackSize = fo1.getMaxStackSize();
-        }
-        if (fo0.stackSize <= 0) {
-            furnaceItemStacks[output + 0] = null;
-        }
-        if (fo1.stackSize <= 0) {
-            furnaceItemStacks[output + 1] = null;
-        }
-
-        furnaceItemStacks[input].stackSize -= 1;
-        if (furnaceItemStacks[input].stackSize == 0) {
-            furnaceItemStacks[input] = null;
-        }
-
+        IVexatiousCrafting<TileEntitySlagFurnace> res = recipes.find(this);
+        res.onCraftingComplete(this);
     }
 
     public int getCookProgressScaled(int par1) {
@@ -285,34 +245,86 @@ public class TileEntitySlagFurnace extends TileEntityFactorization implements IF
         return isBurning();
     }
 
-    public static class SmeltingResult {
-        //Java doesn't need tuples or anything at all like that -- Oh wait, yes it does.
-        public ItemStack input;
+    public static final CraftingManagerGeneric<TileEntitySlagFurnace> recipes = new CraftingManagerGeneric<TileEntitySlagFurnace>(TileEntitySlagFurnace.class);
+
+    public static class SmeltingResult implements IVexatiousCrafting<TileEntitySlagFurnace> {
+        public ItemStack inputItem;
         public float prob1, prob2;
         public ItemStack output1, output2;
 
-        SmeltingResult(ItemStack input, float prob1, ItemStack output1, float prob2,
-                ItemStack output2) {
-            this.input = input;
+        public SmeltingResult(ItemStack input, float prob1, ItemStack output1, float prob2, ItemStack output2) {
+            this.inputItem = input;
             this.prob1 = prob1;
             this.prob2 = prob2;
             this.output1 = output1;
             this.output2 = output2;
-            //what a waste of time.
+        }
+
+        @Override
+        public boolean matches(TileEntitySlagFurnace machine) {
+            return ItemUtil.wildcardSimilar(inputItem, machine.inv[inputSlotIndex]);
+        }
+
+        @Override
+        public void onCraftingStart(TileEntitySlagFurnace machine) {
+
+        }
+
+        @Override
+        public void onCraftingComplete(TileEntitySlagFurnace machine) {
+            ItemStack[] furnaceItemStacks = machine.inv;
+            if (furnaceItemStacks[outputSlotIndex + 0] == null) {
+                furnaceItemStacks[outputSlotIndex + 0] = ItemStack.copyItemStack(output1);
+                furnaceItemStacks[outputSlotIndex + 0].stackSize = 0;
+            }
+            if (furnaceItemStacks[outputSlotIndex + 1] == null) {
+                furnaceItemStacks[outputSlotIndex + 1] = ItemStack.copyItemStack(output2);
+                furnaceItemStacks[outputSlotIndex + 1].stackSize = 0;
+            }
+            ItemStack fo0 = furnaceItemStacks[outputSlotIndex + 0];
+            ItemStack fo1 = furnaceItemStacks[outputSlotIndex + 1];
+            fo0.stackSize += getRandomSize(prob1);
+            fo1.stackSize += getRandomSize(prob2);
+            if (fo0.stackSize > fo0.getMaxStackSize()) {
+                fo0.stackSize = fo0.getMaxStackSize();
+            }
+            if (fo1.stackSize > fo1.getMaxStackSize()) {
+                fo1.stackSize = fo1.getMaxStackSize();
+            }
+            if (fo0.stackSize <= 0) {
+                furnaceItemStacks[outputSlotIndex + 0] = null;
+            }
+            if (fo1.stackSize <= 0) {
+                furnaceItemStacks[outputSlotIndex + 1] = null;
+            }
+
+            furnaceItemStacks[inputSlotIndex].stackSize -= 1;
+            if (furnaceItemStacks[inputSlotIndex].stackSize == 0) {
+                furnaceItemStacks[inputSlotIndex] = null;
+            }
+        }
+
+        boolean checkFit(ItemStack output, ItemStack res, int resSize) {
+            if (output == null) {
+                return true;
+            }
+            if (!ItemUtil.couldMerge(output, res)) {
+                return false;
+            }
+            if (output.stackSize + resSize <= output.getMaxStackSize()) {
+                return true;
+            }
+            return false;
+        }
+
+        @Override
+        public boolean isUnblocked(TileEntitySlagFurnace machine) {
+            return checkFit(machine.inv[outputSlotIndex + 0], output1, (int) prob1) && checkFit(machine.inv[outputSlotIndex + 1], output2, (int) prob2);
         }
     }
 
     public static class SlagRecipes {
-
-        public static ArrayList<SmeltingResult> smeltingResults = new ArrayList();
-
-        public static void register(Object o_input, float prob1, Object o_output1, float prob2,
-                Object o_output2) {
-            ItemStack input = obj2is(o_input), output1 = obj2is(o_output1), output2 = obj2is(o_output2);
-            input.stackSize = 1;
-            SmeltingResult value = new SmeltingResult(input, prob1, output1, prob2, output2);
-            smeltingResults.add(value);
-        }
+        public static ArrayList<SmeltingResult> smeltingResults = (ArrayList<SmeltingResult>) (ArrayList) (recipes.list); // Compatibility!
 
         static ItemStack obj2is(Object o) {
             if (o instanceof ItemStack) {
@@ -330,13 +342,11 @@ public class TileEntitySlagFurnace extends TileEntityFactorization implements IF
             return null;
         }
 
-        static SmeltingResult getSlaggingResult(ItemStack input) {
-            for (SmeltingResult res : smeltingResults) {
-                if (ItemUtil.wildcardSimilar(res.input, input)) {
-                    return res;
-                }
-            }
-            return null;
+        public static void register(Object o_input, float prob1, Object o_output1, float prob2, Object o_output2) {
+            ItemStack input = obj2is(o_input), output1 = obj2is(o_output1), output2 = obj2is(o_output2);
+            input.stackSize = 1;
+            SmeltingResult recipe = new SmeltingResult(input, prob1, output1, prob2, output2);
+            recipes.add(recipe);
         }
     }
 

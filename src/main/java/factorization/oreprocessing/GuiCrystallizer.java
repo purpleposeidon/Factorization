@@ -35,7 +35,7 @@ public class GuiCrystallizer extends FactorizationGui {
         int progress = (int) (prog * 90);
         this.drawTexturedModalRect(var5 + 43, var6 + 89, 0, 192, progress, 16);
 
-        float h = crys.heat / (float) TileEntityCrystallizer.topHeat;
+        float h = crys.heat / (float) crys.heating_amount;
         float cool_start = 1F/20F;
         float cool_end = 2F/20F;
         if (prog > cool_start) {
