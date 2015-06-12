@@ -41,12 +41,12 @@ import java.util.*;
 public class TileEntityMixer extends TileEntityFactorization implements
         IChargeConductor {
     //inventory: 4 input slots, 4 output slots
-    private static final int INPUT_SIZE = 4;
-    ItemStack input[] = new ItemStack[INPUT_SIZE], output[] = new ItemStack[4];
-    private static final int[] IN_s = {0, 1, 2, 3}, OUT_s = {4, 5, 6, 7};
-    ArrayList<ItemStack> outputBuffer = new ArrayList();
-    int progress = 0;
-    int speed = 0;
+    public static final int INPUT_SIZE = 4;
+    public ItemStack input[] = new ItemStack[INPUT_SIZE], output[] = new ItemStack[4];
+    public static final int[] IN_s = {0, 1, 2, 3}, OUT_s = {4, 5, 6, 7};
+    public ArrayList<ItemStack> outputBuffer = new ArrayList();
+    public int progress = 0;
+    public int speed = 0;
     Charge charge = new Charge(this);
     
     @Override
@@ -204,7 +204,7 @@ public class TileEntityMixer extends TileEntityFactorization implements
     
     private static class WeirdRecipeException extends Throwable {}
 
-    public static final CraftingManagerGeneric<TileEntityMixer> recipes = new CraftingManagerGeneric<TileEntityMixer>(TileEntityMixer.class);
+    public static final CraftingManagerGeneric<TileEntityMixer> recipes = CraftingManagerGeneric.get(TileEntityMixer.class);
 
     public static class RecipeMatchInfo implements IVexatiousCrafting<TileEntityMixer> {
         public ArrayList inputs = new ArrayList();

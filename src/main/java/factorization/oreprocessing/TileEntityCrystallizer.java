@@ -1,28 +1,29 @@
 package factorization.oreprocessing;
 
-import java.io.IOException;
-import java.util.ArrayList;
-
 import factorization.api.IFurnaceHeatable;
+import factorization.api.crafting.CraftingManagerGeneric;
 import factorization.api.crafting.IVexatiousCrafting;
 import factorization.api.datahelpers.DataHelper;
 import factorization.api.datahelpers.Share;
-import factorization.shared.*;
+import factorization.common.BlockIcons;
+import factorization.common.FactoryType;
+import factorization.shared.BlockClass;
+import factorization.shared.Core;
+import factorization.shared.NetworkFactorization;
+import factorization.shared.NetworkFactorization.MessageType;
+import factorization.shared.TileEntityFactorization;
 import factorization.util.DataUtil;
 import factorization.util.ItemUtil;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.IIcon;
 import net.minecraftforge.common.util.ForgeDirection;
-import cpw.mods.fml.common.network.internal.FMLProxyPacket;
-import factorization.common.BlockIcons;
-import factorization.common.FactoryType;
-import factorization.shared.NetworkFactorization.MessageType;
+
+import java.io.IOException;
 
 public class TileEntityCrystallizer extends TileEntityFactorization implements IFurnaceHeatable {
-    ItemStack inputs[] = new ItemStack[6];
-    ItemStack output;
+    public ItemStack inputs[] = new ItemStack[6];
+    public ItemStack output;
 
     public ItemStack growing_crystal, solution;
     public int heat, progress;
@@ -33,7 +34,7 @@ public class TileEntityCrystallizer extends TileEntityFactorization implements I
     public int cool_time = default_crystallization_time;
     public int heating_amount = default_heating_amount;
 
-    CrystalRecipe active_recipe;
+    IVexatiousCrafting<TileEntityCrystallizer> active_recipe;
     
     @Override
     public IIcon getIcon(ForgeDirection dir) {
@@ -58,6 +59,8 @@ public class TileEntityCrystallizer extends TileEntityFactorization implements I
         if (data.isReader() && data.isNBT() && heating_amount > 0) {
             heating_amount = default_heating_amount;
         }
+        growing_crystal = data.as(Share.VISIBLE, "growing_crystal").putItemStack(growing_crystal);
+        solution = data.as(Share.VISIBLE, "solution").putItemStack(solution);
     }
 
     @Override
@@ -145,7 +148,7 @@ public class TileEntityCrystallizer extends TileEntityFactorization implements I
         if (heat >= heating_amount) {
             return false;
         }
-        return getMatchingRecipe() != null;
+        return active_recipe != null;
     }
 
     void empty() {
@@ -156,25 +159,26 @@ public class TileEntityCrystallizer extends TileEntityFactorization implements I
 
     @Override
     protected void doLogic() {
-        if (heat <= 0) {
-            current_state = 1;
-            empty();
-            return;
+        if (dirtied) {
+            dirtied = false;
+            IVexatiousCrafting<TileEntityCrystallizer> match = recipes.find(this);
+            if (match != active_recipe) {
+                active_recipe = match;
+                if (active_recipe != null) {
+                    heat = 0;
+                }
+            }
         }
-        CrystalRecipe match = getMatchingRecipe();
-        if (match == null) {
+        if (active_recipe == null) {
             heat = Math.max(heat - 3, 0);
             progress = (int) Math.min(progress * 0.005 - 1, 0);
             current_state = 2;
             empty();
             return;
         }
-        if (growing_crystal == null) {
-            growing_crystal = match.output.copy();
-            growing_crystal.stackSize = 1;
-            solution = match.solution;
-            share_delay = 0;
-            current_state = 3;
+        if (heat == 0) {
+            active_recipe.onCraftingStart(this);
+            getCoord().syncTE();
         }
         if (heat < heating_amount) {
             current_state = 4;
@@ -184,7 +188,7 @@ public class TileEntityCrystallizer extends TileEntityFactorization implements I
         //we're hot enough. Do progress
         needLogic();
         if (progress == 0) {
-            match.onCraftingStart(this);
+            //match.onCraftingStart(this);
             share_delay = 0;
             current_state = 5;
         }
@@ -192,7 +196,7 @@ public class TileEntityCrystallizer extends TileEntityFactorization implements I
         if (getProgressRemaining() <= 0 || Core.cheat) {
             heat = Core.cheat ? heat * 6 / 10 : 0;
             progress = 0;
-            match.onCraftingComplete(this);
+            active_recipe.onCraftingComplete(this);
             share_delay = 0;
             current_state = 6;
         }
@@ -223,7 +227,7 @@ public class TileEntityCrystallizer extends TileEntityFactorization implements I
         return count;
     }
 
-    public static ArrayList<CrystalRecipe> recipes = new ArrayList();
+    public static final CraftingManagerGeneric<TileEntityCrystallizer> recipes = CraftingManagerGeneric.get(TileEntityCrystallizer.class);
 
     @Override
     public boolean acceptsHeat() {
@@ -280,6 +284,9 @@ public class TileEntityCrystallizer extends TileEntityFactorization implements I
         public void onCraftingStart(TileEntityCrystallizer machine) {
             machine.heating_amount = this.heat_amount;
             machine.cool_time = this.cool_time;
+            machine.growing_crystal = output.copy();
+            machine.growing_crystal.stackSize = 1;
+            machine.solution = solution;
         }
 
         @Override
@@ -336,15 +343,6 @@ public class TileEntityCrystallizer extends TileEntityFactorization implements I
         recipes.add(new CrystalRecipe(input, output, output_count, solution));
     }
 
-    CrystalRecipe getMatchingRecipe() {
-        for (CrystalRecipe r : recipes) {
-            if (r.matches(this)) {
-                return r;
-            }
-        }
-        return null;
-    }
-
     ItemStack null2fake(ItemStack is) {
         if (is == null) {
             return Core.registry.crystallizer_item;
@@ -369,5 +367,13 @@ public class TileEntityCrystallizer extends TileEntityFactorization implements I
     @Override
     public double getMaxRenderDistanceSquared() {
         return 576; //24²
+    }
+
+    boolean dirtied = true;
+
+    @Override
+    public void markDirty() {
+        super.markDirty();
+        this.dirtied = true;
     }
 }

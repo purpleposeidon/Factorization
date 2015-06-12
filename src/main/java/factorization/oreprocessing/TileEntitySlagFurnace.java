@@ -245,7 +245,7 @@ public class TileEntitySlagFurnace extends TileEntityFactorization implements IF
         return isBurning();
     }
 
-    public static final CraftingManagerGeneric<TileEntitySlagFurnace> recipes = new CraftingManagerGeneric<TileEntitySlagFurnace>(TileEntitySlagFurnace.class);
+    public static final CraftingManagerGeneric<TileEntitySlagFurnace> recipes = CraftingManagerGeneric.get(TileEntitySlagFurnace.class);
 
     public static class SmeltingResult implements IVexatiousCrafting<TileEntitySlagFurnace> {
         public ItemStack inputItem;

@@ -1098,6 +1098,9 @@ public class Registry {
                     "  L",
                     'L', shortChain);
         }
+        if (Core.enable_test_content) {
+            TestContent.add();
+        }
     }
     
     private void makeServoRecipes() {

@@ -15,7 +15,7 @@ public final class CraftingManagerGeneric<MachineType> {
 
     public final ArrayList<IVexatiousCrafting<MachineType>> list = new ArrayList<IVexatiousCrafting<MachineType>>();
 
-    public CraftingManagerGeneric(Class<MachineType> machineClass) {
+    CraftingManagerGeneric(Class<MachineType> machineClass) {
         systems.put(machineClass, this);
     }
 

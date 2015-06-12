@@ -115,17 +115,18 @@ public class Core {
     public static int factory_rendertype = -1;
     public static boolean finished_loading = false;
 
-    public static boolean cheat = false;
-    public static boolean cheat_servo_energy = false;
-    public static boolean debug_network = false;
-    public static boolean show_fine_logging = false;
-    public static boolean dev_environ = Launch.blackboard != null ? (Boolean) Launch.blackboard.get("fml.deobfuscatedEnvironment") : false;
-    static {
-        if (!dev_environ) {
-            cheat = false;
-            cheat_servo_energy = false;
-        }
+    public static final boolean dev_environ = Launch.blackboard != null ? (Boolean) Launch.blackboard.get("fml.deobfuscatedEnvironment") : false;
+    public static final boolean cheat = dev_only(false);
+    public static final boolean cheat_servo_energy = dev_only(false);
+    public static final boolean debug_network = false;
+    public static final boolean show_fine_logging = false;
+    public static final boolean enable_test_content = dev_environ || Boolean.parseBoolean(System.getProperty("fz.enableTestContent"));
+
+    private static boolean dev_only(boolean a) {
+        if (!dev_environ) return false;
+        return a;
     }
+
     static public boolean serverStarted = false;
 
     public static void checkJar() {

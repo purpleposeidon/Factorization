@@ -81,6 +81,9 @@ public class TileEntityCrystallizerRender extends TileEntitySpecialRenderer {
                 float f = 0.9F;
                 glColor4f(f, f, f, 0.9F);
                 tex = Blocks.quartz_block.getIcon(0, 0); // Or white stained clay
+            } else if (sol.getItem() == Items.lava_bucket) {
+                tex = Blocks.flowing_lava.getBlockTextureFromSide(1);
+                glColor4f(1, 1, 1, 0.5F);
             } else {
                 glColor4f(1F, 1F, 1F, 1);
                 glBlendFunc(GL_SRC_COLOR, GL_ONE_MINUS_SRC_ALPHA);
