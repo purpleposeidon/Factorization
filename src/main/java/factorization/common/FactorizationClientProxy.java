@@ -1,5 +1,7 @@
 package factorization.common;
 
+import factorization.citizen.EntityCitizen;
+import factorization.citizen.RenderCitizen;
 import factorization.mechanics.BlockRenderHinge;
 import factorization.mechanics.SocketPoweredCrank;
 import factorization.mechanics.TileEntityHinge;
@@ -204,6 +206,7 @@ public class FactorizationClientProxy extends FactorizationProxy {
         RenderingRegistry.registerEntityRenderingHandler(ServoMotor.class, new RenderServoMotor());
         RenderingRegistry.registerEntityRenderingHandler(ColossusController.class, new ColossusControllerRenderer());
         RenderingRegistry.registerEntityRenderingHandler(EntityPoster.class, new RenderPoster());
+        RenderingRegistry.registerEntityRenderingHandler(EntityCitizen.class, new RenderCitizen());
 
         RenderingRegistry.registerBlockHandler(new FactorizationRender());
         BlockRenderBattery renderBattery = new BlockRenderBattery();

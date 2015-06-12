@@ -10,6 +10,7 @@ import factorization.shared.Core;
 import factorization.shared.EntityFz;
 import factorization.util.ItemUtil;
 import factorization.util.NumUtil;
+import factorization.util.PlayerUtil;
 import factorization.util.SpaceUtil;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
@@ -26,13 +27,14 @@ import net.minecraftforge.common.util.ForgeDirection;
 import java.io.IOException;
 
 public class EntityPoster extends EntityFz {
-    ItemStack inv = new ItemStack(Core.registry.spawnPoster);
-    Quaternion rot = new Quaternion();
-    double scale = 1.0;
+    public ItemStack inv = new ItemStack(Core.registry.spawnPoster);
+    public Quaternion rot = new Quaternion();
+    public double scale = 1.0;
+    public boolean locked = false;
 
     Quaternion base_rotation = new Quaternion();
     double base_scale = 1.0;
-    short spin_normal = 0, spin_vertical = 0, spin_tilt = 0;
+    public short spin_normal = 0, spin_vertical = 0, spin_tilt = 0;
     byte delta_scale = 0;
     ForgeDirection norm = ForgeDirection.NORTH, top = ForgeDirection.UP, tilt = ForgeDirection.EAST;
 
@@ -67,7 +69,7 @@ public class EntityPoster extends EntityFz {
         SpaceUtil.copyTo(this.boundingBox, bounds);
     }
 
-    void updateValues() {
+    public void updateValues() {
         delta_scale = (byte) NumUtil.clip(delta_scale, -8, +6);
         scale = base_scale * Math.pow(SCALE_INCR, delta_scale);
         Quaternion rNorm = Quaternion.getRotationQuaternionRadians(spin_normal * SPIN_PER_CLICK, norm);
@@ -81,6 +83,7 @@ public class EntityPoster extends EntityFz {
         if (!worldObj.isRemote) return false;
         EntityPlayer player = Minecraft.getMinecraft().thePlayer;
         if (player == null) return false;
+        if (locked && !PlayerUtil.isPlayerCreative(player)) return false;
         if (player.isSneaking()) return true;
         if (inv.getItem() == Core.registry.spawnPoster) return true;
         ItemStack held = player.getHeldItem();
@@ -93,6 +96,7 @@ public class EntityPoster extends EntityFz {
         if (worldObj.isRemote) return false;
         if (!(ent instanceof EntityPlayer)) return false;
         EntityPlayer player = (EntityPlayer) ent;
+        if (locked && !PlayerUtil.isPlayerCreative(player)) return false;
         Coord at = new Coord(this);
         if (spin_normal != 0 || spin_vertical != 0 || spin_tilt != 0) {
             spin_normal = spin_vertical = spin_tilt = 0;
@@ -143,6 +147,7 @@ public class EntityPoster extends EntityFz {
             }
         }
         SpaceUtil.copyTo(this.boundingBox, box);
+        locked = data.as(Share.PRIVATE, "locked").putBoolean(locked);
     }
 
     @Override
@@ -153,6 +158,7 @@ public class EntityPoster extends EntityFz {
 
     @Override
     public boolean interactFirst(EntityPlayer player) {
+        if (locked) return false;
         if (worldObj.isRemote) return true;
         ItemStack held = player.getHeldItem();
         if (held == null) return false;

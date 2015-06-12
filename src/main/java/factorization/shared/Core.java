@@ -10,6 +10,7 @@ import java.util.Map;
 import java.util.Set;
 
 import cpw.mods.fml.common.ModContainer;
+import factorization.citizen.EntityCitizen;
 import factorization.fzds.DeltaChunk;
 import factorization.mechanics.MechanismsFeature;
 import factorization.util.DataUtil;
@@ -205,6 +206,7 @@ public class Core {
         EntityRegistry.registerModEntity(ServoMotor.class, "factory_servo", 1, Core.instance, 100, 1, true);
         EntityRegistry.registerModEntity(ColossusController.class, "fz_colossal_controller", 2, Core.instance, 256, 20, false);
         EntityRegistry.registerModEntity(EntityPoster.class, "fz_entity_poster", 3, Core.instance, 160, Integer.MAX_VALUE, false);
+        EntityRegistry.registerModEntity(EntityCitizen.class, "fz_entity_citizen", 4, Core.instance, 100, 1, true);
     }
     
     @EventHandler

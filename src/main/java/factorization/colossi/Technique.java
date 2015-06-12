@@ -1006,6 +1006,54 @@ public enum Technique implements IStateMachine<Technique> {
             }
             controller.setDead();
         }
+    },
+
+    HACKED {
+        @Override
+        TechniqueKind getKind() {
+            return TRANSITION;
+        }
+
+        @Override
+        public void onEnterState(ColossusController controller, Technique prevState) {
+            controller.walk_controller.forceState(WalkState.IDLE);
+            controller.crackBroken();
+
+            Coord.iterateCube(controller.body.getCorner(), controller.body.getFarCorner(), new ICoordFunction() {
+                @Override
+                public void handle(Coord here) {
+                    if (here.getBlock() == Core.registry.colossal_block && here.getMd() == ColossalBlock.MD_EYE) {
+                        here.setMd(ColossalBlock.MD_EYE_OPEN, true);
+                    }
+                }
+            });
+
+            for (LimbInfo limb : controller.limbs) {
+                IDeltaChunk idc = limb.idc.getEntity();
+                if (idc == null) continue;
+                idc.cancelOrderedRotation();
+                idc.setRotationalVelocity(new Quaternion());
+                if (limb.type == LimbType.BODY) continue;
+                int angleDeg = limb.type == LimbType.ARM ? 90 + 45 : 45;
+                if (limb.side == BodySide.LEFT) angleDeg = -angleDeg;
+                Quaternion target = Quaternion.getRotationQuaternionRadians(Math.toRadians(angleDeg), ForgeDirection.EAST);
+                limb.target(target, 1);
+            }
+
+            playNoise(controller);
+        }
+
+        @Override
+        public Technique tick(ColossusController controller, int age) {
+            return finishMove(controller, HACKED_EXPIRE);
+        }
+    },
+
+    HACKED_EXPIRE {
+        @Override
+        TechniqueKind getKind() {
+            return TRANSITION;
+        }
     }
     
     ;

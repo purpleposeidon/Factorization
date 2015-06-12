@@ -191,6 +191,8 @@ public class ItemMatrixProgrammer extends ItemFactorization {
     private static StatBase authStat = new StatBase("factorization.lmpAuthenticated", new ChatComponentTranslation("factorization.lmpAuthenticated")).registerStat();
 
     public static boolean isUserAuthenticated(EntityPlayerMP player) {
+        if (PlayerUtil.isPlayerCreative(player)) return true;
+        if (Core.dev_environ) return false;
         StatisticsFile statsFile = PlayerUtil.getStatsFile(player);
         return (statsFile != null && statsFile.writeStat(authStat) > 0) || player.getEntityData().hasKey(authTagName);
     }

@@ -187,10 +187,10 @@ public class HammerNet {
             }
             idc.blocksChanged(x, y, z);
         } else if (type == HammerNetType.rightClickBlock) {
-            if (!idc.can(DeltaCapability.BLOCK_PLACE)) {
+            /*if (!idc.can(DeltaCapability.BLOCK_PLACE)) {
                 Core.logWarning("%s tried to use an item on IDC that doesn't permit that %s", player, idc);
                 return;
-            }
+            }*/
             int x = dis.readInt();
             int y = dis.readInt();
             int z = dis.readInt();
@@ -236,6 +236,10 @@ public class HammerNet {
     public void handlePlace(PlaceEvent event) {
         if (dont_check_range) return;
         if (active_idc == null) return;
+        if (!active_idc.can(DeltaCapability.BLOCK_PLACE)) {
+            event.setCanceled(true);
+            return;
+        }
         cancelOutOfRangePlacements(event);
         if (!event.isCanceled()) {
             askController(event);
@@ -322,7 +326,7 @@ public class HammerNet {
         return liason;
     }
 
-    private boolean do_click(WorldServer world, EntityPlayerMP player, int x, int y, int z, byte sideHit, float vecX, float vecY, float vecZ) {
+    private boolean do_click(IDeltaChunk idc, WorldServer world, EntityPlayerMP player, int x, int y, int z, byte sideHit, float vecX, float vecY, float vecZ) {
         // Copy of PlayerControllerMP.onPlayerRightClick
         ItemStack is = player.getHeldItem();
         if (is != null && is.getItem().onItemUseFirst(is, player, world, x, y, z, sideHit, vecX, vecY, vecZ)) {
@@ -337,7 +341,7 @@ public class HammerNet {
 
         if (ret) {
             return true;
-        } else if (is == null) {
+        } else if (is == null || idc.can(DeltaCapability.BLOCK_PLACE)) {
             return false;
         } else if (PlayerUtil.isPlayerCreative(player)) {
             int j1 = is.getItemDamage();
@@ -367,7 +371,7 @@ public class HammerNet {
         
         InteractionLiason liason = getLiason(shadowWorld, real_player, idc);
         try {
-            do_click(shadowWorld, liason, x, y, z, sideHit, vecX, vecY, vecZ);
+            do_click(idc, shadowWorld, liason, x, y, z, sideHit, vecX, vecY, vecZ);
         } catch (Throwable t) {
             t.printStackTrace();
         }

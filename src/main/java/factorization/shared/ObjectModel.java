@@ -39,6 +39,19 @@ public class ObjectModel {
         }
         GL11.glCallList(render_list);
     }
+
+    public void render() {
+        if (render_list == 0) {
+            return;
+        }
+        if (render_list == -1) {
+            WavefrontObject model = readModel();
+            if (model != null) {
+                recordModel(model);
+            }
+        }
+        GL11.glCallList(render_list);
+    }
     
     private WavefrontObject readModel() {
         WavefrontObject objectModel = null;
@@ -87,6 +100,19 @@ public class ObjectModel {
         subsetTessellator.startDrawingQuads();
         objectModel.tessellateAll(subsetTessellator);
         subsetTessellator.draw();
+        modelScale = 1/modelScale;
+        GL11.glScaled(modelScale, modelScale, modelScale);
+        GL11.glEndList();
+    }
+
+    private void recordModel(WavefrontObject objectModel) {
+        render_list = GLAllocation.generateDisplayLists(1);
+        GL11.glNewList(render_list, GL11.GL_COMPILE);
+        double modelScale = 1.0/16.0;
+        GL11.glScaled(modelScale, modelScale, modelScale);
+        Tessellator.instance.startDrawingQuads();
+        objectModel.tessellateAll(Tessellator.instance);
+        Tessellator.instance.draw();
         modelScale = 1/modelScale;
         GL11.glScaled(modelScale, modelScale, modelScale);
         GL11.glEndList();

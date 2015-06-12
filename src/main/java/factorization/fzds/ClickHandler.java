@@ -63,9 +63,6 @@ public class ClickHandler {
             break;
         case BLOCK:
             if (rightClick) {
-                if (!parent.can(DeltaCapability.BLOCK_PLACE)) {
-                    return;
-                }
                 toSend = HammerNet.makePacket(HammerNetType.rightClickBlock, parent.getEntityId(), hit,
                         (float) (hit.hitVec.xCoord - hit.blockX),
                         (float) (hit.hitVec.yCoord - hit.blockY),
@@ -151,6 +148,7 @@ public class ClickHandler {
         }
         if (controller.currentGameType.isAdventure() && !player.isCurrentToolAdventureModeExempt(hit.blockX, hit.blockY, hit.blockZ)) return;
         if (controller.currentGameType.isCreative()) {
+            if (!Hammer.proxy.getHitIDC().can(DeltaCapability.BLOCK_MINE)) return;
             sendDigPacket(HammerNetType.digFinish, hit);
             Hammer.proxy.setShadowWorld();
             try {
@@ -172,6 +170,10 @@ public class ClickHandler {
             original_block = hit;
             original_tool = player.getHeldItem();
         } else {
+            if (!Hammer.proxy.getHitIDC().can(DeltaCapability.BLOCK_MINE)) {
+                resetProgress();
+                return;
+            }
             ItemStack held = player.getHeldItem();
             if (original_tool != held) {
                 if (original_tool == null || held == null) {

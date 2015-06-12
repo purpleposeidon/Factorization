@@ -9,6 +9,8 @@ import factorization.citizen.EntityCitizen;
 import factorization.servo.ItemMatrixProgrammer;
 import factorization.util.FzUtil;
 import factorization.util.PlayerUtil;
+import factorization.weird.poster.EntityPoster;
+import factorization.weird.poster.ItemSpawnPoster;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.MapColor;
 import net.minecraft.block.material.Material;
@@ -230,7 +232,7 @@ public class ColossalBlock extends Block {
         if (held != null && held.getItem() == Core.registry.logicMatrixProgrammer && world == DeltaChunk.getServerShadowWorld()) {
             if (Core.registry.logicMatrixProgrammer.isAuthenticated(held)) return true;
             EntityPlayer realPlayer = DeltaChunk.getRealPlayer(player);
-            return giveUserAuthentication(held, realPlayer);
+            return giveUserAuthentication(held, realPlayer, at);
         }
         if (PlayerUtil.isPlayerCreative(player) && md == MD_CORE) {
             TileEntityColossalHeart heart = at.getTE(TileEntityColossalHeart.class);
@@ -250,16 +252,35 @@ public class ColossalBlock extends Block {
         return false;
     }
 
-    private boolean giveUserAuthentication(ItemStack held, EntityPlayer player) {
+    private boolean giveUserAuthentication(ItemStack held, EntityPlayer player, Coord at) {
         if (player == null) return true;
         if (player.worldObj == DeltaChunk.getServerShadowWorld()) return true;
         if (!(player instanceof EntityPlayerMP)) return true;
         if (ItemMatrixProgrammer.isUserAuthenticated((EntityPlayerMP) player)) {
             Core.registry.logicMatrixProgrammer.setAuthenticated(held);
         } else {
-            EntityCitizen.spawnOn((EntityPlayerMP) player);
+            ColossusController controller = findController(at);
+            if (controller == null) return true;
+
+            controller.ai_controller.forceState(Technique.HACKED);
+            placePoster(held, player, at);
+            //EntityCitizen.spawnOn((EntityPlayerMP) player);
         }
         return true;
+    }
+
+    private void placePoster(ItemStack held, EntityPlayer player, Coord at) {
+        ItemSpawnPoster.PosterPlacer placer = new ItemSpawnPoster.PosterPlacer(new ItemStack(Core.registry.spawnPoster), player, at.w, at.x, at.y, at.z, ForgeDirection.EAST.ordinal());
+        placer.invoke();
+        final EntityPoster poster = placer.result;
+        poster.locked = true;
+        poster.inv = held.copy();
+        poster.spin_tilt = -8;
+        poster.spin_vertical = -8;
+        poster.updateValues();
+        poster.posX += 1.5 / 16.0;
+        placer.spawn();
+        poster.locked = true;
     }
 
     @Override

@@ -32,8 +32,8 @@ public class ColossusController extends EntityFz implements IBossDisplayData, ID
     LimbInfo[] limbs;
     IDeltaChunk body;
     LimbInfo bodyLimbInfo;
-    final StateMachineExecutor walk_controller = new StateMachineExecutor(this, "walk", WalkState.IDLE);
-    final StateMachineExecutor ai_controller = new StateMachineExecutor(this, "tech", Technique.STATE_MACHINE_ENTRY);
+    public final StateMachineExecutor walk_controller = new StateMachineExecutor(this, "walk", WalkState.IDLE);
+    public final StateMachineExecutor ai_controller = new StateMachineExecutor(this, "tech", Technique.STATE_MACHINE_ENTRY);
     boolean setup = false;
     int arm_size = 0, arm_length = 0;
     int leg_size = 0, leg_length = 0;
@@ -303,6 +303,10 @@ public class ColossusController extends EntityFz implements IBossDisplayData, ID
     
     public void setDestroyedCracks(int newCount) {
         dataWatcher.updateObject(_destroyed_cracked_block_id, newCount);
+    }
+
+    public void setHacked() {
+        setDestroyedCracks(getTotalCracks());
     }
     
     public int getTotalCracks() {
