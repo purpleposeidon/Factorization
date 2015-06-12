@@ -6,6 +6,7 @@ import factorization.mechanics.BlockRenderHinge;
 import factorization.mechanics.SocketPoweredCrank;
 import factorization.mechanics.TileEntityHinge;
 import factorization.mechanics.TileEntityHingeRenderer;
+import factorization.weird.*;
 import factorization.weird.poster.EntityPoster;
 import factorization.weird.poster.RenderPoster;
 import net.minecraft.client.Minecraft;
@@ -86,12 +87,6 @@ import factorization.sockets.TileEntitySocketRenderer;
 import factorization.sockets.fanturpeller.SocketFanturpeller;
 import factorization.twistedblock.TwistedRender;
 import factorization.utiligoo.GooRenderer;
-import factorization.weird.BlockRenderDayBarrel;
-import factorization.weird.ContainerPocket;
-import factorization.weird.DayBarrelItemRenderer;
-import factorization.weird.GuiPocketTable;
-import factorization.weird.TileEntityDayBarrel;
-import factorization.weird.TileEntityDayBarrelRenderer;
 import factorization.wrath.BlockRenderLamp;
 import factorization.wrath.TileEntityWrathLamp;
 
@@ -207,6 +202,7 @@ public class FactorizationClientProxy extends FactorizationProxy {
         RenderingRegistry.registerEntityRenderingHandler(ColossusController.class, new ColossusControllerRenderer());
         RenderingRegistry.registerEntityRenderingHandler(EntityPoster.class, new RenderPoster());
         RenderingRegistry.registerEntityRenderingHandler(EntityCitizen.class, new RenderCitizen());
+        RenderingRegistry.registerEntityRenderingHandler(EntityMinecartDayBarrel.class, new RenderMinecartDayBarrel());
 
         RenderingRegistry.registerBlockHandler(new FactorizationRender());
         BlockRenderBattery renderBattery = new BlockRenderBattery();

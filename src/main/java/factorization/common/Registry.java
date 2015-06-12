@@ -39,10 +39,7 @@ import factorization.util.DataUtil;
 import factorization.util.FzUtil;
 import factorization.util.ItemUtil;
 import factorization.utiligoo.ItemGoo;
-import factorization.weird.BarrelUpgradeRecipes;
-import factorization.weird.ItemDayBarrel;
-import factorization.weird.ItemPocketTable;
-import factorization.weird.TileEntityDayBarrel;
+import factorization.weird.*;
 import factorization.weird.poster.ItemSpawnPoster;
 import factorization.wrath.BlockLightAir;
 import factorization.wrath.TileEntityWrathLamp;
@@ -146,6 +143,7 @@ public class Registry {
     public ItemDarkIronChain darkIronChain;
     public ItemCraftingComponent chainLink, shortChain;
     public ItemSpawnPoster spawnPoster;
+    public Item barrelCart;
 
     public Material materialMachine = new Material(MapColor.ironColor);
     
@@ -384,6 +382,8 @@ public class Registry {
         
         //Barrels
         daybarrel = new ItemDayBarrel("daybarrel");
+        barrelCart = new ItemMinecartDayBarrel();
+
         docbook = new ItemDocBook("docbook", TabType.TOOLS);
         utiligoo = new ItemGoo("utiligoo", TabType.TOOLS);
         if (DeltaChunk.enabled()) {
