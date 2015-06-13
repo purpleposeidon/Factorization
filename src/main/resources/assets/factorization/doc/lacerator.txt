@@ -32,12 +32,16 @@ and iron ore becomes dirty iron gravel.
 
 The lacerator can not break barrels.
 Instead, it will process the contents of the barrel.
+This allows the lacerator to process things that aren't blocks,
+but this will usually be slower than breaking the actual blocks
+since the lacerator is optimized for stone-breaking, not wood-chopping.
 
 Items dropped by killed entities and broken blocks will
 be put into an internal buffer, which will be drained
 into the backing inventory.
 If the buffer can't be emptied, then the lacerator will
 become clogged and will stop operating.
+Punching a clogged lacerator will unclog it.
 
 A redstone signal will disable the lacerator.
 
