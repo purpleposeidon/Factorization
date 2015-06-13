@@ -24,9 +24,12 @@ public class RecipeCrystallizer extends TemplateRecipeHandler  {
     @Override
     public void loadCraftingRecipes(ItemStack result) {
         //XXX NOTE: This is probably a lame implementation of this function.
-        for (CrystalRecipe cr : TileEntityCrystallizer.recipes) {
-            if (result == null || result.isItemEqual(cr.output)) {
-                arecipes.add(new CachedCrystallizerRecipe(cr));
+        for (Object obj : TileEntityCrystallizer.recipes) {
+            if (obj instanceof CrystalRecipe) {
+                CrystalRecipe cr = (CrystalRecipe) obj;
+                if (result == null || result.isItemEqual(cr.output)) {
+                    arecipes.add(new CachedCrystallizerRecipe(cr));
+                }
             }
         }
     }
@@ -43,11 +46,14 @@ public class RecipeCrystallizer extends TemplateRecipeHandler  {
     @Override
     public void loadUsageRecipes(ItemStack ingredient) {
         //XXX NOTE: This is probably a lame implementation of this function.
-        for (CrystalRecipe cr : TileEntityCrystallizer.recipes) {
-            if (ingredient == null
-                    || ingredient.isItemEqual(cr.input)
-                    || ingredient.isItemEqual(cr.solution)) {
-                arecipes.add(new CachedCrystallizerRecipe(cr));
+        for (Object obj : TileEntityCrystallizer.recipes) {
+            if (obj instanceof CrystalRecipe) {
+                CrystalRecipe cr = (CrystalRecipe) obj;
+                if (ingredient == null
+                        || ingredient.isItemEqual(cr.input)
+                        || ingredient.isItemEqual(cr.solution)) {
+                    arecipes.add(new CachedCrystallizerRecipe(cr));
+                }
             }
         }
     }

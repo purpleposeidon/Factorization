@@ -248,12 +248,12 @@ public class TileEntitySlagFurnace extends TileEntityFactorization implements IF
     public static final CraftingManagerGeneric<TileEntitySlagFurnace> recipes = CraftingManagerGeneric.get(TileEntitySlagFurnace.class);
 
     public static class SmeltingResult implements IVexatiousCrafting<TileEntitySlagFurnace> {
-        public ItemStack inputItem;
+        public ItemStack input;
         public float prob1, prob2;
         public ItemStack output1, output2;
 
         public SmeltingResult(ItemStack input, float prob1, ItemStack output1, float prob2, ItemStack output2) {
-            this.inputItem = input;
+            this.input = input;
             this.prob1 = prob1;
             this.prob2 = prob2;
             this.output1 = output1;
@@ -262,7 +262,7 @@ public class TileEntitySlagFurnace extends TileEntityFactorization implements IF
 
         @Override
         public boolean matches(TileEntitySlagFurnace machine) {
-            return ItemUtil.wildcardSimilar(inputItem, machine.inv[inputSlotIndex]);
+            return ItemUtil.wildcardSimilar(input, machine.inv[inputSlotIndex]);
         }
 
         @Override

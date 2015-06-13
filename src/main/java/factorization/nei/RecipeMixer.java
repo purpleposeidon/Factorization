@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import factorization.api.crafting.IVexatiousCrafting;
 import factorization.util.ItemUtil;
 import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.item.ItemStack;
@@ -37,7 +38,12 @@ public class RecipeMixer extends TemplateRecipeHandler {
     
     ArrayList<TileEntityMixer.RecipeMatchInfo> getCache() {
         if (cache == null) {
-            cache = TileEntityMixer.getRecipes();
+            cache = new ArrayList<RecipeMatchInfo>();
+            for (IVexatiousCrafting<TileEntityMixer> iv : TileEntityMixer.recipes.list) {
+                if (iv instanceof RecipeMatchInfo) {
+                    cache.add((RecipeMatchInfo) iv);
+                }
+            }
         }
         return cache;
     }

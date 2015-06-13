@@ -2,8 +2,9 @@ package factorization.api.crafting;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 
-public final class CraftingManagerGeneric<MachineType> {
+public final class CraftingManagerGeneric<MachineType> implements Iterable {
     private static final HashMap<Class, CraftingManagerGeneric> systems = new HashMap<Class, CraftingManagerGeneric>();
 
     public static <M> CraftingManagerGeneric<M> get(Class<M> klass) {
@@ -28,5 +29,10 @@ public final class CraftingManagerGeneric<MachineType> {
 
     public void add(IVexatiousCrafting<MachineType> recipe) {
         list.add(recipe);
+    }
+
+    @Override
+    public Iterator iterator() {
+        return list.iterator();
     }
 }
