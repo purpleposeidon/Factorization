@@ -25,6 +25,7 @@ public abstract class EntityFz extends Entity implements IEntityAdditionalSpawnD
 
     @Override
     protected final void readEntityFromNBT(NBTTagCompound tag) {
+        //super.readEntityFromNBT(tag);
         DataHelper data = new DataInNBT(tag);
         try {
             putData(data);
@@ -35,6 +36,7 @@ public abstract class EntityFz extends Entity implements IEntityAdditionalSpawnD
 
     @Override
     protected final void writeEntityToNBT(NBTTagCompound tag) {
+        //super.writeEntityToNBT(tag);
         DataHelper data = new DataOutNBT(tag);
         try {
             putData(data);

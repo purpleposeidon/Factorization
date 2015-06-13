@@ -1,15 +1,14 @@
 package factorization.weird;
 
 import factorization.api.FzOrientation;
+import factorization.api.datahelpers.DataHelper;
+import factorization.api.datahelpers.DataInNBT;
+import factorization.api.datahelpers.DataOutNBT;
 import factorization.shared.Core;
-import factorization.shared.NORELEASE;
-import factorization.util.DataUtil;
 import net.minecraft.block.Block;
 import net.minecraft.entity.item.EntityMinecart;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.init.Blocks;
 import net.minecraft.inventory.IInventory;
-import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.DamageSource;
@@ -17,9 +16,10 @@ import net.minecraft.util.MathHelper;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.ForgeDirection;
 
+import java.io.IOException;
+
 public class EntityMinecartDayBarrel extends EntityMinecart implements IInventory {
     protected TileEntityDayBarrel barrel;
-    private ItemStack stack;
     private int activatorRailTicks = 0;
     private boolean activatorRailPowered;
 
@@ -60,67 +60,55 @@ public class EntityMinecartDayBarrel extends EntityMinecart implements IInventor
     }
 
     public void initFromStack(ItemStack is) {
-        this.stack = is;
+        barrel.loadFromStack(is);
+        updateDataWatcher(true);
     }
 
-    private NBTTagCompound writeItemStackToNBT(ItemStack is) {
-        NBTTagCompound tag = new NBTTagCompound();
-        is.writeToNBT(tag);
-        return tag;
+    private void create_barrel() {
+        if (barrel != null) return;
+        barrel = new TileEntityDayBarrel();
+        barrel.setWorldObj(worldObj);
+        barrel.xCoord = barrel.yCoord = barrel.zCoord = 0;
+        barrel.validate();
+        barrel.orientation = FzOrientation.fromDirection(ForgeDirection.WEST).pointTopTo(ForgeDirection.UP);
+        barrel.notice_target = this;
     }
 
-    @Override
-    protected void readEntityFromNBT(NBTTagCompound nbt) {
-        super.readEntityFromNBT(nbt);
-
-        if (nbt.hasKey("BarrelType")) {
-            barrel.woodLog = DataUtil.tag2item(nbt.getCompoundTag("BarrelLog"), barrel.woodLog);
-            barrel.woodSlab = DataUtil.tag2item(nbt.getCompoundTag("BarrelSlab"), barrel.woodSlab);
-            barrel.setItemCount(nbt.getInteger("BarrelItemCount"));
-            barrel.orientation = FzOrientation.getOrientation(nbt.getByte("BarrelOrientation"));
-            barrel.type = TileEntityDayBarrel.Type.values()[nbt.getByte("BarrelType")];
-            if (nbt.hasKey("BarrelItem")) {
-                barrel.item = DataUtil.tag2item(nbt.getCompoundTag("BarrelItem"), new ItemStack(Blocks.air));
-                if (barrel.item.getItem() == Item.getItemFromBlock(Blocks.air)) {
-                    barrel.item = null;
-                }
-            }
+    public void putData(DataHelper data) throws IOException {
+        if (data.isReader() && barrel == null) {
+            create_barrel();
+        }
+        if (barrel != null) {
+            barrel.putData(data);
         }
     }
 
     @Override
-    protected void writeEntityToNBT(NBTTagCompound nbt) {
-        super.writeEntityToNBT(nbt);
-        if (barrel != null) {
-            if (barrel.item != null) {
-                nbt.setTag("BarrelItem", DataUtil.item2tag(barrel.item));
-            }
-            nbt.setTag("BarrelLog", DataUtil.item2tag(barrel.woodLog));
-            nbt.setTag("BarrelSlab", DataUtil.item2tag(barrel.woodSlab));
-            nbt.setInteger("BarrelItemCount", barrel.getItemCount());
-            nbt.setByte("BarrelOrientation", (byte) barrel.orientation.ordinal());
-            nbt.setByte("BarrelType", (byte) barrel.type.ordinal());
+    protected final void readEntityFromNBT(NBTTagCompound tag) {
+        super.readEntityFromNBT(tag);
+        DataHelper data = new DataInNBT(tag);
+        try {
+            putData(data);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    protected final void writeEntityToNBT(NBTTagCompound tag) {
+        super.writeEntityToNBT(tag);
+        DataHelper data = new DataOutNBT(tag);
+        try {
+            putData(data);
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 
     @Override
     protected void entityInit() {
         super.entityInit();
-
-        if (barrel == null) {
-            barrel = new TileEntityDayBarrel();
-            barrel.setWorldObj(worldObj);
-            barrel.xCoord = barrel.yCoord = barrel.zCoord = 0;
-            barrel.validate();
-            barrel.orientation = FzOrientation.fromDirection(ForgeDirection.WEST).pointTopTo(ForgeDirection.UP);
-            if (stack != null) {
-                barrel.loadFromStack(stack);
-            } else {
-                barrel.type = TileEntityDayBarrel.Type.HOPPING;
-                TileEntityDayBarrel.getLog(new ItemStack(Blocks.stone_brick_stairs));
-                TileEntityDayBarrel.getSlab(new ItemStack(Blocks.stone_brick_stairs));
-            }
-        }
+        create_barrel();
 
         dataWatcher.addObjectByDataType(23, 5);
         dataWatcher.updateObject(23, barrel.item);
@@ -147,8 +135,9 @@ public class EntityMinecartDayBarrel extends EntityMinecart implements IInventor
 
     @Override
     public void onActivatorRailPass(int x, int y, int z, boolean powered) {
-        activatorRailTicks = 2;
-        activatorRailPowered = powered;
+        if (powered) {
+            activatorRailTicks = barrel.getLogicSpeed();
+        }
     }
 
     @Override
@@ -168,18 +157,10 @@ public class EntityMinecartDayBarrel extends EntityMinecart implements IInventor
             barrel.xCoord = MathHelper.floor_double(posX);
             barrel.yCoord = MathHelper.floor_double(posY);
             barrel.zCoord = MathHelper.floor_double(posZ);
-            barrel.draw_active = 2;
+            if (activatorRailTicks > 0) activatorRailTicks--;
 
-            if (barrel.canUpdate()) {
-                if (activatorRailTicks > 0) {
-                    NORELEASE.fixme("NEPTUNAL TODO: Use activatorRailPowered for something useful.");
-                    NORELEASE.fixme("<asie> neptunepunk: one more bug! in the entity's readEntityFromNBT\n" +
-                            "[00:57:51] <asie> make the item count load AFTER the item\n" +
-                            "[00:57:55] <asie> or it will load \"0 Light Blue Wool\"");
-                    NORELEASE.fixme("Notice should be sent to cart entity, not to barrel");
-                    NORELEASE.fixme("fix serialization");
-                }
-                barrel.updateEntity();
+            if (barrel.canUpdate() && activatorRailTicks <= 0 && worldObj.getTotalWorldTime() % barrel.getLogicSpeed() == 0) {
+                barrel.doLogic();
                 updateDataWatcher(false);
             }
         }

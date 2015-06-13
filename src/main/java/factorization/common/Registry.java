@@ -143,7 +143,7 @@ public class Registry {
     public ItemDarkIronChain darkIronChain;
     public ItemCraftingComponent chainLink, shortChain;
     public ItemSpawnPoster spawnPoster;
-    public Item barrelCart;
+    public ItemMinecartDayBarrel barrelCart;
 
     public Material materialMachine = new Material(MapColor.ironColor);
     
@@ -734,7 +734,57 @@ public class Registry {
             TileEntityDayBarrel.makeRecipe(log, slab);
         }
 
-        new BarrelUpgradeRecipes().addUpgradeRecipes();
+        IRecipe barrel_cart_recipe = new IRecipe() {
+            @Override
+            public boolean matches(InventoryCrafting inv, World world) {
+                boolean found_barrel = false, found_cart = false;
+                for (int i = 0; i < inv.getSizeInventory(); i++) {
+                    ItemStack is = inv.getStackInSlot(i);
+                    if (is == null) continue;
+                    if (is.getItem() == Core.registry.daybarrel) {
+                        if (TileEntityDayBarrel.getUpgrade(is) == TileEntityDayBarrel.Type.SILKY) {
+                            return false;
+                        }
+                        found_barrel = true;
+                    } else if (is.getItem() == Items.minecart) {
+                        found_cart = true;
+                    } else {
+                        return false;
+                    }
+                }
+                return found_barrel && found_cart;
+            }
+
+            @Override
+            public ItemStack getCraftingResult(InventoryCrafting inv) {
+                for (int i = 0; i < inv.getSizeInventory(); i++) {
+                    ItemStack is = inv.getStackInSlot(i);
+                    if (is == null) continue;
+                    if (is.getItem() != Core.registry.daybarrel) continue;
+                    if (TileEntityDayBarrel.getUpgrade(is) == TileEntityDayBarrel.Type.SILKY) {
+                        return null;
+                    }
+                    ItemStack ret = new ItemStack(Core.registry.barrelCart, 1, is.getItemDamage());
+                    ret.setTagCompound((NBTTagCompound) is.getTagCompound().copy());
+                    return ret;
+                }
+                return new ItemStack(barrelCart);
+            }
+
+            @Override
+            public int getRecipeSize() {
+                return 2;
+            }
+
+            @Override
+            public ItemStack getRecipeOutput() {
+                return new ItemStack(barrelCart);
+            }
+        };
+        GameRegistry.addRecipe(barrel_cart_recipe);
+        RecipeSorter.register("factorization:barrel_cart", barrel_cart_recipe.getClass(), Category.SHAPELESS, "");
+
+        BarrelUpgradeRecipes.addUpgradeRecipes();
         
         // Craft stamper
         oreRecipe(stamper_item,
@@ -1215,6 +1265,7 @@ public class Registry {
     }
     
     public void addOtherRecipes() {
+        barrelCart.setMaxStackSize(Items.chest_minecart.getItemStackLimit(new ItemStack(Items.chest_minecart))); // Duplicate changes Railcraft might make
         ArrayList<ItemStack> theLogs = new ArrayList<ItemStack>();
         for (ItemStack is : OreDictionary.getOres("logWood")) {
             Block log = Block.getBlockFromItem(is.getItem());

@@ -1,13 +1,11 @@
 package factorization.notify;
 
-import java.util.ArrayList;
-import java.util.EnumSet;
-
 import factorization.shared.Core;
+import factorization.shared.NORELEASE;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLiving;
+import net.minecraft.entity.item.EntityMinecart;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
@@ -15,6 +13,9 @@ import net.minecraft.util.EnumChatFormatting;
 import net.minecraft.util.StatCollector;
 import net.minecraft.util.Vec3;
 import net.minecraft.world.World;
+
+import java.util.ArrayList;
+import java.util.EnumSet;
 
 class ClientMessage {
     World world;
@@ -99,16 +100,19 @@ class ClientMessage {
             return (Vec3) locus;
         }
         if (locus instanceof Entity) {
+            if (locus instanceof EntityMinecart) {
+                partial = 0; // Wtf?
+            }
             Entity e = ((Entity) locus);
-            double w = e.width*-1.5;
-            double eye_height = 4.0/16.0;
+            double w = e.width * -1.5;
+            double eye_height = 4.0 / 16.0;
             if (e instanceof EntityLiving) {
                 eye_height += e.getEyeHeight();
             }
-            return Vec3.createVectorHelper(
-                    interp(e.prevPosX, e.posX, partial) + w/2,
-                    interp(e.prevPosY, e.posY, partial) + eye_height,
-                    interp(e.prevPosZ, e.posZ, partial) + w/2);
+            final double x = interp(e.prevPosX, e.posX, partial) + w / 2;
+            final double y = interp(e.prevPosY, e.posY, partial) + eye_height;
+            final double z = interp(e.prevPosZ, e.posZ, partial) + w / 2;
+            return Vec3.createVectorHelper(x, y, z);
         }
         if (locus instanceof TileEntity) {
             TileEntity te = ((TileEntity) locus);

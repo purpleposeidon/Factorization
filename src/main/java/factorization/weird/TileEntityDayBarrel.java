@@ -65,6 +65,7 @@ public class TileEntityDayBarrel extends TileEntityFactorization {
     
     public FzOrientation orientation = FzOrientation.FACE_UP_POINT_NORTH;
     public Type type = Type.NORMAL;
+    Object notice_target = this;
     
     private static final int maxStackDrop = 64*64*2;
     
@@ -135,7 +136,7 @@ public class TileEntityDayBarrel extends TileEntityFactorization {
         if (orientation == FzOrientation.UNKNOWN) {
             return;
         }
-        if (worldObj.getBlockPowerInput(xCoord, yCoord, zCoord) > 0) {
+        if (notice_target == this && worldObj.getBlockPowerInput(xCoord, yCoord, zCoord) > 0) {
             return;
         }
         boolean youve_changed_jim = false;
@@ -590,7 +591,7 @@ public class TileEntityDayBarrel extends TileEntityFactorization {
         }
         
         if (!worldObj.isRemote && isNested(held) && (item == null || itemMatch(held))) {
-            new Notice(this, "No.").send(entityplayer);
+            new Notice(notice_target, "No.").send(entityplayer);
             return true;
         }
         
@@ -603,7 +604,7 @@ public class TileEntityDayBarrel extends TileEntityFactorization {
 
         if (!itemMatch(held)) {
             if (Core.getTranslationKey(held.getItem()).equals(Core.getTranslationKey(item))) {
-                new Notice(this, "That item is different").send(entityplayer);
+                new Notice(notice_target, "That item is different").send(entityplayer);
             } else {
                 info(entityplayer);
             }
@@ -633,7 +634,7 @@ public class TileEntityDayBarrel extends TileEntityFactorization {
         }
         /*if (held != null && !itemMatch(held)) {
             if (Core.getTranslationKey(held).equals(Core.getTranslationKey(item))) {
-                new Notice(this, "That item is different").send(entityplayer);
+                new Notice(notice_target, "That item is different").send(entityplayer);
             } else {
                 info(entityplayer);
             }
@@ -838,7 +839,7 @@ public class TileEntityDayBarrel extends TileEntityFactorization {
     }
     
     void info(final EntityPlayer entityplayer) {
-        new Notice(this, new NoticeUpdater() {
+        new Notice(notice_target, new NoticeUpdater() {
             @Override
             public void update(Notice msg) {
                 int itemCount = getItemCount();
