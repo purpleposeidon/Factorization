@@ -518,8 +518,12 @@ public final class InvUtil {
         public ItemStack push(ItemStack is) {
             is = ItemUtil.normalize(is);
             //First, fill up already existing stacks
+            int first_empty = -1;
             for (int i = 0; i < size(); i++) {
                 if (is == null) {
+                    if (first_empty == -1) {
+                        first_empty = i;
+                    }
                     return null;
                 }
                 ItemStack dest = get(i);
@@ -528,6 +532,7 @@ public final class InvUtil {
                 }
             }
             //Second, add to null stacks
+            if (first_empty == -1) return is; // No nulls found.
             for (int i = 0; i < size(); i++) {
                 if (is == null) {
                     return null;

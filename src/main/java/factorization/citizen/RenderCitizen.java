@@ -2,7 +2,6 @@ package factorization.citizen;
 
 import factorization.api.Quaternion;
 import factorization.fzds.interfaces.Interpolation;
-import factorization.shared.NORELEASE;
 import factorization.shared.NetworkFactorization;
 import factorization.shared.ObjectModel;
 import net.minecraft.client.Minecraft;
@@ -41,7 +40,6 @@ public class RenderCitizen extends RenderEntity {
             mid = citizen.rotation_start.slerp(citizen.rotation_target, t);
         }
         mid.glRotate();
-        //NORELEASE.println(x, y, z, mid);
 
         GL11.glPushMatrix();
         GL11.glRotatef(90, 1, 0, 0);
@@ -53,8 +51,6 @@ public class RenderCitizen extends RenderEntity {
             GL11.glScalef(s, s, s);
             GL11.glRotatef(90, 1, 0, 0);
             GL11.glRotatef(90, 0, 1, 0);
-            //GL11.glTranslatef(-20F/16F, -6.75F/16F/2, 0);
-            //GL11.glRotatef(ent.worldObj.getTotalWorldTime(), 0, 1, 0);
             float now = ent.worldObj.getTotalWorldTime() + partial;
             float angle = 40 + (float) Interpolation.SMOOTH.scale(Math.abs(Math.sin(now / 20))) * 5;
             GL11.glRotatef(angle, 0, 1, 0);

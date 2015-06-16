@@ -11,10 +11,8 @@ import factorization.servo.ItemMatrixProgrammer;
 import factorization.shared.Core;
 import factorization.shared.EntityFz;
 import factorization.shared.EntityReference;
-import factorization.shared.NORELEASE;
 import factorization.util.InvUtil;
 import factorization.util.ItemUtil;
-import factorization.util.PlayerUtil;
 import factorization.util.SpaceUtil;
 import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
@@ -24,7 +22,6 @@ import net.minecraft.entity.monster.IMob;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.init.Blocks;
-import net.minecraft.item.ItemMinecart;
 import net.minecraft.item.ItemStack;
 import net.minecraft.potion.Potion;
 import net.minecraft.potion.PotionEffect;
@@ -160,8 +157,7 @@ public class EntityCitizen extends EntityFz {
             s(80, say, "bedrock"),
             s(80, say, "power"),
             s(80, say, "bye"),
-            NORELEASE.just(s(10, restart)),
-            //s(0, leave)
+            s(0, leave)
     };
 
     String current_text = null;
@@ -171,7 +167,7 @@ public class EntityCitizen extends EntityFz {
 
     private void doEvent(ScriptEvent se, EntityPlayer player) {
         final String arg = se.arg;
-        NORELEASE.println(se.kind, arg);
+        //NORELEASE.println(se.kind, arg);
         current_text = null;
         switch (se.kind) {
             case restart:

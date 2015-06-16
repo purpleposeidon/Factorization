@@ -1,7 +1,6 @@
 package factorization.notify;
 
 import factorization.shared.Core;
-import factorization.shared.NORELEASE;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLiving;
