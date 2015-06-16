@@ -4,8 +4,10 @@ import factorization.api.Coord;
 import factorization.api.DeltaCoord;
 import factorization.api.ICoordFunction;
 import factorization.api.Quaternion;
+import factorization.citizen.EntityCitizen;
 import factorization.colossi.ColossusController.BodySide;
 import factorization.colossi.ColossusController.LimbType;
+import factorization.fzds.DeltaChunk;
 import factorization.fzds.TransferLib;
 import factorization.fzds.interfaces.DeltaCapability;
 import factorization.fzds.interfaces.IDeltaChunk;
@@ -21,6 +23,8 @@ import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.Vec3;
+import net.minecraft.world.Explosion;
+import net.minecraft.world.WorldServer;
 import net.minecraftforge.common.util.ForgeDirection;
 
 import java.util.ArrayList;
@@ -1028,16 +1032,27 @@ public enum Technique implements IStateMachine<Technique> {
                 }
             });
 
+            int target_time = EntityCitizen.SURRENDER_TIME;
             for (LimbInfo limb : controller.limbs) {
                 IDeltaChunk idc = limb.idc.getEntity();
                 if (idc == null) continue;
                 idc.cancelOrderedRotation();
                 idc.setRotationalVelocity(new Quaternion());
-                if (limb.type == LimbType.BODY) continue;
+                if (limb.type == LimbType.BODY) {
+                    Quaternion bodyRot = controller.body.getRotation();
+                    double yRot = bodyRot.toRotationVector().yCoord;
+                    Quaternion straightRot = Quaternion.getRotationQuaternionRadians(-yRot, ForgeDirection.UP);
+                    if (bodyRot.dotProduct(straightRot) < 0) {
+                        // Sometimes seems to go the long way 'round; this should make it short
+                        straightRot.incrConjugate();
+                    }
+                    idc.orderTargetRotation(straightRot, target_time, Interpolation.SMOOTH);
+                    continue;
+                }
                 int angleDeg = limb.type == LimbType.ARM ? 90 + 45 : 45;
-                if (limb.side == BodySide.LEFT) angleDeg = -angleDeg;
+                if (limb.side == BodySide.RIGHT) angleDeg = -angleDeg;
                 Quaternion target = Quaternion.getRotationQuaternionRadians(Math.toRadians(angleDeg), ForgeDirection.EAST);
-                limb.target(target, 1);
+                idc.orderTargetRotation(target, target_time, Interpolation.INV_CUBIC);
             }
 
             playNoise(controller);
@@ -1054,9 +1069,90 @@ public enum Technique implements IStateMachine<Technique> {
         TechniqueKind getKind() {
             return TRANSITION;
         }
-    }
-    
-    ;
+
+        @Override
+        public Technique tick(ColossusController controller, int age) {
+            if (age >= EntityCitizen.EXPLODE_TIME) {
+                Coord min = null, max = null;
+                for (LimbInfo limb : controller.limbs) {
+                    IDeltaChunk idc = limb.idc.getEntity();
+                    if (idc == null) continue;
+                    final Coord corner = idc.shadow2realCoord(idc.getCorner());
+                    final Coord farCorner = idc.shadow2realCoord(idc.getFarCorner());
+                    Coord.sort(corner, farCorner);
+                    if (min == null) {
+                        min = corner;
+                        max = farCorner;
+                    } else {
+                        Coord.sort(min, corner);
+                        Coord.sort(farCorner, max);
+                    }
+                }
+                final WorldServer world = (WorldServer) min.w;
+
+                Coord.iterateCube(min, max, new ICoordFunction() {
+                    @Override
+                    public void handle(Coord here) {
+                        if (world.rand.nextInt(5) > 0) return;
+                        //sendParticlePacket(String particleName, double x, double y, double z, int particleCount, double R, double G, double B, double blastRange)
+                        world.func_147487_a("portal", here.x, here.y, here.z, 1, 0, 4, 0, 1);
+                    }
+                });
+                return DEAD;
+            }
+            if (age % 24 == 0) {
+                final ReservoirSampler<Coord> eyes = new ReservoirSampler<Coord>(1, controller.worldObj.rand);
+                Coord.iterateCube(controller.body.getCorner(), controller.body.getFarCorner(), new ICoordFunction() {
+                    @Override
+                    public void handle(Coord here) {
+                        if (here.getBlock() != Core.registry.colossal_block) return;
+                        final int md = here.getMd();
+                        if (md == ColossalBlock.MD_EYE || md == ColossalBlock.MD_EYE_OPEN) {
+                            eyes.give(here.copy());
+                        }
+                    }
+                });
+                for (Coord eye : eyes.getSamples()) {
+                    eye.setAir();
+                    eye.w.createExplosion(null, eye.x + 0.5, eye.y + 0.5, eye.z + 0.5, 2, false);
+                }
+            }
+            return super.tick(controller, age);
+        }
+    },
+
+    DEAD {
+        @Override
+        TechniqueKind getKind() {
+            return TRANSITION;
+        }
+
+        @Override
+        public void onEnterState(ColossusController controller, Technique prevState) {
+            ICoordFunction clear = new ICoordFunction() {
+                @Override
+                public void handle(Coord here) {
+                    here.setAir();
+                }
+            };
+            for (LimbInfo limb : controller.limbs) {
+                IDeltaChunk idc = limb.idc.getEntity();
+                if (idc == null) continue;
+                Coord.iterateChunks(idc.getCorner(), idc.getFarCorner(), clear);
+            }
+        }
+
+        @Override
+        public Technique tick(ColossusController controller, int age) {
+            for (LimbInfo limb : controller.limbs) {
+                IDeltaChunk idc = limb.idc.getEntity();
+                if (idc == null) continue;
+                idc.setDead();
+            }
+            controller.setDead();
+            return DEAD;
+        }
+    };
     
     abstract TechniqueKind getKind();
     

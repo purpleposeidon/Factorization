@@ -11,7 +11,7 @@ public enum Command {
     craftClear(2, true), craftSwirl(3, true), craftBalance(4, true), craftOpen(5, true), craftFill(11, true),
     gooRightClick(12, false), gooLeftClick(13, false), gooSelectNone(14, false);
 
-    static class name {
+    static class Names {
         static HashMap<Byte, Command> map = new HashMap<Byte, Command>();
     }
 
@@ -21,7 +21,7 @@ public enum Command {
 
     Command(int id) {
         this.id = (byte) id;
-        name.map.put(this.id, this);
+        Names.map.put(this.id, this);
     }
 
     Command(int id, boolean executeLocally) {
@@ -35,7 +35,7 @@ public enum Command {
     }
 
     public static void fromNetwork(EntityPlayer player, byte s, byte arg) {
-        Command c = name.map.get(s);
+        Command c = Names.map.get(s);
         if (c == null) {
             Core.logWarning("Received invalid command #" + s);
             return;

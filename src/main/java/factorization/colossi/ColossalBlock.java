@@ -27,6 +27,7 @@ import net.minecraft.util.WeightedRandomChestContent;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import net.minecraftforge.common.ChestGenHooks;
+import net.minecraftforge.common.util.FakePlayer;
 import net.minecraftforge.common.util.ForgeDirection;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
@@ -232,6 +233,9 @@ public class ColossalBlock extends Block {
         if (held != null && held.getItem() == Core.registry.logicMatrixProgrammer && world == DeltaChunk.getServerShadowWorld()) {
             if (Core.registry.logicMatrixProgrammer.isAuthenticated(held)) return true;
             EntityPlayer realPlayer = DeltaChunk.getRealPlayer(player);
+            if (realPlayer instanceof FakePlayer) {
+                return true;
+            }
             return giveUserAuthentication(held, realPlayer, at);
         }
         if (PlayerUtil.isPlayerCreative(player) && md == MD_CORE) {
@@ -264,7 +268,7 @@ public class ColossalBlock extends Block {
 
             controller.ai_controller.forceState(Technique.HACKED);
             placePoster(held, player, at);
-            //EntityCitizen.spawnOn((EntityPlayerMP) player);
+            EntityCitizen.spawnOn((EntityPlayerMP) player);
         }
         return true;
     }

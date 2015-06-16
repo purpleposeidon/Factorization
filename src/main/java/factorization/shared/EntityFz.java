@@ -1,10 +1,12 @@
 package factorization.shared;
 
 import cpw.mods.fml.common.network.internal.FMLNetworkHandler;
+import factorization.api.IEntityMessage;
 import io.netty.buffer.ByteBuf;
 
 import java.io.IOException;
 
+import io.netty.buffer.Unpooled;
 import net.minecraft.entity.Entity;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.Packet;
@@ -17,7 +19,7 @@ import factorization.api.datahelpers.DataInNBT;
 import factorization.api.datahelpers.DataOutByteBuf;
 import factorization.api.datahelpers.DataOutNBT;
 
-public abstract class EntityFz extends Entity implements IEntityAdditionalSpawnData {
+public abstract class EntityFz extends Entity implements IEntityAdditionalSpawnData, IEntityMessage {
 
     public EntityFz(World w) {
         super(w);
@@ -71,6 +73,31 @@ public abstract class EntityFz extends Entity implements IEntityAdditionalSpawnD
         FzNetDispatch.addPacketFrom(p, this);
     }
 
+    public void syncData() {
+        ByteBuf output = Unpooled.buffer();
+        try {
+            Core.network.prefixEntityPacket(output, this, NetworkFactorization.MessageType.entity_sync);
+            writeSpawnData(output);
+            Packet p = Core.network.entityPacket(output);
+            FzNetDispatch.addPacketFrom(p, this);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
     protected abstract void putData(DataHelper data) throws IOException;
 
+    @Override
+    public boolean handleMessageFromClient(NetworkFactorization.MessageType messageType, ByteBuf input) throws IOException {
+        return false;
+    }
+
+    @Override
+    public boolean handleMessageFromServer(NetworkFactorization.MessageType messageType, ByteBuf input) throws IOException {
+        if (messageType == NetworkFactorization.MessageType.entity_sync) {
+            putData(new DataInByteBuf(input, Side.CLIENT));
+            return true;
+        }
+        return false;
+    }
 }
