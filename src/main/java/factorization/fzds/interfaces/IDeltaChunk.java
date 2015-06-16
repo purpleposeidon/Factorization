@@ -218,11 +218,13 @@ public abstract class IDeltaChunk extends EntityFz {
     /** NORELEASE: Refactor/rename & deprecate
      * @param realCoord A {@link Coord} in real world coordinates that will be mutated into shadow coordinates.
      */
+    @Deprecated // Use real2shadowCoord
     public abstract void real2shadow(Coord realCoord);
 
     /** NORELEASE: Refactor/rename & deprecate
      * @param shadowCoord A {@link Coord} in shadow coordinates that will be mutated into real coordinates
      */
+    @Deprecated // Use shadow2realCoord
     public abstract void shadow2real(Coord shadowCoord);
 
     public Coord shadow2realCoord(Coord realCoord) {
