@@ -105,6 +105,13 @@ public class ASMTransformer implements IClassTransformer {
                 );
             }
         }
+        {
+            // Just for funnsies
+            if (transformedName.equals("net.minecraft.block.BlockRailBase") && !Boolean.parseBoolean(System.getProperty("fz.disableRailStairs"))) {
+                return applyTransform(basicClass,
+                        new AbstractAsmClassTransform.Mixin("factorization.coremodhooks.MixinRailStairs", "Lfactorization/coremodhooks/MixinRailStairs;"));
+            }
+        }
         return basicClass;
     }
     
