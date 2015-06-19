@@ -25,7 +25,7 @@ public class TextWord extends Word {
     @Override
     public int draw(DocViewer page, int x, int y, boolean hover) {
         String t = text;
-        int color = getLinkColor(hover);
+        int color = getLinkColor(page, hover);
         if (getLink() != null) {
             t = EnumChatFormatting.UNDERLINE + text;
         }

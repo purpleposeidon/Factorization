@@ -1,8 +1,5 @@
 package factorization.docs;
 
-import java.util.ArrayDeque;
-import java.util.Deque;
-
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.GuiButton;
@@ -12,11 +9,14 @@ import net.minecraft.client.gui.inventory.GuiInventory;
 import net.minecraft.client.renderer.OpenGlHelper;
 import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.item.ItemStack;
-
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL12;
+
+import java.util.ArrayDeque;
+import java.util.Deque;
+import java.util.HashMap;
 
 public class DocViewer extends GuiScreen {
     final String domain;
@@ -28,8 +28,28 @@ public class DocViewer extends GuiScreen {
     GuiButton prevPage;
     GuiButton backButton;
     GuiButton homeButton;
-    
-    public static boolean dark_color_scheme = false;
+
+    private final PersistentState state;
+
+    public static HashMap<String, PersistentState> per_domain_state = new HashMap<String, PersistentState>();
+
+    public static class PersistentState {
+        public boolean dark_color_scheme = false;
+        public Deque<HistoryPage> the_pageHistory = new ArrayDeque<HistoryPage>();
+        public String current_page = "index";
+        public int current_index = 0;
+
+        public HistoryPage popLastPage() {
+            if (the_pageHistory.isEmpty()) {
+                return new HistoryPage("index", 0);
+            }
+            return the_pageHistory.pollLast();
+        }
+
+        public void addNewHistoryEntry(String name, int page) {
+            the_pageHistory.add(new HistoryPage(name, page));
+        }
+    }
     
     public static class HistoryPage {
         String docName;
@@ -40,11 +60,6 @@ public class DocViewer extends GuiScreen {
             this.offset = offset;
         }
     }
-    
-    private static Deque<HistoryPage> the_pageHistory = new ArrayDeque<HistoryPage>();
-    public static String current_page = "index";
-    public static int current_index = 0;
-    
     
     
     int getPageWidth(int pageNum) {
@@ -68,29 +83,36 @@ public class DocViewer extends GuiScreen {
         return height*90/100;
     }
     
-    public static HistoryPage popLastPage() {
-        if (the_pageHistory.isEmpty()) {
-            return new HistoryPage("index", 0);
-        }
-        return the_pageHistory.pollLast();
-    }
-    
-    public static void addNewHistoryEntry(String name, int page) {
-        the_pageHistory.add(new HistoryPage(name, page));
-    }
-    
     int orig_scale = -1;
 
     public DocViewer(String domain, String name) {
         this.domain = domain;
         this.name = name;
         this.startPageIndex = -1;
+        this.state = getStateFor(domain);
     }
     
     public DocViewer(String domain, HistoryPage hist) {
         this.domain = domain;
         this.name = hist.docName;
         this.startPageIndex = hist.offset;
+        this.state = getStateFor(domain);
+    }
+
+    public DocViewer(String domain) {
+        this.domain = domain;
+        this.state = getStateFor(domain);
+        this.name = state.current_page;
+        this.startPageIndex = state.current_index;
+    }
+
+    private PersistentState getStateFor(String domain) {
+        if (per_domain_state.containsKey(domain)) {
+            return per_domain_state.get(domain);
+        }
+        PersistentState ret = new PersistentState();
+        per_domain_state.put(domain, ret);
+        return ret;
     }
     
     @Override
@@ -128,7 +150,7 @@ public class DocViewer extends GuiScreen {
         buttonList.add(nextPage = new GuiButtonNextPage(1, getPageLeft(1) + getPageWidth(1) - 23 /* 23 is the button width */ + 12, row - arrow_half, true));
         buttonList.add(backButton = new GuiButton(3, (120 + 38)/2, row, 50, 20, "Back"));
         buttonList.add(homeButton = new GuiButton(4, (120 + 38), row, 50, 20, "Home"));
-        current_page = doc.name;
+        state.current_page = doc.name;
     }
     
     Document getDocument(String name) {
@@ -162,7 +184,7 @@ public class DocViewer extends GuiScreen {
         hot = false;
         drawDefaultBackground();
         
-        backButton.visible = !the_pageHistory.isEmpty();
+        backButton.visible = !state.the_pageHistory.isEmpty();
         homeButton.visible = !name.equals("index");
         prevPage.visible = doc.pages.indexOf(page) > 0;
         nextPage.visible = doc.pages.indexOf(page) + 2 < doc.pages.size();
@@ -178,7 +200,7 @@ public class DocViewer extends GuiScreen {
                 
                 if (pass == 1) {
                     GL11.glColor3f(0, 0, 0);
-                } else if (dark_color_scheme) {
+                } else if (state.dark_color_scheme) {
                     GL11.glColor3f(0.075F, 0.075F, 0.1125F);
                 } else {
                     GL11.glColor3f(1 - 0.075F, 1 - 0.075F, 1 - 0.1125F);
@@ -199,7 +221,7 @@ public class DocViewer extends GuiScreen {
             int y1 = getPageHeight(0) + paddingVert;
             
             float cs;
-            if (dark_color_scheme) {
+            if (state.dark_color_scheme) {
                 cs = 0.75F;
                 GL11.glColor3f(0.075F*cs, 0.075F*cs, 0.1125F*cs);
             } else {
@@ -280,7 +302,7 @@ public class DocViewer extends GuiScreen {
             if (link != null && link.getLink() != null) {
                 if (link.getLink().equals(name)) return;
                 DocViewer newDoc = new DocViewer(domain, link.getLink());
-                addNewHistoryEntry(name, getCurrentPageIndex());
+                state.addNewHistoryEntry(name, getCurrentPageIndex());
                 mc.displayGuiScreen(newDoc);
                 return;
             }
@@ -313,11 +335,11 @@ public class DocViewer extends GuiScreen {
                 page = n;
             }
         } else if (button == backButton) {
-            DocViewer newDoc = new DocViewer(domain, popLastPage());
+            DocViewer newDoc = new DocViewer(domain, state.popLastPage());
             mc.displayGuiScreen(newDoc);
         } else if (button == homeButton) {
             if (!name.equals("index")) {
-                addNewHistoryEntry(name, getCurrentPageIndex());
+                state.addNewHistoryEntry(name, getCurrentPageIndex());
                 mc.displayGuiScreen(new DocViewer(domain, "index"));
             }
         }
@@ -336,7 +358,7 @@ public class DocViewer extends GuiScreen {
         } else if (chr == 'r') {
             initGui();
         } else if (chr == 's') {
-            dark_color_scheme ^= true;
+            state.dark_color_scheme ^= true;
         } else if (keySym == mc.gameSettings.keyBindInventory.getKeyCode()) {
             mc.displayGuiScreen(new GuiInventory(mc.thePlayer));
         } else {
@@ -379,7 +401,7 @@ public class DocViewer extends GuiScreen {
         for (AbstractPage page : doc.pages) {
             page.closed();
         }
-        current_index = doc.pages.indexOf(getPage(0));
+        state.current_index = doc.pages.indexOf(getPage(0));
     }
     
     @Override
@@ -389,5 +411,9 @@ public class DocViewer extends GuiScreen {
     
     FontRenderer getFont() {
         return fontRendererObj;
+    }
+
+    public boolean isDark() {
+        return state.dark_color_scheme;
     }
 }

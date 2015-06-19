@@ -131,7 +131,7 @@ public class ItemWord extends Word {
         
         {
             GL11.glDisable(GL11.GL_TEXTURE_2D);
-            float gray = DocViewer.dark_color_scheme ? 0.2F : 139F/0xFF;
+            float gray = doc.isDark() ? 0.2F : 139F/0xFF;
             GL11.glColor3f(gray, gray, gray);
             
             float z = 0;
@@ -145,7 +145,7 @@ public class ItemWord extends Word {
             GL11.glEnd();
             
             if (hover) {
-                int color = getLinkColor(hover);
+                int color = getLinkColor(doc, hover);
                 byte r = (byte) ((color >> 16) & 0xFF);
                 byte g = (byte) ((color >> 8) & 0xFF);
                 byte b = (byte) ((color >> 0) & 0xFF);
