@@ -246,10 +246,10 @@ public class SocketRobotHand extends TileEntitySocketBase {
         int origSize = ItemUtil.getStackSize(itemstack);
         ItemStack mutatedItem = itemstack.useItemRightClick(world, player);
         ret = ret
-                | mutatedItem != itemstack
-                | origSize != ItemUtil.getStackSize(mutatedItem)
-                | !ItemUtil.identical(mutatedItem, itemstack)
-                | origItemHash != ItemUtil.getItemHash(mutatedItem);
+                || mutatedItem != itemstack
+                || origSize != ItemUtil.getStackSize(mutatedItem)
+                || !ItemUtil.identical(mutatedItem, itemstack)
+                || origItemHash != ItemUtil.getItemHash(mutatedItem);
         player.inventory.mainInventory[player.inventory.currentItem] = mutatedItem;
         return ret;
     }
