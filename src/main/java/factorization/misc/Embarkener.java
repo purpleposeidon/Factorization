@@ -2,6 +2,7 @@ package factorization.misc;
 
 import java.util.ArrayList;
 
+import factorization.util.PlayerUtil;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockLog;
 import net.minecraft.block.material.Material;
@@ -68,7 +69,7 @@ public class Embarkener {
         }
         
         void handle() {
-            if (stack.stackSize >= orig_stacksize) return;
+            if (stack.stackSize >= orig_stacksize && !PlayerUtil.isPlayerCreative(player)) return;
             if (player.isDead) return;
             if (!target.blockExists()) return;
             if (target.getBlock() != expectedBlock) return;
