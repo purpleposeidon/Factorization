@@ -1,7 +1,5 @@
 package factorization.coremodhooks;
 
-import factorization.aabbdebug.AabbDebugger;
-import factorization.shared.NORELEASE;
 import net.minecraft.block.BlockRailBase;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
