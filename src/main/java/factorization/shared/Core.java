@@ -133,17 +133,34 @@ public class Core {
 
     public static void checkJar() {
         // Apparently some people somehow manage to get "Factorization.jar.zip", which somehow breaks the coremod.
+        if (Boolean.parseBoolean(System.getProperty("fz.dontCheckJar"))) {
+            Core.logSevere("checkJar disabled by system property");
+            return;
+        }
         ModContainer mod = FMLCommonHandler.instance().findContainerFor(modId);
         if (mod == null) {
             Core.logSevere("I don't have a mod container? Wat?");
             return;
         }
         final File src = mod.getSource();
-        if (src == null || src.isDirectory()) return;
+        if (src == null) {
+            Core.logSevere("mod has null source!");
+            return;
+        }
+        if (src.isDirectory()) {
+            throw new RuntimeException("Factorization jar has been unpacked into a directory. Don't do that. Just put Factorization.jar in the mods/ folder");
+        }
         final String path = src.getPath();
-        if (!isBadName(path)) return;
+        if (!isBadName(path)) {
+            Core.logSevere("Mod jar seems to have a valid filename");
+            return;
+        }
         String correctName = path.replaceAll("\\.zip$", ".jar");
-        if (isBadName(correctName)) return; // Carefully ensure we don't make a loop
+        if (isBadName(correctName)) {
+            // Carefully ensure we don't make a loop
+            Core.logSevere("Failed to fix filename? " + path + " didn't work when changed to " + correctName);
+            return;
+        }
 
         Core.logSevere("The factorization jar is improperly named! Renaming " + path + "  to " + correctName);
         boolean success = src.renameTo(new File(correctName));
