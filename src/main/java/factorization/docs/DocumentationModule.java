@@ -215,13 +215,20 @@ public class DocumentationModule {
         if (slot == null) return;
         tryOpenBookForItem(slot.getStack());
     }
-    
+
+    public static String default_lookup_domain = "factorization";
+    public static String default_recipe_domain = "factorization";
+    public static final ArrayList<String> indexed_domains = new ArrayList<String>();
+
     @SideOnly(Side.CLIENT)
     public static boolean tryOpenBookForItem(ItemStack is) {
-        if (is == null) return false;
         Minecraft mc = Minecraft.getMinecraft();
+        if (is == null) {
+            mc.displayGuiScreen(new DocViewer(default_lookup_domain));
+            return true;
+        }
         EntityPlayer player = mc.thePlayer;
-        if (!player.capabilities.isCreativeMode && FzConfig.require_book_for_manual) {
+        if (player != null && !player.capabilities.isCreativeMode && FzConfig.require_book_for_manual) {
             // TODO: Add manwiches
             boolean found = false;
             for (ItemStack manual : player.inventory.mainInventory) {
@@ -230,34 +237,38 @@ public class DocumentationModule {
                 found = true;
                 break;
             }
-            if (!found) return false;
+            if (!found) {
+                return true;
+            }
         }
         String name = is.getUnlocalizedName();
-        InputStream topic_index = getDocumentResource("factorization", "topic_index");
-        if (topic_index == null) return false;
-        BufferedReader br = new BufferedReader(new InputStreamReader(topic_index));
-        try {
-            while (true) {
-                String line = br.readLine();
-                if (line == null) {
-                    break;
-                }
-                String[] bits = line.split("\t");
-                if (bits.length >= 2) {
-                    if (bits[0].equalsIgnoreCase(name)) {
-                        String filename = bits[1];
-                        mc.displayGuiScreen(new DocViewer("factorization", filename));
-                        return true;
+        for (String domain : indexed_domains) {
+            InputStream topic_index = getDocumentResource(domain, "topic_index");
+            if (topic_index == null) return false;
+            BufferedReader br = new BufferedReader(new InputStreamReader(topic_index));
+            try {
+                while (true) {
+                    String line = br.readLine();
+                    if (line == null) {
+                        break;
+                    }
+                    String[] bits = line.split("\t");
+                    if (bits.length >= 2) {
+                        if (bits[0].equalsIgnoreCase(name)) {
+                            String filename = bits[1];
+                            mc.displayGuiScreen(new DocViewer(domain, filename));
+                            return true;
+                        }
                     }
                 }
+            } catch (IOException e) {
+                e.printStackTrace();
+            } finally {
+                FzUtil.closeNoisily("closing topic_index", topic_index);
             }
-        } catch (IOException e) {
-            e.printStackTrace();
-        } finally {
-            FzUtil.closeNoisily("closing topic_index", topic_index);
         }
         // if (Loader.isModLoaded("NotEnoughItems") || Loader.isModLoaded("craftguide")) return false;
-        mc.displayGuiScreen(new DocViewer("factorization", "cgi/recipes/" + name));
+        mc.displayGuiScreen(new DocViewer(default_recipe_domain, "cgi/recipes/" + name));
         return true;
     }
     

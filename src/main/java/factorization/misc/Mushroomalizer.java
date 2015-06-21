@@ -42,10 +42,11 @@ public class Mushroomalizer {
             if (event.isCanceled()) continue;
             Coord at = new Coord(event.entityPlayer.worldObj, event.x, event.y, event.z).add(ForgeDirection.getOrientation(event.face));
             if (event.entityPlayer.isSneaking()) {
+                // Stalk
                 if (event.face > 1) {
-                    at.setMd(15);
+                    at.setMd(15); // Vertical stalk
                 } else {
-                    at.setMd(10);
+                    at.setMd(10); // All-sides stalk
                 }
                 continue;
             }

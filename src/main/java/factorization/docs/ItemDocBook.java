@@ -1,5 +1,7 @@
 package factorization.docs;
 
+import factorization.util.FzUtil;
+import factorization.weird.TileEntityDayBarrel;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
@@ -20,6 +22,7 @@ public class ItemDocBook extends ItemFactorization {
         setMaxStackSize(1);
         if (FMLCommonHandler.instance().getSide() == Side.CLIENT) {
             DocumentationModule.registerGenerators();
+            DocumentationModule.indexed_domains.add("factorization");
         }
     }
     
@@ -32,9 +35,12 @@ public class ItemDocBook extends ItemFactorization {
         if (!player.isSneaking()) return false;
         Minecraft mc = Minecraft.getMinecraft();
         Coord at = new Coord(world, x, y, z);
-        ItemStack hit = at.getPickBlock(mc.objectMouseOver);
-        DocumentationModule.tryOpenBookForItem(hit);
+        ItemStack hit = FzUtil.getReifiedBarrel(at);
+        if (hit == null) {
+            hit = at.getPickBlock(mc.objectMouseOver);
+        }
         if (hit != null) {
+            DocumentationModule.tryOpenBookForItem(hit);
             Notice.onscreen(player, "%s", hit.getDisplayName());
         }
         return true;
