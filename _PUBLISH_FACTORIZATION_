@@ -1,6 +1,10 @@
 #!/usr/bin/python
 
+
 import os, random, time
+
+if open("fzversion").read().strip() in open("build.log").read():
+    raise SystemExit("Version probably already published")
 
 def getForgeVersion():
   return "Minecraft Forge " + getMinecraftVersion()
@@ -13,13 +17,16 @@ def getMinecraftVersion():
       return ret
   return "unknown"
 
-def run(cmd):
+def run(cmd, expect_exit_code=0):
   print "> ", cmd
   exit_code = os.system(cmd)
-  print "> Exit code = ", exit_code
+  if expect_exit_code != exit_code:
+      print "> Exit code = ", exit_code
+      if expect_exit_code != any: raise SystemExit(exit_code)
 
 def adfly(url):
-  return "http://adf.ly/2137658/" + url
+  return url
+  #return "http://adf.ly/2137658/" + url
 
 def devify(name): return name.replace(".jar", "-dev.jar")
 
@@ -46,12 +53,12 @@ last_fz = open("last_fz").read().strip()
 run("cp " + last_fz + " " + oldfile)
 run("cp " + devify(last_fz) + " " + devify(oldfile))
 mfurl = exp("~/tmp/factorization_mediafire_url")
-run("rm " + mfurl)
+run("rm -f " + mfurl)
 changelogFilename = "changelogs/Changelog-" + version + ".txt"
 my_dropbox = "http://dl.dropbox.com/u/76265666/"
 
 #Check for baddies
-run("./check_norelease")
+run("./check_norelease", expect_exit_code=any)
 
 #Factorization
 run("cp CHANGELOG ~/Dropbox/Public/old/")
@@ -75,7 +82,7 @@ if mediafire_url == "":
 print("\n"*4)
 LOG  = "Factorization " + version + "\n"
 LOG += '''
-[url="{0}"]adfly + MediaFire[/url], or\n[url="{1}"]adfly + DropBox[/url]
+[url="{0}"]MediaFire[/url], or\n[url="{1}"]DropBox[/url]
 '''.format(
   adfly(mediafire_url),
   adfly(dropbox_url)
@@ -87,7 +94,7 @@ LOG += '' + commit
 print(LOG)
 print
 print "Update targets:"
-for _ in "IRC topic; twitter; patreon; forum thread; forgecraft".split('; '):
+for _ in "read forum thread; add build log; paste to forum post; update thread title; post changelog; IRC topic; twitter; patreon; forgecraft".split('; '):
     print "[ ]", _
 
 open("build.log", 'a').write(LOG+ '\n\n')
