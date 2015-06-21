@@ -133,6 +133,10 @@ public class Core {
 
     public static void checkJar() {
         // Apparently some people somehow manage to get "Factorization.jar.zip", which somehow breaks the coremod.
+        if (Core.dev_environ) {
+            Core.logSevere("Dev environ; skipping jar check.");
+            return;
+        }
         if (Boolean.parseBoolean(System.getProperty("fz.dontCheckJar"))) {
             Core.logSevere("checkJar disabled by system property");
             return;
