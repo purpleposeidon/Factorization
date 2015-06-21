@@ -1,8 +1,6 @@
 package factorization.util;
 
-import factorization.util.DataUtil;
 import net.minecraft.block.Block;
-import net.minecraft.init.Items;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
@@ -29,6 +27,9 @@ public final class ItemUtil {
 
     public static boolean isWildcard(ItemStack is, boolean ifNull) {
         if (is == null) return ifNull;
+        if (is.getItem() == null) {
+            return ifNull;
+        }
         return is.getItemDamage() == WILDCARD_DAMAGE;
     }
 
