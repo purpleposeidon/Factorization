@@ -3,7 +3,9 @@ package factorization.util;
 import com.google.common.collect.Multimap;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
+import factorization.api.Coord;
 import factorization.shared.Core;
+import factorization.weird.TileEntityDayBarrel;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.entity.ai.attributes.BaseAttributeMap;
@@ -93,4 +95,11 @@ public class FzUtil {
         return attr.getAttributeValue();
     }
 
+    public static ItemStack getReifiedBarrel(Coord at) {
+        if (at == null) return null;
+        if (at.w == null) return null;
+        TileEntityDayBarrel barrel = at.getTE(TileEntityDayBarrel.class);
+        if (barrel == null) return null;
+        return barrel.item;
+    }
 }
