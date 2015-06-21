@@ -116,9 +116,17 @@ public class RecipeViewer implements IDocGenerator {
         for (Object part : recipe) {
             if (part instanceof ItemWord) {
                 ItemWord iw = (ItemWord) part;
-                if (iw.is == null) continue;
-                if (ItemUtil.identical(iw.is, matching) || ItemUtil.wildcardSimilar(iw.is, matching)) {
-                    return true;
+                if (iw.is != null) {
+                    if (ItemUtil.identical(iw.is, matching) || ItemUtil.wildcardSimilar(iw.is, matching)) {
+                        return true;
+                    }
+                }
+                if (iw.entries != null) {
+                    for (ItemStack is : iw.entries) {
+                        if (ItemUtil.identical(is, matching) || ItemUtil.wildcardSimilar(is, matching)) {
+                            return true;
+                        }
+                    }
                 }
                 if (mustBeResult) {
                     return false;
@@ -240,6 +248,7 @@ public class RecipeViewer implements IDocGenerator {
     Object genericRecipePrefix(List sb, IRecipe recipe) {
         ItemStack output = ((IRecipe) recipe).getRecipeOutput();
         if (output == null) return null;
+        if (output.getItem() == null) return null;
         sb.add(new ItemWord(output));
         sb.add(" \\b{" + getDisplayName(output) + "}\\vpad{15}\\nl");
         return output;
