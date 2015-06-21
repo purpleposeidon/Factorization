@@ -4,7 +4,9 @@ import java.text.DateFormat;
 import java.util.*;
 
 import factorization.api.ICoordFunction;
+import factorization.util.FzUtil;
 import factorization.util.ItemUtil;
+import factorization.weird.TileEntityDayBarrel;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.audio.PositionedSoundRecord;
 import net.minecraft.client.gui.GuiMainMenu;
@@ -52,6 +54,39 @@ public class MiscClientTickHandler {
         }
         count++;
     }
+
+    private static class Replacement {
+        final ItemStack new_held, old_held;
+
+        private Replacement(ItemStack new_held, ItemStack old_held) {
+            this.new_held = new_held;
+            this.old_held = old_held;
+        }
+    }
+
+    void add_replacement(ItemStack new_held, ItemStack old_held) {
+        replacements.add(new Replacement(new_held, old_held));
+        if (replacements.size() > 16) {
+            replacements.remove(0);
+        }
+    }
+
+    ItemStack find_replacement(ItemStack held) {
+        Replacement found = null;
+        for (Iterator<Replacement> iterator = replacements.iterator(); iterator.hasNext(); ) {
+            Replacement replacement = iterator.next();
+            if (ItemUtil.couldMerge(replacement.new_held, held)) {
+                found = replacement;
+                iterator.remove();
+                replacements.add(found);
+                return found.old_held;
+            }
+        }
+        return null;
+
+    }
+
+    private ArrayList<Replacement> replacements = new ArrayList<Replacement>();
     
     boolean wasClicked = false;
     private void checkPickBlockKey() {
@@ -59,32 +94,46 @@ public class MiscClientTickHandler {
             wasClicked = false;
             return;
         }
+        if (wasClicked) {
+            return;
+        }
+        wasClicked = true;
         EntityPlayer player = mc.thePlayer;
         if (player == null) {
             return;
         }
         if (player.capabilities.isCreativeMode) {
+            // I suppose we could try pulling from the player's inventory.
+            // And creative mode inventories tend to get super-ugly cluttered with duplicate crap...
+            // But it doesn't work. Oh well.
             return;
         }
         if (mc.currentScreen != null) {
             return;
         }
-        if (wasClicked) {
-            return;
-        }
-        wasClicked = true;
         MovingObjectPosition mop = mc.objectMouseOver;
         if (mop == null || mop.typeOfHit != MovingObjectPosition.MovingObjectType.BLOCK) {
             return;
         }
         Coord here = new Coord(player.worldObj, mop);
+        List<ItemStack> validItems = new ArrayList<ItemStack>();
+        final ItemStack held = player.getHeldItem();
         if (vanillaSatisfied(mop, here, player)) {
-            return;
+            if (held == null) return;
+            ItemStack replace = find_replacement(held);
+            if (replace == null) return;
+            validItems.add(replace);
         }
         // Search the inventory for the exact block. Failing that, search for the broken version
-        List<ItemStack> validItems = Arrays.asList(here.getPickBlock(mop), here.getBrokenBlock(), new ItemStack(here.getId(), 1, here.getMd()));
+        if (validItems.isEmpty()) {
+            validItems.add(here.getPickBlock(mop));
+            validItems.add(here.getBrokenBlock());
+            validItems.add(new ItemStack(here.getId(), 1, here.getMd()));
+            ItemStack b = FzUtil.getReifiedBarrel(here);
+            if (b != null) validItems.add(b);
+        }
         int firstEmpty = -1;
-        if (player.getHeldItem() == null) {
+        if (held == null) {
             firstEmpty = player.inventory.currentItem;
         }
         for (int i = 0; i < player.inventory.mainInventory.length; i++) {
@@ -92,11 +141,11 @@ public class MiscClientTickHandler {
                 if (needle == null) {
                     continue;
                 }
-                ItemStack is = player.inventory.mainInventory[i];
-                if (is == null && firstEmpty == -1 && i < 9) {
+                ItemStack hay = player.inventory.mainInventory[i];
+                if (hay == null && firstEmpty == -1 && i < 9) {
                     firstEmpty = i;
                 }
-                if (is == null || !ItemUtil.couldMerge(needle, is)) {
+                if (hay == null || !ItemUtil.couldMerge(needle, hay)) {
                     continue;
                 }
                 if (i < 9) {
@@ -108,6 +157,9 @@ public class MiscClientTickHandler {
                 }
                 int targetSlot = player.inventory.currentItem;
                 mc.playerController.windowClick(player.inventoryContainer.windowId, i, targetSlot, 2, player);
+                if (held != null) {
+                    add_replacement(hay, held);
+                }
                 return;
             }
         }
@@ -115,13 +167,13 @@ public class MiscClientTickHandler {
     
     private boolean vanillaSatisfied(MovingObjectPosition mop, Coord here, EntityPlayer player) {
         ItemStack held = player.inventory.getStackInSlot(player.inventory.currentItem);
-        if (held == null) {
-            return false;
-        }
-        if (ItemUtil.couldMerge(held, here.getPickBlock(mop))) {
+        if (held == null) return false;
+        final ItemStack pickBlock = here.getPickBlock(mop);
+        if (pickBlock != null && ItemUtil.couldMerge(held, pickBlock)) {
             return true;
         }
-        if (ItemUtil.couldMerge(held, here.getBrokenBlock())) {
+        final ItemStack brokenBlock = here.getBrokenBlock();
+        if (brokenBlock != null && ItemUtil.couldMerge(held, brokenBlock)) {
             return true;
         }
         return false;
