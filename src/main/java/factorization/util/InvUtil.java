@@ -520,20 +520,17 @@ public final class InvUtil {
             //First, fill up already existing stacks
             int first_empty = -1;
             for (int i = 0; i < size(); i++) {
-                if (is == null) {
-                    if (first_empty == -1) {
-                        first_empty = i;
-                    }
-                    return null;
-                }
+                if (is == null) return null;
                 ItemStack dest = get(i);
                 if (dest != null) {
                     is = ItemUtil.normalize(pushInto(i, is));
+                } else if (first_empty == -1) {
+                    first_empty = i;
                 }
             }
             //Second, add to null stacks
             if (first_empty == -1) return is; // No nulls found.
-            for (int i = 0; i < size(); i++) {
+            for (int i = first_empty; i < size(); i++) {
                 if (is == null) {
                     return null;
                 }
