@@ -122,7 +122,18 @@ public class MiscClientTickHandler {
             if (held == null) return;
             ItemStack replace = find_replacement(held);
             if (replace == null) return;
-            validItems.add(replace);
+            boolean already_found = false;
+            for (int i = 0; i < 9; i++) {
+                ItemStack is = player.inventory.getStackInSlot(i);
+                if (is == null) continue;
+                if (ItemUtil.couldMerge(is, replace)) {
+                    already_found = true;
+                    break;
+                }
+            }
+            if (!already_found) {
+                validItems.add(replace);
+            }
         }
         // Search the inventory for the exact block. Failing that, search for the broken version
         if (validItems.isEmpty()) {
