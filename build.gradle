@@ -22,10 +22,21 @@ version = new File(projectDir.getPath() + "/fzversion").getText("UTF-8").replace
 group = "factorization"
 archivesBaseName = "Factorization"
 
+ext.apiRailcraft = "./apis/railcraft"
+
+
 minecraft {
     version = "1.7.10-10.13.2.1230" // FORGEMARK
     assetDir = "eclipse/assets"
     replace '@FZVERSION@', (project.version.split("-")[1])
+}
+
+sourceSets {
+    main {
+        java {
+            srcDir project.apiRailcraft
+        }
+    }
 }
 
 // Target java 1.6
@@ -99,6 +110,7 @@ jar {
                    "FMLCorePluginContainsFMLMod": "true")
     }
     exclude "codechicken/**"
+    exclude "mods/**"
 }
 
 task deobfJar(type: Jar) {
@@ -106,13 +118,13 @@ task deobfJar(type: Jar) {
     from sourceSets.api.output
     classifier = 'dev'
     
-    // Copied from 'jar'?
-    NORELEASE: Make sure this works!
+    // Copied from 'jar'
     manifest {
         attributes("FMLCorePlugin": "factorization.coremod.LoadingPlugin",
                    "FMLCorePluginContainsFMLMod": "true")
     }
     exclude "codechicken/**"
+    exclude "mods/**"
     // End copied from 'jar'?
 }
 
