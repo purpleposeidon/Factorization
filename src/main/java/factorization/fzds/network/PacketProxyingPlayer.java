@@ -251,6 +251,10 @@ public class PacketProxyingPlayer extends EntityPlayerMP implements
     boolean canDie = false;
 
     public void endProxy() {
+        if (canDie && isDead) {
+            // !!! Recursion death!?
+            return;
+        }
         canDie = true;
         setDead();
         // From playerNetServerHandler.mcServer.getConfigurationManager().playerLoggedOut(this);
