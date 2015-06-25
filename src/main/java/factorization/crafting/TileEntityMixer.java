@@ -202,7 +202,7 @@ public class TileEntityMixer extends TileEntityFactorization implements
         return rotation;
     }
     
-    private static class WeirdRecipeException extends Throwable {}
+    public static class WeirdRecipeException extends Throwable {}
 
     public static final CraftingManagerGeneric<TileEntityMixer> recipes = CraftingManagerGeneric.get(TileEntityMixer.class);
 
