@@ -45,7 +45,9 @@ public class RecipeSlagFurnace extends TemplateRecipeHandler {
         } else {
             return;
         } 
-        for (SmeltingResult sr : TileEntitySlagFurnace.SlagRecipes.smeltingResults) {
+        for (Object o : TileEntitySlagFurnace.SlagRecipes.smeltingResults) {
+            if (!(o instanceof SmeltingResult)) continue;
+            SmeltingResult sr = (SmeltingResult) o;
             if (ingredient == null || ingredient.isItemEqual(sr.input)) {
                 arecipes.add(new CachedSlagRecipe(sr));
             }
