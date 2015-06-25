@@ -21,24 +21,20 @@ public abstract class IDeltaChunk extends EntityFz {
      * Sets the parent. The parent can be null. Reparenting probably isn't synchronized, so set it before spawning in the IDC.
      * Attatches the slice to its parent. When the parent translates & rotates, the child follows, *and* does the same physics calculations as if it had native motion.
      * The child can rotate independently of the parent.
-     * The child can not translate locally at this time.
-     * 
-     * @param parent
-     * @param jointPositionAtParent Specifies a location to attatch to in the parent's local entity space, relative to parent.getCorner()
-     * 
-     * 
-     * Suppose you have an IDC for a large door. The rotational center is located at (0, 0, 0) to allow it to be opened on a hinge, and also kicked down.
-     * setParent can be used to add a doorknob that will stay connected as appropriate, but still be able to be spun independently.
-     * 
-     * The knob will have its rotation point be the center of its area so that it can turn appropriately on its axis. If the knob is just a 3-block long stick passing through the door,
-     * then the center would well be (0.5, 0.5, 1).
-     * If the door has height = H and width = W, then jointPositionAtParent would be (W - 1, H / 2.0, 0)
-     * 
+     * Local linear velocities in the child are not supported at this time, nor is dynamic displacement.
+     *
+     * The return value of {@link factorization.fzds.interfaces.IDeltaChunk#getParentJoint} is determined from the positioning of the parent and this child.
+     *
+     * @param parent The IDC to be the parent
+     * @throws java.lang.IllegalArgumentException if a loop is attempted.
      */
-    public abstract void setParent(IDeltaChunk parent, Vec3 jointPositionAtParent);
+    public abstract void setParent(IDeltaChunk parent);
     
     public abstract IDeltaChunk getParent();
-    
+
+    /**
+     * @return the center of location, in the parent's IDC space. Returns null if there is no parent.
+     */
     public abstract Vec3 getParentJoint();
     
     public abstract List<IDeltaChunk> getChildren();

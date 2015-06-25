@@ -262,13 +262,13 @@ public class Awakener {
         for (LimbInfo li : parts) {
             IDeltaChunk idc = li.idc.getEntity();
             if (idc != bodyIdc) {
-                Vec3 at = SpaceUtil.fromEntPos(idc);
+                /*Vec3 at = SpaceUtil.fromEntPos(idc);
                 at = bodyIdc.real2shadow(at);
                 Coord corner = bodyIdc.getCorner();
                 at.xCoord -= corner.x;
                 at.yCoord -= corner.y;
-                at.zCoord -= corner.z;
-                idc.setParent(bodyIdc, at);
+                at.zCoord -= corner.z;*/
+                idc.setParent(bodyIdc);
             }
             FzUtil.spawn(idc);
         }
@@ -299,7 +299,7 @@ public class Awakener {
     BodySide getSide(Set<Coord> set) {
         return one(set).z > heartTE.zCoord ? BodySide.RIGHT : BodySide.LEFT;
     }
-    
+
     Vec3 calculateJointPosition(Set<Coord> limb, int size, int length, LimbType type) {
         size++;
         Coord corner = null;

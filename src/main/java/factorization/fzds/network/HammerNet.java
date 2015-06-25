@@ -341,7 +341,7 @@ public class HammerNet {
 
         if (ret) {
             return true;
-        } else if (is == null || idc.can(DeltaCapability.BLOCK_PLACE)) {
+        } else if (is == null || !idc.can(DeltaCapability.BLOCK_PLACE)) {
             return false;
         } else if (PlayerUtil.isPlayerCreative(player)) {
             int j1 = is.getItemDamage();

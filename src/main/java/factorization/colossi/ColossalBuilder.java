@@ -452,6 +452,11 @@ public class ColossalBuilder {
                     }
                 }
                 at.y = y;
+                if (id == Blocks.grass) {
+                    at.y++;
+                    if (at.isSolid()) id = Blocks.dirt;
+                    at.y--;
+                }
                 at.setIdMd(id, md, false);
                 onSolid = true;
             }

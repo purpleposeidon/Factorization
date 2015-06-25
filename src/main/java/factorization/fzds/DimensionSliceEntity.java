@@ -18,6 +18,7 @@ import factorization.fzds.network.PacketProxyingPlayer;
 import factorization.shared.Core;
 import factorization.shared.EntityReference;
 import factorization.algos.TortoiseAndHare;
+import factorization.shared.NORELEASE;
 import factorization.util.SpaceUtil;
 import net.minecraft.block.Block;
 import net.minecraft.command.IEntitySelector;
@@ -51,8 +52,8 @@ public class DimensionSliceEntity extends IDeltaChunk implements IFzdsEntryContr
     private Vec3 centerOffset = Vec3.createVectorHelper(0, 0, 0);
     
     private final EntityReference<DimensionSliceEntity> parent; // init in constructor ._.
-    private Vec3 offsetFromParent = Vec3.createVectorHelper(0, 0, 0);
-    private transient ArrayList<IDeltaChunk> children = new ArrayList<IDeltaChunk>(0);
+    private Vec3 parentShadowOrigin = Vec3.createVectorHelper(0, 0, 0);
+    private transient final ArrayList<IDeltaChunk> children = new ArrayList<IDeltaChunk>(0);
     
     private long capabilities = DeltaCapability.of(DeltaCapability.MOVE, DeltaCapability.COLLIDE, DeltaCapability.DRAG, DeltaCapability.REMOVE_ITEM_ENTITIES);
     
@@ -229,7 +230,7 @@ public class DimensionSliceEntity extends IDeltaChunk implements IFzdsEntryContr
             }
         }
         /*parent =*/ data.as(Share.VISIBLE, "parent").put(parent);
-        offsetFromParent = data.as(Share.VISIBLE, "parentOffset").putVec3(offsetFromParent);
+        parentShadowOrigin = data.as(Share.VISIBLE, "parentShadowOrigin").putVec3(parentShadowOrigin);
         entityUniqueID = data.as(Share.VISIBLE, "entityUUID").putUUID(entityUniqueID);
         
         rotationStart = data.as(Share.VISIBLE, "rotStart").put(rotationStart);
@@ -277,11 +278,15 @@ public class DimensionSliceEntity extends IDeltaChunk implements IFzdsEntryContr
     
     @Override
     public Vec3 getParentJoint() {
-        return offsetFromParent;
+        return parentShadowOrigin;
     }
     
     @Override
-    public void setParent(IDeltaChunk _parent, Vec3 jointPositionAtParent) {
+    public void setParent(IDeltaChunk _parent) {
+        DimensionSliceEntity oldParent = this.parent.getEntity();
+        if (oldParent != null) {
+            oldParent.children.remove(this);
+        }
         if (null != TortoiseAndHare.race(this, new TortoiseAndHare.Advancer<IDeltaChunk>() {
             @Override
             public IDeltaChunk getNext(IDeltaChunk node) {
@@ -291,14 +296,8 @@ public class DimensionSliceEntity extends IDeltaChunk implements IFzdsEntryContr
             throw new IllegalArgumentException("Parenting loop!");
         }
         DimensionSliceEntity newParent = (DimensionSliceEntity) _parent;
-        if (this.parent.trackingEntity()) {
-            DimensionSliceEntity oldParent = parent.getEntity();
-            if (oldParent != null) {
-                oldParent.children.remove(this);
-            }
-        }
         this.parent.trackEntity(newParent);
-        this.offsetFromParent = jointPositionAtParent;
+        this.parentShadowOrigin = _parent.real2shadow(SpaceUtil.fromEntPos(this));
         newParent.children.remove(this);
         newParent.children.add(this);
     }
@@ -609,6 +608,7 @@ public class DimensionSliceEntity extends IDeltaChunk implements IFzdsEntryContr
         if (linearMotion || rotationalMotion) {
             updateUniversalCollisions();
         }
+        if (children.isEmpty()) return;
         Vec3 childAt = Vec3.createVectorHelper(0, 0, 0);
         for (Iterator<IDeltaChunk> iterator = children.iterator(); iterator.hasNext();) {
             DimensionSliceEntity child = (DimensionSliceEntity) iterator.next();
@@ -621,6 +621,14 @@ public class DimensionSliceEntity extends IDeltaChunk implements IFzdsEntryContr
             childAt.zCoord = child.posZ;
             Vec3 inst = getInstRotVel(childAt, rot);
             SpaceUtil.incrAdd(inst, mot);
+
+            // Errors accumulate, mainly during turns.
+            Vec3 correctPos = shadow2real(child.parentShadowOrigin);
+            Vec3 nextChildAt = SpaceUtil.add(childAt, inst);
+            Vec3 error = SpaceUtil.subtract(nextChildAt, correctPos);
+            SpaceUtil.incrScale(error, 0.5); // Okay I wasn't *really* expecting this to work! o_O This reduces jitters
+            SpaceUtil.incrSubtract(inst, error);
+
             child.updateMotion(inst, rot);
         }
     }
@@ -901,8 +909,10 @@ public class DimensionSliceEntity extends IDeltaChunk implements IFzdsEntryContr
             Core.profileEnd();
         } else if (!parent.entityFound()) {
             IDeltaChunk p = parent.getEntity();
-            if (p != null) {
-                setParent(p, getParentJoint());
+            Vec3 real_parent_origin = parentShadowOrigin;
+            setParent(p);
+            if (!SpaceUtil.isZero(real_parent_origin)) {
+                parentShadowOrigin = real_parent_origin;
             }
         }
         if (!worldObj.isRemote) {
@@ -1192,7 +1202,12 @@ public class DimensionSliceEntity extends IDeltaChunk implements IFzdsEntryContr
     
     @Override
     public boolean hasOrderedRotation() {
-        return orderTimeStart != -1;
+        if (orderTimeStart == -1) return false;
+        if (orderTimeEnd < worldObj.getTotalWorldTime()) {
+            cancelOrderedRotation();
+            return false;
+        }
+        return true;
     }
     
     @Override

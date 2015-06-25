@@ -11,6 +11,7 @@ import factorization.fzds.interfaces.IDeltaChunk;
 import factorization.fzds.interfaces.Interpolation;
 import factorization.shared.Core;
 import factorization.shared.EntityFz;
+import factorization.shared.NORELEASE;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.boss.IBossDisplayData;
 import net.minecraft.entity.player.EntityPlayer;
@@ -253,6 +254,10 @@ public class ColossusController extends EntityFz implements IBossDisplayData, ID
     public void setTarget(Coord at) {
         if (at == null && path_target == null) return;
         if (at != null && path_target != null && at.equals(path_target)) return;
+        if (at != null) {
+            double dist = new Coord(this).distance(at);
+            NORELEASE.println("Travel distance: " + dist);
+        }
         path_target = at;
         target_changed = true;
     }
@@ -282,7 +287,7 @@ public class ColossusController extends EntityFz implements IBossDisplayData, ID
             IDeltaChunk idc = li.idc.getEntity();
             if (idc == null) continue;
             idc.setRotationalVelocity(new Quaternion());
-            li.reset(time, interp);
+            li.reset((int)(time * getSpeedScale()), interp);
         }
     }
     
@@ -496,4 +501,12 @@ public class ColossusController extends EntityFz implements IBossDisplayData, ID
 
     @Override
     public void afterUpdate(IDeltaChunk idc) { }
+
+    public double getStrikeSpeedScale() {
+        return 1;
+    }
+
+    public double getSpeedScale() {
+        return 2;
+    }
 }

@@ -1036,9 +1036,8 @@ public class FZDSCommand extends CommandBase {
                 selected.cancelOrderedRotation();
                 selected.setRotation(new Quaternion());
                 selected.setRotationalVelocity(new Quaternion());
-                Coord pc = selected.getCorner();
                 for (IDeltaChunk idc : selected.getChildren()) {
-                    Vec3 base = idc.getParentJoint().addVector(pc.x, pc.y, pc.z);
+                    Vec3 base = idc.getParentJoint();
                     Vec3 snapTo = idc.shadow2real(base);
                     SpaceUtil.toEntPos(idc, snapTo);
                     selected = idc;
@@ -1066,13 +1065,7 @@ public class FZDSCommand extends CommandBase {
                     sendChat("Can't parent to itself");
                     return;
                 }
-                Vec3 at = SpaceUtil.fromEntPos(selected);
-                Vec3 shadow = parent.real2shadow(at);
-                Coord corner = parent.getCorner();
-                shadow.xCoord -= corner.x;
-                shadow.yCoord -= corner.y;
-                shadow.zCoord -= corner.z;
-                selected.setParent(parent, shadow);
+                selected.setParent(parent);
             }
             
         }, Requires.SLICE_SELECTED);

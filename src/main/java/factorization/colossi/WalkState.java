@@ -44,11 +44,11 @@ public enum WalkState implements IStateMachine<WalkState> {
                 if (idc == null) continue;
                 if (limb.type == LimbType.ARM) {
                     if ((limb.side == BodySide.LEFT) ^ controller.turningDirection == 1) {
-                        limb.target(new Quaternion(), 1);
+                        limb.target(new Quaternion(), 1 * controller.getSpeedScale());
                     } else {
                         double arm_angle = arms_angle * (limb.side == BodySide.LEFT ? +1 : -1);
                         Quaternion ar = Quaternion.getRotationQuaternionRadians(arm_angle, ForgeDirection.EAST);
-                        limb.target(ar, 1);
+                        limb.target(ar, 1 * controller.getSpeedScale());
                     }
                     limb.creak();
                 }
@@ -95,7 +95,7 @@ public enum WalkState implements IStateMachine<WalkState> {
                     // Lift a leg up a tiny bit
                     nr.incrMultiply(Quaternion.getRotationQuaternionRadians(Math.toRadians(2), ForgeDirection.SOUTH));
                 }
-                limb.setTargetRotation(nr, (int) nextRotationTime, interp);
+                limb.setTargetRotation(nr, (int) (nextRotationTime * controller.getSpeedScale()), interp);
                 limb.creak();
             }
             
@@ -112,12 +112,12 @@ public enum WalkState implements IStateMachine<WalkState> {
             double angle = Math.atan2(delta.xCoord, delta.zCoord) - Math.PI / 2;
             Quaternion target_rotation = Quaternion.getRotationQuaternionRadians(angle, ForgeDirection.UP);
             Quaternion current_rotation = body.getRotation();
-            double rotation_distance = target_rotation.getAngleBetween(current_rotation);
             int size = controller.leg_size + 1;
-            double rotation_speed = (Math.PI * 2) / (360 * size * 2);
-            double rotation_time = rotation_distance / rotation_speed;
+            double rotation_distance = (((Math.toDegrees(target_rotation.getAngleBetween(current_rotation)) % 360) + 360) % 360) / 360;
+            double rotation_speed = 80;
+            double rotation_time = rotation_distance * rotation_speed;
             if (rotation_time >= 1) {
-                controller.bodyLimbInfo.setTargetRotation(target_rotation, (int) rotation_time, Interpolation.SMOOTH);
+                controller.bodyLimbInfo.setTargetRotation(target_rotation, (int) (rotation_time * controller.getSpeedScale()), Interpolation.SMOOTH);
                 // Now bodyLimbInfo.isTurning() is set.
                 controller.turningDirection = angle > 0 ? 1 : -1;
                 for (LimbInfo li : controller.limbs) {
@@ -158,7 +158,7 @@ public enum WalkState implements IStateMachine<WalkState> {
             target.yCoord = controller.posY;
             Vec3 me = SpaceUtil.fromEntPos(body);
             Vec3 delta = me.subtract(target);
-            double walk_speed = Math.min(MAX_WALK_SPEED, delta.lengthVector());
+            double walk_speed = Math.min(MAX_WALK_SPEED, delta.lengthVector()) * controller.getSpeedScale();
             delta = delta.normalize();
             body.motionX = delta.xCoord * walk_speed;
             body.motionZ = delta.zCoord * walk_speed;
@@ -186,7 +186,7 @@ public enum WalkState implements IStateMachine<WalkState> {
             
             for (LimbInfo limb : controller.limbs) {
                 if (limb.type != LimbType.LEG && limb.type != LimbType.ARM) continue;
-                if (limb.isTurning()) continue;
+                if (limb.isTurning() && !(limb.type == LimbType.LEG && age == 0)) continue;
                 IDeltaChunk idc = limb.idc.getEntity();
                 if (idc == null) continue;
                 double nextRotationTime = swingTime;
@@ -211,7 +211,7 @@ public enum WalkState implements IStateMachine<WalkState> {
                         nextRotation.incrMultiply(arm_hang.conjugate());
                     }
                 }
-                limb.setTargetRotation(nextRotation, (int) nextRotationTime, Interpolation.SMOOTH);
+                limb.setTargetRotation(nextRotation, (int) (nextRotationTime * controller.getSpeedScale()), Interpolation.SMOOTH);
                 limb.creak();
             }
             
