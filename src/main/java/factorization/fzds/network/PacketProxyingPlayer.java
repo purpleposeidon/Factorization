@@ -233,19 +233,6 @@ public class PacketProxyingPlayer extends EntityPlayerMP implements
                 addNettyMessageForPlayer(target, new WrappedPacketFromServer(description));
             }
         }
-        // Some BS nonsense to get to the entity spawn packet
-        EntityTrackerEntry tracker = new EntityTrackerEntry(target, Integer.MAX_VALUE, 1, true);
-        for (Chunk chunk : chunks) {
-            for (List<Entity> entList : (List<Entity>[]) chunk.entityLists) {
-                for (Entity ent : entList) {
-                    if (ent == this) continue;
-                    if (ent.isDead) continue;
-                    tracker.myEntity = ent;
-                    Packet packet = tracker.func_151260_c();
-                    addNettyMessageForPlayer(target, wrapMessage(packet));
-                }
-            }
-        }
     }
 
     boolean canDie = false;
