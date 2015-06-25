@@ -4,6 +4,8 @@ import factorization.api.Coord;
 import factorization.api.Quaternion;
 import factorization.shared.Core;
 import factorization.shared.ItemFactorization;
+import factorization.shared.NORELEASE;
+import factorization.util.PlayerUtil;
 import factorization.util.SpaceUtil;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
@@ -149,7 +151,14 @@ public class ItemSpawnPoster extends ItemFactorization {
             }
 
             if (blockBox == null) blockBox = at.getCollisionBoundingBoxFromPool();
-            if (blockBox == null) blockBox = at.getSelectedBoundingBoxFromPool();
+            if (blockBox == null) {
+                MovingObjectPosition mop = at.getBlock().collisionRayTrace(at.w, at.x, at.y, at.z, playerEye, reachEnd);
+                if (mop != null) {
+                    // Oh, look, the mop doesn't actually help us! Let's just act like this block's like BlockTorch and sets its bounds idiotically like it does
+                    blockBox = at.getBlockBounds();
+                }
+            }
+            //Client-side only: if (blockBox == null) blockBox = at.getSelectedBoundingBoxFromPool();
             if (blockBox == null) return true;
             return false;
         }

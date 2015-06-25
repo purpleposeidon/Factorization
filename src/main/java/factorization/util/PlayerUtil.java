@@ -23,7 +23,9 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.management.ServerConfigurationManager;
 import net.minecraft.stats.StatisticsFile;
 import net.minecraft.util.ChunkCoordinates;
+import net.minecraft.util.MovingObjectPosition;
 import net.minecraft.util.StringUtils;
+import net.minecraft.util.Vec3;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;
 import net.minecraftforge.common.util.FakePlayer;
@@ -194,5 +196,12 @@ public final class PlayerUtil {
         public boolean isEntityInvulnerable() {
             return true;
         }
+    }
+
+    public static MovingObjectPosition rayTrace(EntityPlayer player, double dist, float partial) {
+        Vec3 pos = Vec3.createVectorHelper(player.posX, player.posY + (player.getEyeHeight() - player.getDefaultEyeHeight()), player.posZ);
+        Vec3 look = player.getLook(partial);
+        Vec3 ray = pos.addVector(look.xCoord * dist, look.yCoord * dist, look.zCoord * dist);
+        return player.worldObj.func_147447_a(pos, ray, false, false, true);
     }
 }

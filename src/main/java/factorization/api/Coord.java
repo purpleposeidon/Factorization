@@ -823,6 +823,17 @@ public final class Coord implements IDataSerializable, ISaneCoord, Comparable<Co
         }
         return b.getSelectedBoundingBoxFromPool(w, x, y, z);
     }
+
+    public AxisAlignedBB getBlockBounds() {
+        Block block = getBlock();
+        double minX = block.getBlockBoundsMinX();
+        double maxX = block.getBlockBoundsMaxX();
+        double minY = block.getBlockBoundsMinY();
+        double maxY = block.getBlockBoundsMaxY();
+        double minZ = block.getBlockBoundsMinZ();
+        double maxZ = block.getBlockBoundsMaxZ();
+        return AxisAlignedBB.getBoundingBox(x + minX, y + minY, z + minZ, x + maxX, y + maxY, z + maxZ);
+    }
     
     public static AxisAlignedBB aabbFromRange(Coord min, Coord max) {
         Coord.sort(min, max);
