@@ -874,6 +874,14 @@ public final class Coord implements IDataSerializable, ISaneCoord, Comparable<Co
         setAsVector(vec);
         return vec;
     }
+
+    public Vec3 toMiddleVector() {
+        Vec3 vec = toVector();
+        vec.xCoord += 0.5;
+        vec.yCoord += 0.5;
+        vec.zCoord += 0.5;
+        return vec;
+    }
     
     public static void sort(Coord lower, Coord upper) {
         Coord a = lower.copy();

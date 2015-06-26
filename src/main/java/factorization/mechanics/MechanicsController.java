@@ -172,6 +172,10 @@ public class MechanicsController implements IDCController {
         constraints = ArrayUtils.removeElement(constraints, constraint);
     }
 
+    IDCController[] getConstraints() {
+        return constraints;
+    }
+
     @Override
     public boolean placeBlock(IDeltaChunk idc, EntityPlayer player, Coord at) {
         for (IDCController c : constraints) {

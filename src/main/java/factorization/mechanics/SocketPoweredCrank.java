@@ -11,6 +11,7 @@ import factorization.fzds.DeltaChunk;
 import factorization.fzds.DimensionSliceEntity;
 import factorization.fzds.interfaces.IDCController;
 import factorization.fzds.interfaces.IDeltaChunk;
+import factorization.fzds.interfaces.Interpolation;
 import factorization.servo.ServoMotor;
 import factorization.shared.Core;
 import factorization.shared.EntityReference;
@@ -36,6 +37,7 @@ public class SocketPoweredCrank extends TileEntitySocketBase implements IChargeC
     final EntityReference<IDeltaChunk> hookedIdc = MechanicsController.autoJoin(this);
     Vec3 hookLocation = SpaceUtil.newVec();
     DeltaCoord hookDelta = new DeltaCoord();
+    byte powerTime = 0;
 
     static final float sprocketRadius = 8F / 16F;
 
@@ -72,6 +74,7 @@ public class SocketPoweredCrank extends TileEntitySocketBase implements IChargeC
             chainDelta = 0;
         }
         hookDelta = data.as(Share.PRIVATE, "hookDelta").put(hookDelta);
+        powerTime = data.as(Share.PRIVATE, "powerTime").putByte(powerTime);
         return this;
     }
 
@@ -83,7 +86,7 @@ public class SocketPoweredCrank extends TileEntitySocketBase implements IChargeC
     @Override
     public String getInfo() {
         if (!hookedIdc.trackingEntity()) return "Not connected";
-        if (hookedIdc.getEntity() == null) return "Chained (but IDC not found)";
+        if (hookedIdc.getEntity() == null) return "Chained (unloaded)";
         return "Chained";
     }
 
@@ -136,27 +139,120 @@ public class SocketPoweredCrank extends TileEntitySocketBase implements IChargeC
         }
         shareCharge();
         if (chainLen < MIN_CHAIN_LEN) return;
-        boolean hyperExtended = chainLen >= MAX_CHAIN_LEN;
-        if (!powered && !hyperExtended) return;
-        if (!hyperExtended && charge.tryTake(WINDING_CHARGE_COST) == 0) {
-            // Pull it back if we're hyper-extended, for free.
-            // Used to have extra force for the hyperextended case, but not anymore.
+        if (chainLen >= MAX_CHAIN_LEN) {
+            yoinkChain(socket, idc, 1.0 / 16.0);
             return;
         }
-        // retract
-        double tickTime = 16; // how long it should take to move the chain 1 meter
-        if (socket == this) {
-            double power = coord.getPowerInput();
-            if (power == 0) power = 0xF; // Indirect power... TODO: This is stupid. Just figure out what the indirect power level is
-            tickTime += 0xF - power;
-        } else {
-            tickTime = 64; // Servos look pretty weak
+        if (powered && powerTime >= 0) {
+            if (charge.tryTake(10) == 0) {
+                if (powerTime > 5) {
+                    idc.cancelOrderedRotation();
+                    powerTime = 4;
+                    return;
+                }
+                powerTime++; // keep sort of consistent behavior even when out of power
+                return;
+            }
         }
-        double targetSpeed = 1.0 / tickTime;
+        if (!powered) {
+            if (5 > powerTime && powerTime > 0) {
+                // Brief pulse: wind anchor in 1 block
+                yankChain(socket, idc, true);
+            } else if (powerTime > 0 && powerTime != -1) {
+                // Long pulse has been interrupted
+                // powerTime == -1 --> already cancelled, so another one should not be done.
+                idc.cancelOrderedRotation();
+            }
+            powerTime = 0;
+        } else if (powerTime == 5) {
+            // Long pulse: Pull it all the way towards us, stopping when the signal does
+            yankChain(socket, idc, false);
+            powerTime++;
+        } else if (powered && powerTime >= 0) {
+            if (powerTime > 5 && !idc.hasOrderedRotation()) {
+                // Rotation completed; stop so that we aren't irrelevantly canceling rotation
+                powerTime = -1;
+                return;
+            }
+            powerTime++;
+        }
+    }
+
+    private void yoinkChain(ISocketHolder socket, IDeltaChunk idc, double targetSpeed) {
         Vec3 force = getForce(idc, socket, targetSpeed);
-        force = limitForce(idc, force, targetSpeed);
         Coord at = new Coord(DeltaChunk.getServerShadowWorld(), hookLocation);
         MechanicsController.push(idc, at, force);
+    }
+
+    private void yankChain(ISocketHolder socket, IDeltaChunk idc, boolean singleBlock) {
+        TileEntityHinge hinge = getHinge(idc);
+        if (hinge == null) {
+            yoinkChain(socket, idc, 1.0 / 16.0);
+            return;
+        }
+        if (new Coord(hinge).isWeaklyPowered()) {
+            powerTime = -1;
+            return;
+        }
+        Vec3 rotationAxis = hinge.getRotationAxis();
+        Quaternion rot = idc.getRotation();
+        Quaternion min = getMinimizedRotation(idc, hinge, rotationAxis);
+        double dtheta = rot.getAngleBetween(min);
+        double r = SpaceUtil.subtract(idc.shadow2real(hookLocation), SpaceUtil.fromEntPos(idc)).lengthVector();
+        double deltaC = dtheta * r;
+        double totalC = deltaC;
+        if (singleBlock && deltaC > 1) {
+            deltaC = 1;
+        }
+        if (deltaC == 0) return;
+        double I = hinge.getInertia(idc, rotationAxis);
+        I = NumUtil.clip(I, 100, 5000);
+        double radiansPerTick = 10 / I;
+        double t = deltaC / totalC;
+        Quaternion target = rot.shortSlerp(min, t);
+        int ticks = (int) (deltaC / radiansPerTick);
+        ticks = NumUtil.clip(ticks, 10, (int) (20 * 10 * totalC));
+        Interpolation interp = singleBlock ? Interpolation.SMOOTH : Interpolation.LINEAR;
+        idc.orderTargetRotation(target, ticks, interp);
+    }
+
+    private TileEntityHinge getHinge(IDeltaChunk idc) {
+        IDCController controller = idc.getController();
+        if (controller instanceof MechanicsController) {
+            MechanicsController mc = (MechanicsController) controller;
+            for (IDCController constraint : mc.getConstraints()) {
+                if (constraint instanceof TileEntityHinge) {
+                    return (TileEntityHinge) constraint;
+                }
+            }
+        } else if (controller instanceof TileEntityHinge) {
+            return (TileEntityHinge) controller;
+        }
+        return null;
+    }
+
+    private Quaternion getMinimizedRotation(IDeltaChunk idc, TileEntityHinge hinge, Vec3 rotationAxis) {
+        // Return the rotation that happens when the anchor point is pointing at us as much as possible.
+        Vec3 anchorVec;
+        {
+            Vec3 com = idc.real2shadow(SpaceUtil.fromEntPos(idc));
+            anchorVec = SpaceUtil.subtract(hookLocation, com).normalize();
+        }
+        Vec3 minVec;
+        {
+            Vec3 you = SpaceUtil.fromEntPos(idc);
+            Vec3 me = new Coord(this).toMiddleVector();
+            Vec3 vec = SpaceUtil.subtract(me, you);
+            Vec3 mask = SpaceUtil.copy(rotationAxis);
+            mask.xCoord = mask.xCoord == 0 ? 1 : 0;
+            mask.yCoord = mask.yCoord == 0 ? 1 : 0;
+            mask.zCoord = mask.zCoord == 0 ? 1 : 0;
+            SpaceUtil.incrComponentMultiply(vec, mask);
+            minVec = vec.normalize();
+        }
+
+        double angle = SpaceUtil.getAngle(anchorVec, minVec);
+        return Quaternion.getRotationQuaternionRadians(angle, rotationAxis);
     }
 
     private Vec3 getForce(IDeltaChunk idc, ISocketHolder socket, double targetSpeed) {

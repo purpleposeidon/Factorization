@@ -287,7 +287,7 @@ public class TileEntityHinge extends TileEntityCommon implements IDCController {
         idc.setRotationalVelocity(newOmega);
     }
 
-    private Vec3 getRotationAxis() {
+    Vec3 getRotationAxis() {
         Vec3 topVec = fromDirection(facing.top);
         Vec3 faceVec = fromDirection(facing.facing);
         return topVec.crossProduct(faceVec);
@@ -315,6 +315,10 @@ public class TileEntityHinge extends TileEntityCommon implements IDCController {
 
     @Override
     public void beforeUpdate(IDeltaChunk idc) {
+        if (idc.hasOrderedRotation()) {
+            limitBend(idc);
+            return;
+        }
         idc_ticking = true;
         Quaternion rotVel = idc.getRotationalVelocity();
         if (rotVel.isZero()) return;
@@ -340,9 +344,8 @@ public class TileEntityHinge extends TileEntityCommon implements IDCController {
     }
 
     private void limitBend(IDeltaChunk idc) {
-        if (idc.hasOrderedRotation()) return;
         final Quaternion rotationalVelocity = idc.getRotationalVelocity();
-        if (rotationalVelocity.isZero()) return;
+        if (!idc.hasOrderedRotation() && rotationalVelocity.isZero()) return;
         final Quaternion nextRotation = idc.getRotation().multiply(rotationalVelocity);
         final Vec3 middle = SpaceUtil.fromDirection(facing.top);
         final Vec3 arm = SpaceUtil.fromDirection(facing.facing);
@@ -355,7 +358,11 @@ public class TileEntityHinge extends TileEntityCommon implements IDCController {
 
         double p = end / angle;
         Quaternion armAngle = Quaternion.getRotationQuaternionRadians(0, middle);
-        idc.setRotationalVelocity(new Quaternion());
+        if (idc.hasOrderedRotation()) {
+            idc.cancelOrderedRotation();
+        } else {
+            idc.setRotationalVelocity(new Quaternion());
+        }
         double t = nextRotation.getAngleRadians();
         if (t < 0) t = -end;
         if (t > Math.PI) t = Math.PI;
@@ -436,6 +443,11 @@ public class TileEntityHinge extends TileEntityCommon implements IDCController {
             idc.setRotationalVelocity(new Quaternion());
         }
         Quaternion rot = idc.getRotation();
+        if (rot.hasNaN() || rot.hasInf() || w.hasNaN() || w.hasInf()) {
+            idc.setRotation(new Quaternion());
+            idc.setRotationalVelocity(new Quaternion());
+            return;
+        }
         Quaternion align;
         double theta = rot.getAngleBetween(new Quaternion());
         if (theta < Math.PI * 0.01) {
