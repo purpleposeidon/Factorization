@@ -76,9 +76,15 @@ public final class Coord implements IDataSerializable, ISaneCoord, Comparable<Co
     public Coord(World w, Vec3 v) {
         this(w, v.xCoord, v.yCoord, v.zCoord);
     }
-    
+
+    @Deprecated
     public Coord(World w, MovingObjectPosition mop) {
         this(w, mop.blockX, mop.blockY, mop.blockZ);
+    }
+
+    public static Coord fromMop(World world, MovingObjectPosition mop) {
+        if (mop.typeOfHit == MovingObjectPosition.MovingObjectType.ENTITY && mop.entityHit != null) return new Coord(mop.entityHit);
+        return new Coord(world, mop.blockX, mop.blockY, mop.blockZ);
     }
     
     public Coord(Chunk chunk) {
@@ -459,7 +465,7 @@ public final class Coord implements IDataSerializable, ISaneCoord, Comparable<Co
         return this;
     }
     
-    public Coord adjust(DeltaCoord dc) {
+    public Coord adjust(DeltaCoord dc) { // aka incrAdd
         x += dc.x;
         y += dc.y;
         z += dc.z;
@@ -653,9 +659,6 @@ public final class Coord implements IDataSerializable, ISaneCoord, Comparable<Co
     public boolean isReplacable() {
         Block b = getBlock();
         if (b == null) {
-            return true;
-        }
-        if (b.getMaterial().isReplaceable()) {
             return true;
         }
         return b.isReplaceable(w, x, y, z);

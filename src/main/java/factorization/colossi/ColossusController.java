@@ -11,7 +11,6 @@ import factorization.fzds.interfaces.IDeltaChunk;
 import factorization.fzds.interfaces.Interpolation;
 import factorization.shared.Core;
 import factorization.shared.EntityFz;
-import factorization.shared.NORELEASE;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.boss.IBossDisplayData;
 import net.minecraft.entity.player.EntityPlayer;
@@ -256,7 +255,7 @@ public class ColossusController extends EntityFz implements IBossDisplayData, ID
         if (at != null && path_target != null && at.equals(path_target)) return;
         if (at != null) {
             double dist = new Coord(this).distance(at);
-            NORELEASE.println("Travel distance: " + dist);
+            //NORELEASE.println("Travel distance: " + dist);
         }
         path_target = at;
         target_changed = true;

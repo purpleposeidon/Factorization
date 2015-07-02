@@ -39,6 +39,7 @@ public class ItemFactorizationBlock extends ItemBlock {
         }
         TileEntityCommon tec = f.makeTileEntity();
         if (tec == null) return false;
+        here.setAsTileEntityLocation(tec);
         Coord placedAgainst = here.add(ForgeDirection.getOrientation(side).getOpposite());
         boolean good = tec.canPlaceAgainst(player, placedAgainst, side);
         if (!good) {

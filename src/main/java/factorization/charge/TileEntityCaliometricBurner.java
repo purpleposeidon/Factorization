@@ -1,11 +1,17 @@
 package factorization.charge;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
 
+import com.google.common.collect.HashMultimap;
 import factorization.shared.*;
+import factorization.util.DataUtil;
 import factorization.util.InvUtil;
 import factorization.util.ItemUtil;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemFood;
@@ -26,6 +32,40 @@ import factorization.common.FactoryType;
 import factorization.notify.Notice;
 
 public class TileEntityCaliometricBurner extends TileEntityFactorization {
+    public static class FoodInfo {
+        public final ItemStack match;
+        public final int heal;
+        public final double sat;
+
+        public FoodInfo(ItemStack match, int heal, double sat) {
+            this.match = match;
+            this.heal = heal;
+            this.sat = sat;
+        }
+    }
+
+    public static void register(ItemStack food, int heal, double sat) {
+        special_foods.put(food.getItem(), new FoodInfo(food, heal, sat));
+    }
+
+    public static void register(Item food, int heal, double sat) {
+        special_foods.put(food, new FoodInfo(null, heal, sat));
+    }
+
+    public static FoodInfo lookup(ItemStack food) {
+        if (food == null) return null;
+        for (FoodInfo info : special_foods.get(food.getItem())) {
+            if (info.match == null) return info;
+            if (ItemUtil.wildcardSimilar(info.match, food)) return info;
+        }
+        return null;
+    }
+
+    private static final HashMultimap<Item, FoodInfo> special_foods = HashMultimap.create();
+    static {
+        register(DataUtil.getItem(Blocks.cake), 12, 0.1);
+    }
+
     ItemStack stomache;
     int foodQuality = 0;
     int ticksUntilNextDigestion = 0;
@@ -149,13 +189,15 @@ public class TileEntityCaliometricBurner extends TileEntityFactorization {
         Item it = is.getItem();
         int heal = 0;
         double sat = 0;
-        if (it instanceof ItemFood) {
+
+        FoodInfo fi = lookup(is);
+        if (fi != null) {
+            heal = fi.heal;
+            sat = fi.sat;
+        } else if (it instanceof ItemFood) {
             ItemFood nom = (ItemFood) it;
             heal = nom.func_150905_g(is);
             sat = nom.func_150906_h(is);
-        } else if (it == Items.cake) {
-            heal = 2*6;
-            sat = 0.1F;
         }
         heal += Math.min(0, heal*2*sat);
         int r = (int)(heal*(heal/4F));

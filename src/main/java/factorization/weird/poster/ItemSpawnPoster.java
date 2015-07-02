@@ -4,7 +4,6 @@ import factorization.api.Coord;
 import factorization.api.Quaternion;
 import factorization.shared.Core;
 import factorization.shared.ItemFactorization;
-import factorization.shared.NORELEASE;
 import factorization.util.PlayerUtil;
 import factorization.util.SpaceUtil;
 import net.minecraft.entity.player.EntityPlayer;

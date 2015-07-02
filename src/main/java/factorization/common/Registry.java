@@ -11,6 +11,7 @@ import cpw.mods.fml.common.registry.GameRegistry;
 import cpw.mods.fml.common.registry.GameRegistry.Type;
 import cpw.mods.fml.relauncher.Side;
 import factorization.api.IActOnCraft;
+import factorization.beauty.ItemLeafBomb;
 import factorization.ceramics.ItemGlazeBucket;
 import factorization.ceramics.ItemSculptingTool;
 import factorization.ceramics.TileEntityGreenware;
@@ -102,7 +103,8 @@ public class Registry {
             greenware_item,
             rocket_engine_item_hidden,
             parasieve_item,
-            compression_crafter_item;
+            compression_crafter_item,
+            sap_generator_item;
     public ItemStack silver_ore_item, silver_block_item, lead_block_item,
             dark_iron_block_item;
     public ItemStack is_factory, is_lamp, is_lightair;
@@ -144,6 +146,8 @@ public class Registry {
     public ItemCraftingComponent chainLink, shortChain;
     public ItemSpawnPoster spawnPoster;
     public ItemMinecartDayBarrel barrelCart;
+    public ItemCraftingComponent sap;
+    public ItemLeafBomb leafBomb;
 
     public Material materialMachine = new Material(MapColor.ironColor);
     
@@ -281,6 +285,7 @@ public class Registry {
         steamturbine_item = FactoryType.STEAMTURBINE.itemStack();
         solarboiler_item = FactoryType.SOLARBOILER.itemStack();
         caliometric_burner_item = FactoryType.CALIOMETRIC_BURNER.itemStack();
+        sap_generator_item = FactoryType.SAP_TAP.itemStack();
         heater_item = FactoryType.HEATER.itemStack();
         mirror_item_hidden = FactoryType.MIRROR.itemStack();
         leadwire_item = FactoryType.LEADWIRE.itemStack();
@@ -393,6 +398,11 @@ public class Registry {
             chainLink = new ItemCraftingComponent("chainLink", TabType.MATERIALS);
             shortChain = new ItemCraftingComponent("shortChain", TabType.MATERIALS);
         }
+
+        // Beautiful generators
+        sap = new ItemCraftingComponent("sap");
+        leafBomb = new ItemLeafBomb();
+
         postMakeItems();
     }
 
@@ -1148,6 +1158,18 @@ public class Registry {
                     "  L",
                     'L', shortChain);
         }
+
+        // Beautiful generators
+        oreRecipe(FactoryType.SAP_TAP.itemStack(),
+                "LYL",
+                "W+W",
+                "WUW",
+                'L', "treeLeaves",
+                'Y', Blocks.hopper,
+                '+', Blocks.fence,
+                'W', "logWood",
+                'U', Items.bucket);
+
         if (Core.enable_test_content) {
             TestContent.add();
         }
@@ -1265,6 +1287,8 @@ public class Registry {
     }
     
     public void addOtherRecipes() {
+        leafBomb.addRecipes();
+
         barrelCart.setMaxStackSize(Items.chest_minecart.getItemStackLimit(new ItemStack(Items.chest_minecart))); // Duplicate changes Railcraft might make
         ArrayList<ItemStack> theLogs = new ArrayList<ItemStack>();
         for (ItemStack is : OreDictionary.getOres("logWood")) {

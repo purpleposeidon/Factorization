@@ -13,6 +13,7 @@ import net.minecraft.command.ICommandSender;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.item.ItemStack;
 import net.minecraft.network.NetHandlerPlayServer;
 import net.minecraft.network.NetworkManager;
 import net.minecraft.network.Packet;
@@ -203,5 +204,12 @@ public final class PlayerUtil {
         Vec3 look = player.getLook(partial);
         Vec3 ray = pos.addVector(look.xCoord * dist, look.yCoord * dist, look.zCoord * dist);
         return player.worldObj.func_147447_a(pos, ray, false, false, true);
+    }
+
+    public static void decr(EntityPlayer player, ItemStack stack) {
+        if (ItemUtil.normalize(stack) == null) return;
+        if (!player.capabilities.isCreativeMode) {
+            stack.stackSize--;
+        }
     }
 }

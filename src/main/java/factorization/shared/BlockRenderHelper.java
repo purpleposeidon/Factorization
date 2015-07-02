@@ -157,15 +157,15 @@ public class BlockRenderHelper extends Block {
     }
     
     @SideOnly(Side.CLIENT)
-    public void render(RenderBlocks rb, int x, int y, int z) {
+    public boolean render(RenderBlocks rb, int x, int y, int z) {
         rb.setRenderBounds(minX, minY, minZ, maxX, maxY, maxZ);
-        rb.renderStandardBlock(this, x, y, z);
+        return rb.renderStandardBlock(this, x, y, z);
     }
     
     @SideOnly(Side.CLIENT)
-    public void render(RenderBlocks rb, Coord c) {
+    public boolean render(RenderBlocks rb, Coord c) {
         rb.setRenderBounds(minX, minY, minZ, maxX, maxY, maxZ);
-        rb.renderStandardBlock(this, c.x, c.y, c.z);
+        return rb.renderStandardBlock(this, c.x, c.y, c.z);
     }
     
     private static final byte UV_NONE = 0, UV_OLD_STYLE_ROTATED = 1, UV_NEW_STYLE_MIRRORED = 2, UV_FULLY_ROTATED_STYLE = 3;

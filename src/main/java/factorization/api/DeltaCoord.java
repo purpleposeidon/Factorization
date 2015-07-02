@@ -28,6 +28,10 @@ public class DeltaCoord implements IDataSerializable {
     public DeltaCoord add(DeltaCoord o) {
         return new DeltaCoord(x + o.x, y + o.y, z + o.z);
     }
+
+    public DeltaCoord add(int dx, int dy, int dz) {
+        return new DeltaCoord(x + dx, y + dy, z + dz);
+    }
     
     public DeltaCoord scale(double d) {
         return new DeltaCoord((int)(x*d), (int)(y*d), (int)(z*d));

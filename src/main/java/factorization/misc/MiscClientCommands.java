@@ -819,6 +819,7 @@ public class MiscClientCommands implements ICommand {
             cp.addAll(mc.ingameGUI.getChatGUI().getSentMessages());
             mc.ingameGUI.getChatGUI().clearChatMessages(); 
             mc.ingameGUI.getChatGUI().getSentMessages().addAll(cp);
+            new Notice(mc.thePlayer, "").withStyle(Style.CLEAR).send(mc.thePlayer);
             break;
         case SHOW_MODS_LIST:
             mc.displayGuiScreen(new GuiModList(null));

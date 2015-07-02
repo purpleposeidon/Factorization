@@ -1,5 +1,6 @@
 package factorization.common;
 
+import factorization.beauty.BlockRenderSapExtractor;
 import factorization.citizen.EntityCitizen;
 import factorization.citizen.RenderCitizen;
 import factorization.mechanics.BlockRenderHinge;
@@ -133,7 +134,7 @@ public class FactorizationClientProxy extends FactorizationProxy {
         if (ID == FactoryType.SLAGFURNACE.gui) {
             gui = new GuiSlag(cont);
         }
-        if (ID == FactoryType.MIXER.gui) {
+        if (ID == FactoryType.MIXER.gui && cont instanceof ContainerMixer) {
             gui = new GuiMixer((ContainerMixer)cont);
         }
         if (ID == FactoryType.CRYSTALLIZER.gui) {
@@ -142,6 +143,7 @@ public class FactorizationClientProxy extends FactorizationProxy {
         if (ID == FactoryType.PARASIEVE.gui) {
             gui = new GuiParasieve(cont);
         }
+        if (gui == null) return null;
         cont.addSlotsForGui(fac, player.inventory);
         return gui;
     }
@@ -155,9 +157,6 @@ public class FactorizationClientProxy extends FactorizationProxy {
             gui.containerPocket.updateCraft();
         }
     }
-
-    int fireParticlesSpawned = 0;
-    int fireParticlesMax = 5;
 
     @Override
     public void playSoundFX(String src, float volume, float pitch) {
@@ -221,6 +220,7 @@ public class FactorizationClientProxy extends FactorizationProxy {
         //NORELEASE new BlockRenderRocketEngine();
         new BlockRenderServoRail();
         new BlockRenderHinge();
+        new BlockRenderSapExtractor();
         for (FactoryType ft : new FactoryType[] {
                 FactoryType.SOCKET_EMPTY,
                 FactoryType.SOCKET_LACERATOR,

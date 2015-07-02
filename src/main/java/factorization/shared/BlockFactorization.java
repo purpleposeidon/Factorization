@@ -281,6 +281,7 @@ public class BlockFactorization extends BlockContainer {
         put(itemList, reg.leydenjar_item_full);
         put(itemList, FactoryType.CREATIVE_CHARGE.itemStack());
         put(itemList, reg.caliometric_burner_item);
+        put(itemList, reg.sap_generator_item);
         put(itemList, reg.solarboiler_item);
         put(itemList, reg.steamturbine_item);
         if (reg.mirror != null) {

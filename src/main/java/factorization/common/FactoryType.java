@@ -2,6 +2,7 @@ package factorization.common;
 
 import cpw.mods.fml.common.registry.GameRegistry;
 import factorization.astro.TileEntityRocketEngine;
+import factorization.beauty.TileEntitySapTap;
 import factorization.ceramics.TileEntityGreenware;
 import factorization.charge.*;
 import factorization.crafting.TileEntityCompressionCrafter;
@@ -77,6 +78,7 @@ public enum FactoryType {
     //SOCKET_HAND_CRANK(46, false, SocketHandCrank.class, "fzsock_hand_crank"),
     SOCKET_POWERED_CRANK(47, false, SocketPoweredCrank.class, "factory_powered_crank"),
     //SOCKET_CONTROLLED_CRANK(48, true, SocketControlledCrank.class, "factory_controlled_crank"),
+    SAP_TAP(49, false, TileEntitySapTap.class, "factory_sap_extractor"),
 
     POCKETCRAFTGUI(101, true)
     ;

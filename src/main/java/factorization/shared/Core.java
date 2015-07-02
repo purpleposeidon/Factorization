@@ -10,6 +10,7 @@ import java.util.Map;
 import java.util.Set;
 
 import cpw.mods.fml.common.ModContainer;
+import factorization.beauty.EntityLeafBomb;
 import factorization.citizen.EntityCitizen;
 import factorization.fzds.DeltaChunk;
 import factorization.mechanics.MechanismsFeature;
@@ -223,13 +224,15 @@ public class Core {
         GameRegistry.registerTileEntity(TileEntityFzNull.class, "fz.null");
         GameRegistry.registerTileEntity(BlockDarkIronOre.Glint.class, "fz.glint");
         //TileEntity renderers are registered in the client proxy
-        
+
+        // See EntityTracker.addEntityToTracker for reference on what the three last values should be
         EntityRegistry.registerModEntity(TileEntityWrathLamp.RelightTask.class, "factory_relight_task", 0, Core.instance, 1, 10, false);
         EntityRegistry.registerModEntity(ServoMotor.class, "factory_servo", 1, Core.instance, 100, 1, true);
         EntityRegistry.registerModEntity(ColossusController.class, "fz_colossal_controller", 2, Core.instance, 256, 20, false);
         EntityRegistry.registerModEntity(EntityPoster.class, "fz_entity_poster", 3, Core.instance, 160, Integer.MAX_VALUE, false);
         EntityRegistry.registerModEntity(EntityCitizen.class, "fz_entity_citizen", 4, Core.instance, 100, 1, true);
         EntityRegistry.registerModEntity(EntityMinecartDayBarrel.class, "fz_minecart_barrel", 5, this, 80, 3, true);
+        EntityRegistry.registerModEntity(EntityLeafBomb.class, "fz_leaf_bomb", 6, this, 64, 10, true);
     }
     
     @EventHandler

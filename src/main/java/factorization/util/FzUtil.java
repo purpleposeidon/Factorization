@@ -14,7 +14,6 @@ import net.minecraft.entity.ai.attributes.ServersideAttributeMap;
 import net.minecraft.item.ItemStack;
 import net.minecraft.world.World;
 import net.minecraftforge.common.DimensionManager;
-
 import java.awt.*;
 import java.awt.datatransfer.StringSelection;
 import java.io.IOException;
@@ -101,5 +100,64 @@ public class FzUtil {
         TileEntityDayBarrel barrel = at.getTE(TileEntityDayBarrel.class);
         if (barrel == null) return null;
         return barrel.item;
+    }
+
+    private static class UnitBase {
+        final long ratio;
+        final String unit;
+
+        private UnitBase(long ratio, String unit) {
+            this.ratio = ratio;
+            this.unit = unit;
+        }
+    }
+
+    public static UnitBase unit_time[] = new UnitBase[] {
+            new UnitBase(1L * 20 * 60 * 60 * 24 * 365 * 1000000000, "eons"),
+            new UnitBase(1L * 20 * 60 * 60 * 24 * 365 * 1000, "millenia"),
+            new UnitBase(1L * 20 * 60 * 60 * 24 * 365 * 100, "centuries"),
+            new UnitBase(1L * 20 * 60 * 60 * 24 * 365, "years"),
+            new UnitBase(1L * 20 * 60 * 60 * 24 * 30, "months"), // Mostly! :D
+            new UnitBase(1L * 20 * 60 * 60 * 24 * 7, "weeks"),
+            new UnitBase(1L * 20 * 60 * 60 * 24, "days"),
+            new UnitBase(1L * 20 * 60 * 60, "hours"),
+            new UnitBase(1L * 20 * 60 * 20, "days of St. Jeb"),
+            new UnitBase(1L * 20 * 60, "minutes"),
+            new UnitBase(1L * 20, "seconds"),
+            new UnitBase(1L, "ticks"),
+    };
+    public static UnitBase unit_distance_px[] = new UnitBase[] {
+            new UnitBase(1L * 16 * 1000, "kilometers"),
+            new UnitBase(1L * 16, "blocks"),
+            new UnitBase(1L, "pixel"),
+    };
+
+    private static UnitBase best(UnitBase[] bases, long value) {
+        boolean wasAbove = false;
+        for (UnitBase base : bases) {
+            if (base.ratio <= value && wasAbove) {
+                return base;
+            } else if (base.ratio >= value) {
+                wasAbove = true;
+            }
+        }
+        return bases[bases.length - 1];
+    }
+
+    public static String unitify(UnitBase[] bases, long value, int max_len) {
+        String r = "";
+        while (max_len-- != 0) {
+            UnitBase best = best(bases, value);
+            long l = value / best.ratio;
+            value -= best.ratio * l;
+            if (l > 0) {
+                if (!r.isEmpty()) r += " ";
+                r += l + " " + best.unit;
+            } else if (value == 0 && !r.isEmpty()) {
+                return r;
+            }
+            if (best.ratio == 1 || max_len == 0) break;
+        }
+        return r;
     }
 }

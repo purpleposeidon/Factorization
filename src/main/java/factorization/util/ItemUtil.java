@@ -185,6 +185,13 @@ public final class ItemUtil {
         return is.stackSize;
     }
 
+    public static ItemStack copyWithSize(ItemStack is, int size) {
+        if (is == null) return null;
+        ItemStack ret = is.copy();
+        ret.stackSize = size;
+        return ret;
+    }
+
     public static int getFreeSpace(ItemStack is, int stackLimit) {
         int max = Math.min(is.getMaxStackSize(), stackLimit);
         return Math.max(0, max - is.stackSize);

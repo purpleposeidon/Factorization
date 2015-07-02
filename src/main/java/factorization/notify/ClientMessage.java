@@ -53,6 +53,7 @@ class ClientMessage {
     
     void translate(String... args) {
         msg = StatCollector.translateToLocal(msg);
+        msg = msg.replace("\\n", "\n");
         
         String item_name = "null", item_info = "", item_info_newline = "";
         if (item != null) {
