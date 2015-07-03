@@ -11,6 +11,7 @@ import cpw.mods.fml.common.registry.GameRegistry;
 import cpw.mods.fml.common.registry.GameRegistry.Type;
 import cpw.mods.fml.relauncher.Side;
 import factorization.api.IActOnCraft;
+import factorization.beauty.ItemGrossFood;
 import factorization.beauty.ItemLeafBomb;
 import factorization.ceramics.ItemGlazeBucket;
 import factorization.ceramics.ItemSculptingTool;
@@ -146,7 +147,7 @@ public class Registry {
     public ItemCraftingComponent chainLink, shortChain;
     public ItemSpawnPoster spawnPoster;
     public ItemMinecartDayBarrel barrelCart;
-    public ItemCraftingComponent sap, entheas;
+    public ItemGrossFood sap, entheas;
     public ItemLeafBomb leafBomb;
 
     public Material materialMachine = new Material(MapColor.ironColor);
@@ -401,8 +402,8 @@ public class Registry {
         }
 
         // Beautiful generators
-        sap = new ItemCraftingComponent("sap");
-        entheas = new ItemCraftingComponent("entheas");
+        sap = new ItemGrossFood("sap", Core.TabType.MATERIALS, false);
+        entheas = new ItemGrossFood("entheas", Core.TabType.MATERIALS, true);
         leafBomb = new ItemLeafBomb();
 
         postMakeItems();

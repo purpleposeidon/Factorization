@@ -27,7 +27,7 @@ import java.io.IOException;
 import java.util.List;
 
 public class TileEntityAnthroGen extends TileEntityCommon implements IInventory, ICoordFunction {
-    public static int UPDATE_RATE = 20 * 60 * 5;
+    public static int UPDATE_RATE = 20 * 60 * 7;
     public static int MIN_WANDER_DISTANCE = 12 * 12;
     public static int VILLAGER_CHECKS_PER_ENTHEAS = 8;
     public static final int CHUNK_RANGE = 1;
