@@ -3,8 +3,10 @@ package factorization.shared;
 import java.io.IOException;
 import java.io.InputStream;
 
+import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.GLAllocation;
+import net.minecraft.client.renderer.RenderBlocks;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.util.IIcon;
 import net.minecraft.util.ResourceLocation;
@@ -40,6 +42,27 @@ public class ObjectModel {
         GL11.glCallList(render_list);
     }
 
+    private WavefrontObject isbrh_model = null;
+
+    public boolean renderISBRH(RenderBlocks rb, IIcon icon, Block block, int x, int y, int z) {
+        if (isbrh_model == null) {
+            isbrh_model = readModel();
+        }
+        if (isbrh_model == null) {
+            return false;
+        }
+        if (rb.overrideBlockTexture != null) {
+            icon = rb.overrideBlockTexture;
+        }
+        Tessellator.instance.setColorOpaque(0xFF, 0xFF, 0xFF);
+        int brightness = block.getMixedBrightnessForBlock(rb.blockAccess, x, y, z);
+        Tessellator.instance.setBrightness(brightness);
+        ModelTessellator tess = new ModelTessellator(icon);
+        tess.setTranslation(x + 0.5, y, z + 0.5);
+        isbrh_model.tessellateAll(tess);
+        return true;
+    }
+
     public void render() {
         if (render_list == 0) {
             return;
@@ -51,6 +74,30 @@ public class ObjectModel {
             }
         }
         GL11.glCallList(render_list);
+    }
+
+    public static final double modelScale = 1.0 / 16.0;
+    private static class ModelTessellator extends Tessellator {
+        final IIcon icon;
+
+        private ModelTessellator(IIcon icon) {
+            this.icon = icon;
+        }
+
+        @Override
+        public void setTextureUV(double u, double v) {
+            Tessellator.instance.setTextureUV(icon.getInterpolatedU(u * 16), icon.getInterpolatedV(v * 16));
+        }
+
+        @Override
+        public void addVertex(double x, double y, double z) {
+            Tessellator.instance.addVertex(x * modelScale + xOffset, y * modelScale + yOffset, z * modelScale + zOffset);
+        }
+
+        @Override
+        public void setNormal(float x, float y, float z) {
+            Tessellator.instance.setNormal(x, y, z);
+        }
     }
     
     private WavefrontObject readModel() {
@@ -95,13 +142,12 @@ public class ObjectModel {
         
         render_list = GLAllocation.generateDisplayLists(1);
         GL11.glNewList(render_list, GL11.GL_COMPILE);
-        double modelScale = 1.0/16.0;
         GL11.glScaled(modelScale, modelScale, modelScale);
         subsetTessellator.startDrawingQuads();
         objectModel.tessellateAll(subsetTessellator);
         subsetTessellator.draw();
-        modelScale = 1/modelScale;
-        GL11.glScaled(modelScale, modelScale, modelScale);
+        double s = 1/modelScale;
+        GL11.glScaled(s, s, s);
         GL11.glEndList();
     }
 
@@ -124,5 +170,6 @@ public class ObjectModel {
             GLAllocation.deleteDisplayLists(render_list);
         }
         render_list = -1;
+        isbrh_model = null;
     }
 }

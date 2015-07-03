@@ -13,6 +13,7 @@ import factorization.shared.BlockClass;
 import factorization.shared.Core;
 import factorization.shared.TileEntityCommon;
 import factorization.util.FzUtil;
+import factorization.util.InvUtil;
 import factorization.util.ItemUtil;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockLog;
@@ -277,5 +278,21 @@ public class TileEntitySapTap extends TileEntityCommon implements IInventory {
                 }
             }
         }
+    }
+
+    @Override
+    protected void onRemove() {
+        super.onRemove();
+        if (ItemUtil.normalize(sap) != null) {
+            Coord here = new Coord(this);
+            InvUtil.spawnItemStack(here, sap);
+        }
+    }
+
+    @Override
+    public void click(EntityPlayer entityplayer) {
+        if (ItemUtil.normalize(sap) == null) return;
+        InvUtil.givePlayerItem(entityplayer, sap);
+        sap = new ItemStack(Core.registry.sap);
     }
 }

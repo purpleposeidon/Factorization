@@ -6,11 +6,6 @@ import net.minecraft.util.IIcon;
 public class ItemIcons {
 
     public static IIcon charge$crankshaft;
-    
-    public static IIcon wrath_particle;
-    
-    @Directory("craft")
-    public static IIcon packet_complete, packet_incomplete;
 
     public static IIcon socket$half_scissors;
     

@@ -343,7 +343,8 @@ public class NetworkFactorization {
         ExtensionInfo, RocketState,
         ServoRailDecor, ServoRailEditComment,
         CompressionCrafter, CompressionCrafterBeginCrafting, CompressionCrafterBounds,
-        ScissorState, 
+        ScissorState,
+        GeneratorParticles,
         
         // Messages to entities; (true) marks that they are entity messages.
         servo_brief(true), servo_item(true), servo_complete(true), servo_stopped(true),

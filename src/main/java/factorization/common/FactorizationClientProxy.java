@@ -1,6 +1,8 @@
 package factorization.common;
 
+import factorization.beauty.BlockRenderAnthrogen;
 import factorization.beauty.BlockRenderSapExtractor;
+import factorization.beauty.EntityLeafBomb;
 import factorization.citizen.EntityCitizen;
 import factorization.citizen.RenderCitizen;
 import factorization.mechanics.BlockRenderHinge;
@@ -14,6 +16,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.audio.ISound;
 import net.minecraft.client.audio.PositionedSoundRecord;
 import net.minecraft.client.gui.GuiScreen;
+import net.minecraft.client.renderer.entity.RenderSnowball;
 import net.minecraft.client.renderer.texture.IIconRegister;
 import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
 import net.minecraft.client.settings.GameSettings;
@@ -202,8 +205,9 @@ public class FactorizationClientProxy extends FactorizationProxy {
         RenderingRegistry.registerEntityRenderingHandler(EntityPoster.class, new RenderPoster());
         RenderingRegistry.registerEntityRenderingHandler(EntityCitizen.class, new RenderCitizen());
         RenderingRegistry.registerEntityRenderingHandler(EntityMinecartDayBarrel.class, new RenderMinecartDayBarrel());
+        RenderingRegistry.registerEntityRenderingHandler(EntityLeafBomb.class, new RenderSnowball(Core.registry.leafBomb, 0));
 
-        RenderingRegistry.registerBlockHandler(new FactorizationRender());
+                RenderingRegistry.registerBlockHandler(new FactorizationRender());
         BlockRenderBattery renderBattery = new BlockRenderBattery();
         BlockRenderDayBarrel renderBarrel = new BlockRenderDayBarrel();
         new BlockRenderLeydenJar();
@@ -221,6 +225,7 @@ public class FactorizationClientProxy extends FactorizationProxy {
         new BlockRenderServoRail();
         new BlockRenderHinge();
         new BlockRenderSapExtractor();
+        new BlockRenderAnthrogen();
         for (FactoryType ft : new FactoryType[] {
                 FactoryType.SOCKET_EMPTY,
                 FactoryType.SOCKET_LACERATOR,

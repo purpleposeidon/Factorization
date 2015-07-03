@@ -89,7 +89,7 @@ public class BlockIcons {
     
     public static IIcon utiligoo$invasion;
 
-    public static IIcon beauty$saptap, beauty$saptap_top;
+    public static IIcon beauty$saptap, beauty$saptap_top, beauty$anthrogen;
     
     @Directory("storage")
     public static BarrelTextureset normal, silky, hopping, sticky;

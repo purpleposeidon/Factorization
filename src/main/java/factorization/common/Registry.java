@@ -104,7 +104,7 @@ public class Registry {
             rocket_engine_item_hidden,
             parasieve_item,
             compression_crafter_item,
-            sap_generator_item;
+            sap_generator_item, anthro_generator_item;
     public ItemStack silver_ore_item, silver_block_item, lead_block_item,
             dark_iron_block_item;
     public ItemStack is_factory, is_lamp, is_lightair;
@@ -146,7 +146,7 @@ public class Registry {
     public ItemCraftingComponent chainLink, shortChain;
     public ItemSpawnPoster spawnPoster;
     public ItemMinecartDayBarrel barrelCart;
-    public ItemCraftingComponent sap;
+    public ItemCraftingComponent sap, entheas;
     public ItemLeafBomb leafBomb;
 
     public Material materialMachine = new Material(MapColor.ironColor);
@@ -286,6 +286,7 @@ public class Registry {
         solarboiler_item = FactoryType.SOLARBOILER.itemStack();
         caliometric_burner_item = FactoryType.CALIOMETRIC_BURNER.itemStack();
         sap_generator_item = FactoryType.SAP_TAP.itemStack();
+        anthro_generator_item = FactoryType.ANTHRO_GEN.itemStack();
         heater_item = FactoryType.HEATER.itemStack();
         mirror_item_hidden = FactoryType.MIRROR.itemStack();
         leadwire_item = FactoryType.LEADWIRE.itemStack();
@@ -401,6 +402,7 @@ public class Registry {
 
         // Beautiful generators
         sap = new ItemCraftingComponent("sap");
+        entheas = new ItemCraftingComponent("entheas");
         leafBomb = new ItemLeafBomb();
 
         postMakeItems();
@@ -1160,7 +1162,7 @@ public class Registry {
         }
 
         // Beautiful generators
-        oreRecipe(FactoryType.SAP_TAP.itemStack(),
+        oreRecipe(sap_generator_item,
                 "LYL",
                 "W+W",
                 "WUW",
@@ -1169,6 +1171,17 @@ public class Registry {
                 '+', Blocks.fence,
                 'W', "logWood",
                 'U', Items.bucket);
+        int red = 14;
+        oreRecipe(anthro_generator_item,
+                "s#s",
+                "#i#",
+                "s-s",
+                '#', Items.paper,
+                's', "stickWood",
+                'C', new ItemStack(Blocks.carpet, 1, red),
+                'W', new ItemStack(Blocks.wool, 1, red),
+                '-', Blocks.wooden_pressure_plate,
+                'i', Items.glowstone_dust);
 
         if (Core.enable_test_content) {
             TestContent.add();
