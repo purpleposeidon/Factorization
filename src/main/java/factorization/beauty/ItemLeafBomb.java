@@ -6,9 +6,11 @@ import factorization.shared.ItemFactorization;
 import factorization.util.DataUtil;
 import factorization.util.ItemUtil;
 import factorization.util.PlayerUtil;
+import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Items;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
@@ -48,6 +50,18 @@ public class ItemLeafBomb extends ItemFactorization {
         return stack;
     }
 
+    @Override
+    public boolean getHasSubtypes() {
+        return true;
+    }
+
+    @Override
+    public void getSubItems(Item item, CreativeTabs tab, List list) {
+        list.addAll(all);
+    }
+
+    ArrayList<ItemStack> all = new ArrayList<ItemStack>();
+
     transient ArrayList<ItemStack> _leaves = new ArrayList<ItemStack>();
     transient ArrayList<String> known = new ArrayList<String>();
 
@@ -83,6 +97,7 @@ public class ItemLeafBomb extends ItemFactorization {
             setLeaves(bomb, ItemUtil.copyWithSize(leaf, 8 + 4));
 
             GameRegistry.addShapelessRecipe(bomb, Core.registry.sap, leaf, leaf, leaf, leaf, leaf, leaf, leaf, leaf);
+            all.add(bomb);
         }
     }
 
