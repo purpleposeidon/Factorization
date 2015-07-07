@@ -58,6 +58,7 @@ public class FzConfig {
     public static boolean large_servo_instructions = false;
     public static boolean players_discover_colossus_guides = true;
     public static boolean disable_endermen_griefing = false;
+    public static boolean hotblocks = true;
     public static boolean debug_fzds_collisions = false;
     public static boolean enable_rocketry = /* Hey! If you're turning this on, remove stuff from factorization_dead_items */ Core.dev_environ;
     public static boolean sockets_ignore_front_redstone = true;
@@ -220,6 +221,7 @@ public class FzConfig {
         equal_opportunities_for_mobs = getBoolConfig("equalOpportunitiesForMobs", "server", equal_opportunities_for_mobs, "Causes some mobs to rarely spawn wearing your armor");
         embarken_wood = getBoolConfig("barkRecipes", "server", embarken_wood, "Adds recipes for bark variants of logs");
         mushroomalize = getBoolConfig("mushroomNormalize", "server", mushroomalize, "Textures giant mushroom blocks when placed");
+        hotblocks = getBoolConfig("hotBlocks", "server", hotblocks, "If true, then recently placed blocks break easily");
         proper_projectile_physics = getBoolConfig("properProjectilePhysics", "server", proper_projectile_physics, "Makes projectiles start with the velocity of the thrower");
         buffed_nametags = getBoolConfig("buffedNametags", "server", buffed_nametags, "Naming entities gives them +5 hearts");
         players_discover_colossus_guides = getBoolConfig("playersDiscoverColossusGuides", "server", players_discover_colossus_guides, "If set to true, players will find a lost map after getting the diamonds achievement. If colossi are disabled, they'll get an LMP instead.");
