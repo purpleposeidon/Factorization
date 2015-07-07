@@ -6,6 +6,7 @@ import java.util.*;
 import factorization.api.ICoordFunction;
 import factorization.util.FzUtil;
 import factorization.util.ItemUtil;
+import factorization.util.PlayerUtil;
 import factorization.weird.TileEntityDayBarrel;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.audio.PositionedSoundRecord;
@@ -55,38 +56,7 @@ public class MiscClientTickHandler {
         count++;
     }
 
-    private static class Replacement {
-        final ItemStack new_held, old_held;
-
-        private Replacement(ItemStack new_held, ItemStack old_held) {
-            this.new_held = new_held;
-            this.old_held = old_held;
-        }
-    }
-
-    void add_replacement(ItemStack new_held, ItemStack old_held) {
-        replacements.add(new Replacement(new_held, old_held));
-        if (replacements.size() > 16) {
-            replacements.remove(0);
-        }
-    }
-
-    ItemStack find_replacement(ItemStack held) {
-        Replacement found = null;
-        for (Iterator<Replacement> iterator = replacements.iterator(); iterator.hasNext(); ) {
-            Replacement replacement = iterator.next();
-            if (ItemUtil.couldMerge(replacement.new_held, held)) {
-                found = replacement;
-                iterator.remove();
-                replacements.add(found);
-                return found.old_held;
-            }
-        }
-        return null;
-
-    }
-
-    private ArrayList<Replacement> replacements = new ArrayList<Replacement>();
+    private ItemStack[] swaps = new ItemStack[9];
     
     boolean wasClicked = false;
     private void checkPickBlockKey() {
@@ -102,7 +72,7 @@ public class MiscClientTickHandler {
         if (player == null) {
             return;
         }
-        if (player.capabilities.isCreativeMode) {
+        if (PlayerUtil.isPlayerCreative(player)) {
             // I suppose we could try pulling from the player's inventory.
             // And creative mode inventories tend to get super-ugly cluttered with duplicate crap...
             // But it doesn't work. Oh well.
@@ -120,7 +90,7 @@ public class MiscClientTickHandler {
         final ItemStack held = player.getHeldItem();
         if (vanillaSatisfied(mop, here, player)) {
             if (held == null) return;
-            ItemStack replace = find_replacement(held);
+            ItemStack replace = swaps[player.inventory.currentItem];
             if (replace == null) return;
             boolean already_found = false;
             for (int i = 0; i < 9; i++) {
@@ -169,7 +139,22 @@ public class MiscClientTickHandler {
                 int targetSlot = player.inventory.currentItem;
                 mc.playerController.windowClick(player.inventoryContainer.windowId, i, targetSlot, 2, player);
                 if (held != null) {
-                    add_replacement(hay, held);
+                    if (swaps[player.inventory.currentItem] == null) {
+                        swaps[player.inventory.currentItem] = held;
+                    } else {
+                        boolean canReplace = false;
+                        for (int bar = 0; bar < 9; bar++) {
+                            ItemStack barItem = player.inventory.getStackInSlot(bar);
+                            if (barItem == null) continue;
+                            if (barItem == swaps[player.inventory.currentItem]) {
+                                canReplace = true;
+                                break;
+                            }
+                        }
+                        if (canReplace) {
+                            swaps[player.inventory.currentItem] = held;
+                        }
+                    }
                 }
                 return;
             }
