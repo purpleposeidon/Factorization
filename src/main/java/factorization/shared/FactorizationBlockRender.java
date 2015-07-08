@@ -60,6 +60,9 @@ abstract public class FactorizationBlockRender implements ICoord {
     }
     
     private void initialize(FactoryType ft) {
+        if (ft == FactoryType.NONE) {
+            return;
+        }
         if (ft != null) {
             int md = ft.md;
             if (renderMap[md] != null) {
@@ -73,7 +76,7 @@ abstract public class FactorizationBlockRender implements ICoord {
             defaultRender = this;
         }
     }
-    
+
     public abstract boolean render(RenderBlocks rb);
     public abstract FactoryType getFactoryType();
     public boolean renderSecondPass(RenderBlocks rb) { return false; }

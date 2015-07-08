@@ -1,0 +1,13 @@
+\title{Hot Blocks}
+
+You can easily break any block that you have recently placed.
+
+This makes it easy to fix misplaced blocks,
+particularly smoothstone, obsidian, and glass.
+
+You do not need the appropriate tool to break blocks in this manner.
+
+If you leave the world, then your hot blocks will be forgotten.
+
+The last 5 blocks you have placed are kept hot.
+

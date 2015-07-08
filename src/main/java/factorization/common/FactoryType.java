@@ -3,6 +3,7 @@ package factorization.common;
 import cpw.mods.fml.common.registry.GameRegistry;
 import factorization.astro.TileEntityRocketEngine;
 import factorization.beauty.TileEntityAnthroGen;
+import factorization.beauty.TileEntityBiblioGen;
 import factorization.beauty.TileEntitySapTap;
 import factorization.ceramics.TileEntityGreenware;
 import factorization.charge.*;
@@ -81,8 +82,10 @@ public enum FactoryType {
     //SOCKET_CONTROLLED_CRANK(48, true, SocketControlledCrank.class, "factory_controlled_crank"),
     SAP_TAP(49, false, TileEntitySapTap.class, "factory_sap_extractor"),
     ANTHRO_GEN(50, false, TileEntityAnthroGen.class, "factory_anthro_gen"),
+    BIBLIO_GEN(51, false, TileEntityBiblioGen.class, "factory_biblio_gen"),
 
-    POCKETCRAFTGUI(101, true)
+    POCKETCRAFTGUI(101, true),
+    NONE(102, false)
     ;
 
     public static int MAX_ID = 0;

@@ -571,6 +571,11 @@ public final class Coord implements IDataSerializable, ISaneCoord, Comparable<Co
         // Could check blockHasTE() first. Might only be needed for TE-scanning, which is often better done w/ hashmap iteration instead
     }
 
+    public TileEntity forceGetTE() {
+        if (w == null) return null;
+        return w.getTileEntity(x, y, z);
+    }
+
     public boolean blockHasTE() {
         return getBlock().hasTileEntity(getMd());
     }

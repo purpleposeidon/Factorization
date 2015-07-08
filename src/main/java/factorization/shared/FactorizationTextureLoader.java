@@ -5,6 +5,7 @@ import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
+import java.lang.reflect.Array;
 import java.lang.reflect.Field;
 
 import net.minecraft.client.renderer.texture.IIconRegister;
@@ -23,21 +24,23 @@ import cpw.mods.fml.relauncher.SideOnly;
 public class FactorizationTextureLoader {
     /**
      * This annotation indicates that the IIcon is in a subdirectory. The following are equivalent, and will cause the icon to be registered as "servo/catGrabber"
+     * <pre>
      * IIcon servo$catGrabber;
-     * @Directory("servo")
+     * @<b></b>Directory("servo")
      * IIcon catGrabber;
+     * </pre>
      */
     @Retention(value = RetentionPolicy.RUNTIME)
     @Target(value = ElementType.FIELD)
     public @interface Directory {
-        public String value();
+        String value();
     }
     
     /** IIcons with this annotation will not be registered.
      */
     @Retention(value = RetentionPolicy.RUNTIME)
     @Target(value = ElementType.FIELD)
-    public @interface Ignore { };
+    public @interface Ignore { }
     
     public abstract static class IIconGroup {
         public String group_prefix;
@@ -76,6 +79,21 @@ public class FactorizationTextureLoader {
                 if (IIcon.class.isAssignableFrom(f.getType())) {
                     String icon_file = prefix + f.getName();
                     f.set(instance, reg.registerIcon(icon_file.replace('$', '/')));
+                }
+                if (IIcon[].class.isAssignableFrom(f.getType())) {
+                    IIcon[] array = (IIcon[]) f.get(base);
+                    for (int i = 0; i < array.length; i++) {
+                        String icon_file = prefix + f.getName() + i;
+                        array[i] = reg.registerIcon(icon_file.replace('$', '/'));
+                    }
+                } else if (f.getType().isArray()) {
+                    Object theArray = f.get(base);
+                    int len = Array.getLength(theArray);
+                    Class<?> componentType = theArray.getClass().getComponentType();
+                    for (int i = 0; i < len; i++) {
+                        Object val = Array.get(theArray, i);
+                        register(reg, componentType, val, prefix + i);
+                    }
                 }
             }
         } catch (Exception e) {

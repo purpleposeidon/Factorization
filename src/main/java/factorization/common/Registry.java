@@ -11,6 +11,7 @@ import cpw.mods.fml.common.registry.GameRegistry;
 import cpw.mods.fml.common.registry.GameRegistry.Type;
 import cpw.mods.fml.relauncher.Side;
 import factorization.api.IActOnCraft;
+import factorization.beauty.BlockShaft;
 import factorization.beauty.ItemGrossFood;
 import factorization.beauty.ItemLeafBomb;
 import factorization.ceramics.ItemGlazeBucket;
@@ -90,6 +91,7 @@ public class Registry {
     public Block colossal_block;
     public Block gargantuan_block;
     public Block mantlerock_block;
+    public BlockShaft wooden_shaft;
 
     public ItemStack servorail_item;
     public ItemStack empty_socket_item, socket_lacerator, socket_robot_hand, socket_shifter;
@@ -183,6 +185,7 @@ public class Registry {
         }
         gargantuan_block = new GargantuanBlock().setBlockName("factorization:gargantuanBrick").setCreativeTab(Core.tabFactorization);
         mantlerock_block = new BlockNetherrack().setBlockName("factorization:mantlerock").setBlockTextureName("factorization:mantlerock").setHardness(1.25F).setResistance(7.0F).setStepSound(Block.soundTypeStone);
+        wooden_shaft = (BlockShaft)(new BlockShaft(Material.wood).setBlockName("factorization:woodenShaft").setStepSound(Block.soundTypeWood).setHardness(2F).setResistance(5));
         
         GameRegistry.registerBlock(factory_block, ItemFactorizationBlock.class, "FzBlock");
         GameRegistry.registerBlock(lightair_block, "Lightair");
@@ -192,6 +195,7 @@ public class Registry {
         GameRegistry.registerBlock(blasted_bedrock_block, "BlastedBedrock");
         GameRegistry.registerBlock(gargantuan_block, ItemGargantuanBlock.class, "GargantuanBlock");
         GameRegistry.registerBlock(mantlerock_block, "MantleRock");
+        GameRegistry.registerBlock(wooden_shaft, "WoodenShaft");
         if (DeltaChunk.enabled()) {
             GameRegistry.registerBlock(colossal_block, ColossalBlockItem.class, "ColossalBlock");
             GameRegistry.registerTileEntity(TileEntityColossalHeart.class, "fz_colossal_heart");

@@ -1,3 +1,19 @@
+0.8.95
+  Barrel carts, with lots of help from asie!
+  Made sloped tracks climable! (Can disable with -Dfz.disableRailStairs=true (config in coremods being kind of weird or something? I dunno man.))
+  Added IVexatiousCrafting, a general crafting API, so that Vexatos can implement his insane plans.
+  Bugfixes & polishes
+  Fixed a dupebug reported by dtk.
+  Barked blocks work in creative mode
+  Fixed FzMan lookup of recipes with OD/wildcard entries
+  Improved the pickblock improvements:
+    Properly handles blocks that don't drop things, like glass.
+    A common hiccup was replacing your pick with cobblestone. Now if you do this, you can complete your cobblestone use, hit pick-block while holding & looking at cobblestone, and it will put your pick back.
+
+0.8.94
+  The weird unregistered packet situation causes spam and sadness instead of crashes and sadness
+  Made DSE collision detection way faster
+
 0.8.93
   Don't allow natural spawns in the hammar dimension
   FZDS crash-fixes

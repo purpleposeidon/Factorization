@@ -1,0 +1,12 @@
+\title{Pick Block}
+
+The "pick block" button (middle click) has been made more useful.
+If pick a block that is not on your hotbar,
+your inventory will be searched for that block,
+and, if found, it will be moved to your hotbar.
+
+Additionally, if you middle click smooth stone,
+and you have smooth stone in your inventory,
+then it will pull that block up if you have
+no cobblestone.
+This also applies to similar blocks.

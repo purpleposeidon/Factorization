@@ -1,3 +1,33 @@
+=== Actually Dangerous Battle Rewrite ===
+Weapons for each component that it drops. Normal cracked blocks drop dark iron ingots.
+Whenever a crack is mined, it uses a technique that gets rid of the player and places itself in an advantageous spot maybe? Also equips a new weapon
+player-disposal-techniques:
+    fall through the ground, pop out elsewhere; players that might be where it's about to return get launched away; spawns particles @ ground before it pops out
+    tilt over sideways (and magnetically push the player away)
+Unarmed colossi must be somewhat able to hold its own:
+    must move faster in general
+    must actually kind of move towards the player to attack
+    ground pound: ground pounds, causes standing-on-ground players to get launched dangerously high into the air
+    leaping towards target if it's far away
+    quickly turning 180°
+    hammer smashing
+    face plant (blinding & melting through ground if successful?)
+    extremely quick 180°/90° spin; snap noise; teleport-spin
+weapon textures must be cracked, indicating minability
+    diamond shard launcher
+    tractor beam
+    laser
+    lava launcher
+    flame thrower
+    mob spawner
+    TNT cannon
+    death bats
+    freezing
+    paralysis
+    deadly teleportation
+    block whirlwind
+
+
 === Engagement ===
 
 After the player has completed particular achievements, 'e is given a "Weird Tablet".

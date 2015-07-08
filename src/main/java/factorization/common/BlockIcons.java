@@ -84,12 +84,13 @@ public class BlockIcons {
     public static IIcon socket$corkscrew;
     public static IIcon socket$mini_piston;
 
-    public static IIcon mechanism$hinge_bottom, mechanism$hinge_side, mechanism$hinge_uvs;
+    public static IIcon mechanism$hinge_uvs;
 
     
     public static IIcon utiligoo$invasion;
 
     public static IIcon beauty$saptap, beauty$saptap_top, beauty$anthrogen;
+    public static IIcon[] beauty$shaft = new IIcon[4];
     
     @Directory("storage")
     public static BarrelTextureset normal, silky, hopping, sticky;

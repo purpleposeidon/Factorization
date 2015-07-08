@@ -6,7 +6,7 @@ This might explain other spinning you've seen in places.
 While all this baseless gobledegook hypothesizing sounds more like the domain of magic than of science,
 the engineer in you can't resist investigating another potential source for infinite power.
 
-Early models would only spin when you weren't looking, but gluing the pages shut solves that problem.
+Early prototypes would only spin when you weren't looking, but gluing the pages shut solves that problem.
 Unfortunately its power output proved to be too anemic for any practical purpose, doomed to be a curiosity...
 until you chanced to take it to your local library, where it whirled to life, knocking books off of shelves and making a huge ruckus, and earning yourself a lifetime ban.
 

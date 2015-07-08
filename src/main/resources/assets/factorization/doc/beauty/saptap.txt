@@ -1,0 +1,7 @@
+\title{The Sap Tap}
+
+There's more than one way to harvest energy from the sun.
+Trees have been collecting sunlight long before mankind first reflected it onto \link{solarboilers}{Solar Boilers}!
+The Sap Tap extracts a thick and foul-tasting sap from trees.
+It is quite unpaletable, but the \link{calio}{Caliometric Burner} has no tongue with which to notice.
+

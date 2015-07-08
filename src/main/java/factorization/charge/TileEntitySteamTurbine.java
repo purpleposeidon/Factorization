@@ -2,6 +2,7 @@ package factorization.charge;
 
 import java.io.IOException;
 
+import factorization.api.IShaftPowerSource;
 import factorization.api.datahelpers.DataHelper;
 import factorization.api.datahelpers.Share;
 import factorization.shared.*;
@@ -23,7 +24,7 @@ import factorization.common.BlockIcons;
 import factorization.common.FactoryType;
 import factorization.shared.NetworkFactorization.MessageType;
 
-public class TileEntitySteamTurbine extends TileEntityCommon implements IFluidHandler, IChargeConductor {
+public class TileEntitySteamTurbine extends TileEntityCommon implements IFluidHandler, IChargeConductor, IShaftPowerSource {
     FluidTank steamTank = new FluidTank(/*this,*/ TileEntitySolarBoiler.steam_stack.copy(), 1000*16);
     Charge charge = new Charge(this);
     int fan_speed = 0;
@@ -109,6 +110,8 @@ public class TileEntitySteamTurbine extends TileEntityCommon implements IFluidHa
         }
     }
 
+    transient double rotation_power_buffer = 0;
+
     @Override
     public void updateEntity() {
         fan_rotation += Math.min(35, fan_speed/5);
@@ -136,6 +139,7 @@ public class TileEntitySteamTurbine extends TileEntityCommon implements IFluidHa
                 steam.amount -= fan_speed;
             }
         }
+        rotation_power_buffer = fan_speed;
         if (fan_speed <= 0) {
             fan_speed = 0;
             return;
@@ -156,5 +160,29 @@ public class TileEntitySteamTurbine extends TileEntityCommon implements IFluidHa
             return true;
         }
         return false;
+    }
+
+    @Override
+    public boolean canConnect(ForgeDirection direction) {
+        return direction == ForgeDirection.UP;
+    }
+
+    @Override
+    public double availablePower(ForgeDirection direction) {
+        if (direction == ForgeDirection.UP) return rotation_power_buffer;
+        return 0;
+    }
+
+    @Override
+    public double deplete(ForgeDirection direction, double maxPower) {
+        double d = Math.min(rotation_power_buffer, maxPower);
+        rotation_power_buffer -= d;
+        return d;
+    }
+
+    @Override
+    public double getAngularSpeed(ForgeDirection direction) {
+        if (direction == ForgeDirection.UP) return fan_speed;
+        return 0;
     }
 }
