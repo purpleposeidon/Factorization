@@ -23,6 +23,7 @@ group = "factorization"
 archivesBaseName = "Factorization"
 
 ext.apiRailcraft = "./apis/railcraft"
+// ext.apiIc2 = "./apis/industrialcraft-2-2.2.737-experimental-api.jar"
 
 
 minecraft {
@@ -65,7 +66,7 @@ dependencies {
     // for more info...
     // http://www.gradle.org/docs/current/userguide/artifact_dependencies_tutorial.html
     // http://www.gradle.org/docs/current/userguide/dependency_management.html
-
+    compile files("apis/*.jar") // TODO: Copy what railcraft's build.gradle does for the IC2 dependency
 }
 
 compileJava {

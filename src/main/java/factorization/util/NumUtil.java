@@ -8,28 +8,20 @@ public final class NumUtil {
     public static Random rand = new Random();
     private static ThreadLocal<Random> random_cache = new ThreadLocal<Random>();
 
-    public static boolean significantChange(float a, float b, float threshold) {
-        if (a == b) {
-            return false;
-        }
-        if (a == 0 || b == 0) {
-            a = Math.abs(a);
-            b = Math.abs(b);
-            if (a + b < 2) return true;
-        }
-        float thresh = Math.abs(a - b)/Math.max(a, b);
+    public static boolean significantChange(double a, double b, double threshold) {
+        if (a == b) return false;
+        if (a == 0 || b == 0) return true;
+        double thresh = Math.abs(a - b) / Math.max(a, b);
         return thresh > threshold;
     }
 
-    public static boolean significantChange(float a, float b) {
-        return significantChange(a, b, 0.05F);
+    public static boolean significantChange(double a, double b) {
+        return significantChange(a, b, 0.05);
     }
 
     /**
-     *
-     * @param oldValue
-     * @param newValue
-     * @param partial
+     * See also: {@link factorization.fzds.interfaces.Interpolation}
+     * @param partial value between 0 and 1, inclusive
      * @return the linear interpolation of the two values
      */
     public static float interp(float oldValue, float newValue, float partial) {

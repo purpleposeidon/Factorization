@@ -19,6 +19,7 @@ import cpw.mods.fml.relauncher.Side;
 import factorization.shared.Core;
 
 public class AtVerifier {
+    // We might be able to get rid of this now? The at issues may have been caused only by the .zip thing.
     private static String currentLine;
     
     public static void verify() {
@@ -63,7 +64,7 @@ public class AtVerifier {
     protected static void validate(String access, String className, String member) throws Throwable {
         Class<?> theClass;
         try {
-            theClass = AtVerifier.class.forName(className);
+            theClass = Class.forName(className);
         } catch (ClassNotFoundException e) {
             if (FMLCommonHandler.instance().getSide() != Side.CLIENT) {
                 // Client-only classes are in the AT.
@@ -72,7 +73,7 @@ public class AtVerifier {
                 return;
             }
             throw e;
-        }
+        } // Someone was running optifine on the server, causing Tessellator to exist, causing further weird issues to happen.
         if (member == null) {
             validateClass(access, theClass);
             return;

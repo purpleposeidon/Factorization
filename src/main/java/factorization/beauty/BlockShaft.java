@@ -1,6 +1,5 @@
 package factorization.beauty;
 
-import cpw.mods.fml.common.Loader;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import factorization.api.Coord;
@@ -8,14 +7,11 @@ import factorization.api.IShaftPowerSource;
 import factorization.shared.Core;
 import factorization.shared.FactorizationBlockRender;
 import factorization.shared.IRenderNonTE;
-import factorization.shared.NORELEASE;
 import factorization.util.SpaceUtil;
-import ic2.api.energy.tile.IKineticSource;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.client.renderer.texture.IIconRegister;
 import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.AxisAlignedBB;
@@ -35,7 +31,7 @@ public class BlockShaft extends Block implements IRenderNonTE {
     // Bit layout:
     //      SSDD
     // S = speed
-    // D = direction
+    // D = shaftDirection
 
     public static final ForgeDirection[] meta2direction = new ForgeDirection[] {
             UP, UP, UP, UP, UP,
@@ -75,12 +71,6 @@ public class BlockShaft extends Block implements IRenderNonTE {
     @Override
     public boolean isOpaqueCube() {
         return false;
-    }
-
-    @Override
-    public void onBlockClicked(World w, int x, int y, int z, EntityPlayer player) {
-        int md = w.getBlockMetadata(x, y, z);
-        w.setBlockMetadataWithNotify(x, y, z, (md + 1) % 0xF, Coord.NOTIFY_NEIGHBORS | Coord.UPDATE);
     }
 
     @Override
@@ -196,10 +186,10 @@ public class BlockShaft extends Block implements IRenderNonTE {
     }
 
     public static void propagateVelocity(IShaftPowerSource src, Coord at, ForgeDirection dir) {
-        double angularVelocity = src.getAngularSpeed(dir);
+        double angularVelocity = src.getAngularVelocity(dir);
         int i_speed = (int) (Math.abs(angularVelocity) / Math.PI / 20);
         byte speed = i_speed > MAX_SPEED ? MAX_SPEED : (byte) i_speed;
-        while (at.blockExists()) {
+        while (dir.offsetY != 0 || at.blockExists()) {
             if (!(at.getBlock() instanceof BlockShaft)) break;
             int origMd = at.getMd();
             ForgeDirection d = meta2direction[origMd];
@@ -209,7 +199,6 @@ public class BlockShaft extends Block implements IRenderNonTE {
             at.setMd(newMd, true);
             at.adjust(dir);
         }
-        NORELEASE.fixme("notify the other end of block updates if an end is updated");
     }
 
     @Override

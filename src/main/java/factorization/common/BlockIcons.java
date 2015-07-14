@@ -1,5 +1,6 @@
 package factorization.common;
 
+import factorization.beauty.BlockShaft;
 import net.minecraft.client.renderer.RenderBlocks;
 import net.minecraft.util.IIcon;
 import net.minecraftforge.common.util.ForgeDirection;
@@ -37,7 +38,7 @@ public class BlockIcons {
         wire,
         battery_bottom, battery_top, battery_side, battery_meter,
         boiler_side, boiler_top,
-        mirror_front, mirror_back, mirror_side,
+        mirror_front, mirror_back, mirror_side, mirror_beam,
         turbine_top, turbine_bottom, turbine_side,
         leyden_glass, leyden_glass_side, leyden_knob,
         caliometric_side, caliometric_top;
@@ -89,8 +90,8 @@ public class BlockIcons {
     
     public static IIcon utiligoo$invasion;
 
-    public static IIcon beauty$saptap, beauty$saptap_top, beauty$anthrogen;
-    public static IIcon[] beauty$shaft = new IIcon[4];
+    public static IIcon beauty$saptap, beauty$saptap_top, beauty$anthrogen, beauty$whirligig;
+    public static IIcon[] beauty$shaft = new IIcon[BlockShaft.MAX_SPEED + 1];
     
     @Directory("storage")
     public static BarrelTextureset normal, silky, hopping, sticky;

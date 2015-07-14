@@ -4,15 +4,15 @@ import java.io.IOException;
 
 import factorization.api.datahelpers.DataHelper;
 import factorization.api.datahelpers.Share;
+import factorization.common.FzConfig;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.block.Block;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.IIcon;
+import net.minecraft.world.EnumSkyBlock;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.ForgeDirection;
-import cpw.mods.fml.common.network.internal.FMLProxyPacket;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import factorization.api.Coord;
@@ -26,13 +26,13 @@ import factorization.shared.NetworkFactorization.MessageType;
 import factorization.shared.TileEntityCommon;
 
 public class TileEntityMirror extends TileEntityCommon {
-    Coord reflection_target = null;
+    public Coord reflection_target = null;
 
     //don't save
     public boolean is_lit = false;
     int next_check = 1;
     //don't save, but *do* share w/ client
-    public int target_rotation = -99;
+    public transient int target_rotation = -99;
 
     @Override
     public FactoryType getFactoryType() {
@@ -88,31 +88,19 @@ public class TileEntityMirror extends TileEntityCommon {
         return angle;
     }
 
-    boolean hasSun() {
+    public boolean hasSun() {
         boolean raining = getWorldObj().isRaining() && getWorldObj().getBiomeGenForCoords(xCoord, yCoord).rainfall > 0;
         if (raining) return false;
-        if (!worldObj.isDaytime()) return false;
-        // Used to be able to use Coord.canSeeSky(), but I made my blocks transparent. >_>
-        Coord skyLook = new Coord(this);
-        int y = yCoord;
-        World w = getWorldObj();
-        for (int i = y + 1; i < w.getHeight(); i++) {
-            skyLook.y = i;
-            if (!skyLook.canBeSeenThrough()) {
-                return false;
-            }
-            if (skyLook.getTE(TileEntityMirror.class) != null) {
-                return false;
-            }
-        }
-        return true;
+        if (worldObj.getSavedLightValue(EnumSkyBlock.Sky, xCoord, yCoord, zCoord) < 0xF) return false;
+        return worldObj.getSunBrightnessFactor(0) > 0.7;
     }
 
     int last_shared = -1;
 
     void broadcastTargetInfoIfChanged() {
         if (getTargetInfo() != last_shared) {
-            broadcastMessage(null, MessageType.MirrorDescription, getTargetInfo());
+            Coord target = reflection_target == null ? new Coord(this) : reflection_target;
+            broadcastMessage(null, MessageType.MirrorDescription, getTargetInfo(), target.x, target.y, target.z);
             last_shared = getTargetInfo();
         }
     }
@@ -134,6 +122,10 @@ public class TileEntityMirror extends TileEntityCommon {
         }
         if (messageType == MessageType.MirrorDescription) {
             target_rotation = input.readInt();
+            reflection_target = new Coord(this);
+            reflection_target.x = input.readInt();
+            reflection_target.y = input.readInt();
+            reflection_target.z = input.readInt();
             getCoord().redraw();
             gotten_info_packet = true;
             return true;
@@ -175,15 +167,21 @@ public class TileEntityMirror extends TileEntityCommon {
     void setNextCheck() {
         next_check = 80 + rand.nextInt(20);
     }
+
+    public boolean last_drawn_as_lit = false;
     
     @Override
     public void updateEntity() {
-        if (worldObj.isRemote) {
-            return;
-        }
         if (next_check-- <= 0) {
+            setNextCheck();
+            if (worldObj.isRemote) {
+                is_lit = hasSun();
+                if (is_lit != last_drawn_as_lit && FzConfig.mirror_sunbeams) {
+                    new Coord(this).markBlockForUpdate();
+                }
+                return;
+            }
             try {
-                setNextCheck();
                 if (reflection_target == null) {
                     findTarget();
                     if (reflection_target == null) {
@@ -211,9 +209,10 @@ public class TileEntityMirror extends TileEntityCommon {
                         return;
                     }
                 }
-    
-                if (hasSun() != is_lit) {
-                    is_lit = hasSun();
+
+                boolean has_sun = hasSun();
+                if (has_sun != is_lit) {
+                    is_lit = has_sun;
                     target.addReflector(is_lit ? getPower() : -getPower());
                 }
             } finally {

@@ -1,6 +1,7 @@
 package factorization.beauty;
 
 import cpw.mods.fml.common.Loader;
+import cpw.mods.fml.common.SidedProxy;
 import factorization.api.Coord;
 import factorization.api.IShaftPowerSource;
 import factorization.util.SpaceUtil;
@@ -11,7 +12,7 @@ import net.minecraftforge.common.util.ForgeDirection;
 public class KineticProxy {
     public static IShaftPowerSource cast(TileEntity te) {
         if (te instanceof IShaftPowerSource) return (IShaftPowerSource) te;
-        return castIc2(te);
+        return ic2Proxy.convert(te);
     }
 
     /**
@@ -41,24 +42,23 @@ public class KineticProxy {
         }
     }
 
-    static boolean ic2_kinetic_source = Loader.isModLoaded("IC2");
-    private static IShaftPowerSource castIc2(TileEntity te) {
-        if (!ic2_kinetic_source) return null;
-        try {
-            return castIc20(te);
-        } catch (Throwable t) {
-            t.printStackTrace();
-            ic2_kinetic_source = false;
+    private static class Ic2ConverterProxy {
+        IShaftPowerSource convert(TileEntity te) {
             return null;
         }
     }
 
-    private static IShaftPowerSource castIc20(final TileEntity te) {
-        if (!(te instanceof IKineticSource)) return null;
-        Ic4Fz ret = new Ic4Fz((IKineticSource) te);
-        ret.verify();
-        return ret;
+    private static class Ic2ConverterImpl {
+        IShaftPowerSource convert(TileEntity te) {
+            if (!(te instanceof IKineticSource)) return null;
+            Ic4Fz ret = new Ic4Fz((IKineticSource) te);
+            ret.verify();
+            return ret;
+        }
     }
+
+    @SidedProxy(clientSide = "factorization.beauty.KineticProxy.Ic2ConverterImpl", serverSide = "factorization.beauty.KineticProxy.Ic2ConverterImpl", modId = "IC2")
+    static Ic2ConverterProxy ic2Proxy = new Ic2ConverterProxy(); //Loader.isModLoaded("IC2") ?
 
     public static double IC2_FZ_RATIO = 1.0;
     public static double IC2_ANGULAR_VELOCITY_RATIO = 1.0 / 20.0;
@@ -89,12 +89,12 @@ public class KineticProxy {
         }
 
         @Override
-        public double deplete(ForgeDirection direction, double maxPower) {
+        public double powerConsumed(ForgeDirection direction, double maxPower) {
             return base.requestkineticenergy(direction, (int) (maxPower * IC2_FZ_RATIO)) / IC2_FZ_RATIO;
         }
 
         @Override
-        public double getAngularSpeed(ForgeDirection direction) {
+        public double getAngularVelocity(ForgeDirection direction) {
             return base.maxrequestkineticenergyTick(direction) * IC2_ANGULAR_VELOCITY_RATIO;
         }
     }

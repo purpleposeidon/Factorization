@@ -5,6 +5,7 @@ import factorization.api.datahelpers.Share;
 import factorization.shared.*;
 import factorization.util.DataUtil;
 import factorization.util.FluidUtil;
+import io.netty.buffer.ByteBuf;
 import net.minecraft.init.Blocks;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.IIcon;
@@ -40,6 +41,7 @@ public class TileEntitySolarBoiler extends TileEntityCommon implements IReflecti
     FluidTank waterTank = new FluidTank(/*this, */ water_stack.copy(), 1000*8);
     FluidTank steamTank = new FluidTank(/*this, */ steam_stack.copy(), 1000*8);
     int reflector_count = 0;
+    public transient short given_heat = 0, last_synced_heat = 0;
     
     public TileEntitySolarBoiler() {
         waterTank.getFluid().amount = 0;
@@ -71,6 +73,7 @@ public class TileEntitySolarBoiler extends TileEntityCommon implements IReflecti
         if (data.isReader()) {
             sanitize();
         }
+        given_heat = data.as(Share.VISIBLE_TRANSIENT, "givenHeat").putShort(given_heat);
     }
     
     private FluidTank getTank(ForgeDirection from) {
@@ -150,7 +153,21 @@ public class TileEntitySolarBoiler extends TileEntityCommon implements IReflecti
             steamTank.setFluid(steam_stack.copy());
         }
     }
-    
+
+    IFluidHandler above = this;
+
+    IFluidHandler getAbove() {
+        if (above == this) {
+            above = getCoord().add(0, 1, 0).getTE(IFluidHandler.class);
+        }
+        return above;
+    }
+
+    @Override
+    public void onNeighborTileChanged(int tilex, int tiley, int tilez) {
+        above = this;
+    }
+
     @Override
     public void updateEntity() {
         if (worldObj.isRemote) {
@@ -161,16 +178,21 @@ public class TileEntitySolarBoiler extends TileEntityCommon implements IReflecti
         FluidStack steam = steamTank.getFluid();
         Coord here = getCoord();
         long seed = here.seed() + worldObj.getTotalWorldTime();
-        if (steam.amount*2 > steamTank.getCapacity() || seed % 20 == 0) {
-            //Send steam upwards
-            Coord above = here.add(0, 1, 0);
-            IFluidHandler tc = above.getTE(IFluidHandler.class);
-            if (tc != null) {
-                FluidStack sending_steam = steam.copy();
-                sending_steam.amount = Math.min(sending_steam.amount, 1000);
-                steam.amount -= tc.fill(ForgeDirection.DOWN, steam.copy(), true);
-                steam.amount = Math.max(0, steam.amount);
+        short measure_time = 5;
+        if (seed % measure_time == 0) {
+            short m = (short) (given_heat / measure_time);
+            given_heat = 0;
+            if (m != last_synced_heat) {
+                last_synced_heat = m;
+                broadcastMessage(null, NetworkFactorization.MessageType.BoilerHeat, last_synced_heat);
             }
+        }
+        IFluidHandler aboveTank = getAbove();
+        if (aboveTank != null) {
+            FluidStack sending_steam = steam.copy();
+            sending_steam.amount = Math.min(sending_steam.amount, 1000);
+            steam.amount -= aboveTank.fill(ForgeDirection.DOWN, steam.copy(), true);
+            steam.amount = Math.max(0, steam.amount);
         }
         boolean random = seed % 40 == 0;
         if (water.amount <= 1000 || (random && water.amount < waterTank.getCapacity() - 1000)) {
@@ -212,6 +234,7 @@ public class TileEntitySolarBoiler extends TileEntityCommon implements IReflecti
     }
     
     public void applyHeat(int heat) {
+        given_heat += heat;
         sanitize();
         FluidStack water = waterTank.getFluid();
         FluidStack steam = steamTank.getFluid();
@@ -245,5 +268,14 @@ public class TileEntitySolarBoiler extends TileEntityCommon implements IReflecti
         return "Power: " + reflector_count
                 + "\nSteam: " + String.format("%.1f", s)
                 + "\nWater: " + String.format("%.1f", w);
+    }
+
+    @Override
+    public boolean handleMessageFromServer(NetworkFactorization.MessageType messageType, ByteBuf input) throws IOException {
+        if (messageType == NetworkFactorization.MessageType.BoilerHeat) {
+            given_heat = last_synced_heat = input.readShort();
+            return true;
+        }
+        return super.handleMessageFromServer(messageType, input);
     }
 }

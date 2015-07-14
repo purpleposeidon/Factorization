@@ -12,8 +12,7 @@ public class BlockRenderDefault extends FactorizationBlockRender {
             if (c == null) {
                 return false;
             }
-            renderNormalBlock(rb, c.getFactoryType().md);
-            return true;
+            return renderNormalBlock(rb, c.getFactoryType().md);
         } else {
             renderNormalBlock(rb, metadata);
         }

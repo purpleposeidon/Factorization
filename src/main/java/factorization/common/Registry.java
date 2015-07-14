@@ -107,7 +107,8 @@ public class Registry {
             rocket_engine_item_hidden,
             parasieve_item,
             compression_crafter_item,
-            sap_generator_item, anthro_generator_item;
+            sap_generator_item, anthro_generator_item,
+            shaft_generator_item, steam_to_shaft;
     public ItemStack silver_ore_item, silver_block_item, lead_block_item,
             dark_iron_block_item;
     public ItemStack is_factory, is_lamp, is_lightair;
@@ -292,6 +293,8 @@ public class Registry {
         caliometric_burner_item = FactoryType.CALIOMETRIC_BURNER.itemStack();
         sap_generator_item = FactoryType.SAP_TAP.itemStack();
         anthro_generator_item = FactoryType.ANTHRO_GEN.itemStack();
+        shaft_generator_item = FactoryType.SHAFT_GEN.itemStack();
+        steam_to_shaft = FactoryType.STEAM_SHAFT.itemStack();
         heater_item = FactoryType.HEATER.itemStack();
         mirror_item_hidden = FactoryType.MIRROR.itemStack();
         leadwire_item = FactoryType.LEADWIRE.itemStack();
@@ -1187,6 +1190,13 @@ public class Registry {
                 'W', new ItemStack(Blocks.wool, 1, red),
                 '-', Blocks.wooden_pressure_plate,
                 'i', Items.glowstone_dust);
+        oreRecipe(shaft_generator_item,
+                "-I-",
+                "IUI",
+                "-I-",
+                '-', Blocks.heavy_weighted_pressure_plate,
+                'I', dark_iron,
+                'U', Blocks.cauldron);
 
         if (Core.enable_test_content) {
             TestContent.add();

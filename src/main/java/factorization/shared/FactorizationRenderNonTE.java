@@ -6,6 +6,7 @@ import net.minecraft.block.Block;
 import net.minecraft.client.renderer.RenderBlocks;
 import net.minecraft.world.IBlockAccess;
 import net.minecraftforge.client.IItemRenderer;
+import net.minecraftforge.client.MinecraftForgeClient;
 import org.lwjgl.opengl.GL11;
 
 public class FactorizationRenderNonTE implements ISimpleBlockRenderingHandler {
@@ -34,7 +35,7 @@ public class FactorizationRenderNonTE implements ISimpleBlockRenderingHandler {
     @Override
     public boolean renderWorldBlock(IBlockAccess world, int x, int y, int z,
                                     Block block, int modelId, RenderBlocks renderBlocks) {
-        int renderPass = BlockFactorization.CURRENT_PASS; //MinecraftForgeClient.getRenderPass(); //Bluh
+        int renderPass = 0; //MinecraftForgeClient.getRenderPass(); // Ohhh, look, that helpful method's returned! Like 2 years after I asked for it back! Except now it's broken. Great job, Forge.
         if (block instanceof IRenderNonTE) {
             int fmd = world.getBlockMetadata(x, y, z);
             FactorizationBlockRender FBR = ((IRenderNonTE) block).getFBR();

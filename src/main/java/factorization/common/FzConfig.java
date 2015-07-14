@@ -65,6 +65,7 @@ public class FzConfig {
     public static boolean show_time_on_fullscreen = true;
     public static boolean require_book_for_manual = true;
     public static boolean infinite_guide_usage = false;
+    public static boolean mirror_sunbeams = true;
     public static Graylist<Block> lacerator_block_graylist;
     public static String f = "f";
     
@@ -188,6 +189,7 @@ public class FzConfig {
             fix_middle_click = getBoolConfig("fixPickBlock", "client", fix_middle_click, "Make middle clicking more useful");
             large_servo_instructions = editMain().getBoolConfig("largeServoInstructions", "client", large_servo_instructions, "Render servo instructions extra-large. This can also be toggled on and off using '/f servoInstructionSize'.");
             show_time_on_fullscreen = editRun().getBoolConfig("showTimeOnFullscreen", "client", show_time_on_fullscreen, "If true, show the time every half hour");
+            mirror_sunbeams = editRun().getBoolConfig("drawMirrorSunbeams", "client", mirror_sunbeams, "If false, mirrors won't draw sunbeams");
         }
 
 

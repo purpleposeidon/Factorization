@@ -3,6 +3,7 @@ package factorization.shared;
 import cpw.mods.fml.common.network.ByteBufUtils;
 import cpw.mods.fml.relauncher.Side;
 import factorization.api.datahelpers.DataInByteBuf;
+import factorization.notify.Notice;
 import factorization.util.DataUtil;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufAllocator;
@@ -54,6 +55,8 @@ public class NetworkFactorization {
                 output.writeBoolean((Boolean) item);
             } else if (item instanceof Float) {
                 output.writeFloat((Float) item);
+            } else if (item instanceof Double) {
+                output.writeDouble((Double) item);
             } else if (item instanceof ItemStack) {
                 ItemStack is = (ItemStack) item;
                 if (is == EMPTY_ITEMSTACK) is = null;
@@ -159,7 +162,11 @@ public class NetworkFactorization {
             Coord here = new Coord(world, x, y, z);
             
             if (Core.debug_network) {
-                Core.logFine("FactorNet: " + messageType + "      " + here);
+                if (world.isRemote) {
+                    new Notice(here, messageType.name()).sendTo(player);
+                } else {
+                    Core.logFine("FactorNet: " + messageType + "      " + here);
+                }
             }
 
             if (!here.blockExists() && world.isRemote) {
@@ -324,7 +331,7 @@ public class NetworkFactorization {
     
     
     private static byte message_type_count = 0;
-    static public enum MessageType {
+    public enum MessageType {
         factorizeCmdChannel,
         PlaySound, EntityParticles(true),
         
@@ -345,6 +352,7 @@ public class NetworkFactorization {
         CompressionCrafter, CompressionCrafterBeginCrafting, CompressionCrafterBounds,
         ScissorState,
         GeneratorParticles,
+        BoilerHeat,
         
         // Messages to entities; (true) marks that they are entity messages.
         servo_brief(true), servo_item(true), servo_complete(true), servo_stopped(true),

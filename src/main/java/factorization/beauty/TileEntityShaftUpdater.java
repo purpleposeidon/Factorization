@@ -1,5 +1,7 @@
 package factorization.beauty;
 
+import cpw.mods.fml.common.FMLCommonHandler;
+import cpw.mods.fml.relauncher.Side;
 import factorization.api.Coord;
 import factorization.api.IShaftPowerSource;
 import net.minecraft.nbt.NBTTagCompound;
@@ -40,21 +42,27 @@ public class TileEntityShaftUpdater extends TileEntity implements IShaftPowerSou
 
     @Override
     public boolean canUpdate() {
-        return !worldObj.isRemote;
+        return FMLCommonHandler.instance().getEffectiveSide() == Side.SERVER;
     }
 
     @Override
     public void updateEntity() {
         if (worldObj.isRemote) return;
-        if (worldObj.getTotalWorldTime() % 5 != 0) return;
         if (base == null) {
             base = KineticProxy.cast(worldObj.getTileEntity(baseX, baseY, baseZ));
             if (base == null) {
                 invalidate();
                 return;
             }
+            propagate();
+            return;
         }
-        BlockShaft.propagateVelocity(this, new Coord((TileEntity) base), dir);
+        if (worldObj.getTotalWorldTime() % 5 != 0) return;
+        propagate();
+    }
+
+    void propagate() {
+        BlockShaft.propagateVelocity(this, new Coord(this), dir);
     }
     
     boolean broken() {
@@ -74,14 +82,14 @@ public class TileEntityShaftUpdater extends TileEntity implements IShaftPowerSou
     }
 
     @Override
-    public double deplete(ForgeDirection direction, double maxPower) {
+    public double powerConsumed(ForgeDirection direction, double maxPower) {
         if (broken()) return 0;
-        return base.deplete(direction, maxPower);
+        return base.powerConsumed(direction, maxPower);
     }
 
     @Override
-    public double getAngularSpeed(ForgeDirection direction) {
+    public double getAngularVelocity(ForgeDirection direction) {
         if (broken()) return 0;
-        return base.getAngularSpeed(direction);
+        return base.getAngularVelocity(direction);
     }
 }

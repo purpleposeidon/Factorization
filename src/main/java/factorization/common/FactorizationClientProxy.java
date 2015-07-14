@@ -1,8 +1,7 @@
 package factorization.common;
 
-import factorization.beauty.BlockRenderAnthrogen;
-import factorization.beauty.BlockRenderSapExtractor;
-import factorization.beauty.EntityLeafBomb;
+import factorization.beauty.*;
+import factorization.charge.*;
 import factorization.citizen.EntityCitizen;
 import factorization.citizen.RenderCitizen;
 import factorization.mechanics.BlockRenderHinge;
@@ -38,19 +37,6 @@ import factorization.ceramics.BlockRenderGreenware;
 import factorization.ceramics.ItemRenderGlazeBucket;
 import factorization.ceramics.TileEntityGreenware;
 import factorization.ceramics.TileEntityGreenwareRender;
-import factorization.charge.BatteryItemRender;
-import factorization.charge.BlockRenderBattery;
-import factorization.charge.BlockRenderHeater;
-import factorization.charge.BlockRenderLeydenJar;
-import factorization.charge.BlockRenderMirrorStand;
-import factorization.charge.BlockRenderSteamTurbine;
-import factorization.charge.BlockRenderWire;
-import factorization.charge.TileEntityHeater;
-import factorization.charge.TileEntityHeaterRenderer;
-import factorization.charge.TileEntityLeydenJar;
-import factorization.charge.TileEntityLeydenJarRender;
-import factorization.charge.TileEntitySteamTurbine;
-import factorization.charge.TileEntitySteamTurbineRender;
 import factorization.colossi.ColossusController;
 import factorization.colossi.ColossusControllerRenderer;
 import factorization.crafting.BlockRenderCompressionCrafter;
@@ -189,6 +175,7 @@ public class FactorizationClientProxy extends FactorizationProxy {
             setTileEntityRendererDispatcher(SocketFanturpeller.class, new TileEntitySocketRenderer());
             setTileEntityRendererDispatcher(TileEntityHinge.class, new TileEntityHingeRenderer());
             setTileEntityRendererDispatcher(SocketPoweredCrank.class, new TileEntitySocketRenderer());
+            setTileEntityRendererDispatcher(TileEntitySteamShaft.class, new TileEntitySteamShaftRenderer());
         }
 
         RenderingRegistry.registerEntityRenderingHandler(TileEntityWrathLamp.RelightTask.class, new EmptyRender());
@@ -201,10 +188,10 @@ public class FactorizationClientProxy extends FactorizationProxy {
 
         RenderingRegistry.registerBlockHandler(new FactorizationRender());
         RenderingRegistry.registerBlockHandler(new FactorizationRenderNonTE());
+        new BlockRenderDefault();
         BlockRenderBattery renderBattery = new BlockRenderBattery();
         BlockRenderDayBarrel renderBarrel = new BlockRenderDayBarrel();
         new BlockRenderLeydenJar();
-        new BlockRenderDefault();
         new BlockRenderHeater();
         new BlockRenderLamp();
         new BlockRenderMirrorStand();
@@ -219,6 +206,8 @@ public class FactorizationClientProxy extends FactorizationProxy {
         new BlockRenderHinge();
         new BlockRenderSapExtractor();
         new BlockRenderAnthrogen();
+        new BlockRenderSteamShaft();
+        new BlockRenderSolarBoiler();
         for (FactoryType ft : new FactoryType[] {
                 FactoryType.SOCKET_EMPTY,
                 FactoryType.SOCKET_LACERATOR,
@@ -236,7 +225,6 @@ public class FactorizationClientProxy extends FactorizationProxy {
                 FactoryType.STAMPER,
                 FactoryType.PACKAGER,
                 FactoryType.SLAGFURNACE,
-                FactoryType.SOLARBOILER,
                 FactoryType.PARASIEVE,
                 FactoryType.CALIOMETRIC_BURNER,
                 FactoryType.CREATIVE_CHARGE

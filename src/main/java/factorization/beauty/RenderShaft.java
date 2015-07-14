@@ -26,7 +26,7 @@ public class RenderShaft extends FactorizationBlockRender {
             if (speed >= 0 && speed < BlockIcons.beauty$shaft.length) {
                 icon = BlockIcons.beauty$shaft[speed];
             } else {
-                icon = BlockIcons.beauty$shaft[0];
+                icon = BlockIcons.error;
             }
         }
         if (world_mode) {

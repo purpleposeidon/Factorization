@@ -174,14 +174,14 @@ public class TileEntitySteamTurbine extends TileEntityCommon implements IFluidHa
     }
 
     @Override
-    public double deplete(ForgeDirection direction, double maxPower) {
+    public double powerConsumed(ForgeDirection direction, double maxPower) {
         double d = Math.min(rotation_power_buffer, maxPower);
         rotation_power_buffer -= d;
         return d;
     }
 
     @Override
-    public double getAngularSpeed(ForgeDirection direction) {
+    public double getAngularVelocity(ForgeDirection direction) {
         if (direction == ForgeDirection.UP) return fan_speed;
         return 0;
     }

@@ -129,18 +129,18 @@ abstract public class FactorizationBlockRender implements ICoord {
         metadata = md;
     }
     
-    protected void renderNormalBlock(RenderBlocks rb, int md) {
+    protected boolean renderNormalBlock(RenderBlocks rb, int md) {
 //		renderPart(rb, Core.registry.factory_block.getBlockTextureFromSideAndMetadata(0, md), 0, 0, 0, 1, 1, 1);
         Block b = Core.registry.factory_rendering_block;
         rb.setRenderBounds(0, 0, 0, 1, 1, 1);
         //b.setBlockBounds(0, 0, 0, 1, 1, 1);
         if (world_mode) {
-            rb.renderStandardBlock(b, x, y, z);
-        }
-        else {
+            return rb.renderStandardBlock(b, x, y, z);
+        } else {
             Core.registry.factory_rendering_block.fake_normal_render = true;
             rb.renderBlockAsItem(b, md, 1.0F);
             Core.registry.factory_rendering_block.fake_normal_render = false;
+            return true;
         }
     }
     

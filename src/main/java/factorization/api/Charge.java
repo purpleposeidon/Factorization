@@ -39,6 +39,11 @@ public class Charge implements IDataSerializable {
         createOrJoinConductorSet();
         return conductorSet.totalCharge += chargeToAdd;
     }
+
+    public void raiseValue(int toAdd) {
+        if (toAdd < getValue()) return;
+        setValue(toAdd);
+    }
     
     /**
      * Removes all the charge.

@@ -2,9 +2,7 @@ package factorization.common;
 
 import cpw.mods.fml.common.registry.GameRegistry;
 import factorization.astro.TileEntityRocketEngine;
-import factorization.beauty.TileEntityAnthroGen;
-import factorization.beauty.TileEntityBiblioGen;
-import factorization.beauty.TileEntitySapTap;
+import factorization.beauty.*;
 import factorization.ceramics.TileEntityGreenware;
 import factorization.charge.*;
 import factorization.crafting.TileEntityCompressionCrafter;
@@ -67,7 +65,7 @@ public enum FactoryType {
     SOCKET_LACERATOR(33, false, SocketLacerator.class, "fzsock_lacerate"),
     SOCKET_ROBOTHAND(34, false, SocketRobotHand.class, "fzsock_hand"),
     SOCKET_SHIFTER(35, true, SocketShifter.class, "fzsock_shift"),
-    // 36 -- Was the short-lived SOCKET_FANTURPELLER; which is now abstract
+    //36 -- Was the short-lived SOCKET_FANTURPELLER; which is now abstract
     SOCKET_PUMP(37, false, PumpLiquids.class, "fzsock_pump"),
     //38 -- Was the short-lived SOCKET_POWERGEN
     SOCKET_BLOWER(39, true, BlowEntities.class, "fzsock_blow"),
@@ -83,6 +81,8 @@ public enum FactoryType {
     SAP_TAP(49, false, TileEntitySapTap.class, "factory_sap_extractor"),
     ANTHRO_GEN(50, false, TileEntityAnthroGen.class, "factory_anthro_gen"),
     BIBLIO_GEN(51, false, TileEntityBiblioGen.class, "factory_biblio_gen"),
+    SHAFT_GEN(52, false, TileEntityShaftGen.class, "factory_shaft_gen"),
+    STEAM_SHAFT(53, false, TileEntitySteamShaft.class, "factory_steam_shaft"),
 
     POCKETCRAFTGUI(101, true),
     NONE(102, false)
