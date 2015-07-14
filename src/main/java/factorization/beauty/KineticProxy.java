@@ -6,6 +6,7 @@ import factorization.api.Coord;
 import factorization.api.IShaftPowerSource;
 import factorization.util.SpaceUtil;
 import ic2.api.energy.tile.IKineticSource;
+import net.minecraft.block.Block;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraftforge.common.util.ForgeDirection;
 
@@ -26,7 +27,8 @@ public class KineticProxy {
         ForgeDirection expectShaftDir = SpaceUtil.sign(dir) == -1 ? dir.getOpposite() : dir;
         Coord start = at.copy();
         while (true) {
-            if (!(at.getBlock() instanceof BlockShaft)) {
+            Block atBlock = at.getBlock();
+            if (!(atBlock instanceof BlockShaft)) {
                 // NOTE: This is not the case on the first iteration
                 IShaftPowerSource powerSource = cast(at.getTE());
                 if (powerSource == null) return null;
@@ -34,7 +36,7 @@ public class KineticProxy {
                 start.setTE(updater);
                 return updater;
             }
-            ForgeDirection shaftDir = BlockShaft.meta2direction[at.getMd()];
+            ForgeDirection shaftDir = ((BlockShaft) atBlock).axis;
             if (shaftDir != expectShaftDir) return null;
             at.adjust(dir);
             // There could be a TileEntityShaftUpdater underneath the Shaft. It is ignored, as it ought to only be at the end.

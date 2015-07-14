@@ -24,30 +24,31 @@ import java.util.ArrayList;
 import static net.minecraftforge.common.util.ForgeDirection.*;
 
 public class BlockShaft extends Block implements IRenderNonTE {
-    public BlockShaft(Material material) {
+    public BlockShaft(Material material, ForgeDirection axis) {
         super(material);
+        if (SpaceUtil.sign(axis) <= 0) throw new IllegalArgumentException();
+        this.axis = axis;
     }
 
     // Bit layout:
     //      SSDD
     // S = speed
     // D = shaftDirection
-
-    public static final ForgeDirection[] meta2direction = new ForgeDirection[] {
-            UP, UP, UP, UP, UP,
-            SOUTH, SOUTH, SOUTH, SOUTH, SOUTH,
-            EAST, EAST, EAST, EAST, EAST,
-            UP /* Invalid. Could be UNKNOWN, let's just use something that's valid */
-    };
-
+    public final ForgeDirection axis;
+    private BlockShaft[] shafts;
     public static final byte MAX_SPEED = 4;
     public static final byte[] meta2speed = new byte[] {
             0, 1, 2, 3, 4,
-            0, 1, 2, 3, 4,
-            0, 1, 2, 3, 4,
-            0 /* Invalid */
+            0, -1, -2, -3, -4,
+            0, 0, 0, 0, 0, 0 /* Invalid */
     };
 
+    public void setShafts(BlockShaft[] shafts) {
+        this.shafts = shafts;
+        if (shafts[axis.ordinal()] != this || shafts[axis.getOpposite().ordinal()] != this) {
+            throw new IllegalArgumentException();
+        }
+    }
 
     @SideOnly(Side.CLIENT)
     FactorizationBlockRender render;
@@ -80,8 +81,7 @@ public class BlockShaft extends Block implements IRenderNonTE {
 
     @Override
     public void setBlockBoundsBasedOnState(IBlockAccess w, int x, int y, int z) {
-        int md = w.getBlockMetadata(x, y, z);
-        ForgeDirection dir = meta2direction[md];
+        ForgeDirection dir = axis;
         float l = 0.5F - 2F / 16F;
         float h = 1 - l;
         if (dir == ForgeDirection.SOUTH) {
@@ -97,8 +97,7 @@ public class BlockShaft extends Block implements IRenderNonTE {
     // Otherwise 'setBlockBoundsBasedOnState' would ordinarily take care of everything
     @Override
     public AxisAlignedBB getCollisionBoundingBoxFromPool(World w, int x, int y, int z) {
-        int md = w.getBlockMetadata(x, y, z);
-        ForgeDirection dir = meta2direction[md];
+        ForgeDirection dir = axis;
         float l = 0.5F - 2F / 16F;
         float h = 1 - l;
         if (dir == ForgeDirection.SOUTH) {
@@ -115,88 +114,33 @@ public class BlockShaft extends Block implements IRenderNonTE {
         return getCollisionBoundingBoxFromPool(w, x, y, z);
     }
 
-    static int getDirection(ForgeDirection fd, int speed) {
-        if (SpaceUtil.sign(fd) == -1) fd = fd.getOpposite();
-        for (int i = 0; i < meta2direction.length; i++) {
-            if (meta2direction[i] == fd && meta2speed[i] == speed) return i;
-        }
-        return speed;
-    }
-
-    @Override
-    public int onBlockPlaced(World w, int x, int y, int z, int side, float hitX, float hitY, float hitZ, int metadata) {
-        // Just figure out the correct metadata
-        ForgeDirection fd = ForgeDirection.getOrientation(side);
-        return getDirection(fd, 0);
-    }
-
-    @Override
-    public void onBlockPlacedBy(World w, int x, int y, int z, EntityLivingBase placer, ItemStack stack) {
-        Coord at = new Coord(w, x, y, z);
-        if (!isUnconnected(at)) return;
-        ArrayList<Coord> lockedNeighbors = new ArrayList<Coord>();
-        ArrayList<Coord> freeNeighbors = new ArrayList<Coord>();
-        for (Coord neighbor : at.getNeighborsAdjacent()) {
-            if (!(neighbor.getBlock() instanceof BlockShaft)) continue;
-            if (isUnconnected(neighbor)) {
-                freeNeighbors.add(neighbor);
-            } else {
-                int nmd = neighbor.getMd();
-                ForgeDirection dir = meta2direction[nmd];
-                if (neighbor.add(dir).equals(at) || neighbor.add(dir.getOpposite()).equals(at)) {
-                    lockedNeighbors.add(neighbor);
-                }
-            }
-        }
-        int n = lockedNeighbors.size() + freeNeighbors.size();
-        if (n != 1) return;
-        for (Coord neighbor : lockedNeighbors) {
-            int nmd = neighbor.getMd();
-            ForgeDirection dir = meta2direction[nmd];
-            at.setMd(getDirection(dir, meta2speed[nmd]), true);
-            return;
-        }
-        for (Coord neighbor : freeNeighbors) {
-            ForgeDirection dir = neighbor.difference(at).getDirection();
-            if (SpaceUtil.sign(dir) == -1) dir = dir.getOpposite();
-            // We're turning the neighbor, so speed won't be kept
-            int dirMd = getDirection(dir, 0);
-            neighbor.setMd(dirMd, true);
-            at.setMd(dirMd, true);
-            return;
-        }
-    }
-
     boolean isUnconnected(Coord at) {
-        ForgeDirection dir = meta2direction[at.getMd()];
-        return !isConnected(at, dir) && !isConnected(at, dir.getOpposite());
+        return !isConnected(at, axis) && !isConnected(at, axis.getOpposite());
     }
 
     boolean isConnected(Coord at, ForgeDirection dir) {
-        ForgeDirection myDir = meta2direction[at.getMd()];
-        if (myDir != dir && myDir != dir.getOpposite()) return false;
+        if (axis != dir && axis != dir.getOpposite()) return false;
         Coord neighbor = at.add(dir);
         if (!(neighbor.getBlock() instanceof BlockShaft)) {
             TileEntity te = neighbor.getTE();
             IShaftPowerSource shaft = KineticProxy.cast(te);
             return shaft != null && shaft.canConnect(dir.getOpposite());
         }
-        ForgeDirection nDir = meta2direction[neighbor.getMd()];
-        return nDir == myDir;
+        return at.getBlock() == this;
     }
 
     public static void propagateVelocity(IShaftPowerSource src, Coord at, ForgeDirection dir) {
+        ForgeDirection dirAxis = normalizeDirection(dir);
         double angularVelocity = src.getAngularVelocity(dir);
         int i_speed = (int) (Math.abs(angularVelocity) / Math.PI / 20);
-        byte speed = i_speed > MAX_SPEED ? MAX_SPEED : (byte) i_speed;
+        byte speedMd = i_speed > MAX_SPEED ? MAX_SPEED : (byte) i_speed;
         while (dir.offsetY != 0 || at.blockExists()) {
-            if (!(at.getBlock() instanceof BlockShaft)) break;
+            Block atBlock = at.getBlock();
+            if (!(atBlock instanceof BlockShaft)) break;
+            if (((BlockShaft) atBlock).axis != dirAxis) break;
             int origMd = at.getMd();
-            ForgeDirection d = meta2direction[origMd];
-            if (d != dir && d != dir.getOpposite()) break;
-            int newMd = getDirection(d, speed);
-            if (origMd == newMd) break;
-            at.setMd(newMd, true);
+            if (origMd == speedMd) break;
+            at.setMd(speedMd, true);
             at.adjust(dir);
         }
     }
@@ -205,7 +149,7 @@ public class BlockShaft extends Block implements IRenderNonTE {
     public void breakBlock(World w, int x, int y, int z, Block block, int md) {
         super.breakBlock(w, x, y, z, block, md); // Yes, we want the TE invalidation here
         Coord at = new Coord(w, x, y, z);
-        ForgeDirection dir = meta2direction[at.getMd()];
+        ForgeDirection dir = axis;
         invalidateLine(at.copy(), dir);
         invalidateLine(at.copy(), dir.getOpposite());
     }
@@ -215,16 +159,22 @@ public class BlockShaft extends Block implements IRenderNonTE {
     }
 
     void invalidateLine(Coord at, ForgeDirection dir) {
+        if (dir == null || dir == ForgeDirection.UNKNOWN) {
+            dir = axis;
+        }
         ForgeDirection normal = normalizeDirection(dir);
+        if (normal != axis) {
+            shafts[normal.ordinal()].invalidateLine(at, dir);
+            return;
+        }
         while (true) {
             at.adjust(dir);
             if (!(at.getBlock() instanceof BlockShaft)) {
                 at.notifyBlockChange();
                 break;
             }
-            int md = at.getMd();
-            if (meta2direction[md] != normal) break;
-            at.setMd(getDirection(normal, 0), true);
+            if (at.getBlock() != this) break;
+            at.setMd(0, true);
             TileEntity te = at.forceGetTE();
             if (te instanceof TileEntityShaftUpdater) te.invalidate();
         }

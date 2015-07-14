@@ -19,7 +19,6 @@ public class RenderShaft extends FactorizationBlockRender {
     @Override
     public boolean render(RenderBlocks rb) {
         if (metadata > 0xF || metadata < 0) return false;
-        ForgeDirection dir = BlockShaft.meta2direction[metadata];
         byte speed = BlockShaft.meta2speed[metadata];
         IIcon icon = rb.overrideBlockTexture;
         if (icon == null) {
@@ -29,22 +28,19 @@ public class RenderShaft extends FactorizationBlockRender {
                 icon = BlockIcons.error;
             }
         }
-        if (world_mode) {
-            Tessellator.instance.addTranslation(0, 0.5F, 0);
-        }
         if (!world_mode) {
             shaftModel.render(icon);
-        } else if (dir == ForgeDirection.SOUTH) {
-            shaftModel.renderRotatedISBRH(rb, icon, Core.registry.wooden_shaft, x, y, z, Quaternion.fromOrientation(FzOrientation.FACE_SOUTH_POINT_DOWN));
-        } else if (dir == ForgeDirection.EAST) {
-            shaftModel.renderRotatedISBRH(rb, icon, Core.registry.wooden_shaft, x, y, z, Quaternion.fromOrientation(FzOrientation.FACE_EAST_POINT_DOWN));
+            return true;
         } else {
-            shaftModel.renderISBRH(rb, icon, Core.registry.wooden_shaft, x, y, z);
-        }
-        if (world_mode) {
+            BlockShaft block = (BlockShaft) w.getBlock(x, y, z);
+            ForgeDirection dir = block.axis;
+            Tessellator.instance.addTranslation(0, 0.5F, 0);
+            ForgeDirection spin = BlockShaft.meta2speed[metadata] > 0 ? block.axis : block.axis.getOpposite();
+            FzOrientation fzo = FzOrientation.fromDirection(spin);
+            boolean ret = shaftModel.renderRotatedISBRH(rb, icon, block, x, y, z, Quaternion.fromOrientation(fzo));
             Tessellator.instance.addTranslation(0, -0.5F, 0);
+            return ret;
         }
-        return true;
     }
 
     @Override

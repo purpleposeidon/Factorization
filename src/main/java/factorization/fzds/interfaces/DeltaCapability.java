@@ -44,7 +44,9 @@ public enum DeltaCapability {
     /** The DSE stops moving if it hits a block. (Hitting other DSEs could be a capability, but is presently disabled.) */
     COLLIDE_WITH_WORLD,
     /** When an ordered rotation completes, recalculate the orientation. For debugging; might also be useful if there are precision issues */
-    SNAP_TO_EXACT_ORDERED_ROTATION
+    SNAP_TO_EXACT_ORDERED_ROTATION,
+    /** A stub for an addon to implement the functionality. neptune does not intend to implement this. */
+    LOCAL_GRAVITY
     ;
     //Do not re-order this list, only append.
     public final long bit;

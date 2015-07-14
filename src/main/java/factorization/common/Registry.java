@@ -12,6 +12,7 @@ import cpw.mods.fml.common.registry.GameRegistry.Type;
 import cpw.mods.fml.relauncher.Side;
 import factorization.api.IActOnCraft;
 import factorization.beauty.BlockShaft;
+import factorization.beauty.ItemBlockShaft;
 import factorization.beauty.ItemGrossFood;
 import factorization.beauty.ItemLeafBomb;
 import factorization.ceramics.ItemGlazeBucket;
@@ -62,6 +63,7 @@ import net.minecraft.item.crafting.FurnaceRecipes;
 import net.minecraft.item.crafting.IRecipe;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.world.World;
+import net.minecraftforge.common.util.ForgeDirection;
 import net.minecraftforge.event.entity.player.EntityItemPickupEvent;
 import net.minecraftforge.fluids.Fluid;
 import net.minecraftforge.fluids.FluidRegistry;
@@ -91,7 +93,7 @@ public class Registry {
     public Block colossal_block;
     public Block gargantuan_block;
     public Block mantlerock_block;
-    public BlockShaft wooden_shaft;
+    public BlockShaft wooden_shaft_x, wooden_shaft_y, wooden_shaft_z;
 
     public ItemStack servorail_item;
     public ItemStack empty_socket_item, socket_lacerator, socket_robot_hand, socket_shifter;
@@ -186,7 +188,19 @@ public class Registry {
         }
         gargantuan_block = new GargantuanBlock().setBlockName("factorization:gargantuanBrick").setCreativeTab(Core.tabFactorization);
         mantlerock_block = new BlockNetherrack().setBlockName("factorization:mantlerock").setBlockTextureName("factorization:mantlerock").setHardness(1.25F).setResistance(7.0F).setStepSound(Block.soundTypeStone);
-        wooden_shaft = (BlockShaft)(new BlockShaft(Material.wood).setBlockName("factorization:woodenShaft").setStepSound(Block.soundTypeWood).setHardness(2F).setResistance(5));
+        wooden_shaft_x = new BlockShaft(Material.wood, ForgeDirection.EAST);
+        wooden_shaft_y = new BlockShaft(Material.wood, ForgeDirection.UP);
+        wooden_shaft_z = new BlockShaft(Material.wood, ForgeDirection.SOUTH);
+        BlockShaft[] shafts = { wooden_shaft_x, wooden_shaft_y, wooden_shaft_z };
+        for (BlockShaft shaft : shafts) {
+            shaft.setBlockName("factorization:woodenShaft_" + shaft.axis.name()).setStepSound(Block.soundTypeWood).setHardness(2F).setResistance(5);
+        }
+        BlockShaft[] shaft_array = new BlockShaft[] {
+                wooden_shaft_y, wooden_shaft_y,
+                wooden_shaft_z, wooden_shaft_z,
+                wooden_shaft_x,wooden_shaft_x,
+                wooden_shaft_y
+        };
         
         GameRegistry.registerBlock(factory_block, ItemFactorizationBlock.class, "FzBlock");
         GameRegistry.registerBlock(lightair_block, "Lightair");
@@ -196,7 +210,10 @@ public class Registry {
         GameRegistry.registerBlock(blasted_bedrock_block, "BlastedBedrock");
         GameRegistry.registerBlock(gargantuan_block, ItemGargantuanBlock.class, "GargantuanBlock");
         GameRegistry.registerBlock(mantlerock_block, "MantleRock");
-        GameRegistry.registerBlock(wooden_shaft, "WoodenShaft");
+        for (BlockShaft shaft : shafts) {
+            Class<ItemBlockShaft> itemClass = shaft == wooden_shaft_y ? ItemBlockShaft.class : null;
+            GameRegistry.registerBlock(shaft, itemClass, "WoodenShaft_" + shaft.axis.name(), new Object[] { shaft_array });
+        }
         if (DeltaChunk.enabled()) {
             GameRegistry.registerBlock(colossal_block, ColossalBlockItem.class, "ColossalBlock");
             GameRegistry.registerTileEntity(TileEntityColossalHeart.class, "fz_colossal_heart");
