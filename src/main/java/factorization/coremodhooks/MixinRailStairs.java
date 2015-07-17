@@ -1,5 +1,6 @@
 package factorization.coremodhooks;
 
+import net.minecraft.block.Block;
 import net.minecraft.block.BlockRailBase;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
@@ -15,6 +16,13 @@ public class MixinRailStairs extends BlockRailBase {
 
     @Override
     public void addCollisionBoxesToList(World world, int x, int y, int z, AxisAlignedBB queryBox, List boxList, Entity ent) {
+        // Can't call super: we *are* super!
+        AxisAlignedBB underBox = ((Block) this).getCollisionBoundingBoxFromPool(world, x, y, z);
+
+        if (underBox != null && queryBox.intersectsWith(underBox)) {
+            boxList.add(underBox);
+            return;
+        }
         if (ent instanceof EntityPlayer) {
             final double h = 0.5;
             final double w = 0.5;
@@ -35,6 +43,5 @@ public class MixinRailStairs extends BlockRailBase {
                 boxList.add(box);
             }
         }
-        // Don't call super. We *are* the super.
     }
 }
