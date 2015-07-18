@@ -4,8 +4,10 @@ import factorization.util.ItemUtil;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.item.ItemStack;
+import org.apache.commons.lang3.ArrayUtils;
 import org.lwjgl.opengl.GL11;
 
+import java.util.Iterator;
 import java.util.List;
 
 public class ItemWord extends Word {
@@ -37,6 +39,9 @@ public class ItemWord extends Word {
     
     static String getDefaultHyperlink(ItemStack is) {
         if (is == null) return null;
+        if (is.getItem() == null) {
+            return null;
+        }
         if (ItemUtil.isWildcard(is, false)) {
             List<ItemStack> sub = ItemUtil.getSubItems(is);
             if (sub.isEmpty()) {
@@ -54,6 +59,9 @@ public class ItemWord extends Word {
     }
 
     void cleanWildlings() {
+        if (is != null && is.getItem() == null) {
+            is = null;
+        }
         if (ItemUtil.isWildcard(is, false)) {
             List<ItemStack> out = ItemUtil.getSubItems(is);
             entries = out.toArray(new ItemStack[out.size()]); // If you give me a wildcard here, then it's your own damn fault if that causes a crash
@@ -67,6 +75,9 @@ public class ItemWord extends Word {
             // Probably an OD list, which may contain wildcards, which will have to be expanded
             List<ItemStack> wildingChildren = null;
             for (ItemStack wildling : entries) {
+                if (wildling == null || wildling.getItem() == null) {
+                    continue;
+                }
                 if (!ItemUtil.isWildcard(wildling, false)) continue;
                 if (wildingChildren == null) {
                     wildingChildren = ItemUtil.getSubItems(wildling);
@@ -76,7 +87,14 @@ public class ItemWord extends Word {
             }
             if (wildingChildren != null && !wildingChildren.isEmpty()) {
                 for (ItemStack nonWild : entries) {
+                    if (nonWild == null || nonWild.getItem() == null) {
+                        continue;
+                    }
                     if (!ItemUtil.isWildcard(nonWild, true)) wildingChildren.add(nonWild);
+                }
+                for (Iterator<ItemStack> iterator = wildingChildren.iterator(); iterator.hasNext(); ) {
+                    ItemStack is = iterator.next();
+                    if (is == null || is.getItem() == null) iterator.remove();
                 }
                 entries = wildingChildren.toArray(new ItemStack[wildingChildren.size()]);
             }

@@ -64,7 +64,7 @@ public class DocumentationModule {
         for (Item it : (Iterable<Item>) Item.itemRegistry) {
             if (it == null) continue;
             try {
-                it.getSubItems(it, null, items);
+                it.getSubItems(it, it.getCreativeTab(), items);
             } catch (Throwable t) {
                 Core.logWarning("Error getting sub-items from item: " + it);
                 t.printStackTrace();
