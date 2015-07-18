@@ -9,12 +9,15 @@ import net.minecraft.block.Block;
 import net.minecraft.block.BlockDispenser;
 import net.minecraft.block.BlockRailBase;
 import net.minecraft.block.material.Material;
+import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.dispenser.BehaviorDefaultDispenseItem;
 import net.minecraft.dispenser.IBehaviorDispenseItem;
 import net.minecraft.dispenser.IBlockSource;
 import net.minecraft.entity.item.EntityMinecart;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.world.World;
 
@@ -67,6 +70,7 @@ public class ItemMinecartDayBarrel extends ItemFactorization implements IMinecar
         super("barrelCart", Core.TabType.TOOLS);
         setMaxStackSize(1); // Just for now. It gets reset later to copy railcraft.
         BlockDispenser.dispenseBehaviorRegistry.putObject(this, dispenserMinecartBehavior);
+        setHasSubtypes(true);
     }
 
     @Override
@@ -105,5 +109,33 @@ public class ItemMinecartDayBarrel extends ItemFactorization implements IMinecar
         cart.stackSize--;
         world.spawnEntityInWorld(minecart);
         return minecart;
+    }
+
+    ItemStack creative_cart = null;
+
+    @Override
+    public void getSubItems(Item item, CreativeTabs tab, List list) {
+        super.getSubItems(item, tab, list);
+        if (creative_cart == null) {
+            ItemStack creative = null;
+            for (ItemStack barrel : TileEntityDayBarrel.barrel_items) {
+                TileEntityDayBarrel.Type type = TileEntityDayBarrel.getUpgrade(barrel);
+                if (type == TileEntityDayBarrel.Type.CREATIVE) {
+                    creative = barrel;
+                    break;
+                }
+            }
+            if (creative == null) return;
+            creative_cart = makeBarrel(creative);
+        }
+        if (creative_cart != null) {
+            list.add(creative_cart);
+        }
+    }
+
+    public ItemStack makeBarrel(ItemStack barrelItem) {
+        ItemStack ret = new ItemStack(this, 1, barrelItem.getItemDamage());
+        ret.setTagCompound((NBTTagCompound) barrelItem.getTagCompound().copy());
+        return ret;
     }
 }

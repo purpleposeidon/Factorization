@@ -80,6 +80,9 @@ public class EntityMinecartDayBarrel extends EntityMinecart implements IInventor
         }
         if (barrel != null) {
             barrel.putData(data);
+            if (data.isReader() && !worldObj.isRemote) {
+                updateDataWatcher(true);
+            }
         }
     }
 
@@ -177,6 +180,12 @@ public class EntityMinecartDayBarrel extends EntityMinecart implements IInventor
             int oldItemCount = barrel.getItemCount();
             barrel.click((EntityPlayer) source.getEntity());
             updateDataWatcher(false);
+            if (source.getEntity().isSneaking()) {
+                return super.attackEntityFrom(source, f);
+            }
+            if (barrel.type == TileEntityDayBarrel.Type.CREATIVE) {
+                return false;
+            }
             if (barrel.getItemCount() != oldItemCount) {
                 return false;
             }
