@@ -9,8 +9,10 @@ import factorization.api.datahelpers.Share;
 import factorization.charge.TileEntityCaliometricBurner;
 import factorization.common.BlockIcons;
 import factorization.common.FactoryType;
-import factorization.notify.Notice;
-import factorization.shared.*;
+import factorization.shared.BlockClass;
+import factorization.shared.Core;
+import factorization.shared.NetworkFactorization;
+import factorization.shared.TileEntityCommon;
 import factorization.util.InvUtil;
 import factorization.util.ItemUtil;
 import io.netty.buffer.ByteBuf;
@@ -60,7 +62,6 @@ public class TileEntityAnthroGen extends TileEntityCommon implements IInventory,
     public void updateEntity() {
         if (worldObj.isRemote) return;
         long now = worldObj.getTotalWorldTime() + this.hashCode();
-        UPDATE_RATE = NORELEASE.just(40);
         if ((now % UPDATE_RATE) != 0) {
             int max_particle_rate = 16;
             if (now % max_particle_rate == 0 && ItemUtil.stackSize(entheas) > 0) {
@@ -112,9 +113,6 @@ public class TileEntityAnthroGen extends TileEntityCommon implements IInventory,
                 if (!(ent instanceof INpc)) continue;
                 if (hashEnt(ent)) {
                     satisfactory_villagers++;
-                    if (NORELEASE.on) {
-                        new Notice(ent, "Hmm!").sendToAll();
-                    }
                 }
             }
         }

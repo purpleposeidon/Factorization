@@ -4,7 +4,6 @@ import factorization.common.BlockIcons;
 import factorization.common.FactoryType;
 import factorization.shared.BlockRenderHelper;
 import factorization.shared.FactorizationBlockRender;
-import factorization.shared.NORELEASE;
 import factorization.shared.TileEntityCommon;
 import net.minecraft.client.renderer.RenderBlocks;
 import net.minecraft.client.renderer.Tessellator;

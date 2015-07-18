@@ -7,9 +7,7 @@ import factorization.api.IShaftPowerSource;
 import factorization.api.datahelpers.DataHelper;
 import factorization.api.datahelpers.Share;
 import factorization.common.FactoryType;
-import factorization.notify.Notice;
 import factorization.shared.BlockClass;
-import factorization.shared.NORELEASE;
 import factorization.shared.TileEntityCommon;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraftforge.common.util.ForgeDirection;
@@ -22,7 +20,7 @@ public class TileEntityShaftGen extends TileEntityCommon implements IChargeCondu
     ForgeDirection shaft_direction = ForgeDirection.DOWN;
     IShaftPowerSource shaft;
     transient double last_power;
-    public static double MAX_POWER = 1024, CHARGE_PER_POWER = 100;
+    public static double MAX_POWER = 1024, CHARGE_PER_POWER = 130;
 
     @Override
     public Charge getCharge() {
@@ -80,7 +78,6 @@ public class TileEntityShaftGen extends TileEntityCommon implements IChargeCondu
     @Override
     public void updateEntity() {
         if (worldObj.isRemote) return;
-        CHARGE_PER_POWER = NORELEASE.just(130);
         charge.update();
         if (shaftIsBroken()) {
             if (worldObj.getTotalWorldTime() % 5 == 0) {

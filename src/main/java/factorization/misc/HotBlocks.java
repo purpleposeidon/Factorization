@@ -2,7 +2,6 @@ package factorization.misc;
 
 import cpw.mods.fml.common.eventhandler.EventPriority;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
-import factorization.shared.NORELEASE;
 import factorization.util.DataUtil;
 import factorization.util.FzUtil;
 import factorization.util.PlayerUtil;
