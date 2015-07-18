@@ -18,17 +18,12 @@ public class BlockIcons {
     
     @Directory("material")
     public static IIcon
-        edgeless_glass,
-        iron_bar_grid,
         transparent,
         wood;
     
     @Directory("resource")
     public static IIcon
         dark_iron_block,
-        galena_ore,
-        lead_block,
-        silver_block,
         ore_dark_iron,
         ore_dark_iron_glint;
     
@@ -38,7 +33,7 @@ public class BlockIcons {
         wire,
         battery_bottom, battery_top, battery_side, battery_meter,
         boiler_side, boiler_top,
-        mirror_front, mirror_back, mirror_side, mirror_beam,
+        mirror_front, mirror_side, mirror_beam,
         turbine_top, turbine_bottom, turbine_side,
         leyden_glass, leyden_glass_side, leyden_knob,
         caliometric_side, caliometric_top;
@@ -54,8 +49,6 @@ public class BlockIcons {
     
     @Directory("machine")
     public static IIcon
-        generic_metal,
-        grinder_bottom, grinder_top, grinder_side, grinder_bottom_top_edge,
         heater_heat, heater_spiral,
         parasieve_front, parasieve_side, parasieve_back;
 
