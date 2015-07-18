@@ -101,7 +101,7 @@ class ClientMessage {
         }
         if (locus instanceof Entity) {
             if (locus instanceof EntityMinecart) {
-                partial = 0; // Wtf?
+                partial = 1; // Wtf?
             }
             Entity e = ((Entity) locus);
             double w = e.width * -1.5;
