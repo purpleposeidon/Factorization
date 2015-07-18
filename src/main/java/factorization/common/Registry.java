@@ -801,9 +801,7 @@ public class Registry {
                     if (TileEntityDayBarrel.getUpgrade(is) == TileEntityDayBarrel.Type.SILKY) {
                         return null;
                     }
-                    ItemStack ret = new ItemStack(Core.registry.barrelCart, 1, is.getItemDamage());
-                    ret.setTagCompound((NBTTagCompound) is.getTagCompound().copy());
-                    return ret;
+                    return Core.registry.barrelCart.makeBarrel(is);
                 }
                 return new ItemStack(barrelCart);
             }

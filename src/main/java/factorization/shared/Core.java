@@ -101,7 +101,7 @@ public class Core {
     public static final boolean dev_environ = Launch.blackboard != null ? (Boolean) Launch.blackboard.get("fml.deobfuscatedEnvironment") : false;
     public static final boolean cheat = dev_only(false);
     public static final boolean cheat_servo_energy = dev_only(false);
-    public static final boolean debug_network = NORELEASE.just(true);
+    public static final boolean debug_network = false;
     public static final boolean show_fine_logging = false;
     public static final boolean enable_test_content = dev_environ || Boolean.parseBoolean(System.getProperty("fz.enableTestContent"));
 
