@@ -7,21 +7,16 @@ import factorization.api.IShaftPowerSource;
 import factorization.shared.Core;
 import factorization.shared.FactorizationBlockRender;
 import factorization.shared.IRenderNonTE;
+import factorization.shared.NORELEASE;
 import factorization.util.SpaceUtil;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.client.renderer.texture.IIconRegister;
-import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.ForgeDirection;
-
-import java.util.ArrayList;
-
-import static net.minecraftforge.common.util.ForgeDirection.*;
 
 public class BlockShaft extends Block implements IRenderNonTE {
     public BlockShaft(Material material, ForgeDirection axis) {
@@ -36,12 +31,28 @@ public class BlockShaft extends Block implements IRenderNonTE {
     // D = shaftDirection
     public final ForgeDirection axis;
     private BlockShaft[] shafts;
-    public static final byte MAX_SPEED = 4;
-    public static final byte[] meta2speed = new byte[] {
-            0, 1, 2, 3, 4,
-            0, -1, -2, -3, -4,
-            0, 0, 0, 0, 0, 0 /* Invalid */
+    public static final byte MAX_SPEED = 5;
+    public static final byte[] meta2speedNumber = new byte[] {
+            0, 1, 2, 3, 4, 5,
+            0, -1, -2, -3, -4, -5,
+            0, 0, 0, 0, /* Invalid */
     };
+
+    public static int speed2meta(double angularVelocity) {
+        angularVelocity = IShaftPowerSource.Display.limitVelocity(angularVelocity);
+        int x = 0;
+        if (angularVelocity < 0) {
+            x = 5;
+            angularVelocity *= -1;
+        }
+        angularVelocity = Math.toDegrees(angularVelocity);
+        if (angularVelocity < 5) return x + 0;
+        if (angularVelocity < 10) return x + 1;
+        if (angularVelocity < 20) return x + 2;
+        if (angularVelocity < 40) return x + 3;
+        if (angularVelocity < 80) return x + 4;
+        return x + 5;
+    }
 
     public void setShafts(BlockShaft[] shafts) {
         this.shafts = shafts;
@@ -132,16 +143,15 @@ public class BlockShaft extends Block implements IRenderNonTE {
     public static void propagateVelocity(IShaftPowerSource src, Coord at, ForgeDirection dir) {
         ForgeDirection dirAxis = normalizeDirection(dir);
         double angularVelocity = src.getAngularVelocity(dir);
-        int i_speed = (int) (Math.abs(angularVelocity) / Math.PI / 20);
-        byte speedMd = i_speed > MAX_SPEED ? MAX_SPEED : (byte) i_speed;
+        byte speedMd = (byte) speed2meta(angularVelocity);
         while (dir.offsetY != 0 || at.blockExists()) {
+            at.adjust(dir);
             Block atBlock = at.getBlock();
             if (!(atBlock instanceof BlockShaft)) break;
             if (((BlockShaft) atBlock).axis != dirAxis) break;
             int origMd = at.getMd();
             if (origMd == speedMd) break;
             at.setMd(speedMd, true);
-            at.adjust(dir);
         }
     }
 
@@ -149,6 +159,10 @@ public class BlockShaft extends Block implements IRenderNonTE {
     public void breakBlock(World w, int x, int y, int z, Block block, int md) {
         super.breakBlock(w, x, y, z, block, md); // Yes, we want the TE invalidation here
         Coord at = new Coord(w, x, y, z);
+        invalidate(at);
+    }
+
+    public void invalidate(Coord at) {
         ForgeDirection dir = axis;
         invalidateLine(at.copy(), dir);
         invalidateLine(at.copy(), dir.getOpposite());
@@ -176,7 +190,7 @@ public class BlockShaft extends Block implements IRenderNonTE {
             if (at.getBlock() != this) break;
             at.setMd(0, true);
             TileEntity te = at.forceGetTE();
-            if (te instanceof TileEntityShaftUpdater) te.invalidate();
+            if (te instanceof TileEntityConnectedShaft) te.invalidate();
         }
     }
 

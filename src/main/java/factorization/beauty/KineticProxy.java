@@ -1,6 +1,5 @@
 package factorization.beauty;
 
-import cpw.mods.fml.common.Loader;
 import cpw.mods.fml.common.SidedProxy;
 import factorization.api.Coord;
 import factorization.api.IShaftPowerSource;
@@ -26,13 +25,14 @@ public class KineticProxy {
         if (end != null) return end;
         ForgeDirection expectShaftDir = SpaceUtil.sign(dir) == -1 ? dir.getOpposite() : dir;
         Coord start = at.copy();
-        while (true) {
+        int limit = 12;
+        while (limit-- > 0) {
             Block atBlock = at.getBlock();
             if (!(atBlock instanceof BlockShaft)) {
                 // NOTE: This is not the case on the first iteration
                 IShaftPowerSource powerSource = cast(at.getTE());
                 if (powerSource == null) return null;
-                TileEntityShaftUpdater updater = new TileEntityShaftUpdater(powerSource, dir.getOpposite());
+                TileEntityConnectedShaft updater = new TileEntityConnectedShaft(powerSource, dir.getOpposite());
                 start.setTE(updater);
                 return updater;
             }
@@ -42,6 +42,7 @@ public class KineticProxy {
             // There could be a TileEntityShaftUpdater underneath the Shaft. It is ignored, as it ought to only be at the end.
             // We aren't checking blockExists!
         }
+        return null;
     }
 
     private static class Ic2ConverterProxy {
@@ -99,5 +100,40 @@ public class KineticProxy {
         public double getAngularVelocity(ForgeDirection direction) {
             return base.maxrequestkineticenergyTick(direction) * IC2_ANGULAR_VELOCITY_RATIO;
         }
+    }
+
+    public interface IShaftUpdater {
+        /**
+         * Call this whenever the speed might have changed.
+         * @return the IShaftUpdater to use next time
+         */
+        IShaftUpdater tick();
+
+        /**
+         * Call this when the block is removed
+         */
+        void remove();
+    }
+
+    public static IShaftUpdater getUpdater(final IShaftPowerSource src, final ForgeDirection outputDirection) {
+        final TileEntity te = (TileEntity) src;
+        return new IShaftUpdater() {
+            @Override
+            public IShaftUpdater tick() {
+                double out = src.availablePower(outputDirection);
+                BlockShaft.propagateVelocity(src, new Coord(te), outputDirection);
+                return this;
+            }
+
+            @Override
+            public void remove() {
+                Coord at = new Coord(te).add(outputDirection);
+                Block b = at.getBlock();
+                if (b instanceof BlockShaft) {
+                    BlockShaft shaft = (BlockShaft) b;
+                    shaft.invalidate(at);
+                }
+            }
+        };
     }
 }

@@ -1,19 +1,16 @@
 package factorization.beauty;
 
-import cpw.mods.fml.common.FMLCommonHandler;
-import cpw.mods.fml.relauncher.Side;
-import factorization.api.Coord;
 import factorization.api.IShaftPowerSource;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraftforge.common.util.ForgeDirection;
 
-public class TileEntityShaftUpdater extends TileEntity implements IShaftPowerSource {
+public class TileEntityConnectedShaft extends TileEntity implements IShaftPowerSource {
     IShaftPowerSource base;
     int baseX, baseY, baseZ;
     ForgeDirection dir;
 
-    public TileEntityShaftUpdater(IShaftPowerSource src, ForgeDirection dir) {
+    public TileEntityConnectedShaft(IShaftPowerSource src, ForgeDirection dir) {
         TileEntity te = (TileEntity) src;
         baseX = te.xCoord;
         baseY = te.yCoord;
@@ -42,30 +39,13 @@ public class TileEntityShaftUpdater extends TileEntity implements IShaftPowerSou
 
     @Override
     public boolean canUpdate() {
-        return FMLCommonHandler.instance().getEffectiveSide() == Side.SERVER;
-    }
-
-    @Override
-    public void updateEntity() {
-        if (worldObj.isRemote) return;
-        if (base == null) {
-            base = KineticProxy.cast(worldObj.getTileEntity(baseX, baseY, baseZ));
-            if (base == null) {
-                invalidate();
-                return;
-            }
-            propagate();
-            return;
-        }
-        if (worldObj.getTotalWorldTime() % 5 != 0) return;
-        propagate();
-    }
-
-    void propagate() {
-        BlockShaft.propagateVelocity(this, new Coord(this), dir);
+        return false;
     }
     
-    boolean broken() {
+    private boolean broken() {
+        if (base == null) {
+            base = KineticProxy.cast(worldObj.getTileEntity(baseX, baseY, baseZ));
+        }
         return base == null || isInvalid();
     }
 

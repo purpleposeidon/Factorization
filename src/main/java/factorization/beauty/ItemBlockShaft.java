@@ -26,8 +26,13 @@ public class ItemBlockShaft extends ItemBlock {
         }
     }
 
-    boolean set(Coord at, ForgeDirection axis) {
-        return at.setId(shafts[axis.ordinal()]);
+    boolean set(Coord at, ForgeDirection axis, int md) {
+        BlockShaft theBlock = shafts[axis.ordinal()];
+        boolean ret = at.setIdMd(theBlock, md, true);
+        if (ret) {
+            theBlock.invalidate(at);
+        }
+        return ret;
     }
 
     @Override
@@ -38,30 +43,36 @@ public class ItemBlockShaft extends ItemBlock {
         ArrayList<Coord> lockedNeighbors = new ArrayList<Coord>();
         ArrayList<Coord> freeNeighbors = new ArrayList<Coord>();
         ForgeDirection lockedDirection = ForgeDirection.UNKNOWN;
+        int free_md = 0, locked_md = 0;
         for (ForgeDirection neighborDirection : ForgeDirection.VALID_DIRECTIONS) {
             Coord neighbor = at.add(neighborDirection);
             Block neighborBlock = neighbor.getBlock();
             if (!(neighborBlock instanceof BlockShaft)) continue;
-            if (BlockShaft.meta2speed[at.getMd()] != 0) continue;
+            if (BlockShaft.meta2speedNumber[at.getMd()] != 0) continue;
             BlockShaft neighborShaft = (BlockShaft) neighborBlock;
             if (neighborShaft.isUnconnected(neighbor)) {
                 freeNeighbors.add(neighbor);
+                free_md = neighbor.getMd();
             } else if (neighborShaft.axis == neighborDirection || neighborShaft.axis == neighborDirection.getOpposite()) {
                 lockedDirection = neighborShaft.axis;
                 lockedNeighbors.add(neighbor);
+                locked_md = neighbor.getMd();
             }
         }
         int n = lockedNeighbors.size() + freeNeighbors.size();
         if (n != 1 || player.isSneaking()) {
-            return set(at, defaultDirection);
+            return set(at, defaultDirection, 0);
         }
         if (!lockedNeighbors.isEmpty()) {
-            return set(at, lockedDirection);
+            return set(at, lockedDirection, locked_md);
         }
         for (Coord neighbor : freeNeighbors) {
             ForgeDirection dir = BlockShaft.normalizeDirection(neighbor.difference(at).getDirection());
-            set(neighbor, dir); // We're turning the neighbor, so speed won't be kept
-            return set(at, dir);
+            if (neighbor.getBlock() == shafts[dir.ordinal()]) {
+                return set(at, dir, free_md);
+            }
+            set(neighbor, dir, 0); // We're turning the neighbor, so speed won't be kept
+            return set(at, dir, 0);
         }
 
         return false;

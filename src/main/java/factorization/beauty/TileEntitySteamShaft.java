@@ -31,8 +31,8 @@ public class TileEntitySteamShaft extends TileEntityCommon implements IFluidHand
     FluidTank steamTank = new FluidTank(/*this,*/ TileEntitySolarBoiler.steam_stack.copy(), 800);
 
     public static double Z = 1.6;
-    public static int TURBINE_MASS = 20 * (10); // force:steam = mass * acceleration --> acceleration = force / mass
-    public static double BEARING_DRAG = 0.001; // v -= drag * v**Z
+    public static int TURBINE_MASS = 1000; // force:steam = mass * acceleration --> acceleration = force / mass
+    public static double BEARING_DRAG = 0.05; // v -= drag * v**Z // Was 0.001
     public static double DRAW_EFFICIENCY = 0.2; // don't let it take *all* of the power in one fell swoop
     // steam_force / mass = drag * velocity ** z
     // terminal velocity = (steam_force / (mass * drag)) ** (1/z)
@@ -41,6 +41,7 @@ public class TileEntitySteamShaft extends TileEntityCommon implements IFluidHand
     double velocity = 0, drawable_velocity = 0;
     public double angle = Math.PI * Math.random();
     public double prev_angle = angle;
+    private KineticProxy.IShaftUpdater shaftUpdater = KineticProxy.getUpdater(this, ForgeDirection.UP);
 
 
     @Override
@@ -108,7 +109,6 @@ public class TileEntitySteamShaft extends TileEntityCommon implements IFluidHand
 
     @Override
     public void updateEntity() {
-        TURBINE_MASS = NORELEASE.just(1000);
         if (worldObj.isRemote) {
             prev_angle = angle;
             double displayVelocity = Display.limitVelocity(velocity);
@@ -139,7 +139,22 @@ public class TileEntitySteamShaft extends TileEntityCommon implements IFluidHand
         velocity = velocity - drag + acceleration;
         velocity = Math.max(0, velocity);
         drawable_velocity = velocity * DRAW_EFFICIENCY;
+        if (velocity > 0 && force == 0 && velocity < 0.03 && worldObj.getTotalWorldTime() % 60 == 0) {
+            velocity = 0;
+        }
         shareTurbineSpeed();
+        shaftUpdater = shaftUpdater.tick();
+    }
+
+    @Override
+    public void neighborChanged() {
+        shaftUpdater = KineticProxy.getUpdater(this, ForgeDirection.UP);
+    }
+
+    @Override
+    protected void onRemove() {
+        super.onRemove();
+        shaftUpdater.remove();
     }
 
     @SideOnly(Side.CLIENT)
@@ -208,6 +223,7 @@ public class TileEntitySteamShaft extends TileEntityCommon implements IFluidHand
     public double powerConsumed(ForgeDirection direction, double maxPower) {
         double d = Math.min(drawable_velocity, maxPower);
         drawable_velocity -= d;
+        velocity -= d;
         return d;
     }
 
@@ -220,6 +236,6 @@ public class TileEntitySteamShaft extends TileEntityCommon implements IFluidHand
     @Override
     public String getInfo() {
         return "Steam: " + steamTank.getFluidAmount() + "mB\n"
-                + "Turbine speed: " + (int) velocity;
+                + "Turbine speed: " + (int) Math.toDegrees(velocity);
     }
 }
