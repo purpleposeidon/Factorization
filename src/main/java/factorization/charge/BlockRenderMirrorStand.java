@@ -122,6 +122,11 @@ public class BlockRenderMirrorStand extends FactorizationBlockRender {
         byte[] as = new byte[] { 2, 1, 0, 3 };
         byte[] bs = new byte[] { 0, 3, 1, 2 };
         Vec3 work = SpaceUtil.newVec();
+        // default opacity: 38/0xFF
+        float min_opacity = 30F / 255F;
+        float opacity_per_power = 12F / 255F; // max is 9
+        float alpha = min_opacity + mirror.getPower() * opacity_per_power;
+        Tessellator.instance.setColorRGBA_F(1, 1, 1, alpha);
         for (i = 0; i < 4; i++) {
             Vec3 a = points[as[i]];
             Vec3 b = points[bs[i]];

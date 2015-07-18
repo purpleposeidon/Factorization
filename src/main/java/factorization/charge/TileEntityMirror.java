@@ -1,10 +1,14 @@
 package factorization.charge;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
 
 import factorization.api.datahelpers.DataHelper;
 import factorization.api.datahelpers.Share;
 import factorization.common.FzConfig;
+import factorization.util.DataUtil;
+import factorization.util.ItemUtil;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.block.Block;
 import net.minecraft.entity.player.EntityPlayer;
@@ -24,6 +28,7 @@ import factorization.shared.BlockClass;
 import factorization.shared.Core;
 import factorization.shared.NetworkFactorization.MessageType;
 import factorization.shared.TileEntityCommon;
+import net.minecraftforge.oredict.OreDictionary;
 
 public class TileEntityMirror extends TileEntityCommon {
     public Coord reflection_target = null;
@@ -33,6 +38,8 @@ public class TileEntityMirror extends TileEntityCommon {
     int next_check = 1;
     //don't save, but *do* share w/ client
     public transient int target_rotation = -99;
+    private boolean covered_by_other_mirror = false;
+    public byte silver = 1;
 
     @Override
     public FactoryType getFactoryType() {
@@ -55,6 +62,8 @@ public class TileEntityMirror extends TileEntityCommon {
         } else if (data.isReader()) {
             updateRotation();
         }
+        covered_by_other_mirror = data.as(Share.VISIBLE, "covered").putBoolean(covered_by_other_mirror);
+        silver = data.as(Share.VISIBLE, "silver").putByte(silver);
     }
 
     @Override
@@ -74,10 +83,22 @@ public class TileEntityMirror extends TileEntityCommon {
     @Override
     public void neighborChanged() {
         next_check = -1;
+        IReflectionTarget target = reflection_target == null ? null : reflection_target.getTE(IReflectionTarget.class);
+        byte new_silver = countSilver();
+        if (new_silver == silver) return;
+        if (target == null) {
+            silver = new_silver;
+            return;
+        }
+        int oldPower = -getPower();
+        silver = new_silver;
+        int newPower = getPower();
+        target.addReflector(oldPower + newPower);
+        broadcastTargetInfoIfChanged(true);
     }
 
     int getPower() {
-        return 1;
+        return silver;
     }
 
     int clipAngle(int angle) {
@@ -92,15 +113,16 @@ public class TileEntityMirror extends TileEntityCommon {
         boolean raining = getWorldObj().isRaining() && getWorldObj().getBiomeGenForCoords(xCoord, yCoord).rainfall > 0;
         if (raining) return false;
         if (worldObj.getSavedLightValue(EnumSkyBlock.Sky, xCoord, yCoord, zCoord) < 0xF) return false;
+        if (covered_by_other_mirror) return false;
         return worldObj.getSunBrightnessFactor(0) > 0.7;
     }
 
     int last_shared = -1;
 
-    void broadcastTargetInfoIfChanged() {
-        if (getTargetInfo() != last_shared) {
+    void broadcastTargetInfoIfChanged(boolean force) {
+        if (force || getTargetInfo() != last_shared) {
             Coord target = reflection_target == null ? new Coord(this) : reflection_target;
-            broadcastMessage(null, MessageType.MirrorDescription, getTargetInfo(), target.x, target.y, target.z);
+            broadcastMessage(null, MessageType.MirrorDescription, getTargetInfo(), target.x, target.y, target.z, silver);
             last_shared = getTargetInfo();
         }
     }
@@ -126,16 +148,43 @@ public class TileEntityMirror extends TileEntityCommon {
             reflection_target.x = input.readInt();
             reflection_target.y = input.readInt();
             reflection_target.z = input.readInt();
+            silver = input.readByte();
             getCoord().redraw();
             gotten_info_packet = true;
             return true;
         }
         return false;
     }
-    
+
+    void setBelowObscured(Coord at, boolean state) {
+        // Don't let mirrors be stacked on top of eachother. A few things to make this work:
+        // 1) store this information
+        // 2) always cover mirrors below us when placed
+        // 3) always uncover mirrors below us when broken, but only if we ourselves aren't covered
+        while (at.y > 0) {
+            at.y--;
+            if (at.getBlock() == Core.registry.factory_block) {
+                TileEntityMirror below = at.getTE(TileEntityMirror.class);
+                if (below != null) {
+                    below.covered_by_other_mirror = state;
+                    break;
+                }
+            }
+        }
+    }
+
+    @Override
+    public void onPlacedBy(EntityPlayer player, ItemStack is, int side, float hitX, float hitY, float hitZ) {
+        super.onPlacedBy(player, is, side, hitX, hitY, hitZ);
+        setBelowObscured(getCoord(), true);
+    }
+
     @Override
     protected void onRemove() {
         super.onRemove();
+        if (!covered_by_other_mirror) {
+            setBelowObscured(getCoord(), false);
+        }
         if (reflection_target == null) {
             return;
         }
@@ -216,7 +265,7 @@ public class TileEntityMirror extends TileEntityCommon {
                     target.addReflector(is_lit ? getPower() : -getPower());
                 }
             } finally {
-                broadcastTargetInfoIfChanged();
+                broadcastTargetInfoIfChanged(false);
             }
         }
     }
@@ -324,5 +373,37 @@ public class TileEntityMirror extends TileEntityCommon {
     @Override
     public ItemStack getDroppedBlock() {
         return new ItemStack(Core.registry.mirror);
+    }
+
+
+    private static ItemStack[] _silver_blocks = null;
+
+    public static ItemStack[] getSilver() {
+        if (_silver_blocks != null) return _silver_blocks;
+        ArrayList<ItemStack> foundSilver = new ArrayList<ItemStack>();
+        for (String oreName : Arrays.asList("blockSilver", "blockGold", "blockCopper", "factorization:mirrorBoost")) {
+            for (ItemStack ag : OreDictionary.getOres(oreName)) {
+                Block b = DataUtil.getBlock(ag);
+                if (b == null) continue;
+                foundSilver.add(ag);
+            }
+        }
+        return _silver_blocks = foundSilver.toArray(new ItemStack[foundSilver.size()]);
+    }
+
+    private byte countSilver() {
+        byte ret = 1;
+        for (Coord c : getCoord().getNeighborsAdjacent()) {
+            if (c.isAir() || !c.isSolid()) continue;
+            ItemStack is = c.getPickBlock(ForgeDirection.DOWN);
+            for (ItemStack ag : getSilver()) {
+                if (ItemUtil.wildcardSimilar(ag, is)) {
+                    ret += 2;
+                    if (ret > 6) return 6;
+                    break;
+                }
+            }
+        }
+        return ret;
     }
 }
