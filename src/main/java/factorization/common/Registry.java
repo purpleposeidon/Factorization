@@ -433,25 +433,40 @@ public class Registry {
         postMakeItems();
     }
 
+    private boolean checkInput(ItemStack res, Object... params) {
+        if (res == null) {
+            return true;
+        }
+        for (Object obj : params) {
+            if (obj == null) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     public void vanillaRecipe(ItemStack res, Object... params) {
+        if (checkInput(res, params)) return;
         GameRegistry.addRecipe(res, params);
     }
 
     public void vanillaShapelessRecipe(ItemStack res, Object... params) {
-        if (res == null) {
-            return;
-        }
+        if (checkInput(res, params)) return;
         GameRegistry.addShapelessRecipe(res, params);
     }
 
     public void oreRecipe(ItemStack res, Object... params) {
-        if (res == null) {
-            return;
-        }
+        if (checkInput(res, params)) return;
         convertOreItems(params);
         GameRegistry.addRecipe(new ShapedOreRecipe(res, params));
     }
-    
+
+    public void shapelessOreRecipe(ItemStack res, Object... params) {
+        if (checkInput(res, params)) return;
+        convertOreItems(params);
+        GameRegistry.addRecipe(new ShapelessOreRecipe(res, params));
+    }
+
     void batteryRecipe(ItemStack res, Object... params) {
         for (int damage : new int[] { 1, 2 }) {
             ArrayList<Object> items = new ArrayList<Object>(params.length);
@@ -463,14 +478,6 @@ public class Registry {
             }
             oreRecipe(res, items.toArray());
         }
-    }
-
-    public void shapelessOreRecipe(ItemStack res, Object... params) {
-        if (res == null) {
-            return;
-        }
-        convertOreItems(params);
-        GameRegistry.addRecipe(new ShapelessOreRecipe(res, params));
     }
     
     private void convertOreItems(Object[] params) {
@@ -1205,13 +1212,28 @@ public class Registry {
                 'W', new ItemStack(Blocks.wool, 1, red),
                 '-', Blocks.wooden_pressure_plate,
                 'i', Items.glowstone_dust);
-        oreRecipe(shaft_generator_item,
+        oreRecipe(steam_to_shaft,
                 "-I-",
                 "IUI",
                 "-I-",
                 '-', Blocks.heavy_weighted_pressure_plate,
                 'I', dark_iron,
-                'U', Blocks.cauldron);
+                'U', Items.cauldron);
+        oreRecipe(new ItemStack(wooden_shaft_y, 8),
+                "LLL",
+                "III",
+                "LLL",
+                'L', "logWood",
+                'I', dark_iron);
+        oreRecipe(shaft_generator_item,
+                "IDI",
+                "CMC",
+                "LIL",
+                'I', "ingotIron",
+                'D', dark_iron,
+                'C', insulated_coil,
+                'M', motor,
+                'L', lead_ingot);
 
         if (Core.enable_test_content) {
             TestContent.add();
