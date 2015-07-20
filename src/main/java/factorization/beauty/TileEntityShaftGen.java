@@ -6,10 +6,14 @@ import factorization.api.IChargeConductor;
 import factorization.api.IShaftPowerSource;
 import factorization.api.datahelpers.DataHelper;
 import factorization.api.datahelpers.Share;
+import factorization.common.BlockIcons;
 import factorization.common.FactoryType;
 import factorization.shared.BlockClass;
+import factorization.shared.NetworkFactorization;
 import factorization.shared.TileEntityCommon;
+import io.netty.buffer.ByteBuf;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.IIcon;
 import net.minecraftforge.common.util.ForgeDirection;
 
 import java.io.IOException;
@@ -21,6 +25,7 @@ public class TileEntityShaftGen extends TileEntityCommon implements IChargeCondu
     IShaftPowerSource shaft;
     transient double last_power;
     public static double MAX_POWER = 1024, CHARGE_PER_POWER = 130;
+    boolean on;
 
     @Override
     public Charge getCharge() {
@@ -43,6 +48,7 @@ public class TileEntityShaftGen extends TileEntityCommon implements IChargeCondu
         charge.serialize("", data);
         rotor_angle = data.as(Share.VISIBLE, "rotorAngle").putDouble(rotor_angle);
         shaft_direction = data.as(Share.VISIBLE, "shaft_direction").putEnum(shaft_direction);
+        on = data.as(Share.VISIBLE, "on").putBoolean(on);
     }
 
     @Override
@@ -89,7 +95,33 @@ public class TileEntityShaftGen extends TileEntityCommon implements IChargeCondu
         double avail = shaft.availablePower(shaftOutputDirection);
         double usable = Math.min(MAX_POWER, avail);
         last_power = shaft.powerConsumed(shaftOutputDirection, usable);
-        charge.raiseValue((int) (last_power * CHARGE_PER_POWER));
+        int line = (int) (last_power * CHARGE_PER_POWER);
+        charge.raiseValue(line);
         rotor_angle += shaft.getAngularVelocity(shaftOutputDirection);
+        boolean is_on = line > 0;
+        if (is_on != on) {
+            on = is_on;
+            broadcastMessage(null, NetworkFactorization.MessageType.ShaftGenState, on);
+        }
+    }
+
+    @Override
+    public boolean handleMessageFromServer(NetworkFactorization.MessageType messageType, ByteBuf input) throws IOException {
+        if (messageType == NetworkFactorization.MessageType.ShaftGenState) {
+            on = input.readBoolean();
+            // ask for a redraw? Nah; things are getting redrawn constantly anyways
+        }
+        return super.handleMessageFromServer(messageType, input);
+    }
+
+    @Override
+    public IIcon getIcon(ForgeDirection dir) {
+        if (dir == ForgeDirection.DOWN) {
+            return on ? BlockIcons.beauty$shaft_gen_bottom_on : BlockIcons.beauty$shaft_gen_bottom;
+        } else if (dir == ForgeDirection.UP) {
+            return BlockIcons.beauty$shaft_gen_top;
+        } else {
+            return on ? BlockIcons.beauty$shaft_gen_side_on : BlockIcons.beauty$shaft_gen_side;
+        }
     }
 }
