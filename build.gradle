@@ -23,7 +23,6 @@ group = "factorization"
 archivesBaseName = "Factorization"
 
 ext.apiRailcraft = "./apis/railcraft"
-// ext.apiIc2 = "./apis/industrialcraft-2-2.2.737-experimental-api.jar"
 
 
 minecraft {
@@ -40,6 +39,18 @@ sourceSets {
     }
 }
 
+repositories {
+    maven {
+        name = "ic2"
+        url = "http://maven.ic2.player.to/"
+    }   
+}
+
+configurations {
+    api
+    compile.extendsFrom api
+}
+
 // Target java 1.6
 targetCompatibility = '1.6'
 sourceCompatibility = '1.6'
@@ -54,6 +65,7 @@ repositories {
 
 dependencies {
     compile 'codechicken:NotEnoughItems:1.7.10-1.0.2.15:dev'
+    api 'net.industrial-craft:industrialcraft-2:2.2.717-experimental:api'
     // you may put jars on which you depend on in ./libs
     // or you may define them like so..
     //compile "some.group:artifact:version:classifier"
