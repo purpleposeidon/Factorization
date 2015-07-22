@@ -234,7 +234,7 @@ public class Quaternion implements IDataSerializable {
         return new Quaternion(Math.cos(halfAngle), ax*sin, ay*sin, az*sin);
     }
     
-    private static Quaternion[] quat_cache = new Quaternion[FzOrientation.values().length];
+    private static Quaternion[] quat_cache = new Quaternion[25 /*FzOrientation.values().length recursive reference, bleh*/];
     /***
      * @param An {@link FzOrientation}
      * @return A {@link Quaternion} that should not be mutated. It 

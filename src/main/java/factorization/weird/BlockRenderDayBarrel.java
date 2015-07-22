@@ -1,5 +1,6 @@
 package factorization.weird;
 
+import factorization.api.FzOrientation;
 import factorization.util.DataUtil;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
@@ -21,39 +22,32 @@ public class BlockRenderDayBarrel extends FactorizationBlockRender {
     @Override
     public boolean render(RenderBlocks rb) {
         if (world_mode) {
-            doRender(rb, 0);
-            return true;
-        }
-        if (!world_mode) {
+            return doRender(rb, 0);
+        } else {
             doRender(rb, 0);
             GL11.glPushAttrib(GL11.GL_COLOR_BUFFER_BIT);
             GL11.glEnable(GL11.GL_BLEND);
             GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
             doRender(rb, 1);
             GL11.glPopAttrib();
+            return true;
         }
-        return false;
     }
     
     @Override
     public boolean renderSecondPass(RenderBlocks rb) {
         //NOTE: We can almost get away with doing this in the first render pass.
         //But GL_BLEND is not consistently enabled.
-        doRender(rb, 1);
+        return doRender(rb, 1);
         //We can also almost get away with enabling GL_BLEND in this ISBRH.
         //But then my conscience attacks.
-        return true;
     }
     
-    void doRender(RenderBlocks rb, int pass) {
+    boolean doRender(RenderBlocks rb, int pass) {
         BlockRenderHelper block = Core.registry.blockRender;
         TileEntityDayBarrel barrel;
         if (world_mode) {
-            if (te instanceof TileEntityDayBarrel) {
-                barrel = (TileEntityDayBarrel) te;
-            } else {
-                return;
-            }
+            barrel = (TileEntityDayBarrel) te;
         } else {
             barrel = (TileEntityDayBarrel) FactoryType.DAYBARREL.getRepresentative();
             barrel.loadFromStack(is);
@@ -88,14 +82,17 @@ public class BlockRenderDayBarrel extends FactorizationBlockRender {
         block.setBlockBoundsOffset(blockOffset, blockOffset, blockOffset);
         if (world_mode) {
             Tessellator.instance.setBrightness(block.getMixedBrightnessForBlock(w, x, y, z));
-            Quaternion q = Quaternion.fromOrientation(barrel.orientation.getSwapped());
+            FzOrientation fzo = barrel.orientation.getSwapped();
+            Quaternion q = Quaternion.fromOrientation(fzo);
+            block.simpleCull(fzo, w, x, y, z);
             block.beginWithMirroredUVs();
             block.rotateMiddle(q);
-            block.renderRotated(Tessellator.instance, x, y, z);
+            return block.renderRotated(Tessellator.instance, x, y, z);
         } else {
             block.renderForInventory(rb);
             final float d = 1F/64F;
             block.setBlockBoundsOffset(d, 0, d);
+            return true;
         }
     }
     

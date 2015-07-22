@@ -1,5 +1,7 @@
 package factorization.shared;
 
+import factorization.api.FzOrientation;
+import factorization.util.SpaceUtil;
 import net.minecraft.block.Block;
 import net.minecraft.init.Blocks;
 import net.minecraft.block.material.Material;
@@ -196,10 +198,9 @@ public class BlockRenderHelper extends Block {
             }
             currentFace = faceCache[i];
             faceVerts(i, uv_mode);
-            for (int f = 0; f < currentFace.length; f++) {
-                VectorUV vert = currentFace[f];
-                vert.u = faceIIcon.getInterpolatedU(vert.u*16);
-                vert.v = faceIIcon.getInterpolatedV(vert.v*16);
+            for (VectorUV vert : currentFace) {
+                vert.u = faceIIcon.getInterpolatedU(vert.u * 16);
+                vert.v = faceIIcon.getInterpolatedV(vert.v * 16);
             }
         }
         center.x = (minX + maxX)/2;
@@ -304,11 +305,10 @@ public class BlockRenderHelper extends Block {
         }
     }
     
-    Quaternion A = new Quaternion(), B = new Quaternion(), C = new Quaternion();
-    
     Quaternion getNormal(VectorUV a, VectorUV b, VectorUV c) {
         //Dir = (B - A) x (C - A)
         //Norm = Dir / len(Dir)
+        Quaternion A = new Quaternion(), B = new Quaternion(), C = new Quaternion();
         A.loadFrom(a);
         B.loadFrom(b);
         C.loadFrom(c);
@@ -323,14 +323,33 @@ public class BlockRenderHelper extends Block {
     }
     
     public float alpha = 1F;
-    
+
+
+    public void simpleCull(FzOrientation fzo, IBlockAccess w, int x, int y, int z) {
+        if (NORELEASE.on) {
+            Blocks.obsidian.setBlockBounds(0.2F, 0.2F, 0.2F, 0.8F, 0.8F, 0.8F);
+        }
+        for (ForgeDirection dir : ForgeDirection.VALID_DIRECTIONS) {
+            /*Quaternion quat = Quaternion.fromOrientation(fzo);
+            Vec3 v = SpaceUtil.fromDirection(dir);
+            quat.applyRotation(v);
+            ForgeDirection turned = SpaceUtil.round(v, ForgeDirection.UNKNOWN);*/
+            ForgeDirection turned = fzo.applyRotation(dir);
+            boolean cull = w.isSideSolid(x + turned.offsetX, y + turned.offsetY, z + turned.offsetZ, turned.getOpposite(), true);
+            if (!cull) continue;
+            int ordinal = dir.ordinal();
+            textures[ordinal] = null;
+        }
+    }
+
     @SideOnly(Side.CLIENT)
-    public void renderRotated(Tessellator tess, int x, int y, int z) {
+    public boolean renderRotated(Tessellator tess, int x, int y, int z) {
+        boolean any = false;
         for (int f = 0; f < faceCache.length; f++) {
-            if (textures[f] == null) {
-                continue;
-            }
+            if (textures[f] == null) continue;
             VectorUV[] face = faceCache[f];
+            if (face == null) continue;
+            any = true;
             float lighting = getNormalizedLighting(face, center);
             int color = colors[f];
             float color_r = (color & 0xFF0000) >> 16;
@@ -338,13 +357,13 @@ public class BlockRenderHelper extends Block {
             float color_b = (color & 0x0000FF);
             lighting /= 255F; /* because the colors go from 0x00 to 0xFF*/
             tess.setColorRGBA_F(lighting*color_r, lighting*color_g, lighting*color_b, alpha);
-            
-            
-            for (int i = 0; i < face.length; i++) {
-                VectorUV vert = face[i];
+
+
+            for (VectorUV vert : face) {
                 tess.addVertexWithUV(vert.x + x, vert.y + y, vert.z + z, vert.u, vert.v);
             }
         }
+        return any;
     }
     
     @SideOnly(Side.CLIENT)
@@ -662,5 +681,4 @@ public class BlockRenderHelper extends Block {
         if (c.w == null) return; // Is that cool?
         tess.instance.setBrightness(getMixedBrightnessForBlock(c.w, c.x, c.y, c.z));
     }
-
 }

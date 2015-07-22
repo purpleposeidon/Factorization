@@ -1,5 +1,6 @@
 package factorization.api;
 
+import factorization.util.SpaceUtil;
 import net.minecraft.util.Vec3;
 import net.minecraftforge.common.util.ForgeDirection;
 
@@ -78,6 +79,7 @@ public enum FzOrientation {
     private FzOrientation nextFaceRotation, prevFaceRotation;
     private int rotation;
     private FzOrientation swapped;
+    private ForgeDirection[] dirRotations = new ForgeDirection[ForgeDirection.values().length]; // Admitedly we could just use values() here. But that's ugly.
     
     private static FzOrientation[] valuesCache = values();
     
@@ -101,11 +103,14 @@ public enum FzOrientation {
                 }
             }
         }
+        for (FzOrientation o : values()) {
+            o.setupDirectionRotation();
+        }
         if (valuesCache.length == 0) {
             throw new RuntimeException("lolwut");
         }
     }
-    
+
     private void setup() {
         if (this == UNKNOWN) {
             nextFaceRotation = prevFaceRotation = this;
@@ -126,6 +131,14 @@ public enum FzOrientation {
             }
             rcount++;
             head = head.nextFaceRotation;
+        }
+    }
+
+    private void setupDirectionRotation() {
+        for (ForgeDirection dir : ForgeDirection.values()) {
+            Vec3 v = SpaceUtil.fromDirection(dir);
+            Quaternion.fromOrientation(this).applyRotation(v);
+            dirRotations[dir.ordinal()] = SpaceUtil.round(v, ForgeDirection.UNKNOWN);
         }
     }
     
@@ -230,5 +243,9 @@ public enum FzOrientation {
     
     public FzOrientation getSwapped() {
         return swapped;
+    }
+
+    public ForgeDirection applyRotation(ForgeDirection dir) {
+        return dirRotations[dir.ordinal()];
     }
 }
