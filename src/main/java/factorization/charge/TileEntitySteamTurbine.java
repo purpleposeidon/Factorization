@@ -2,14 +2,12 @@ package factorization.charge;
 
 import java.io.IOException;
 
-import factorization.api.IShaftPowerSource;
+import factorization.api.IRotationalEnergySource;
 import factorization.api.datahelpers.DataHelper;
 import factorization.api.datahelpers.Share;
 import factorization.shared.*;
-import factorization.util.DataUtil;
 import factorization.util.NumUtil;
 import io.netty.buffer.ByteBuf;
-import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.IIcon;
 import net.minecraftforge.common.util.ForgeDirection;
 import net.minecraftforge.fluids.Fluid;
@@ -24,7 +22,7 @@ import factorization.common.BlockIcons;
 import factorization.common.FactoryType;
 import factorization.shared.NetworkFactorization.MessageType;
 
-public class TileEntitySteamTurbine extends TileEntityCommon implements IFluidHandler, IChargeConductor, IShaftPowerSource {
+public class TileEntitySteamTurbine extends TileEntityCommon implements IFluidHandler, IChargeConductor, IRotationalEnergySource {
     FluidTank steamTank = new FluidTank(/*this,*/ TileEntitySolarBoiler.steam_stack.copy(), 1000*16);
     Charge charge = new Charge(this);
     int fan_speed = 0;
@@ -168,20 +166,20 @@ public class TileEntitySteamTurbine extends TileEntityCommon implements IFluidHa
     }
 
     @Override
-    public double availablePower(ForgeDirection direction) {
+    public double availableEnergy(ForgeDirection direction) {
         if (direction == ForgeDirection.UP) return rotation_power_buffer;
         return 0;
     }
 
     @Override
-    public double powerConsumed(ForgeDirection direction, double maxPower) {
+    public double takeEnergy(ForgeDirection direction, double maxPower) {
         double d = Math.min(rotation_power_buffer, maxPower);
         rotation_power_buffer -= d;
         return d;
     }
 
     @Override
-    public double getAngularVelocity(ForgeDirection direction) {
+    public double getVelocity(ForgeDirection direction) {
         if (direction == ForgeDirection.UP) return fan_speed;
         return 0;
     }

@@ -3,12 +3,13 @@ package factorization.beauty;
 import factorization.api.Charge;
 import factorization.api.Coord;
 import factorization.api.IChargeConductor;
-import factorization.api.IShaftPowerSource;
+import factorization.api.IRotationalEnergySource;
 import factorization.api.datahelpers.DataHelper;
 import factorization.api.datahelpers.Share;
 import factorization.common.BlockIcons;
 import factorization.common.FactoryType;
 import factorization.shared.BlockClass;
+import factorization.shared.NORELEASE;
 import factorization.shared.NetworkFactorization;
 import factorization.shared.TileEntityCommon;
 import io.netty.buffer.ByteBuf;
@@ -22,7 +23,7 @@ public class TileEntityShaftGen extends TileEntityCommon implements IChargeCondu
     final Charge charge = new Charge(this);
     double rotor_angle;
     ForgeDirection shaft_direction = ForgeDirection.DOWN;
-    IShaftPowerSource shaft;
+    IRotationalEnergySource shaft;
     transient double last_power;
     public static double MAX_POWER = 1024, CHARGE_PER_POWER = 130;
     boolean on;
@@ -35,7 +36,7 @@ public class TileEntityShaftGen extends TileEntityCommon implements IChargeCondu
     @Override
     public String getInfo() {
         if (shaftIsBroken()) return "Missing shaft";
-        return "Power: " + (int) last_power;
+        return "";
     }
 
     @Override
@@ -65,7 +66,7 @@ public class TileEntityShaftGen extends TileEntityCommon implements IChargeCondu
         working = true;
         try {
             if (shaft == null || ((TileEntity) shaft).isInvalid()) {
-                shaft = KineticProxy.connect(new Coord(this), shaft_direction);
+                shaft = KineticProxy.cast(getCoord().adjust(shaft_direction).getTE());
             }
         } finally {
             working = false;
@@ -87,17 +88,17 @@ public class TileEntityShaftGen extends TileEntityCommon implements IChargeCondu
         charge.update();
         if (shaftIsBroken()) {
             if (worldObj.getTotalWorldTime() % 5 == 0) {
-                shaft = KineticProxy.connect(new Coord(this), ForgeDirection.DOWN);
+                shaft = KineticProxy.cast(getCoord().add(shaft_direction).getTE());
             }
             return;
         }
         ForgeDirection shaftOutputDirection = shaft_direction.getOpposite();
-        double avail = shaft.availablePower(shaftOutputDirection);
+        double avail = shaft.availableEnergy(shaftOutputDirection);
         double usable = Math.min(MAX_POWER, avail);
-        last_power = shaft.powerConsumed(shaftOutputDirection, usable);
+        last_power = shaft.takeEnergy(shaftOutputDirection, usable);
         int line = (int) (last_power * CHARGE_PER_POWER);
         charge.raiseValue(line);
-        rotor_angle += shaft.getAngularVelocity(shaftOutputDirection);
+        rotor_angle += shaft.getVelocity(shaftOutputDirection);
         boolean is_on = line > 0;
         if (is_on != on) {
             on = is_on;
@@ -109,6 +110,7 @@ public class TileEntityShaftGen extends TileEntityCommon implements IChargeCondu
     public boolean handleMessageFromServer(NetworkFactorization.MessageType messageType, ByteBuf input) throws IOException {
         if (messageType == NetworkFactorization.MessageType.ShaftGenState) {
             on = input.readBoolean();
+            getCoord().redraw();
             // ask for a redraw? Nah; things are getting redrawn constantly anyways
         }
         return super.handleMessageFromServer(messageType, input);
@@ -116,12 +118,6 @@ public class TileEntityShaftGen extends TileEntityCommon implements IChargeCondu
 
     @Override
     public IIcon getIcon(ForgeDirection dir) {
-        if (dir == ForgeDirection.DOWN) {
-            return on ? BlockIcons.beauty$shaft_gen_bottom_on : BlockIcons.beauty$shaft_gen_bottom;
-        } else if (dir == ForgeDirection.UP) {
-            return BlockIcons.beauty$shaft_gen_top;
-        } else {
-            return on ? BlockIcons.beauty$shaft_gen_side_on : BlockIcons.beauty$shaft_gen_side;
-        }
+        return BlockIcons.beauty$shaft_gen_side;
     }
 }

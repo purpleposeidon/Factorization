@@ -168,6 +168,7 @@ public class ItemMatrixProgrammer extends ItemFactorization {
 
     @SubscribeEvent(priority = EventPriority.LOW)
     public void removeMask(PlayerInteractEvent event) {
+        if (event.action == PlayerInteractEvent.Action.LEFT_CLICK_BLOCK) return;
         final EntityPlayer player = event.entityPlayer;
         if (player.worldObj.isRemote) return;
         if (!player.isSneaking()) return;

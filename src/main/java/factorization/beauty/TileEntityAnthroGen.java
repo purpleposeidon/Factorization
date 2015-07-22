@@ -38,7 +38,7 @@ public class TileEntityAnthroGen extends TileEntityCommon implements IInventory,
     transient boolean isLit = false;
 
     static {
-        TileEntityCaliometricBurner.register(Core.registry.entheas, 1, 1);
+        TileEntityCaliometricBurner.register(Core.registry.entheas, 2, 16);
     }
 
     @Override

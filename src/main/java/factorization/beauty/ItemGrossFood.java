@@ -1,7 +1,10 @@
 package factorization.beauty;
 
+import factorization.charge.TileEntityCaliometricBurner;
+import factorization.servo.ItemMatrixProgrammer;
 import factorization.shared.Core;
 import factorization.shared.ItemFactorization;
+import factorization.shared.NORELEASE;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.EnumAction;
 import net.minecraft.item.ItemStack;
@@ -25,8 +28,13 @@ public class ItemGrossFood extends ItemFactorization {
 
     @Override
     public ItemStack onEaten(ItemStack stack, World world, EntityPlayer player) {
+        if (lmpFeed(player, stack)) {
+            stack.splitStack(1);
+            return stack;
+        }
         if (isInsane) {
             for (Potion potion : new Potion[] {
+                    Potion.weakness,
                     Potion.digSlowdown,
                     Potion.moveSlowdown,
                     Potion.confusion,
@@ -43,13 +51,24 @@ public class ItemGrossFood extends ItemFactorization {
         return null;
     }
 
+    boolean lmpFeed(EntityPlayer player, ItemStack stack) {
+        ItemStack helmet = player.getCurrentArmor(3);
+        if (helmet == null) return false;
+        if (!(helmet.getItem() instanceof ItemMatrixProgrammer)) return false;
+        TileEntityCaliometricBurner.FoodInfo food = TileEntityCaliometricBurner.lookup(stack);
+        if (food == null) return false;
+        if (player.worldObj.isRemote) return true;
+        player.getFoodStats().addStats(food.heal, (float) food.sat);
+        return true;
+    }
+
     @Override
     public int getMaxItemUseDuration(ItemStack stack) {
         return 32;
     }
 
     public ItemStack onItemRightClick(ItemStack stack, World world, EntityPlayer player) {
-        if (player.canEat(isInsane)) {
+        if (player.canEat(false)) {
             player.setItemInUse(stack, getMaxItemUseDuration(stack));
         }
         return stack;

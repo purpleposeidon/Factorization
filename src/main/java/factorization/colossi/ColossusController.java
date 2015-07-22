@@ -11,6 +11,7 @@ import factorization.fzds.interfaces.IDeltaChunk;
 import factorization.fzds.interfaces.Interpolation;
 import factorization.shared.Core;
 import factorization.shared.EntityFz;
+import factorization.shared.NORELEASE;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.boss.IBossDisplayData;
 import net.minecraft.entity.player.EntityPlayer;
@@ -60,6 +61,7 @@ public class ColossusController extends EntityFz implements IBossDisplayData, ID
         offensives = _offensives.toArray(new Technique[0]);
         idlers = _idlers.toArray(new Technique[0]);
         defensives = _defensives.toArray(new Technique[0]);
+        NORELEASE.fixme("Make sure AI is in a shippable state");
     }
     
     private Coord path_target = null;

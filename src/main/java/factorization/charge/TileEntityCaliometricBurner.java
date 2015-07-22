@@ -49,7 +49,7 @@ public class TileEntityCaliometricBurner extends TileEntityFactorization {
     }
 
     public static void register(Item food, int heal, double sat) {
-        special_foods.put(food, new FoodInfo(null, heal, sat));
+        special_foods.put(food, new FoodInfo(ItemUtil.makeWildcard(food), heal, sat));
     }
 
     public static FoodInfo lookup(ItemStack food) {
@@ -199,9 +199,14 @@ public class TileEntityCaliometricBurner extends TileEntityFactorization {
             heal = nom.func_150905_g(is);
             sat = nom.func_150906_h(is);
         }
+        if (heal < sat) {
+            double swapah = heal;
+            heal = (int) sat;
+            sat = swapah;
+        }
         heal += Math.min(0, heal*2*sat);
         int r = (int)(heal*(heal/4F));
-        return Math.max(heal, r)/2;
+        return Math.max(heal, r);
     }
     
     @Override

@@ -110,6 +110,10 @@ public abstract class TileEntityCommon extends TileEntity implements ICoord, IFa
     /** Called when there's a block update. */
     public void neighborChanged() {
     }
+
+    public void neighborChanged(Block neighbor) {
+        neighborChanged();
+    }
     
     private long pulseTime = -1000;
     
@@ -328,4 +332,6 @@ public abstract class TileEntityCommon extends TileEntity implements ICoord, IFa
     public void spawnDisplayTickParticles(Random rand) { }
 
     public boolean recolourBlock(ForgeDirection side, FzColor fzColor) { return false; }
+
+    public void spawnPacketReceived() { }
 }

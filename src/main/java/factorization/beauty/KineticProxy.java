@@ -2,7 +2,7 @@ package factorization.beauty;
 
 import cpw.mods.fml.common.SidedProxy;
 import factorization.api.Coord;
-import factorization.api.IShaftPowerSource;
+import factorization.api.IRotationalEnergySource;
 import factorization.util.SpaceUtil;
 import ic2.api.energy.tile.IKineticSource;
 import net.minecraft.block.Block;
@@ -10,49 +10,20 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraftforge.common.util.ForgeDirection;
 
 public class KineticProxy {
-    public static IShaftPowerSource cast(TileEntity te) {
-        if (te instanceof IShaftPowerSource) return (IShaftPowerSource) te;
+    public static IRotationalEnergySource cast(TileEntity te) {
+        if (te == null || te.isInvalid()) return null;
+        if (te instanceof IRotationalEnergySource) return (IRotationalEnergySource) te;
         return ic2Proxy.convert(te);
     }
 
-    /**
-     * This method can be a little expensive; only call it after block updates.
-     */
-    public static IShaftPowerSource connect(Coord at, ForgeDirection dir) {
-        at.adjust(dir);
-        if (!(at.getBlock() instanceof BlockShaft)) return cast(at.getTE());
-        IShaftPowerSource end = at.getTE(IShaftPowerSource.class);
-        if (end != null) return end;
-        ForgeDirection expectShaftDir = SpaceUtil.sign(dir) == -1 ? dir.getOpposite() : dir;
-        Coord start = at.copy();
-        int limit = 12;
-        while (limit-- > 0) {
-            Block atBlock = at.getBlock();
-            if (!(atBlock instanceof BlockShaft)) {
-                // NOTE: This is not the case on the first iteration
-                IShaftPowerSource powerSource = cast(at.getTE());
-                if (powerSource == null) return null;
-                TileEntityConnectedShaft updater = new TileEntityConnectedShaft(powerSource, dir.getOpposite());
-                start.setTE(updater);
-                return updater;
-            }
-            ForgeDirection shaftDir = ((BlockShaft) atBlock).axis;
-            if (shaftDir != expectShaftDir) return null;
-            at.adjust(dir);
-            // There could be a TileEntityShaftUpdater underneath the Shaft. It is ignored, as it ought to only be at the end.
-            // We aren't checking blockExists!
-        }
-        return null;
-    }
-
     private static class Ic2ConverterProxy {
-        IShaftPowerSource convert(TileEntity te) {
+        IRotationalEnergySource convert(TileEntity te) {
             return null;
         }
     }
 
-    private static class Ic2ConverterImpl {
-        IShaftPowerSource convert(TileEntity te) {
+    private static class Ic2ConverterImpl extends Ic2ConverterProxy {
+        IRotationalEnergySource convert(TileEntity te) {
             if (!(te instanceof IKineticSource)) return null;
             Ic4Fz ret = new Ic4Fz((IKineticSource) te);
             ret.verify();
@@ -66,12 +37,14 @@ public class KineticProxy {
     public static double IC2_FZ_RATIO = 1.0;
     public static double IC2_ANGULAR_VELOCITY_RATIO = 1.0 / 20.0;
 
-    private static class Ic4Fz implements IShaftPowerSource {
+    private static class Ic4Fz implements IRotationalEnergySource {
         private final IKineticSource base;
+        private final TileEntity baseTe;
         private static boolean verified = false;
 
         private Ic4Fz(IKineticSource base) {
             this.base = base;
+            this.baseTe = (TileEntity) base;
         }
 
         private void verify() {
@@ -87,53 +60,23 @@ public class KineticProxy {
         }
 
         @Override
-        public double availablePower(ForgeDirection direction) {
+        public double availableEnergy(ForgeDirection direction) {
             return base.maxrequestkineticenergyTick(direction) / IC2_FZ_RATIO;
         }
 
         @Override
-        public double powerConsumed(ForgeDirection direction, double maxPower) {
+        public double takeEnergy(ForgeDirection direction, double maxPower) {
             return base.requestkineticenergy(direction, (int) (maxPower * IC2_FZ_RATIO)) / IC2_FZ_RATIO;
         }
 
         @Override
-        public double getAngularVelocity(ForgeDirection direction) {
+        public double getVelocity(ForgeDirection direction) {
             return base.maxrequestkineticenergyTick(direction) * IC2_ANGULAR_VELOCITY_RATIO;
         }
-    }
 
-    public interface IShaftUpdater {
-        /**
-         * Call this whenever the speed might have changed.
-         * @return the IShaftUpdater to use next time
-         */
-        IShaftUpdater tick();
-
-        /**
-         * Call this when the block is removed
-         */
-        void remove();
-    }
-
-    public static IShaftUpdater getUpdater(final IShaftPowerSource src, final ForgeDirection outputDirection) {
-        final TileEntity te = (TileEntity) src;
-        return new IShaftUpdater() {
-            @Override
-            public IShaftUpdater tick() {
-                double out = src.availablePower(outputDirection);
-                BlockShaft.propagateVelocity(src, new Coord(te), outputDirection);
-                return this;
-            }
-
-            @Override
-            public void remove() {
-                Coord at = new Coord(te).add(outputDirection);
-                Block b = at.getBlock();
-                if (b instanceof BlockShaft) {
-                    BlockShaft shaft = (BlockShaft) b;
-                    shaft.invalidate(at);
-                }
-            }
-        };
+        @Override
+        public boolean isInvalid() {
+            return baseTe.isInvalid();
+        }
     }
 }

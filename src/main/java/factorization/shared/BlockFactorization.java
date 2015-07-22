@@ -82,11 +82,10 @@ public class BlockFactorization extends BlockContainer {
     
     @Override
     public void onNeighborBlockChange(World w, int x, int y, int z, Block neighbor) {
-        int md = w.getBlockMetadata(x, y, z);
         TileEntity te = w.getTileEntity(x, y, z);
         if (te instanceof TileEntityCommon) {
             TileEntityCommon tec = (TileEntityCommon) te;
-            tec.neighborChanged();
+            tec.neighborChanged(neighbor);
         }
     }
 
@@ -285,6 +284,7 @@ public class BlockFactorization extends BlockContainer {
         put(itemList, reg.anthro_generator_item);
         put(itemList, reg.solarboiler_item);
         put(itemList, reg.steamturbine_item);
+        put(itemList, reg.wooden_shaft);
         if (reg.mirror != null) {
             put(itemList, new ItemStack(reg.mirror));
         }
@@ -525,14 +525,10 @@ public class BlockFactorization extends BlockContainer {
         return 1;
     }
     
-    public static int sideDisable = 0;
-    
     @Override
     public boolean shouldSideBeRendered(IBlockAccess iworld, int x, int y, int z, int side) {
-        if (sideDisable != 0) {
-            return (sideDisable & (1 << side)) == 0; 
-        }
-        return super.shouldSideBeRendered(iworld, x, y, z, side);
+        int md = iworld.getBlockMetadata(x, y, z);
+        return !BlockClass.get(md).isNormal() || super.shouldSideBeRendered(iworld, x, y, z, side);
     }
     
     @Override

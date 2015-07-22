@@ -6,14 +6,8 @@ import factorization.api.datahelpers.DataInByteBuf;
 import factorization.notify.Notice;
 import factorization.util.DataUtil;
 import io.netty.buffer.ByteBuf;
-import io.netty.buffer.ByteBufAllocator;
-import io.netty.buffer.ByteBufOutputStream;
 import io.netty.buffer.Unpooled;
 
-import java.io.ByteArrayOutputStream;
-import java.io.DataInput;
-import java.io.DataOutput;
-import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.Random;
 
@@ -21,7 +15,6 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.CompressedStreamTools;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.world.World;
@@ -193,6 +186,10 @@ public class NetworkFactorization {
 
                 byte ftId = input.readByte();
                 FactoryType ft = FactoryType.fromMd(ftId);
+                if (ft == null) {
+                    Core.logSevere("Got invalid FactoryType ID %s", ftId);
+                    return;
+                }
                 TileEntityCommon spawn = here.getTE(TileEntityCommon.class);
                 if (spawn != null && spawn.getFactoryType() != ft) {
                     world.removeTileEntity(x, y, z);
@@ -200,13 +197,17 @@ public class NetworkFactorization {
                 }
                 if (spawn == null) {
                     spawn = ft.makeTileEntity();
+                    if (spawn == null) {
+                        Core.logSevere("Tried to spawn FactoryType with no associated TE %s", ft);
+                        return;
+                    }
                     spawn.setWorldObj(world);
                     world.setTileEntity(x, y, z, spawn);
-                    here.redraw();
                 }
 
                 DataInByteBuf data = new DataInByteBuf(input, Side.CLIENT);
                 spawn.putData(data);
+                spawn.spawnPacketReceived();
                 return;
             }
 

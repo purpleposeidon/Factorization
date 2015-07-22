@@ -83,6 +83,7 @@ public enum FactoryType {
     BIBLIO_GEN(51, false, TileEntityBiblioGen.class, "factory_biblio_gen"),
     SHAFT_GEN(52, false, TileEntityShaftGen.class, "factory_shaft_gen"),
     STEAM_SHAFT(53, false, TileEntitySteamShaft.class, "factory_steam_shaft"),
+    SHAFT(54, false, TileEntityShaft.class, "factory_shaft"),
 
     POCKETCRAFTGUI(101, true),
     NONE(102, false)

@@ -3,7 +3,7 @@ package factorization.beauty;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import factorization.api.IMeterInfo;
-import factorization.api.IShaftPowerSource;
+import factorization.api.IRotationalEnergySource;
 import factorization.api.Quaternion;
 import factorization.api.datahelpers.DataHelper;
 import factorization.api.datahelpers.Share;
@@ -25,21 +25,20 @@ import net.minecraftforge.fluids.*;
 import java.io.IOException;
 import java.util.Random;
 
-public class TileEntitySteamShaft extends TileEntityCommon implements IFluidHandler, IShaftPowerSource, IMeterInfo {
+public class TileEntitySteamShaft extends TileEntityCommon implements IFluidHandler, IRotationalEnergySource, IMeterInfo {
     FluidTank steamTank = new FluidTank(/*this,*/ TileEntitySolarBoiler.steam_stack.copy(), 800);
 
     public static double Z = 1.6;
     public static int TURBINE_MASS = 1000; // force:steam = mass * acceleration --> acceleration = force / mass
     public static double BEARING_DRAG = 0.05; // v -= drag * v**Z // Was 0.001
-    public static double DRAW_EFFICIENCY = 0.2; // don't let it take *all* of the power in one fell swoop
+    public static double DRAW_EFFICIENCY = 0.10; // taking energy causes a loss
     // steam_force / mass = drag * velocity ** z
     // terminal velocity = (steam_force / (mass * drag)) ** (1/z)
     // kmplot: f(f,z) = (f / (20 ∙ 0.001))^(1/1.6)
 
-    double velocity = 0, drawable_velocity = 0;
+    private double velocity = 0, drawable_velocity = 0;
     public double angle = Math.PI * Math.random();
     public double prev_angle = angle;
-    private KineticProxy.IShaftUpdater shaftUpdater = KineticProxy.getUpdater(this, ForgeDirection.UP);
 
 
     @Override
@@ -109,9 +108,8 @@ public class TileEntitySteamShaft extends TileEntityCommon implements IFluidHand
     public void updateEntity() {
         if (worldObj.isRemote) {
             prev_angle = angle;
-            double displayVelocity = Display.limitVelocity(velocity);
-            angle += displayVelocity;
-            if (displayVelocity > 0) {
+            if (velocity != 0) {
+                angle += getVelocity(ForgeDirection.UP);
                 emitParticles();
             }
             return;
@@ -126,7 +124,8 @@ public class TileEntitySteamShaft extends TileEntityCommon implements IFluidHand
                 steam.amount = 0;
             }
         }
-        double drag = BEARING_DRAG * Math.pow(velocity, Z);
+        double drag = BEARING_DRAG * Math.pow(Math.abs(velocity), Z);
+        if (drag != drag) drag = 0; // Catch NaN
         double acceleration = force / TURBINE_MASS;
         if (acceleration > drag * 1.2) {
             // Slow acceleration so that it looks cool
@@ -141,18 +140,6 @@ public class TileEntitySteamShaft extends TileEntityCommon implements IFluidHand
             velocity = 0;
         }
         shareTurbineSpeed();
-        shaftUpdater = shaftUpdater.tick();
-    }
-
-    @Override
-    public void neighborChanged() {
-        shaftUpdater = KineticProxy.getUpdater(this, ForgeDirection.UP);
-    }
-
-    @Override
-    protected void onRemove() {
-        super.onRemove();
-        shaftUpdater.remove();
     }
 
     @SideOnly(Side.CLIENT)
@@ -160,7 +147,7 @@ public class TileEntitySteamShaft extends TileEntityCommon implements IFluidHand
         int particleLevel = Minecraft.getMinecraft().gameSettings.particleSetting;
         if (particleLevel >= 2) return;
         double r = 7.0 / 16.0;
-        double v = IShaftPowerSource.Display.limitVelocity(velocity) * r;
+        double v = getVelocity(ForgeDirection.UP) * r;
         double bottom = -3.0 / 16.0;
         double left = -4.0 / 16.0;
         double scootch_x = 3.0 / 16.0;
@@ -212,28 +199,37 @@ public class TileEntitySteamShaft extends TileEntityCommon implements IFluidHand
     }
 
     @Override
-    public double availablePower(ForgeDirection direction) {
+    public double availableEnergy(ForgeDirection direction) {
         if (direction == ForgeDirection.UP) return drawable_velocity;
         return 0;
     }
 
     @Override
-    public double powerConsumed(ForgeDirection direction, double maxPower) {
+    public double takeEnergy(ForgeDirection direction, double maxPower) {
         double d = Math.min(drawable_velocity, maxPower);
         drawable_velocity -= d;
-        velocity -= d;
+        velocity -= d * DRAW_EFFICIENCY;
         return d;
     }
 
     @Override
-    public double getAngularVelocity(ForgeDirection direction) {
-        if (direction == ForgeDirection.UP) return velocity;
+    public double getVelocity(ForgeDirection direction) {
+        if (direction == ForgeDirection.UP) {
+            if (velocity > MAX_SPEED) return MAX_SPEED;
+            if (velocity < -MAX_SPEED) return -MAX_SPEED;
+            return velocity;
+        }
         return 0;
     }
 
     @Override
     public String getInfo() {
-        return "Steam: " + steamTank.getFluidAmount() + "mB\n"
-                + "Turbine speed: " + (int) Math.toDegrees(velocity);
+        return (int) (Math.toDegrees(getVelocity(ForgeDirection.UP)) * 10 / 3) + " RPM\n"
+                + "Power: " + (int) velocity;
+    }
+
+    @Override
+    public boolean isBlockSolidOnSide(int side) {
+        return false;
     }
 }

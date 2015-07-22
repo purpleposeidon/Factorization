@@ -46,15 +46,16 @@ public class FzNetDispatch {
     }
     
     public static void addPacketFrom(Packet packet, Chunk chunk) {
-        // Can't actually use this because the AT just won't apply.
-//    	if (chunk.worldObj.isRemote) return;
-//        final WorldServer world = (WorldServer) chunk.worldObj;
-//        final PlayerManager pm = world.getPlayerManager();
-//        PlayerManager.PlayerInstance watcher = pm.getOrCreateChunkWatcher(chunk.xPosition, chunk.zPosition, false);
-//        if (watcher == null) return;
-//        watcher.sendToAllPlayersWatchingChunk(packet);
-        
         if (chunk.worldObj.isRemote) return;
+        final WorldServer world = (WorldServer) chunk.worldObj;
+        final PlayerManager pm = world.getPlayerManager();
+        PlayerManager.PlayerInstance watcher = pm.getOrCreateChunkWatcher(chunk.xPosition, chunk.zPosition, false);
+        if (watcher == null) return;
+        watcher.sendToAllPlayersWatchingChunk(packet);
+
+        // The above requires an AT; nested classes have historically had issues with this.
+        
+        /*if (chunk.worldObj.isRemote) return;
         final WorldServer world = (WorldServer) chunk.worldObj;
         final PlayerManager pm = world.getPlayerManager();
         final int near = 10;
@@ -71,7 +72,7 @@ public class FzNetDispatch {
             if (dist < sufficientlyClose || pm.isPlayerWatchingChunk(player, chunk.xPosition, chunk.zPosition)) {
                 player.playerNetServerHandler.sendPacket(packet);
             }
-        }
+        }*/
     }
     
     public static void addPacketFrom(Packet packet, World world, double x, double z) {

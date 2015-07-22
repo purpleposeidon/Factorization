@@ -1,16 +1,14 @@
 package factorization.common;
 
-import factorization.beauty.BlockShaft;
-import factorization.shared.NORELEASE;
-import net.minecraft.client.renderer.RenderBlocks;
-import net.minecraft.util.IIcon;
-import net.minecraftforge.common.util.ForgeDirection;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
-import factorization.shared.TileEntityFactorization;
 import factorization.shared.FactorizationTextureLoader.Directory;
 import factorization.shared.FactorizationTextureLoader.IIconGroup;
 import factorization.shared.FactorizationTextureLoader.Ignore;
+import factorization.shared.TileEntityFactorization;
+import net.minecraft.client.renderer.RenderBlocks;
+import net.minecraft.util.IIcon;
+import net.minecraftforge.common.util.ForgeDirection;
 
 public class BlockIcons {
     public static IIcon uv_test,
@@ -85,7 +83,7 @@ public class BlockIcons {
     public static IIcon utiligoo$invasion;
 
     public static IIcon beauty$saptap, beauty$saptap_top, beauty$anthrogen, beauty$whirligig;
-    public static IIcon[] beauty$shaft = NORELEASE.just(new IIcon[BlockShaft.MAX_SPEED + 1]);
+    public static IIcon beauty$shaft;
     public static IIcon beauty$shaft_gen_top, beauty$shaft_gen_bottom, beauty$shaft_gen_bottom_on, beauty$shaft_gen_side, beauty$shaft_gen_side_on;
     
     @Directory("storage")

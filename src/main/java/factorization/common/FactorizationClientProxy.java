@@ -176,6 +176,7 @@ public class FactorizationClientProxy extends FactorizationProxy {
             setTileEntityRendererDispatcher(TileEntityHinge.class, new TileEntityHingeRenderer());
             setTileEntityRendererDispatcher(SocketPoweredCrank.class, new TileEntitySocketRenderer());
             setTileEntityRendererDispatcher(TileEntitySteamShaft.class, new TileEntitySteamShaftRenderer());
+            setTileEntityRendererDispatcher(TileEntityShaft.class, new TileEntityShaftRenderer());
         }
 
         RenderingRegistry.registerEntityRenderingHandler(TileEntityWrathLamp.RelightTask.class, new EmptyRender());
@@ -208,6 +209,8 @@ public class FactorizationClientProxy extends FactorizationProxy {
         new BlockRenderAnthrogen();
         new BlockRenderSteamShaft();
         new BlockRenderSolarBoiler();
+        new BlockRenderShaftGen();
+        new BlockRenderShaft();
         for (FactoryType ft : new FactoryType[] {
                 FactoryType.SOCKET_EMPTY,
                 FactoryType.SOCKET_LACERATOR,

@@ -83,6 +83,7 @@ public class BlockRenderMirrorStand extends FactorizationBlockRender {
     public boolean renderSecondPass(RenderBlocks rb) {
         if (!world_mode) return false;
         if (!FzConfig.mirror_sunbeams) return false;
+        if (rb.overrideBlockTexture != null) return false;
         TileEntityMirror mirror = (TileEntityMirror) te;
         Coord hit = mirror.reflection_target;
         if (hit == null) return false;
@@ -123,8 +124,8 @@ public class BlockRenderMirrorStand extends FactorizationBlockRender {
         byte[] bs = new byte[] { 0, 3, 1, 2 };
         Vec3 work = SpaceUtil.newVec();
         // default opacity: 38/0xFF
-        float min_opacity = 30F / 255F;
-        float opacity_per_power = 12F / 255F; // max is 9
+        float min_opacity = 24F / 255F;
+        float opacity_per_power = 4F / 255F; // max is 9
         float alpha = min_opacity + mirror.getPower() * opacity_per_power;
         Tessellator.instance.setColorRGBA_F(1, 1, 1, alpha);
         for (i = 0; i < 4; i++) {

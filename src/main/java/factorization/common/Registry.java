@@ -11,8 +11,6 @@ import cpw.mods.fml.common.registry.GameRegistry;
 import cpw.mods.fml.common.registry.GameRegistry.Type;
 import cpw.mods.fml.relauncher.Side;
 import factorization.api.IActOnCraft;
-import factorization.beauty.BlockShaft;
-import factorization.beauty.ItemBlockShaft;
 import factorization.beauty.ItemGrossFood;
 import factorization.beauty.ItemLeafBomb;
 import factorization.ceramics.ItemGlazeBucket;
@@ -63,7 +61,6 @@ import net.minecraft.item.crafting.FurnaceRecipes;
 import net.minecraft.item.crafting.IRecipe;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.world.World;
-import net.minecraftforge.common.util.ForgeDirection;
 import net.minecraftforge.event.entity.player.EntityItemPickupEvent;
 import net.minecraftforge.fluids.Fluid;
 import net.minecraftforge.fluids.FluidRegistry;
@@ -93,7 +90,6 @@ public class Registry {
     public Block colossal_block;
     public Block gargantuan_block;
     public Block mantlerock_block;
-    public BlockShaft wooden_shaft_x, wooden_shaft_y, wooden_shaft_z;
 
     public ItemStack servorail_item;
     public ItemStack empty_socket_item, socket_lacerator, socket_robot_hand, socket_shifter;
@@ -110,7 +106,7 @@ public class Registry {
             parasieve_item,
             compression_crafter_item,
             sap_generator_item, anthro_generator_item,
-            shaft_generator_item, steam_to_shaft;
+            shaft_generator_item, steam_to_shaft, wooden_shaft;
     public ItemStack silver_ore_item, silver_block_item, lead_block_item,
             dark_iron_block_item;
     public ItemStack is_factory, is_lamp, is_lightair;
@@ -188,19 +184,6 @@ public class Registry {
         }
         gargantuan_block = new GargantuanBlock().setBlockName("factorization:gargantuanBrick").setCreativeTab(Core.tabFactorization);
         mantlerock_block = new BlockNetherrack().setBlockName("factorization:mantlerock").setBlockTextureName("factorization:mantlerock").setHardness(1.25F).setResistance(7.0F).setStepSound(Block.soundTypeStone);
-        wooden_shaft_x = new BlockShaft(Material.wood, ForgeDirection.EAST);
-        wooden_shaft_y = new BlockShaft(Material.wood, ForgeDirection.UP);
-        wooden_shaft_z = new BlockShaft(Material.wood, ForgeDirection.SOUTH);
-        BlockShaft[] shafts = { wooden_shaft_x, wooden_shaft_y, wooden_shaft_z };
-        for (BlockShaft shaft : shafts) {
-            shaft.setBlockName("factorization:woodenShaft_" + shaft.axis.name()).setStepSound(Block.soundTypeWood).setHardness(2F).setResistance(5);
-        }
-        BlockShaft[] shaft_array = new BlockShaft[] {
-                wooden_shaft_y, wooden_shaft_y,
-                wooden_shaft_z, wooden_shaft_z,
-                wooden_shaft_x,wooden_shaft_x,
-                wooden_shaft_y
-        };
         
         GameRegistry.registerBlock(factory_block, ItemFactorizationBlock.class, "FzBlock");
         GameRegistry.registerBlock(lightair_block, "Lightair");
@@ -210,10 +193,6 @@ public class Registry {
         GameRegistry.registerBlock(blasted_bedrock_block, "BlastedBedrock");
         GameRegistry.registerBlock(gargantuan_block, ItemGargantuanBlock.class, "GargantuanBlock");
         GameRegistry.registerBlock(mantlerock_block, "MantleRock");
-        for (BlockShaft shaft : shafts) {
-            Class<ItemBlockShaft> itemClass = shaft == wooden_shaft_y ? ItemBlockShaft.class : null;
-            GameRegistry.registerBlock(shaft, itemClass, "WoodenShaft_" + shaft.axis.name(), new Object[] { shaft_array });
-        }
         if (DeltaChunk.enabled()) {
             GameRegistry.registerBlock(colossal_block, ColossalBlockItem.class, "ColossalBlock");
             GameRegistry.registerTileEntity(TileEntityColossalHeart.class, "fz_colossal_heart");
@@ -312,6 +291,7 @@ public class Registry {
         anthro_generator_item = FactoryType.ANTHRO_GEN.itemStack();
         shaft_generator_item = FactoryType.SHAFT_GEN.itemStack();
         steam_to_shaft = FactoryType.STEAM_SHAFT.itemStack();
+        wooden_shaft = FactoryType.SHAFT.itemStack();
         heater_item = FactoryType.HEATER.itemStack();
         mirror_item_hidden = FactoryType.MIRROR.itemStack();
         leadwire_item = FactoryType.LEADWIRE.itemStack();
@@ -1219,7 +1199,9 @@ public class Registry {
                 '-', Blocks.heavy_weighted_pressure_plate,
                 'I', dark_iron,
                 'U', Items.cauldron);
-        oreRecipe(new ItemStack(wooden_shaft_y, 8),
+        ItemStack shaft8 = wooden_shaft.copy();
+        shaft8.stackSize = 8;
+        oreRecipe(shaft8,
                 "LLL",
                 "III",
                 "LLL",

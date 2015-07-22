@@ -38,12 +38,14 @@ public class NORELEASE {
      * NORELEASE.just may be better.
      */
     public static int zero = 0;
-    
+
+    public static final Joiner joiner = Joiner.on(" ").useForNull("null");
+
     /**
      * Noise-free logging. (On Posix, at least)
      */
     public static void println(Object... msg) {
-        String line = Joiner.on(" ").join(msg);
+        String line = joiner.join(msg);
         trace.println(line);
     }
 
