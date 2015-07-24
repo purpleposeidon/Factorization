@@ -109,14 +109,14 @@ public class TileEntitySolarBoiler extends TileEntityCommon implements IReflecti
         if (from == ForgeDirection.UP) {
             return false;
         }
-        return fluid == null || fluid.getID() == water_stack.fluidID;
+        return fluid == null || fluid == water_stack.getFluid();
     }
     
     @Override
     public FluidStack drain(ForgeDirection from, FluidStack resource, boolean doDrain) {
         if (from != ForgeDirection.UP) return null; 
         FluidTank tank = getTank(from);
-        if (resource == null || tank.getFluid().fluidID != resource.fluidID) {
+        if (resource == null || tank.getFluid() != resource) {
             return null;
         }
         return tank.drain(tank.getCapacity(), doDrain);

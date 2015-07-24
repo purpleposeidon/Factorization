@@ -22,7 +22,7 @@ import factorization.common.BlockIcons;
 import factorization.common.FactoryType;
 import factorization.shared.NetworkFactorization.MessageType;
 
-public class TileEntitySteamTurbine extends TileEntityCommon implements IFluidHandler, IChargeConductor, IRotationalEnergySource {
+public class TileEntitySteamTurbine extends TileEntityCommon implements IFluidHandler, IChargeConductor {
     FluidTank steamTank = new FluidTank(/*this,*/ TileEntitySolarBoiler.steam_stack.copy(), 1000*16);
     Charge charge = new Charge(this);
     int fan_speed = 0;
@@ -158,29 +158,5 @@ public class TileEntitySteamTurbine extends TileEntityCommon implements IFluidHa
             return true;
         }
         return false;
-    }
-
-    @Override
-    public boolean canConnect(ForgeDirection direction) {
-        return direction == ForgeDirection.UP;
-    }
-
-    @Override
-    public double availableEnergy(ForgeDirection direction) {
-        if (direction == ForgeDirection.UP) return rotation_power_buffer;
-        return 0;
-    }
-
-    @Override
-    public double takeEnergy(ForgeDirection direction, double maxPower) {
-        double d = Math.min(rotation_power_buffer, maxPower);
-        rotation_power_buffer -= d;
-        return d;
-    }
-
-    @Override
-    public double getVelocity(ForgeDirection direction) {
-        if (direction == ForgeDirection.UP) return fan_speed;
-        return 0;
     }
 }

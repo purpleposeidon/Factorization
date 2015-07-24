@@ -225,7 +225,7 @@ public class TileEntityMirror extends TileEntityCommon {
             setNextCheck();
             if (worldObj.isRemote) {
                 is_lit = hasSun();
-                if (is_lit != last_drawn_as_lit && FzConfig.mirror_sunbeams) {
+                if (is_lit != last_drawn_as_lit && FzConfig.mirror_sunbeams && reflection_target != null) {
                     new Coord(this).markBlockForUpdate();
                 }
                 return;
