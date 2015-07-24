@@ -85,7 +85,7 @@ public enum AabbDebugger {
     
     static final List<AxisAlignedBB> boxes = list(), frozen = list();
     static final List<Line> lines = list(), frozen_lines = list();
-    static boolean freeze = false;
+    public static boolean freeze = false;
     
     public static void addBox(AxisAlignedBB box) {
         if (box == null) return;

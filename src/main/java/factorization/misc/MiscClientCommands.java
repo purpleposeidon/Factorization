@@ -4,6 +4,7 @@ import com.google.common.base.Joiner;
 import cpw.mods.fml.client.GuiModList;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
+import factorization.aabbdebug.AabbDebugger;
 import factorization.api.Coord;
 import factorization.common.FzConfig;
 import factorization.notify.Notice;
@@ -27,6 +28,7 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.ChatComponentText;
 import net.minecraft.util.EnumChatFormatting;
 import net.minecraft.util.StringUtils;
+import net.minecraft.world.IWorldAccess;
 import net.minecraft.world.World;
 import net.minecraft.world.chunk.Chunk;
 
@@ -607,6 +609,26 @@ public class MiscClientCommands implements ICommand {
         public static void cape() {
             mc.gameSettings.showCape ^= true;
             mc.gameSettings.sendSettingsToServer();
+        }
+
+        private static int active_world_hash = 0;
+        private static IWorldAccess debugger = null;
+
+        @help("shows block render update ranges; run again to disable")
+        public static void debugBlockUpdates() {
+            if (debugger == null) {
+                debugger = new BlockUpdateDebugger();
+                AabbDebugger.freeze = true;
+            }
+            World w = mc.theWorld;
+            int hash = w.hashCode();
+            if (hash == active_world_hash) {
+                w.removeWorldAccess(debugger);
+                active_world_hash = 0;
+            } else {
+                w.addWorldAccess(debugger);
+                active_world_hash = hash;
+            }
         }
         
         /*
