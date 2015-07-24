@@ -4,7 +4,6 @@ import factorization.charge.TileEntityCaliometricBurner;
 import factorization.servo.ItemMatrixProgrammer;
 import factorization.shared.Core;
 import factorization.shared.ItemFactorization;
-import factorization.shared.NORELEASE;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.EnumAction;
 import net.minecraft.item.ItemStack;

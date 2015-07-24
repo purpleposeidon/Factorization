@@ -2,7 +2,6 @@ package factorization.misc;
 
 import factorization.aabbdebug.AabbDebugger;
 import factorization.shared.Core;
-import factorization.shared.NORELEASE;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
