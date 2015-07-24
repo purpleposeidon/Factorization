@@ -1,5 +1,7 @@
 package factorization.beauty;
 
+import factorization.api.FzOrientation;
+import factorization.api.Quaternion;
 import factorization.common.BlockIcons;
 import factorization.common.FactoryType;
 import factorization.shared.BlockRenderHelper;
@@ -7,15 +9,19 @@ import factorization.shared.FactorizationBlockRender;
 import net.minecraft.client.renderer.RenderBlocks;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.util.IIcon;
+import net.minecraftforge.common.util.ForgeDirection;
 
 public class BlockRenderShaftGen extends FactorizationBlockRender {
     @Override
     public boolean render(RenderBlocks rb) {
         BlockRenderHelper block = BlockRenderHelper.instance;
         boolean on = true;
+        ForgeDirection shaft = ForgeDirection.UP;
         if (world_mode) {
+            Tessellator.instance.setBrightness(block.getMixedBrightnessForBlock(w, x, y, z));
             TileEntityShaftGen gen = (TileEntityShaftGen) te;
             on = gen.on;
+            shaft = gen.shaft_direction.getOpposite();
         }
         IIcon top = BlockIcons.beauty$shaft_gen_top;
         IIcon side = on ? BlockIcons.beauty$shaft_gen_side_on : BlockIcons.beauty$shaft_gen_side;
@@ -24,6 +30,8 @@ public class BlockRenderShaftGen extends FactorizationBlockRender {
         block.useTextures(top, bottom, side, side, side, side);
         if (world_mode) {
             block.beginWithMirroredUVs();
+            FzOrientation fzo = FzOrientation.fromDirection(shaft);
+            block.rotateCenter(Quaternion.fromOrientation(fzo));
             block.renderRotated(Tessellator.instance, x, y, z);
         } else {
             block.renderForInventory(rb);

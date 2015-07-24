@@ -13,6 +13,8 @@ import factorization.shared.NORELEASE;
 import factorization.shared.NetworkFactorization;
 import factorization.shared.TileEntityCommon;
 import io.netty.buffer.ByteBuf;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.IIcon;
 import net.minecraftforge.common.util.ForgeDirection;
@@ -45,6 +47,32 @@ public class TileEntityShaftGen extends TileEntityCommon implements IChargeCondu
     }
 
     @Override
+    public void onPlacedBy(EntityPlayer player, ItemStack is, int side, float hitX, float hitY, float hitZ) {
+        super.onPlacedBy(player, is, side, hitX, hitY, hitZ);
+        shaft_direction = ForgeDirection.getOrientation(side);
+        if (player.isSneaking()) return;
+        Coord at = getCoord();
+        ForgeDirection use = ForgeDirection.UNKNOWN;
+        for (ForgeDirection dir : ForgeDirection.VALID_DIRECTIONS) {
+            IRotationalEnergySource res = KineticProxy.cast(at.add(dir).getTE());
+            if (res == null) continue;
+            if (res.canConnect(dir.getOpposite())) {
+                if (use != ForgeDirection.UNKNOWN) return;
+                use = dir;
+            }
+        }
+        if (use == ForgeDirection.UNKNOWN) return;
+        shaft_direction = use;
+    }
+
+    @Override
+    public boolean rotate(ForgeDirection axis) {
+        if (axis == shaft_direction) return false;
+        shaft_direction = axis;
+        return true;
+    }
+
+    @Override
     public void putData(DataHelper data) throws IOException {
         charge.serialize("", data);
         rotor_angle = data.as(Share.VISIBLE, "rotorAngle").putDouble(rotor_angle);
@@ -65,7 +93,7 @@ public class TileEntityShaftGen extends TileEntityCommon implements IChargeCondu
         if (working) return;
         working = true;
         try {
-            if (shaft == null || ((TileEntity) shaft).isInvalid()) {
+            if (shaft == null || shaft.isInvalid()) {
                 shaft = KineticProxy.cast(getCoord().adjust(shaft_direction).getTE());
             }
         } finally {
@@ -75,7 +103,7 @@ public class TileEntityShaftGen extends TileEntityCommon implements IChargeCondu
 
     boolean shaftIsBroken() {
         if (shaft == null) return true;
-        if (((TileEntity) shaft).isInvalid()) {
+        if (shaft.isInvalid()) {
             shaft = null;
             return true;
         }

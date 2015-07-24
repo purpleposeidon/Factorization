@@ -1,27 +1,20 @@
 package factorization.shared;
 
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
+import factorization.api.Coord;
 import factorization.api.FzOrientation;
-import factorization.util.SpaceUtil;
+import factorization.api.Quaternion;
+import factorization.api.VectorUV;
+import factorization.common.BlockIcons;
 import net.minecraft.block.Block;
-import net.minecraft.init.Blocks;
 import net.minecraft.block.material.Material;
 import net.minecraft.client.renderer.RenderBlocks;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.util.IIcon;
 import net.minecraft.util.Vec3;
 import net.minecraft.world.IBlockAccess;
-import net.minecraft.world.World;
 import net.minecraftforge.common.util.ForgeDirection;
-
-import org.lwjgl.opengl.GL11;
-
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
-import factorization.api.Coord;
-import factorization.api.Quaternion;
-import factorization.api.VectorUV;
-import factorization.common.BlockIcons;
-import factorization.common.FzConfig;
 
 public class BlockRenderHelper extends Block {
     //This class is used to make it easy (and very thread-safe) to render cubes of various sizes. It's a fake block.
@@ -326,9 +319,6 @@ public class BlockRenderHelper extends Block {
 
 
     public void simpleCull(FzOrientation fzo, IBlockAccess w, int x, int y, int z) {
-        if (NORELEASE.on) {
-            Blocks.obsidian.setBlockBounds(0.2F, 0.2F, 0.2F, 0.8F, 0.8F, 0.8F);
-        }
         for (ForgeDirection dir : ForgeDirection.VALID_DIRECTIONS) {
             /*Quaternion quat = Quaternion.fromOrientation(fzo);
             Vec3 v = SpaceUtil.fromDirection(dir);
