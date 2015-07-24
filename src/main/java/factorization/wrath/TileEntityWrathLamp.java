@@ -332,7 +332,7 @@ public class TileEntityWrathLamp extends TileEntityCommon {
                     /*if (block == 0 && worldObj.getBlock(x, height - 1, z) == Blocks.cobblestone_wall) {
                         block = -1;
                     }*/
-                    if (block.isAir(worldObj, x, height, z)) {
+                    if (worldObj.getBlock(x, height, z) == Blocks.air) {
                         //Nice work, Mojang. If we didn't do this the hard way, the client will lag very badly near chunks that are unloaded.
                         //XXX TODO FIXME: Seems a bit difficult. What's the right way to do this?
                         Chunk chunk = worldObj.getChunkFromBlockCoords(x, z);
