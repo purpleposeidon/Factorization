@@ -53,7 +53,7 @@ public class FzNetDispatch {
         if (watcher == null) return;
         watcher.sendToAllPlayersWatchingChunk(packet);
 
-        // The above requires an AT; nested classes have historically had issues with this.
+        // The above requires an AT that is impossible to get working?
         
         /*if (chunk.worldObj.isRemote) return;
         final WorldServer world = (WorldServer) chunk.worldObj;
