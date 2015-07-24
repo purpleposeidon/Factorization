@@ -85,6 +85,8 @@ public class BlockIcons {
     public static IIcon beauty$saptap, beauty$saptap_top, beauty$anthrogen, beauty$whirligig;
     public static IIcon beauty$shaft;
     public static IIcon beauty$shaft_gen_top, beauty$shaft_gen_bottom, beauty$shaft_gen_bottom_on, beauty$shaft_gen_side, beauty$shaft_gen_side_on;
+
+    public static IIcon redstone$matcher_face, redstone$matcher_side;
     
     @Directory("storage")
     public static BarrelTextureset normal, silky, hopping, sticky;

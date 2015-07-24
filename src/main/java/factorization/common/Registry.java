@@ -31,6 +31,7 @@ import factorization.oreprocessing.ItemOreProcessing.OreType;
 import factorization.oreprocessing.TileEntityCrystallizer;
 import factorization.oreprocessing.TileEntityGrinder;
 import factorization.oreprocessing.TileEntitySlagFurnace;
+import factorization.redstone.BlockMatcher;
 import factorization.servo.*;
 import factorization.shared.*;
 import factorization.shared.Core.TabType;
@@ -90,6 +91,7 @@ public class Registry {
     public Block colossal_block;
     public Block gargantuan_block;
     public Block mantlerock_block;
+    public BlockMatcher matcher_block;
 
     public ItemStack servorail_item;
     public ItemStack empty_socket_item, socket_lacerator, socket_robot_hand, socket_shifter;
@@ -106,7 +108,7 @@ public class Registry {
             parasieve_item,
             compression_crafter_item,
             sap_generator_item, anthro_generator_item,
-            shaft_generator_item, steam_to_shaft, wooden_shaft;
+            shaft_generator_item, steam_to_shaft, wooden_shaft, bibliogen;
     public ItemStack silver_ore_item, silver_block_item, lead_block_item,
             dark_iron_block_item;
     public ItemStack is_factory, is_lamp, is_lightair;
@@ -184,6 +186,7 @@ public class Registry {
         }
         gargantuan_block = new GargantuanBlock().setBlockName("factorization:gargantuanBrick").setCreativeTab(Core.tabFactorization);
         mantlerock_block = new BlockNetherrack().setBlockName("factorization:mantlerock").setBlockTextureName("factorization:mantlerock").setHardness(1.25F).setResistance(7.0F).setStepSound(Block.soundTypeStone);
+        matcher_block = new BlockMatcher();
         
         GameRegistry.registerBlock(factory_block, ItemFactorizationBlock.class, "FzBlock");
         GameRegistry.registerBlock(lightair_block, "Lightair");
@@ -193,6 +196,7 @@ public class Registry {
         GameRegistry.registerBlock(blasted_bedrock_block, "BlastedBedrock");
         GameRegistry.registerBlock(gargantuan_block, ItemGargantuanBlock.class, "GargantuanBlock");
         GameRegistry.registerBlock(mantlerock_block, "MantleRock");
+        GameRegistry.registerBlock(matcher_block, "BlockMatcher");
         if (DeltaChunk.enabled()) {
             GameRegistry.registerBlock(colossal_block, ColossalBlockItem.class, "ColossalBlock");
             GameRegistry.registerTileEntity(TileEntityColossalHeart.class, "fz_colossal_heart");
@@ -292,6 +296,7 @@ public class Registry {
         shaft_generator_item = FactoryType.SHAFT_GEN.itemStack();
         steam_to_shaft = FactoryType.STEAM_SHAFT.itemStack();
         wooden_shaft = FactoryType.SHAFT.itemStack();
+        bibliogen = FactoryType.BIBLIO_GEN.itemStack();
         heater_item = FactoryType.HEATER.itemStack();
         mirror_item_hidden = FactoryType.MIRROR.itemStack();
         leadwire_item = FactoryType.LEADWIRE.itemStack();
@@ -1216,6 +1221,21 @@ public class Registry {
                 'C', insulated_coil,
                 'M', motor,
                 'L', lead_ingot);
+        oreRecipe(bibliogen,
+                "I",
+                "O",
+                "Y",
+                'I', "crystallineDark Iron",
+                'O', "slimeball",
+                'Y', Blocks.enchanting_table);
+
+        oreRecipe(new ItemStack(matcher_block),
+                "#-#",
+                "#@#",
+                "#-#",
+                '#', "cobblestone",
+                '-', "paneGlass",
+                '@', logicMatrixIdentifier);
 
         if (Core.enable_test_content) {
             TestContent.add();
@@ -1318,7 +1338,7 @@ public class Registry {
         //Format: "Factorization@<Recipe Name>@<outputId that used to view all recipes>"
         for (String msg : new String[] {
                 "factorization crystallizer recipes@fz.crystallizing",
-                "factorization grinder recipes@fz.grinding",
+                //"factorization grinder recipes@fz.grinding",
                 "factorization mixer recipes@fz.mixing",
                 "factorization slag furnace recipes@fz.slagging"
         }) {
