@@ -250,4 +250,9 @@ public class TileEntityAnthroGen extends TileEntityCommon implements IInventory,
         entheas = new ItemStack(Core.registry.entheas, 0, 0);
         sync();
     }
+
+    @Override
+    public boolean isBlockSolidOnSide(int side) {
+        return side == 0;
+    }
 }
