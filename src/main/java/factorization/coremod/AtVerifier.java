@@ -1,22 +1,19 @@
 package factorization.coremod;
 
+import com.google.common.base.Charsets;
+import com.google.common.base.Splitter;
+import com.google.common.io.CharSource;
+import com.google.common.io.Resources;
+import cpw.mods.fml.common.FMLCommonHandler;
+import cpw.mods.fml.relauncher.Side;
+import org.objectweb.asm.Type;
+
 import java.io.IOException;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.List;
-
-import org.objectweb.asm.Type;
-
-import com.google.common.base.Charsets;
-import com.google.common.base.Splitter;
-import com.google.common.io.CharSource;
-import com.google.common.io.Resources;
-
-import cpw.mods.fml.common.FMLCommonHandler;
-import cpw.mods.fml.relauncher.Side;
-import factorization.shared.Core;
 
 public class AtVerifier {
     // We might be able to get rid of this now? The at issues may have been caused only by the .zip thing.
@@ -37,7 +34,7 @@ public class AtVerifier {
                 currentLine = line = line.trim();
                 if (line.equals("")) continue;
                 List<String> parts = bannana.splitToList(line);
-                if (parts == null || parts.size() == 0) continue;
+                if (parts.size() == 0) continue;
                 String access, className, member;
                 if (parts.size() == 3) {
                     access = parts.get(0);
@@ -47,6 +44,7 @@ public class AtVerifier {
                     access = parts.get(0);
                     className = parts.get(1);
                     member = null;
+                    if (className.contains("$")) continue; // Yeah. :/
                 } else {
                     throw new IllegalArgumentException("Malformed AT? " + line);
                 }

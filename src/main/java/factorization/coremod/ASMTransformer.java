@@ -85,7 +85,7 @@ public class ASMTransformer implements IClassTransformer {
                 return applyTransform(basicClass,
                         new AbstractAsmClassTransform.Mixin("factorization.coremodhooks.MixinEntityKinematicsTracker", "Lfactorization/coremodhooks/MixinEntityKinematicsTracker;"));
             }
-            // Don't let IDCs be knocked backwards; fixes a vanilla bugor
+            // Don't let IDCs be knocked backwards; fixes a vanilla bug
             if (transformedName.equals("net.minecraft.world.Explosion") && HammerEnabled.ENABLED) {
                 return applyTransform(basicClass,
                         new AbstractAsmMethodTransform.MutateCall(name, transformedName, "func_77278_a", "doExplosionA")
