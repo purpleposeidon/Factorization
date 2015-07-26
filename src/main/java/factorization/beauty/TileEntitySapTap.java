@@ -1,6 +1,6 @@
 package factorization.beauty;
 
-import factorization.algos.PureFloodfill;
+import factorization.algos.FastBag;
 import factorization.api.Coord;
 import factorization.api.ICoordFunction;
 import factorization.api.datahelpers.DataHelper;
@@ -28,6 +28,7 @@ import net.minecraft.world.chunk.Chunk;
 import net.minecraftforge.common.util.ForgeDirection;
 
 import java.io.IOException;
+import java.util.HashSet;
 
 public class TileEntitySapTap extends TileEntityCommon implements IInventory {
     ItemStack sap = new ItemStack(Core.registry.sap, 0, 0);
@@ -147,7 +148,7 @@ public class TileEntitySapTap extends TileEntityCommon implements IInventory {
         if (worldObj.isRemote) return;
         try {
             Coord level = getCoord();
-            TreeRuler ruler = new TreeRuler(level.add(-search_radius, -8, -search_radius), level.add(search_radius, 32, search_radius), getCoord().add(ForgeDirection.UP));
+            TreeCounter ruler = new TreeCounter(level.add(-search_radius, -8, -search_radius), level.add(search_radius, 32, search_radius), getCoord().add(ForgeDirection.UP));
             ruler.calculate(1000);
             log_count = ruler.logs;
             leaf_count = ruler.leaves;
@@ -184,40 +185,6 @@ public class TileEntitySapTap extends TileEntityCommon implements IInventory {
     public boolean activate(EntityPlayer player, ForgeDirection side) {
         doLogic(player);
         return super.activate(player, side);
-    }
-
-    static class TreeRuler extends PureFloodfill {
-        protected TreeRuler(Coord start, Coord end, Coord origin) {
-            super(start, end, origin);
-        }
-
-        @Override
-        protected byte convert(Coord here) {
-            final Block block = here.getBlock();
-            Material mat = block.getMaterial();
-            if (mat == Material.wood && block instanceof BlockLog) {
-                return 1;
-            } else if (mat == Material.leaves) {
-                return 2;
-            }
-            return 0;
-        }
-
-        int logs = 0, leaves = 0;
-
-        @Override
-        protected void visit(Coord here, byte val) {
-            if (val == 1) {
-                logs++;
-            } else if (val == 2) {
-                leaves++;
-            }
-        }
-
-        @Override
-        protected boolean canTransition(byte here, byte next) {
-            return next != 0 && (here == 1 || here == next) && here != 0;
-        }
     }
 
     @Override
@@ -293,6 +260,66 @@ public class TileEntitySapTap extends TileEntityCommon implements IInventory {
     public void click(EntityPlayer entityplayer) {
         if (ItemUtil.normalize(sap) == null) return;
         InvUtil.givePlayerItem(entityplayer, sap);
-        sap = new ItemStack(Core.registry.sap);
+        sap = new ItemStack(Core.registry.sap, 0);
+    }
+
+    private class TreeCounter {
+        final Coord start, min, max;
+        final FastBag<Coord> frontier = new FastBag<Coord>();
+        final HashSet<Coord> visited = new HashSet<Coord>();
+        int logs = 0, leaves = 0;
+
+        public TreeCounter(Coord min, Coord max, Coord start) {
+            this.start = start;
+            this.min = min.copy();
+            this.max = max.copy();
+            Coord.sort(min, max);
+            frontier.add(start);
+        }
+
+        void calculate(int n) {
+            while (n-- > 0 && !frontier.isEmpty()) {
+                Coord c = frontier.remove(0);
+                visit(c);
+            }
+        }
+
+        static final byte WOOD = 1, LEAF = 2, NON = 0;
+
+        byte kind(Coord at) {
+            final Block block = at.getBlock();
+            Material mat = block.getMaterial();
+            if (mat == Material.wood && block instanceof BlockLog) {
+                return WOOD;
+            } else if (mat == Material.leaves) {
+                return LEAF;
+            }
+            return NON;
+        }
+
+        boolean check(Coord at, byte kind) {
+            visited.add(at);
+            if (kind == WOOD) {
+                logs++;
+                return true;
+            } else if (kind == LEAF) {
+                leaves++;
+                return true;
+            }
+            return false;
+        }
+
+        void visit(Coord at) {
+            byte atKind = kind(at);
+            for (Coord n : at.getNeighborsDiagonal()) {
+                if (!n.inside(min, max)) continue;
+                if (visited.contains(n)) continue;
+                byte nKind = kind(n);
+                if (atKind == LEAF && nKind != LEAF) continue;
+                if (check(n, nKind)) {
+                    frontier.add(n);
+                }
+            }
+        }
     }
 }

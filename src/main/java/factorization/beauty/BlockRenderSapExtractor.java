@@ -44,56 +44,56 @@ public class BlockRenderSapExtractor extends FactorizationBlockRender {
     }
 
     public boolean doRender(RenderBlocks rb, int pass) {
-        Block block = Blocks.log2;
+        Block log = Blocks.log2;
         int md = 1;
         if (world_mode) {
             Block above = w.getBlock(x, y + 1, z);
             int mdAbove = w.getBlockMetadata(x, y + 1, z);
             if (above.getMaterial() == Material.wood && above instanceof BlockLog) {
-                block = above;
+                log = above;
                 md = mdAbove;
             }
         }
         boolean any = false;
+        BlockRenderHelper block = BlockRenderHelper.instance;
+        block.setBlockBoundsOffset(0, 0, 0);
         if (pass == 0) {
             if (world_mode) {
-                BlockRenderHelper b = BlockRenderHelper.instance;
-                b.useTextures(
-                        block.getIcon(0, md),
-                        block.getIcon(1, md),
-                        block.getIcon(2, md),
-                        block.getIcon(3, md),
-                        block.getIcon(4, md),
-                        block.getIcon(5, md)
+                block.useTextures(
+                        log.getIcon(0, md),
+                        log.getIcon(1, md),
+                        log.getIcon(2, md),
+                        log.getIcon(3, md),
+                        log.getIcon(4, md),
+                        log.getIcon(5, md)
                 );
-                b.beginWithMirroredUVs();
+                block.beginWithMirroredUVs();
                 int rotation = md & 12;
                 if (rotation == 4) {
-                    b.rotateCenter(Quaternion.fromOrientation(FzOrientation.FACE_NORTH_POINT_DOWN));
+                    block.rotateCenter(Quaternion.fromOrientation(FzOrientation.FACE_NORTH_POINT_DOWN));
                 } else if (rotation == 8) {
-                    b.rotateCenter(Quaternion.fromOrientation(FzOrientation.FACE_WEST_POINT_NORTH));
+                    block.rotateCenter(Quaternion.fromOrientation(FzOrientation.FACE_WEST_POINT_NORTH));
                 } else {
-                    b.rotateCenter(new Quaternion());
+                    block.rotateCenter(new Quaternion());
                 }
-                b.renderRotated(Tessellator.instance, x, y, z);
+                block.renderRotated(Tessellator.instance, x, y, z);
             } else {
-                invLog(rb, block, md);
+                invLog(rb, log, md);
                 any = true;
             }
         }
         if (pass == 1) {
-            BlockRenderHelper b = BlockRenderHelper.instance;
-            b.useTextures(BlockIcons.beauty$saptap_top, BlockIcons.beauty$saptap_top,
+            block.useTextures(BlockIcons.beauty$saptap_top, BlockIcons.beauty$saptap_top,
                     BlockIcons.beauty$saptap, BlockIcons.beauty$saptap,
                     BlockIcons.beauty$saptap, BlockIcons.beauty$saptap);
             float d = -1.0F / 1024F;
-            b.setBlockBoundsOffset(d, d, d);
+            block.setBlockBoundsOffset(d, d, d);
             if (world_mode) {
-                any |= b.render(rb, x, y, z);
-                b.setBlockBoundsOffset(0, 0, 0);
+                any |= block.render(rb, x, y, z);
+                block.setBlockBoundsOffset(0, 0, 0);
             } else {
-                b.renderForInventory(rb);
-                b.setBlockBoundsOffset(0, 0, 0);
+                block.renderForInventory(rb);
+                block.setBlockBoundsOffset(0, 0, 0);
                 any = true;
             }
         }
