@@ -43,7 +43,7 @@ public class RenderMessages extends RenderMessagesProxy {
         ClientMessage msg = new ClientMessage(player.worldObj, locus, item, format, args);
         if (msg.style.contains(Style.CLEAR)) {
             messages.clear();
-            return;
+            if (msg.msg == null || msg.msg.equals("")) return;
         }
         if (msg.style.contains(Style.UPDATE) || msg.style.contains(Style.UPDATE_SAME_ITEM)) {
             updateMessage(msg);
