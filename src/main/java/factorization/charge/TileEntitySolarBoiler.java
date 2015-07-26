@@ -234,6 +234,7 @@ public class TileEntitySolarBoiler extends TileEntityCommon implements IReflecti
     }
     
     public void applyHeat(int heat) {
+        heat *= 5;
         given_heat += heat;
         sanitize();
         FluidStack water = waterTank.getFluid();
