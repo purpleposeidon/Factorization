@@ -1,0 +1,28 @@
+\title{Leaf Bomb}
+
+Wrapping 8 leaves of the same type around a ball of \#{item.factorization:sap} sap
+creates a Leaf Bomb.
+Throwing the Leaf Bomb against a solid surface will sprout a burst of organic leaves;
+a true pearl in the horticulturist's toolbox.
+
+Fortune can be applied to the leaf bomb in an \link{tile.anvil.intact}{anvil}, creating larger and larger bursts of leaves as the fortune level increases.
+(Whether or not this is actually worthwhile is debatable; you will usually get more leaves than you put in, even with no enchantment.)
+
+\figure{
+H4sIAAAAAAAAAO3cT46bMBTH8ccEadQZUlW5QFbNQXqWmUUXbTddtD0OJ22osObVMsb2MyEM348U
+8Uc8QyJ+tkOkPIkcpHkRkY8fpHmVwXXl57+VZ2m+iXySippx+TiuN2of9qe9kzawvMZbJ/vb1qpl
+K/k5bKW81nJe2B0zjw/l3d9+tF7UO2e930P1enuu3dC5dZtd4TUdE84du54anwluQ/cDR2EekMN6
+r3bqpaX05bqP6Lz9rj6W/7m+I6X/mKvHfWvU0s9+Sf6tfYa7Dmt9yb13VK8cOm8iefXdeHzpOB3K
+aWr+rPXu2FjbuG+xZ38lWbZkV7PcO9Z7L/U9+GOdP4dPERr/c/PXBY7Nef+x7x8l9dg26xxgbbWe
+X6XmL5S9nDlIKHu557fkF/um5wBue4u5d6z5121Yr8FSS4ZxK/68/z30AZbaW80fYm1Y0HegxNZz
+X8OaYz8AAAAAAAAAAAB26iAPP36JtO2w8ue64/uzNF+9fwZ4mHilOo/Ly7h+VvuwP6c7aQPzprKf
+2gcMOb+odbK/bSe1PEl+Dk9SXms5L/L5We8D+2J9gM673wc4F78I/7He76F6vT3XbujcNTLcG2pr
+fSaIC2X9ENgX48/5e2EekMN6r05lpU+sDV2Dy69I/NpS+o6U/idWj+WEsp+b/yHjn+Ut+9b8p9y3
+c/WWNlx9yb3XS9n5dd5E8uqXGGtzsmupd8fG2sZyaoz//rO/Xu1bI/9OjTG1VOp7iI2Vqeevkb+p
+cTxV7PtHST1uY+7ZX+7vAM5Ztv0doNbzq5z8+ftyxvSp7JfmnzzuQ6386zmA23bfC7bImn/dhvUa
+LLVkGHNqjf16rN/y2O8s8Uwut3bN59/0HftRa94/8H8P3KM1x34AAAAAAAAAAADs1PCHAL+vyy/y
+F/zJRaRJgAAA}
+
+\i{A tree made in a few moments with Leaf Bombs and \link{vanillablocks}{Bark}}
+
+\topic{item.factorization:leafBomb}

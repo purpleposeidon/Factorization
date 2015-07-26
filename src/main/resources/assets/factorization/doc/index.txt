@@ -35,3 +35,19 @@
 
 
 \checkmods{all}{ForgeIRC}{Join us in #factorization on irc.esper.net!}{}
+
+\link{beauty/saptap}{NORELEASE}
+
+
+\figure{
+H4sIAAAAAAAAAO3cX2/SUBjH8ee0QIElbv55F0u88l4XEy+99M5gpQfWpNCklG3s0hdm4kvR96Am
+XgxPoWCFzkCZUNLvJzkpaznP81uXhyzZ0raILcoTkXZLlJaEeRG3zfG0LfVrN9aRLY2LQTgexiJP
+vjal9SYY+95bd6DT69IUy/fkWc/txmE06YzCwI1642jodrUS9VyZFrdJZXOcmINlCo9i7Q4yhaX1
+d+HZ9WTDzSzTvMPTZYfkamd06fbihpx5kXvtfgz0Ox2EXT+eSKohzav01MvP315MPjhf8uLYeXFk
+gziPl3GSIJ2+HpoK3Us36ic3UjWkHYXm+sWwH+hX5z9fvw9bn5RY4VClMU7nGz0/0t3YD4dpqGy4
+2krPR5mb7M1+NH8aKqmNfE/Xcu95WkdtXkfl3qzt6+TmqW1fR/71fVmrdQZ+FIWmjhMnZeI0e/rV
+7XQ6vVPSGPnBlWm2PH9jzv/KtnEWbZQ43dC8V3tyX8eCye29J1/rWDB5be/J1zoWTF7fe/K1juvJ
+7TR5PVvSWpmXupyIGoiczT+p89e2iu53duy/2F/UrvuBY3bo+QdwOLvO/0N9fpTJsecHNsX8A9XF
+/APVxfwD1cX8A9VVlvl3VhaA/68s869WFgAAAAAAAAAAAAAA2JAtVjh7AkHyYvaIghNRfvpkgPN7
+1qYW/wlQaL/J8iNvbbt/i7wPuh84cgedfwAHtev877q/dPh9ABXC/APVxfwD1cX8A9XF/APVVYr5
+L/r3PwA7Kcv8f8+ubfcDAAAAAAAAAAAAAFBlyQMBJpI8iv83Ay0CG9+FAAA=}
