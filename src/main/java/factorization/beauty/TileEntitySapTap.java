@@ -148,7 +148,7 @@ public class TileEntitySapTap extends TileEntityCommon implements IInventory {
         if (worldObj.isRemote) return;
         try {
             Coord level = getCoord();
-            TreeCounter ruler = new TreeCounter(level.add(-search_radius, -8, -search_radius), level.add(search_radius, 32, search_radius), getCoord().add(ForgeDirection.UP));
+            TreeCounter ruler = new TreeCounter(level.add(-search_radius, -8, -search_radius), level.add(search_radius, 32, search_radius), getCoord());
             ruler.calculate(1000);
             log_count = ruler.logs;
             leaf_count = ruler.leaves;
@@ -274,7 +274,12 @@ public class TileEntitySapTap extends TileEntityCommon implements IInventory {
             this.min = min.copy();
             this.max = max.copy();
             Coord.sort(min, max);
-            frontier.add(start);
+            for (Coord c : start.getNeighborsAdjacent()) {
+                if (kind(c) == WOOD) {
+                    check(c, WOOD);
+                    frontier.add(c);
+                }
+            }
         }
 
         void calculate(int n) {

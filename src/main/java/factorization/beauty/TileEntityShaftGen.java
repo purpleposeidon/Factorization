@@ -9,6 +9,7 @@ import factorization.api.datahelpers.Share;
 import factorization.common.BlockIcons;
 import factorization.common.FactoryType;
 import factorization.shared.BlockClass;
+import factorization.shared.NORELEASE;
 import factorization.shared.NetworkFactorization;
 import factorization.shared.TileEntityCommon;
 import io.netty.buffer.ByteBuf;
@@ -25,7 +26,7 @@ public class TileEntityShaftGen extends TileEntityCommon implements IChargeCondu
     ForgeDirection shaft_direction = ForgeDirection.DOWN;
     IRotationalEnergySource shaft;
     transient double last_power;
-    public static double MAX_POWER = 1024, CHARGE_PER_POWER = 130;
+    public static double MAX_POWER = 1024, CHARGE_PER_POWER = 180;
     boolean on;
 
     @Override
