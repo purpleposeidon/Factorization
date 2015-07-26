@@ -152,6 +152,7 @@ public class Registry {
     public ItemMinecartDayBarrel barrelCart;
     public ItemGrossFood sap, entheas;
     public ItemLeafBomb leafBomb;
+    public BlockBlast blastBlock;
 
     public Material materialMachine = new Material(MapColor.ironColor);
     
@@ -183,6 +184,7 @@ public class Registry {
         blasted_bedrock_block = new BlastedBedrock();
         if (DeltaChunk.enabled()) {
             colossal_block = new ColossalBlock();
+            blastBlock = new BlockBlast();
         }
         gargantuan_block = new GargantuanBlock().setBlockName("factorization:gargantuanBrick").setCreativeTab(Core.tabFactorization);
         mantlerock_block = new BlockNetherrack().setBlockName("factorization:mantlerock").setBlockTextureName("factorization:mantlerock").setHardness(1.25F).setResistance(7.0F).setStepSound(Block.soundTypeStone);
@@ -200,6 +202,7 @@ public class Registry {
         if (DeltaChunk.enabled()) {
             GameRegistry.registerBlock(colossal_block, ColossalBlockItem.class, "ColossalBlock");
             GameRegistry.registerTileEntity(TileEntityColossalHeart.class, "fz_colossal_heart");
+            GameRegistry.registerBlock(blastBlock, "BlastBlock");
         }
         
         
@@ -1236,6 +1239,13 @@ public class Registry {
                 '#', "cobblestone",
                 '-', "paneGlass",
                 '@', logicMatrixIdentifier);
+        if (DeltaChunk.enabled()) {
+            oreRecipe(new ItemStack(blastBlock),
+                    "###",
+                    "###",
+                    "###",
+                    '#', Items.gunpowder);
+        }
 
         if (Core.enable_test_content) {
             TestContent.add();
