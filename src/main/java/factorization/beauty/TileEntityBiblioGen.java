@@ -24,7 +24,7 @@ public class TileEntityBiblioGen extends TileEntityCommon implements IRotational
     double angle = 0, prev_angle = 0;
     double availablePower = 0;
     static int LIBRARY_RADIUS = 24;
-    static double POWER_PER_BOOK = Math.PI / 1600;
+    static double POWER_PER_BOOK = Math.PI / 3200;
 
     @Override
     public BlockClass getBlockClass() {
