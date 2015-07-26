@@ -325,7 +325,8 @@ public class BlockRenderHelper extends Block {
             quat.applyRotation(v);
             ForgeDirection turned = SpaceUtil.round(v, ForgeDirection.UNKNOWN);*/
             ForgeDirection turned = fzo.applyRotation(dir);
-            boolean cull = w.isSideSolid(x + turned.offsetX, y + turned.offsetY, z + turned.offsetZ, turned.getOpposite(), true);
+            Block b = w.getBlock(x + turned.offsetX, y + turned.offsetY, z + turned.offsetZ);
+            boolean cull = b.isOpaqueCube();
             if (!cull) continue;
             int ordinal = dir.ordinal();
             textures[ordinal] = null;
