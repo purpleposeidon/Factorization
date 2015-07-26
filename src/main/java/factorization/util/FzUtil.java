@@ -102,6 +102,8 @@ public class FzUtil {
         return barrel.item;
     }
 
+    // Enh, really belongs in NumUtil maybe?
+    // Probably UnitUtil, with the map compass stuff as well
     private static class UnitBase {
         final long ratio;
         final String unit;
@@ -113,23 +115,24 @@ public class FzUtil {
     }
 
     public static UnitBase unit_time[] = new UnitBase[] {
-            new UnitBase(1L * 20 * 60 * 60 * 24 * 365 * 1000000000, "eons"),
-            new UnitBase(1L * 20 * 60 * 60 * 24 * 365 * 1000, "millenia"),
-            new UnitBase(1L * 20 * 60 * 60 * 24 * 365 * 100, "centuries"),
-            new UnitBase(1L * 20 * 60 * 60 * 24 * 365, "years"),
-            new UnitBase(1L * 20 * 60 * 60 * 24 * 30, "months"), // Mostly! :D
-            new UnitBase(1L * 20 * 60 * 60 * 24 * 7, "weeks"),
-            new UnitBase(1L * 20 * 60 * 60 * 24, "days"),
-            new UnitBase(1L * 20 * 60 * 60, "hours"),
-            new UnitBase(1L * 20 * 60 * 20, "days of St. Jeb"),
+            new UnitBase(1L * 20 * 60 * 60 * 24 * 365 * 1000000000, "long eons"),
+            new UnitBase(1L * 20 * 60 * 60 * 24 * 365 * 1000, "long millenia"),
+            new UnitBase(1L * 20 * 60 * 60 * 24 * 365 * 100, "long centuries"),
+            new UnitBase(1L * 20 * 60 * 60 * 24 * 365, "long years"),
+            new UnitBase(1L * 20 * 60 * 60 * 24 * 30, "long months"), // Mostly! :D
+            new UnitBase(1L * 20 * 60 * 60 * 24 * 7, "long weeks"),
+            new UnitBase(1L * 20 * 60 * 60 * 24, "long days"),
+            new UnitBase(1L * 20 * 60 * 60, "long hours"),
+            new UnitBase(1L * 20 * 60 * 20, "days"), // assuming no sleeping
             new UnitBase(1L * 20 * 60, "minutes"),
             new UnitBase(1L * 20, "seconds"),
             new UnitBase(1L, "ticks"),
     };
     public static UnitBase unit_distance_px[] = new UnitBase[] {
             new UnitBase(1L * 16 * 1000, "kilometers"),
+            new UnitBase(1L * 16 * 16, "chunks"),
             new UnitBase(1L * 16, "blocks"),
-            new UnitBase(1L, "pixel"),
+            new UnitBase(1L, "pixels"),
     };
 
     private static UnitBase best(UnitBase[] bases, long value) {
