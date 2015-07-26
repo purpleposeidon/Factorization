@@ -1,5 +1,6 @@
 package factorization.colossi;
 
+import factorization.algos.ReservoirSampler;
 import factorization.api.Coord;
 import factorization.api.DeltaCoord;
 import factorization.api.ICoordFunction;
@@ -7,30 +8,30 @@ import factorization.api.Quaternion;
 import factorization.citizen.EntityCitizen;
 import factorization.colossi.ColossusController.BodySide;
 import factorization.colossi.ColossusController.LimbType;
-import factorization.fzds.DeltaChunk;
 import factorization.fzds.TransferLib;
 import factorization.fzds.interfaces.DeltaCapability;
 import factorization.fzds.interfaces.IDeltaChunk;
 import factorization.fzds.interfaces.Interpolation;
 import factorization.shared.Core;
-import factorization.algos.ReservoirSampler;
+import factorization.util.NumUtil;
 import factorization.util.SpaceUtil;
 import net.minecraft.block.Block;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.item.EntityFallingBlock;
 import net.minecraft.entity.item.EntityFireworkRocket;
 import net.minecraft.entity.item.EntityItem;
+import net.minecraft.entity.monster.EntityZombie;
+import net.minecraft.entity.passive.EntityChicken;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
+import net.minecraft.potion.Potion;
+import net.minecraft.potion.PotionEffect;
 import net.minecraft.util.Vec3;
-import net.minecraft.world.Explosion;
 import net.minecraft.world.WorldServer;
 import net.minecraftforge.common.util.ForgeDirection;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 import static factorization.colossi.TechniqueKind.*;
 
@@ -68,7 +69,9 @@ public enum Technique implements IStateMachine<Technique> {
                     return FINISH_MOVE;
                 }
             }
+            if (controller.confused) return CONFUSED;
             boolean use_defense = controller.checkHurt(true);
+            if (use_defense) return SUMMON_RETALIATION;
             List<Technique> avail = Arrays.asList(Technique.values());
             Collections.shuffle(avail);
             Technique chosen_offense = null;
@@ -154,8 +157,145 @@ public enum Technique implements IStateMachine<Technique> {
         @Override
         public Technique tick(ColossusController controller, int age) {
             if (HIT_WITH_LIMB.usable(controller)) return HIT_WITH_LIMB;
-            if (age > 20 * 15 || controller.checkHurt(false)) return finishMove(controller);
+            if (age > 20 * 15) return finishMove(controller);
+            if (controller.checkHurt(false)) return WANDER;
             return this;
+        }
+    },
+
+    CONFUSED {
+        @Override
+        TechniqueKind getKind() {
+            return TRANSITION;
+        }
+
+        @Override
+        public void onEnterState(ColossusController controller, Technique prevState) {
+            controller.setTarget(null);
+            STAND_STILL.onEnterState(controller, prevState);
+            // Bend over slightly
+            double slight_bend = Math.PI / 8;
+            Random rand = controller.worldObj.rand;
+            ForgeDirection dir = rand.nextBoolean() ? ForgeDirection.NORTH : ForgeDirection.SOUTH;
+            Quaternion bend = Quaternion.getRotationQuaternionRadians(slight_bend, dir);
+            Quaternion rot = controller.body.getRotation().multiply(bend);
+            controller.bodyLimbInfo.target(rot, controller.getSpeedScale());
+            Quaternion legBack = bend.conjugate();
+            legBack = legBack.slerp(legBack.multiply(legBack), 0.5);
+            for (LimbInfo limb : controller.limbs) {
+                if (limb.type == LimbType.ARM) wiggle(controller, limb, rand);
+                if (limb.type == LimbType.LEG) {
+                    limb.target(legBack, controller.getSpeedScale());
+                }
+
+            }
+        }
+
+        @Override
+        public Technique tick(ColossusController controller, int age) {
+            int end = 20 * 25;
+            if (age == end || controller.checkHurt(false)) {
+                STAND_STILL.onEnterState(controller, this);
+                return FINISH_MOVE;
+            }
+            for (LimbInfo limb : controller.limbs) {
+                if (limb.type == LimbType.ARM && !limb.isTurning()) wiggle(controller, limb, controller.worldObj.rand);
+            }
+            return this;
+        }
+
+        @Override
+        public void onExitState(ColossusController controller, Technique nextState) {
+            controller.confused = false;
+        }
+
+        void wiggle(ColossusController controller, LimbInfo arm, Random rand) {
+            // TODO: Play a grumble noise
+            playNoise(controller);
+            double MIN_RAISE = Math.PI / 2, MAX_RAISE = Math.PI * 0.8;
+            double MIN_CROSS = Math.PI / 8, MAX_CROSS = Math.PI / 4;
+            double raise = NumUtil.interp(MIN_RAISE, MAX_RAISE, rand.nextDouble());
+            double cross = NumUtil.interp(MIN_CROSS, MAX_CROSS, rand.nextDouble());
+            double twist = Math.PI / 2 * rand.nextDouble();
+            if (arm.side == BodySide.LEFT) cross = -cross;
+            Quaternion rot = Quaternion.getRotationQuaternionRadians(cross, ForgeDirection.UP);
+            rot.incrMultiply(Quaternion.getRotationQuaternionRadians(raise, ForgeDirection.SOUTH));
+            rot.incrMultiply(Quaternion.getRotationQuaternionRadians(twist, ForgeDirection.UP));
+            arm.target(rot, controller.getSpeedScale());
+        }
+    },
+
+    SUMMON_RETALIATION {
+        @Override
+        TechniqueKind getKind() {
+            return TRANSITION;
+        }
+
+        @Override
+        public void onEnterState(ColossusController controller, Technique prevState) {
+            STAND_STILL.onEnterState(controller, prevState);
+            for (LimbInfo limb : controller.limbs) {
+                if (limb.type != LimbType.ARM) continue;
+                limb.target(Quaternion.getRotationQuaternionRadians(Math.PI, ForgeDirection.WEST), controller.getStrikeSpeedScale());
+            }
+        }
+
+        @Override
+        public Technique tick(ColossusController controller, int age) {
+            return finishMove(controller);
+        }
+
+        double rng(ColossusController controller) {
+            int w = controller.body_width;
+            Random rand = controller.worldObj.rand;
+            return (rand.nextBoolean() ? -1 : +1) * (w + rand.nextInt(w));
+        }
+
+        @Override
+        public void onExitState(ColossusController controller, Technique nextState) {
+            Random rand = controller.worldObj.rand;
+            int baby = 3 + rand.nextInt(controller.getDestroyedCracks());
+            int forever = 999999;
+            while (baby-- > 0) {
+                EntityZombie zombie = new EntityZombie(controller.worldObj);
+                final boolean jockey = rand.nextDouble() > 0.95;
+                zombie.setChild(true);
+                zombie.addPotionEffect(new PotionEffect(Potion.damageBoost.getId(), forever, 1, true));
+                zombie.addPotionEffect(new PotionEffect(Potion.invisibility.getId(), forever, 1, false));
+                zombie.addPotionEffect(new PotionEffect(Potion.fireResistance.getId(), forever, 1, true));
+                if (!jockey) {
+                    zombie.addPotionEffect(new PotionEffect(Potion.jump.getId(), 20 * 5, 3, true));
+                }
+
+                zombie.setCurrentItemOrArmor(4, new ItemStack(Core.registry.blastBlock));
+                zombie.setEquipmentDropChance(4, 1);
+                zombie.setCurrentItemOrArmor(3, new ItemStack(Items.fire_charge));
+                zombie.setEquipmentDropChance(3, 1);
+                // Ye gods baby zombie OP no
+                //zombie.setCurrentItemOrArmor(0, new ItemStack(Items.iron_sword));
+                //zombie.setEquipmentDropChance(0, 0);
+                zombie.livingSoundTime = Integer.MIN_VALUE;
+                zombie.setFire(forever);
+                zombie.setCanPickUpLoot(false);
+                zombie.func_110163_bv(); // 'persistenceRequired = true'
+
+                double ex = controller.posX + rng(controller);
+                double ey = controller.posY + controller.height;
+                double ez = controller.posZ + rng(controller);
+
+                zombie.setPosition(ex, ey, ez);
+                if (jockey) {
+                    EntityChicken chicken = new EntityChicken(controller.worldObj);
+                    chicken.setPosition(ex, ey, ez);
+                    zombie.mountEntity(chicken);
+                    chicken.addPotionEffect(new PotionEffect(Potion.invisibility.getId(), forever, 1, false));
+                    chicken.func_152117_i(true); // Sets 'chicken jockey', makes it despawn & not lay eggs
+                    chicken.livingSoundTime = Integer.MIN_VALUE; // Unfortunately it's only a temporary stiffling
+                    controller.worldObj.spawnEntityInWorld(chicken);
+                }
+
+                controller.worldObj.spawnEntityInWorld(zombie);
+            }
         }
     },
     
@@ -234,6 +374,7 @@ public enum Technique implements IStateMachine<Technique> {
             int newCracks = sampler.size();
             int destroyed = controller.getDestroyedCracks();
             controller.setTotalCracks(newCracks + destroyed);
+            controller.confused = false; // No pre-confusing!
         }
         
         boolean isExposedSkin(Coord cell) {
@@ -300,7 +441,9 @@ public enum Technique implements IStateMachine<Technique> {
             } else {
                 bodyBendTime = 60; // Hmph! Make something up. Shouldn't happen.
             }
-            Quaternion legBend = Quaternion.getRotationQuaternionRadians(-bowAngle * 1.5, ForgeDirection.NORTH);
+            //Quaternion legBend = Quaternion.getRotationQuaternionRadians(-bowAngle * 1.5, ForgeDirection.NORTH);
+            Quaternion bodyBack = bodyBend.conjugate();
+            Quaternion legBend = bodyBack.slerp(bodyBack.multiply(bodyBack), 0.5);
             for (LimbInfo limb : controller.limbs) {
                 IDeltaChunk idc = limb.idc.getEntity();
                 if (idc == null) continue;
@@ -430,7 +573,7 @@ public enum Technique implements IStateMachine<Technique> {
 
         @Override
         public Technique tick(ColossusController controller, int age) {
-            if (controller.atTarget()) return PICK_NEXT_TECHNIQUE;
+            if (controller.atTarget() || controller.confused) return PICK_NEXT_TECHNIQUE;
             return this;
         }
     },
@@ -706,7 +849,7 @@ public enum Technique implements IStateMachine<Technique> {
         
         @Override
         public Technique tick(ColossusController controller, int age) {
-            if (controller.atTarget()) return PICK_NEXT_TECHNIQUE;
+            if (controller.atTarget() || controller.confused) return PICK_NEXT_TECHNIQUE;
             return this;
         }
         

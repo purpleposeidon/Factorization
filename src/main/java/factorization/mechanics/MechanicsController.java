@@ -14,6 +14,7 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntityComparator;
+import net.minecraft.util.DamageSource;
 import net.minecraft.util.Vec3;
 import org.apache.commons.lang3.ArrayUtils;
 
@@ -259,6 +260,9 @@ public class MechanicsController implements IDCController {
         }
         updatePhysics(idc);
     }
+
+    @Override
+    public boolean onAttacked(IDeltaChunk idc, DamageSource damageSource, float damage) { return false; }
 
     /**
      * Returns an EntityReference that will call MechanicsController.rejoin for you.

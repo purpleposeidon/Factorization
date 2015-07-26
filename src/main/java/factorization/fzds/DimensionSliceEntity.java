@@ -908,6 +908,7 @@ public class DimensionSliceEntity extends IDeltaChunk implements IFzdsEntryContr
             Core.profileEnd();
         } else if (!parent.entityFound()) {
             IDeltaChunk p = parent.getEntity();
+            if (p == null) return;
             Vec3 real_parent_origin = parentShadowOrigin;
             setParent(p);
             if (!SpaceUtil.isZero(real_parent_origin)) {
@@ -1326,6 +1327,14 @@ public class DimensionSliceEntity extends IDeltaChunk implements IFzdsEntryContr
     public ItemStack[] getLastActiveItems() {
         return blast_protection;
     }
+
+    @Override
+    public boolean attackEntityFrom(DamageSource damageSource, float damage) {
+        return getController().onAttacked(this, damageSource, damage);
+    }
+
+    @Override
+    public void setFire(int fireTicks) { }
 
     @Override
     public boolean doesEntityNotTriggerPressurePlate() {

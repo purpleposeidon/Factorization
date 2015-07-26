@@ -11,11 +11,11 @@ import factorization.fzds.interfaces.IDeltaChunk;
 import factorization.fzds.interfaces.Interpolation;
 import factorization.shared.Core;
 import factorization.shared.EntityFz;
-import factorization.shared.NORELEASE;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.boss.IBossDisplayData;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.ChatComponentTranslation;
+import net.minecraft.util.DamageSource;
 import net.minecraft.util.IChatComponent;
 import net.minecraft.world.World;
 
@@ -38,9 +38,11 @@ public class ColossusController extends EntityFz implements IBossDisplayData, ID
     boolean setup = false;
     int arm_size = 0, arm_length = 0;
     int leg_size = 0, leg_length = 0;
+    int body_width = 0;
     //int cracked_body_blocks = 0;
     private Coord home = null;
     private boolean been_hurt = false;
+    boolean confused = false;
     
     
     static Technique[] offensives, idlers, defensives;
@@ -61,7 +63,6 @@ public class ColossusController extends EntityFz implements IBossDisplayData, ID
         offensives = _offensives.toArray(new Technique[0]);
         idlers = _idlers.toArray(new Technique[0]);
         defensives = _defensives.toArray(new Technique[0]);
-        NORELEASE.fixme("Make sure AI is in a shippable state");
     }
     
     private Coord path_target = null;
@@ -88,7 +89,7 @@ public class ColossusController extends EntityFz implements IBossDisplayData, ID
         dataWatcher.addObject(_unbroken_cracked_block_id, (Integer) 0);
     }
     
-    public ColossusController(World world, LimbInfo[] limbInfo, int arm_size, int arm_length, int leg_size, int leg_length) {
+    public ColossusController(World world, LimbInfo[] limbInfo, int arm_size, int arm_length, int leg_size, int leg_length, int width) {
         this(world);
         this.limbs = limbInfo;
         for (LimbInfo li : limbs) {
@@ -105,6 +106,7 @@ public class ColossusController extends EntityFz implements IBossDisplayData, ID
         this.arm_length = arm_length;
         this.leg_size = leg_size;
         this.leg_length = leg_length;
+        this.body_width = width;
         calcLimbParity();
         setTotalCracks(getNaturalCrackCount() + 1);
     }
@@ -177,6 +179,7 @@ public class ColossusController extends EntityFz implements IBossDisplayData, ID
         leg_size = data.as(Share.VISIBLE, "legSize").putInt(leg_size);
         arm_size = data.as(Share.VISIBLE, "armSize").putInt(arm_size);
         arm_length = data.as(Share.VISIBLE, "armLength").putInt(arm_length);
+        body_width = data.as(Share.VISIBLE, "bodyWidth").putInt(body_width);
         home = data.as(Share.PRIVATE, "home").put(home);
         if (data.as(Share.PRIVATE, "has_path_target").putBoolean(path_target != null)) {
             path_target = data.as(Share.PRIVATE, "path_target").put(path_target);
@@ -191,6 +194,7 @@ public class ColossusController extends EntityFz implements IBossDisplayData, ID
         last_step_direction = data.as(Share.PRIVATE, "last_step_direction").putInt(last_step_direction);
         been_hurt = data.as(Share.PRIVATE, "been_hurt").putBoolean(been_hurt);
         spin_direction = data.as(Share.PRIVATE, "spin_dir").putEnum(spin_direction);
+        confused = data.as(Share.PRIVATE, "confused").putBoolean(confused);
     }
     
     <E extends Enum<E>> EnumSet<E> putEnumSet(DataHelper data, String prefix, EnumSet<E> set, Class<E> elementType) throws IOException {
@@ -257,7 +261,6 @@ public class ColossusController extends EntityFz implements IBossDisplayData, ID
         if (at != null && path_target != null && at.equals(path_target)) return;
         if (at != null) {
             double dist = new Coord(this).distance(at);
-            //NORELEASE.println("Travel distance: " + dist);
         }
         path_target = at;
         target_changed = true;
@@ -509,5 +512,13 @@ public class ColossusController extends EntityFz implements IBossDisplayData, ID
 
     public double getSpeedScale() {
         return 2;
+    }
+
+    @Override
+    public boolean onAttacked(IDeltaChunk idc, DamageSource damageSource, float damage) {
+        if (damageSource.isExplosion()) {
+            confused = true;
+        }
+        return false;
     }
 }

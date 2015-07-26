@@ -216,6 +216,8 @@ public class Awakener {
         all_members.addAll(legs);
         
         boolean first = true;
+        Coord min = null, max = null;
+        Coord work = new Coord(heartTE);
         for (Set<Coord> set : all_members) {
             int l = lowest(set);
             if (first) {
@@ -223,6 +225,17 @@ public class Awakener {
                 ground_level = l;
             } else if (l < ground_level) {
                 ground_level = l;
+            }
+            for (Coord c : set) {
+                if (min == null) {
+                    min = c.copy();
+                    max = c.copy();
+                    continue;
+                }
+                work.set(c);
+                Coord.sort(min, work);
+                work.set(c);
+                Coord.sort(work, max);
             }
         }
         
@@ -276,7 +289,8 @@ public class Awakener {
         int part_size = parts.size();
         msg("Activated with %s parts", part_size);
         LimbInfo[] info = parts.toArray(new LimbInfo[part_size]);
-        ColossusController controller = new ColossusController(heartTE.getWorldObj(), info, arm_size, arm_length, leg_size, leg_length);
+        int body_size = max.z - min.z;
+        ColossusController controller = new ColossusController(heartTE.getWorldObj(), info, arm_size, arm_length, leg_size, leg_length, body_size);
         new Coord(heartTE).setAsEntityLocation(controller);
         FzUtil.spawn(controller);
         
@@ -516,7 +530,7 @@ public class Awakener {
         for (Coord ret : set) return ret;
         return null;
     }
-    
+
     IDeltaChunk createIDC(final Set<Coord> parts, Vec3 rotationCenter, String partName) {
         Coord min = null, max = null;
         for (Coord c : parts) {
@@ -537,7 +551,7 @@ public class Awakener {
         int r = 2; //NORELEASE.fixme("Can this be lowered?");
         min.adjust(new DeltaCoord(-r, -r, -r));
         max.adjust(new DeltaCoord(r, r, r));
-        
+
         IDeltaChunk ret = DeltaChunk.makeSlice(ColossusFeature.deltachunk_channel, min, max, new AreaMap() {
             @Override
             public void fillDse(DseDestination destination) {

@@ -26,10 +26,7 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.AxisAlignedBB;
-import net.minecraft.util.IIcon;
-import net.minecraft.util.MovingObjectPosition;
-import net.minecraft.util.Vec3;
+import net.minecraft.util.*;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.ForgeDirection;
 import org.lwjgl.opengl.GL11;
@@ -300,6 +297,9 @@ public class TileEntityHinge extends TileEntityCommon implements IDCController {
         markDirty();
         getCoord().syncTE();
     }
+
+    @Override
+    public boolean onAttacked(IDeltaChunk idc, DamageSource damageSource, float damage) { return false; }
 
     IDeltaChunk getIdc() {
         return idcRef.getEntity();

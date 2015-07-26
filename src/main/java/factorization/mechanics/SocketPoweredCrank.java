@@ -25,6 +25,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.DamageSource;
 import net.minecraft.util.Vec3;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.ForgeDirection;
@@ -61,6 +62,9 @@ public class SocketPoweredCrank extends TileEntitySocketBase implements IChargeC
     public boolean canUpdate() {
         return true;
     }
+
+    @Override
+    public boolean onAttacked(IDeltaChunk idc, DamageSource damageSource, float damage) { return false; }
 
     @Override
     public IDataSerializable serialize(String prefix, DataHelper data) throws IOException {
