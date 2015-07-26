@@ -9,7 +9,6 @@ import factorization.api.datahelpers.Share;
 import factorization.common.BlockIcons;
 import factorization.common.FactoryType;
 import factorization.shared.BlockClass;
-import factorization.shared.NORELEASE;
 import factorization.shared.NetworkFactorization;
 import factorization.shared.TileEntityCommon;
 import io.netty.buffer.ByteBuf;
