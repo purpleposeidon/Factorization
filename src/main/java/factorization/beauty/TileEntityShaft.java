@@ -94,7 +94,7 @@ public class TileEntityShaft extends TileEntityCommon implements IRotationalEner
         if (_src == this) {
             return null;
         }
-        if (_src.isInvalid()) {
+        if (_src.isTileEntityInvalid()) {
             _src = this;
         }
         return _src;
@@ -151,6 +151,11 @@ public class TileEntityShaft extends TileEntityCommon implements IRotationalEner
         IRotationalEnergySource src = getSrc();
         if (src == null) return 0;
         return src.getVelocity(direction);
+    }
+
+    @Override
+    public boolean isTileEntityInvalid() {
+        return this.isInvalid();
     }
 
     @Override

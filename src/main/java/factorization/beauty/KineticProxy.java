@@ -75,7 +75,7 @@ public class KineticProxy {
         }
 
         @Override
-        public boolean isInvalid() {
+        public boolean isTileEntityInvalid() {
             return baseTe.isInvalid();
         }
     }

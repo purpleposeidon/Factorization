@@ -91,7 +91,7 @@ public class TileEntityShaftGen extends TileEntityCommon implements IChargeCondu
         if (working) return;
         working = true;
         try {
-            if (shaft == null || shaft.isInvalid()) {
+            if (shaft == null || shaft.isTileEntityInvalid()) {
                 shaft = KineticProxy.cast(getCoord().adjust(shaft_direction).getTE());
             }
         } finally {
@@ -101,7 +101,7 @@ public class TileEntityShaftGen extends TileEntityCommon implements IChargeCondu
 
     boolean shaftIsBroken() {
         if (shaft == null) return true;
-        if (shaft.isInvalid()) {
+        if (shaft.isTileEntityInvalid()) {
             shaft = null;
             return true;
         }

@@ -46,7 +46,8 @@ public interface IRotationalEnergySource {
     double MAX_SPEED = Math.PI / 8;
 
     /**
-     * A copy of TileEntity.isInvalid().
+     * <code>return ((TileEntity) this).isInvalid();</code>
+     * the deobfuscator is simply TOO LAME to rename this method for us.
      */
-    boolean isInvalid();
+    boolean isTileEntityInvalid();
 }

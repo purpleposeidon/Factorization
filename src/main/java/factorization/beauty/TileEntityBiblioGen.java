@@ -103,6 +103,11 @@ public class TileEntityBiblioGen extends TileEntityCommon implements IRotational
     }
 
     @Override
+    public boolean isTileEntityInvalid() {
+        return this.isInvalid();
+    }
+
+    @Override
     public double getVelocity(ForgeDirection direction) {
         if (direction != ForgeDirection.DOWN) return 0;
         double v = bookCount * POWER_PER_BOOK;

@@ -223,6 +223,11 @@ public class TileEntitySteamShaft extends TileEntityCommon implements IFluidHand
     }
 
     @Override
+    public boolean isTileEntityInvalid() {
+        return this.isInvalid();
+    }
+
+    @Override
     public String getInfo() {
         return (int) (Math.toDegrees(getVelocity(ForgeDirection.UP)) * 10 / 3) + " RPM\n"
                 + "Power: " + (int) velocity;
