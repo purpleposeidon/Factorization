@@ -71,7 +71,7 @@ public enum Technique implements IStateMachine<Technique> {
             }
             if (controller.confused) return CONFUSED;
             boolean use_defense = controller.checkHurt(true);
-            if (use_defense) return SUMMON_RETALIATION;
+            if (use_defense && !controller.peaceful()) return SUMMON_RETALIATION;
             List<Technique> avail = Arrays.asList(Technique.values());
             Collections.shuffle(avail);
             Technique chosen_offense = null;

@@ -14,9 +14,11 @@ import factorization.shared.EntityFz;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.boss.IBossDisplayData;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.ChatComponentTranslation;
 import net.minecraft.util.DamageSource;
 import net.minecraft.util.IChatComponent;
+import net.minecraft.world.EnumDifficulty;
 import net.minecraft.world.World;
 
 import java.io.IOException;
@@ -511,6 +513,7 @@ public class ColossusController extends EntityFz implements IBossDisplayData, ID
     }
 
     public double getSpeedScale() {
+        if (peaceful()) return 1;
         return 2;
     }
 
@@ -520,5 +523,9 @@ public class ColossusController extends EntityFz implements IBossDisplayData, ID
             confused = true;
         }
         return false;
+    }
+
+    public boolean peaceful() {
+        return worldObj.difficultySetting == EnumDifficulty.PEACEFUL;
     }
 }
