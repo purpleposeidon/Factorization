@@ -57,21 +57,28 @@ public class MiscClientTickHandler {
     }
 
     private ItemStack[] swaps = new ItemStack[9];
-    
+    int previous_bar_slot = -1;
+
     boolean wasClicked = false;
     private void checkPickBlockKey() {
-        if (!mc.gameSettings.keyBindPickBlock.getIsKeyPressed()) {
-            wasClicked = false;
+        EntityPlayer player = mc.thePlayer;
+        if (player == null) {
+            return;
+        }
+        int slot = player.inventory.currentItem;
+        boolean keyPressed = mc.gameSettings.keyBindPickBlock.getIsKeyPressed();
+        if (slot != previous_bar_slot || !keyPressed) {
+            // Don't do anything if the vanilla pick-block has worked
+            previous_bar_slot = slot;
+            if (!keyPressed) {
+                wasClicked = false;
+            }
             return;
         }
         if (wasClicked) {
             return;
         }
         wasClicked = true;
-        EntityPlayer player = mc.thePlayer;
-        if (player == null) {
-            return;
-        }
         if (PlayerUtil.isPlayerCreative(player)) {
             // I suppose we could try pulling from the player's inventory.
             // And creative mode inventories tend to get super-ugly cluttered with duplicate crap...
