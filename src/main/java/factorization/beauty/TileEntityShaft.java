@@ -3,16 +3,16 @@ package factorization.beauty;
 import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.relauncher.Side;
 import factorization.api.Coord;
-import factorization.api.IMeterInfo;
 import factorization.api.IRotationalEnergySource;
 import factorization.api.datahelpers.DataHelper;
 import factorization.api.datahelpers.Share;
 import factorization.common.FactoryType;
-import factorization.common.FzConfig;
-import factorization.shared.*;
+import factorization.shared.BlockClass;
+import factorization.shared.BlockRenderHelper;
+import factorization.shared.Core;
+import factorization.shared.TileEntityCommon;
 import factorization.util.NumUtil;
 import factorization.util.SpaceUtil;
-import io.netty.buffer.ByteBuf;
 import net.minecraft.block.Block;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
@@ -26,7 +26,7 @@ import net.minecraftforge.common.util.ForgeDirection;
 import java.io.IOException;
 import java.util.ArrayList;
 
-public class TileEntityShaft extends TileEntityCommon implements IRotationalEnergySource, IMeterInfo {
+public class TileEntityShaft extends TileEntityCommon implements IRotationalEnergySource {
     ForgeDirection axis = ForgeDirection.UP;
     IRotationalEnergySource _src = null;
     Coord srcPos = null;
@@ -357,10 +357,5 @@ public class TileEntityShaft extends TileEntityCommon implements IRotationalEner
             if (tes == null) break;
             tes.angle = baseAngle;
         }
-    }
-
-    @Override
-    public String getInfo() {
-        return "Axis: " + axis + "\nSrc: " + getSrc() + "\nSrcpos: " + srcPos + "\nEq: " + (_src == this);
     }
 }
