@@ -8,7 +8,9 @@ import factorization.api.IRotationalEnergySource;
 import factorization.api.datahelpers.DataHelper;
 import factorization.api.datahelpers.Share;
 import factorization.common.FactoryType;
+import factorization.common.FzConfig;
 import factorization.shared.*;
+import factorization.util.NumUtil;
 import factorization.util.SpaceUtil;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.block.Block;
@@ -30,6 +32,8 @@ public class TileEntityShaft extends TileEntityCommon implements IRotationalEner
     Coord srcPos = null;
     double angle = 0, prev_angle = 0;
     ForgeDirection srcConnection = ForgeDirection.UNKNOWN;
+    boolean useCustomVelocity = false;
+    double customVelocity = 0;
 
     @Override
     public BlockClass getBlockClass() {
@@ -45,6 +49,8 @@ public class TileEntityShaft extends TileEntityCommon implements IRotationalEner
         if (data.isReader()) {
             _src = null;
         }
+        useCustomVelocity = data.as(Share.VISIBLE, "useCustom").putBoolean(useCustomVelocity);
+        customVelocity = data.as(Share.VISIBLE, "customVel").putDouble(customVelocity);
     }
 
     @Override
@@ -62,15 +68,35 @@ public class TileEntityShaft extends TileEntityCommon implements IRotationalEner
 
     @Override
     public boolean canUpdate() {
-        return FMLCommonHandler.instance().getEffectiveSide() == Side.CLIENT;
+        return FMLCommonHandler.instance().getEffectiveSide() == Side.CLIENT || KineticProxy.ic2compatEnabled;
     }
 
     @Override
     public void updateEntity() {
-        prev_angle = angle;
-        IRotationalEnergySource src = getSrc();
-        if (src == null) return;
-        angle += src.getVelocity(srcConnection);
+        if (worldObj.isRemote) {
+            prev_angle = angle;
+            if (useCustomVelocity) {
+                angle += customVelocity;
+                return;
+            }
+            IRotationalEnergySource src = getSrc();
+            if (src == null) return;
+            angle += src.getVelocity(srcConnection);
+        } else if (worldObj.getTotalWorldTime() % 20 == 0) {
+            IRotationalEnergySource src = getSrc();
+            if (!(src instanceof TileEntity) && src != null) {
+                useCustomVelocity = true;
+                double newv = src.getVelocity(srcConnection);
+                if (NumUtil.significantChange(newv, customVelocity)) {
+                    customVelocity = newv;
+                    broadcastMessage(null, getDescriptionPacket());
+                }
+            } else if (useCustomVelocity) {
+                useCustomVelocity = false;
+                customVelocity = 0;
+                broadcastMessage(null, getDescriptionPacket());
+            }
+        }
     }
 
     public IRotationalEnergySource getSrc() {
