@@ -41,5 +41,9 @@ public class ReservoirSampler<E> implements Iterable<E> {
     public int size() {
         return samples.size();
     }
+
+    public void preGive(int given) {
+        this.given = given;
+    }
     
 }
