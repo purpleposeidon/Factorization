@@ -2,6 +2,7 @@ package factorization.beauty;
 
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
+import factorization.algos.PIDController;
 import factorization.api.IMeterInfo;
 import factorization.api.IRotationalEnergySource;
 import factorization.api.Quaternion;
@@ -10,7 +11,9 @@ import factorization.api.datahelpers.Share;
 import factorization.charge.TileEntitySolarBoiler;
 import factorization.common.BlockIcons;
 import factorization.common.FactoryType;
+import factorization.notify.Notice;
 import factorization.shared.BlockClass;
+import factorization.shared.NORELEASE;
 import factorization.shared.NetworkFactorization;
 import factorization.shared.TileEntityCommon;
 import factorization.util.NumUtil;
@@ -28,10 +31,11 @@ import java.util.Random;
 public class TileEntitySteamShaft extends TileEntityCommon implements IFluidHandler, IRotationalEnergySource, IMeterInfo {
     FluidTank steamTank = new FluidTank(/*this,*/ TileEntitySolarBoiler.steam_stack.copy(), 800);
 
-    public static double Z = 1.6;
+    public static double Z = 1.6; // exponent on velocity for determining drag
     public static int TURBINE_MASS = 1000; // force:steam = mass * acceleration --> acceleration = force / mass
     public static double BEARING_DRAG = 0.05; // v -= drag * v**Z // Was 0.001
     public static double DRAW_EFFICIENCY = 0.10; // taking energy causes a loss
+    public static double FORCE_PER_STEAM = 2.0;
     // steam_force / mass = drag * velocity ** z
     // terminal velocity = (steam_force / (mass * drag)) ** (1/z)
     // kmplot: f(f,z) = (f / (20 ∙ 0.001))^(1/1.6)
@@ -39,7 +43,9 @@ public class TileEntitySteamShaft extends TileEntityCommon implements IFluidHand
     private double velocity = 0, drawable_velocity = 0;
     public double angle = Math.PI * Math.random();
     public double prev_angle = angle;
-
+    public static double target_fill = 0.5;
+    private PIDController pidController = new PIDController(1, 1, 1).setIntegrationFail(1000);
+    private int last_take = 1;
 
     @Override
     public BlockClass getBlockClass() {
@@ -56,6 +62,8 @@ public class TileEntitySteamShaft extends TileEntityCommon implements IFluidHand
         velocity = data.as(Share.VISIBLE, "velocity").putDouble(velocity);
         drawable_velocity = data.as(Share.PRIVATE, "drawableVelocity").putDouble(drawable_velocity);
         steamTank = data.as(Share.PRIVATE, "steam").putTank(steamTank);
+        pidController.putData(data, "pid");
+        last_take = data.as(Share.PRIVATE, "lastTake").putInt(last_take);
     }
 
 
@@ -116,23 +124,74 @@ public class TileEntitySteamShaft extends TileEntityCommon implements IFluidHand
         }
         double force = 0;
         if (worldObj.getBlockPowerInput(xCoord, yCoord, zCoord) == 0) {
+            double steam_setpoint = steamTank.getCapacity() * NORELEASE.just(0.9); //target_fill;
             FluidStack steam = steamTank.getFluid();
             if (steam == null) { // Has happened on occasion
                 steamTank.setFluid(steam = FluidRegistry.getFluidStack("steam", 0));
             } else {
-                force = steam.amount;
-                steam.amount = 0;
+                // Accelerate slowly, also balances steam consumtion with non-steady inputs
+                int DT = 1; //10;
+                if (NORELEASE.on) {
+                    pidController.adjustPID(0.05, 0.001, 0); // Too responsive
+                    pidController.adjustPID(0.05, 0, 0); // Approaches setpoint well, but doesn't adapt
+                    pidController.adjustPID(0.5, 0, 0); // Too responsive
+                    pidController.adjustPID(0.005, 0, 0); // Gets stuck
+                    pidController.adjustPID(0.005, 0.0001, 0); // ranges between 9 & 12
+                    pidController.adjustPID(0.0005, 0.00001, 0); // Gets stuck
+                    pidController.adjustPID(0.0005, 0.00005, 0); // Settles on a value, but it's a bit too high
+                    pidController.adjustPID(0.0005, 0.000001, 0); // Gets *really* stuck
+                    pidController.adjustPID(0.0005, 0.000025, 0); // Hey! This works great with setpoint@90% w/ RC! But too slow with FZ
+                    pidController.adjustPID(0.005, 0.000025, 0); // Not faster
+                    pidController.adjustPID(0.0005, 0.00005, 0); // Uh, hmm
+                    pidController.setIntegrationFail(10000000);
+                    pidController.setIntegrationFail(10000);
+                    pidController.adjustPID(0.0005, 0.005, 0); // Gets stuck at 50
+                    pidController.adjustPID(0.0005, 0.05, 0); // Doesn't stabilize
+                    pidController.setIntegrationFail(100000);
+                    pidController.adjustPID(0.0005, 0.01, 0); // Also doesn't stabilize?
+                    pidController.adjustPID(0.0005, 0.02, 0); // Same story
+                    pidController.adjustPID(4, 0, 0); // Bouncy
+                    pidController.adjustPID(1, 0.05, 0); // Works beautifully with entheas ;_;
+                    pidController.adjustPID(0.5, 0.05, 0); // oscillates into negativity
+                    pidController.adjustPID(0.5, 0, 0); // too reactive
+                    pidController.adjustPID(0.5, 0.01, 0); // doesn't let it drop
+                    pidController.adjustPID(0.5, 0.1, 0); // Spends a lot of time trapped in negative-land
+                    pidController.adjustPID(0.5, 0.5, 0); // similar
+                    pidController.adjustPID(0.5, 0.001, 0); // Blah
+                    pidController.adjustPID(0.5, 0.01, 0); //
+                    pidController.setIntegrationLimits(-100000, 0);
+                    pidController.adjustPID(1, 0.05, 0); // Works beautifully with entheas ;_;
+                    pidController.setDt(DT);
+                    pidController.adjustPID(0.1, 0.005, 0); // uh negative crap
+                    pidController.adjustPID(0.0005, 0.000025, 0); // slow
+                    pidController.adjustPID(0.0005, 0.00025, 0); // oscillates
+                    pidController.adjustPID(0.0005, 0.00005, 0); // way too slow even w/ the sIL below
+                    pidController.setIntegrationLimits(-1000000, 0);
+                    pidController.adjustPID(0.0005, 0.0001, 0); // Too slow to start
+                    pidController.adjustPID(0.05, 0.0001, 0); // Too reactive
+                    pidController.adjustPID(0.05, 0.00001, 0); // Too slow
+                    pidController.adjustPID(0.05, 0.00005, 0); // Too reactive
+                    pidController.adjustPID(0.0005, 0.000025, 0); // Hey! This works great with setpoint@90% w/ RC! But too slow with FZ
+                    pidController.adjustPID(0.05,   0.00002, 0); // Goes lame when it gets bad
+                    pidController.adjustPID(0.005,  0.00002, 0.1); //
+                    pidController.adjustPID(0.005,  0.00002, 1); //
+                }
+                if (worldObj.getTotalWorldTime() % DT == 0) {
+                    last_take = (int) -pidController.tick(steam_setpoint, steam.amount);
+                }
+                int takable = last_take;
+                String msg = takable + " " + steam.amount + "\n" + pidController.integral + " " + pidController.previous_error;
+                new Notice(getCoord().add(0, -3, 0), msg).sendToAll();
+                if (takable < 0) takable = 0;
+                else if (takable < 1 && steam.amount > steam_setpoint) takable = 1;
+                if (takable > steam.amount) takable = steam.amount;
+                force = takable * FORCE_PER_STEAM;
+                steam.amount -= takable;
             }
         }
         double drag = BEARING_DRAG * Math.pow(Math.abs(velocity), Z);
         if (drag != drag) drag = 0; // Catch NaN
         double acceleration = force / TURBINE_MASS;
-        if (acceleration > drag * 1.2) {
-            // Slow acceleration so that it looks cool
-            double avail = acceleration - drag;
-            acceleration = drag + avail * 0.2;
-            //new Notice(this, "accel").sendToAll();
-        }
         velocity = velocity - drag + acceleration;
         velocity = Math.max(0, velocity);
         drawable_velocity = velocity * DRAW_EFFICIENCY;
@@ -230,7 +289,7 @@ public class TileEntitySteamShaft extends TileEntityCommon implements IFluidHand
     @Override
     public String getInfo() {
         return (int) (Math.toDegrees(getVelocity(ForgeDirection.UP)) * 10 / 3) + " RPM\n"
-                + "Power: " + (int) velocity;
+                + "Power: " + (int) (velocity * 10);
     }
 
     @Override
