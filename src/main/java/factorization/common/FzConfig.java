@@ -66,6 +66,7 @@ public class FzConfig {
     public static boolean require_book_for_manual = true;
     public static boolean infinite_guide_usage = false;
     public static boolean mirror_sunbeams = true;
+    public static boolean ic2_kinetic_compat = true;
     public static Graylist<Block> lacerator_block_graylist;
     public static String f = "f";
     
@@ -236,6 +237,7 @@ public class FzConfig {
         require_book_for_manual = getBoolConfig("requireBookForManual", "general", require_book_for_manual, "If set to true, then you must have a manual in your inventory to look up items");
         lacerator_block_graylist = Graylist.ofBlocks(getStringConfig("laceratorBlockGraylist", "server", "-minecraft:bedrock,minecraft:end_portal", "Comma-separated list of block names. In front of the list must be either a +, for white-listing, or a -, for black-listing."));
         f = getStringConfig("miscClientCommand", "client", f, "Use this to change the /f command to avoid conflict with the Factions bukkit plugin");
+        ic2_kinetic_compat = getBoolConfig("ic2KineticCompat", "server", ic2_kinetic_compat, "Compatability with IC2's IKineticSource");
 
         if (!DeltaChunk.enabled()) {
             gen_colossi = false;

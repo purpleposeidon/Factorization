@@ -1,11 +1,9 @@
 package factorization.beauty;
 
-import cpw.mods.fml.common.SidedProxy;
-import factorization.api.Coord;
+import cpw.mods.fml.common.Loader;
 import factorization.api.IRotationalEnergySource;
-import factorization.util.SpaceUtil;
+import factorization.common.FzConfig;
 import ic2.api.energy.tile.IKineticSource;
-import net.minecraft.block.Block;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraftforge.common.util.ForgeDirection;
 
@@ -31,11 +29,11 @@ public class KineticProxy {
         }
     }
 
-    @SidedProxy(clientSide = "factorization.beauty.KineticProxy.Ic2ConverterImpl", serverSide = "factorization.beauty.KineticProxy.Ic2ConverterImpl", modId = "IC2")
-    static Ic2ConverterProxy ic2Proxy = new Ic2ConverterProxy(); //Loader.isModLoaded("IC2") ?
+    public static boolean ic2compatEnabled = FzConfig.ic2_kinetic_compat && Loader.isModLoaded("IC2");
+    static Ic2ConverterProxy ic2Proxy = ic2compatEnabled ? new Ic2ConverterImpl() : new Ic2ConverterProxy();
 
-    public static double IC2_FZ_RATIO = 1.0;
-    public static double IC2_ANGULAR_VELOCITY_RATIO = 1.0 / 20.0;
+    public static double IC2_FZ_RATIO = 5000;
+    public static double IC2_ANGULAR_VELOCITY_RATIO = 1.0 / 1000.0;
 
     private static class Ic4Fz implements IRotationalEnergySource {
         private final IKineticSource base;
@@ -71,7 +69,10 @@ public class KineticProxy {
 
         @Override
         public double getVelocity(ForgeDirection direction) {
-            return base.maxrequestkineticenergyTick(direction) * IC2_ANGULAR_VELOCITY_RATIO;
+            double v = base.maxrequestkineticenergyTick(direction) * IC2_ANGULAR_VELOCITY_RATIO;
+            if (v > MAX_SPEED) v = MAX_SPEED;
+            if (v < -MAX_SPEED) v = -MAX_SPEED;
+            return v;
         }
 
         @Override
