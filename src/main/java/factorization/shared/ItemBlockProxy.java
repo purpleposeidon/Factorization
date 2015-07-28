@@ -2,6 +2,7 @@ package factorization.shared;
 
 import java.util.List;
 
+import factorization.util.DataUtil;
 import net.minecraft.block.Block;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.player.EntityPlayer;
@@ -18,18 +19,24 @@ public class ItemBlockProxy extends ItemFactorization {
     //TODO: Why doesn't this just extend ItemBlock?
     ItemStack proxy;
     Block theBlock;
+    ItemBlock theBlockItem;
 
-    public ItemBlockProxy(ItemStack proxy, String name, TabType tabType) {
+    public ItemBlockProxy(Block theBlock, ItemStack proxy, String name, TabType tabType) {
         super(name, tabType);
         this.proxy = proxy.copy();
-        theBlock = Block.getBlockFromItem(proxy.getItem());
+        this.theBlock = theBlock;
+        theBlockItem = (ItemBlock) DataUtil.getItem(theBlock);
+    }
+
+    public ItemBlockProxy(ItemStack proxy, String name, TabType tabType) {
+        this(Block.getBlockFromItem(proxy.getItem()), proxy, name, tabType);
     }
 
     public boolean placeBlockAt(ItemStack stack, EntityPlayer player, World world, int x, int y, int z, int side,
             float hitX, float hitY, float hitZ, int metadata) {
         proxy.stackSize = stack.stackSize;
         proxy.setTagCompound(stack.getTagCompound());
-        boolean ret = ((ItemBlock) proxy.getItem()).placeBlockAt(proxy, player, world, x, y, z, side, hitX, hitY, hitZ, metadata);
+        boolean ret = theBlockItem.placeBlockAt(proxy, player, world, x, y, z, side, hitX, hitY, hitZ, metadata);
         stack.stackSize = proxy.stackSize;
         return ret;
     }

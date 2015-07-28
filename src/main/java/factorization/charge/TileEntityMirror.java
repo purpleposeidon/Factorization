@@ -7,6 +7,7 @@ import java.util.Arrays;
 import factorization.api.datahelpers.DataHelper;
 import factorization.api.datahelpers.Share;
 import factorization.common.FzConfig;
+import factorization.shared.BlockFactorization;
 import factorization.util.DataUtil;
 import factorization.util.ItemUtil;
 import io.netty.buffer.ByteBuf;
@@ -163,7 +164,7 @@ public class TileEntityMirror extends TileEntityCommon {
         // 3) always uncover mirrors below us when broken, but only if we ourselves aren't covered
         while (at.y > 0) {
             at.y--;
-            if (at.getBlock() == Core.registry.factory_block) {
+            if (at.getBlock() instanceof BlockFactorization) {
                 TileEntityMirror below = at.getTE(TileEntityMirror.class);
                 if (below != null) {
                     below.covered_by_other_mirror = state;

@@ -148,7 +148,7 @@ public class DocWorld extends WorldClient {
         int i = getIndex(dc.x, dc.y, dc.z);
         if (i == -1) return;
         int useId = DataUtil.getId(block);
-        if (block == Core.registry.factory_block) {
+        if (block == Core.registry.factory_block || block == Core.registry.factory_block_barrel) {
             useId = -10;
         } else if (block == Core.registry.resource_block) {
             useId = -11;

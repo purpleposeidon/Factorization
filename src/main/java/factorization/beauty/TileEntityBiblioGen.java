@@ -10,6 +10,7 @@ import factorization.common.FactoryType;
 import factorization.notify.Notice;
 import factorization.notify.Style;
 import factorization.shared.BlockClass;
+import factorization.shared.BlockFactorization;
 import factorization.shared.Core;
 import factorization.shared.TileEntityCommon;
 import net.minecraft.block.Block;
@@ -134,7 +135,7 @@ public class TileEntityBiblioGen extends TileEntityCommon implements IRotational
         @Override
         public void handle(Coord here) {
             Block block = here.getBlock();
-            if (block == Core.registry.factory_block) {
+            if (block instanceof BlockFactorization) {
                 TileEntity te = here.getTE(TileEntityBiblioGen.class);
                 if (te != null && te != TileEntityBiblioGen.this) {
                     interference = te;

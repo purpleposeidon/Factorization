@@ -16,7 +16,7 @@ import factorization.weird.TileEntityDayBarrel.Type;
 public class ItemDayBarrel extends ItemBlockProxy {
 
     public ItemDayBarrel(String name) {
-        super(Core.registry.daybarrel_item_hidden, name, TabType.BLOCKS);
+        super(Core.registry.factory_block_barrel, Core.registry.daybarrel_item_hidden, name, TabType.BLOCKS);
         setMaxDamage(0);
         setNoRepair();
     }

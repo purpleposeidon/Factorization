@@ -2,6 +2,7 @@ package factorization.shared;
 
 import factorization.api.Coord;
 import net.minecraft.block.Block;
+import org.apache.http.impl.conn.Wire;
 
 /**
  * This associates various block properties with metadata.
@@ -11,7 +12,7 @@ public enum BlockClass {
 
     Default(0, true, 0, 0, 1F),
     DarkIron(1, true, 0, 0, 3.25F),
-    Barrel(2, true, 25, 0, 2F),
+    Barrel(Core.registry.factory_block_barrel, 2, true, 25, 0, 2F),
     //Cage(3, false, 0, 0, 5F),
     Socket(3, false, 0, 0, 3F),
     Lamp(4, false, 0, 15, 6F),
@@ -34,7 +35,7 @@ public enum BlockClass {
         static BlockClass map[] = new BlockClass[16];
     }
 
-    Block block; //XXX This actually gets set to the block properly right now, but it might not in a dynamic-block-ids future or something...?
+    public final Block block; //XXX This actually gets set to the block properly right now, but it might not in a dynamic-block-ids future or something...?
     public final int md;
     final boolean normalCube;
     final int flamability;
@@ -44,6 +45,7 @@ public enum BlockClass {
     boolean normal_cube = true;
 
     BlockClass(Block block, int md, boolean normalCube, int flamability, int lightValue, float hardness) {
+        if (block == null) throw new NullPointerException("BlockClass loaded too early?");
         this.block = block;
         this.md = md;
         this.normalCube = normalCube;
@@ -79,14 +81,6 @@ public enum BlockClass {
     public void enforce(Coord c) {
         if (c.getBlock() == block) {
             //only enforce if the block's right.
-            if (c.setMd(md, false)) {
-                //System.out.println("BlockClass enforce: Changed to " + this + " at " + c);
-            }
-        }
-    }
-
-    void enforceQuiet(Coord c) {
-        if (c.getBlock() == block) {
             c.setMd(md, false);
         }
     }

@@ -349,7 +349,7 @@ public class SocketLacerator extends TileEntitySocketBase implements IChargeCond
             }
             TileEntity te = null;
             TileEntityDayBarrel barrel = null;
-            if (block == Core.registry.factory_block) {
+            if (block instanceof BlockFactorization) {
                 te = mopWorld.getTileEntity(mop.blockX, mop.blockY, mop.blockZ);
                 if (te instanceof TileEntityDayBarrel) {
                     barrel = (TileEntityDayBarrel) te;

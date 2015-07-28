@@ -777,7 +777,7 @@ public class TileEntityDayBarrel extends TileEntityFactorization {
             this.orientation = newOrientation;
         }
         this.validate();
-        next.setId(Core.registry.factory_block);
+        next.setId(getBlockClass().block);
         next.setTE(this);
         last_hit_side = -1;
         player.addExhaustion(0.5F);

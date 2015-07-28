@@ -19,7 +19,7 @@ public class FactorizationRender implements ISimpleBlockRenderingHandler {
 
     @Override
     public void renderInventoryBlock(Block block, int metadata, int modelID, RenderBlocks renderer) {
-        if (block == Core.registry.factory_block) {
+        if (block == Core.registry.factory_block || block == Core.registry.factory_block_barrel) {
             FactorizationBlockRender FBR = FactorizationBlockRender.getRenderer(metadata);
             FBR.renderInInventory();
             FBR.setMetadata(metadata);

@@ -13,6 +13,7 @@ import factorization.shared.NetworkFactorization.MessageType;
 import factorization.weird.TileEntityDayBarrel;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockContainer;
+import net.minecraft.block.material.Material;
 import net.minecraft.client.particle.EffectRenderer;
 import net.minecraft.client.particle.EntityDiggingFX;
 import net.minecraft.client.renderer.texture.IIconRegister;
@@ -31,8 +32,8 @@ import java.util.*;
 
 public class BlockFactorization extends BlockContainer {
     public boolean fake_normal_render = false;
-    public BlockFactorization() {
-        super(Core.registry.materialMachine);
+    public BlockFactorization(Material material) {
+        super(material);
         setHardness(2.0F);
         setResistance(5);
         setLightOpacity(0);
@@ -631,5 +632,13 @@ public class BlockFactorization extends BlockContainer {
             return ((TileEntityCommon) te).recolourBlock(side, FzColor.fromVanillaColorIndex(colour));
         }
         return false;
+    }
+
+    @Override
+    public float getPlayerRelativeBlockHardness(EntityPlayer player, World w, int x, int y, int z) {
+        if (!player.capabilities.allowEdit && this == Core.registry.factory_block_barrel) {
+            return 0;
+        }
+        return super.getPlayerRelativeBlockHardness(player, w, x, y, z);
     }
 }

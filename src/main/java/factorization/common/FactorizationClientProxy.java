@@ -240,6 +240,7 @@ public class FactorizationClientProxy extends FactorizationProxy {
 
         ItemRenderCapture capture = new ItemRenderCapture();
         MinecraftForgeClient.registerItemRenderer(Item.getItemFromBlock(Core.registry.factory_block), capture);
+        MinecraftForgeClient.registerItemRenderer(Item.getItemFromBlock(Core.registry.factory_block_barrel), capture);
         MinecraftForgeClient.registerItemRenderer(Core.registry.battery, new BatteryItemRender(renderBattery));
         MinecraftForgeClient.registerItemRenderer(Core.registry.glaze_bucket, new ItemRenderGlazeBucket());
         MinecraftForgeClient.registerItemRenderer(Core.registry.daybarrel, new DayBarrelItemRenderer(renderBarrel));

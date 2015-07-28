@@ -81,7 +81,8 @@ import java.util.regex.Matcher;
 public class Registry {
     public ItemFactorizationBlock item_factorization;
     public ItemBlockResource item_resource;
-    public BlockFactorization factory_block, factory_rendering_block;
+    public BlockFactorization factory_block, factory_block_barrel;
+    public BlockFactorization factory_rendering_block;
     public BlockRenderHelper blockRender = null, serverTraceHelper = null, clientTraceHelper = null;
     public BlockLightAir lightair_block;
     public BlockResource resource_block;
@@ -155,7 +156,10 @@ public class Registry {
     public BlockBlast blastBlock;
 
     public Material materialMachine = new Material(MapColor.ironColor);
-    
+    public Material materialBarrel = new Material(MapColor.woodColor) {{
+        setAdventureModeExempt();
+    }};
+
     WorldgenManager worldgenManager;
 
     public static HashMap<String, Item> nameCleanup = new HashMap<String, Item>();
@@ -172,11 +176,12 @@ public class Registry {
         if (FMLCommonHandler.instance().getSide() == Side.CLIENT) {
             //Theoretically, not necessary. I bet BUKKIT would flip its shit tho.
             blockRender = new BlockRenderHelper();
-            factory_rendering_block = new BlockFactorization();
+            factory_rendering_block = new BlockFactorization(materialMachine);
         }
         serverTraceHelper = new BlockRenderHelper();
         clientTraceHelper = new BlockRenderHelper();
-        factory_block = new BlockFactorization();
+        factory_block = new BlockFactorization(materialMachine);
+        factory_block_barrel = new BlockFactorization(materialBarrel);
         lightair_block = new BlockLightAir();
         resource_block = new BlockResource();
         dark_iron_ore = new BlockDarkIronOre().setBlockName("factorization:darkIronOre").setBlockTextureName("stone").setCreativeTab(Core.tabFactorization).setHardness(3.0F).setResistance(5.0F);
@@ -191,6 +196,7 @@ public class Registry {
         matcher_block = new BlockMatcher();
         
         GameRegistry.registerBlock(factory_block, ItemFactorizationBlock.class, "FzBlock");
+        GameRegistry.registerBlock(factory_block_barrel, ItemFactorizationBlock.class, "FzBlockBarrel");
         GameRegistry.registerBlock(lightair_block, "Lightair");
         GameRegistry.registerBlock(resource_block, ItemBlockResource.class, "ResourceBlock");
         GameRegistry.registerBlock(dark_iron_ore, "DarkIronOre");
