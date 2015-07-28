@@ -3,23 +3,37 @@ package factorization.misc;
 import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.eventhandler.EventPriority;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
+import factorization.algos.ReservoirSampler;
 import factorization.common.FzConfig;
 import factorization.shared.Core;
 import factorization.util.FzUtil;
 import factorization.weird.NeptuneCape;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiButton;
+import net.minecraft.client.gui.GuiMainMenu;
 import net.minecraft.client.gui.GuiOptions;
 import net.minecraft.client.gui.GuiSelectWorld;
+import net.minecraft.client.resources.IResource;
+import net.minecraft.client.resources.IResourceManager;
 import net.minecraft.client.settings.GameSettings;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.EnumChatFormatting;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.EnumDifficulty;
 import net.minecraftforge.client.ClientCommandHandler;
 import net.minecraftforge.client.event.GuiScreenEvent.ActionPerformedEvent;
 import net.minecraftforge.client.event.GuiScreenEvent.InitGuiEvent;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
 import net.minecraftforge.client.event.sound.PlaySoundEvent17;
+import org.apache.commons.io.Charsets;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
 
 public class MiscClientProxy extends MiscProxy {
     static final Minecraft mc = Minecraft.getMinecraft();
@@ -159,4 +173,43 @@ public class MiscClientProxy extends MiscProxy {
         };
     }
 
+    int last_hash = 0;
+    @SubscribeEvent
+    public void customSplash(InitGuiEvent.Pre event) {
+        if (!(event.gui instanceof GuiMainMenu)) return;
+        int hash = event.gui.hashCode();
+        if (hash == last_hash) return;
+        last_hash = hash;
+        GuiMainMenu menu = (GuiMainMenu) event.gui;
+        ReservoirSampler<String> sampler = new ReservoirSampler<String>(1, new Random());
+        sampler.give(menu.splashText);
+        sampler.preGive(321); // NORELEASE: Verify this number each MC version. (Or we could just count it. Hmm.)
+        sampler.give(""); // !!!! The secret EMPTY splash text! :O
+        try {
+            @SuppressWarnings("unchecked")
+            List<IResource> resources = mc.getResourceManager().getAllResources(new ResourceLocation("minecraft:texts/extra_splashes.txt"));
+            for (IResource res : resources) {
+                InputStream is = null;
+                try {
+                    is = res.getInputStream();
+                    BufferedReader bufferedreader = new BufferedReader(new InputStreamReader(is, Charsets.UTF_8));
+                    String s;
+
+                    while ((s = bufferedreader.readLine()) != null) {
+                        s = s.trim();
+                        if (!s.isEmpty()) {
+                            if (s.hashCode() == 125780783) continue; // Probably "This message will never appear on the splash screen, isn't that weird?".hashCode()
+                            sampler.give(s);
+                        }
+                    }
+                } finally {
+                    FzUtil.closeNoisily("Closing " + res, is);
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        if (sampler.size() < 1) return;
+        menu.splashText = sampler.getSamples().get(0);
+    }
 }
