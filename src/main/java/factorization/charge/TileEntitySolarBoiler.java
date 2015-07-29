@@ -38,8 +38,8 @@ public class TileEntitySolarBoiler extends TileEntityCommon implements IReflecti
         }
     }
     
-    FluidTank waterTank = new FluidTank(/*this, */ water_stack.copy(), 1000*8);
-    FluidTank steamTank = new FluidTank(/*this, */ steam_stack.copy(), 1000*8);
+    FluidTank waterTank = new FluidTank(/*this, */ water_stack.copy(), 1000 * 1);
+    FluidTank steamTank = new FluidTank(/*this, */ steam_stack.copy(), 1000 * 1);
     int reflector_count = 0;
     public transient short given_heat = 0, last_synced_heat = 0;
     
