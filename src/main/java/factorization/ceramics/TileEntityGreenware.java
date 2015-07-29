@@ -787,7 +787,7 @@ public class TileEntityGreenware extends TileEntityCommon implements IFurnaceHea
         }
         shouldDestroy |= state != ClayState.WET;
         if (shouldDestroy) {
-            InvUtil.spawnItemStack(here, getItem());
+            //InvUtil.spawnItemStack(here, getItem()); -- No; item is spawned from elsewhere
             here.setAir();
         } else {
             removeLump(hit.subHit);
