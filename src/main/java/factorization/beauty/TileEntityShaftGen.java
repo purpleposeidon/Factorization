@@ -25,7 +25,7 @@ public class TileEntityShaftGen extends TileEntityCommon implements IChargeCondu
     ForgeDirection shaft_direction = ForgeDirection.DOWN;
     IRotationalEnergySource shaft;
     transient double last_power;
-    public static double MAX_POWER = 1024, CHARGE_PER_POWER = 180;
+    public static double MAX_POWER = 1024, CHARGE_PER_POWER = 180 * 4;
     boolean on;
 
     @Override
@@ -48,7 +48,10 @@ public class TileEntityShaftGen extends TileEntityCommon implements IChargeCondu
     public void onPlacedBy(EntityPlayer player, ItemStack is, int side, float hitX, float hitY, float hitZ) {
         super.onPlacedBy(player, is, side, hitX, hitY, hitZ);
         shaft_direction = ForgeDirection.getOrientation(side);
-        if (player.isSneaking()) return;
+        if (player.isSneaking()) {
+            shaft_direction = shaft_direction.getOpposite();
+            return;
+        }
         Coord at = getCoord();
         ForgeDirection use = ForgeDirection.UNKNOWN;
         for (ForgeDirection dir : ForgeDirection.VALID_DIRECTIONS) {
