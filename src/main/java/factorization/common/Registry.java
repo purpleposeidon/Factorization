@@ -1207,18 +1207,18 @@ public class Registry {
                 '-', Blocks.wooden_pressure_plate,
                 'i', Items.glowstone_dust);
         oreRecipe(steam_to_shaft,
-                "-I-",
-                "IUI",
-                "-I-",
+                " I ",
+                "-B-",
+                " I ",
                 '-', Blocks.heavy_weighted_pressure_plate,
                 'I', dark_iron,
-                'U', Items.cauldron);
+                'B', "blockIron");
         ItemStack shaft8 = wooden_shaft.copy();
         shaft8.stackSize = 8;
         oreRecipe(shaft8,
-                "LLL",
-                "III",
-                "LLL",
+                "LIL",
+                "LIL",
+                "LIL",
                 'L', "logWood",
                 'I', dark_iron);
         oreRecipe(shaft_generator_item,
