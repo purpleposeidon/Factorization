@@ -61,6 +61,7 @@ public class MiscClientTickHandler {
 
     boolean wasClicked = false;
     private void checkPickBlockKey() {
+        if (!FzConfig.fix_middle_click) return;
         EntityPlayer player = mc.thePlayer;
         if (player == null) {
             return;
