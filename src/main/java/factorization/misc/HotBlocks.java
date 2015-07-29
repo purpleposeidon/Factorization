@@ -48,6 +48,7 @@ public class HotBlocks {
         if (event.player instanceof FakePlayer) return;
         if (event.block.getBlockHardness(event.world, event.x, event.y, event.z) <= 0F) return;
         if (PlayerUtil.isPlayerCreative(event.player)) return;
+        if (event.player.isSneaking()) return;
         ArrayList<HotBlock> coords;
         if (!hots.containsKey(event.player)) {
             hots.put(event.player, coords = new ArrayList<HotBlock>());
