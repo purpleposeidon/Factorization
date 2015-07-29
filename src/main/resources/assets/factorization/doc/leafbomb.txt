@@ -5,7 +5,7 @@ creates a Leaf Bomb.
 Throwing the Leaf Bomb against a solid surface will sprout a burst of organic leaves;
 a true pearl in the horticulturist's toolbox.
 
-Fortune can be applied to the leaf bomb in an \link{tile.anvil.intact}{anvil}, creating larger and larger bursts of leaves as the fortune level increases.
+Fortune can be applied to the leaf bomb in an \#{tile.anvil.intact}anvil, creating larger and larger bursts of leaves as the fortune level increases.
 (Whether or not this is actually worthwhile is debatable; you will usually get more leaves than you put in, even with no enchantment.)
 
 \figure{

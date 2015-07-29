@@ -1,0 +1,14 @@
+\title{Caliometric Burner}
+
+The caliometric burner converts food into heat,
+and should be placed next to a \link{gen/boiler}{boiler}.
+
+In addition to standard foods, the boiler can also consume
+\link{gen/anthro}{Entheas}, \link{gen/saptap}{Sap}, and \link{gen/pollen}{Pollen}.
+
+A well-fed caliometric burner emits as much thermal energy as 16 mirrors,
+and it is suggested to use more than one burner.
+
+Those unfamiliar with how eating works on this planet should note that food enters through the mouth.
+
+\topic{factorization.factoryBlock.CALIOMETRIC_BURNER}

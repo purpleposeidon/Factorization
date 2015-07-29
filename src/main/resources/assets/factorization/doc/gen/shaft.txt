@@ -1,0 +1,9 @@
+\title{Shaft}
+
+The shaft can be used to deliver power from
+\link{gen/whirligig}{Whirligigs} or \link{gen/wind}{Windmills}
+to \link{gen/charge}{Charge Generators}.
+
+They aren't required.
+
+\topic{factorization.factoryBlock.SHAFT}

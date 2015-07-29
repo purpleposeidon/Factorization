@@ -1,0 +1,10 @@
+\title{Charge Generator}
+
+The charge generator converts rotational power to charge.
+
+If you wish to separate it from its rotational energy source,
+you can use a \link{gen/shaft}{Shaft}.
+
+\checkmods{all}{IC2}{It is compatible with IC2 kinetic energy.}{}
+
+\topic{factorization.factoryBlock.SHAFT_GEN}

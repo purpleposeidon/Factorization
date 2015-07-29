@@ -1,0 +1,23 @@
+\title{The Sap Tap}
+
+There's more than one way to harvest energy from the sun.
+Trees have been collecting sunlight long before mankind first reflected it onto \link{gen/boiler}{Solar Boilers}!
+The Sap Tap extracts a thick and foul-tasting sap from trees.
+It is quite unpalatable, but the \link{gen/calio}{Caliometric Burner}, having no tongue, won't notice.
+Small trees do not produce sufficient sap to be worthwhile;
+large custom trees produce the best output.
+
+The sap tap must be placed underneath a log.
+
+A good sap-producing tree will have hundreds of logs, and many more leaves;
+the \link{leafbomb}{Leaf Bomb} may be useful here.
+
+Placing multiple sap taps nearby would anger the trees, so as a safety precaution this is not allowed.
+
+Sap can be converted into charge by feeding it to a \link{gen/calio}{Caliometric Burner}
+adjacent to \link{gen/boiler}{Boiler}
+with a \link{gen/whirligig}{Whirligig} and \link{gen/charge}{Charge Generator} above.
+
+\topic{factorization.factoryBlock.SAP_TAP}
+\topic{item.factorization:sap}
+

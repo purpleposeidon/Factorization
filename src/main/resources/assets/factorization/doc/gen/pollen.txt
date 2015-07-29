@@ -1,0 +1,5 @@
+\title{Plant Power}
+
+... is not yet implemented
+
+(However, it'll work like the \link{gen/anthro}{Anthropic Generator})

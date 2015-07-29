@@ -1,9 +1,0 @@
-\title{The Anthropic Generator}
-
-These small lanterns are capable of gathering energy from villagers and similar folk as they go about their lives.
-\#{item.factorization:entheas} Entheas accumulates within,
-and is a very potent foodstuff,
-but eating it is... inadvisable.
-Fortunately the \link{\#{factorization.factoryBlock.CALIOMETRIC_BURNER}}{Caliometric Burner}, having no heart, is immune to the poison.
-
-\topic{anthrogen}

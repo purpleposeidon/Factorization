@@ -1,5 +1,23 @@
 \title{Generating Charge}
 
+There are many ways of creating charge:
+\nl
+\index{gen/saptap}{Tree Power}
+\index{gen/anthro}{People Power}
+\index{gen/pollen}{Plant Power}
+\index{gen/biblio}{Book Power}
+\index{gen/mirror}{Solar Power}
+\index{gen/wind}{Wind Power}
+\index{gen/water}{Water Power}
+
+These power sources use various machines:
+\nl
+\index{gen/charge}{The Charge Generator}
+\index{gen/shaft}{The Shaft}
+\index{gen/whirligig}{The Whirligig}
+\index{gen/boiler}{The Boiler}
+\index{gen/calio}{The Caliometric Burner}
+
 Water boilers will suck of water from source blocks beneath them,
 or it can be pumped into them from other means.
 It will output steam to steam turbines above it,

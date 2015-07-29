@@ -1,0 +1,14 @@
+\title{The Boiler}
+
+The boiler uses heat and water to create steam.
+The heat can come from \link{gen/mirror}{mirrors}, or from \link{gen/calio}{caliometric burners}.
+The boiler can suck in water from an infinite source block below,
+or, alternatively,
+water can be piped in from the bottom.
+
+Boilers can be stacked on top of one another;
+in this case steam and water will be sent upwards.
+
+The steam is ejected out of the top-most boiler.
+
+\topic{factorization.factoryBlock.SOLARBOILER}

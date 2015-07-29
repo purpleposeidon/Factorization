@@ -1,0 +1,11 @@
+\title{The Anthropic Generator}
+
+These small lanterns accumulate energy from villagers and similar folk as they go about their lives.
+This energy is \#{item.factorization:entheas} Entheas,
+a very potent foodstuff,
+but eating it is... inadvisable.
+Fortunately the \link{gen/calio}{Caliometric Burner}, having no heart, is immune to the poison.
+
+Entheas is converted to charge just like \link{gen/saptap}{sap}.
+
+\topic{factorization.factoryBlock.ANTHRO_GEN}
