@@ -11,7 +11,7 @@ import factorization.charge.TileEntitySolarBoiler;
 import factorization.common.BlockIcons;
 import factorization.common.FactoryType;
 import factorization.shared.BlockClass;
-import factorization.shared.NORELEASE;
+import factorization.shared.Core;
 import factorization.shared.NetworkFactorization;
 import factorization.shared.TileEntityCommon;
 import factorization.util.NumUtil;
@@ -258,9 +258,10 @@ public class TileEntitySteamShaft extends TileEntityCommon implements IFluidHand
         return (int) (Math.toDegrees(getVelocity(ForgeDirection.UP)) * 10 / 3) + " RPM"
                 + "\nPower: " + (int) (velocity * 10)
                 + "\nSteam: " + steamTank.getFluidAmount() + "mB"
-                + "\nTake-speed: " + NORELEASE.just(take_spead)
-                + "\nLast-sync: " + last_sent_velocity
-                + "\nAccel: " + take_accel;
+                + (!Core.dev_environ ? "" :
+                        "\nTake-speed: " + take_spead
+                        + "\nLast-sync: " + last_sent_velocity
+                        + "\nAccel: " + take_accel);
     }
 
     @Override
