@@ -34,10 +34,6 @@ import java.util.Random;
 import static factorization.citizen.EntityCitizen.ScriptKinds.*;
 
 public class EntityCitizen extends EntityFz {
-    public EntityCitizen(World w) {
-        super(w);
-        setSize(1, 1);
-    }
 
     public ItemStack held = new ItemStack(Blocks.stone, 0);
     private int ticks = 0;
@@ -53,6 +49,12 @@ public class EntityCitizen extends EntityFz {
     Quaternion rotation_start = NORMAL, rotation_target = NORMAL;
 
     final EntityReference<EntityPlayer> playerRef = new EntityReference<EntityPlayer>();
+
+    public EntityCitizen(World w) {
+        super(w);
+        setSize(1, 1);
+        playerRef.setWorld(w);
+    }
 
     private static boolean isLmp(ItemStack is) {
         if (is == null) return false;
@@ -254,8 +256,14 @@ public class EntityCitizen extends EntityFz {
             int n = 20;
             player.rotationPitch = (player.rotationPitch * n + -90) / (n + 1);
         }
-        player.closeScreen();
-        final GameSettings settings = Minecraft.getMinecraft().gameSettings;
+        // This is fine, right? Right?
+        Minecraft mc = Minecraft.getMinecraft();
+        if (mc.currentScreen != null) {
+            if (!mc.currentScreen.doesGuiPauseGame()) {
+                player.closeScreen();
+            }
+        }
+        final GameSettings settings = mc.gameSettings;
         settings.smoothCamera = true;
         settings.thirdPersonView = 0;
         cinema_player = player;
@@ -288,9 +296,7 @@ public class EntityCitizen extends EntityFz {
                 return;
             }
 
-            if (!Core.dev_environ) {
-                lockdownClient();
-            }
+            lockdownClient();
 
             if (spinning_ticks++ > TICKS_PER_SPIN) {
                 rotation_start = rotation_target;
@@ -319,7 +325,7 @@ public class EntityCitizen extends EntityFz {
                 EntityPlayer player = playerRef.getEntity();
                 if (player == null) {
                     if (visible) {
-                        player_lost_visibility_state = visible;
+                        player_lost_visibility_state = true;
                         visible = false;
                         syncData();
                     }
