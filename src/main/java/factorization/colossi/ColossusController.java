@@ -182,6 +182,9 @@ public class ColossusController extends EntityFz implements IBossDisplayData, ID
         arm_size = data.as(Share.VISIBLE, "armSize").putInt(arm_size);
         arm_length = data.as(Share.VISIBLE, "armLength").putInt(arm_length);
         body_width = data.as(Share.VISIBLE, "bodyWidth").putInt(body_width);
+        if (data.isReader() && data.isNBT() && body_width < 1) {
+            body_width = 5; // Well, whatever!
+        }
         home = data.as(Share.PRIVATE, "home").put(home);
         if (data.as(Share.PRIVATE, "has_path_target").putBoolean(path_target != null)) {
             path_target = data.as(Share.PRIVATE, "path_target").put(path_target);
