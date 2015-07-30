@@ -233,9 +233,10 @@ public class ColossalBlock extends Block {
         if (held != null && held.getItem() == Core.registry.logicMatrixProgrammer && world == DeltaChunk.getServerShadowWorld()) {
             if (Core.registry.logicMatrixProgrammer.isAuthenticated(held)) return true;
             EntityPlayer realPlayer = DeltaChunk.getRealPlayer(player);
-            if (realPlayer instanceof FakePlayer) {
+            if (realPlayer instanceof FakePlayer || realPlayer == null) {
                 return true;
             }
+            if (realPlayer.worldObj == world) return true;
             return giveUserAuthentication(held, realPlayer, at);
         }
         if (PlayerUtil.isPlayerCreative(player) && md == MD_CORE) {
@@ -265,7 +266,7 @@ public class ColossalBlock extends Block {
         } else {
             ColossusController controller = findController(at);
             if (controller == null) return true;
-
+            if (controller.getHealth() <= 0) return true;
             controller.ai_controller.forceState(Technique.HACKED);
             placePoster(held, player, at);
             EntityCitizen.spawnOn((EntityPlayerMP) player);
