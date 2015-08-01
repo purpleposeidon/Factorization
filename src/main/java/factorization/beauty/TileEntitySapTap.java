@@ -34,6 +34,7 @@ public class TileEntitySapTap extends TileEntityCommon implements IInventory {
     ItemStack sap = new ItemStack(Core.registry.sap, 0, 0);
     int log_count = 0, leaf_count = 0;
     long sap_rate = 0;
+    int ticks = 0;
 
     static {
         TileEntityCaliometricBurner.register(Core.registry.sap, 8, 0.5);
@@ -124,6 +125,7 @@ public class TileEntitySapTap extends TileEntityCommon implements IInventory {
         log_count = data.as(Share.PRIVATE, "logCount").putInt(log_count);
         leaf_count = data.as(Share.PRIVATE, "leafCount").putInt(leaf_count);
         sap_rate = data.as(Share.PRIVATE, "sapRate").putLong(sap_rate);
+        ticks = data.as(Share.PRIVATE, "ticks").putInt(ticks);
     }
 
     @Override
@@ -131,9 +133,10 @@ public class TileEntitySapTap extends TileEntityCommon implements IInventory {
         if (worldObj.isRemote) return;
         final long nowish = worldObj.getTotalWorldTime() + this.hashCode();
         if (0 == nowish % (20 * 60 * 30)) {
-            doLogic(null);
+            scanTree(null);
         }
-        if (sap_rate > 0 && 0 == nowish % sap_rate) {
+        if (sap_rate > 0 && ticks++ > sap_rate) {
+            ticks = 0;
             if (sap == null) {
                 sap = new ItemStack(Core.registry.sap, 0);
             }
@@ -144,7 +147,7 @@ public class TileEntitySapTap extends TileEntityCommon implements IInventory {
     }
 
     static final int search_radius = 16;
-    void doLogic(EntityPlayer player) {
+    void scanTree(EntityPlayer player) {
         if (worldObj.isRemote) return;
         try {
             Coord level = getCoord();
@@ -178,12 +181,12 @@ public class TileEntitySapTap extends TileEntityCommon implements IInventory {
     @Override
     public void onPlacedBy(EntityPlayer player, ItemStack is, int side, float hitX, float hitY, float hitZ) {
         super.onPlacedBy(player, is, side, hitX, hitY, hitZ);
-        doLogic(player);
+        scanTree(player);
     }
 
     @Override
     public boolean activate(EntityPlayer player, ForgeDirection side) {
-        doLogic(player);
+        scanTree(player);
         return super.activate(player, side);
     }
 
@@ -296,7 +299,7 @@ public class TileEntitySapTap extends TileEntityCommon implements IInventory {
             Material mat = block.getMaterial();
             if (mat == Material.wood && block instanceof BlockLog) {
                 return WOOD;
-            } else if (mat == Material.leaves) {
+            } else if (mat == Material.leaves || mat == Material.vine) {
                 return LEAF;
             }
             return NON;
