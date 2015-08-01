@@ -8,6 +8,7 @@
     "colossus.tech_DEATH_FALL": {"category": "hostile", "sounds": [{"name": "colossus_death", "stream": true}]},
     "colossus.creak": {"category": "hostile", "sounds": ["colossus_creak1", "colossus_creak2", "colossus_creak3", "colossus_creak4"]},
     "colossus.hurt": {"category": "hostile", "sounds": ["colossus_hurt"]},
+    "colossus.tech_SUMMON_RETALIATION": {"category": "hostile", "sounds": ["colossus_summon"]},
 
     "winch.powered": {"category": "block", "sounds": ["winch_powered1", "winch_powered2", "winch_powered3"]},
     "winch.unwind": {"category": "block", "sounds": ["winch_unwind1", "winch_unwind2", "winch_unwind3"]}

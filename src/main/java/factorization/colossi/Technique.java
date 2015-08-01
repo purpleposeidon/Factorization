@@ -1,5 +1,6 @@
 package factorization.colossi;
 
+import cpw.mods.fml.relauncher.Side;
 import factorization.algos.ReservoirSampler;
 import factorization.api.Coord;
 import factorization.api.DeltaCoord;
@@ -236,7 +237,9 @@ public enum Technique implements IStateMachine<Technique> {
             STAND_STILL.onEnterState(controller, prevState);
             for (LimbInfo limb : controller.limbs) {
                 if (limb.type != LimbType.ARM) continue;
-                limb.target(Quaternion.getRotationQuaternionRadians(Math.PI, ForgeDirection.WEST), controller.getStrikeSpeedScale());
+                final Quaternion rot = Quaternion.getRotationQuaternionRadians(Math.PI, ForgeDirection.WEST);
+                if (limb.side == BodySide.LEFT) rot.incrConjugate();
+                limb.target(rot, controller.getStrikeSpeedScale());
             }
         }
 
@@ -253,6 +256,7 @@ public enum Technique implements IStateMachine<Technique> {
 
         @Override
         public void onExitState(ColossusController controller, Technique nextState) {
+            playNoise(controller);
             Random rand = controller.worldObj.rand;
             int baby = 3 + rand.nextInt(controller.getDestroyedCracks());
             int forever = 999999;
