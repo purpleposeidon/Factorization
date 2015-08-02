@@ -3,6 +3,7 @@ package factorization.misc;
 import cpw.mods.fml.common.eventhandler.EventPriority;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import factorization.api.Coord;
+import factorization.common.FzConfig;
 import factorization.util.DataUtil;
 import factorization.util.FzUtil;
 import factorization.util.PlayerUtil;
@@ -171,12 +172,14 @@ public class HotBlocks {
                 int xp = block.getExpDrop(w, md, 0);
                 block.dropXpOnBlockBreak(w, x, y, z, xp);
             }
-            for (Object o : w.getEntitiesWithinAABB(EntityItem.class, box)) {
-                EntityItem ei = (EntityItem) o;
-                int orig_delay = ei.delayBeforeCanPickup;
-                ei.delayBeforeCanPickup = 0;
-                ei.onCollideWithPlayer(real_player);
-                ei.delayBeforeCanPickup = orig_delay;
+            if (FzConfig.hotblocks_grab) {
+                for (Object o : w.getEntitiesWithinAABB(EntityItem.class, box)) {
+                    EntityItem ei = (EntityItem) o;
+                    int orig_delay = ei.delayBeforeCanPickup;
+                    ei.delayBeforeCanPickup = 0;
+                    ei.onCollideWithPlayer(real_player);
+                    ei.delayBeforeCanPickup = orig_delay;
+                }
             }
         }
         PlayerUtil.recycleFakePlayer(fake_player);
