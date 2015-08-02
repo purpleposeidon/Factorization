@@ -38,7 +38,7 @@ public class TileEntitySolarBoiler extends TileEntityCommon implements IReflecti
         }
     }
     
-    FluidTank waterTank = new FluidTank(/*this, */ water_stack.copy(), 1000 * 1);
+    FluidTank waterTank = new FluidTank(/*this, */ water_stack.copy(), 1000 * 2);
     FluidTank steamTank = new FluidTank(/*this, */ steam_stack.copy(), 1000 * 1);
     int reflector_count = 0;
     public transient short given_heat = 0, last_synced_heat = 0;
@@ -194,8 +194,7 @@ public class TileEntitySolarBoiler extends TileEntityCommon implements IReflecti
             steam.amount -= aboveTank.fill(ForgeDirection.DOWN, steam.copy(), true);
             steam.amount = Math.max(0, steam.amount);
         }
-        boolean random = seed % 40 == 0;
-        if (water.amount <= 1000 || (random && water.amount < waterTank.getCapacity() - 1000)) {
+        if (water.amount < 1000) {
             //pull water from below
             Coord below = here.add(0, -1, 0);
             IFluidHandler tc = below.getTE(IFluidHandler.class);
@@ -264,8 +263,8 @@ public class TileEntitySolarBoiler extends TileEntityCommon implements IReflecti
     @Override
     public String getInfo() {
         sanitize();
-        float w = waterTank.getFluid().amount*16/(float)waterTank.getCapacity();
-        float s = steamTank.getFluid().amount*16/(float)steamTank.getCapacity();
+        float w = waterTank.getFluid().amount / 1000F;
+        float s = steamTank.getFluid().amount / 1000F;
         return "Power: " + reflector_count
                 + "\nSteam: " + String.format("%.1f", s)
                 + "\nWater: " + String.format("%.1f", w);
