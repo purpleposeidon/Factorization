@@ -2,15 +2,19 @@ package factorization.misc;
 
 import cpw.mods.fml.common.eventhandler.EventPriority;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
+import factorization.api.Coord;
 import factorization.util.DataUtil;
 import factorization.util.FzUtil;
 import factorization.util.PlayerUtil;
 import net.minecraft.block.Block;
 import net.minecraft.enchantment.Enchantment;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.world.World;
 import net.minecraftforge.common.ForgeHooks;
 import net.minecraftforge.common.util.FakePlayer;
@@ -48,7 +52,7 @@ public class HotBlocks {
         if (event.player instanceof FakePlayer) return;
         if (event.block.getBlockHardness(event.world, event.x, event.y, event.z) <= 0F) return;
         if (PlayerUtil.isPlayerCreative(event.player)) return;
-        if (event.player.isSneaking()) return;
+        //if (event.player.isSneaking()) return;
         ArrayList<HotBlock> coords;
         if (!hots.containsKey(event.player)) {
             hots.put(event.player, coords = new ArrayList<HotBlock>());
@@ -119,7 +123,8 @@ public class HotBlocks {
 
     @SubscribeEvent(priority = EventPriority.HIGH) // Cancel before most things, but permission-handlers can cancel before us
     public void playerRemovedBlock(BlockEvent.BreakEvent event) {
-        ArrayList<HotBlock> coords = hots.get(event.getPlayer());
+        EntityPlayer thePlayer = event.getPlayer();
+        ArrayList<HotBlock> coords = hots.get(thePlayer);
         if (coords == null) return;
         HotBlock heat = null;
         final World w = event.world;
@@ -129,7 +134,6 @@ public class HotBlocks {
         final Block block = event.block;
         final int md = event.blockMetadata;
         int wDim = FzUtil.getWorldDimension(w);
-        EntityPlayer thePlayer = event.getPlayer();
         if (PlayerUtil.isPlayerCreative(thePlayer)) return;
         for (Iterator<HotBlock> iterator = coords.iterator(); iterator.hasNext(); ) {
             HotBlock hot = iterator.next();
@@ -139,30 +143,43 @@ public class HotBlocks {
                 break;
             }
         }
-        if (heat != null && thePlayer instanceof EntityPlayerMP) {
-            event.setCanceled(true);
-            EntityPlayerMP player = (EntityPlayerMP) thePlayer;
-            ItemStack real_held = player.getHeldItem();
-            ItemStack tool = new ItemStack(Items.diamond_pickaxe);
-            tool.setItemDamage(tool.getMaxDamage() - 1);
-            tool.addEnchantment(Enchantment.silkTouch, 1);
-            player.setCurrentItemOrArmor(0, tool);
-            {
-                block.onBlockHarvested(w, x, y, z, md, player);
-                boolean canDestroy = block.removedByPlayer(w, player, x, y, z, true);
-
-                if (canDestroy) {
-                    block.onBlockDestroyedByPlayer(w, x, y, z, md);
-                }
-                block.harvestBlock(w, event.getPlayer(), x, y, z, md);
-                if (canDestroy) {
-                    int xp = block.getExpDrop(w, md, 0);
-                    block.dropXpOnBlockBreak(w, x, y, z, xp);
-                }
-            }
-            tool.stackSize = 0;
-            player.setCurrentItemOrArmor(0, real_held);
+        if (heat == null || !(thePlayer instanceof EntityPlayerMP)) {
+            return;
         }
+        EntityPlayerMP real_player = (EntityPlayerMP) thePlayer;
+        if (ForgeHooks.canToolHarvestBlock(block, md, real_player.getHeldItem())) {
+            return;
+        }
+        event.setCanceled(true);
+        ItemStack tool = new ItemStack(Items.diamond_pickaxe);
+        tool.setItemDamage(tool.getMaxDamage());
+        tool.addEnchantment(Enchantment.silkTouch, 1);
+        tool.stackSize = 0;
+        EntityPlayer fake_player = PlayerUtil.makePlayer(new Coord(w, x, y, z), "HotBlocks");
+        fake_player.setCurrentItemOrArmor(0, tool);
+        {
+            double r = 0.5;
+            AxisAlignedBB box = AxisAlignedBB.getBoundingBox(x - r, y - r, z - r, x + 1 + r, y + 1 + r, z + 1 + r);
+            block.onBlockHarvested(w, x, y, z, md, fake_player);
+            boolean canDestroy = block.removedByPlayer(w, fake_player, x, y, z, true);
+
+            if (canDestroy) {
+                block.onBlockDestroyedByPlayer(w, x, y, z, md);
+            }
+            block.harvestBlock(w, fake_player, x, y, z, md);
+            if (canDestroy) {
+                int xp = block.getExpDrop(w, md, 0);
+                block.dropXpOnBlockBreak(w, x, y, z, xp);
+            }
+            for (Object o : w.getEntitiesWithinAABB(EntityItem.class, box)) {
+                EntityItem ei = (EntityItem) o;
+                int orig_delay = ei.delayBeforeCanPickup;
+                ei.delayBeforeCanPickup = 0;
+                ei.onCollideWithPlayer(real_player);
+                ei.delayBeforeCanPickup = orig_delay;
+            }
+        }
+        PlayerUtil.recycleFakePlayer(fake_player);
     }
 
 }
