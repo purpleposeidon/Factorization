@@ -3,6 +3,7 @@ package factorization.docs;
 import factorization.util.ItemUtil;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.renderer.Tessellator;
+import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemStack;
 import org.apache.commons.lang3.ArrayUtils;
 import org.lwjgl.opengl.GL11;
@@ -13,9 +14,19 @@ import java.util.List;
 public class ItemWord extends Word {
     ItemStack is = null;
     ItemStack[] entries = null;
-    
+
+    static ItemStack sanitize(ItemStack is) {
+        if (is == null) {
+            return new ItemStack(Blocks.fire);
+        }
+        if (is.getItem() != null) {
+            return is;
+        }
+        return new ItemStack(Blocks.fire);
+    }
+
     public ItemWord(ItemStack is) {
-        super(getDefaultHyperlink(is));
+        super(getDefaultHyperlink(sanitize(is)));
         this.is = is;
         cleanWildlings();
     }
@@ -33,7 +44,7 @@ public class ItemWord extends Word {
     
     public ItemWord(ItemStack is, String hyperlink) {
         super(hyperlink);
-        this.is = is;
+        this.is = sanitize(is);
         cleanWildlings();
     }
     

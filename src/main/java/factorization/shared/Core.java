@@ -25,7 +25,7 @@ import factorization.common.FactorizationProxy;
 import factorization.common.FactoryType;
 import factorization.common.FzConfig;
 import factorization.common.Registry;
-import factorization.compat.CompatManager;
+import factorization.compat.CompatModuleLoader;
 import factorization.coremod.AtVerifier;
 import factorization.coremod.LoadingPlugin;
 import factorization.darkiron.BlockDarkIronOre;
@@ -84,6 +84,7 @@ public class Core {
         foph = new FactorizationOreProcessingHandler();
         network = new NetworkFactorization();
         netevent = new FzNetEventHandler();
+        compatLoader = new CompatModuleLoader();
     }
     
     // runtime storage
@@ -95,6 +96,7 @@ public class Core {
     public static FactorizationProxy proxy;
     public static NetworkFactorization network;
     public static FzNetEventHandler netevent;
+    public static CompatModuleLoader compatLoader;
     public static int factory_rendertype = -1, nonte_rendertype = -1;
     public static boolean finished_loading = false;
 
@@ -197,6 +199,8 @@ public class Core {
         FMLInterModComms.sendMessage(Core.modId, "AddRecipeCategory", "Lacerator|factorization.oreprocessing.TileEntityGrinder|recipes");
         FMLInterModComms.sendMessage(Core.modId, "AddRecipeCategory", "Crystallizer|factorization.oreprocessing.TileEntityCrystallizer|recipes");
         FMLInterModComms.sendMessage(Core.modId, "AddRecipeCategory", "Slag Furnace|factorization.oreprocessing.TileEntitySlagFurnace$SlagRecipes|smeltingResults");
+        compatLoader.loadCompat();
+        compatLoader.preinit(event);
     }
     
     void registerSimpleTileEntities() {
@@ -220,6 +224,7 @@ public class Core {
         registry.sendIMC();
         ColossusFeature.init();
         PatreonRewards.init();
+        compatLoader.init(event);
     }
     
     @EventHandler
@@ -239,9 +244,9 @@ public class Core {
         foph.addDictOres();
 
         registry.addOtherRecipes();
-        (new CompatManager()).loadCompat();
         for (FactoryType ft : FactoryType.values()) ft.getRepresentative(); // Make sure everyone's registered to the EVENT_BUS
         proxy.afterLoad();
+        compatLoader.postinit(event);
         finished_loading = true;
         Blocks.diamond_block.setHardness(5.0F).setResistance(10.0F);
         validateEnvironment();

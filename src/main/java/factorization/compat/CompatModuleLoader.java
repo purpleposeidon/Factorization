@@ -1,0 +1,70 @@
+package factorization.compat;
+
+import cpw.mods.fml.common.Loader;
+import cpw.mods.fml.common.event.FMLInitializationEvent;
+import cpw.mods.fml.common.event.FMLPostInitializationEvent;
+import cpw.mods.fml.common.event.FMLPreInitializationEvent;
+import factorization.shared.Core;
+
+import java.util.ArrayList;
+
+public class CompatModuleLoader extends CompatBase {
+    ArrayList<CompatBase> modules = new ArrayList<CompatBase>();
+
+    String[] mod_compats = new String[] {"IC2", "Railcraft"};
+    String base_name = getClass().getCanonicalName().replace(getClass().getSimpleName(), "");
+    
+    public void loadCompat() {
+        ClassLoader cl = getClass().getClassLoader();
+        for (String mod : mod_compats) {
+            if (!Loader.isModLoaded(mod)) {
+                Core.logInfo(mod  + " not loaded; not loading compatibility module");
+                continue;
+            }
+            try {
+                String name = base_name + mod.toLowerCase() + ".Compat_" + mod;
+                Class<? extends CompatBase> compatClass = (Class<? extends CompatBase>) cl.loadClass(name);
+                modules.add(compatClass.newInstance());
+            } catch (Throwable e) {
+                // A mystery!
+                Core.logWarning("Failed to load compatability module for " + mod);
+                e.printStackTrace();
+                continue;
+            }
+            Core.logInfo(mod + " compatibility module loaded");
+        }
+    }
+
+    @Override
+    public void preinit(FMLPreInitializationEvent event) {
+        for (CompatBase mod : modules) {
+            try {
+                mod.preinit(event);
+            } catch (Throwable t) {
+                t.printStackTrace();
+            }
+        }
+    }
+
+    @Override
+    public void init(FMLInitializationEvent event) {
+        for (CompatBase mod : modules) {
+            try {
+                mod.init(event);
+            } catch (Throwable t) {
+                t.printStackTrace();
+            }
+        }
+    }
+
+    @Override
+    public void postinit(FMLPostInitializationEvent event) {
+        for (CompatBase mod : modules) {
+            try {
+                mod.postinit(event);
+            } catch (Throwable t) {
+                t.printStackTrace();
+            }
+        }
+    }
+}

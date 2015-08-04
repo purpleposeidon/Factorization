@@ -8,11 +8,14 @@ import net.minecraft.block.Block;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.*;
+import net.minecraft.nbt.NBTBase;
+import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.oredict.OreDictionary;
 import net.minecraftforge.oredict.ShapedOreRecipe;
 import net.minecraftforge.oredict.ShapelessOreRecipe;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.*;
 import java.util.Map.Entry;
@@ -150,7 +153,8 @@ public class RecipeViewer implements IDocGenerator {
         }
     }
     
-    static TreeMap<String, Iterable> customRecipes = new TreeMap();
+    static TreeMap<String, Iterable> customRecipes = new TreeMap<String, Iterable>();
+    static TreeMap<String, Map> customRecipesMap = new TreeMap<String, Map>();
     public static void handleImc(IMCMessage message) throws ClassNotFoundException, NoSuchFieldException, IllegalAccessException {
         if (!message.key.equals("AddRecipeCategory")) return;
         String[] cmd = message.getStringValue().split("\\|");
@@ -160,7 +164,33 @@ public class RecipeViewer implements IDocGenerator {
         Class kl = RecipeViewer.class.getClassLoader().loadClass(className);
         Field field = kl.getField(fieldName);
         Object obj = field.get(null);
-        customRecipes.put(key, (Iterable) obj);
+        if (!(obj instanceof Iterable)) {
+            String[] getter_names = new String[] {"getRecipes", "recipes", "allRecipes", "getAllRecipes"};
+            Object found = null;
+            Class cl = obj.getClass();
+            for (String name : getter_names) {
+                try {
+                    Method getter = cl.getMethod(name);
+                    found = getter.invoke(obj);
+                    if (found != null) break;
+                } catch (Throwable ignored) {
+
+                }
+            }
+            if (found != null) {
+                obj = found;
+            } else {
+                return;
+            }
+        }
+        if (obj instanceof Map) {
+            obj = ((Map) obj).entrySet();
+        }
+        if (obj instanceof Iterable) {
+            customRecipes.put(key, (Iterable) obj);
+        } else {
+            Core.logWarning("Unable to load recipe list provided by IMC message, obtained object is neither Iterable nor Map: " + message.getStringValue());
+        }
     }
 
     void setupReverseOD() {
@@ -330,7 +360,7 @@ public class RecipeViewer implements IDocGenerator {
     }
     
     void addRecipeWithReflection(List sb, Object recipe) throws IllegalArgumentException, IllegalAccessException {
-        if (recipe instanceof ItemStack || recipe instanceof String || recipe.getClass().isArray() || recipe instanceof Collection) {
+        if (recipe instanceof ItemStack || recipe instanceof String || recipe instanceof Number || recipe.getClass().isArray() || recipe instanceof Collection || recipe instanceof NBTBase) {
             convertObject(sb, recipe);
             return;
         }
@@ -346,14 +376,15 @@ public class RecipeViewer implements IDocGenerator {
         }
         Field[] fields = recipe.getClass().getDeclaredFields();
         for (Field f : fields) {
+            if (f.getName().contains("$")) continue;
+            int modifiers = f.getModifiers();
+            if ((modifiers & Modifier.STATIC) != 0) continue;
             if (!f.isAccessible()) {
                 f.setAccessible(true);
             }
-            int modifiers = f.getModifiers();
-            if ((modifiers & Modifier.STATIC) != 0) continue;
             Object v = f.get(recipe);
             if (v == output || v == null) continue;
-            if (v instanceof String || v instanceof ItemStack || v instanceof Collection || v.getClass().isArray()) {
+            if (recursion < 2 || v instanceof String || v instanceof ItemStack || v instanceof Collection || v.getClass().isArray() || v instanceof NBTBase) {
                 sb.add(f.getName() + ": ");
                 convertObject(sb, v);
                 sb.add("\\nl ");
@@ -388,8 +419,12 @@ public class RecipeViewer implements IDocGenerator {
         try {
             if (obj instanceof ItemStack) {
                 sb.add(new ItemWord((ItemStack) obj));
-            } else if (obj instanceof String) {
+            } else if (obj instanceof String || obj instanceof Number || obj instanceof NBTBase) {
                 sb.add(obj.toString());
+            } else if (obj instanceof FluidStack) {
+                FluidStack fs = (FluidStack) obj;
+                sb.add(FluidViewer.convert(fs.getFluid()));
+                sb.add(new TextWord("" + fs.amount, null)); // TODO: Link to fluid viewer
             } else if (obj.getClass().isArray()) {
                 Class<?> component = obj.getClass().getComponentType();
                 if (component == ItemStack.class) {

@@ -60,7 +60,7 @@ public class DocumentationModule {
     }
 
     private static void loadCache() {
-        ArrayList<ItemStack> items = new ArrayList();
+        ArrayList<ItemStack> items = new ArrayList<ItemStack>();
         for (Item it : (Iterable<Item>) Item.itemRegistry) {
             if (it == null) continue;
             try {
@@ -76,7 +76,7 @@ public class DocumentationModule {
             String itemName = is.getUnlocalizedName();
             ArrayList<ItemStack> list = nameCache.get(itemName);
             if (list == null) {
-                list = new ArrayList();
+                list = new ArrayList<ItemStack>();
                 nameCache.put(itemName, list);
             }
             list.add(is);
