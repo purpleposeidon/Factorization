@@ -4,6 +4,7 @@ import java.io.File;
 import java.lang.annotation.Annotation;
 import java.util.HashMap;
 
+import factorization.shared.NORELEASE;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;
 import net.minecraftforge.common.config.ConfigCategory;
@@ -28,7 +29,7 @@ public class HammerInfo {
     boolean world_loaded = false;
     HashMap<Integer, ConfigCategory> channel2category = new HashMap<Integer, ConfigCategory>();
     
-    private static final int defaultPadding = 16*4;
+    private static final int defaultPadding = 16 * 4;
     
     void setConfigFile(File f) {
         channelConfig = new Configuration(f);
@@ -52,44 +53,63 @@ public class HammerInfo {
         worldState = new Configuration(worldConfigFile);
         saveChannelConfig();
     }
-    
-    public int makeChannelFor(String modName, String channelName, int default_channel_id, int padding, String comment) {
-        DeltaChunk.assertEnabled();
-        if (padding < 0) {
-            padding = defaultPadding;
-        }
-        if (channelConfig == null) {
-            throw new IllegalArgumentException("Tried to register channel too early");
-        }
-        Core.logFine("Allocating Hammer channel for %s: %s", modName, comment);
-        
-        String modCategory = ("hammerChannels." + modName + "." + channelName).toLowerCase();
-        
-        int max = default_channel_id;
-        boolean collision = false;
-        
+
+    boolean isFree(String name, int val) {
         for (String categoryName : channelConfig.getCategoryNames()) {
             ConfigCategory cat = channelConfig.getCategory(categoryName);
-            if (cat.equals(modCategory)) {
+            if (cat.getQualifiedName().equals(name)) {
+                if (channelConfig.get(categoryName, "channel", val).getInt() == val) {
+                    return true;
+                }
+                // Uhm.
                 continue;
             }
             if (!cat.containsKey("channel")) {
                 continue;
             }
             int here_chan = channelConfig.get(categoryName, "channel", -1).getInt();
-            max = Math.max(max, here_chan);
-            if (here_chan == default_channel_id) {
-                collision = true;
+            if (here_chan == val) {
+                return false;
             }
         }
+        return true;
+    }
+    
+    public int makeChannelFor(String modName, String channelName, int default_channel_id, int padding, String comment) {
+        DeltaChunk.assertEnabled();
+        NORELEASE.fixme("Uh, totally broken ID registration");
+        if (padding < 0) {
+            padding = defaultPadding;
+        }
+        if (channelConfig == null) {
+            throw new IllegalArgumentException("Tried to register channel too early");
+        }
+        Core.logFine("Allocating Hammer channel for %s: %s", modName, channelName);
+        
+        String modCategory = ("hammerChannels." + modName + "." + channelName).toLowerCase();
+
+        boolean collision = false;
+        int channel_id = default_channel_id;
+        while (!isFree(modCategory, channel_id)) {
+            channel_id++;
+            collision = true;
+        }
         if (collision) {
-            int newDefault = max + 1;
-            Core.logFine("Default channel ID for %s (%s) was already taken, using %s", modCategory, default_channel_id, newDefault);
-            default_channel_id = newDefault;
+            Core.logFine("Default channel ID for %s (%s) was already taken, using %s", modCategory, default_channel_id, channel_id);
+            default_channel_id = channel_id;
         }
         
         channelConfig.addCustomCategoryComment(modCategory, comment);
         int channelRet = channelConfig.get(modCategory, "channel", default_channel_id).getInt();
+        if (!isFree(modCategory, channelRet)) {
+            int fixedChannel = channelRet;
+            do {
+                fixedChannel++;
+            } while (!isFree(modCategory, fixedChannel));
+            Core.logWarning("Saved channel ID for %s (%s) conflicted, changing to %s", modCategory, channelRet, fixedChannel);
+            channelRet = fixedChannel;
+            channelConfig.get(modCategory, "channel", channelRet).set(channelRet);
+        }
         padding = channelConfig.get(modCategory, "padding", padding).getInt();
         
         if (world_loaded) {
@@ -107,8 +127,7 @@ public class HammerInfo {
             return defaultPadding;
         }
         Property prop = cat.get("padding");
-        int ret = prop.getInt(defaultPadding);
-        return ret;
+        return prop.getInt(defaultPadding);
     }
     
     int roundToChunk(int n) {
