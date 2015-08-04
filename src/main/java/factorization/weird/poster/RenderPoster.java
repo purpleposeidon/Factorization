@@ -65,18 +65,15 @@ public class RenderPoster extends RenderEntity {
                 needRotationFix = false;
             }
         }
-        float scale = 1.5F;
+        GL11.glTranslatef(0, 0, 0.5F/16F);
         if (needRotationFix) {
-            scale = 10.5F / 16F;
+            float scale = 10.5F / 16F;
             GL11.glScalef(scale, scale, scale);
             float wtf = (1.5F / 16F);
             float wtfY = wtf + (-0.5F / 16F);
             GL11.glTranslatef(7F / 16F + wtf, -7F / 16F + wtfY, 0F);
             GL11.glRotatef(-335.0F, 0.0F, 0.0F, 1.0F);
             GL11.glRotatef(-50.0F, 0.0F, 1.0F, 0.0F);
-        } else {
-            scale = 1;
-            GL11.glScalef(scale, scale, scale);
         }
 
         int itemColor = is.getItem().getColorFromItemStack(is, 0);

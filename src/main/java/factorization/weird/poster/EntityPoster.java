@@ -45,11 +45,27 @@ public class EntityPoster extends EntityFz {
     }
 
     void updateSize() {
-        if (top.offsetY != 0) {
-            setSize(0.5F, 0.0001F);
-        } else {
-            setSize(0.5F, 0.5F);
+        Vec3 here = SpaceUtil.fromEntPos(this);
+        SpaceUtil.setAABB(this.boundingBox, here, here);
+        for (ForgeDirection dir : ForgeDirection.VALID_DIRECTIONS) {
+            if (dir == norm) continue;
+            float s = (float) scale;
+            if (dir == norm.getOpposite()) {
+                s /= 16;
+            } else {
+                s /= 2;
+            }
+            Vec3 d = SpaceUtil.fromDirection(dir);
+            SpaceUtil.incrScale(d, s);
+            rot.applyRotation(d);
+            SpaceUtil.incrAdd(d, here);
+            SpaceUtil.include(this.boundingBox, d);
         }
+    }
+
+    @Override
+    public boolean isInRangeToRender3d(double p_145770_1_, double p_145770_3_, double p_145770_5_) {
+        return super.isInRangeToRender3d(p_145770_1_, p_145770_3_, p_145770_5_);
     }
 
     public void setBase(double baseScale, Quaternion baseRotation, ForgeDirection norm, ForgeDirection top, AxisAlignedBB bounds) {
@@ -138,15 +154,12 @@ public class EntityPoster extends EntityFz {
         norm = data.as(Share.PRIVATE, "norm").putEnum(norm);
         top = data.as(Share.PRIVATE, "top").putEnum(top);
         tilt = data.as(Share.PRIVATE, "tilt").putEnum(tilt);
-        AxisAlignedBB box = boundingBox.copy();
-        box = data.as(Share.VISIBLE, "box").putBox(box);
         if (data.isReader()) {
             updateSize();
             if (inv == null) {
                 inv = new ItemStack(Core.registry.spawnPoster);
             }
         }
-        SpaceUtil.copyTo(this.boundingBox, box);
         locked = data.as(Share.PRIVATE, "locked").putBoolean(locked);
     }
 

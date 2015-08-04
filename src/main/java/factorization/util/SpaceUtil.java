@@ -239,11 +239,11 @@ public final class SpaceUtil {
         double x = ab.maxX - ab.minX;
         double y = ab.maxY - ab.minY;
         double z = ab.maxZ - ab.minZ;
-        return Math.sqrt(x*x + y*y + z*z);
+        return Math.sqrt(x * x + y * y + z * z);
     }
 
     public static Vec3 averageVec(Vec3 a, Vec3 b) {
-        return Vec3.createVectorHelper((a.xCoord + b.xCoord)/2, (a.yCoord + b.yCoord)/2, (a.zCoord + b.zCoord)/2);
+        return Vec3.createVectorHelper((a.xCoord + b.xCoord) / 2, (a.yCoord + b.yCoord) / 2, (a.zCoord + b.zCoord) / 2);
     }
 
     public static void assignVecFrom(Vec3 dest, Vec3 orig) {
@@ -528,6 +528,15 @@ public final class SpaceUtil {
         if (at.y + 1 > box.maxY) box.maxY = at.y + 1;
         if (at.z < box.minZ) box.minZ = at.z;
         if (at.z + 1 > box.maxZ) box.maxZ = at.z + 1;
+    }
+
+    public static void include(AxisAlignedBB box, Vec3 at) {
+        if (at.xCoord < box.minX) box.minX = at.xCoord;
+        if (at.xCoord > box.maxX) box.maxX = at.xCoord;
+        if (at.yCoord < box.minY) box.minY = at.yCoord;
+        if (at.yCoord > box.maxY) box.maxY = at.yCoord;
+        if (at.zCoord < box.minZ) box.minZ = at.zCoord;
+        if (at.zCoord > box.maxZ) box.maxZ = at.zCoord;
     }
 
     public static boolean contains(AxisAlignedBB box, Coord at) {
