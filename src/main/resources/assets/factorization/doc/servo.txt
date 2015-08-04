@@ -14,4 +14,7 @@ They are controlled by \link{servodecor}{instructions}.
 
 They can be \link{servocolor}{colored}.
 
+In addition to the socket part, servos can hold a single stack of items.
+
+
 \topic{item.factorization:servo/servo}
