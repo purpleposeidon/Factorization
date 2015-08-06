@@ -21,6 +21,7 @@ import net.minecraft.block.material.Material;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
 import net.minecraft.inventory.IInventory;
+import net.minecraft.inventory.ISidedInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.IIcon;
@@ -30,7 +31,7 @@ import net.minecraftforge.common.util.ForgeDirection;
 import java.io.IOException;
 import java.util.HashSet;
 
-public class TileEntitySapTap extends TileEntityCommon implements IInventory {
+public class TileEntitySapTap extends TileEntityCommon implements ISidedInventory {
     ItemStack sap = new ItemStack(Core.registry.sap, 0, 0);
     int log_count = 0, leaf_count = 0;
     long sap_rate = 0;
@@ -59,6 +60,7 @@ public class TileEntitySapTap extends TileEntityCommon implements IInventory {
     @Override
     public ItemStack decrStackSize(int slot, int amount) {
         if (slot == 0) {
+            if (sap.stackSize <= 0) return null;
             return sap.splitStack(amount);
         }
         return null;
@@ -230,6 +232,22 @@ public class TileEntitySapTap extends TileEntityCommon implements IInventory {
             return false;
         }
         return super.canPlaceAgainst(player, c, side);
+    }
+
+    @Override
+    public int[] getAccessibleSlotsFromSide(int side) {
+        if (side == ForgeDirection.DOWN.ordinal()) return new int[] {0};
+        return new int[0];
+    }
+
+    @Override
+    public boolean canInsertItem(int side, ItemStack stack, int slot) {
+        return false;
+    }
+
+    @Override
+    public boolean canExtractItem(int side, ItemStack stack, int slot) {
+        return slot == 0 && sap.stackSize > 1;
     }
 
     private class CrowdedCheck implements ICoordFunction {
