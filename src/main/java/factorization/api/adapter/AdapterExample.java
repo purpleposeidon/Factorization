@@ -1,4 +1,4 @@
-package factorization.api;
+package factorization.api.adapter;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
@@ -7,7 +7,7 @@ import net.minecraft.world.World;
 
 public class AdapterExample {
     public interface ISparkly {
-        InterfaceAdapter<ISparkly> adapter = new InterfaceAdapter<ISparkly>(ISparkly.class);
+        InterfaceAdapter<Block, ISparkly> adapter = new InterfaceAdapter<Block, ISparkly>(ISparkly.class);
 
         int getSparklePower(World w, int x, int y, int z);
     }
