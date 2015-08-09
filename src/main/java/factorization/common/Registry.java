@@ -109,7 +109,7 @@ public class Registry {
             parasieve_item,
             compression_crafter_item,
             sap_generator_item, anthro_generator_item,
-            shaft_generator_item, steam_to_shaft, wooden_shaft, bibliogen;
+            shaft_generator_item, steam_to_shaft, wooden_shaft, bibliogen, fluid_mill;
     public ItemStack silver_ore_item, silver_block_item, lead_block_item,
             dark_iron_block_item;
     public ItemStack is_factory, is_lamp, is_lightair;
@@ -317,6 +317,7 @@ public class Registry {
         }
         if (DeltaChunk.enabled()) {
             hinge = FactoryType.HINGE.itemStack();
+            fluid_mill = FactoryType.FLUID_MILL_GEN.itemStack();
             //anchor = FactoryType.ANCHOR.itemStack();
         }
 
@@ -906,15 +907,12 @@ public class Registry {
                 'P', Blocks.sticky_piston,
                 'S', Items.shears,
                 'I', Items.iron_sword);
-        if (FzConfig.enable_solar_steam) {
-            oreRecipe(solarboiler_item,
-                    "I#I",
-                    "I I",
-                    "III",
-                    'I', Items.iron_ingot,
-                    '#', Blocks.iron_bars
-                    );
-        }
+        oreRecipe(solarboiler_item,
+                "I#I",
+                "I I",
+                "III",
+                'I', Items.iron_ingot,
+                '#', Blocks.iron_bars);
         oreRecipe(steamturbine_item,
                 "I#I",
                 "GXG",
@@ -933,6 +931,15 @@ public class Registry {
                 'P', Blocks.sticky_piston,
                 'A', sulfuric_acid,
                 'L', Items.leather);
+        if (DeltaChunk.enabled()) {
+            oreRecipe(fluid_mill,
+                    "#I#",
+                    "===",
+                    "#I#",
+                    '#', "logWood",
+                    'I', dark_iron,
+                    '=', wooden_shaft);
+        }
         oreRecipe(new ItemStack(charge_meter),
                 "WSW",
                 "W|W",
@@ -977,7 +984,7 @@ public class Registry {
                 'B', battery,
                 'L', "ingotLead",
                 'I', Items.iron_ingot);
-        if (FzConfig.enable_solar_steam) { //NOTE: This'll probably cause a bug when we use mirrors for other things
+        if (FzConfig.enable_solar_steam) { //NOTE: This'll probably cause a bug should we use mirrors for other things
             oreRecipe(new ItemStack(mirror),
                     "SSS",
                     "S#S",
