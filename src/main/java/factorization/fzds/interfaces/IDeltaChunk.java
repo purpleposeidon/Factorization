@@ -176,6 +176,16 @@ public abstract class IDeltaChunk extends EntityFz {
      * @return this
      */
     public abstract IDeltaChunk forbid(DeltaCapability cap);
+
+    public IDeltaChunk permit(DeltaCapability... caps) {
+        for (DeltaCapability cap : caps) permit(cap);
+        return this;
+    }
+
+    public IDeltaChunk forbid(DeltaCapability... caps) {
+        for (DeltaCapability cap : caps) forbid(cap);
+        return this;
+    }
     
     public void loadUsualCapabilities() {
         for (DeltaCapability cap : DeltaCapability.values()) {
