@@ -84,6 +84,8 @@ public enum FactoryType {
     SHAFT_GEN(52, false, TileEntityShaftGen.class, "factory_shaft_gen"),
     STEAM_SHAFT(53, false, TileEntitySteamShaft.class, "factory_steam_shaft"),
     SHAFT(54, false, TileEntityShaft.class, "factory_shaft"),
+    FLUID_MILL_GEN(55, false, TileEntityFluidMill.class, "factory_fluidmill"),
+    // BLOCK_INTAKE(56, false, TileEntityBlockIntake.class, "factory_blockintake"),
 
     POCKETCRAFTGUI(101, true),
     NONE(102, false)
@@ -101,6 +103,7 @@ public enum FactoryType {
             HINGE.disable();
             //ANCHOR.disable();
             ROCKETENGINE.disable();
+            FLUID_MILL_GEN.disable();
         }
     }
     

@@ -334,4 +334,8 @@ public abstract class TileEntityCommon extends TileEntity implements ICoord, IFa
     public boolean recolourBlock(ForgeDirection side, FzColor fzColor) { return false; }
 
     public void spawnPacketReceived() { }
+
+    public void blockUpdateTick(Block myself) {
+        worldObj.notifyBlockChange(xCoord, yCoord, zCoord, myself);
+    }
 }

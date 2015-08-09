@@ -291,6 +291,7 @@ public class BlockFactorization extends BlockContainer {
             put(itemList, new ItemStack(reg.mirror));
         }
         put(itemList, reg.shaft_generator_item);
+        put(itemList, reg.fluid_mill);
         put(itemList, reg.steam_to_shaft);
         put(itemList, reg.heater_item);
         put(itemList, reg.leadwire_item);
@@ -311,7 +312,9 @@ public class BlockFactorization extends BlockContainer {
 
         //mechanics
         put(itemList, reg.hinge);
-        //put(itemList, reg.anchor);
+
+        //redstone
+        put(itemList, reg.block_intake);
 
         //Barrels
         if (todaysBarrels != null) {
@@ -484,7 +487,11 @@ public class BlockFactorization extends BlockContainer {
     
     @Override
     public void updateTick(World w, int x, int y, int z, Random rand) {
-        w.notifyBlockChange(x, y, z, this);
+        TileEntity te = w.getTileEntity(x, y, z);
+        if (te instanceof TileEntityCommon) {
+            TileEntityCommon tec = (TileEntityCommon) te;
+            tec.blockUpdateTick(this);
+        }
     }
     
     
