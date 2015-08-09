@@ -138,11 +138,7 @@ public class SafeCommandHelp extends CommandHelp {
         @Override
         public int compareTo(@SuppressWarnings("NullableProblems") Object obj) {
             try {
-                if (obj instanceof SafetyWrap) {
-                    SafetyWrap b = (SafetyWrap) obj;
-                    return base.compareTo(b);
-                }
-                return base.compareTo(obj);
+                return base.getClass().getName().compareTo(obj.getClass().getName());
             } catch (Throwable t) {
                 final int a = System.identityHashCode(base);
                 final int b = System.identityHashCode(obj);
