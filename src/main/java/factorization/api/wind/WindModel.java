@@ -11,13 +11,10 @@ public class WindModel {
     private static int best = -1;
 
     /**
-     * Registers a wind model. Might change activeModel.
+     * Registers a wind model. Might change activeModel, but of course this should be done during load time.
      * @param modelName The name of the model to use; suggested to use the modid of the register.
      * @param model The IWindModel instance
-     * @param awesomeness A self-evaluation of how cool the model is. Some hints:
-     *                    0: The default model. Very boring.
-     *                    20: IC2. Wind varies with time & height (& biome?). Has a wind measuring device. Has obstruction.
-     *                    50: Tropicraft's weathermod. Probably totally awesomely detailed & stuff.
+     * @param awesomeness A self-evaluation of how cool the model is.
      */
     public static void register(String modelName, IWindModel model, int awesomeness) {
         models.put(modelName, model);

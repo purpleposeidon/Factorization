@@ -938,6 +938,7 @@ public final class Coord implements IDataSerializable, ISaneCoord, Comparable<Co
     }
     
     public static void iterateEmptyBox(Coord min, Coord max, ICoordFunction func) {
+        // Warning: Probably broken; check it before you use it
         min = min.copy();
         max = max.copy();
         sort(min, max);

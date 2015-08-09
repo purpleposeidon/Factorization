@@ -25,6 +25,12 @@ public class DeltaCoord implements IDataSerializable {
         this.z = z;
     }
 
+    public DeltaCoord(DeltaCoord orig) {
+        this.x = orig.x;
+        this.y = orig.y;
+        this.z = orig.z;
+    }
+
     public DeltaCoord add(DeltaCoord o) {
         return new DeltaCoord(x + o.x, y + o.y, z + o.z);
     }
@@ -204,5 +210,11 @@ public class DeltaCoord implements IDataSerializable {
 
     public Vec3 toVector() {
         return Vec3.createVectorHelper(x, y, z);
+    }
+
+    public void move(ForgeDirection dir) {
+        x += dir.offsetX;
+        y += dir.offsetY;
+        z += dir.offsetZ;
     }
 }

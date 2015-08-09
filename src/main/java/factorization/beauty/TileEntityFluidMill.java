@@ -1,44 +1,51 @@
 package factorization.beauty;
 
+import cpw.mods.fml.common.FMLCommonHandler;
+import cpw.mods.fml.relauncher.Side;
 import factorization.api.*;
 import factorization.api.datahelpers.DataHelper;
 import factorization.api.datahelpers.Share;
+import factorization.api.wind.IWindmill;
+import factorization.api.wind.WindModel;
 import factorization.common.FactoryType;
 import factorization.fzds.DeltaChunk;
+import factorization.fzds.TransferLib;
 import factorization.fzds.interfaces.DeltaCapability;
 import factorization.fzds.interfaces.IDCController;
 import factorization.fzds.interfaces.IDeltaChunk;
-import factorization.notify.Notice;
 import factorization.shared.BlockClass;
 import factorization.shared.Core;
 import factorization.shared.EntityReference;
 import factorization.shared.TileEntityCommon;
-import factorization.util.DataUtil;
 import factorization.util.PlayerUtil;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockFence;
+import factorization.util.SpaceUtil;
+import net.minecraft.block.*;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.DamageSource;
+import net.minecraft.util.Vec3;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.ForgeDirection;
 
 import java.io.IOException;
 
-public class TileEntityFluidMill extends TileEntityCommon implements IRotationalEnergySource, IDCController {
+public class TileEntityFluidMill extends TileEntityCommon implements IRotationalEnergySource, IDCController, IWindmill {
     enum Mode {
         BROKEN, WIND, WATER;
     };
     Mode mode = Mode.BROKEN;
-    ForgeDirection outputDirection = ForgeDirection.UP;
+    ForgeDirection sailDirection = ForgeDirection.UP;
     boolean dirty = true;
+    double power_per_tick, power_this_tick, target_velocity, velocity;
+    double wind_strength = 0, efficiency = 0;
     final EntityReference<IDeltaChunk> idcRef = new EntityReference<IDeltaChunk>();
 
     @Override
     public void setWorldObj(World w) {
         super.setWorldObj(w);
         idcRef.setWorld(w);
+        WindModel.activeModel.registerWindmillTileEntity(this);
     }
 
     @Override
@@ -53,25 +60,29 @@ public class TileEntityFluidMill extends TileEntityCommon implements IRotational
 
     @Override
     public boolean canConnect(ForgeDirection direction) {
-        return direction == this.outputDirection;
+        return direction == this.sailDirection.getOpposite();
     }
 
     @Override
     public double availableEnergy(ForgeDirection direction) {
-        if (direction != outputDirection) return 0;
-        return 0;
+        if (direction != sailDirection.getOpposite()) return 0;
+        return power_this_tick;
     }
 
     @Override
     public double takeEnergy(ForgeDirection direction, double maxPower) {
-        if (direction != outputDirection) return 0;
-        return 0;
+        if (direction != sailDirection.getOpposite()) return 0;
+        if (maxPower > power_this_tick) {
+            maxPower = power_this_tick;
+        }
+        power_this_tick -= maxPower;
+        return maxPower;
     }
 
     @Override
     public double getVelocity(ForgeDirection direction) {
-        if (direction != outputDirection) return 0;
-        return 0;
+        if (direction != sailDirection.getOpposite()) return 0;
+        return velocity;
     }
 
     @Override
@@ -84,6 +95,12 @@ public class TileEntityFluidMill extends TileEntityCommon implements IRotational
         }
         if (idcRef.trackedAndAlive()) return false;
         return super.removedByPlayer(player, willHarvest);
+    }
+
+    @Override
+    public void onPlacedBy(EntityPlayer player, ItemStack is, int side, float hitX, float hitY, float hitZ) {
+        super.onPlacedBy(player, is, side, hitX, hitY, hitZ);
+        sailDirection = ForgeDirection.getOrientation(side);
     }
 
     @Override
@@ -113,9 +130,15 @@ public class TileEntityFluidMill extends TileEntityCommon implements IRotational
     @Override
     public void putData(DataHelper data) throws IOException {
         mode = data.as(Share.VISIBLE, "millMode").putEnum(mode);
-        outputDirection = data.as(Share.VISIBLE, "outputDirection").putEnum(outputDirection);
+        sailDirection = data.as(Share.VISIBLE, "sailDirection").putEnum(sailDirection);
         dirty = data.as(Share.PRIVATE, "dirty").putBoolean(dirty);
         data.as(Share.PRIVATE, "idcRef").put(idcRef);
+        power_per_tick = data.as(Share.VISIBLE, "powerPerTick").putDouble(power_per_tick);
+        power_this_tick = data.as(Share.VISIBLE, "powerThisTick").putDouble(power_this_tick);
+        target_velocity = data.as(Share.VISIBLE, "targetVelocity").putDouble(target_velocity);
+        velocity = data.as(Share.VISIBLE, "velocity").putDouble(velocity);
+        wind_strength = data.as(Share.PRIVATE, "wind_strength").putDouble(wind_strength);
+        efficiency = data.as(Share.PRIVATE, "efficiency").putDouble(efficiency);
     }
 
     @Override
@@ -125,27 +148,33 @@ public class TileEntityFluidMill extends TileEntityCommon implements IRotational
     }
 
     static int channel_id = 100;
-    static final int MAX_OUT = 4;
-    static final int MAX_IN = 3;
-    static final int MAX_RADIUS = 5;
+    static final int MAX_OUT = 2;
+    static final int MAX_IN = 2;
+    static final int MAX_RADIUS = 6;
+
+    boolean working = false;
 
     @Override
-    public boolean activate(EntityPlayer player, ForgeDirection side) {
-        if (worldObj.isRemote) return false;
-        if (idcRef.trackedAndAlive()) {
-            new Notice(this, "fz.fluidmill.alreadyrunning").sendTo(player);
-            return true;
+    public void onNeighborTileChanged(int tilex, int tiley, int tilez) {
+        neighborChanged(null);
+    }
+
+    @Override
+    public void neighborChanged(Block neighbor) {
+        if (working) return;
+        if (idcRef.trackedAndAlive()) return;
+        working = true;
+        try {
+            trySpawnMill();
+        } finally {
+            working = false;
         }
-        ItemStack held = player.getHeldItem();
-        Block block = DataUtil.getBlock(held);
-        if (block == null) {
-            new Notice(this, "fz.fluidmill.type." + mode.name()).sendTo(player);
-            return true;
-        }
-        if (!(block instanceof BlockFence)) {
-            new Notice(this, "fz.fluidmill.nonfence").sendTo(player);
-            return true;
-        }
+    }
+
+    private boolean trySpawnMill() {
+        Coord fenceLocation = new Coord(this);
+        fenceLocation.adjust(sailDirection);
+        if (!isFenceish(fenceLocation)) return false;
         DeltaCoord idcSize = new DeltaCoord(MAX_RADIUS * 2, MAX_OUT + MAX_IN, MAX_RADIUS * 2);
         DeltaCoord offset = new DeltaCoord(MAX_RADIUS, MAX_OUT, MAX_RADIUS);
         IDeltaChunk idc = DeltaChunk.allocateSlice(worldObj, channel_id, idcSize);
@@ -153,29 +182,147 @@ public class TileEntityFluidMill extends TileEntityCommon implements IRotational
                 DeltaCapability.BLOCK_MINE,
                 DeltaCapability.INTERACT,
                 DeltaCapability.ROTATE,
-                DeltaCapability.DIE_WHEN_EMPTY);
+                DeltaCapability.DIE_WHEN_EMPTY,
+                DeltaCapability.REMOVE_ALL_ENTITIES);
         idc.forbid(DeltaCapability.COLLIDE_WITH_WORLD,
                 DeltaCapability.COLLIDE,
                 DeltaCapability.VIOLENT_COLLISIONS,
                 DeltaCapability.DRAG);
         idc.setRotationalCenterOffset(offset.toVector().addVector(0.5, 0.5, 0.5));
-        Coord at = new Coord(this);
-        final ForgeDirection normal = outputDirection.getOpposite();
-        at.add(normal);
-
-        FzOrientation fzo = FzOrientation.fromDirection(normal).getSwapped();
-        idc.setRotation(Quaternion.fromOrientation(fzo));
+        final ForgeDirection normal = sailDirection.getOpposite();
+        Coord at = new Coord(this).add(sailDirection);
         at.setAsEntityLocation(idc);
-        //idc.posX -= 0.5;
-        //idc.posZ -= 0.5;
-        Coord.iterateEmptyBox(idc.getCorner(), idc.getFarCorner(), new ICoordFunction() {
-            @Override
-            public void handle(Coord here) {
-                here.setId(Blocks.stone);
+        if (normal.offsetY == 0) {
+            Vec3 up = SpaceUtil.fromDirection(ForgeDirection.UP);
+            Vec3 vnorm = SpaceUtil.fromDirection(normal);
+            Vec3 axis = up.crossProduct(vnorm);
+            Quaternion rot = Quaternion.getRotationQuaternionRadians(-Math.PI / 2, axis);
+            idc.setRotation(rot);
+            idc.posY += 0.5;
+        } else {
+            double a = .5;
+            idc.posX += sailDirection.offsetX * a;
+            idc.posY += sailDirection.offsetY * a;
+            idc.posZ += sailDirection.offsetZ * a;
+            if (normal.offsetY == 1) {
+                idc.posY += 1;
             }
-        });
+        }
+        TransferLib.move(fenceLocation, idc.getCenter(), false /* We'll do it this way to synchronize them */, true);
+        fenceLocation.setAir();
         worldObj.spawnEntityInWorld(idc);
         idcRef.trackEntity(idc);
+        updateWindStrength(true);
         return true;
+    }
+
+    private boolean isFenceish(Coord fenceLocation) {
+        final Block block = fenceLocation.getBlock();
+        if (block instanceof BlockFence) return true;
+        if (block.getRenderType() == Blocks.fence.getRenderType()) return true;
+        if (block instanceof BlockWall) return true;
+        if (block.getRenderType() == Blocks.cobblestone_wall.getRenderType()) return true;
+        if (block instanceof BlockLog) return true;
+        if (block instanceof BlockCompressed) return true;
+        return false;
+    }
+
+    @Override
+    public boolean canUpdate() {
+        return FMLCommonHandler.instance().getEffectiveSide() == Side.SERVER;
+    }
+
+    @Override
+    public void updateEntity() {
+        if (worldObj.isRemote) return;
+        if (!idcRef.entityFound()) {
+            if (velocity != 0) {
+                velocity = 0;
+                broadcastMessage(null, getDescriptionPacket());
+            }
+            idcRef.getEntity();
+            return;
+        }
+        updateWindStrength(false);
+        power_this_tick = power_per_tick;
+        if (velocity != target_velocity) {
+            double error = target_velocity > velocity ? (velocity / target_velocity) : 1;
+            velocity = (velocity * 5 + target_velocity) / 6;
+            power_this_tick *= error;
+            if (error > 0.9999) {
+                velocity = target_velocity;
+            }
+            IDeltaChunk idc = idcRef.getEntity();
+            if (idc != null) {
+                idc.setRotationalVelocity(Quaternion.getRotationQuaternionRadians(velocity, sailDirection));
+            }
+            broadcastMessage(null, getDescriptionPacket());
+        }
+        if (!dirty) return;
+        if (worldObj.getTotalWorldTime() % 40 != 0) return;
+        calculate();
+    }
+
+    static double MAX_SPEED = IRotationalEnergySource.MAX_SPEED; // Maximum velocity (doesn't change power output)
+    static double V_SCALE = 0.1; // Scales down velocity (also doesn't change power output)
+    static double WIND_POWER_SCALE = 6; // Boosts the power output (and does not influence velocity)
+
+    void calculate() {
+        IDeltaChunk idc = idcRef.getEntity();
+        if (idc == null) return;
+        dirty = false;
+        int score = 0;
+        int asymetry = 0;
+        Coord center = idc.getCenter();
+        center.y -= MAX_IN;
+        int ys = MAX_IN + MAX_OUT;
+        int max_score = 1;
+        while (ys-- > 0) {
+            Symmetry symmetry = new Symmetry(center, MAX_RADIUS, ForgeDirection.UP);
+            symmetry.calculate();
+            score += symmetry.score;
+            asymetry += symmetry.asymetry;
+            center.y++;
+            max_score = symmetry.max_score;
+        }
+        int sum = score - asymetry * 3;
+        if (sum < 0) {
+            efficiency = 0;
+            return;
+        }
+        max_score /= 5;
+        if (sum > max_score) {
+            sum = max_score;
+        }
+        efficiency = sum / (double) max_score;
+        updatePowerPerTick();
+    }
+
+    void updatePowerPerTick() {
+        power_per_tick = efficiency * wind_strength;
+        if (power_this_tick < 0) power_this_tick = 0;
+        target_velocity = power_per_tick * V_SCALE;
+        if (target_velocity > MAX_SPEED) {
+            target_velocity = MAX_SPEED;
+        }
+        power_per_tick *= WIND_POWER_SCALE;
+    }
+
+    @Override
+    public int getWindmillRadius() {
+        return MAX_RADIUS;
+    }
+
+    @Override
+    public ForgeDirection getDirection() {
+        return sailDirection;
+    }
+
+    void updateWindStrength(boolean force) {
+        if (!force && worldObj.getTotalWorldTime() % 200 != 0) return;
+        Vec3 wind = WindModel.activeModel.getWindPower(worldObj, xCoord, yCoord, zCoord, this);
+        // TODO: Dot product or something to reverse the velocity
+        wind_strength = wind.lengthVector();
+        updatePowerPerTick();
     }
 }
