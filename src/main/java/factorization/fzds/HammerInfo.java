@@ -1,22 +1,19 @@
 package factorization.fzds;
 
-import java.io.File;
-import java.lang.annotation.Annotation;
-import java.util.HashMap;
-
-import factorization.shared.NORELEASE;
-import net.minecraft.world.World;
-import net.minecraft.world.WorldServer;
-import net.minecraftforge.common.config.ConfigCategory;
-import net.minecraftforge.common.config.Configuration;
-import net.minecraftforge.common.config.Property;
-import cpw.mods.fml.common.Mod;
 import cpw.mods.fml.common.Mod.EventHandler;
 import cpw.mods.fml.common.gameevent.TickEvent.Phase;
 import cpw.mods.fml.common.gameevent.TickEvent.ServerTickEvent;
 import factorization.api.Coord;
 import factorization.api.DeltaCoord;
 import factorization.shared.Core;
+import net.minecraft.world.World;
+import net.minecraft.world.WorldServer;
+import net.minecraftforge.common.config.ConfigCategory;
+import net.minecraftforge.common.config.Configuration;
+import net.minecraftforge.common.config.Property;
+
+import java.io.File;
+import java.util.HashMap;
 
 public class HammerInfo {
     static File worldConfigFile = null;
@@ -77,7 +74,6 @@ public class HammerInfo {
     
     public int makeChannelFor(String modName, String channelName, int default_channel_id, int padding, String comment) {
         DeltaChunk.assertEnabled();
-        NORELEASE.fixme("Uh, totally broken ID registration");
         if (padding < 0) {
             padding = defaultPadding;
         }
