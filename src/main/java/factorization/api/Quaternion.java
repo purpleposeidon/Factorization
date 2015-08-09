@@ -211,7 +211,11 @@ public class Quaternion implements IDataSerializable {
         y /= norm;
         z /= norm;
     }
-    
+
+    /**
+     * I think this is broken? Use Quaternion.fromOrientation
+     */
+    @Deprecated
     public static Quaternion getRotationQuaternion(FzOrientation orient) {
         return getRotationQuaternionRadians(Math.toRadians(orient.getRotation()*90), orient.facing);
     }
