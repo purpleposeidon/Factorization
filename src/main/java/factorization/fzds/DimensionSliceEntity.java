@@ -98,7 +98,7 @@ public class DimensionSliceEntity extends IDeltaChunk implements IFzdsEntryContr
     
     private void setCorners(Coord lowerCorner, Coord upperCorner) {
         if (lowerCorner.w != DeltaChunk.getWorld(worldObj)) {
-            if (!can(DeltaCapability.ORACLE) || lowerCorner.w != worldObj) {
+            if (!(can(DeltaCapability.ORACLE) && lowerCorner.w == worldObj)) {
                 throw new IllegalArgumentException("My corners are not shadow!");
             }
         }
