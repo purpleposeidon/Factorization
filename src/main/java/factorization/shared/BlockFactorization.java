@@ -313,9 +313,6 @@ public class BlockFactorization extends BlockContainer {
         //mechanics
         put(itemList, reg.hinge);
 
-        //redstone
-        put(itemList, reg.block_intake);
-
         //Barrels
         if (todaysBarrels != null) {
             itemList.addAll(todaysBarrels);
