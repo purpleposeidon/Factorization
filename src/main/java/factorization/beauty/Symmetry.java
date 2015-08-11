@@ -9,15 +9,16 @@ import net.minecraftforge.common.util.ForgeDirection;
 
 public class Symmetry {
     final Coord center;
-    final int radius;
+    final int max_radius;
     ForgeDirection normal, right, up;
 
     public int score = 0, asymetry = 0;
     public int max_score;
+    public double measured_radius = 1;
 
-    public Symmetry(Coord center, int radius, ForgeDirection normal) {
+    public Symmetry(Coord center, int max_radius, ForgeDirection normal) {
         this.center = center;
-        this.radius = radius;
+        this.max_radius = max_radius;
         this.normal = normal;
         score += scoreBlock(center);
         int normAxis = SpaceUtil.getAxis(normal);
@@ -32,7 +33,7 @@ public class Symmetry {
                 break;
             }
         }
-        this.max_score = (radius * radius * 4) * 1;
+        this.max_score = (max_radius * max_radius * 4) * 1;
         assert normal != null && right != null && up != null;
     }
 
@@ -53,28 +54,31 @@ public class Symmetry {
             dRight[i] = new DeltaCoord();
         }
 
-        for (int r = 1; r <= radius; r++) {
+        for (int r = 1; r <= max_radius; r++) {
             move(dRight, rights);
             for (int i = 0; i < 4; i++) {
                 dUp[i] = new DeltaCoord(dRight[i]);
             }
-            for (int y = 0; y <= radius; y++) {
+            for (int y = 0; y <= max_radius; y++) {
                 Block found = null;
                 boolean all_match = true;
-                int score = 0;
+                int spoke_score = 0;
                 for (int i = 0; i < 4; i++) {
                     final Coord spoke = center.add(dUp[i]);
                     Block peeked = spoke.getBlock();
+                    if (spoke.isSolid()) {
+                        measured_radius = Math.max(measured_radius, dUp[i].magnitude());
+                    }
                     if (found == null) {
                         found = peeked;
-                        score = scoreBlock(spoke);
+                        spoke_score = scoreBlock(spoke);
                     } else if (peeked != found) {
                         all_match = false;
                         break;
                     }
                 }
                 if (all_match) {
-                    score += score;
+                    score += spoke_score;
                 } else {
                     asymetry++;
                 }

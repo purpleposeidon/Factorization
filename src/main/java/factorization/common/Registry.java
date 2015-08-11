@@ -109,7 +109,7 @@ public class Registry {
             parasieve_item,
             compression_crafter_item,
             sap_generator_item, anthro_generator_item,
-            shaft_generator_item, steam_to_shaft, wooden_shaft, bibliogen, fluid_mill;
+            shaft_generator_item, steam_to_shaft, wooden_shaft, bibliogen, wind_mill, water_wheel;
     public ItemStack silver_ore_item, silver_block_item, lead_block_item,
             dark_iron_block_item;
     public ItemStack is_factory, is_lamp, is_lightair;
@@ -317,7 +317,8 @@ public class Registry {
         }
         if (DeltaChunk.enabled()) {
             hinge = FactoryType.HINGE.itemStack();
-            fluid_mill = FactoryType.FLUID_MILL_GEN.itemStack();
+            wind_mill = FactoryType.WIND_MILL_GEN.itemStack();
+            water_wheel = FactoryType.WATER_WHEEL_GEN.itemStack();
             //anchor = FactoryType.ANCHOR.itemStack();
         }
 
@@ -932,7 +933,7 @@ public class Registry {
                 'A', sulfuric_acid,
                 'L', Items.leather);
         if (DeltaChunk.enabled()) {
-            oreRecipe(fluid_mill,
+            oreRecipe(wind_mill,
                     "#I#",
                     "===",
                     "#I#",

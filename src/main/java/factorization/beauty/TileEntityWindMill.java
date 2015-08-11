@@ -13,12 +13,11 @@ import factorization.fzds.TransferLib;
 import factorization.fzds.interfaces.DeltaCapability;
 import factorization.fzds.interfaces.IDCController;
 import factorization.fzds.interfaces.IDeltaChunk;
-import factorization.shared.BlockClass;
-import factorization.shared.Core;
-import factorization.shared.EntityReference;
-import factorization.shared.TileEntityCommon;
+import factorization.shared.*;
+import factorization.util.FzUtil;
 import factorization.util.PlayerUtil;
 import factorization.util.SpaceUtil;
+import io.netty.buffer.ByteBuf;
 import net.minecraft.block.*;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
@@ -30,22 +29,22 @@ import net.minecraftforge.common.util.ForgeDirection;
 
 import java.io.IOException;
 
-public class TileEntityFluidMill extends TileEntityCommon implements IRotationalEnergySource, IDCController, IWindmill {
-    enum Mode {
-        BROKEN, WIND, WATER;
-    };
-    Mode mode = Mode.BROKEN;
+public class TileEntityWindMill extends TileEntityCommon implements IRotationalEnergySource, IDCController, IWindmill, IMeterInfo {
     ForgeDirection sailDirection = ForgeDirection.UP;
     boolean dirty = true;
     double power_per_tick, power_this_tick, target_velocity, velocity;
     double wind_strength = 0, efficiency = 0;
-    final EntityReference<IDeltaChunk> idcRef = new EntityReference<IDeltaChunk>();
+    double radius = 0;
+    final EntityReference<IDeltaChunk> idcRef = new EntityReference<IDeltaChunk>().whenFound(new IDCController.AutoControl(this));
 
     @Override
     public void setWorldObj(World w) {
         super.setWorldObj(w);
         idcRef.setWorld(w);
         WindModel.activeModel.registerWindmillTileEntity(this);
+        if (radius > 0) {
+            WindModel.activeModel.registerWindmillTileEntity(this);
+        }
     }
 
     @Override
@@ -55,7 +54,7 @@ public class TileEntityFluidMill extends TileEntityCommon implements IRotational
 
     @Override
     public FactoryType getFactoryType() {
-        return FactoryType.FLUID_MILL_GEN;
+        return FactoryType.WIND_MILL_GEN;
     }
 
     @Override
@@ -129,7 +128,6 @@ public class TileEntityFluidMill extends TileEntityCommon implements IRotational
 
     @Override
     public void putData(DataHelper data) throws IOException {
-        mode = data.as(Share.VISIBLE, "millMode").putEnum(mode);
         sailDirection = data.as(Share.VISIBLE, "sailDirection").putEnum(sailDirection);
         dirty = data.as(Share.PRIVATE, "dirty").putBoolean(dirty);
         data.as(Share.PRIVATE, "idcRef").put(idcRef);
@@ -139,6 +137,7 @@ public class TileEntityFluidMill extends TileEntityCommon implements IRotational
         velocity = data.as(Share.VISIBLE, "velocity").putDouble(velocity);
         wind_strength = data.as(Share.PRIVATE, "wind_strength").putDouble(wind_strength);
         efficiency = data.as(Share.PRIVATE, "efficiency").putDouble(efficiency);
+        radius = data.as(Share.PRIVATE, "radius").putDouble(radius);
     }
 
     @Override
@@ -169,6 +168,21 @@ public class TileEntityFluidMill extends TileEntityCommon implements IRotational
         } finally {
             working = false;
         }
+    }
+
+    @Override
+    public boolean handleMessageFromServer(NetworkFactorization.MessageType messageType, ByteBuf input) throws IOException {
+        if (super.handleMessageFromServer(messageType, input)) {
+            return true;
+        }
+        if (messageType == NetworkFactorization.MessageType.MillVelocity) {
+            velocity = input.readDouble();
+        }
+        return false;
+    }
+
+    void sendVelocity() {
+        broadcastMessage(null, NetworkFactorization.MessageType.MillVelocity, velocity);
     }
 
     private boolean trySpawnMill() {
@@ -213,6 +227,7 @@ public class TileEntityFluidMill extends TileEntityCommon implements IRotational
         worldObj.spawnEntityInWorld(idc);
         idcRef.trackEntity(idc);
         updateWindStrength(true);
+        idc.setPartName("Windmill");
         return true;
     }
 
@@ -238,7 +253,7 @@ public class TileEntityFluidMill extends TileEntityCommon implements IRotational
         if (!idcRef.entityFound()) {
             if (velocity != 0) {
                 velocity = 0;
-                broadcastMessage(null, getDescriptionPacket());
+                sendVelocity();
             }
             idcRef.getEntity();
             return;
@@ -256,14 +271,14 @@ public class TileEntityFluidMill extends TileEntityCommon implements IRotational
             if (idc != null) {
                 idc.setRotationalVelocity(Quaternion.getRotationQuaternionRadians(velocity, sailDirection));
             }
-            broadcastMessage(null, getDescriptionPacket());
+            sendVelocity();
         }
         if (!dirty) return;
         if (worldObj.getTotalWorldTime() % 40 != 0) return;
         calculate();
     }
 
-    static double MAX_SPEED = IRotationalEnergySource.MAX_SPEED; // Maximum velocity (doesn't change power output)
+    static double MAX_SPEED = IRotationalEnergySource.MAX_SPEED / 4; // Maximum velocity (doesn't change power output)
     static double V_SCALE = 0.1; // Scales down velocity (also doesn't change power output)
     static double WIND_POWER_SCALE = 6; // Boosts the power output (and does not influence velocity)
 
@@ -277,6 +292,7 @@ public class TileEntityFluidMill extends TileEntityCommon implements IRotational
         center.y -= MAX_IN;
         int ys = MAX_IN + MAX_OUT;
         int max_score = 1;
+        double new_radius = 0;
         while (ys-- > 0) {
             Symmetry symmetry = new Symmetry(center, MAX_RADIUS, ForgeDirection.UP);
             symmetry.calculate();
@@ -284,8 +300,18 @@ public class TileEntityFluidMill extends TileEntityCommon implements IRotational
             asymetry += symmetry.asymetry;
             center.y++;
             max_score = symmetry.max_score;
+            new_radius = Math.max(symmetry.measured_radius, new_radius);
         }
-        int sum = score - asymetry * 3;
+        if (radius != new_radius) {
+            if (radius != 0) {
+                WindModel.activeModel.deregisterWindmillTileEntity(this);
+            }
+            radius = new_radius;
+            if (radius != 0) {
+                WindModel.activeModel.registerWindmillTileEntity(this);
+            }
+        }
+        int sum = score - asymetry * 20;
         if (sum < 0) {
             efficiency = 0;
             return;
@@ -324,5 +350,23 @@ public class TileEntityFluidMill extends TileEntityCommon implements IRotational
         // TODO: Dot product or something to reverse the velocity
         wind_strength = wind.lengthVector();
         updatePowerPerTick();
+    }
+
+    @Override
+    public String getInfo() {
+        String speed;
+        if (velocity == 0) {
+            speed = "stopped";
+        } else {
+            double spr = 1 / (Math.toDegrees(velocity) * 20 / 360);
+            if (spr > 60) {
+                speed = (int) spr + " SPR";
+            } else {
+                speed = FzUtil.toRpm(velocity);
+            }
+        }
+        return "Efficiency: " + (int) (efficiency * 100) + "%" +
+                "\nWind: " + wind_strength +
+                "\nSpeed: " + speed;
     }
 }

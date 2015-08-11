@@ -29,14 +29,14 @@ import net.minecraft.item.ItemStack;
 
 public enum FactoryType {
     //Traced here is the history of Factorization.
-    //0 -- This used to be ROUTER
-    //1 -- This used to be CUTTER
-    //2 -- This used to be MAKER
+    //0 -- This used to be ROUTER, which is now servos
+    //1 -- This used to be CUTTER, which only existed for routers
+    //2 -- This used to be MAKER, which is now
     STAMPER(3, true, TileEntityStamper.class, "factory_stamper"), // Crafts a single item
     //4 -- This used to be QUEUE
     //5 -- This used to be BARREL
     LAMP(6, false, TileEntityWrathLamp.class, "factory_lamp"), //spawn a bunch of AIR blocks around and below
-    //7 -- this was the BlockDarkIron, which got moved.
+    //7 -- this was the BlockDarkIron, which got turned into a proper block
     PACKAGER(8, true, STAMPER.gui, TileEntityPackager.class, "factory_packager"), //crafts its input as a 3x3 or 2x2
     //9 -- This used to be SENTRYDEMON
     //10 -- This used to be WRATHFIRE
@@ -84,8 +84,9 @@ public enum FactoryType {
     SHAFT_GEN(52, false, TileEntityShaftGen.class, "factory_shaft_gen"),
     STEAM_SHAFT(53, false, TileEntitySteamShaft.class, "factory_steam_shaft"),
     SHAFT(54, false, TileEntityShaft.class, "factory_shaft"),
-    FLUID_MILL_GEN(55, false, TileEntityFluidMill.class, "factory_fluidmill"),
-    // BLOCK_INTAKE(56, false, TileEntityBlockIntake.class, "factory_blockintake"),
+    WIND_MILL_GEN(55, false, TileEntityWindMill.class, "factory_fluidmill" /* bad name to save a nice windmill */),
+    //56 -- The short-lived BLOCK_INTAKE; was an automatic block-breaker...
+    WATER_WHEEL_GEN(57, false, TileEntityWaterWheel.class, "factory_water_wheel"),
 
     POCKETCRAFTGUI(101, true),
     NONE(102, false)
@@ -103,7 +104,8 @@ public enum FactoryType {
             HINGE.disable();
             //ANCHOR.disable();
             ROCKETENGINE.disable();
-            FLUID_MILL_GEN.disable();
+            WIND_MILL_GEN.disable();
+            WATER_WHEEL_GEN.disable();
         }
     }
     

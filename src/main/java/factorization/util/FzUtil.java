@@ -14,6 +14,8 @@ import net.minecraft.entity.ai.attributes.ServersideAttributeMap;
 import net.minecraft.item.ItemStack;
 import net.minecraft.world.World;
 import net.minecraftforge.common.DimensionManager;
+import net.minecraftforge.common.util.ForgeDirection;
+
 import java.awt.*;
 import java.awt.datatransfer.StringSelection;
 import java.io.IOException;
@@ -100,6 +102,10 @@ public class FzUtil {
         TileEntityDayBarrel barrel = at.getTE(TileEntityDayBarrel.class);
         if (barrel == null) return null;
         return barrel.item;
+    }
+
+    public static String toRpm(double velocity) {
+        return (int) (Math.toDegrees(velocity) * 10 / 3) + " RPM";
     }
 
     // Enh, really belongs in NumUtil maybe?

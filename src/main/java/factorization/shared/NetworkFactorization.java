@@ -355,6 +355,7 @@ public class NetworkFactorization {
         GeneratorParticles,
         BoilerHeat,
         ShaftGenState,
+        MillVelocity,
         
         // Messages to entities; (true) marks that they are entity messages.
         servo_brief(true), servo_item(true), servo_complete(true), servo_stopped(true),

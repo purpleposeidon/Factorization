@@ -14,6 +14,7 @@ import factorization.shared.BlockClass;
 import factorization.shared.Core;
 import factorization.shared.NetworkFactorization;
 import factorization.shared.TileEntityCommon;
+import factorization.util.FzUtil;
 import factorization.util.NumUtil;
 import factorization.util.SpaceUtil;
 import io.netty.buffer.ByteBuf;
@@ -255,7 +256,7 @@ public class TileEntitySteamShaft extends TileEntityCommon implements IFluidHand
 
     @Override
     public String getInfo() {
-        return (int) (Math.toDegrees(getVelocity(ForgeDirection.UP)) * 10 / 3) + " RPM"
+        return FzUtil.toRpm(getVelocity(ForgeDirection.UP))
                 + "\nPower: " + (int) (velocity * 10)
                 + "\nSteam: " + steamTank.getFluidAmount() + "mB"
                 + (!Core.dev_environ ? "" :

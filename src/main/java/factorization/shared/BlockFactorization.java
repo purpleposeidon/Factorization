@@ -291,7 +291,8 @@ public class BlockFactorization extends BlockContainer {
             put(itemList, new ItemStack(reg.mirror));
         }
         put(itemList, reg.shaft_generator_item);
-        put(itemList, reg.fluid_mill);
+        put(itemList, reg.wind_mill);
+        put(itemList, reg.water_wheel);
         put(itemList, reg.steam_to_shaft);
         put(itemList, reg.heater_item);
         put(itemList, reg.leadwire_item);
