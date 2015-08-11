@@ -14,6 +14,7 @@ import net.minecraftforge.common.config.Property;
 
 import java.io.File;
 import java.util.HashMap;
+import java.util.Locale;
 
 public class HammerInfo {
     static File worldConfigFile = null;
@@ -82,7 +83,7 @@ public class HammerInfo {
         }
         Core.logFine("Allocating Hammer channel for %s: %s", modName, channelName);
         
-        String modCategory = ("hammerChannels." + modName + "." + channelName).toLowerCase();
+        String modCategory = ("hammerChannels." + modName + "." + channelName).toLowerCase(Locale.ROOT);
 
         boolean collision = false;
         int channel_id = default_channel_id;

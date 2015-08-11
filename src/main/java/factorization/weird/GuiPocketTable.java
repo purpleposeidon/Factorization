@@ -10,6 +10,8 @@ import factorization.common.Command;
 import factorization.common.FzConfig;
 import factorization.shared.Core;
 
+import java.util.Locale;
+
 public class GuiPocketTable extends GuiContainer {
     public ContainerPocket containerPocket;
 
@@ -66,7 +68,7 @@ public class GuiPocketTable extends GuiContainer {
             super.keyTyped(key, par2);
             return;
         }
-        char my_key = ("" + key).toLowerCase().charAt(0);
+        char my_key = ("" + key).toLowerCase(Locale.ROOT).charAt(0);
         // 'x' clears items out of the way. Fill inv, then bag (and make slurp
         // sound). [XXX TODO -- Doing this server-friendly'd require a packet or
         // something]

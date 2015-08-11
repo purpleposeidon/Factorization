@@ -1,10 +1,7 @@
 package factorization.fzds;
 
 import java.lang.ref.WeakReference;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
+import java.util.*;
 import java.util.Map.Entry;
 
 import factorization.util.PlayerUtil;
@@ -781,7 +778,7 @@ public class FZDSCommand extends CommandBase {
                 ForgeDirection dir;
                 try {
                     if (args.length == 2) {
-                        dir = ForgeDirection.valueOf(args[1].toUpperCase());
+                        dir = ForgeDirection.valueOf(args[1].toUpperCase(Locale.ROOT));
                     } else {
                         dir = ForgeDirection.UP;
                     }

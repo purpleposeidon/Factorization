@@ -1,6 +1,7 @@
 package factorization.servo;
 
 import java.util.Arrays;
+import java.util.Locale;
 
 import org.lwjgl.opengl.GL11;
 
@@ -128,7 +129,7 @@ public class BlockRenderServoRail extends FactorizationBlockRender {
     public static void registerColoredIcons(IIconRegister reg) {
         for (int i = 0; i < FzColor.VALID_COLORS.length; i++) {
             FzColor color = FzColor.VALID_COLORS[i];
-            coloredRails[i] = reg.registerIcon("factorization:servo/colored_rails/" + color.toString().toLowerCase());
+            coloredRails[i] = reg.registerIcon("factorization:servo/colored_rails/" + color.toString().toLowerCase(Locale.ROOT));
         }
     }
 }

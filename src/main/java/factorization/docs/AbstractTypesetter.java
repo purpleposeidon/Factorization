@@ -1,6 +1,7 @@
 package factorization.docs;
 
 import java.util.ArrayList;
+import java.util.Locale;
 
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.util.EnumChatFormatting;
@@ -85,7 +86,7 @@ public abstract class AbstractTypesetter {
                 process(token, link, style);
                 break;
             case COMMAND:
-                final String cmd = token.toLowerCase();
+                final String cmd = token.toLowerCase(Locale.ROOT);
                 if (cmd.equals("\\include")) {
                     String name = getParameter(cmd, tokenizer);
                     if (name == null) {

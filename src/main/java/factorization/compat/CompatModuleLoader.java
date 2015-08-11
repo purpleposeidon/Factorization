@@ -7,6 +7,7 @@ import cpw.mods.fml.common.event.FMLPreInitializationEvent;
 import factorization.shared.Core;
 
 import java.util.ArrayList;
+import java.util.Locale;
 
 public class CompatModuleLoader extends CompatBase {
     ArrayList<CompatBase> modules = new ArrayList<CompatBase>();
@@ -22,7 +23,7 @@ public class CompatModuleLoader extends CompatBase {
                 continue;
             }
             try {
-                String name = base_name + mod.toLowerCase() + ".Compat_" + mod;
+                String name = base_name + mod.toLowerCase(Locale.ROOT) + ".Compat_" + mod;
                 Class<? extends CompatBase> compatClass = (Class<? extends CompatBase>) cl.loadClass(name);
                 modules.add(compatClass.newInstance());
             } catch (Throwable e) {
