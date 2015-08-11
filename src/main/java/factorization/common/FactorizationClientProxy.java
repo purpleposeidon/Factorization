@@ -213,6 +213,8 @@ public class FactorizationClientProxy extends FactorizationProxy {
         new BlockRenderShaftGen();
         new BlockRenderShaft();
         new BlockRenderBiblioGen();
+        new BlockRenderWindMill();
+        new BlockRenderWaterWheel();
         for (FactoryType ft : new FactoryType[] {
                 FactoryType.SOCKET_EMPTY,
                 FactoryType.SOCKET_LACERATOR,

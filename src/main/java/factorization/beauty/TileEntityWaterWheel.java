@@ -99,6 +99,9 @@ public class TileEntityWaterWheel extends TileEntityCommon implements IRotationa
     public void onPlacedBy(EntityPlayer player, ItemStack is, int side, float hitX, float hitY, float hitZ) {
         super.onPlacedBy(player, is, side, hitX, hitY, hitZ);
         wheelDirection = ForgeDirection.getOrientation(side);
+        if (wheelDirection.offsetY != 0) {
+            wheelDirection = ForgeDirection.getOrientation(SpaceUtil.determineFlatOrientation(player)).getOpposite();
+        }
     }
 
     @Override
