@@ -21,6 +21,7 @@ public class BlockRenderWindMill extends FactorizationBlockRender {
         }
         BlockRenderHelper block = BlockRenderHelper.instance;
         IIcon i = BlockIcons.beauty$wind_side;
+        block.setBlockBounds(0, 0, 0, 1, 1, 1);
         block.useTextures(BlockIcons.beauty$wind_bottom, BlockIcons.beauty$wind_top, i, i, i, i);
         if (world_mode) {
             FzOrientation fzo = FzOrientation.fromDirection(out);

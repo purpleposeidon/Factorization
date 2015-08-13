@@ -21,6 +21,7 @@ public class BlockRenderWaterWheel extends FactorizationBlockRender {
         }
         BlockRenderHelper block = BlockRenderHelper.instance;
         IIcon i = BlockIcons.beauty$water_side;
+        block.setBlockBounds(0, 0, 0, 1, 1, 1);
         block.useTextures(BlockIcons.beauty$water_bottom, BlockIcons.beauty$water_top, i, i, i, i);
         if (world_mode) {
             FzOrientation fzo = FzOrientation.fromDirection(out);
