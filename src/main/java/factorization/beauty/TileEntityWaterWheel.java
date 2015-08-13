@@ -10,10 +10,7 @@ import factorization.fzds.DeltaChunk;
 import factorization.fzds.TransferLib;
 import factorization.fzds.interfaces.DeltaCapability;
 import factorization.fzds.interfaces.IDeltaChunk;
-import factorization.shared.BlockClass;
-import factorization.shared.EntityReference;
-import factorization.shared.NetworkFactorization;
-import factorization.shared.TileEntityCommon;
+import factorization.shared.*;
 import factorization.util.FzUtil;
 import factorization.util.NumUtil;
 import factorization.util.PlayerUtil;
@@ -255,8 +252,8 @@ public class TileEntityWaterWheel extends TileEntityCommon implements IRotationa
     }
 
     static double MAX_SPEED = IRotationalEnergySource.MAX_SPEED / 4; // Maximum velocity (doesn't change power output)
-    static double V_SCALE = 0.01; // Scales down velocity (also doesn't change power output)
-    static double WATER_POWER_SCALE = 6; // Boosts the power output (and does not influence velocity)
+    static double V_SCALE = 0.001; // Scales down velocity (also doesn't change power output)
+    static double WATER_POWER_SCALE = 1.0 / 200.0; // Boosts the power output (and does not influence velocity)
     static double riverFlow = 1.0 / Math.sqrt(2); // Water in river biome is considered to have a 'flow' of riverFlow * Vec3(1, 0, 1); same power as diagonally flowing water
     static double oceanFlow = riverFlow / 8; // And a similar case for oceans
     static int sea_level_range_min = -4; // non-flowing blocks within river/ocean biomes, but outside of this range, do not flow
@@ -287,13 +284,17 @@ public class TileEntityWaterWheel extends TileEntityCommon implements IRotationa
                 speed = FzUtil.toRpm(velocity);
             }
         }
-        return "Water: " + water_strength +
+        return "Water power: " + (int) Math.abs(water_strength * 10) +
                 "\nSpeed: " + speed;
     }
 
     void calculateWaterForce() {
         final IDeltaChunk idc = idcRef.getEntity();
-        if (idc == null) return;
+        if (idc == null || getCoord().isWeaklyPowered()) {
+            water_strength = 0;
+            updatePowerPerTick();
+            return;
+        }
         non_air_block_count = 0;
         // Overworld: Require river biome + sealevel or flowing blocks, & wood
         // Nether: Require flowing lava & metal blocks
@@ -356,8 +357,10 @@ public class TileEntityWaterWheel extends TileEntityCommon implements IRotationa
         };
         Coord.iterateCube(idc.getCorner(), idc.getFarCorner(), measure);
         ForgeDirection a = this.wheelDirection;
-        if (SpaceUtil.sign(a) == -1) a = a.getOpposite();
-        SpaceUtil.incrComponentMultiply(water_force, SpaceUtil.fromDirection(a));
+        if (SpaceUtil.sign(a) == +1) a = a.getOpposite();
+        Vec3 mask = SpaceUtil.fromDirection(a);
+        SpaceUtil.incrAdd(mask, Vec3.createVectorHelper(1, 1, 1));
+        SpaceUtil.incrComponentMultiply(water_force, mask);
         water_strength = SpaceUtil.sum(water_force);
 
         updatePowerPerTick();
