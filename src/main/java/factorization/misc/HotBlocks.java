@@ -151,6 +151,9 @@ public class HotBlocks {
         if (ForgeHooks.canToolHarvestBlock(block, md, real_player.getHeldItem())) {
             return;
         }
+        if (block.getItemDropped(md, thePlayer.worldObj.rand, 0) != DataUtil.getItem(block)) {
+            return;
+        }
         event.setCanceled(true);
         ItemStack tool = new ItemStack(Items.diamond_pickaxe);
         tool.setItemDamage(tool.getMaxDamage());
