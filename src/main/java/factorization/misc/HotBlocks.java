@@ -6,14 +6,15 @@ import factorization.api.Coord;
 import factorization.common.FzConfig;
 import factorization.util.DataUtil;
 import factorization.util.FzUtil;
+import factorization.util.ItemUtil;
 import factorization.util.PlayerUtil;
 import net.minecraft.block.Block;
 import net.minecraft.enchantment.Enchantment;
-import net.minecraft.entity.Entity;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.init.Items;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.world.World;
@@ -23,6 +24,7 @@ import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.event.world.BlockEvent;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.WeakHashMap;
 
@@ -32,13 +34,15 @@ public class HotBlocks {
 
     private static class HotBlock {
         final int w, x, y, z, idmd;
+        final ItemStack orig;
 
-        private HotBlock(int w, int x, int y, int z, int idmd) {
+        private HotBlock(int w, int x, int y, int z, int idmd, ItemStack orig) {
             this.w = w;
             this.x = x;
             this.y = y;
             this.z = z;
             this.idmd = idmd;
+            this.orig = orig;
         }
     }
 
@@ -48,8 +52,16 @@ public class HotBlocks {
 
     WeakHashMap<EntityPlayer, ArrayList<HotBlock>> hots = new WeakHashMap<EntityPlayer, ArrayList<HotBlock>>();
 
+    private static ItemStack toItem(Block b, World w, int x, int y, int z, int md) {
+        for (ItemStack is : b.getDrops(w, x, y, z, md, 0)) {
+            return is;
+        }
+        return null;
+    }
+
     @SubscribeEvent(priority = EventPriority.LOWEST) // Act after any cancellations
     public void heatBlock(BlockEvent.PlaceEvent event) {
+        if (event.player == null || event.player.isSneaking()) return;
         if (event.player instanceof FakePlayer) return;
         if (event.block.getBlockHardness(event.world, event.x, event.y, event.z) <= 0F) return;
         if (PlayerUtil.isPlayerCreative(event.player)) return;
@@ -60,8 +72,9 @@ public class HotBlocks {
         } else {
             coords = hots.get(event.player);
         }
+        int md = event.world.getBlockMetadata(event.x, event.y, event.z); // Notable for NOT being the same as event.blockMetadata for Railcraft quarried stone! :|
         int idmd = (DataUtil.getId(event.block) << 4) /*+ event.blockMetadata*/;
-        coords.add(new HotBlock(FzUtil.getWorldDimension(event.world), event.x, event.y, event.z, idmd));
+        coords.add(new HotBlock(FzUtil.getWorldDimension(event.world), event.x, event.y, event.z, idmd, toItem(event.block, event.world, event.x, event.y, event.z, md)));
         if (coords.size() > HOT_BLOCK_COUNT) {
             coords.remove(0);
         }
@@ -81,6 +94,21 @@ public class HotBlocks {
         }
     }
 
+    private HashMap<Integer, Long> playerBreakage = new HashMap<Integer, Long>();
+    private boolean stillBusy(EntityPlayer player) {
+        Integer code = player.hashCode();
+        Long last = playerBreakage.get(code);
+        if (last == null) last = -1000L;
+        final long end = player.worldObj.getTotalWorldTime() + 8;
+        return last > end;
+    }
+
+    private void markBusy(EntityPlayer player) {
+        Integer code = player.hashCode();
+        playerBreakage.put(code, player.worldObj.getTotalWorldTime());
+    }
+
+
     private void determineBreakSpeed(PlayerEvent.BreakSpeed event) {
         final int y = event.y;
         if (y == -1) return; // Event specifies that 'y' might be -1 for unknown usage?
@@ -88,13 +116,19 @@ public class HotBlocks {
         final int md = event.metadata;
         final int x = event.x;
         final int z = event.z;
+        final EntityPlayer player = event.entityPlayer;
+        if (stillBusy(player)) return;
         if (!isHot(event, x, y, z, block, md)) return;
         // Duplicate logic to figure out what the *actual* break speed will be, so that we don't make this actual break speed too fast
-        final EntityPlayer player = event.entityPlayer;
         float hardness = block.getBlockHardness(player.worldObj, x, y, z);
         if (hardness < 0.0F) {
             // Block is invulnerable
             return;
+        }
+        String heldName = DataUtil.getName(player.getHeldItem());
+        if (heldName == null) heldName = "";
+        if (heldName.startsWith("TConstruct:")) {
+            return; // avoid warp-speed issues
         }
         final float harvestingSpeed = ForgeHooks.canHarvestBlock(block, player, md) ? 30F : 100F;
         final float max_true_speed = block.hasTileEntity(md) ? MAX_TRUE_SPEED_TILEENTITY : MAX_TRUE_SPEED_STANDARD;
@@ -125,6 +159,7 @@ public class HotBlocks {
     @SubscribeEvent(priority = EventPriority.HIGH) // Cancel before most things, but permission-handlers can cancel before us
     public void playerRemovedBlock(BlockEvent.BreakEvent event) {
         EntityPlayer thePlayer = event.getPlayer();
+        markBusy(thePlayer);
         ArrayList<HotBlock> coords = hots.get(thePlayer);
         if (coords == null) return;
         HotBlock heat = null;
@@ -147,15 +182,30 @@ public class HotBlocks {
         if (heat == null || !(thePlayer instanceof EntityPlayerMP)) {
             return;
         }
+        if (!ItemUtil.identical(heat.orig, toItem(block, w, x, y, z, md))) {
+            return;
+        }
         EntityPlayerMP real_player = (EntityPlayerMP) thePlayer;
-        if (ForgeHooks.canToolHarvestBlock(block, md, real_player.getHeldItem())) {
+        final ItemStack heldItem = real_player.getHeldItem();
+        String heldName = DataUtil.getName(heldItem);
+        if (heldName == null) heldName = "";
+        if (heldName.startsWith("TConstruct:")) {
+            return; // avoid warp-speed issues
+        }
+        if (ForgeHooks.canToolHarvestBlock(block, md, heldItem)) {
             return;
         }
         if (block.getItemDropped(md, thePlayer.worldObj.rand, 0) != DataUtil.getItem(block)) {
-            return;
+            if (!real_player.isSneaking()) {
+                return;
+            }
         }
+        String harvestTool = block.getHarvestTool(md);
+        int harvestLevel = block.getHarvestLevel(md);
+        Item harvester = findAppropriateTool(harvestTool, harvestLevel);
+        if (harvester == null) return;
         event.setCanceled(true);
-        ItemStack tool = new ItemStack(Items.diamond_pickaxe);
+        ItemStack tool = new ItemStack(harvester);
         tool.setItemDamage(tool.getMaxDamage());
         tool.addEnchantment(Enchantment.silkTouch, 1);
         tool.stackSize = 0;
@@ -186,6 +236,33 @@ public class HotBlocks {
             }
         }
         PlayerUtil.recycleFakePlayer(fake_player);
+    }
+
+
+    private final HashMap<String, Item> cache = new HashMap<String, Item>();
+    private Item findAppropriateTool(String tool, int level) {
+        if (tool == null && level == -1) {
+            return Items.diamond_pickaxe;
+        }
+        String name = tool + "#" + level;
+        Item ret = cache.get(name);
+        if (ret != null) {
+            return ret;
+        }
+        if (cache.containsKey(name)) return null;
+        for (Object obj : Item.itemRegistry) {
+            Item item = (Item) obj;
+            final ItemStack dummy = new ItemStack(item);
+            if (item.getToolClasses(dummy).contains(tool)) {
+                if (item.getHarvestLevel(dummy, tool) >= level) {
+                    cache.put(name, item);
+                    return item;
+                }
+            }
+        }
+        cache.put(name, null);
+        return null;
+
     }
 
 }

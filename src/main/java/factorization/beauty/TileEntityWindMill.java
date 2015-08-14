@@ -280,7 +280,7 @@ public class TileEntityWindMill extends TileEntityCommon implements IRotationalE
 
     static double MAX_SPEED = IRotationalEnergySource.MAX_SPEED / 4; // Maximum velocity (doesn't change power output)
     static double V_SCALE = 0.1; // Scales down velocity (also doesn't change power output)
-    static double WIND_POWER_SCALE = 6; // Boosts the power output (and does not influence velocity)
+    static double WIND_POWER_SCALE = 1.0 / 10.0; // Boosts the power output (and does not influence velocity)
 
     void calculate() {
         IDeltaChunk idc = idcRef.getEntity();
@@ -346,6 +346,11 @@ public class TileEntityWindMill extends TileEntityCommon implements IRotationalE
 
     void updateWindStrength(boolean force) {
         if (!force && worldObj.getTotalWorldTime() % 200 != 0) return;
+        if (getCoord().isWeaklyPowered()) {
+            wind_strength = 0;
+            updatePowerPerTick();
+            return;
+        }
         Vec3 wind = WindModel.activeModel.getWindPower(worldObj, xCoord, yCoord, zCoord, this);
         // TODO: Dot product or something to reverse the velocity
         wind_strength = wind.lengthVector();
