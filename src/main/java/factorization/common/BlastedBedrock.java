@@ -4,6 +4,7 @@ import factorization.shared.Core;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.entity.Entity;
+import net.minecraft.init.Blocks;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.world.Explosion;
@@ -44,5 +45,15 @@ public class BlastedBedrock extends Block {
     @Override
     public void onBlockExploded(World world, int x, int y, int z, Explosion explosion) {
         // Not explodable!
+    }
+
+    @Override
+    public boolean isAssociatedBlock(Block block) {
+        return block == Blocks.bedrock || block == this;
+    }
+
+    @Override
+    public boolean isReplaceableOreGen(World world, int x, int y, int z, Block target) {
+        return target == Blocks.bedrock || target == this;
     }
 }
