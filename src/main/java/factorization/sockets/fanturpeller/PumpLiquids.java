@@ -87,12 +87,12 @@ public class PumpLiquids extends SocketFanturpeller implements IFluidHandler {
     public boolean canDrain(ForgeDirection from, Fluid fluid) {
         return false;
     }
-
-    private FluidTankInfo[] tank_info = new FluidTankInfo[] { new FluidTankInfo(buffer) };
     
     @Override
     public FluidTankInfo[] getTankInfo(ForgeDirection from) {
-        if (from == facing.getOpposite()) return tank_info;
+        if (from == facing.getOpposite()) {
+            return new FluidTankInfo[] { new FluidTankInfo(buffer), new FluidTankInfo(auxBuffer) };
+        }
         return no_info;
     }
     
@@ -536,6 +536,9 @@ public class PumpLiquids extends SocketFanturpeller implements IFluidHandler {
                 destinationAction = null;
             }
             coord.adjust(facing.getOpposite());
+        }
+        if (buffer.getFluidAmount() == 0 && auxBuffer.getFluidAmount() > 0) {
+            FluidUtil.transfer(buffer, auxBuffer);
         }
         if (!shouldDoWork()) {
             updateDestination(coord, onServo);
