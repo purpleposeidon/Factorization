@@ -47,8 +47,8 @@ public class HotBlocks {
     }
 
     public static int HOT_BLOCK_COUNT = 5;
-    public static float MAX_TRUE_SPEED_STANDARD = 0.25F;
-    public static float MAX_TRUE_SPEED_TILEENTITY = 0.125F;
+    public static float MAX_TRUE_SPEED_STANDARD = 0.25F / 2;
+    public static float MAX_TRUE_SPEED_TILEENTITY = 0.125F / 2;
 
     WeakHashMap<EntityPlayer, ArrayList<HotBlock>> hots = new WeakHashMap<EntityPlayer, ArrayList<HotBlock>>();
 
