@@ -537,7 +537,7 @@ public class PumpLiquids extends SocketFanturpeller implements IFluidHandler {
             }
             coord.adjust(facing.getOpposite());
         }
-        if (buffer.getFluidAmount() == 0 && auxBuffer.getFluidAmount() > 0) {
+        if (auxBuffer.getFluidAmount() > 0) {
             FluidUtil.transfer(buffer, auxBuffer);
         }
         if (!shouldDoWork()) {
