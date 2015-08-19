@@ -196,7 +196,7 @@ public class HotBlocks {
             return;
         }
         if (block.getItemDropped(md, thePlayer.worldObj.rand, 0) != DataUtil.getItem(block)) {
-            if (!real_player.isSneaking()) {
+            if (!real_player.isSneaking() && block.getBlockHardness(w, x, y, z) < 1) {
                 return;
             }
         }
