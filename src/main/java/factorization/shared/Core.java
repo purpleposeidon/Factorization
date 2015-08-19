@@ -114,7 +114,10 @@ public class Core {
 
     static public boolean serverStarted = false;
 
+    private static boolean checked = false;
     public static void checkJar() {
+        if (checked) return;
+        checked = true;
         // Apparently some people somehow manage to get "Factorization.jar.zip", which somehow breaks the coremod.
         if (Core.dev_environ) {
             Core.logSevere("Dev environ; skipping jar check.");
