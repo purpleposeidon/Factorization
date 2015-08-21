@@ -136,11 +136,20 @@ public class ClientTypesetter extends AbstractTypesetter {
                     emitWord(new ItemWord(theItems, link));
                 }
             }
-        } else if (cmd.equals("\\img")) {
+        } else if (cmd.equals("\\img") || cmd.equals("\\img%")) {
             String imgName = getParameter(cmd, tokenizer);
             if (imgName == null) {
                 error("No img specified");
                 return;
+            }
+            double scale = 1;
+            if (cmd.equals("\\img%")) {
+                String scaleStr = getParameter(cmd, tokenizer);
+                if (scaleStr == null) {
+                    error("No scale specified");
+                    return;
+                }
+                scale = Double.parseDouble(scaleStr); // exception's fine
             }
             ResourceLocation rl = new ResourceLocation(imgName);
             Minecraft mc = Minecraft.getMinecraft();
@@ -155,7 +164,10 @@ public class ClientTypesetter extends AbstractTypesetter {
                 e.printStackTrace();
                 return;
             }
-            emitWord(new ImgWord(rl, link));
+            ImgWord word = new ImgWord(rl, link);
+            word.scale(scale);
+            word.fitToPage(pageWidth, pageHeight);
+            emitWord(word);
         } else if (cmd.equals("\\imgx")) {
             int width = Integer.parseInt(getParameter(cmd, tokenizer));
             int height = Integer.parseInt(getParameter(cmd, tokenizer));
@@ -263,9 +275,22 @@ public class ClientTypesetter extends AbstractTypesetter {
             String height_ = getParameter(cmd, tokenizer);
             if (height_ == null) {
                 error("\\vpad missing parameter");
+                return;
             }
             int height = Integer.parseInt(height_);
             emitWord(new VerticalSpacerWord(height));
+        } else if (cmd.equals("\\url")) {
+            String uriLink = getParameter(cmd, tokenizer);
+            if (uriLink == null) {
+                error("\\url missing parameter: uriLink");
+                return;
+            }
+            String content = getParameter(cmd, tokenizer);
+            if (content == null) {
+                error("\\url missing parameter: content");
+                return;
+            }
+            emitWord(new URIWord(content, uriLink));
         } else if (cmd.equals("\\ifhtml")) {
             String trueBranch = getParameter(cmd, tokenizer);
             String falseBranch = getParameter(cmd, tokenizer);

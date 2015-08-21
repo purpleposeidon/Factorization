@@ -199,6 +199,10 @@ public class HtmlConversionTypesetter extends AbstractTypesetter {
             getParameter(cmd, tokenizer);
         } else if (cmd.equals("\\-")) {
             s("<br> •", null);
+        } else if (cmd.equals("\\url")) {
+            String url = getParameter(cmd, tokenizer);
+            String content = getParameter(cmd, tokenizer);
+            process(content, url, style);
         } else {
             error("Unknown command: ");
             emit(cmd, null);
@@ -206,7 +210,13 @@ public class HtmlConversionTypesetter extends AbstractTypesetter {
     }
 
     void s(String s, String link) {
+        if (link != null) {
+            out.print("<a href=\"" + link + "\">");
+        }
         out.print(s);
+        if (link != null) {
+            out.print("</a>");
+        }
     }
 
     static String esc(String s) {

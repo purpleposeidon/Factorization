@@ -30,4 +30,8 @@ public abstract class Word {
         }
         return color;
     }
+
+    public boolean onClick() {
+        return false;
+    }
 }

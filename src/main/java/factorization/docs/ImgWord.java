@@ -1,10 +1,21 @@
 package factorization.docs;
 
+import factorization.util.FzUtil;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.renderer.Tessellator;
+import net.minecraft.client.resources.IResource;
+import net.minecraft.client.resources.IResourceManager;
 import net.minecraft.util.ResourceLocation;
 
+import org.apache.commons.lang3.tuple.Pair;
 import org.lwjgl.opengl.GL11;
+
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.HashMap;
 
 public class ImgWord extends Word {
     final ResourceLocation resource;
@@ -12,12 +23,18 @@ public class ImgWord extends Word {
     public ImgWord(ResourceLocation resource, String hyperlink) {
         super(hyperlink);
         this.resource = resource;
+        autosize();
     }
-    
+
     public ImgWord(ResourceLocation resource, String hyperlink, int width, int height) {
         this(resource, hyperlink);
         this.width = width;
         this.height = height;
+    }
+
+    public void scale(double scale) {
+        width *= scale;
+        height *= scale;
     }
 
     @Override
@@ -31,9 +48,14 @@ public class ImgWord extends Word {
     }
 
     @Override
+    public int getPaddingBelow() {
+        return height - getPaddingAbove();
+    }
+
+    @Override
     public int draw(DocViewer doc, int x, int y, boolean hover) {
         int z = 0;
-        doc.mc.renderEngine.bindTexture(resource);
+        doc.mc.renderEngine.bindTexture(resource); // memleak goes here! :|
         Tessellator tess = new Tessellator();
         GL11.glColor4f(1, 1, 1, 1);
         tess.startDrawingQuads();
@@ -45,4 +67,44 @@ public class ImgWord extends Word {
         return 16;
     }
 
+    private static final HashMap<ResourceLocation, Pair<Integer, Integer>> size_cache = new HashMap<ResourceLocation, Pair<Integer, Integer>>();
+
+    private void autosize() {
+        Pair<Integer, Integer> cached = size_cache.get(resource);
+        if (cached != null) {
+            width = cached.getLeft();
+            height = cached.getRight();
+            return;
+        }
+
+        IResourceManager resourceManager = Minecraft.getMinecraft().getResourceManager();
+        IResource iresource = null;
+        InputStream is = null;
+        try {
+            iresource = resourceManager.getResource(resource);
+            is = iresource.getInputStream();
+            BufferedImage bufferedimage = ImageIO.read(is);
+            this.width = bufferedimage.getWidth();
+            this.height = bufferedimage.getHeight();
+            size_cache.put(resource, Pair.of(width, height));
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            FzUtil.closeNoisily("reading size of image", is);
+        }
+    }
+
+    public void fitToPage(int pageWidth, int pageHeight) {
+        double s = 1.0;
+        if (width > pageWidth) {
+            s = pageWidth / (double) width;
+        }
+        if (height > pageHeight) {
+            double h = pageHeight / (double) height;
+            if (h < s) {
+                s = h;
+            }
+        }
+        scale(s);
+    }
 }
