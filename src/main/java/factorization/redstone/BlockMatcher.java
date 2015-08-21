@@ -3,6 +3,7 @@ package factorization.redstone;
 import factorization.api.Coord;
 import factorization.common.BlockIcons;
 import factorization.shared.Core;
+import factorization.shared.NORELEASE;
 import factorization.util.SpaceUtil;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
@@ -102,10 +103,15 @@ public class BlockMatcher extends Block {
         byte state = getState(md);
         if (state == STATE_READY) {
             world.scheduleBlockUpdate(x, y, z, this, 2);
+            NORELEASE.println("neighbor changed; update scheduled");
         } else if (state == STATE_WAIT) {
             ForgeDirection axis = getAxis(md);
             byte match = match(world, x, y, z, axis);
-            if (match >= 3) return;
+            world.func_147453_f(x, y, z, this);
+            if (match >= 3) {
+                return;
+            }
+            NORELEASE.println("neighbor changed", state, "-->", STATE_READY);
             world.setBlockMetadataWithNotify(x, y, z, makeMd(axis, STATE_READY), 0);
         }
     }
@@ -141,15 +147,26 @@ public class BlockMatcher extends Block {
             nextState = STATE_WAIT;
             world.scheduleBlockUpdate(x, y, z, this, 2);
         } else {
+            NORELEASE.println("update tick ignored");
             return;
         }
         int nextMd = makeMd(getAxis(md), nextState);
+        NORELEASE.println("update tick", state, "-->", nextState);
         world.setBlockMetadataWithNotify(x, y, z, nextMd, notify);
     }
 
     @Override
     public int onBlockPlaced(World w, int x, int y, int z, int side, float hitX, float hitY, float hitZ, int itemMetadata) {
         return makeMd(ForgeDirection.getOrientation(side), STATE_READY);
+    }
+
+    @Override
+    public void onBlockAdded(World world, int x, int y, int z) {
+        int md = world.getBlockMetadata(x, y, z);
+        byte state = getState(md);
+        if (state == STATE_READY) return;
+        ForgeDirection axis = getAxis(md);
+        world.setBlockMetadataWithNotify(x, y, z, makeMd(axis, STATE_READY), 0);
     }
 
     @Override
