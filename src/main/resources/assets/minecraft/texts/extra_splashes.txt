@@ -8,14 +8,13 @@ Sculpt!
 Pocket crafting!
 Please report bugs!
 FZ barrels are best barrels!
-With strange aeons, even death may die!
+Even death may die!
 A dream within a dream!
-Self-reference!
 Contains itself!
 Exclamations!
 Proclamations!
 Crenelations!
-Bad unicode rendering!
+Ugly unicode rendering!
 May contain mods!
 Sneaky endermen!
 Scary spiders!
@@ -26,8 +25,7 @@ Nasty witches!
 Hacky coremods!
 Whoo, Patreon!
 Buggy!
-BEES!
-BEEEEEEEEEES!
+BEEEES!
 Visit the Twilight Forest!
 Try IC2 liquid-cooled nuclear reactors!
 Trains!
