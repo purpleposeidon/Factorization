@@ -252,10 +252,11 @@ public class TileEntityWaterWheel extends TileEntityCommon implements IRotationa
     }
 
     static double MAX_SPEED = IRotationalEnergySource.MAX_SPEED / 4; // Maximum velocity (doesn't change power output)
-    static double V_SCALE = 0.001; // Scales down velocity (also doesn't change power output)
-    static double WATER_POWER_SCALE = 1.0 / 200.0; // Boosts the power output (and does not influence velocity)
+    static double V_SCALE = 0.05; // Scales down velocity (also doesn't change power output)
+    static double WATER_POWER_SCALE = 1.0 / 25.0; // Boosts the power output (and does not influence velocity)
     static double riverFlow = 1.0 / Math.sqrt(2); // Water in river biome is considered to have a 'flow' of riverFlow * Vec3(1, 0, 1); same power as diagonally flowing water
     static double oceanFlow = riverFlow / 8; // And a similar case for oceans
+    static double otherFlowNerf = 1.0 / 4.0;
     static int sea_level_range_min = -4; // non-flowing blocks within river/ocean biomes, but outside of this range, do not flow
     static int sea_level_range_max = +2; // The range is relative to sealevel ('worldProvider.getAverageGroundLevel'). Sealevel is 64 for normal worlds, 4 for superflat.
 
@@ -348,6 +349,8 @@ public class TileEntityWaterWheel extends TileEntityCommon implements IRotationa
                                 tmp.zCoord = oceanFlow;
                             }
                         }
+                    } else {
+                        SpaceUtil.incrScale(tmp, otherFlowNerf);
                     }
                 } else if (lavaOkay && realBlock.getMaterial() == Material.lava) {
                     realBlock.velocityToAddToEntity(worldObj, real.x, real.y, real.z, null, tmp);
