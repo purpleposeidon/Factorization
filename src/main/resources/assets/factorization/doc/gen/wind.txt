@@ -1,3 +1,27 @@
 \title{Wind Power}
 
-... is not yet implemented
+The windmill can be used to harness the power of the wind!
+
+The windmill base has two sides, the shaft side and, opposite of that, the log side.
+A \link{gen/charge}{Charge Generator} or a \link{gen/shaft}{shaft} should be connected to the shaft side.
+
+A fence or log should be placed on the other side to begin building the windmill blades.
+
+Good building materials for windmills are planks, logs, wool, fences, and carpet.
+The larger they are, the more power they produce.
+Windmills must be symetrical.
+
+Windmills can be horizontal or vertical.
+Blocks on horizontal windmills are turned sideways, so that fences will point out instead of up.
+
+A redstone signal will stop the windmill.
+
+The \link{chargemeter}{Charge Meter} will measure various properties of the windmill,
+including efficiency and windspeed.
+
+\img{factorization:textures/screenshots/windmill.png}
+
+\link{https://duckduckgo.com/?q=minecraft+windmill&ia=images&iax=1}{Search for images of windmills}
+
+
+\topic{factorization.factoryBlock.WIND_MILL_GEN}

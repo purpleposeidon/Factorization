@@ -1,3 +1,18 @@
 \title{Water Power}
 
-... is not yet implemented
+The waterwheel extracts power from rivers and other sources of flowing water.
+
+Waterwheels are built out of logs and other wooden blocks such as planks, slabs, stairs, fences, and fence gates.
+
+Unlike the \link{gen/wind}{windmill}, the waterwheel doesn't tilt the blocks down,
+so the direction that fences point will change as they spin.
+
+The waterwheel base can also be used to build lavawheels; such lavawheels must be built out of metal blocks.
+
+
+
+\img{factorization:textures/screenshots/waterwheel.png}
+
+\url{https://duckduckgo.com/?q=minecraft+waterwheel&ia=images&iax=1}{Search for images of waterwheels}
+
+\topic{factorization.factoryBlock.WATER_WHEEL_GEN}

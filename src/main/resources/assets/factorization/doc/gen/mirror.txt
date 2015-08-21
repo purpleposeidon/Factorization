@@ -11,7 +11,7 @@ Mirrors can only target boilers that are at the same height,
 but it is possible to stack boilers on top of one another,
 and boilers below will feed their steam & water to boilers above.
 
-The boiler can be no more than 8 blocks away.
+The boiler must be within 8 blocks of the mirror.
 
 Placing a \link{gen/whirligig}{Whirligig} on the boiler and a \link{gen/charge}{Charge Generator} above the whirligig
 will generate charge.

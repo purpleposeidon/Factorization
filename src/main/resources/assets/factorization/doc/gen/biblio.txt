@@ -3,7 +3,7 @@
 Being an astute scientist, you've noticed that books on enchanting tables have a tendency to spin all by themselves.
 You can only guess at the cause — perhaps there's some kind of pervasive electro-magneto-enchantio field that floods the universe with a spinwards tendency?
 This might explain other spinning you've seen in places.
-While all this abstract gobledegook sounds more like the domain of magic than of science,
+While all this abstract gobbledygook sounds more like the domain of magic than of science,
 the engineer in you can't resist investigating another power source.
 
 Early prototypes would only spin when you weren't looking, but gluing the pages shut solves that problem.
@@ -14,6 +14,9 @@ But no matter. You can build your own library. A better library. A library with 
 
 A \link{gen/charge}{Charge Generator} placed underneath the block will convert the book's spinning energy into charge.
 
+A \link{chargemeter}{Charge Meter} can measure how many bookshelves are powering the bibliogenerator.
+
 Placing more than one bibliogenerator in the same area makes the books wrathful. So don't do that.
 
 \topic{factorization.factoryBlock.BIBLIO_GEN}
+\topic{tile.bookshelf}

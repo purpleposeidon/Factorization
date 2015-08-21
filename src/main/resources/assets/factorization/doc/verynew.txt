@@ -1,1 +1,2 @@
 \index{hotblocks}{\#{tile.fire} Hot Blocks!}
+\index{barrel}{Barrel carts!}
