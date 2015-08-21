@@ -933,10 +933,17 @@ public class Registry {
                 'A', sulfuric_acid,
                 'L', Items.leather);
         if (DeltaChunk.enabled()) {
-            oreRecipe(wind_mill,
+            oreRecipe(water_wheel,
                     "#I#",
                     "===",
                     "#I#",
+                    '#', "logWood",
+                    'I', dark_iron,
+                    '=', wooden_shaft);
+            oreRecipe(wind_mill,
+                    "#=#",
+                    "I=I",
+                    "#=#",
                     '#', "logWood",
                     'I', dark_iron,
                     '=', wooden_shaft);
