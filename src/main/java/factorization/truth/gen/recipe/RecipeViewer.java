@@ -1,10 +1,12 @@
-package factorization.truth.gen;
+package factorization.truth.gen.recipe;
 
 import cpw.mods.fml.common.event.FMLInterModComms.IMCMessage;
 import cpw.mods.fml.relauncher.ReflectionHelper;
 import factorization.shared.Core;
 import factorization.truth.AbstractTypesetter;
 import factorization.truth.DocumentationModule;
+import factorization.truth.gen.FluidViewer;
+import factorization.truth.gen.IDocGenerator;
 import factorization.truth.word.ItemWord;
 import factorization.truth.word.TextWord;
 import factorization.truth.word.Word;
@@ -25,10 +27,9 @@ import java.lang.reflect.Modifier;
 import java.util.*;
 import java.util.Map.Entry;
 
-public class RecipeViewer implements IDocGenerator {
+public class RecipeViewer implements IDocGenerator, IObjectWriter<Object> {
     HashMap<String, ArrayList<ArrayList>> recipeCategories = null;
     ArrayList<String> categoryOrder = new ArrayList<String>();
-    HashMap<List<ItemStack>, String> reverseOD = new HashMap<List<ItemStack>, String>();
     
     /** USAGE
      * recipe/
@@ -49,12 +50,11 @@ public class RecipeViewer implements IDocGenerator {
      */
     @Override
     public void process(AbstractTypesetter out, String arg) {
+        StandardObjectWriters.setup();
         if (recipeCategories == null || Core.dev_environ) {
             categoryOrder.clear();
             recipeCategories = new HashMap<String, ArrayList<ArrayList>>();
-            reverseOD.clear();
             Core.logInfo("Loading recipe list");
-            setupReverseOD();
             loadRecipes();
             Core.logInfo("Done");
         }
@@ -197,13 +197,6 @@ public class RecipeViewer implements IDocGenerator {
         }
     }
 
-    void setupReverseOD() {
-        for (String name : OreDictionary.getOreNames()) {
-            List<ItemStack> entries = OreDictionary.getOres(name);
-            reverseOD.put(entries, name);
-        }
-    }
-
     void loadRecipes() {
         putCategory("Workbench", CraftingManager.getInstance().getRecipeList());
         putCategory("Furnace", FurnaceRecipes.smelting().getSmeltingList().entrySet());
@@ -228,7 +221,7 @@ public class RecipeViewer implements IDocGenerator {
     }
     
     int recursion;
-    ArrayList<ArrayList> addAll(Iterable list) {
+    private ArrayList<ArrayList> addAll(Iterable list) {
         ArrayList<ArrayList> generated = new ArrayList<ArrayList>();
         for (Object obj : list) {
             ArrayList entry = new ArrayList();
@@ -250,237 +243,46 @@ public class RecipeViewer implements IDocGenerator {
             return "ERROR";
         }
     }
-    
-    void addRecipe(List sb, Object obj) {
-        sb.add("\\seg");
+
+    static int MAX_RECURSION = 4;
+
+    @Override
+    public void writeObject(List out, Object val, IObjectWriter<Object> generic) {
+        if (recursion > MAX_RECURSION) return;
+        recursion++;
+        try {
+            addRecipe(out, val);
+        } finally {
+            recursion--;
+        }
+    }
+
+    public void addRecipe(List out, Object obj) {
+        if (recursion == 0) {
+            out.add("\\seg");
+        }
         if (obj instanceof IRecipe) {
-            genericRecipePrefix(sb, (IRecipe) obj);
+            genericRecipePrefix(out, (IRecipe) obj);
         }
-        int origLen = sb.size();
-        if (obj instanceof ShapedOreRecipe) {
-            addShapedOreRecipe(sb, (ShapedOreRecipe) obj);
-        } else if (obj instanceof ShapedRecipes) {
-            addShapedRecipes(sb, (ShapedRecipes) obj);
-        } else if (obj instanceof ShapelessOreRecipe) {
-            addShapelessOreRecipe(sb, (ShapelessOreRecipe) obj);
-        } else if (obj instanceof ShapelessRecipes) {
-            addShapelessRecipes(sb, (ShapelessRecipes) obj);
-        } else {
-            try {
-                addRecipeWithReflection(sb, obj);
-            } catch (Throwable t) {
-                t.printStackTrace();
-            }
+        int origLen = out.size();
+        IObjectWriter writer = IObjectWriter.adapter.cast(obj);
+        writer.writeObject(out, obj, this);
+        if (out.size() == origLen) {
+            out.add(obj.toString());
         }
-        if (sb.size() == origLen) {
-            sb.add(obj.toString());
+        if (recursion == 0) {
+            out.add("\\endseg");
+            out.add("\\nl");
         }
-        sb.add("\\endseg");
-        sb.add("\\nl");
     }
     
-    Object genericRecipePrefix(List sb, IRecipe recipe) {
+    public static Object genericRecipePrefix(List sb, IRecipe recipe) {
         ItemStack output = recipe.getRecipeOutput();
         if (output == null) return null;
         if (output.getItem() == null) return null;
         sb.add(new ItemWord(output));
         sb.add(" \\b{" + getDisplayName(output) + "}\\vpad{15}\\nl");
         return output;
-    }
-    
-    static ItemStack fixMojangRecipes(ItemStack is) {
-        if (is == null) return null;
-        if (is.stackSize > 1) {
-            is = is.copy();
-            is.stackSize = 1;
-        }
-        return is;
-    }
-    
-    void addShapedOreRecipe(List sb, ShapedOreRecipe recipe) {
-        int width = ReflectionHelper.getPrivateValue(ShapedOreRecipe.class, recipe, "width");
-        //int height = ReflectionHelper.getPrivateValue(ShapedOreRecipe.class, recipe, "height");
-        Object[] input = recipe.getInput();
-        int i = 0;
-        for (Object in : input) {
-            if (in instanceof ItemStack || in == null) {
-                ItemStack is = (ItemStack) in;
-                sb.add(new ItemWord(fixMojangRecipes(is)));
-            } else if (in instanceof Iterable) {
-                Iterator<Object> it = ((Iterable<Object>)in).iterator();
-                if (it.hasNext()) {
-                    convertObject(sb, it.next());
-                } else {
-                    convertObject(sb, null);
-                }
-            } else {
-                convertObject(sb, in);
-            }
-            i++;
-            if (i % width == 0) {
-                sb.add("\\nl");
-            }
-        }
-    }
-    
-    void addShapedRecipes(List sb, ShapedRecipes recipe) {
-        int width = recipe.recipeWidth;
-        for (int i = 0; i < recipe.recipeItems.length; i++) {
-            sb.add(new ItemWord(fixMojangRecipes(recipe.recipeItems[i])));
-            if ((i + 1) % width == 0) {
-                sb.add("\\nl");
-            }
-        }
-    }
-    
-    void addShapelessOreRecipe(List sb, ShapelessOreRecipe recipe) {
-        ArrayList<Object> input = recipe.getInput();
-        if (input == null) return;
-        sb.add("Shapeless: ");
-        for (Object obj : input) {
-            if (obj instanceof Object[]) {
-                Object[] objs = (Object[]) obj;
-                if (objs.length > 0) {
-                    convertObject(sb, objs[0]);
-                } else {
-                    convertObject(sb, null);
-                }
-            } else {
-                convertObject(sb, obj);
-            }
-        }
-    }
-    
-    void addShapelessRecipes(List sb, ShapelessRecipes recipe) {
-        if (recipe.recipeItems == null) return;
-        sb.add("Shapeless: ");
-        for (Object obj : recipe.recipeItems) {
-            convertObject(sb, obj);
-        }
-    }
-    
-    void addRecipeWithReflection(List sb, Object recipe) throws IllegalArgumentException, IllegalAccessException {
-        if (recipe instanceof ItemStack || recipe instanceof String || recipe instanceof Number || recipe.getClass().isArray() || recipe instanceof Collection || recipe instanceof NBTBase) {
-            convertObject(sb, recipe);
-            return;
-        }
-        Object output = RecipeViewer.class; //Just something that isn't null.
-        if (recipe instanceof IRecipe) {
-            output = genericRecipePrefix(sb, (IRecipe) recipe);
-        } else if (recipe instanceof Entry) {
-            Entry ent = (Entry) recipe;
-            addRecipeWithReflection(sb, ent.getKey());
-            sb.add(" ➤ ");
-            addRecipeWithReflection(sb, ent.getValue());
-            return;
-        }
-        Field[] fields = recipe.getClass().getDeclaredFields();
-        for (Field f : fields) {
-            if (f.getName().contains("$")) continue;
-            int modifiers = f.getModifiers();
-            if ((modifiers & Modifier.STATIC) != 0) continue;
-            if (!f.isAccessible()) {
-                f.setAccessible(true);
-            }
-            Object v = f.get(recipe);
-            if (v == output || v == null) continue;
-            if (recursion < 2 || v instanceof String || v instanceof ItemStack || v instanceof Collection || v.getClass().isArray() || v instanceof NBTBase) {
-                sb.add(f.getName() + ": ");
-                convertObject(sb, v);
-                sb.add("\\nl ");
-            }
-        }
-    }
-    
-    HashSet<String> knownOres = new HashSet<String>();
-    {
-        Collections.addAll(knownOres, OreDictionary.getOreNames());
-    }
-    
-    void convertObject(List sb, Object obj) {
-        if (obj == null) {
-            return;
-        }
-        if (recursion > 4) {
-            return;
-        }
-        if (obj instanceof Item) {
-            obj = new ItemStack((Item) obj);
-        } else if (obj instanceof Block) {
-            obj = new ItemStack((Block) obj);
-        } else if (obj instanceof String) {
-            String name = (String) obj;
-            if (knownOres.contains(name)) {
-                obj = OreDictionary.getOres(name);
-            }
-        }
-        
-        recursion++;
-        try {
-            if (obj instanceof ItemStack) {
-                sb.add(new ItemWord((ItemStack) obj));
-            } else if (obj instanceof String || obj instanceof Number || obj instanceof NBTBase) {
-                sb.add(obj.toString());
-            } else if (obj instanceof FluidStack) {
-                FluidStack fs = (FluidStack) obj;
-                sb.add(FluidViewer.convert(fs.getFluid()));
-                sb.add(new TextWord("" + fs.amount, null)); // TODO: Link to fluid viewer
-            } else if (obj.getClass().isArray()) {
-                if (obj instanceof ItemStack[]) {
-                    ItemStack[] array = (ItemStack[]) obj;
-                    if (array.length == 0) {
-                        sb.add(new TextWord("<Empty>", null));
-                    } else {
-                        sb.add(new ItemWord(array));
-                    }
-                } else if (obj instanceof Object[]) {
-                    Object[] listy = (Object[]) obj;
-                    for (Object o : listy) {
-                        if (o == null) {
-                            sb.add("-");
-                        } else {
-                            convertObject(sb, o);
-                        }
-                    }
-                }
-            } else if (obj instanceof Collection) {
-                boolean probableOreDictionary = false;
-                if (obj instanceof List) {
-                    probableOreDictionary = reverseOD.containsKey(obj);
-                }
-                if (probableOreDictionary) {
-                    boolean bad = false;
-                    for (Object o : (Collection) obj) {
-                        if (!(o instanceof ItemStack)) {
-                            bad = true;
-                            break;
-                        }
-                    }
-                    if (!bad) {
-                        Collection<ItemStack> col = (Collection<ItemStack>) obj;
-                        ItemStack[] items = col.toArray(new ItemStack[col.size()]);
-                        sb.add(new ItemWord(items));
-                        return;
-                    }
-                }
-                for (Object o : (Collection) obj) {
-                    convertObject(sb, o);
-                }
-            } else if (obj instanceof IRecipe) {
-                sb.add("Embedded Recipe:\n\n");
-                ArrayList sub = new ArrayList();
-                addRecipe(sub, obj);
-                sb.addAll(sub);
-            } else {
-                try {
-                    addRecipeWithReflection(sb, obj);
-                } catch (Throwable t) {
-                    t.printStackTrace();
-                }
-            }
-        } finally {
-            recursion--;
-        }
     }
 
 }

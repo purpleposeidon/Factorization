@@ -10,6 +10,7 @@ import factorization.coremodhooks.HookTargetsClient;
 import factorization.shared.Core;
 import factorization.truth.export.ExportHtml;
 import factorization.truth.gen.*;
+import factorization.truth.gen.recipe.RecipeViewer;
 import factorization.util.FzUtil;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufInputStream;
@@ -81,8 +82,8 @@ public class DocumentationModule {
     
     public void serverStarts(FMLServerStartingEvent event) {
         if (FMLCommonHandler.instance().getSide() == Side.CLIENT) {
-            event.registerServerCommand(new FzdocSerialize());
-            if (Core.dev_environ) {
+            if (Core.dev_environ || Boolean.getBoolean("fz.registerDocCommands")) {
+                event.registerServerCommand(new FzdocSerialize());
                 event.registerServerCommand(new ExportHtml());
             }
         }
@@ -251,7 +252,6 @@ public class DocumentationModule {
                 FzUtil.closeNoisily("closing topic_index", topic_index);
             }
         }
-        // if (Loader.isModLoaded("NotEnoughItems") || Loader.isModLoaded("craftguide")) return false;
         mc.displayGuiScreen(new DocViewer(default_recipe_domain, "cgi/recipes/" + name));
         return true;
     }
