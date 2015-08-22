@@ -7,10 +7,14 @@ import net.minecraft.util.EnumChatFormatting;
 
 public class TextWord extends Word {
     public final String text;
-    
+
     public TextWord(String text, String hyperlink) {
         super(hyperlink);
         this.text = text;
+    }
+
+    public TextWord(String text) {
+        this(text, null);
     }
     
     @Override
