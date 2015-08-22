@@ -15,7 +15,7 @@ import net.minecraftforge.common.MinecraftForge;
 import factorization.common.Command;
 import factorization.common.FactorizationKeyHandler;
 import factorization.common.FzConfig;
-import factorization.docs.DocumentationModule;
+import factorization.truth.DocumentationModule;
 import net.minecraftforge.event.world.WorldEvent;
 
 public class HookTargetsClient {

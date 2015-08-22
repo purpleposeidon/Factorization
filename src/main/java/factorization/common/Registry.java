@@ -23,7 +23,7 @@ import factorization.charge.ItemChargeMeter;
 import factorization.charge.TileEntityLeydenJar;
 import factorization.colossi.*;
 import factorization.darkiron.BlockDarkIronOre;
-import factorization.docs.ItemDocBook;
+import factorization.truth.minecraft.ItemDocBook;
 import factorization.fzds.DeltaChunk;
 import factorization.mechanics.ItemDarkIronChain;
 import factorization.oreprocessing.ItemOreProcessing;
