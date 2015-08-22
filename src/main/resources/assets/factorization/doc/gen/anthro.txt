@@ -4,7 +4,7 @@ These small lanterns accumulate energy from villagers and similar folk as they g
 This energy is \#{item.factorization:entheas} Entheas,
 a very potent foodstuff,
 but eating it is... inadvisable.
-Fortunately the \link{gen/calio}{Caliometric Burner}, having no heart, is immune to the poison.
+Fortunately the \link{gen/calio}{Caliometric Burner}, lacking a heart, is immune to the poison.
 
 Entheas is converted to charge just like \link{gen/saptap}{sap}.
 

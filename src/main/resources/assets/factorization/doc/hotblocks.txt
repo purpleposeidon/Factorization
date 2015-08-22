@@ -9,5 +9,9 @@ You do not need the appropriate tool to break blocks in this manner.
 
 If you leave the world, then your hot blocks will be forgotten.
 
-The last 5 blocks you have placed are kept hot.
+The last 6 blocks you have placed are easily broken.
+
+Some blocks, such as \#{tile.clay}\ Clay will not be broken in the silken manner
+as it is impossible to tell if that's what you actually want.
+Holding shift while breaking will force a silk touch.
 

@@ -5,8 +5,8 @@
 
 
 \index{about}{\#{item.factorization:docbook}About}
-\index{ores}{\#{tile.oreGold}Ores and Materials}
 \index{lmp}{\#{item.factorization:tool/matrix_programmer}The Logic Matrix Programmer}
+\index{ores}{\#{tile.oreGold}Ores and Materials}
 \index{parts}{\#{factorization.factoryBlock.SOCKET_EMPTY}Parts and Machines}
 \index{charge}{\#{item.factorization:motor}Charge Energy}
 % \index{oreprocessing}{Ore Processing}
@@ -34,5 +34,5 @@
 \link{allnew}{\#{item.seeds}Other New Things}
 
 
-\checkmods{all}{ForgeIRC}{Join us in #factorization on irc.esper.net!}{}
+\checkmods{any}{ForgeIRC}{Join us in #factorization on irc.esper.net!}{}
 

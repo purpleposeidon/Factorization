@@ -12,8 +12,9 @@ The whirligig gets steam from the \link{gen/boiler}{Boiler},
 which can be heated by \link{gen/mirror}{Solar Power},
 or by feeding various substances to the \link{gen/calio}{Caliometric Burner}:
 
-\index{gen/saptap}{Tree Power}
-\index{gen/anthro}{People Power}
+\- \link{gen/saptap}{Tree Sap}
+\- \link{gen/anthro}{People Power}
+\- Food
 % TODO: index{gen/pollen}{Plant Power}
 % TODO: misanthropic generator
 

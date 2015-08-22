@@ -14,6 +14,6 @@ The \link{hinge}{Hinge} can be used to make large doors.
 
 \link{pickblock}{Block picking} has been improved.
 
-Recently placed blocks are \link{hotblocks}{break quickly}.
+Recently placed blocks \link{hotblocks}{break quickly}.
 
 \newpage

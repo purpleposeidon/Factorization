@@ -18,3 +18,5 @@ scroll: next page \nl
 right click: go back \nl
 escape: close manual \nl
 }
+
+\topic{item.factorization:docbook}

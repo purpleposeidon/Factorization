@@ -31,7 +31,7 @@ import factorization.coremod.LoadingPlugin;
 import factorization.darkiron.BlockDarkIronOre;
 import factorization.truth.minecraft.DistributeDocs;
 import factorization.truth.DocumentationModule;
-import factorization.truth.gen.RecipeViewer;
+import factorization.truth.gen.recipe.RecipeViewer;
 import factorization.fzds.DeltaChunk;
 import factorization.fzds.Hammer;
 import factorization.mechanics.MechanismsFeature;

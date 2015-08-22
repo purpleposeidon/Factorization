@@ -13,4 +13,7 @@ Certain \link{socket}{socket parts} can be configured by clicking on them with t
 
 Certain \link{servo}{Servo Instructions} can be configured by clicking on them with the LMP.
 
+\p
+It also makes a funny hat, but \i{this is almost certainly of no consequence whatsoever}.
+
 \topic{item.factorization:tool/matrix_programmer}
