@@ -1,6 +1,7 @@
 package factorization.docs;
 
 import factorization.coremodhooks.HookTargetsClient;
+import factorization.docs.gen.*;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufInputStream;
 import io.netty.buffer.Unpooled;
@@ -272,7 +273,7 @@ public class DocumentationModule {
         return true;
     }
     
-    static void registerGenerators() {
+    static {
         registerGenerator("items", new ItemListViewer());
         registerGenerator("recipes", new RecipeViewer());
         registerGenerator("enchants", new EnchantViewer());

@@ -1,10 +1,12 @@
-package factorization.docs;
+package factorization.docs.gen;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.Map.Entry;
 
+import factorization.docs.AbstractTypesetter;
+import factorization.docs.DocumentationModule;
+import factorization.docs.word.ItemWord;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.item.ItemStack;
 

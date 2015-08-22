@@ -1,19 +1,20 @@
-package factorization.docs;
+package factorization.docs.word;
 
+import factorization.docs.DocViewer;
+import factorization.docs.WordPage;
 import factorization.util.ItemUtil;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemStack;
-import org.apache.commons.lang3.ArrayUtils;
 import org.lwjgl.opengl.GL11;
 
 import java.util.Iterator;
 import java.util.List;
 
 public class ItemWord extends Word {
-    ItemStack is = null;
-    ItemStack[] entries = null;
+    public ItemStack is = null;
+    public ItemStack[] entries = null;
 
     static ItemStack sanitize(ItemStack is) {
         if (is == null) {
@@ -133,7 +134,7 @@ public class ItemWord extends Word {
     }
 
     static int active_index;
-    ItemStack getItem() {
+    public ItemStack getItem() {
         active_index = 0;
         if (is != null) return is;
         if (entries == null || entries.length == 0) return null;

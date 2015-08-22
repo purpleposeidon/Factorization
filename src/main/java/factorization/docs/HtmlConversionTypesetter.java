@@ -1,10 +1,12 @@
 package factorization.docs;
 
 import cpw.mods.fml.common.Loader;
-import net.minecraft.client.renderer.texture.IIconRegister;
+import factorization.docs.gen.IDocGenerator;
+import factorization.docs.word.ItemWord;
+import factorization.docs.word.TextWord;
+import factorization.docs.word.Word;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.IIcon;
-import net.minecraft.util.ResourceLocation;
 
 import java.io.OutputStream;
 import java.io.PrintStream;
@@ -234,18 +236,18 @@ public class HtmlConversionTypesetter extends AbstractTypesetter {
     }
     
     @Override
-    void error(String msg) {
+    public void error(String msg) {
         s("<span class=\"manualerror\">" + msg + "</s>", null);
     }
     
     @Override
-    TextWord emit(String text, String link) {
+    public TextWord emit(String text, String link) {
         s(esc(text), link);
         return null;
     }
 
     @Override
-    void emitWord(Word w) {
+    public void emitWord(Word w) {
         // LAMELY IMPLEMENTED! :O
         if (w instanceof TextWord) {
             TextWord tw = (TextWord) w;

@@ -1,4 +1,4 @@
-package factorization.docs;
+package factorization.docs.minecraft;
 
 import java.util.HashSet;
 

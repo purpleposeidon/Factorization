@@ -1,4 +1,4 @@
-package factorization.docs;
+package factorization.docs.minecraft;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiButton;

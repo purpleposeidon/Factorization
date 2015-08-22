@@ -1,4 +1,4 @@
-package factorization.docs;
+package factorization.docs.gen;
 
 import com.google.common.base.Splitter;
 import cpw.mods.fml.common.FMLCommonHandler;
@@ -7,6 +7,8 @@ import cpw.mods.fml.common.eventhandler.EventPriority;
 import cpw.mods.fml.common.eventhandler.IEventListener;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import cpw.mods.fml.relauncher.ReflectionHelper;
+import factorization.docs.AbstractTypesetter;
+import factorization.docs.word.TextWord;
 import net.minecraftforge.common.MinecraftForge;
 
 import java.lang.reflect.Method;

@@ -1,6 +1,8 @@
 package factorization.docs;
 
 
+import factorization.docs.word.Word;
+
 public class IndexerTypesetter extends AbstractTypesetter {
     String filename;
     
@@ -38,5 +40,5 @@ public class IndexerTypesetter extends AbstractTypesetter {
     WordPage newPage() { return null; }
     
     @Override
-    void emitWord(Word w) { }
+    public void emitWord(Word w) { }
 }

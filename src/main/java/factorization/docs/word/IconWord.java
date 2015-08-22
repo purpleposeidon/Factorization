@@ -1,6 +1,8 @@
-package factorization.docs;
+package factorization.docs.word;
 
 import factorization.common.BlockIcons;
+import factorization.docs.DocViewer;
+import factorization.docs.WordPage;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.util.IIcon;

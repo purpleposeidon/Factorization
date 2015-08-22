@@ -48,7 +48,7 @@ public class DocWorld extends WorldClient {
         NBTTagList teList = tag.getTagList(TE_LIST, Constants.NBT.TAG_COMPOUND);
         tileEntities.clear();
         for (int i = 0; i < teList.tagCount(); i++) {
-            NBTTagCompound tc = (NBTTagCompound) teList.getCompoundTagAt(i);
+            NBTTagCompound tc = teList.getCompoundTagAt(i);
             TileEntity te = TileEntity.createAndLoadEntity(tc);
             if (te != null) {
                 te.setWorldObj(this);
@@ -58,7 +58,7 @@ public class DocWorld extends WorldClient {
         entities.clear();
         NBTTagList entList = tag.getTagList(ENTITY_LIST, Constants.NBT.TAG_COMPOUND);
         for (int i = 0; i < entList.tagCount(); i++) {
-            NBTTagCompound tc = (NBTTagCompound) entList.getCompoundTagAt(i);
+            NBTTagCompound tc = entList.getCompoundTagAt(i);
             Entity e = EntityList.createEntityFromNBT(tc, this);
             if (e != null) {
                 e.worldObj = this;

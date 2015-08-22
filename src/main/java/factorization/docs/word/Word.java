@@ -1,5 +1,6 @@
-package factorization.docs;
+package factorization.docs.word;
 
+import factorization.docs.DocViewer;
 import net.minecraft.client.gui.FontRenderer;
 
 public abstract class Word {

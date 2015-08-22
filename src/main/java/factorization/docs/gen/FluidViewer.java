@@ -1,7 +1,11 @@
-package factorization.docs;
+package factorization.docs.gen;
 
 import java.util.Map.Entry;
 
+import factorization.docs.AbstractTypesetter;
+import factorization.docs.word.IconWord;
+import factorization.docs.word.ItemWord;
+import factorization.docs.word.Word;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.IIcon;
 import net.minecraftforge.fluids.Fluid;

@@ -1,10 +1,12 @@
-package factorization.docs;
+package factorization.docs.word;
 
+import factorization.docs.DocViewer;
+import factorization.docs.WordPage;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.util.EnumChatFormatting;
 
 public class TextWord extends Word {
-    final String text;
+    public final String text;
     
     public TextWord(String text, String hyperlink) {
         super(hyperlink);

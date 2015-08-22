@@ -1,5 +1,7 @@
 package factorization.docs;
 
+import factorization.docs.minecraft.GuiButtonNextPage;
+import factorization.docs.word.Word;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.GuiButton;
@@ -273,13 +275,13 @@ public class DocViewer extends GuiScreen {
         }
     }
     
-    void drawItem(ItemStack is, int x, int y) {
+    public void drawItem(ItemStack is, int x, int y) {
         GL11.glEnable(GL11.GL_DEPTH_TEST);
         GuiContainer.itemRender.renderItemAndEffectIntoGUI(fontRendererObj, this.mc.getTextureManager(), is, x, y);
         GuiContainer.itemRender.renderItemOverlayIntoGUI(fontRendererObj, this.mc.getTextureManager(), is, x, y);
     }
     
-    void drawItemTip(ItemStack is, int x, int y) {
+    public void drawItemTip(ItemStack is, int x, int y) {
         renderToolTip(is, x, y);
     }
     
@@ -410,7 +412,7 @@ public class DocViewer extends GuiScreen {
         return false;
     }
     
-    FontRenderer getFont() {
+    public FontRenderer getFont() {
         return fontRendererObj;
     }
 

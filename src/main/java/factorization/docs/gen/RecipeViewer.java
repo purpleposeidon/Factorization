@@ -1,7 +1,11 @@
-package factorization.docs;
+package factorization.docs.gen;
 
 import cpw.mods.fml.common.event.FMLInterModComms.IMCMessage;
 import cpw.mods.fml.relauncher.ReflectionHelper;
+import factorization.docs.*;
+import factorization.docs.word.ItemWord;
+import factorization.docs.word.TextWord;
+import factorization.docs.word.Word;
 import factorization.shared.Core;
 import factorization.util.ItemUtil;
 import net.minecraft.block.Block;

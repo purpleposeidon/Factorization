@@ -1,4 +1,4 @@
-package factorization.docs;
+package factorization.docs.word;
 
 import factorization.shared.Core;
 

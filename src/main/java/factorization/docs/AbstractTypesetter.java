@@ -3,6 +3,8 @@ package factorization.docs;
 import java.util.ArrayList;
 import java.util.Locale;
 
+import factorization.docs.word.TextWord;
+import factorization.docs.word.Word;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.util.EnumChatFormatting;
 
@@ -37,7 +39,7 @@ public abstract class AbstractTypesetter {
         }
     }
     
-    void error(String msg) {
+    public void error(String msg) {
         process(msg.replace("\\", "\\\\ "), null, "" + EnumChatFormatting.RED + EnumChatFormatting.BOLD);
     }
 
@@ -62,11 +64,11 @@ public abstract class AbstractTypesetter {
         return tokenizer.token;
     }
     
-    void append(final String text) {
+    public void append(final String text) {
         process(text, null, "");
     }
     
-    protected void process(final String text, final String link, final String style) {
+    public void process(final String text, final String link, final String style) {
         if (Strings.isNullOrEmpty(text)) return;
         final Tokenizer tokenizer = new Tokenizer(text);
         
@@ -111,7 +113,7 @@ public abstract class AbstractTypesetter {
         return font.getStringWidth(word);
     }
     
-    void emitWord(Word w) {
+    public void emitWord(Word w) {
         WordPage page = getCurrentPage();
         int len = w.getWidth(font);
         if (len + page.lineLen > pageWidth) {
@@ -138,7 +140,7 @@ public abstract class AbstractTypesetter {
         page.add(w);
     }
     
-    TextWord emit(String text, String link) {
+    public TextWord emit(String text, String link) {
         TextWord w = new TextWord(text, link);
         emitWord(w);
         return w;

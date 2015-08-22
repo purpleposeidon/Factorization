@@ -2,6 +2,8 @@ package factorization.docs;
 
 import java.util.ArrayList;
 
+import factorization.docs.gen.IDocGenerator;
+import factorization.docs.word.*;
 import factorization.util.DataUtil;
 import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;

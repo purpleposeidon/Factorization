@@ -1,5 +1,6 @@
-package factorization.docs;
+package factorization.docs.word;
 
+import factorization.docs.DocViewer;
 import factorization.util.FzUtil;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;

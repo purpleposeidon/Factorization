@@ -1,7 +1,9 @@
-package factorization.docs;
+package factorization.docs.gen;
 
 import java.util.ArrayList;
 
+import factorization.docs.AbstractTypesetter;
+import factorization.docs.word.ItemWord;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.Item;

@@ -1,13 +1,9 @@
-package factorization.docs;
+package factorization.docs.gen;
 
-import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.Loader;
 import cpw.mods.fml.common.ModContainer;
 import cpw.mods.fml.common.versioning.ArtifactVersion;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashSet;
+import factorization.docs.AbstractTypesetter;
 
 public class ModDependViewer implements IDocGenerator {
     @Override

@@ -1,5 +1,7 @@
-package factorization.docs;
+package factorization.docs.word;
 
+import factorization.docs.DocViewer;
+import factorization.docs.word.Word;
 import net.minecraft.client.gui.FontRenderer;
 
 public class VerticalSpacerWord extends Word {

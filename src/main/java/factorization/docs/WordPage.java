@@ -2,12 +2,15 @@ package factorization.docs;
 
 import java.util.ArrayList;
 
+import factorization.docs.AbstractPage;
+import factorization.docs.DocViewer;
+import factorization.docs.word.TextWord;
+import factorization.docs.word.Word;
 import net.minecraft.client.gui.FontRenderer;
 
 public class WordPage extends AbstractPage {
     ArrayList<ArrayList<Word>> text = new ArrayList();
-    Object figure;
-    static int TEXT_HEIGHT = 9;
+    public static int TEXT_HEIGHT = 9;
     int lineLen = 0;
     FontRenderer font;
     

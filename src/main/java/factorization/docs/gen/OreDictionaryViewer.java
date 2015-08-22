@@ -1,9 +1,11 @@
-package factorization.docs;
+package factorization.docs.gen;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 
+import factorization.docs.AbstractTypesetter;
+import factorization.docs.word.ItemWord;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.oredict.OreDictionary;
 

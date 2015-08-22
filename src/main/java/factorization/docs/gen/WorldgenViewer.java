@@ -1,8 +1,9 @@
-package factorization.docs;
+package factorization.docs.gen;
 
 import cpw.mods.fml.common.IWorldGenerator;
 import cpw.mods.fml.common.registry.GameRegistry;
 import cpw.mods.fml.relauncher.ReflectionHelper;
+import factorization.docs.AbstractTypesetter;
 
 import java.util.List;
 

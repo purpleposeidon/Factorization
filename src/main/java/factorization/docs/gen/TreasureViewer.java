@@ -1,10 +1,12 @@
-package factorization.docs;
+package factorization.docs.gen;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Map;
 
+import factorization.docs.AbstractTypesetter;
+import factorization.docs.word.ItemWord;
 import net.minecraft.util.WeightedRandomChestContent;
 import net.minecraftforge.common.ChestGenHooks;
 import cpw.mods.fml.relauncher.ReflectionHelper;

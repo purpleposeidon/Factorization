@@ -1,7 +1,8 @@
-package factorization.docs;
+package factorization.docs.minecraft;
 
+import factorization.docs.DocViewer;
+import factorization.docs.DocumentationModule;
 import factorization.util.FzUtil;
-import factorization.weird.TileEntityDayBarrel;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
@@ -10,7 +11,6 @@ import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import factorization.api.Coord;
-import factorization.docs.DocViewer.HistoryPage;
 import factorization.notify.Notice;
 import factorization.shared.Core.TabType;
 import factorization.shared.ItemFactorization;
@@ -21,7 +21,6 @@ public class ItemDocBook extends ItemFactorization {
         super(name, tabType);
         setMaxStackSize(1);
         if (FMLCommonHandler.instance().getSide() == Side.CLIENT) {
-            DocumentationModule.registerGenerators();
             DocumentationModule.indexed_domains.add("factorization");
         }
     }
