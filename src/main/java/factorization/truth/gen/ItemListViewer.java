@@ -1,19 +1,17 @@
 package factorization.truth.gen;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Map.Entry;
-
+import com.google.common.collect.HashMultimap;
+import com.google.common.collect.Multimap;
+import factorization.shared.Core;
 import factorization.truth.AbstractTypesetter;
 import factorization.truth.DocumentationModule;
 import factorization.truth.word.ItemWord;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.item.ItemStack;
 
-import com.google.common.collect.HashMultimap;
-import com.google.common.collect.Multimap;
-
-import factorization.shared.Core;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Map.Entry;
 
 public class ItemListViewer implements IDocGenerator {
     @Override

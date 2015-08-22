@@ -1,7 +1,6 @@
 package factorization.truth;
 
-import java.util.ArrayList;
-
+import cpw.mods.fml.common.Loader;
 import factorization.truth.gen.IDocGenerator;
 import factorization.truth.word.*;
 import factorization.util.DataUtil;
@@ -13,7 +12,8 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumChatFormatting;
 import net.minecraft.util.ResourceLocation;
-import cpw.mods.fml.common.Loader;
+
+import java.util.ArrayList;
 
 public class ClientTypesetter extends AbstractTypesetter {
 

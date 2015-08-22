@@ -2,11 +2,12 @@ package factorization.truth.gen;
 
 import cpw.mods.fml.common.event.FMLInterModComms.IMCMessage;
 import cpw.mods.fml.relauncher.ReflectionHelper;
-import factorization.truth.*;
+import factorization.shared.Core;
+import factorization.truth.AbstractTypesetter;
+import factorization.truth.DocumentationModule;
 import factorization.truth.word.ItemWord;
 import factorization.truth.word.TextWord;
 import factorization.truth.word.Word;
-import factorization.shared.Core;
 import factorization.util.ItemUtil;
 import net.minecraft.block.Block;
 import net.minecraft.item.Item;

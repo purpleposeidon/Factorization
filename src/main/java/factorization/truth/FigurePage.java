@@ -1,8 +1,8 @@
 package factorization.truth;
 
-import java.util.ArrayList;
-
+import factorization.shared.Core;
 import factorization.util.RenderUtil;
+import factorization.weird.TileEntityDayBarrel;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.GLAllocation;
 import net.minecraft.client.renderer.WorldRenderer;
@@ -12,12 +12,10 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.tileentity.TileEntity;
-
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL12;
 
-import factorization.shared.Core;
-import factorization.weird.TileEntityDayBarrel;
+import java.util.ArrayList;
 
 public class FigurePage extends AbstractPage {
     DocWorld figure;

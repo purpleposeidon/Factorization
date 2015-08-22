@@ -1,44 +1,22 @@
 package factorization.truth.export;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.PrintStream;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map.Entry;
-import java.util.Set;
-
+import com.google.common.collect.ArrayListMultimap;
 import factorization.truth.DocumentationModule;
 import net.minecraft.client.resources.IReloadableResourceManager;
 import net.minecraft.client.resources.IResource;
 import net.minecraft.client.resources.IResourceManager;
 import net.minecraft.client.resources.SimpleReloadableResourceManager;
-import net.minecraft.client.resources.data.AnimationMetadataSection;
-import net.minecraft.client.resources.data.AnimationMetadataSectionSerializer;
-import net.minecraft.client.resources.data.FontMetadataSection;
-import net.minecraft.client.resources.data.FontMetadataSectionSerializer;
-import net.minecraft.client.resources.data.IMetadataSection;
-import net.minecraft.client.resources.data.IMetadataSerializer;
-import net.minecraft.client.resources.data.LanguageMetadataSection;
-import net.minecraft.client.resources.data.LanguageMetadataSectionSerializer;
-import net.minecraft.client.resources.data.PackMetadataSection;
-import net.minecraft.client.resources.data.PackMetadataSectionSerializer;
-import net.minecraft.client.resources.data.TextureMetadataSection;
-import net.minecraft.client.resources.data.TextureMetadataSectionSerializer;
+import net.minecraft.client.resources.data.*;
 import net.minecraft.util.ResourceLocation;
 
-import com.google.common.collect.ArrayListMultimap;
+import java.io.*;
+import java.util.*;
+import java.util.Map.Entry;
 
 public class IndexDocumentation {
     static ArrayListMultimap<String, String> index = ArrayListMultimap.create();
-    static HashSet<String> foundLinks = new HashSet();
-    static ArrayList<String> pendingLinks = new ArrayList();
+    static HashSet<String> foundLinks = new HashSet<String>();
+    static ArrayList<String> pendingLinks = new ArrayList<String>();
 
     static String domain;
     
@@ -48,7 +26,7 @@ public class IndexDocumentation {
             System.exit(1);
             return;
         }
-        final HashMap<String, File> domains = new HashMap();
+        final HashMap<String, File> domains = new HashMap<String, File>();
         boolean first = true;
         PrintStream out = null;
         for (String arg : args) {
@@ -66,7 +44,7 @@ public class IndexDocumentation {
         DocumentationModule.overrideResourceManager = new IResourceManager() {
             @Override
             public Set getResourceDomains() {
-                HashSet<String> ret = new HashSet();
+                HashSet<String> ret = new HashSet<String>();
                 ret.add(domain);
                 return ret;
             }
@@ -94,7 +72,7 @@ public class IndexDocumentation {
             
             @Override
             public List getAllResources(ResourceLocation location) {
-                return Arrays.asList(getResource(location));
+                return Collections.singletonList(getResource(location));
             }
         };
         crawlDocuments("index", out);
@@ -129,8 +107,7 @@ public class IndexDocumentation {
         metadataSerializer_.registerMetadataSectionType(new PackMetadataSectionSerializer(), PackMetadataSection.class);
         metadataSerializer_.registerMetadataSectionType(new LanguageMetadataSectionSerializer(), LanguageMetadataSection.class);
         
-        IReloadableResourceManager mcResourceManager = new SimpleReloadableResourceManager(metadataSerializer_);
-        return mcResourceManager;
+        return new SimpleReloadableResourceManager(metadataSerializer_);
     }
     
     static void foundLink(String linktarget) {

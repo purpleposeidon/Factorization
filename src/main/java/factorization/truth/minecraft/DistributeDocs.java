@@ -1,8 +1,11 @@
 package factorization.truth.minecraft;
 
-import java.util.HashSet;
-
+import cpw.mods.fml.common.eventhandler.SubscribeEvent;
+import cpw.mods.fml.common.gameevent.PlayerEvent.PlayerLoggedInEvent;
+import factorization.api.Coord;
 import factorization.api.ICoordFunction;
+import factorization.common.FzConfig;
+import factorization.shared.Core;
 import factorization.util.PlayerUtil;
 import net.minecraft.block.material.Material;
 import net.minecraft.entity.player.EntityPlayer;
@@ -16,14 +19,11 @@ import net.minecraft.util.ChatComponentTranslation;
 import net.minecraft.world.WorldSettings;
 import net.minecraftforge.common.util.FakePlayer;
 import net.minecraftforge.event.world.BlockEvent;
-import cpw.mods.fml.common.eventhandler.SubscribeEvent;
-import cpw.mods.fml.common.gameevent.PlayerEvent.PlayerLoggedInEvent;
-import factorization.api.Coord;
-import factorization.common.FzConfig;
-import factorization.shared.Core;
+
+import java.util.HashSet;
 
 public class DistributeDocs {
-    static HashSet<String> needyPlayers = new HashSet();
+    static HashSet<String> needyPlayers = new HashSet<String>();
     static final String guideKey = "fzColossusGuide";
     static StatBase guideGet = new StatBase("factorization.dropcolossusguide", new ChatComponentTranslation("factorization.dropcolossusguide")).registerStat();
 

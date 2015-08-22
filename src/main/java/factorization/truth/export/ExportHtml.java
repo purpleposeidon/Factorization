@@ -1,20 +1,16 @@
 package factorization.truth.export;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.io.PrintStream;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-
 import factorization.shared.Core;
 import factorization.truth.DocumentationModule;
 import factorization.util.PlayerUtil;
 import net.minecraft.command.ICommand;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.entity.player.EntityPlayer;
+
+import java.io.*;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
 
 public class ExportHtml implements ICommand {
     @Override
@@ -68,8 +64,14 @@ public class ExportHtml implements ICommand {
         String root = System.getProperty("fzdoc.webroot", "/FzDocs/");
         String outDir = System.getProperty("fzdoc.out", "/tmp/fzdoc-html/");
         File outfile = new File(outDir + filename + ".html");
-        outfile.getParentFile().mkdirs();
-        outfile.delete();
+        if (!outfile.getParentFile().mkdirs()) {
+            throw new IOException("Failed to create output directory");
+        }
+        if (outfile.exists()) {
+            if (!outfile.delete()) {
+                throw new IOException("Unable to delete old file!");
+            }
+        }
         OutputStream os = new FileOutputStream(outfile);
         PrintStream out = new PrintStream(os);
         out.println("<!doctype html>");
@@ -92,8 +94,8 @@ public class ExportHtml implements ICommand {
         }
     }
     
-    static HashSet<String> visited = new HashSet();
-    static ArrayList<String> frontier = new ArrayList();
+    static HashSet<String> visited = new HashSet<String>();
+    static ArrayList<String> frontier = new ArrayList<String>();
 
     public static void visitLink(String newLink) {
         if (visited.contains(newLink)) {

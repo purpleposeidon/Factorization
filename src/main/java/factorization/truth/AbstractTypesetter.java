@@ -1,14 +1,13 @@
 package factorization.truth;
 
-import java.util.ArrayList;
-import java.util.Locale;
-
+import com.google.common.base.Strings;
 import factorization.truth.word.TextWord;
 import factorization.truth.word.Word;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.util.EnumChatFormatting;
 
-import com.google.common.base.Strings;
+import java.util.ArrayList;
+import java.util.Locale;
 
 public abstract class AbstractTypesetter {
     // Super-awesome typesetter version π², by neptunepink

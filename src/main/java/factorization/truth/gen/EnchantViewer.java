@@ -1,13 +1,13 @@
 package factorization.truth.gen;
 
-import java.util.ArrayList;
-
 import factorization.truth.AbstractTypesetter;
 import factorization.truth.word.ItemWord;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+
+import java.util.ArrayList;
 
 public class EnchantViewer implements IDocGenerator {
 

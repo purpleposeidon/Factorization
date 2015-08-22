@@ -1,15 +1,15 @@
 package factorization.truth.gen;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.Map;
-
+import cpw.mods.fml.relauncher.ReflectionHelper;
 import factorization.truth.AbstractTypesetter;
 import factorization.truth.word.ItemWord;
 import net.minecraft.util.WeightedRandomChestContent;
 import net.minecraftforge.common.ChestGenHooks;
-import cpw.mods.fml.relauncher.ReflectionHelper;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Map;
 
 public class TreasureViewer implements IDocGenerator {
 

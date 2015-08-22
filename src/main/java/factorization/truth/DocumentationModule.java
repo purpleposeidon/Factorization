@@ -1,25 +1,20 @@
 package factorization.truth;
 
+import com.google.common.io.Closeables;
+import cpw.mods.fml.common.FMLCommonHandler;
+import cpw.mods.fml.common.event.FMLServerStartingEvent;
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
+import factorization.common.FzConfig;
 import factorization.coremodhooks.HookTargetsClient;
+import factorization.shared.Core;
 import factorization.truth.export.ExportHtml;
 import factorization.truth.gen.*;
+import factorization.util.FzUtil;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufInputStream;
 import io.netty.buffer.Unpooled;
 import io.netty.handler.codec.base64.Base64;
-
-import java.io.BufferedReader;
-import java.io.ByteArrayOutputStream;
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.zip.GZIPInputStream;
-import java.util.zip.GZIPOutputStream;
-
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.client.resources.IResource;
@@ -31,18 +26,13 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompressedStreamTools;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.ResourceLocation;
-
 import org.lwjgl.input.Mouse;
 
-import com.google.common.io.Closeables;
-
-import cpw.mods.fml.common.FMLCommonHandler;
-import cpw.mods.fml.common.event.FMLServerStartingEvent;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
-import factorization.common.FzConfig;
-import factorization.shared.Core;
-import factorization.util.FzUtil;
+import java.io.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.zip.GZIPInputStream;
+import java.util.zip.GZIPOutputStream;
 
 public class DocumentationModule {
     public static final DocumentationModule instance = new DocumentationModule();
@@ -191,7 +181,7 @@ public class DocumentationModule {
             }
         }
     }
-    
+
     public static String textifyItem(ItemStack is) {
         String name = is.getUnlocalizedName();
         return "\\#{" + name + "} " + is.getDisplayName();

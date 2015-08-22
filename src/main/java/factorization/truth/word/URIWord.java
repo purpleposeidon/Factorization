@@ -6,6 +6,7 @@ import net.minecraft.client.gui.GuiConfirmOpenLink;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.gui.GuiYesNoCallback;
 
+import java.awt.*;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Arrays;
@@ -57,11 +58,9 @@ public class URIWord extends TextWord implements GuiYesNoCallback {
         Minecraft.getMinecraft().displayGuiScreen(origGui);
     }
 
-    void visitLink(URI uri) {
+    public static void visitLink(URI uri) {
         try {
-            Class AwtDesktop = Class.forName("java.awt.Desktop");
-            Object desktop = AwtDesktop.getMethod("getDesktop").invoke(null);
-            AwtDesktop.getMethod("browse", URI.class).invoke(desktop, uri);
+            Desktop.getDesktop().browse(uri);
         } catch (Throwable throwable) {
             Core.logWarning("Couldn't open link", throwable);
         }

@@ -1,7 +1,10 @@
 package factorization.truth;
 
-import java.util.ArrayList;
-
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
+import factorization.api.Coord;
+import factorization.api.DeltaCoord;
+import factorization.shared.Core;
 import factorization.util.DataUtil;
 import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
@@ -16,11 +19,8 @@ import net.minecraft.world.EnumSkyBlock;
 import net.minecraft.world.WorldSettings;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraftforge.common.util.Constants;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
-import factorization.api.Coord;
-import factorization.api.DeltaCoord;
-import factorization.shared.Core;
+
+import java.util.ArrayList;
 
 public class DocWorld extends WorldClient {
     static final Minecraft mc = Minecraft.getMinecraft();

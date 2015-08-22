@@ -1,13 +1,13 @@
 package factorization.truth.gen;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-
 import factorization.truth.AbstractTypesetter;
 import factorization.truth.word.ItemWord;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.oredict.OreDictionary;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 
 public class OreDictionaryViewer implements IDocGenerator {
 

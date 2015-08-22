@@ -282,20 +282,9 @@ public class HtmlConversionTypesetter extends AbstractTypesetter {
         String namespace = parts[0];
         String path = parts[1];
         found_icon = namespace + ":" + imgType + "/" + path;
-            /*
-            found_icon = null;
-            theItem.getItem().registerIcons(new IIconRegister() {
-                @Override
-                public IIcon registerIcon(String iconName) {
-                    if (found_icon == null) {
-                        found_icon = iconName;
-                    }
-                    return null; // This'll break shit. Oh well. :/
-                }
-            });*/
-        if (found_icon != null) {
-            s("<img class=\"" + imgType + "\" src=\"" + img(found_icon) + "\" />", link);
-        }
+        s("<img class=\"" + imgType + "\" src=\"" + img(found_icon) + "\" />", link);
         found_icon = null;
+        // TODO (and this is crazy!) render the item to a texture
+        // Would be good to do this only if it isn't a standard item texture.
     }
 }

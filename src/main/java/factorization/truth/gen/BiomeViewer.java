@@ -1,7 +1,5 @@
 package factorization.truth.gen;
 
-import java.util.ArrayList;
-
 import factorization.truth.AbstractTypesetter;
 import factorization.truth.word.ItemWord;
 import net.minecraft.block.Block;
@@ -13,6 +11,8 @@ import net.minecraft.world.biome.BiomeDecorator;
 import net.minecraft.world.biome.BiomeGenBase;
 import net.minecraftforge.common.BiomeDictionary;
 import net.minecraftforge.common.BiomeDictionary.Type;
+
+import java.util.ArrayList;
 
 public class BiomeViewer implements IDocGenerator {
 

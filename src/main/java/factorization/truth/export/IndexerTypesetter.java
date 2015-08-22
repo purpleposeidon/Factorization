@@ -4,7 +4,6 @@ package factorization.truth.export;
 import factorization.truth.AbstractTypesetter;
 import factorization.truth.Tokenizer;
 import factorization.truth.WordPage;
-import factorization.truth.export.IndexDocumentation;
 import factorization.truth.word.Word;
 
 public class IndexerTypesetter extends AbstractTypesetter {

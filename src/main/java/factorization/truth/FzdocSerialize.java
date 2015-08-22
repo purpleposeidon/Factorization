@@ -1,7 +1,10 @@
 package factorization.truth;
 
-import java.util.List;
-
+import factorization.api.Coord;
+import factorization.api.DeltaCoord;
+import factorization.api.ICoordFunction;
+import factorization.notify.Notice;
+import factorization.util.FzUtil;
 import factorization.util.PlayerUtil;
 import factorization.util.SpaceUtil;
 import net.minecraft.block.Block;
@@ -14,11 +17,8 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.ChatComponentText;
 import net.minecraftforge.common.util.ForgeDirection;
-import factorization.api.Coord;
-import factorization.api.DeltaCoord;
-import factorization.api.ICoordFunction;
-import factorization.notify.Notice;
-import factorization.util.FzUtil;
+
+import java.util.List;
 
 final class FzdocSerialize implements ICommand {
     @Override

@@ -1,7 +1,5 @@
 package factorization.truth.gen;
 
-import java.util.Map.Entry;
-
 import factorization.truth.AbstractTypesetter;
 import factorization.truth.word.IconWord;
 import factorization.truth.word.ItemWord;
@@ -10,6 +8,8 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.IIcon;
 import net.minecraftforge.fluids.Fluid;
 import net.minecraftforge.fluids.FluidRegistry;
+
+import java.util.Map.Entry;
 
 public class FluidViewer implements IDocGenerator {
 

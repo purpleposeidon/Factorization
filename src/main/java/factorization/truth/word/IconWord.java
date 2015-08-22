@@ -1,15 +1,13 @@
 package factorization.truth.word;
 
 import factorization.common.BlockIcons;
+import factorization.shared.Core;
 import factorization.truth.DocViewer;
 import factorization.truth.WordPage;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.util.IIcon;
-
 import org.lwjgl.opengl.GL11;
-
-import factorization.shared.Core;
 
 public class IconWord extends Word {
     public static final int BLOCK_TEXTURE = 234, ITEM_TEXTURE = 567;
