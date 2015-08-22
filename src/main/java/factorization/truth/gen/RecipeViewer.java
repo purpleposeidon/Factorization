@@ -27,7 +27,7 @@ import java.util.Map.Entry;
 
 public class RecipeViewer implements IDocGenerator {
     HashMap<String, ArrayList<ArrayList>> recipeCategories = null;
-    ArrayList<String> categoryOrder = new ArrayList();
+    ArrayList<String> categoryOrder = new ArrayList<String>();
     HashMap<List<ItemStack>, String> reverseOD = new HashMap<List<ItemStack>, String>();
     
     /** USAGE
@@ -51,7 +51,7 @@ public class RecipeViewer implements IDocGenerator {
     public void process(AbstractTypesetter out, String arg) {
         if (recipeCategories == null || Core.dev_environ) {
             categoryOrder.clear();
-            recipeCategories = new HashMap();
+            recipeCategories = new HashMap<String, ArrayList<ArrayList>>();
             reverseOD.clear();
             Core.logInfo("Loading recipe list");
             setupReverseOD();
@@ -159,7 +159,6 @@ public class RecipeViewer implements IDocGenerator {
     }
     
     static TreeMap<String, Iterable> customRecipes = new TreeMap<String, Iterable>();
-    static TreeMap<String, Map> customRecipesMap = new TreeMap<String, Map>();
     public static void handleImc(IMCMessage message) throws ClassNotFoundException, NoSuchFieldException, IllegalAccessException {
         if (!message.key.equals("AddRecipeCategory")) return;
         String[] cmd = message.getStringValue().split("\\|");
@@ -230,7 +229,7 @@ public class RecipeViewer implements IDocGenerator {
     
     int recursion;
     ArrayList<ArrayList> addAll(Iterable list) {
-        ArrayList<ArrayList> generated = new ArrayList();
+        ArrayList<ArrayList> generated = new ArrayList<ArrayList>();
         for (Object obj : list) {
             ArrayList entry = new ArrayList();
             recursion = 0;
@@ -281,7 +280,7 @@ public class RecipeViewer implements IDocGenerator {
     }
     
     Object genericRecipePrefix(List sb, IRecipe recipe) {
-        ItemStack output = ((IRecipe) recipe).getRecipeOutput();
+        ItemStack output = recipe.getRecipeOutput();
         if (output == null) return null;
         if (output.getItem() == null) return null;
         sb.add(new ItemWord(output));
@@ -308,7 +307,7 @@ public class RecipeViewer implements IDocGenerator {
                 ItemStack is = (ItemStack) in;
                 sb.add(new ItemWord(fixMojangRecipes(is)));
             } else if (in instanceof Iterable) {
-                Iterator<Object> it = ((Iterable)in).iterator();
+                Iterator<Object> it = ((Iterable<Object>)in).iterator();
                 if (it.hasNext()) {
                     convertObject(sb, it.next());
                 } else {
@@ -320,8 +319,6 @@ public class RecipeViewer implements IDocGenerator {
             i++;
             if (i % width == 0) {
                 sb.add("\\nl");
-            } else {
-                //sb.add(" ");
             }
         }
     }
@@ -332,8 +329,6 @@ public class RecipeViewer implements IDocGenerator {
             sb.add(new ItemWord(fixMojangRecipes(recipe.recipeItems[i])));
             if ((i + 1) % width == 0) {
                 sb.add("\\nl");
-            } else {
-                //sb.add(" ");
             }
         }
     }
@@ -397,9 +392,9 @@ public class RecipeViewer implements IDocGenerator {
         }
     }
     
-    HashSet<String> knownOres = new HashSet();
+    HashSet<String> knownOres = new HashSet<String>();
     {
-        for (String s : OreDictionary.getOreNames()) knownOres.add(s);
+        Collections.addAll(knownOres, OreDictionary.getOreNames());
     }
     
     void convertObject(List sb, Object obj) {
@@ -431,32 +426,20 @@ public class RecipeViewer implements IDocGenerator {
                 sb.add(FluidViewer.convert(fs.getFluid()));
                 sb.add(new TextWord("" + fs.amount, null)); // TODO: Link to fluid viewer
             } else if (obj.getClass().isArray()) {
-                Class<?> component = obj.getClass().getComponentType();
-                if (component == ItemStack.class) {
+                if (obj instanceof ItemStack[]) {
                     ItemStack[] array = (ItemStack[]) obj;
-                    if (array == null || array.length == 0) {
+                    if (array.length == 0) {
                         sb.add(new TextWord("<Empty>", null));
                     } else {
                         sb.add(new ItemWord(array));
                     }
-                } else {
-                    if (component == Object.class) {
-                        Object[] listy = (Object[]) obj;
-                        for (Object o : listy) {
-                            if (o == null) {
-                                sb.add("-");
-                            } else {
-                                convertObject(sb, o);
-                            }
-                        }
-                    } else if (component == ItemStack.class) {
-                        ItemStack[] listy = (ItemStack[]) obj;
-                        for (ItemStack is : listy) {
-                            if (is == null) {
-                                sb.add("-");
-                            } else {
-                                sb.add(new ItemWord(is));
-                            }
+                } else if (obj instanceof Object[]) {
+                    Object[] listy = (Object[]) obj;
+                    for (Object o : listy) {
+                        if (o == null) {
+                            sb.add("-");
+                        } else {
+                            convertObject(sb, o);
                         }
                     }
                 }
