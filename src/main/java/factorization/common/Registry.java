@@ -967,7 +967,7 @@ public class Registry {
         oreRecipe(leydenjar_item,
                 "#G#",
                 "#L#",
-                "L#L",
+                "LLL",
                 '#', Blocks.glass_pane,
                 'G', Blocks.glass,
                 'L', "ingotLead");
