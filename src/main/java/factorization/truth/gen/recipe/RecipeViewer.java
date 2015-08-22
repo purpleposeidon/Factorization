@@ -51,7 +51,7 @@ public class RecipeViewer implements IDocGenerator, IObjectWriter<Object> {
     @Override
     public void process(AbstractTypesetter out, String arg) {
         StandardObjectWriters.setup();
-        if (recipeCategories == null || Core.dev_environ) {
+        if (recipeCategories == null || (Core.dev_environ && !Boolean.getBoolean("fz.devNoRecipeRefresh"))) {
             categoryOrder.clear();
             recipeCategories = new HashMap<String, ArrayList<ArrayList>>();
             Core.logInfo("Loading recipe list");
