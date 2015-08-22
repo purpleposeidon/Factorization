@@ -9,6 +9,7 @@ import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemStack;
 import org.lwjgl.opengl.GL11;
 
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 
@@ -47,6 +48,14 @@ public class ItemWord extends Word {
         super(hyperlink);
         this.is = sanitize(is);
         cleanWildlings();
+    }
+
+    public ItemWord(Collection<ItemStack> entries, String hyperlink) {
+        this(entries.toArray(new ItemStack[entries.size()]), hyperlink);
+    }
+
+    public ItemWord(Collection<ItemStack> entries) {
+        this(new ItemStack[entries.size()]);
     }
     
     static String getDefaultHyperlink(ItemStack is) {
