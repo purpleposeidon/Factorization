@@ -14,14 +14,12 @@ public class OreDictionaryViewer implements IDocGenerator {
     @Override
     public void process(AbstractTypesetter out, String arg) {
         Arrays.asList(OreDictionary.getOreNames());
-        ArrayList<String> names = new ArrayList();
-        for (String name : OreDictionary.getOreNames()) {
-            names.add(name);
-        }
+        ArrayList<String> names = new ArrayList<String>();
+        Collections.addAll(names, OreDictionary.getOreNames());
         Collections.sort(names);
-        ArrayList<String> bountiful = new ArrayList();
-        ArrayList<String> empties = new ArrayList();
-        ArrayList<String> singles = new ArrayList();
+        ArrayList<String> bountiful = new ArrayList<String>();
+        ArrayList<String> empties = new ArrayList<String>();
+        ArrayList<String> singles = new ArrayList<String>();
         for (String name : names) {
             ArrayList<ItemStack> ores = OreDictionary.getOres(name);
             if (ores == null || ores.isEmpty()) {
@@ -69,5 +67,4 @@ public class OreDictionaryViewer implements IDocGenerator {
         }
         out.append("\\endseg");
     }
-
 }
