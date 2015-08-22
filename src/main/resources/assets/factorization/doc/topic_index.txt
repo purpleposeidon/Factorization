@@ -72,6 +72,7 @@ item.factorization:fan	pressurizer
 item.factorization:twistedBlock	twistingblock
 tile.pistonStickyBase	piston
 factorization.factoryBlock.WIND_MILL_GEN	gen/wind
+tile.BlockMatcher	blockmatcher
 item.factorization:socket/SOCKET_ROBOTHAND	arm
 item.factorization:servo/component.fz.instruction.cmp	instructions/value
 item.factorization:servo/component.fz.instruction.repeatedInstruction	instructions/compute

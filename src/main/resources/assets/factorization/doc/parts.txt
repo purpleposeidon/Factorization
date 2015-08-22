@@ -6,6 +6,7 @@
 \index{compact}{Compression Crafting}
 \index{parasieve}{Parasieve}
 \index{barrel}{Barrel}
+\index{blockmatcher}{Block Matcher}
 \endseg
 
 \nl\nl
