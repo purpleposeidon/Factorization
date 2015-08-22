@@ -20,7 +20,7 @@ public class Compat_IC2 extends CompatBase {
             if ((modifiers & Modifier.STATIC) == 0) continue;
             field.setAccessible(true);
             String name = field.getName();
-            FMLInterModComms.sendMessage(Core.modId, "AddRecipeCategory", name + "|ic2.api.recipe.Recipes|" + name);
+            FMLInterModComms.sendMessage(Core.modId, "AddRecipeCategory", "fzdoc.ic2.recipe." + name + "|ic2.api.recipe.Recipes|" + name);
         }
     }
 }

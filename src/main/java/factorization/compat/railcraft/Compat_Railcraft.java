@@ -25,9 +25,9 @@ public class Compat_Railcraft extends CompatBase {
         coke_oven = RailcraftCraftingManager.cokeOven.getRecipes();
         blast_furnace = RailcraftCraftingManager.blastFurnace.getRecipes();
 
-        FMLInterModComms.sendMessage(Core.modId, "AddRecipeCategory", "Rolling Machine|factorization.compat.railcraft.Compat_Railcraft|rollingmachine_recipes");
-        FMLInterModComms.sendMessage(Core.modId, "AddRecipeCategory", "Rock Crusher|factorization.compat.railcraft.Compat_Railcraft|crusher_recipes");
-        FMLInterModComms.sendMessage(Core.modId, "AddRecipeCategory", "Coke Oven|factorization.compat.railcraft.Compat_Railcraft|coke_oven");
-        FMLInterModComms.sendMessage(Core.modId, "AddRecipeCategory", "Blast Furnace|factorization.compat.railcraft.Compat_Railcraft|blast_furnace");
+        FMLInterModComms.sendMessage(Core.modId, "AddRecipeCategory", "tile.railcraft.machine.alpha.rolling.machine.name|factorization.compat.railcraft.Compat_Railcraft|rollingmachine_recipes");
+        FMLInterModComms.sendMessage(Core.modId, "AddRecipeCategory", "tile.railcraft.machine.alpha.rock.crusher.name|factorization.compat.railcraft.Compat_Railcraft|crusher_recipes");
+        FMLInterModComms.sendMessage(Core.modId, "AddRecipeCategory", "railcraft.gui.coke.oven|factorization.compat.railcraft.Compat_Railcraft|coke_oven");
+        FMLInterModComms.sendMessage(Core.modId, "AddRecipeCategory", "railcraft.gui.blast.furnace|factorization.compat.railcraft.Compat_Railcraft|blast_furnace");
     }
 }

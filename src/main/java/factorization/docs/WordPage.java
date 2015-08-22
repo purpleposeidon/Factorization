@@ -22,7 +22,7 @@ public class WordPage extends AbstractPage {
     void add(Word word) {
         if (word instanceof TextWord) {
             TextWord tw = (TextWord) word;
-            if (tw.text == "\t") {
+            if (tw.text.equals("\t")) {
                 word = new TextWord("    ", word.getLink());
             } else if (lineLen == 0 && tw.text.trim().isEmpty()) {
                 return;

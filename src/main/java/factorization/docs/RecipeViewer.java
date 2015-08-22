@@ -56,7 +56,7 @@ public class RecipeViewer implements IDocGenerator {
         if (arg == null || arg.equalsIgnoreCase("categories") || arg.isEmpty()) {
             out.append("\\title{Recipe Categories}\n\n");
             for (String cat : categoryOrder) {
-                out.append(String.format("\\link{cgi/recipes/category/%s}{%s}\\nl", cat, cat));
+                out.append(String.format("\\link{cgi/recipes/category/%s}{\\local{%s}}\\nl", cat, cat));
             }
         } else if (arg.startsWith("category/")) {
             String cat = arg.replace("category/", "");
@@ -106,7 +106,7 @@ public class RecipeViewer implements IDocGenerator {
                     if (first) {
                         first = false;
                         if (categoryName != null) {
-                            out.append("\\u{" + categoryName + "}\n\n");
+                            out.append("\\u{\\local{" + categoryName + "}}\n\n");
                         }
                     }
                     writeRecipe(out, recipe);

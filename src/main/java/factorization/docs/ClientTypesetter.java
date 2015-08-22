@@ -294,7 +294,22 @@ public class ClientTypesetter extends AbstractTypesetter {
         } else if (cmd.equals("\\ifhtml")) {
             String trueBranch = getParameter(cmd, tokenizer);
             String falseBranch = getParameter(cmd, tokenizer);
+            if (trueBranch == null) {
+                error("\\ifhtml missing parameter: trueBranch");
+                return;
+            }
+            if (falseBranch == null) {
+                error("\\ifhtml missing parameter: falseBranch");
+                return;
+            }
             process(falseBranch, link, style);
+        } else if (cmd.equals("\\local")) {
+            String localizationKey = getParameter(cmd, tokenizer);
+            if (localizationKey == null) {
+                error("\\local missing parameter: localizationKey");
+                return;
+            }
+            emitWord(new LocalizedWord(localizationKey, link));
         } else {
             error("Unknown command: ");
             emit(cmd, null);
