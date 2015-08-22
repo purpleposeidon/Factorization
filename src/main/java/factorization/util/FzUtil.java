@@ -169,4 +169,12 @@ public class FzUtil {
         }
         return r;
     }
+
+    public static void debugBytes(String header, byte[] d) {
+        System.out.println(header + " #" + d.length);
+        for (byte b : d) {
+            System.out.print(" " + Integer.toString(b));
+        }
+        System.out.println();
+    }
 }

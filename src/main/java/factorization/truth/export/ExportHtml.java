@@ -1,4 +1,4 @@
-package factorization.truth;
+package factorization.truth.export;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -10,6 +10,7 @@ import java.util.HashSet;
 import java.util.List;
 
 import factorization.shared.Core;
+import factorization.truth.DocumentationModule;
 import factorization.util.PlayerUtil;
 import net.minecraft.command.ICommand;
 import net.minecraft.command.ICommandSender;

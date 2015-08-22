@@ -1,13 +1,13 @@
 package factorization.truth;
 
-import java.util.ArrayList;
-
 import factorization.truth.word.TextWord;
 import factorization.truth.word.Word;
 import net.minecraft.client.gui.FontRenderer;
 
+import java.util.ArrayList;
+
 public class WordPage extends AbstractPage {
-    ArrayList<ArrayList<Word>> text = new ArrayList();
+    ArrayList<ArrayList<Word>> text = new ArrayList<ArrayList<Word>>();
     public static int TEXT_HEIGHT = 9;
     int lineLen = 0;
     FontRenderer font;
@@ -36,7 +36,7 @@ public class WordPage extends AbstractPage {
     }
     
     void nl() {
-        ArrayList newLine = new ArrayList();
+        ArrayList<Word> newLine = new ArrayList<Word>();
         newLine.add(new TextWord("", null));
         text.add(newLine);
         lineLen = 0;
@@ -70,8 +70,9 @@ public class WordPage extends AbstractPage {
 
     /**
      * Return the padding on a line.
-     * @param line
+     * @param line the line to get the padding of
      * @return the "tuple" int[] { padUp, padDown }
+     * TODO: Custom ArrayList that keeps track of the padding
      */
     int[] getVerticalPadding(ArrayList<Word> line) {
         int padUp = 0, padDown = 0;

@@ -132,7 +132,7 @@ final class FzdocSerialize implements ICommand {
 
     void copyEntities(DocWorld dw20, Coord min, Coord max) {
         AxisAlignedBB ab = Coord.aabbFromRange(min, max);
-        List<Entity> ents = min.w.getEntitiesWithinAABBExcludingEntity(null, ab);
+        List<Entity> ents = (List<Entity>) min.w.getEntitiesWithinAABBExcludingEntity(null, ab);
         for (Entity ent : ents) {
             if (ent instanceof EntityPlayer) {
                 continue; //??? We probably could get away with it...

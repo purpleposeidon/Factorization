@@ -1,6 +1,9 @@
-package factorization.truth;
+package factorization.truth.export;
 
 import cpw.mods.fml.common.Loader;
+import factorization.truth.AbstractTypesetter;
+import factorization.truth.DocumentationModule;
+import factorization.truth.Tokenizer;
 import factorization.truth.gen.IDocGenerator;
 import factorization.truth.word.ItemWord;
 import factorization.truth.word.TextWord;

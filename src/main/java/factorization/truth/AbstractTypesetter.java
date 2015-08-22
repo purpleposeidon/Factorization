@@ -17,10 +17,8 @@ public abstract class AbstractTypesetter {
     final FontRenderer font;
     final int pageWidth, pageHeight;
     
-    ArrayList<String> topics = new ArrayList();
-    
-    protected ArrayList<AbstractPage> pages = new ArrayList();
-    private ArrayList<AbstractPage> afterBuffer = new ArrayList();
+    protected ArrayList<AbstractPage> pages = new ArrayList<AbstractPage>();
+    private ArrayList<AbstractPage> afterBuffer = new ArrayList<AbstractPage>();
     protected ArrayList<Word> segmentStart = null;
     
     public AbstractTypesetter(String domain, FontRenderer font, int pageWidth, int pageHeight) {
@@ -48,7 +46,7 @@ public abstract class AbstractTypesetter {
             error("EOF looking for parameter for " + cmdName);
             return null;
         }
-        if (tokenizer.type != tokenizer.type.PARAMETER) {
+        if (tokenizer.type != Tokenizer.TokenType.PARAMETER) {
             error("Expected parameter for " + cmdName);
             return null;
         }
@@ -57,7 +55,7 @@ public abstract class AbstractTypesetter {
 
     public String getOptionalParameter(final Tokenizer tokenizer) {
         if (!tokenizer.nextToken()) return null;
-        if (tokenizer.type != tokenizer.type.PARAMETER) {
+        if (tokenizer.type != Tokenizer.TokenType.PARAMETER) {
             tokenizer.prevToken();
             return null;
         }
@@ -109,10 +107,6 @@ public abstract class AbstractTypesetter {
     
     protected abstract void handleCommand(Tokenizer tokenizer, String cmd, String link, String style);
     
-    int width(String word) {
-        return font.getStringWidth(word);
-    }
-    
     public void emitWord(Word w) {
         WordPage page = getCurrentPage();
         int len = w.getWidth(font);
@@ -153,22 +147,22 @@ public abstract class AbstractTypesetter {
         afterBuffer.clear();
     }
     
-    WordPage newPage() {
+    public WordPage newPage() {
         emptyBuffer();
         current = new WordPage(font);
         pages.add(current);
         segmentStart = null;
         return current;
     }
-    
-    WordPage getCurrentPage() {
+
+    public WordPage getCurrentPage() {
         if (current == null) {
             return newPage();
         }
         return current;
     }
-    
-    ArrayList<AbstractPage> getPages() {
+
+    public ArrayList<AbstractPage> getPages() {
         emptyBuffer();
         return pages;
     }

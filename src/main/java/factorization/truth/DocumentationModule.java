@@ -1,6 +1,7 @@
 package factorization.truth;
 
 import factorization.coremodhooks.HookTargetsClient;
+import factorization.truth.export.ExportHtml;
 import factorization.truth.gen.*;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufInputStream;
@@ -45,7 +46,7 @@ import factorization.util.FzUtil;
 
 public class DocumentationModule {
     public static final DocumentationModule instance = new DocumentationModule();
-    static HashMap<String, IDocGenerator> generators = new HashMap();
+    public static final HashMap<String, IDocGenerator> generators = new HashMap<String, IDocGenerator>();
     
     static HashMap<String, ArrayList<ItemStack>> nameCache = null;
     
@@ -95,14 +96,6 @@ public class DocumentationModule {
                 event.registerServerCommand(new ExportHtml());
             }
         }
-    }
-    
-    static void debugBytes(String header, byte[] d) {
-        System.out.println(header + " #" + d.length);
-        for (byte b : d) {
-            System.out.print(" " + Integer.toString(b));
-        }
-        System.out.println();
     }
     
     //NBT write -> compress -> base64 encode

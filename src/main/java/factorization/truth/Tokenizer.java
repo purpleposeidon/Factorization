@@ -3,7 +3,7 @@ package factorization.truth;
 import static factorization.truth.Tokenizer.TokenType.*;
 
 public class Tokenizer {
-    public static enum TokenType {
+    public enum TokenType {
         WORD, COMMAND, PARAMETER
     }
     

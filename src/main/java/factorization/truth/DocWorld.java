@@ -27,8 +27,8 @@ public class DocWorld extends WorldClient {
     static final int LEN = 16*16*16;
     int[] blockIds;
     int[] blockMetadatas;
-    ArrayList<TileEntity> tileEntities = new ArrayList();
-    ArrayList<Entity> entities = new ArrayList();
+    ArrayList<TileEntity> tileEntities = new ArrayList<TileEntity>();
+    ArrayList<Entity> entities = new ArrayList<Entity>();
     public int diagonal = 32;
     Coord orig = new Coord(this, 0, 0, 0);
     
