@@ -554,6 +554,7 @@ public class Core {
     
     public static String translateExact(String key) {
         String ret = StatCollector.translateToLocal(key);
+        //noinspection StringEquality: StatCollector will return the exact same object if translation fails
         if (ret == key) {
             return null;
         }
