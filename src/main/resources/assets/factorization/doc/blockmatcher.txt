@@ -1,0 +1,12 @@
+\title{Block Matcher}
+
+The Block Matcher is a double-ended block that compares the blocks on both ends.
+If the blocks match, then it emits a brief redstone signal.
+
+Comparators can be used to measure more subtle details, and they have a constant output.
+If the two blocks have the same solidity (such stone and wool, as opposed to air and logs),
+but otherwise have nothing in common, it will output a very weak signal.
+If the two blocks are made of the same kinds of materials, a slightly stronger signal will be emitted.
+If the blocks are absolutely identical, then the comparator will measure the strongest signal.
+
+\topic{tile.BlockMatcher}

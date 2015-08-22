@@ -3,7 +3,6 @@ package factorization.redstone;
 import factorization.api.Coord;
 import factorization.common.BlockIcons;
 import factorization.shared.Core;
-import factorization.shared.NORELEASE;
 import factorization.util.SpaceUtil;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
@@ -23,7 +22,7 @@ public class BlockMatcher extends Block {
         setBlockName("BlockMatcher");
     }
 
-    static final byte STATE_READY = 0, STATE_FIRING = 4, STATE_WAIT = 8;
+    static final byte STATE_READY = 0, STATE_FIRING = 4, STATE_MATCHED = 8;
 
     int makeMd(ForgeDirection axis, byte state) {
         if (SpaceUtil.sign(axis) == 1) axis = axis.getOpposite();
@@ -64,7 +63,7 @@ public class BlockMatcher extends Block {
         Block back = world.getBlock(x + dir2.offsetX, y + dir2.offsetY, z + dir2.offsetZ);
         int backMd = world.getBlockMetadata(x + dir2.offsetX, y + dir2.offsetY, z + dir2.offsetZ);
         boolean backAir = world.isAirBlock(x + dir2.offsetX, y + dir2.offsetY, z + dir2.offsetZ);
-        if (frontAir != backAir) return 0;
+        if (frontAir || backAir) return 0;
         if (front == back) {
             if (frontMd == backMd) {
                 return 4;
@@ -101,24 +100,47 @@ public class BlockMatcher extends Block {
         if (block == this) return;
         int md = world.getBlockMetadata(x, y, z);
         byte state = getState(md);
-        if (state == STATE_READY) {
-            world.scheduleBlockUpdate(x, y, z, this, 2);
-            NORELEASE.println("neighbor changed; update scheduled");
-        } else if (state == STATE_WAIT) {
-            ForgeDirection axis = getAxis(md);
-            byte match = match(world, x, y, z, axis);
-            world.func_147453_f(x, y, z, this);
-            if (match >= 3) {
-                return;
-            }
-            NORELEASE.println("neighbor changed", state, "-->", STATE_READY);
-            world.setBlockMetadataWithNotify(x, y, z, makeMd(axis, STATE_READY), 0);
+        if (state == STATE_FIRING) return;
+        ForgeDirection axis = getAxis(md);
+        byte match = match(world, x, y, z, axis);
+        byte next_state = match >= 3 ? STATE_FIRING : STATE_READY;
+        world.func_147453_f(x, y, z, this); // 'update comparators'; don't do this when firing as it might cause a loop?
+        if (state == STATE_MATCHED && next_state == STATE_FIRING) {
+            return;
         }
+        int notify = Coord.UPDATE | Coord.NOTIFY_NEIGHBORS;
+        final int next_md = makeMd(axis, next_state);
+        if (md == next_md) return;
+        //println("neighbor changed", block.getLocalizedName(), state, "-->", next_state);
+        world.setBlockMetadataWithNotify(x, y, z, next_md, notify);
+        world.scheduleBlockUpdate(x, y, z, this, 4);
     }
 
     @Override
     public boolean canProvidePower() {
         return true;
+    }
+
+    @Override
+    public boolean canConnectRedstone(IBlockAccess world, int x, int y, int z, int side) {
+        int md = world.getBlockMetadata(x, y, z);
+        ForgeDirection axis = getAxis(md);
+        // Great job, forge! This is some right ol' stupid BS!
+        if (axis == ForgeDirection.DOWN) {
+            return side != -1 && side != -2 && side != 4;
+        } else if (axis == ForgeDirection.NORTH) {
+            return side != 0 && side != 2;
+        } else if (axis == ForgeDirection.WEST) {
+            return side != 1 && side != 3;
+        }
+        return false;
+    }
+
+    @Override
+    public boolean isSideSolid(IBlockAccess world, int x, int y, int z, ForgeDirection side) {
+        int md = world.getBlockMetadata(x, y, z);
+        ForgeDirection axis = getAxis(md);
+        return axis != side && axis != side.getOpposite(); // Look how much less stupid this is! :D
     }
 
     @Override
@@ -137,21 +159,12 @@ public class BlockMatcher extends Block {
     @Override
     public void updateTick(World world, int x, int y, int z, Random random) {
         int md = world.getBlockMetadata(x, y, z);
-        byte state = getState(md);
-        byte nextState;
+        ForgeDirection axis = getAxis(md);
+        byte match = match(world, x, y, z, axis);
+        byte nextState = match >= 3 ? STATE_MATCHED : STATE_READY;
         int notify = Coord.UPDATE | Coord.NOTIFY_NEIGHBORS;
-        if (state == STATE_READY) {
-            nextState = STATE_FIRING;
-            world.scheduleBlockUpdate(x, y, z, this, 4);
-        } else if (state == STATE_FIRING) {
-            nextState = STATE_WAIT;
-            world.scheduleBlockUpdate(x, y, z, this, 2);
-        } else {
-            NORELEASE.println("update tick ignored");
-            return;
-        }
         int nextMd = makeMd(getAxis(md), nextState);
-        NORELEASE.println("update tick", state, "-->", nextState);
+        //println("update tick", state, "-->", nextState);
         world.setBlockMetadataWithNotify(x, y, z, nextMd, notify);
     }
 
