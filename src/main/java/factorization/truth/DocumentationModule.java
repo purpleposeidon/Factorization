@@ -66,13 +66,17 @@ public class DocumentationModule {
         nameCache = new HashMap<String, ArrayList<ItemStack>>(items.size());
         for (ItemStack is : items) {
             if (is == null) continue;
-            String itemName = is.getUnlocalizedName();
-            ArrayList<ItemStack> list = nameCache.get(itemName);
-            if (list == null) {
-                list = new ArrayList<ItemStack>();
-                nameCache.put(itemName, list);
+            try {
+                String itemName = is.getUnlocalizedName();
+                ArrayList<ItemStack> list = nameCache.get(itemName);
+                if (list == null) {
+                    list = new ArrayList<ItemStack>();
+                    nameCache.put(itemName, list);
+                }
+                list.add(is);
+            } finally {
+                Core.logSevere("Error getting names from item: " + is.getItem());
             }
-            list.add(is);
         }
     }
     
