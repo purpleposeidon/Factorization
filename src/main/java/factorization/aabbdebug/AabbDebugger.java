@@ -164,6 +164,8 @@ public enum AabbDebugger {
             for (Line line : lines) {
                 GL11.glVertex3d(line.start.xCoord, line.start.yCoord, line.start.zCoord);
                 GL11.glVertex3d(line.end.xCoord, line.end.yCoord, line.end.zCoord);
+                GL11.glVertex3d(line.start.xCoord, line.start.yCoord, line.start.zCoord);
+                GL11.glVertex3d(line.start.xCoord, line.start.yCoord + 0.1, line.start.zCoord);
             }
         }
         GL11.glEnd();
@@ -173,6 +175,8 @@ public enum AabbDebugger {
             for (Line line : frozen_lines) {
                 GL11.glVertex3d(line.start.xCoord, line.start.yCoord, line.start.zCoord);
                 GL11.glVertex3d(line.end.xCoord, line.end.yCoord, line.end.zCoord);
+                GL11.glVertex3d(line.start.xCoord, line.start.yCoord, line.start.zCoord);
+                GL11.glVertex3d(line.start.xCoord, line.start.yCoord + 0.1, line.start.zCoord);
             }
         }
         GL11.glEnd();
