@@ -1265,7 +1265,7 @@ public class Registry {
                 "###",
                 "###",
                 '#', Items.gunpowder);
-        oreRecipe(new ItemStack(Items.gunpowder, 9), blastBlock);
+        shapelessOreRecipe(new ItemStack(Items.gunpowder, 9), blastBlock);
 
         if (Core.enable_test_content) {
             TestContent.add();
