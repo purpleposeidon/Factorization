@@ -1260,13 +1260,12 @@ public class Registry {
                 '#', "cobblestone",
                 '-', "paneGlass",
                 '@', logicMatrixIdentifier);
-        if (DeltaChunk.enabled()) {
-            oreRecipe(new ItemStack(blastBlock),
-                    "###",
-                    "###",
-                    "###",
-                    '#', Items.gunpowder);
-        }
+        oreRecipe(new ItemStack(blastBlock),
+                "###",
+                "###",
+                "###",
+                '#', Items.gunpowder);
+        oreRecipe(new ItemStack(Items.gunpowder, 9), blastBlock);
 
         if (Core.enable_test_content) {
             TestContent.add();
