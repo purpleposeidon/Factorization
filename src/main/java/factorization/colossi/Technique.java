@@ -262,8 +262,8 @@ public enum Technique implements IStateMachine<Technique> {
             int forever = 999999;
             while (baby-- > 0) {
                 EntityZombie zombie = new EntityZombie(controller.worldObj);
-                final boolean jockey = rand.nextDouble() > 0.95;
-                zombie.setChild(true);
+                final boolean jockey = rand.nextDouble() > 0.98;
+                zombie.setChild(false);
                 zombie.addPotionEffect(new PotionEffect(Potion.damageBoost.getId(), forever, 1, true));
                 zombie.addPotionEffect(new PotionEffect(Potion.invisibility.getId(), forever, 1, false));
                 zombie.addPotionEffect(new PotionEffect(Potion.fireResistance.getId(), forever, 1, true));
@@ -275,9 +275,6 @@ public enum Technique implements IStateMachine<Technique> {
                 zombie.setEquipmentDropChance(4, 1);
                 zombie.setCurrentItemOrArmor(3, new ItemStack(Items.fire_charge));
                 zombie.setEquipmentDropChance(3, 1);
-                // Ye gods baby zombie OP no
-                //zombie.setCurrentItemOrArmor(0, new ItemStack(Items.iron_sword));
-                //zombie.setEquipmentDropChance(0, 0);
                 zombie.livingSoundTime = Integer.MIN_VALUE;
                 zombie.setFire(forever);
                 zombie.setCanPickUpLoot(false);
