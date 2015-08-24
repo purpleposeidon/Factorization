@@ -1,6 +1,7 @@
 package factorization.beauty;
 
 import cpw.mods.fml.common.registry.GameRegistry;
+import factorization.algos.ReservoirSampler;
 import factorization.shared.Core;
 import factorization.shared.ItemFactorization;
 import factorization.util.DataUtil;
@@ -18,7 +19,9 @@ import net.minecraft.world.World;
 import net.minecraftforge.oredict.OreDictionary;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
+import java.util.Random;
 
 public class ItemLeafBomb extends ItemFactorization {
     public ItemLeafBomb() {
@@ -57,13 +60,23 @@ public class ItemLeafBomb extends ItemFactorization {
 
     @Override
     public void getSubItems(Item item, CreativeTabs tab, List list) {
-        list.addAll(all);
+        if (todays_leaves == null) {
+            Random rand = new Random(Calendar.getInstance().get(Calendar.DAY_OF_WEEK));
+            ReservoirSampler<ItemStack> sampler = new ReservoirSampler<>(4, rand);
+            for (ItemStack is : all) {
+                if (is.getDisplayName().contains(".")) continue;
+                sampler.give(is);
+            }
+            todays_leaves = sampler.getSamples();
+        }
+        list.addAll(todays_leaves);
     }
 
     ArrayList<ItemStack> all = new ArrayList<ItemStack>();
 
     transient ArrayList<ItemStack> _leaves = new ArrayList<ItemStack>();
     transient ArrayList<String> known = new ArrayList<String>();
+    List<ItemStack> todays_leaves = null;
 
     private void add(ItemStack leaf) {
         String hash = leaf.getUnlocalizedName();
