@@ -48,11 +48,16 @@ import net.minecraftforge.client.event.DrawBlockHighlightEvent;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
 import org.lwjgl.opengl.GL11;
 
+import java.util.WeakHashMap;
+
 public class HammerClientProxy extends HammerProxy {
+    static HammerClientProxy instance;
+
     public HammerClientProxy() {
         RenderDimensionSliceEntity rwe = new RenderDimensionSliceEntity();
         RenderingRegistry.registerEntityRenderingHandler(DimensionSliceEntity.class, rwe);
         Core.loadBus(rwe);
+        HammerClientProxy.instance = this;
     }
     
     //These two classes below make it easy to see in a debugger.
@@ -173,11 +178,11 @@ public class HammerClientProxy extends HammerProxy {
         }
         send_queue.clientWorldController = wc;
     }
-    
+
     private void setWorldAndPlayer(WorldClient wc, EntityClientPlayerMP player) {
         Minecraft mc = Minecraft.getMinecraft();
         if (wc == null || player == null) {
-            Core.logSevere("Setting world/player to null! BRACE FOR IMPACT!");
+            throw new NullPointerException("Tried setting world/player to null!");
         }
         //For logic
         if (mc.renderViewEntity == mc.thePlayer) {
@@ -189,14 +194,35 @@ public class HammerClientProxy extends HammerProxy {
         setSendQueueWorld(wc);
         
         //For rendering
-        mc.renderViewEntity = player; //TODO NOTE: This may mess up in third person!
+        mc.renderViewEntity = player;
         if (TileEntityRendererDispatcher.instance.field_147550_f != null) {
             TileEntityRendererDispatcher.instance.field_147550_f = wc;
         }
         if (RenderManager.instance.worldObj != null) {
             RenderManager.instance.worldObj = wc;
         }
-        mc.renderGlobal.theWorld = wc;
+        renderglobal_cache.put(mc.renderGlobal.theWorld, mc.renderGlobal);
+        mc.renderGlobal = getRenderGlobalForWorld(wc);
+        if (mc.renderGlobal == null) {
+            throw new NullPointerException("mc.renderGlobal");
+        }
+    }
+
+    private final WeakHashMap<World, RenderGlobal> renderglobal_cache = new WeakHashMap<World, RenderGlobal>();
+    private RenderGlobal getRenderGlobalForWorld(WorldClient wc) {
+        RenderGlobal cached = renderglobal_cache.get(wc);
+        if (cached != null) return cached;
+        RenderGlobal ret = new RenderGlobal(Minecraft.getMinecraft());
+        ret.setWorldAndLoadRenderers(wc);
+        renderglobal_cache.put(wc, ret);
+        return ret;
+    }
+
+    public static RenderGlobal getRealRenderGlobal() {
+        if (instance.real_renderglobal == null) {
+            return Minecraft.getMinecraft().renderGlobal;
+        }
+        return instance.real_renderglobal;
     }
 
     @Override
@@ -213,6 +239,7 @@ public class HammerClientProxy extends HammerProxy {
     private EntityClientPlayerMP real_player = null;
     private WorldClient real_world = null;
     private EntityClientPlayerMP fake_player = null;
+    private RenderGlobal real_renderglobal = null;
     
     @Override
     public void setShadowWorld() {
@@ -239,6 +266,7 @@ public class HammerClientProxy extends HammerProxy {
                     real_player.getStatFileWriter());
             fake_player.movementInput = real_player.movementInput;
         }
+        real_renderglobal = mc.renderGlobal;
         setWorldAndPlayer(w, fake_player);
         WrapperAdapter.setShadow(true);
         fake_player.inventory = real_player.inventory;
@@ -249,6 +277,7 @@ public class HammerClientProxy extends HammerProxy {
         setWorldAndPlayer(real_world, real_player);
         real_world = null;
         real_player = null;
+        real_renderglobal = null;
         WrapperAdapter.setShadow(false);
     }
     
@@ -350,7 +379,7 @@ public class HammerClientProxy extends HammerProxy {
                 (float) (box.maxX - here.x), (float) (box.maxY - here.y), (float) (box.maxZ - here.z)
         );
         EntityPlayer player = event.player;
-        RenderGlobal rg = event.context;
+        //RenderGlobal rg = event.context;
         ItemStack is = event.currentItem;
         float partialTicks = event.partialTicks;
         DimensionSliceEntity dse = _hitSlice;
@@ -360,6 +389,7 @@ public class HammerClientProxy extends HammerProxy {
         try {
             GL11.glPushMatrix();
             setShadowWorld();
+            RenderGlobal rg = mc.renderGlobal;
             GL11.glDisable(GL11.GL_ALPHA_TEST);
             /*if (Core.dev_environ) {
                 GL11.glDisable(GL11.GL_DEPTH_TEST);

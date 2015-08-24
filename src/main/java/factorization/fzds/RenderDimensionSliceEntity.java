@@ -14,13 +14,7 @@ import factorization.util.RenderUtil;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.DestroyBlockProgress;
-import net.minecraft.client.renderer.GLAllocation;
-import net.minecraft.client.renderer.OpenGlHelper;
-import net.minecraft.client.renderer.RenderBlocks;
-import net.minecraft.client.renderer.RenderHelper;
-import net.minecraft.client.renderer.Tessellator;
-import net.minecraft.client.renderer.WorldRenderer;
+import net.minecraft.client.renderer.*;
 import net.minecraft.client.renderer.entity.Render;
 import net.minecraft.client.renderer.entity.RenderManager;
 import net.minecraft.client.renderer.texture.TextureMap;
@@ -297,13 +291,15 @@ public class RenderDimensionSliceEntity extends Render implements IFzdsShenaniga
             Tessellator tess = Tessellator.instance;
             startDamageDrawing(tess, player, partial);
             Minecraft mc = Minecraft.getMinecraft();
+
+            RenderGlobal realRg = HammerClientProxy.getRealRenderGlobal();
             
             for (Iterator<DestroyBlockProgress> iterator = damagedBlocks.values().iterator(); iterator.hasNext();) {
                 DestroyBlockProgress damage = iterator.next();
                 if (a.x <= damage.getPartialBlockX() && damage.getPartialBlockX() <= b.x
                         && a.y <= damage.getPartialBlockY() && damage.getPartialBlockY() <= b.y
                         && a.z <= damage.getPartialBlockZ() && damage.getPartialBlockZ() <= b.z) {
-                    renderDamage(a.w, damage, mc.renderGlobal.destroyBlockIcons);
+                    renderDamage(a.w, damage, realRg.destroyBlockIcons);
                 }
             }
             

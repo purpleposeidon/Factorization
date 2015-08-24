@@ -80,7 +80,7 @@ class ShadowRenderGlobal implements IWorldAccess {
         if (realCoords == null) {
             return;
         }
-        Minecraft.getMinecraft().renderGlobal.playRecord(recordName, (int)realCoords.xCoord, (int)realCoords.yCoord, (int)realCoords.zCoord);
+        HammerClientProxy.getRealRenderGlobal().playRecord(recordName, (int) realCoords.xCoord, (int) realCoords.yCoord, (int) realCoords.zCoord);
     }
 
     @Override
@@ -121,12 +121,12 @@ class ShadowRenderGlobal implements IWorldAccess {
     
     @Override
     public void onEntityCreate(Entity entity) {
-        Minecraft.getMinecraft().renderGlobal.onEntityCreate(entity);
+        HammerClientProxy.getRealRenderGlobal().onEntityCreate(entity);
     }
     
     @Override
     public void onEntityDestroy(Entity entity) {
-        Minecraft.getMinecraft().renderGlobal.onEntityDestroy(entity);
+        HammerClientProxy.getRealRenderGlobal().onEntityDestroy(entity);
     }
 
     HashMap<Integer, DestroyBlockProgress> damagedBlocks = new HashMap();
