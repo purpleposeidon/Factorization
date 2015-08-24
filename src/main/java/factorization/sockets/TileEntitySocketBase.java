@@ -398,8 +398,7 @@ public abstract class TileEntitySocketBase extends TileEntityCommon implements I
             Coord at = getCoord();
             at.setTE(replacement);
             replacement.getBlockClass().enforce(at);
-            at.markBlockForUpdate();
-            Core.network.broadcastPacket(null, at, replacement.getDescriptionPacket());
+            at.syncAndRedraw();
         } else if (socket instanceof ServoMotor) {
             ServoMotor motor = (ServoMotor) socket;
             motor.socket = replacement;
