@@ -914,16 +914,6 @@ public class Registry {
                 "III",
                 'I', Items.iron_ingot,
                 '#', Blocks.iron_bars);
-        oreRecipe(steamturbine_item,
-                "I#I",
-                "GXG",
-                "LML",
-                'I', Items.iron_ingot,
-                '#', Blocks.iron_bars,
-                'G', Blocks.glass_pane,
-                'X', fan,
-                'L', "ingotLead",
-                'M', motor );
         oreRecipe(caliometric_burner_item,
                 "BPB",
                 "BAB",
