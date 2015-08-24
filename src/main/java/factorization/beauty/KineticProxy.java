@@ -40,6 +40,8 @@ public class KineticProxy {
         private final TileEntity baseTe;
         private static boolean verified = false;
 
+        private int last_velocity = 0;
+
         private Ic4Fz(IKineticSource base) {
             this.base = base;
             this.baseTe = (TileEntity) base;
@@ -64,12 +66,14 @@ public class KineticProxy {
 
         @Override
         public double takeEnergy(ForgeDirection direction, double maxPower) {
-            return base.requestkineticenergy(direction, (int) (maxPower * IC2_FZ_RATIO)) / IC2_FZ_RATIO;
+            final int avail = base.requestkineticenergy(direction, (int) (maxPower * IC2_FZ_RATIO));
+            last_velocity = avail;
+            return avail / IC2_FZ_RATIO;
         }
 
         @Override
         public double getVelocity(ForgeDirection direction) {
-            double v = base.maxrequestkineticenergyTick(direction) * IC2_ANGULAR_VELOCITY_RATIO;
+            double v = last_velocity * IC2_ANGULAR_VELOCITY_RATIO;
             if (v > MAX_SPEED) v = MAX_SPEED;
             if (v < -MAX_SPEED) v = -MAX_SPEED;
             return v;
