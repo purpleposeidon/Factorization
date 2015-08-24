@@ -230,7 +230,8 @@ public class ColossalBlock extends Block {
         Coord at = new Coord(world, x, y, z);
         ItemStack held = player.getHeldItem();
         int md = at.getMd();
-        if (held != null && held.getItem() == Core.registry.logicMatrixProgrammer && world == DeltaChunk.getServerShadowWorld()) {
+        if (md != MD_CORE) return false;
+        /*if (held != null && held.getItem() == Core.registry.logicMatrixProgrammer && world == DeltaChunk.getServerShadowWorld()) {
             if (Core.registry.logicMatrixProgrammer.isAuthenticated(held)) return true;
             EntityPlayer realPlayer = DeltaChunk.getRealPlayer(player);
             if (realPlayer instanceof FakePlayer || realPlayer == null) {
@@ -238,8 +239,8 @@ public class ColossalBlock extends Block {
             }
             if (realPlayer.worldObj == world) return true;
             return giveUserAuthentication(held, realPlayer, at);
-        }
-        if (PlayerUtil.isPlayerCreative(player) && md == MD_CORE) {
+        }*/
+        if (PlayerUtil.isPlayerCreative(player)) {
             TileEntityColossalHeart heart = at.getTE(TileEntityColossalHeart.class);
             if (heart != null) {
                 if (player.isSneaking()) {
@@ -250,11 +251,8 @@ public class ColossalBlock extends Block {
             }
             return true;
         }
-        if (md == MD_CORE) {
-            Awakener.awaken(at);
-            return true;
-        }
-        return false;
+        Awakener.awaken(at);
+        return true;
     }
 
     private boolean giveUserAuthentication(ItemStack held, EntityPlayer player, Coord at) {
