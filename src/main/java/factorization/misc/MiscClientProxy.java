@@ -192,6 +192,7 @@ public class MiscClientProxy extends MiscProxy {
                 InputStream is = null;
                 try {
                     is = res.getInputStream();
+                    if (is == null) continue;
                     BufferedReader bufferedreader = new BufferedReader(new InputStreamReader(is, Charsets.UTF_8));
                     String s;
 
