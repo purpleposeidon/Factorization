@@ -32,8 +32,8 @@ public interface IRotationalEnergySource {
 
     /**
      * @param direction {@see IRotationalEnergySource#canConnect}
-     * @return The angular velocity, in radians per tick. May be negative. If a generator is causing a shaft to turn
-     * clockwise (looking down the shaft from the position of the generator), then its angular velocity is positive.
+     * @return The angular velocity, in radians per tick. May be negative. If a windmill is causing a shaft to turn
+     * clockwise (looking down the shaft from the position of the windmill), then its angular velocity is positive.
      *
      * This value should be kept synchronized with the client, but need not be exact.
      */
