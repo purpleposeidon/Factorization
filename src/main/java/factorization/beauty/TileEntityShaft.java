@@ -6,6 +6,7 @@ import factorization.api.Coord;
 import factorization.api.IRotationalEnergySource;
 import factorization.api.datahelpers.DataHelper;
 import factorization.api.datahelpers.Share;
+import factorization.common.BlockIcons;
 import factorization.common.FactoryType;
 import factorization.shared.BlockClass;
 import factorization.shared.BlockRenderHelper;
@@ -18,6 +19,7 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.AxisAlignedBB;
+import net.minecraft.util.IIcon;
 import net.minecraft.util.MovingObjectPosition;
 import net.minecraft.util.Vec3;
 import net.minecraft.world.World;
@@ -375,5 +377,10 @@ public class TileEntityShaft extends TileEntityCommon implements IRotationalEner
         invalidateConnections();
         this.axis = axis;
         return true;
+    }
+
+    @Override
+    public IIcon getIcon(ForgeDirection dir) {
+        return BlockIcons.beauty$shaft;
     }
 }

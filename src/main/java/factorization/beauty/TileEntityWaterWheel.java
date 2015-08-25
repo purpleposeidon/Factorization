@@ -5,6 +5,7 @@ import cpw.mods.fml.relauncher.Side;
 import factorization.api.*;
 import factorization.api.datahelpers.DataHelper;
 import factorization.api.datahelpers.Share;
+import factorization.common.BlockIcons;
 import factorization.common.FactoryType;
 import factorization.fzds.DeltaChunk;
 import factorization.fzds.TransferLib;
@@ -24,6 +25,7 @@ import net.minecraft.block.material.Material;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.IIcon;
 import net.minecraft.util.Vec3;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.BiomeGenBase;
@@ -389,5 +391,10 @@ public class TileEntityWaterWheel extends TileEntityCommon implements IRotationa
         water_strength = SpaceUtil.sum(water_torque) * -SpaceUtil.sign(wheelDirection);
 
         updatePowerPerTick();
+    }
+
+    @Override
+    public IIcon getIcon(ForgeDirection dir) {
+        return BlockIcons.beauty$water_side;
     }
 }

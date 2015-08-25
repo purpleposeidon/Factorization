@@ -7,6 +7,7 @@ import factorization.api.datahelpers.DataHelper;
 import factorization.api.datahelpers.Share;
 import factorization.api.wind.IWindmill;
 import factorization.api.wind.WindModel;
+import factorization.common.BlockIcons;
 import factorization.common.FactoryType;
 import factorization.fzds.DeltaChunk;
 import factorization.fzds.TransferLib;
@@ -23,6 +24,7 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.DamageSource;
+import net.minecraft.util.IIcon;
 import net.minecraft.util.Vec3;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.ForgeDirection;
@@ -376,5 +378,10 @@ public class TileEntityWindMill extends TileEntityCommon implements IRotationalE
         return "Efficiency: " + (int) (efficiency * 100) + "%" +
                 "\nWind: " + wind_strength +
                 "\nSpeed: " + speed;
+    }
+
+    @Override
+    public IIcon getIcon(ForgeDirection dir) {
+        return BlockIcons.beauty$wind_side;
     }
 }
