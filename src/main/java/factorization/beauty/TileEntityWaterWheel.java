@@ -116,7 +116,7 @@ public class TileEntityWaterWheel extends TileEntityCommon implements IRotationa
     @Override
     public void putData(DataHelper data) throws IOException {
         wheelDirection = data.as(Share.VISIBLE, "wheelDirection").putEnum(wheelDirection);
-        data.as(Share.PRIVATE, "idcRef").put(idcRef);
+        data.as(Share.VISIBLE, "idcRef").put(idcRef);
         power_per_tick = data.as(Share.VISIBLE, "powerPerTick").putDouble(power_per_tick);
         power_this_tick = data.as(Share.VISIBLE, "powerThisTick").putDouble(power_this_tick);
         target_velocity = data.as(Share.VISIBLE, "targetVelocity").putDouble(target_velocity);
@@ -281,6 +281,9 @@ public class TileEntityWaterWheel extends TileEntityCommon implements IRotationa
 
     @Override
     public String getInfo() {
+        if (!idcRef.trackedAndAlive()) {
+            return "No waterhweel";
+        }
         String speed;
         if (velocity == 0) {
             speed = "stopped";
