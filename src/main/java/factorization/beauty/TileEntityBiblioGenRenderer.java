@@ -20,7 +20,7 @@ public class TileEntityBiblioGenRenderer extends TileEntitySpecialRenderer {
         GL11.glPushMatrix();
         GL11.glTranslated(dx + 0.5F, dy + 0.5F, dz + 0.5F);
         float angle = (float) Math.toDegrees(NumUtil.interp(gen.prev_angle, gen.angle, partial));
-        GL11.glRotatef(angle, 0, 1, 0);
+        GL11.glRotatef(-angle, 0, 1, 0);
         GL11.glTranslatef(0, 4.125F / 16F, 0);
         drawBook();
         GL11.glPopMatrix();
