@@ -34,7 +34,7 @@ public class TileEntitySteamShaft extends TileEntityCommon implements IFluidHand
     public static int TURBINE_MASS = 1000; // force:steam = mass * acceleration --> acceleration = force / mass
     public static double BEARING_DRAG = 0.05; // v -= drag * v**Z // Was 0.001
     public static double DRAW_EFFICIENCY = 0.10; // taking energy causes a loss
-    public static double FORCE_PER_STEAM = 2.0;
+    public static double FORCE_PER_STEAM = 3.0;
     // steam_force / mass = drag * velocity ** z
     // terminal velocity = (steam_force / (mass * drag)) ** (1/z)
     // kmplot: f(f,z) = (f / (20 ∙ 0.001))^(1/1.6)
