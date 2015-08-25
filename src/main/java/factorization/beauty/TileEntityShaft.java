@@ -34,6 +34,7 @@ public class TileEntityShaft extends TileEntityCommon implements IRotationalEner
     ForgeDirection srcConnection = ForgeDirection.UNKNOWN;
     boolean useCustomVelocity = false;
     double customVelocity = 0;
+    byte velocitySign = 1;
 
     @Override
     public BlockClass getBlockClass() {
@@ -51,6 +52,8 @@ public class TileEntityShaft extends TileEntityCommon implements IRotationalEner
         }
         useCustomVelocity = data.as(Share.VISIBLE, "useCustom").putBoolean(useCustomVelocity);
         customVelocity = data.as(Share.VISIBLE, "customVel").putDouble(customVelocity);
+        velocitySign = data.as(Share.VISIBLE, "velocitySign").putByte(velocitySign);
+        if (velocitySign == 0) velocitySign = 1;
     }
 
     @Override
@@ -76,12 +79,12 @@ public class TileEntityShaft extends TileEntityCommon implements IRotationalEner
         if (worldObj.isRemote) {
             prev_angle = angle;
             if (useCustomVelocity) {
-                angle += customVelocity;
+                angle += customVelocity * velocitySign;
                 return;
             }
             IRotationalEnergySource src = getSrc();
             if (src == null) return;
-            angle += src.getVelocity(srcConnection);
+            angle += src.getVelocity(srcConnection) * velocitySign;
         } else if (worldObj.getTotalWorldTime() % 20 == 0) {
             IRotationalEnergySource src = getSrc();
             if (!(src instanceof TileEntity) && src != null) {
@@ -130,7 +133,13 @@ public class TileEntityShaft extends TileEntityCommon implements IRotationalEner
         srcPos = new Coord(this);
         Coord at = getCoord();
         IRotationalEnergySource found = find(at.copy(), axis.getOpposite());
-        if (found != null) return found;
+        byte p = 1;
+        if (axis.offsetX != 0) p = -1;
+        if (found != null) {
+            velocitySign = p;
+            return found;
+        }
+        velocitySign = (byte) -p;
         return find(at, axis);
     }
 
@@ -176,7 +185,7 @@ public class TileEntityShaft extends TileEntityCommon implements IRotationalEner
     public double getVelocity(ForgeDirection direction) {
         IRotationalEnergySource src = getSrc();
         if (src == null) return 0;
-        return src.getVelocity(direction);
+        return src.getVelocity(direction) * velocitySign;
     }
 
     @Override
@@ -357,5 +366,14 @@ public class TileEntityShaft extends TileEntityCommon implements IRotationalEner
             if (tes == null) break;
             tes.angle = baseAngle;
         }
+    }
+
+    @Override
+    public boolean rotate(ForgeDirection axis) {
+        axis = normalizeDirection(axis);
+        if (axis == this.axis) return false;
+        invalidateConnections();
+        this.axis = axis;
+        return true;
     }
 }
