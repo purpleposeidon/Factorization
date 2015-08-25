@@ -298,16 +298,21 @@ public final class SpaceUtil {
         target.maxZ = max.zCoord;
     }
 
-    public static void incrScale(Vec3 base, double s) {
+    public static Vec3 incrScale(Vec3 base, double s) {
         base.xCoord *= s;
         base.yCoord *= s;
         base.zCoord *= s;
+        return base;
     }
 
     public static Vec3 scale(Vec3 base, double s) {
         Vec3 ret = copy(base);
         incrScale(ret, s);
         return ret;
+    }
+
+    public static Vec3 componentMultiply(Vec3 a, Vec3 b) {
+        return incrComponentMultiply(copy(a), b);
     }
 
     public static Vec3 incrComponentMultiply(Vec3 base, Vec3 scale) {

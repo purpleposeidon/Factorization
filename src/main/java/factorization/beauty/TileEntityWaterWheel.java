@@ -16,7 +16,10 @@ import factorization.util.NumUtil;
 import factorization.util.PlayerUtil;
 import factorization.util.SpaceUtil;
 import io.netty.buffer.ByteBuf;
-import net.minecraft.block.*;
+import net.minecraft.block.Block;
+import net.minecraft.block.BlockFence;
+import net.minecraft.block.BlockLog;
+import net.minecraft.block.BlockWall;
 import net.minecraft.block.material.Material;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
@@ -77,7 +80,11 @@ public class TileEntityWaterWheel extends TileEntityCommon implements IRotationa
     @Override
     public double getVelocity(ForgeDirection direction) {
         if (direction != wheelDirection.getOpposite()) return 0;
-        return velocity;
+        // Except I had to reverse it! Silliness!
+        int sign = 1; //SpaceUtil.sign(wheelDirection);
+        if (velocity < -MAX_SPEED) return -MAX_SPEED * sign;
+        if (velocity > MAX_SPEED) return MAX_SPEED * sign;
+        return velocity * sign;
     }
 
     @Override
@@ -243,7 +250,7 @@ public class TileEntityWaterWheel extends TileEntityCommon implements IRotationa
             }
             IDeltaChunk idc = idcRef.getEntity();
             if (idc != null) {
-                idc.setRotationalVelocity(Quaternion.getRotationQuaternionRadians(velocity, wheelDirection));
+                idc.setRotationalVelocity(Quaternion.getRotationQuaternionRadians(getVelocity(wheelDirection.getOpposite()), wheelDirection));
             }
             sendVelocity();
         }
@@ -251,12 +258,12 @@ public class TileEntityWaterWheel extends TileEntityCommon implements IRotationa
         calculateWaterForce();
     }
 
-    static double MAX_SPEED = IRotationalEnergySource.MAX_SPEED / 4; // Maximum velocity (doesn't change power output)
-    static double V_SCALE = 0.05; // Scales down velocity (also doesn't change power output)
-    static double WATER_POWER_SCALE = 1.0 / 25.0; // Boosts the power output (and does not influence velocity)
-    static double riverFlow = 1.0 / Math.sqrt(2); // Water in river biome is considered to have a 'flow' of riverFlow * Vec3(1, 0, 1); same power as diagonally flowing water
+    static double V_SCALE = 0.025; // Scales down velocity (also doesn't change power output)
+    static double WATER_POWER_SCALE = 1.0 / 50.0; // Boosts the power output (and does not influence velocity)
+    static double riverFlow = 1.0 / (Math.sqrt(2) * 2); // Water in river biome is considered to have a 'flow' of riverFlow * Vec3(1, 0, 1); same power as diagonally flowing water
     static double oceanFlow = riverFlow / 8; // And a similar case for oceans
     static double otherFlowNerf = 1.0 / 4.0;
+    static double MAX_SPEED = Math.min(riverFlow / 64, IRotationalEnergySource.MAX_SPEED / 64); // Maximum velocity (doesn't change power output)
     static int sea_level_range_min = -4; // non-flowing blocks within river/ocean biomes, but outside of this range, do not flow
     static int sea_level_range_max = +2; // The range is relative to sealevel ('worldProvider.getAverageGroundLevel'). Sealevel is 64 for normal worlds, 4 for superflat.
 
@@ -286,7 +293,8 @@ public class TileEntityWaterWheel extends TileEntityCommon implements IRotationa
             }
         }
         return "Water power: " + (int) Math.abs(water_strength * 10) +
-                "\nSpeed: " + speed;
+                "\nSpeed: " + speed
+                + NORELEASE.just("\n" + wheelDirection);
     }
 
     void calculateWaterForce() {
@@ -302,7 +310,13 @@ public class TileEntityWaterWheel extends TileEntityCommon implements IRotationa
         final Vec3 tmp = SpaceUtil.newVec();
         final int sea_min = worldObj.provider.getAverageGroundLevel() + sea_level_range_min;
         final int sea_max = worldObj.provider.getAverageGroundLevel() + sea_level_range_max;
-        final Vec3 water_force = SpaceUtil.newVec();
+        final Vec3 water_torque = SpaceUtil.newVec();
+        final Vec3 centerOfMass = idc.getCenter().toMiddleVector();
+        ForgeDirection a = this.wheelDirection;
+        if (SpaceUtil.sign(a) == -1) a = a.getOpposite();
+        final Vec3 mask = SpaceUtil.fromDirection(a);
+        final Vec3 antiMask = SpaceUtil.fromDirection(a.getOpposite());
+        SpaceUtil.incrAdd(antiMask, Vec3.createVectorHelper(1, 1, 1));
 
         ICoordFunction measure = new ICoordFunction() {
             boolean waterOkay(Coord here, Block hereBlock) {
@@ -327,12 +341,14 @@ public class TileEntityWaterWheel extends TileEntityCommon implements IRotationa
                 final Block hereBlock = here.getBlock();
                 if (!hereBlock.isAir(here.w, here.x, here.y, here.z)) {
                     non_air_block_count++;
+                } else {
+                    return;
                 }
                 boolean waterOkay = waterOkay(here, hereBlock);
                 boolean lavaOkay = lavaOkay(here, hereBlock);
                 if (!waterOkay && !lavaOkay) return;
 
-                Coord real = idc.shadow2realCoord(here);
+                Coord real = idc.shadow2realCoordPrecise(here);
                 Block realBlock = real.getBlock();
                 tmp.xCoord = tmp.yCoord = tmp.zCoord = 0;
                 if (waterOkay && realBlock.getMaterial() == Material.water) {
@@ -354,17 +370,20 @@ public class TileEntityWaterWheel extends TileEntityCommon implements IRotationa
                     }
                 } else if (lavaOkay && realBlock.getMaterial() == Material.lava) {
                     realBlock.velocityToAddToEntity(worldObj, real.x, real.y, real.z, null, tmp);
+                } else {
+                    return;
                 }
-                SpaceUtil.incrAdd(water_force, tmp);
+                idc.getRotation().applyReverseRotation(tmp);
+                Vec3 P = SpaceUtil.incrSubtract(here.toMiddleVector(), centerOfMass);
+                SpaceUtil.incrComponentMultiply(P, antiMask); // Remove the axial component of P
+                SpaceUtil.incrComponentMultiply(tmp, antiMask); // And same for F
+                Vec3 torque = tmp.crossProduct(P);
+
+                SpaceUtil.incrAdd(water_torque, torque);
             }
         };
         Coord.iterateCube(idc.getCorner(), idc.getFarCorner(), measure);
-        ForgeDirection a = this.wheelDirection;
-        if (SpaceUtil.sign(a) == +1) a = a.getOpposite();
-        Vec3 mask = SpaceUtil.fromDirection(a);
-        SpaceUtil.incrAdd(mask, Vec3.createVectorHelper(1, 1, 1));
-        SpaceUtil.incrComponentMultiply(water_force, mask);
-        water_strength = SpaceUtil.sum(water_force);
+        water_strength = SpaceUtil.sum(water_torque) * -SpaceUtil.sign(wheelDirection);
 
         updatePowerPerTick();
     }
