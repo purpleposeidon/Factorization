@@ -36,7 +36,6 @@ public class ItemGrossFood extends ItemFactorization {
                     Potion.weakness,
                     Potion.digSlowdown,
                     Potion.moveSlowdown,
-                    Potion.confusion,
                     Potion.blindness,
                     Potion.wither
             }) {
