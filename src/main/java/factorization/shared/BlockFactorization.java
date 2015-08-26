@@ -1,5 +1,6 @@
 package factorization.shared;
 
+import cpw.mods.fml.common.network.internal.FMLProxyPacket;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import factorization.algos.ReservoirSampler;
@@ -217,7 +218,13 @@ public class BlockFactorization extends BlockContainer {
             }
             return world.setBlockToAir(x, y, z);
         }
-        return tec.removedByPlayer(player, willHarvest);
+        boolean ret = tec.removedByPlayer(player, willHarvest);
+        if (!world.isRemote && !ret) {
+            FMLProxyPacket description = tec.getDescriptionPacket();
+            Core.network.broadcastPacket(player, here, description);
+            here.sendRedraw();
+        }
+        return ret;
     }
 
     @Override
