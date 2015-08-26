@@ -4,6 +4,10 @@
   Refactored recipe system to bits
   Added support for IC2's AdvRecipes, so they'll be layedout properly
   Made a change to FZDS's usage of RenderGlobal for Fastcraft compatibility; may cause other issues. Let me know.
+  Leyden jar recipe uses a lead ingot on the bottom instead of glass
+  Screwpump bugfixes
+  Custom titlescreen splashes
+  Colossus uses temporary normal invisible flaming explosive zombies instead of baby invisible flaming explosive zombies.
 
 0.8.96c
   Fix buggy hammer channel allocation
