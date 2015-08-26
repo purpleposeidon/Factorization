@@ -43,3 +43,4 @@ Be wary when pushing them up stairs, as they can slip.
 % Oh well.
 \newpage
 \generate{recipes/item.factorization:daybarrel}
+% \topic{item.factorization:barrelCart}
