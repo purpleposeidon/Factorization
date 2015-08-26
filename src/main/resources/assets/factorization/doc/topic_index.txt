@@ -62,8 +62,8 @@ factorization.factoryBlock.SHAFT	gen/shaft
 item.factorization:utiligoo	goo
 factorization.factoryBlock.SAP_TAP	gen/saptap
 factorization.factoryBlock.LEADWIRE	chargetran
-item.factorization:diamond_shard	ores
 item.factorization:tool/matrix_programmer	lmp
+item.factorization:diamond_shard	ores
 item.factorization:darkIronChain	winch
 tile.factorization.ResourceBlock.SILVERORE	ores
 item.factorization:servo/component.fz.instruction.jmp	instructions/compute
