@@ -53,6 +53,7 @@ public class BlockMatcher extends Block {
         // 2: Same material
         // 3: Same block
         // 4: Same MD
+        // NORELEASE TODO: Barrels
         @SuppressWarnings("UnnecessaryLocalVariable")
         ForgeDirection dir1 = axis;
         ForgeDirection dir2 = axis.getOpposite();
