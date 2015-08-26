@@ -261,10 +261,10 @@ public class ClientTypesetter extends AbstractTypesetter {
                 good = count == mods.length;
             } else if (mode.equalsIgnoreCase("none")) {
                 good = count == 0;
-            } else if (mode.equalsIgnoreCase("some")) {
+            } else if (mode.equalsIgnoreCase("some") || mode.equalsIgnoreCase("any")) {
                 good = count > 1;
             } else {
-                error("\\checkmods first parameter must be 'all', 'none', or 'some', not " + mode);
+                error("\\checkmods first parameter must be 'all', 'none', or 'any', not '" + mode + "'");
                 return;
             }
             String other = getParameter(cmd, tokenizer);
