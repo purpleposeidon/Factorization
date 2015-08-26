@@ -74,8 +74,9 @@ public class DocumentationModule {
                     nameCache.put(itemName, list);
                 }
                 list.add(is);
-            } finally {
+            } catch (Throwable t) {
                 Core.logSevere("Error getting names from item: " + is.getItem());
+                t.printStackTrace();
             }
         }
     }
