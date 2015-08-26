@@ -1,5 +1,6 @@
-#!/bin/sh
+#!/bin/bash
 
 ack-grep --type-set noreleasejava:is:NORELEASE.java --nonoreleasejava NORELEASE src/ QUICK_BUGS TODO
 ack-grep '%i' src/
 ack-grep scala src/
+ack-grep -v Locale <(ack-grep toLowerCase src/) <(ack-grep toUpperCase src/)
