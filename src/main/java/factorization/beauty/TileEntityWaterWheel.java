@@ -298,8 +298,7 @@ public class TileEntityWaterWheel extends TileEntityCommon implements IRotationa
             }
         }
         return "Water power: " + (int) Math.abs(water_strength * 10) +
-                "\nSpeed: " + speed
-                + NORELEASE.just("\n" + wheelDirection);
+                "\nSpeed: " + speed;
     }
 
     void calculateWaterForce() {

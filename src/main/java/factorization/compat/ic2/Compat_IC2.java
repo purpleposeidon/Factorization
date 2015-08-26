@@ -5,7 +5,6 @@ import cpw.mods.fml.common.event.FMLInitializationEvent;
 import cpw.mods.fml.common.event.FMLInterModComms;
 import factorization.compat.CompatBase;
 import factorization.shared.Core;
-import factorization.shared.NORELEASE;
 import factorization.truth.gen.recipe.IObjectWriter;
 import factorization.truth.word.ItemWord;
 import ic2.api.recipe.Recipes;
