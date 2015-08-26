@@ -11,6 +11,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Locale;
 
 public class URIWord extends TextWord implements GuiYesNoCallback {
     final String uriString;
@@ -29,7 +30,7 @@ public class URIWord extends TextWord implements GuiYesNoCallback {
         try {
             uri = new URI(uriString);
 
-            final String scheme = uri.getScheme().toLowerCase();
+            final String scheme = uri.getScheme().toLowerCase(Locale.ROOT);
             if (!safeProtocolSchemes.contains(scheme)) {
                 uri = null;
                 throw new URISyntaxException(uriString, "Unsupported protocol: " + scheme);
