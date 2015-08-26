@@ -1,6 +1,41 @@
+0.8.96i
+  Block Matcher completed
+  Lots of documentation for everything
+  Refactored recipe system to bits
+  Added support for IC2's AdvRecipes, so they'll be layedout properly
+  Made a change to FZDS's usage of RenderGlobal for Fastcraft compatibility; may cause other issues. Let me know.
+
+0.8.96c
+  Fix buggy hammer channel allocation
+  Added (kind of badly done) IC2 & Railcraft fzdoc recipe integration
+  
+0.8.96b
+  Hotblocks: go into your inventory when broken; will break quickly if broken with the correct tool, but won't silk-touch
+
+0.8.96
+  Deleted all anime references from the manual
+  Factored the steam turbine into the whirligig and the charge generator, with optional shaft between them
+  Charge generator can run on IC2 kinetic energy
+  Added anthropic generator
+  Added saptap
+  Added bibliogen
+  Added hotblocks: blocks you've just placed break easily
+  Barrels now work in adventure mode. This required a separate block ID, so only newly placed barrels are adventure-mode-interactible.
+  Barrel ISBRH sides cull
+  Added the 'block matcher'; probably still needs work
+  Added /f debugBlockUpdates ; shows world render updates
+  Pickblock improvement hopefully no longer has lame behavior
+  Added leafbombs; lets you spam leaves nicely
+  Added blast blocks; 9 gunpowder; they chain explosions & can set off TNT; triggered by fire/explosions; currently don't actually explode any blocks, this may be changed
+  The colossus now puts up a proper fight
+  Fixed barrelcart notices
+  Removed all unused textures from resource pack (except for a couple), and also stopped loading textures that weren't used
+  Boilers hold 1 bucket of water & 1 bucket of steam instead of 8 each
+  
+
 0.8.95
   Barrel carts, with lots of help from asie!
-  Made sloped tracks climable! (Can disable with -Dfz.disableRailStairs=true (config in coremods being kind of weird or something? I dunno man.))
+  Made sloped tracks climable! This does require a higher ceiling. (Can disable with JVM option -Dfz.disableRailStairs=true (config in coremods being kind of weird or something? I dunno man.))
   Added IVexatiousCrafting, a general crafting API, so that Vexatos can implement his insane plans.
   Bugfixes & polishes
   Fixed a dupebug reported by dtk.
