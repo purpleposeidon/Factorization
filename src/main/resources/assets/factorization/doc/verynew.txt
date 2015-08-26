@@ -1,2 +1,4 @@
-\index{hotblocks}{\#{tile.fire} Hot Blocks!}
-\index{barrel}{Barrel carts!}
+\index{chargegen}{\#{item.factorization:motor}More powersources!}
+\index{blockmatcher}{\#{tile.BlockMatcher}Block Matching!}
+\index{hotblocks}{\#{item.bucketLava}Hot Blocks!}
+\index{barrel}{\#{item.factorization:barrelCart}Barrel carts!}
