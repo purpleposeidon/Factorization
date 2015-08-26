@@ -62,7 +62,7 @@ public class ItemLeafBomb extends ItemFactorization {
     public void getSubItems(Item item, CreativeTabs tab, List list) {
         if (todays_leaves == null) {
             Random rand = new Random(Calendar.getInstance().get(Calendar.DAY_OF_WEEK));
-            ReservoirSampler<ItemStack> sampler = new ReservoirSampler<>(4, rand);
+            ReservoirSampler<ItemStack> sampler = new ReservoirSampler<ItemStack>(4, rand);
             for (ItemStack is : all) {
                 if (is.getDisplayName().contains(".")) continue;
                 sampler.give(is);
