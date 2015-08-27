@@ -55,7 +55,7 @@ public class ItemWord extends Word {
     }
 
     public ItemWord(Collection<ItemStack> entries) {
-        this(new ItemStack[entries.size()]);
+        this(entries.toArray(new ItemStack[entries.size()]));
     }
     
     static String getDefaultHyperlink(ItemStack is) {
