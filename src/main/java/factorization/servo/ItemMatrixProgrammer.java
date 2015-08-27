@@ -71,11 +71,11 @@ public class ItemMatrixProgrammer extends ItemFactorization {
             new Notice(noteBlock, "noteblock.pitch." + noteBlock.note).withStyle(Style.EXACTPOSITION).send(player);
             return true;
         }
-        if (!player.isSneaking()) {
+        /*if (!player.isSneaking()) {
             if (Core.dev_environ && !world.isRemote) {
             }
             return false;
-        }
+        }*/
         TileEntityServoRail rail = c.getTE(TileEntityServoRail.class);
         if (rail == null) {
             return false;
@@ -88,7 +88,7 @@ public class ItemMatrixProgrammer extends ItemFactorization {
                 c.redraw();
                 c.syncTE();
             }
-            return true;
+            return false;
         }
         if (!decor.isFreeToPlace() && !player.capabilities.isCreativeMode && !world.isRemote) {
             c.spawnItem(decor.toItem());
@@ -148,15 +148,18 @@ public class ItemMatrixProgrammer extends ItemFactorization {
     public IIcon getIconIndex(ItemStack stack) {
         final Minecraft mc = Minecraft.getMinecraft();
         final EntityClientPlayerMP me = mc.thePlayer;
-        if (me != null && stack != null && stack == me.getCurrentArmor(3)) {
-            return ItemIcons.tool$matrix_programmer_tilted;
+        if (me != null && stack != null) {
+            final ItemStack hat = me.getCurrentArmor(3);
+            if (stack == hat || (me.getHeldItem() == stack && isBowed(me) && hat == null)) {
+                return ItemIcons.tool$matrix_programmer_tilted;
+            }
         }
         return super.getIconIndex(stack);
     }
 
     @Override
     public ItemStack onItemRightClick(ItemStack stack, World world, EntityPlayer player) {
-        if (!world.isRemote && player.isSneaking() && player.getCurrentArmor(3) == null) {
+        if (!world.isRemote && player.getCurrentArmor(3) == null) {
             if (isBowed(player)) {
                 ItemStack mask = stack.splitStack(1);
                 player.setCurrentItemOrArmor(4, mask);
@@ -184,7 +187,7 @@ public class ItemMatrixProgrammer extends ItemFactorization {
     }
 
     boolean isBowed(EntityPlayer player) {
-        return player.rotationPitch > 30;
+        return player.rotationPitch > 75 && player.isSneaking();
     }
 
 
