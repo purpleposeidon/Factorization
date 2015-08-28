@@ -189,8 +189,8 @@ public class Registry {
         blasted_bedrock_block = new BlastedBedrock();
         if (DeltaChunk.enabled()) {
             colossal_block = new ColossalBlock();
-            blastBlock = new BlockBlast();
         }
+        blastBlock = new BlockBlast();
         gargantuan_block = new GargantuanBlock().setBlockName("factorization:gargantuanBrick").setCreativeTab(Core.tabFactorization);
         mantlerock_block = new BlockNetherrack().setBlockName("factorization:mantlerock").setBlockTextureName("factorization:mantlerock").setHardness(1.25F).setResistance(7.0F).setStepSound(Block.soundTypeStone);
         matcher_block = new BlockMatcher();
