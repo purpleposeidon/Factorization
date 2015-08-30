@@ -163,7 +163,9 @@ public class TileEntityWindMill extends TileEntityCommon implements IRotationalE
     @Override
     public void neighborChanged(Block neighbor) {
         if (working) return;
-        if (idcRef.trackedAndAlive()) return;
+        if (idcRef.trackedAndAlive()) {
+            updateRedstoneState();
+        }
         working = true;
         try {
             trySpawnMill();
@@ -230,6 +232,7 @@ public class TileEntityWindMill extends TileEntityCommon implements IRotationalE
         idcRef.trackEntity(idc);
         updateWindStrength(true);
         idc.setPartName("Windmill");
+        updateRedstoneState();
         return true;
     }
 
@@ -390,8 +393,7 @@ public class TileEntityWindMill extends TileEntityCommon implements IRotationalE
     private static final byte UNSET = 0, POWERED = 1, UNPOWERED = 2;
     private byte redstone_mode = UNSET;
 
-    @Override
-    public void neighborChanged() {
+    private void updateRedstoneState() {
         byte next = getCoord().isWeaklyPowered() ? POWERED : UNPOWERED;
         if (next == redstone_mode) return;
         redstone_mode = next;
