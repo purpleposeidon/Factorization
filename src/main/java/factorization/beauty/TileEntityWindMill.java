@@ -313,6 +313,7 @@ public class TileEntityWindMill extends TileEntityCommon implements IRotationalE
                 WindModel.activeModel.registerWindmillTileEntity(this);
             }
         }
+        score -= 5; // Don't turn if it's just a shaft or whatever
         int sum = score - asymetry * 20;
         if (sum < 0) {
             efficiency = 0;
@@ -322,7 +323,8 @@ public class TileEntityWindMill extends TileEntityCommon implements IRotationalE
         if (sum > max_score) {
             sum = max_score;
         }
-        efficiency = sum / (double) max_score;
+        efficiency = sum / (double) (max_score / 8);
+        if (efficiency > 1) efficiency = 1;
         updatePowerPerTick();
     }
 
@@ -383,5 +385,16 @@ public class TileEntityWindMill extends TileEntityCommon implements IRotationalE
     @Override
     public IIcon getIcon(ForgeDirection dir) {
         return BlockIcons.beauty$wind_side;
+    }
+
+    private static final byte UNSET = 0, POWERED = 1, UNPOWERED = 2;
+    private byte redstone_mode = UNSET;
+
+    @Override
+    public void neighborChanged() {
+        byte next = getCoord().isWeaklyPowered() ? POWERED : UNPOWERED;
+        if (next == redstone_mode) return;
+        redstone_mode = next;
+        updateWindStrength(true);
     }
 }
