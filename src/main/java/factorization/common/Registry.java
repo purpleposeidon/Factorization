@@ -927,14 +927,14 @@ public class Registry {
                     "#I#",
                     "===",
                     "#I#",
-                    '#', "logWood",
+                    '#', "plankWood",
                     'I', dark_iron_block_item,
                     '=', wooden_shaft);
             oreRecipe(wind_mill,
                     "#=#",
                     "I=I",
                     "#=#",
-                    '#', "logWood",
+                    '#', "plankWood",
                     'I', dark_iron_block_item,
                     '=', wooden_shaft);
         }
