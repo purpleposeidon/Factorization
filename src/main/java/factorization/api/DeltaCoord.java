@@ -31,6 +31,10 @@ public class DeltaCoord implements IDataSerializable {
         this.z = orig.z;
     }
 
+    public DeltaCoord(ForgeDirection dir) {
+        this(dir.offsetX, dir.offsetY, dir.offsetZ);
+    }
+
     public DeltaCoord add(DeltaCoord o) {
         return new DeltaCoord(x + o.x, y + o.y, z + o.z);
     }
@@ -41,6 +45,13 @@ public class DeltaCoord implements IDataSerializable {
     
     public DeltaCoord scale(double d) {
         return new DeltaCoord((int)(x*d), (int)(y*d), (int)(z*d));
+    }
+
+    public DeltaCoord incrScale(int s) {
+        x *= s;
+        y *= s;
+        z *= s;
+        return this;
     }
 
     public boolean isZero() {

@@ -39,6 +39,7 @@ public class TileEntityWaterWheel extends TileEntityCommon implements IRotationa
     ForgeDirection wheelDirection = ForgeDirection.UP;
     double power_per_tick, power_this_tick, target_velocity, velocity;
     double water_strength = 0;
+    boolean rs_power = false;
     int non_air_block_count;
     final EntityReference<IDeltaChunk> idcRef = new EntityReference<IDeltaChunk>();
 
@@ -124,6 +125,7 @@ public class TileEntityWaterWheel extends TileEntityCommon implements IRotationa
         target_velocity = data.as(Share.VISIBLE, "targetVelocity").putDouble(target_velocity);
         velocity = data.as(Share.VISIBLE, "velocity").putDouble(velocity);
         water_strength = data.as(Share.PRIVATE, "water_strength").putDouble(water_strength);
+        rs_power = data.as(Share.PRIVATE, "rs_power").putBoolean(rs_power);
     }
 
     @Override
@@ -146,7 +148,17 @@ public class TileEntityWaterWheel extends TileEntityCommon implements IRotationa
     @Override
     public void neighborChanged(Block neighbor) {
         if (working) return;
-        if (idcRef.trackedAndAlive()) return;
+        if (idcRef.trackedAndAlive()) {
+            if (getCoord().isWeaklyPowered() != rs_power) {
+                rs_power = !rs_power;
+                if (rs_power) {
+                    target_velocity = 0;
+                } else {
+                    calculateWaterForce();
+                }
+            }
+            return;
+        }
         working = true;
         try {
             trySpawnMill();
@@ -262,10 +274,10 @@ public class TileEntityWaterWheel extends TileEntityCommon implements IRotationa
 
     static double V_SCALE = 0.025; // Scales down velocity (also doesn't change power output)
     static double WATER_POWER_SCALE = 1.0 / 50.0; // Boosts the power output (and does not influence velocity)
-    static double riverFlow = 1.0 / (Math.sqrt(2) * 2); // Water in river biome is considered to have a 'flow' of riverFlow * Vec3(1, 0, 1); same power as diagonally flowing water
+    static double riverFlow = 1.0 / (Math.sqrt(2) * 8); // Water in river biome is considered to have a 'flow' of riverFlow * Vec3(1, 0, 1); same power as diagonally flowing water
     static double oceanFlow = riverFlow / 8; // And a similar case for oceans
     static double otherFlowNerf = 1.0 / 4.0;
-    static double MAX_SPEED = Math.min(riverFlow / 64, IRotationalEnergySource.MAX_SPEED / 64); // Maximum velocity (doesn't change power output)
+    static double MAX_SPEED = Math.min(1.0 / (Math.sqrt(2) * 2) / 64, IRotationalEnergySource.MAX_SPEED / 64); // Maximum velocity (doesn't change power output)
     static int sea_level_range_min = -4; // non-flowing blocks within river/ocean biomes, but outside of this range, do not flow
     static int sea_level_range_max = +2; // The range is relative to sealevel ('worldProvider.getAverageGroundLevel'). Sealevel is 64 for normal worlds, 4 for superflat.
 
@@ -318,6 +330,7 @@ public class TileEntityWaterWheel extends TileEntityCommon implements IRotationa
         final Vec3 centerOfMass = idc.getCenter().toMiddleVector();
         ForgeDirection a = this.wheelDirection;
         if (SpaceUtil.sign(a) == -1) a = a.getOpposite();
+        final DeltaCoord fwd = new DeltaCoord(wheelDirection).incrScale(3);
         final Vec3 mask = SpaceUtil.fromDirection(a);
         final Vec3 antiMask = SpaceUtil.fromDirection(a.getOpposite());
         SpaceUtil.incrAdd(antiMask, Vec3.createVectorHelper(1, 1, 1));
@@ -359,14 +372,20 @@ public class TileEntityWaterWheel extends TileEntityCommon implements IRotationa
                     if (realBlock.getMobilityFlag() == 0) return;
                     realBlock.velocityToAddToEntity(worldObj, real.x, real.y, real.z, null, tmp);
                     if (tmp.xCoord == 0 && tmp.yCoord == 0 && tmp.zCoord == 0) {
-                        final BiomeGenBase biome = real.getBiome();
+                        BiomeGenBase biome = real.getBiome();
                         if (NumUtil.intersect(sea_min, sea_max, real.y, real.y)) {
-                            if (biome instanceof BiomeGenRiver) {
-                                tmp.xCoord = riverFlow;
-                                tmp.zCoord = riverFlow;
-                            } else if (biome instanceof BiomeGenOcean) {
-                                tmp.xCoord = oceanFlow;
-                                tmp.zCoord = oceanFlow;
+                            for (int forward = 0; forward < 1; forward++) {
+                                if (biome instanceof BiomeGenRiver) {
+                                    tmp.xCoord = riverFlow;
+                                    tmp.zCoord = riverFlow;
+                                } else if (biome instanceof BiomeGenOcean) {
+                                    tmp.xCoord = oceanFlow;
+                                    tmp.zCoord = oceanFlow;
+                                } else {
+                                    biome = real.add(fwd).getBiome();
+                                    continue;
+                                }
+                                break;
                             }
                         }
                     } else {
