@@ -16,6 +16,7 @@ import factorization.fzds.interfaces.IDCController;
 import factorization.fzds.interfaces.IDeltaChunk;
 import factorization.shared.*;
 import factorization.util.FzUtil;
+import factorization.util.NumUtil;
 import factorization.util.PlayerUtil;
 import factorization.util.SpaceUtil;
 import io.netty.buffer.ByteBuf;
@@ -278,7 +279,12 @@ public class TileEntityWindMill extends TileEntityCommon implements IRotationalE
             }
             sendVelocity();
         }
-        if (!dirty) return;
+        if (!dirty) {
+            if (worldObj.getTotalWorldTime() % 1200 == 0) {
+                dirty = true;
+            }
+            return;
+        }
         if (worldObj.getTotalWorldTime() % 40 != 0) return;
         calculate();
     }
@@ -296,7 +302,7 @@ public class TileEntityWindMill extends TileEntityCommon implements IRotationalE
         Coord center = idc.getCenter();
         center.y -= MAX_IN;
         int ys = MAX_IN + MAX_OUT;
-        int max_score = 1;
+        double max_score = 1;
         double new_radius = 0;
         while (ys-- > 0) {
             Symmetry symmetry = new Symmetry(center, MAX_RADIUS, ForgeDirection.UP);
@@ -307,6 +313,7 @@ public class TileEntityWindMill extends TileEntityCommon implements IRotationalE
             max_score = symmetry.max_score;
             new_radius = Math.max(symmetry.measured_radius, new_radius);
         }
+        max_score = MAX_RADIUS * 4 * 3;
         if (radius != new_radius) {
             if (radius != 0) {
                 WindModel.activeModel.deregisterWindmillTileEntity(this);
@@ -317,17 +324,16 @@ public class TileEntityWindMill extends TileEntityCommon implements IRotationalE
             }
         }
         score -= 5; // Don't turn if it's just a shaft or whatever
-        int sum = score - asymetry * 20;
+        double sum = score - asymetry * 20;
         if (sum < 0) {
             efficiency = 0;
             return;
         }
-        max_score /= 5;
         if (sum > max_score) {
             sum = max_score;
         }
-        efficiency = sum / (double) (max_score / 8);
-        if (efficiency > 1) efficiency = 1;
+        efficiency = sum / (max_score / 8);
+        efficiency = NumUtil.clip(efficiency, 0, 1);
         updatePowerPerTick();
     }
 
