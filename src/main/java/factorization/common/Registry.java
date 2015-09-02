@@ -550,7 +550,8 @@ public class Registry {
                 'I', dark_iron,
                 '#', logicMatrix,
                 '>', Items.comparator);
-        TileEntitySlagFurnace.SlagRecipes.register(new ItemStack(logicMatrixProgrammer), 2F/3F, new ItemStack(dark_iron), 0.85F, new ItemStack(logicMatrix));
+        TileEntitySlagFurnace.SlagRecipes.register(new ItemStack(logicMatrixProgrammer), 2F / 3F, new ItemStack(dark_iron), 0.85F, new ItemStack(logicMatrix));
+        TileEntitySlagFurnace.SlagRecipes.register(dark_iron_sprocket.copy(), 3.5F, new ItemStack(dark_iron), 0.5F, new ItemStack(silver_ingot));
         
         TileEntityCrystallizer.addRecipe(new ItemStack(Blocks.redstone_block), new ItemStack(logicMatrix), 1, Core.registry.aqua_regia);
 
