@@ -23,7 +23,8 @@ public class BlockBlast extends Block {
         setBlockName("blastBlock");
         setBlockTextureName("factorization:blastBlock");
         setCreativeTab(Core.tabFactorization);
-        setResistance(10);
+        setHardness(1.5F);
+        setResistance(10F);
     }
 
     int blast_radius = 1;
