@@ -16,10 +16,7 @@ import net.minecraft.item.crafting.ShapelessRecipes;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.world.World;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 
 public final class CraftUtil {
     private static final ItemStack[] slots3x3 = new ItemStack[9];
@@ -249,14 +246,27 @@ public final class CraftUtil {
     }
 
     public static IRecipe lookupRecipeUncached(InventoryCrafting inv, World world) {
-        List<IRecipe> craftingManagerRecipes = CraftingManager.getInstance().getRecipeList();
-        for (int i = 0; i < craftingManagerRecipes.size(); i++) {
-            IRecipe recipe = craftingManagerRecipes.get(i);
-            if (recipe.matches(inv, world)) {
-                return recipe;
+        while (true) {
+            List<IRecipe> craftingManagerRecipes = CraftingManager.getInstance().getRecipeList();
+            Iterator<IRecipe> iterator = craftingManagerRecipes.iterator();
+            IRecipe recipe = null;
+            try {
+                while (iterator.hasNext()) {
+                    recipe = iterator.next();
+                    if (recipe.matches(inv, world)) {
+                        return recipe;
+                    }
+                }
+            } catch (Throwable t) {
+                if (recipe == null) return null; // Won't happen.
+                Core.logSevere("Recipe crashed: " + recipe.getClass() + " for " + recipe.getRecipeOutput());
+                Core.logSevere("It has been removed.");
+                iterator.remove();
+                t.printStackTrace();
+                continue;
             }
+            return null;
         }
-        return null;
     }
 
     //Recipe creation
