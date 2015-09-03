@@ -1,6 +1,7 @@
 package factorization.truth.export;
 
 import cpw.mods.fml.common.Loader;
+import factorization.shared.Core;
 import factorization.truth.AbstractTypesetter;
 import factorization.truth.DocumentationModule;
 import factorization.truth.Tokenizer;
@@ -93,7 +94,11 @@ public class HtmlConversionTypesetter extends AbstractTypesetter {
                 error("missing content parameter");
                 return;
             }
-            s("<a href=\"" + root + newLink + ".html\">", null);
+            String ref = newLink;
+            if (!newLink.contains("://")) {
+                ref = root + newLink + ".html";
+            }
+            s("<a href=\"" + ref + "\">", null);
             process(content, newLink, style);
             s("</a>", null);
             if (cmd.equals("\\index")) {
@@ -184,7 +189,7 @@ public class HtmlConversionTypesetter extends AbstractTypesetter {
                 good = count == mods.length;
             } else if (mode.equalsIgnoreCase("none")) {
                 good = count == 0;
-            } else if (mode.equalsIgnoreCase("some")) {
+            } else if (mode.equalsIgnoreCase("some") || mode.equalsIgnoreCase("any")) {
                 good = count > 1;
             } else {
                 error("\\checkmods first parameter must be 'all', 'none', or 'some', not " + mode);
@@ -208,6 +213,13 @@ public class HtmlConversionTypesetter extends AbstractTypesetter {
             String url = getParameter(cmd, tokenizer);
             String content = getParameter(cmd, tokenizer);
             process(content, url, style);
+        } else if (cmd.equals("\\local")) {
+            String localizationKey = getParameter(cmd, tokenizer);
+            if (localizationKey == null) {
+                error("\\local missing parameter: localizationKey");
+                return;
+            }
+            s(Core.translate(localizationKey), link);
         } else {
             error("Unknown command: ");
             emit(cmd, null);
@@ -215,13 +227,7 @@ public class HtmlConversionTypesetter extends AbstractTypesetter {
     }
 
     void s(String s, String link) {
-        if (link != null) {
-            out.print("<a href=\"" + link + "\">");
-        }
         out.print(s);
-        if (link != null) {
-            out.print("</a>");
-        }
     }
 
     static String esc(String s) {
