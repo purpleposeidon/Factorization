@@ -1,4 +1,4 @@
-\index{chargegen}{\#{item.factorization:motor}More powersources!}
+\index{chargegen}{\#{factorization.factoryBlock.STEAM_SHAFT}More power!}
 \index{blockmatcher}{\#{tile.BlockMatcher}Block Matching!}
 \index{hotblocks}{\#{item.bucketLava}Hot Blocks!}
 \index{barrel}{\#{item.factorization:barrelCart}Barrel carts!}

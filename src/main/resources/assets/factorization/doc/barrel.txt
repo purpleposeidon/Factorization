@@ -1,12 +1,11 @@
 \title{The Barrel}
 
 Barrels can store up to 64 stacks of a single item.
-So, one of them can store 64 * 64 = 4096 sticks,
-64 swords, or 64 * 16 = 1024 eggs.
+So, a single barrel can store 4096 sticks,
+64 swords, or 1024 eggs.
 
-The barrel has no GUI.
-Right click with an item what you are holding,
-and left click to remove a stack.
+Right clicking a barrel will store what you're holding,
+and left clicking removes a stack.
 Shift left clicking will remove a single item.
 Double right-clicking will fill the barrel
 from your inventory.
@@ -20,7 +19,7 @@ Items can only be extracted from the bottom of the barrel.
 Insertion is done from the top, or the back.
 
 \newpage
-There are a few important varieties of barrel.
+There are a few variations of the standard barrel.
 
 The hopping barrel will pull one item from its above into it,
 and push one item out its bottom, at the same speed as a
@@ -31,12 +30,13 @@ A direct redstone signal will disable it.
 The silky barrel will hold its contents
 if it is broken with a silk-touch axe.
 
+The first item put into a sticky barrel gets stuck to the slime, and must be removed manually.
 
 \newpage
 
 If you are under the influence of a Strength Potion,
 you can push barrels with a knockback sword.
-Be wary when pushing them up stairs, as they can slip.
+They can be pushed up stairs and slabs.
 
 % \topic{item.factorization:daybarrel}
 % Doesn't show the variations recipes, so we do this the ugly way.
@@ -44,3 +44,4 @@ Be wary when pushing them up stairs, as they can slip.
 \newpage
 \generate{recipes/item.factorization:daybarrel}
 % \topic{item.factorization:barrelCart}
+\i{(Not all recipes are shown. Barrels can be made out of most logs and their corresponding slab.)}

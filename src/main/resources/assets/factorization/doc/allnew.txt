@@ -1,13 +1,12 @@
 \title{New!}
 
 \include{verynew}
+\index{poster}{\#{item.factorization:spawnPoster}Put items on Posters!}
+\index{hinge}{\#{factorization.factoryBlock.HINGE}Hinge (more features!)} 
+\index{winch}{\#{item.factorization:servo/sprocket}Winch}
 
-\index{poster}{\#{item.factorization:spawnPoster} Poster} sticks items anywhere!
-
-\index{hinge}{\#{factorization.factoryBlock.HINGE} Hinge (more features!)} 
-
-\index{winch}{\#{item.factorization:servo/sprocket} Winch}
-
+\seg
 Red stained clay too plain?
 \nl Netherrack too ugly?
 \nl Try Mantlerock! \#{tile.factorization:mantlerock}
+\endseg

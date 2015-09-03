@@ -11,7 +11,6 @@ Charge is created by the \link{gen/charge}{Charge Generator}, which creates char
 The whirligig gets steam from the \link{gen/boiler}{Boiler},
 which can be heated by \link{gen/mirror}{Solar Power},
 or by feeding various substances to the \link{gen/calio}{Caliometric Burner}:
-
 \- \link{gen/saptap}{Tree Sap}
 \- \link{gen/anthro}{People Power}
 \- Food

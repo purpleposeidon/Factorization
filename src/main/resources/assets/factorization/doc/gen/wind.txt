@@ -21,7 +21,7 @@ including efficiency and windspeed.
 
 \img{factorization:textures/screenshots/windmill.png}
 
-\link{https://duckduckgo.com/?q=minecraft+windmill&ia=images&iax=1}{Search for images of windmills}
+\url{https://duckduckgo.com/?q=minecraft+windmill&ia=images&iax=1}{Search for images of windmills}
 
 
 \topic{factorization.factoryBlock.WIND_MILL_GEN}

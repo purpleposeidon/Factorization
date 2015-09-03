@@ -62,9 +62,9 @@ public class ExportHtml implements ICommand {
     void processFile(String filename) throws IOException {
         Core.logInfo("Processing: " + filename);
         String root = System.getProperty("fzdoc.webroot", "/FzDocs/");
-        String outDir = System.getProperty("fzdoc.out", "/tmp/fzdoc-html/");
+        String outDir = System.getProperty("fzdoc.out", "/var/www/FzDocs/");
         File outfile = new File(outDir + filename + ".html");
-        if (!outfile.getParentFile().mkdirs()) {
+        if (!outfile.getParentFile().mkdirs() && !outfile.getParentFile().exists()) {
             throw new IOException("Failed to create output directory");
         }
         if (outfile.exists()) {

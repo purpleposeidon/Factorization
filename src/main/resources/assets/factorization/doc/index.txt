@@ -1,14 +1,14 @@
 \title{The Factorization Manual}
 \nl
 % \i{v. @FZVERSION@}
-% \nl
+\nl
 
-
+\seg
 \index{about}{\#{item.factorization:docbook}About}
 \index{lmp}{\#{item.factorization:tool/matrix_programmer}The Logic Matrix Programmer}
-\index{ores}{\#{tile.oreGold}Ores and Materials}
+\index{ores}{\#{tile.factorization:darkIronOre}Ores and Materials}
 \index{parts}{\#{factorization.factoryBlock.SOCKET_EMPTY}Parts and Machines}
-\index{charge}{\#{item.factorization:motor}Charge Energy}
+\index{charge}{\#{factorization.factoryBlock.SHAFT_GEN}Charge Energy}
 % \index{oreprocessing}{Ore Processing}
 \index{building}{\#{tile.fence}Building}
 \ifhtml{
@@ -18,22 +18,17 @@
 \index{misc}{\#{item.fish.salmon.raw}Miscellaneous Nonsense}
 \ifhtml{}{\index{reference}{\#{tile.bookshelf}Reference}}
 \index{deprecation}{\#{item.skull.skeleton}Deprecation}
+\endseg
 
-
-% \figure{
-% H4sIAAAAAAAAAO3csQ3CQAwF0H+XCpKCDRiAHZgGCoqIhgKYnJILYoOcRMF7kuVfWW7cepsMKack
-% dZNyzqKF2yeMKXOySwelxxAAAAAAAAAAAAAAAAAAAAD4Z0Pq9Z7UwxKeLbzGlMv3M0BtNa0Yvu+z
-% I/ADU9bdPwAAAAAAAAAAAAAAAAAA0MnyEODR+jFv0UE2kUmAAAA=
-% }
-
-\newpage
+\seg
 \title{New!}
 
 \include{verynew}
-
 \link{allnew}{\#{item.seeds}Other New Things}
+\endseg
 
 
+\seg
+\ifhtml{}{\#{tile.web} \url{https://purpleposeidon.github.io/FzDocs/}{FZ Manual Website}}
 \checkmods{any}{ForgeIRC}{Join us in #factorization on irc.esper.net!}{}
-
-\url{https://purpleposeidon.github.io/FzDocs/}{Web Docs}
+\endseg
