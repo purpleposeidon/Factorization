@@ -36,3 +36,4 @@
 
 \checkmods{any}{ForgeIRC}{Join us in #factorization on irc.esper.net!}{}
 
+\url{https://purpleposeidon.github.io/FzDocs/}{Web Docs}
