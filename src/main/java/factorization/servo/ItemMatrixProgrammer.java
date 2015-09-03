@@ -82,20 +82,23 @@ public class ItemMatrixProgrammer extends ItemFactorization {
         }
         rail.priority = 0;
         Decorator decor = rail.getDecoration();
-        if (decor == null) {
-            if (rail.color != FzColor.NO_COLOR) {
-                rail.color = FzColor.NO_COLOR;
-                c.redraw();
-                c.syncTE();
+        if (player.isSneaking()) {
+            if (decor == null) {
+                if (rail.color != FzColor.NO_COLOR) {
+                    rail.color = FzColor.NO_COLOR;
+                    c.redraw();
+                    c.syncTE();
+                }
+                return false;
             }
+            if (!decor.isFreeToPlace() && !player.capabilities.isCreativeMode && !world.isRemote) {
+                c.spawnItem(decor.toItem());
+            }
+            rail.setDecoration(null);
+            c.redraw();
             return false;
         }
-        if (!decor.isFreeToPlace() && !player.capabilities.isCreativeMode && !world.isRemote) {
-            c.spawnItem(decor.toItem());
-        }
-        rail.setDecoration(null);
-        c.redraw();
-        return true;
+        return false;
     }
 
     @Override
