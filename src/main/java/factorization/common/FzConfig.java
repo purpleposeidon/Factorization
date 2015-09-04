@@ -240,6 +240,7 @@ public class FzConfig {
         lacerator_block_graylist = Graylist.ofBlocks(getStringConfig("laceratorBlockGraylist", "server", "-minecraft:bedrock,minecraft:end_portal", "Comma-separated list of block names. In front of the list must be either a +, for white-listing, or a -, for black-listing."));
         f = getStringConfig("miscClientCommand", "client", f, "Use this to change the /f command to avoid conflict with the Factions bukkit plugin");
         ic2_kinetic_compat = getBoolConfig("ic2KineticCompat", "server", ic2_kinetic_compat, "Compatability with IC2's IKineticSource");
+        getStringConfig("README", "fzds", "See hammerChannels.cfg for FZDS-related configuration", "");
 
         if (!DeltaChunk.enabled()) {
             gen_colossi = false;
