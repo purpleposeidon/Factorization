@@ -79,7 +79,13 @@ public class ItemLeafBomb extends ItemFactorization {
     List<ItemStack> todays_leaves = null;
 
     private void add(ItemStack leaf) {
-        String hash = leaf.getUnlocalizedName();
+        String hash;
+        try {
+            hash = leaf.getUnlocalizedName();
+        } catch (Throwable t) {
+            t.printStackTrace();
+            return;
+        }
         if (known.contains(hash)) return;
         known.add(hash);
         _leaves.add(leaf);
