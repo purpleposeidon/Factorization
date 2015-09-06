@@ -73,7 +73,7 @@ public class TileEntityShaft extends TileEntityCommon implements IRotationalEner
 
     @Override
     public boolean canUpdate() {
-        return FMLCommonHandler.instance().getEffectiveSide() == Side.CLIENT || KineticProxy.ic2compatEnabled;
+        return true;
     }
 
     @Override
@@ -117,7 +117,7 @@ public class TileEntityShaft extends TileEntityCommon implements IRotationalEner
                 return _src;
             }
             TileEntity te = srcPos.getTE();
-            _src = KineticProxy.cast(te);
+            _src = IRotationalEnergySource.adapter.cast(te);
             if (_src == null) {
                 _src = this;
             }
@@ -155,7 +155,7 @@ public class TileEntityShaft extends TileEntityCommon implements IRotationalEner
                 if (shaft.axis != axis) return null;
                 continue;
             }
-            IRotationalEnergySource ret = KineticProxy.cast(te);
+            IRotationalEnergySource ret = IRotationalEnergySource.adapter.cast(te);
             if (ret != null) {
                 srcConnection = dir.getOpposite();
                 srcPos = at.copy();
@@ -281,8 +281,8 @@ public class TileEntityShaft extends TileEntityCommon implements IRotationalEner
 
     private boolean isUnconnected() {
         ForgeDirection back = axis.getOpposite();
-        boolean a = KineticProxy.cast(getCoord().add(axis).getTE()) == null;
-        boolean b = KineticProxy.cast(getCoord().add(back).getTE()) == null;
+        boolean a = IRotationalEnergySource.adapter.cast(getCoord().add(axis).getTE()) == null;
+        boolean b = IRotationalEnergySource.adapter.cast(getCoord().add(back).getTE()) == null;
         return a && b;
     }
 
@@ -322,7 +322,7 @@ public class TileEntityShaft extends TileEntityCommon implements IRotationalEner
                 }
                 continue;
             }
-            IRotationalEnergySource res = KineticProxy.cast(neighbor.getTE());
+            IRotationalEnergySource res = IRotationalEnergySource.adapter.cast(neighbor.getTE());
             if (res == null) continue;
             if (res.canConnect(neighborDirection.getOpposite())) {
                 lockedDirection = neighborDirection.getOpposite();

@@ -3,6 +3,7 @@ package factorization.compat.ic2;
 
 import cpw.mods.fml.common.event.FMLInitializationEvent;
 import cpw.mods.fml.common.event.FMLInterModComms;
+import factorization.api.IRotationalEnergySource;
 import factorization.compat.CompatBase;
 import factorization.shared.Core;
 import factorization.truth.gen.recipe.IObjectWriter;
@@ -19,6 +20,8 @@ import java.util.List;
 public class Compat_IC2 extends CompatBase {
     @Override
     public void init(FMLInitializationEvent event) {
+        IRotationalEnergySource.adapter.register(new RotationalEnergySourceAdapter());
+
         Class cl = Recipes.class;
         for (Field field : cl.getFields()) {
             final int modifiers = field.getModifiers();
@@ -51,7 +54,7 @@ public class Compat_IC2 extends CompatBase {
         }
     }
 
-    private class WriteShapelessRecipe implements IObjectWriter<AdvShapelessRecipe> {
+    private static class WriteShapelessRecipe implements IObjectWriter<AdvShapelessRecipe> {
         @Override
         public void writeObject(List out, AdvShapelessRecipe val, IObjectWriter<Object> generic) {
             out.add("Shapeless: ");

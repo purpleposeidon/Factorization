@@ -1,5 +1,7 @@
 package factorization.api;
 
+import factorization.api.adapter.InterfaceAdapter;
+import net.minecraft.tileentity.TileEntity;
 import net.minecraftforge.common.util.ForgeDirection;
 
 /**
@@ -7,6 +9,8 @@ import net.minecraftforge.common.util.ForgeDirection;
  *
  */
 public interface IRotationalEnergySource {
+    static InterfaceAdapter<TileEntity, IRotationalEnergySource> adapter = InterfaceAdapter.get(IRotationalEnergySource.class);
+
     /**
      * @param direction the direction that this can emit energy from. For example, if this is a vertical windmill,
      *                  then the sails would be above this TileEntity, and the power would be accessed using

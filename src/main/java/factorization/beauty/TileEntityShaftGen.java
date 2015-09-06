@@ -55,7 +55,7 @@ public class TileEntityShaftGen extends TileEntityCommon implements IChargeCondu
         Coord at = getCoord();
         ForgeDirection use = ForgeDirection.UNKNOWN;
         for (ForgeDirection dir : ForgeDirection.VALID_DIRECTIONS) {
-            IRotationalEnergySource res = KineticProxy.cast(at.add(dir).getTE());
+            IRotationalEnergySource res = IRotationalEnergySource.adapter.cast(at.add(dir).getTE());
             if (res == null) continue;
             if (res.canConnect(dir.getOpposite())) {
                 if (use != ForgeDirection.UNKNOWN) return;
@@ -95,7 +95,7 @@ public class TileEntityShaftGen extends TileEntityCommon implements IChargeCondu
         working = true;
         try {
             if (shaft == null || shaft.isTileEntityInvalid()) {
-                shaft = KineticProxy.cast(getCoord().adjust(shaft_direction).getTE());
+                shaft = IRotationalEnergySource.adapter.cast(getCoord().adjust(shaft_direction).getTE());
             }
         } finally {
             working = false;
@@ -117,7 +117,7 @@ public class TileEntityShaftGen extends TileEntityCommon implements IChargeCondu
         charge.update();
         if (shaftIsBroken()) {
             if (worldObj.getTotalWorldTime() % 5 == 0) {
-                shaft = KineticProxy.cast(getCoord().add(shaft_direction).getTE());
+                shaft = IRotationalEnergySource.adapter.cast(getCoord().add(shaft_direction).getTE());
             }
             return;
         }
