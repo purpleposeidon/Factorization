@@ -119,7 +119,7 @@ public class InterfaceAdapter<SOURCE, TARGET> implements Comparator<Adapter>, Ad
         if (adapterCache.isEmpty()) {
             Collections.sort(adapters, this);
         }
-        if (targetInterface.isInstance(objClass)) {
+        if (targetInterface.isAssignableFrom(objClass)) {
             return (Adapter<OBJ, TARGET>) this; // the self adapter
         }
         for (Adapter<? extends SOURCE, TARGET> a : adapters) {
