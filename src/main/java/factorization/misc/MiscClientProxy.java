@@ -198,10 +198,10 @@ public class MiscClientProxy extends MiscProxy {
 
                     while ((s = bufferedreader.readLine()) != null) {
                         s = s.trim();
-                        if (!s.isEmpty()) {
-                            if (s.hashCode() == 125780783) continue; // Probably "This message will never appear on the splash screen, isn't that weird?".hashCode()
-                            sampler.give(s);
-                        }
+                        if (s.isEmpty()) continue;
+                        if (s.hashCode() == 125780783) continue; // Probably "This message will never appear on the splash screen, isn't that weird?".hashCode()
+                        if (s.startsWith("#")) continue;
+                        sampler.give(s);
                     }
                 } finally {
                     FzUtil.closeNoisily("Closing " + res, is);
