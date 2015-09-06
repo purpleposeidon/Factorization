@@ -280,15 +280,28 @@ public class TileEntityWaterWheel extends TileEntityCommon implements IRotationa
     static double MAX_SPEED = Math.min(1.0 / (Math.sqrt(2) * 2) / 64, IRotationalEnergySource.MAX_SPEED / 64); // Maximum velocity (doesn't change power output)
     static int sea_level_range_min = -4; // non-flowing blocks within river/ocean biomes, but outside of this range, do not flow
     static int sea_level_range_max = +2; // The range is relative to sealevel ('worldProvider.getAverageGroundLevel'). Sealevel is 64 for normal worlds, 4 for superflat.
+    static double MAX_TOTAL_POWER = 20;
+    static double MIN_POWER = 0.15;
+    static double MIN_POWER_FLOOR = 1.5;
 
 
     void updatePowerPerTick() {
         power_per_tick = Math.abs(water_strength);
+        if (power_per_tick > MIN_POWER && power_per_tick < MIN_POWER_FLOOR) {
+            power_per_tick = MIN_POWER_FLOOR;
+        }
+        if (power_per_tick > MAX_TOTAL_POWER) {
+            power_per_tick = MAX_TOTAL_POWER;
+        }
         target_velocity = water_strength * V_SCALE;
         if (target_velocity > MAX_SPEED) {
             target_velocity = MAX_SPEED;
         } else if (target_velocity < -MAX_SPEED) {
             target_velocity = -MAX_SPEED;
+        }
+        if (power_per_tick < MIN_POWER) {
+            power_per_tick = 0;
+            target_velocity = 0;
         }
         power_per_tick *= WATER_POWER_SCALE;
     }
