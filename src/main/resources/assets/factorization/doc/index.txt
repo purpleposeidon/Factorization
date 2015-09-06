@@ -4,27 +4,28 @@
 \nl
 
 \seg
-\index{about}{\#{item.factorization:docbook}About}
-\index{lmp}{\#{item.factorization:tool/matrix_programmer}The Logic Matrix Programmer}
-\index{ores}{\#{tile.factorization:darkIronOre}Ores and Materials}
-\index{parts}{\#{factorization.factoryBlock.SOCKET_EMPTY}Parts and Machines}
-\index{charge}{\#{factorization.factoryBlock.SHAFT_GEN}Charge Energy}
+\index{about}{\#{item.factorization:docbook} About}
+\index{lmp}{\#{item.factorization:tool/matrix_programmer} The Logic Matrix Programmer}
+\index{ores}{\#{tile.factorization:darkIronOre} Ores and Materials}
+\index{parts}{\#{factorization.factoryBlock.SOCKET_EMPTY} Parts and Machines}
+\index{charge}{\#{factorization.factoryBlock.SHAFT_GEN} Charge Energy}
 % \index{oreprocessing}{Ore Processing}
-\index{building}{\#{tile.fence}Building}
+\index{building}{\#{tile.fence} Building}
 \ifhtml{
     % Disabled since docfigures are presently not supported for the HTML export :P
-}{\index{cookbook}{\#{item.redstone}Designs}}
-\index{projects}{\#{item.minecartChest}Projects}
-\index{misc}{\#{item.fish.salmon.raw}Miscellaneous Nonsense}
-\ifhtml{}{\index{reference}{\#{tile.bookshelf}Reference}}
-\index{deprecation}{\#{item.skull.skeleton}Deprecation}
+}{\index{cookbook}{\#{item.redstone} Designs}}
+\index{projects}{\#{item.minecartChest} Projects}
+\index{misc}{\#{item.fish.salmon.raw} Miscellaneous Nonsense}
+\ifhtml{}{\index{reference}{\#{tile.bookshelf} Reference}}
+\index{deprecation}{\#{item.skull.skeleton} Deprecation}
+\nl
 \endseg
 
 \seg
 \title{New!}
 
 \include{verynew}
-\link{allnew}{\#{item.seeds}Other New Things}
+\link{allnew}{\#{item.seeds} Other New Things}
 \endseg
 
 
