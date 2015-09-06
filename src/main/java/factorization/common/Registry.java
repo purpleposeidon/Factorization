@@ -486,6 +486,10 @@ public class Registry {
                 params[i] = "stickWood";
             } else if (params[i] == dark_iron) {
                 params[i] = "ingotFzDarkIron";
+            } else if (params[i] == lead_ingot) {
+                params[i] = "ingotLead";
+            } else if (params[i] == silver_ingot) {
+                params[i] = "ingotSilver";
             }
         }
     }
