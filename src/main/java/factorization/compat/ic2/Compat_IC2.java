@@ -38,7 +38,6 @@ public class Compat_IC2 extends CompatBase {
     private static class WriteShapedRecipe implements IObjectWriter<AdvRecipe> {
         @Override
         public void writeObject(List out, AdvRecipe val, IObjectWriter<Object> generic) {
-            int width = val.inputWidth;
             int mask = val.masks[0];
             int m = 0;
             for (int i = 0; i < 9; i++) {
@@ -47,7 +46,7 @@ public class Compat_IC2 extends CompatBase {
                 } else {
                     out.add(new ItemWord(AdvRecipe.expand(val.input[m++])));
                 }
-                if ((i + 1) % width == 0) {
+                if ((i + 1) % 3 == 0) {
                     out.add("\\nl");
                 }
             }
