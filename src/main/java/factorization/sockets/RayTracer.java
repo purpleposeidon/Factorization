@@ -6,6 +6,7 @@ import factorization.api.Quaternion;
 import factorization.fzds.DeltaChunk;
 import factorization.fzds.HammerEnabled;
 import factorization.fzds.interfaces.IDeltaChunk;
+import factorization.servo.TileEntityServoRail;
 import factorization.util.SpaceUtil;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.AxisAlignedBB;
@@ -180,6 +181,7 @@ public class RayTracer {
     }
 
     boolean mopBlock(Coord target, ForgeDirection side) {
+        if (base != socket && target.getTE(TileEntityServoRail.class) != null) return false;
         boolean isThis = base == socket && target.isAt(base);
         Vec3 hitVec = Vec3.createVectorHelper(base.xCoord + side.offsetX, base.yCoord + side.offsetY, base.zCoord + side.offsetZ);
         return base.handleRay(socket, target.createMop(side, hitVec), target.w, isThis, powered);

@@ -1,6 +1,8 @@
 0.8.98
-  Bug fixes.
   Rebalanced the water wheel
+  Fixed display of narrow IC2 recipes in FZ manual
+  Imported extra splashes from the future.
+  Fixed oredictionary fail in some recipes
 
 0.8.97
   Block Matcher completed
