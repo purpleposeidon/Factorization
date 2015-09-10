@@ -38,6 +38,11 @@ ohai!
 Please report bugs!
 Blocks!
 Good news, everyone!
+Detail!
+Structure!
+Depth!
+Texture!
+So lush!
 
 #FUTURE
 # Lines that start with a # are comments!
