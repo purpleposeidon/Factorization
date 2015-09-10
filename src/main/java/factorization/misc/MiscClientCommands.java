@@ -10,11 +10,15 @@ import factorization.common.FzConfig;
 import factorization.notify.Notice;
 import factorization.notify.Style;
 import factorization.shared.Core;
+import factorization.shared.NORELEASE;
 import factorization.util.FzUtil;
+import factorization.util.RenderUtil;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityClientPlayerMP;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.WorldRenderer;
+import net.minecraft.client.renderer.texture.ITextureObject;
+import net.minecraft.client.renderer.texture.TextureUtil;
 import net.minecraft.client.renderer.tileentity.TileEntityRendererDispatcher;
 import net.minecraft.command.ICommand;
 import net.minecraft.command.ICommandSender;
@@ -27,18 +31,22 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.ChatComponentText;
 import net.minecraft.util.EnumChatFormatting;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.StringUtils;
 import net.minecraft.world.IWorldAccess;
 import net.minecraft.world.World;
 import net.minecraft.world.chunk.Chunk;
+import org.lwjgl.BufferUtils;
+import org.lwjgl.opengl.GL11;
+import org.lwjgl.opengl.GL12;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.Writer;
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
+import java.io.*;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 import java.lang.reflect.Method;
+import java.nio.IntBuffer;
 import java.text.DateFormat;
 import java.util.*;
 
@@ -363,7 +371,7 @@ public class MiscClientCommands implements ICommand {
         }
         
         @cheaty
-        @help("Dump all terrain to a .obj. This can take a while! Watch the console.")
+        @help("Dump all nearby terrain to a .obj. This can take a while! Watch the console.")
         public static String exportWorld() {
             double maxDist = 256;
             if (!StringUtils.isNullOrEmpty(arg1)) {
@@ -630,7 +638,40 @@ public class MiscClientCommands implements ICommand {
                 active_world_hash = hash;
             }
         }
-        
+
+        @help("Saves block & item textures to a file, primarily for exportWorld & exportChunk; probably goes into .minecraft")
+        public static void exportTextures() {
+            // See ScreenShotHelper
+            doSave(Core.blockAtlas, "./fz_block_atlas.png");
+            doSave(Core.itemAtlas, "./fz_item_atlas.png");
+        }
+
+        private static void doSave(ResourceLocation texture, String filename) {
+            mc.getTextureManager().bindTexture(texture);
+            RenderUtil.checkGLError("Before save texture");
+            int width = GL11.glGetTexLevelParameteri(GL11.GL_TEXTURE_2D, 0, GL11.GL_TEXTURE_WIDTH);
+            int height = GL11.glGetTexLevelParameteri(GL11.GL_TEXTURE_2D, 0, GL11.GL_TEXTURE_HEIGHT);
+            //int format = GL11.glGetTexLevelParameteri(GL11.GL_TEXTURE_2D, 0, GL11.GL_TEXTURE_INTERNAL_FORMAT);
+            int bufferSize = width * height;
+            RenderUtil.checkGLError("After get texture info");
+            IntBuffer pixelBuffer = BufferUtils.createIntBuffer(bufferSize);
+            int[] pixelValues = new int[bufferSize];
+
+            GL11.glPixelStorei(GL11.GL_PACK_ALIGNMENT, 1);
+            GL11.glPixelStorei(GL11.GL_UNPACK_ALIGNMENT, 1);
+
+            GL11.glGetTexImage(GL11.GL_TEXTURE_2D, 0, GL12.GL_BGRA, GL12.GL_UNSIGNED_INT_8_8_8_8_REV, pixelBuffer);
+            pixelBuffer.get(pixelValues);
+            BufferedImage img = new BufferedImage(width, height, BufferedImage.TYPE_4BYTE_ABGR);
+            img.setRGB(0, 0, width, height, pixelValues, 0, width);
+            try {
+                ImageIO.write(img, "png", new File(filename));
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            RenderUtil.checkGLError("After save texture");
+        }
+
         /*
         @help("Change the FOV")
         public static String fov() {
