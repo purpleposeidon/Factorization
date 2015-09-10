@@ -10,7 +10,6 @@ import factorization.common.FzConfig;
 import factorization.notify.Notice;
 import factorization.notify.Style;
 import factorization.shared.Core;
-import factorization.shared.NORELEASE;
 import factorization.util.FzUtil;
 import factorization.util.RenderUtil;
 import net.minecraft.client.Minecraft;
