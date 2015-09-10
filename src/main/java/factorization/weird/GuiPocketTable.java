@@ -25,7 +25,7 @@ public class GuiPocketTable extends GuiContainer {
     private int open_time = 0;
 
     @Override
-    protected void drawGuiContainerBackgroundLayer(float f, int i, int j) {
+    protected void drawGuiContainerBackgroundLayer(float partial, int mouseX, int mouseY) {
         GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
         Core.bindGuiTexture("pocketgui");
         int l = (width - xSize) / 2;

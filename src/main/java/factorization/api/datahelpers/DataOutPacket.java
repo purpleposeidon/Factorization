@@ -3,6 +3,8 @@ package factorization.api.datahelpers;
 import java.io.DataOutput;
 import java.io.IOException;
 
+import factorization.util.DataUtil;
+import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompressedStreamTools;
 import net.minecraft.nbt.NBTTagCompound;
 import cpw.mods.fml.relauncher.Side;
@@ -50,4 +52,13 @@ public class DataOutPacket extends DataHelper {
         return value;
     }
 
+    @Override
+    public ItemStack[] putItemArray(ItemStack[] value) throws IOException {
+        for (ItemStack is : value) {
+            if (is == null) is = DataUtil.NULL_ITEM;
+            NBTTagCompound out = is.writeToNBT(new NBTTagCompound());
+            CompressedStreamTools.write(out, dos);
+        }
+        return value;
+    }
 }

@@ -10,6 +10,7 @@ import net.minecraftforge.fluids.FluidTank;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.UUID;
 
 public abstract class DataHelper {
@@ -146,17 +147,19 @@ for t in "Boolean Byte Short Int Long Float Double String FzOrientation ItemStac
         return ret;
     }
 
-    public final ArrayList<ItemStack> putItemArray(ArrayList<ItemStack> value) throws IOException {
+    public final ArrayList<ItemStack> putItemList(ArrayList<ItemStack> value) throws IOException {
         if (!valid) return value;
         if (isReader() && hasLegacy(name + "_len")) {
             return putItemArray_legacy(value);
         }
-        return putItemArray_efficient(value);
+        return putItemList_efficient(value);
     }
 
-    protected ArrayList<ItemStack> putItemArray_efficient(ArrayList<ItemStack> value) throws IOException {
+    protected ArrayList<ItemStack> putItemList_efficient(ArrayList<ItemStack> value) throws IOException {
         return putItemArray_legacy(value);
     }
+
+    public abstract ItemStack[] putItemArray(ItemStack[] value) throws IOException;
 
 
     @Deprecated

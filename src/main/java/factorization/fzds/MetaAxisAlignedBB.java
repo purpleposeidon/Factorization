@@ -17,7 +17,7 @@ import java.util.List;
 public class MetaAxisAlignedBB extends AxisAlignedBB implements IFzdsShenanigans {
     /*
      * So, there's 2 operations: calculate<Axis>Offset and intersectsWith.
-     * For each operation, we need to gather a list of relevant AABBs in hammer space and apply the operation to each of them.
+     * For each operation, we need to work a list of relevant AABBs in hammer space and apply the operation to each of them.
      * 1. Convert the argument AABB to an AABB in shadow space:
      * 		calculate the length of the diagonal
      * 		Calculate the center, as a vector. Transform the vector.

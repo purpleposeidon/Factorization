@@ -1,5 +1,7 @@
 package factorization.api.datahelpers;
 
+import net.minecraft.item.ItemStack;
+
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
@@ -33,5 +35,10 @@ public class DataBackup extends DataHelper {
     
     public void restoring() {
         isReading = false;
+    }
+
+    @Override
+    public ItemStack[] putItemArray(ItemStack[] value) throws IOException {
+        return putImplementation(value);
     }
 }

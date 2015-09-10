@@ -58,18 +58,21 @@ public class PacketProxyingPlayer extends EntityPlayerMP implements
             //promise.setFailure(new UnsupportedOperationException("Sorry!")); // Nooooope, causes spam.
         }
     }
-    
-    void initWrapping() {
+
+    void preinitWrapping() {
         playerNetServerHandler = new NetHandlerPlayServer(mcServer, networkManager, this);
         playerNetServerHandler.netManager.channel().attr(NetworkDispatcher.FML_DISPATCHER).set(new NetworkDispatcher(this.networkManager));
         //Compare cpw.mods.fml.common.network.FMLOutboundHandler.OutboundTarget.PLAYER.{...}.selectNetworks(Object, ChannelHandlerContext, FMLProxyPacket)
         playerNetServerHandler.netManager.setConnectionState(EnumConnectionState.PLAY);
         /* (misc notes here)
          * We don't need to touch NetworkDispatcher; we need a NetworkManager.
-         * 
+         *
          * NetworkManager.scheduleOutboundPacket is too early I think?
          * What we really want is its channel.
          */
+    }
+
+    void initWrapping() {
         registerChunkLoading();
         updateListenerList();
     }
@@ -119,6 +122,7 @@ public class PacketProxyingPlayer extends EntityPlayerMP implements
         int chunkRadius = (int) ((blockRadius / 16) + 2);
         chunkRadius = Math.max(3, chunkRadius);
         c.setAsEntityLocation(this);
+        preinitWrapping();
         ServerConfigurationManager scm = MinecraftServer.getServer().getConfigurationManager();
         if (useShortViewRadius) {
             int orig = savePlayerViewRadius();

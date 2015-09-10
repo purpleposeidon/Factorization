@@ -4,6 +4,8 @@ import java.io.DataInput;
 import java.io.IOException;
 
 import factorization.util.DataUtil;
+import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.CompressedStreamTools;
 import net.minecraft.nbt.NBTTagCompound;
 import cpw.mods.fml.relauncher.Side;
 
@@ -50,4 +52,13 @@ public class DataInPacket extends DataHelper {
         return o;
     }
 
+    @Override
+    public ItemStack[] putItemArray(ItemStack[] value) throws IOException {
+        for (int i = 0; i < value.length; i++) {
+            ItemStack is = ItemStack.loadItemStackFromNBT(DataUtil.readTag(dis));
+            if (DataUtil.NULL_ITEM.isItemEqual(is)) is = null;
+            value[i] = is;
+        }
+        return value;
+    }
 }

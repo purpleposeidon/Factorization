@@ -14,12 +14,10 @@ import io.netty.buffer.ByteBuf;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.IIcon;
 import net.minecraftforge.common.util.ForgeDirection;
-import cpw.mods.fml.common.network.internal.FMLProxyPacket;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import factorization.api.Coord;
@@ -82,7 +80,7 @@ public class TileEntityCompressionCrafter extends TileEntityCommon {
         b_facing = data.as(Share.VISIBLE, "dir").putByte(b_facing);
         isCrafterRoot = data.as(Share.VISIBLE, "root").putBoolean(isCrafterRoot);
         powered = data.as(Share.PRIVATE, "rs").putBoolean(powered);
-        buffer = data.as(Share.PRIVATE, "buff").putItemArray(buffer);
+        buffer = data.as(Share.PRIVATE, "buff").putItemList(buffer);
     }
     
     @Override

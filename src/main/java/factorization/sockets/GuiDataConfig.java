@@ -13,6 +13,7 @@ import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.renderer.texture.TextureManager;
 import net.minecraft.entity.Entity;
+import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.IIcon;
 
@@ -339,6 +340,11 @@ public class GuiDataConfig extends GuiScreen {
             @Override
             public boolean isReader() {
                 return true;
+            }
+
+            @Override
+            public ItemStack[] putItemArray(ItemStack[] value) throws IOException {
+                return value;
             }
         });
     }

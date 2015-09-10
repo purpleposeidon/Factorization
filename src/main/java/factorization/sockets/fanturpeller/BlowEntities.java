@@ -62,7 +62,7 @@ public class BlowEntities extends SocketFanturpeller implements IEntitySelector 
     public IDataSerializable serialize(String prefix, DataHelper data) throws IOException {
         super.serialize(prefix, data);
         dropDelay = data.as(Share.PRIVATE, "dropDelay").putShort(dropDelay);
-        buffer = data.as(Share.PRIVATE, "murderBuff").putItemArray(buffer);
+        buffer = data.as(Share.PRIVATE, "murderBuff").putItemList(buffer);
         return this;
     }
     

@@ -206,10 +206,11 @@ public final class PlayerUtil {
         return player.worldObj.func_147447_a(pos, ray, false, false, true);
     }
 
-    public static void decr(EntityPlayer player, ItemStack stack) {
-        if (ItemUtil.normalize(stack) == null) return;
-        if (!player.capabilities.isCreativeMode) {
+    public static ItemStack decr(EntityPlayer player, ItemStack stack) {
+        if (stack == null) return null;
+        if (!isPlayerCreative(player)) {
             stack.stackSize--;
         }
+        return ItemUtil.normalize(stack);
     }
 }

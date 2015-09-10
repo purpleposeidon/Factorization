@@ -65,7 +65,7 @@ public class DataInNBT extends DataHelperNBT {
     }
 
     @Override
-    protected ArrayList<ItemStack> putItemArray_efficient(ArrayList<ItemStack> value) throws IOException {
+    protected ArrayList<ItemStack> putItemList_efficient(ArrayList<ItemStack> value) throws IOException {
         NBTTagList buffer = tag.getTagList(name, Constants.NBT.TAG_COMPOUND);
         final int size = buffer.tagCount();
         value.clear();
@@ -74,6 +74,20 @@ public class DataInNBT extends DataHelperNBT {
             NBTTagCompound it = buffer.getCompoundTagAt(i);
             ItemStack is = ItemStack.loadItemStackFromNBT(it);
             value.add(is);
+        }
+        return value;
+    }
+
+    @Override
+    public ItemStack[] putItemArray(ItemStack[] value) throws IOException {
+        NBTTagList buffer = tag.getTagList(name, Constants.NBT.TAG_COMPOUND);
+        for (int i = 0; i < value.length; i++) {
+            NBTTagCompound tag = buffer.getCompoundTagAt(i);
+            if (tag == null) {
+                value[i] = null;
+            } else {
+                value[i] = ItemStack.loadItemStackFromNBT(tag);
+            }
         }
         return value;
     }

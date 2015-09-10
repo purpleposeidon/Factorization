@@ -64,7 +64,7 @@ public class TileEntityMixer extends TileEntityFactorization implements
         charge.serialize("", data);
         progress = data.as(Share.PRIVATE, "progress").putInt(progress);
         speed = data.as(Share.VISIBLE, "speed").putInt(speed);
-        outputBuffer = data.as(Share.PRIVATE, "outBuffer").putItemArray(outputBuffer);
+        outputBuffer = data.as(Share.PRIVATE, "outBuffer").putItemList(outputBuffer);
         putSlots(data);
     }
     

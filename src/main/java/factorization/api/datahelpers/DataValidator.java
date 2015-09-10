@@ -1,5 +1,7 @@
 package factorization.api.datahelpers;
 
+import net.minecraft.item.ItemStack;
+
 import java.io.IOException;
 import java.util.Map;
 
@@ -40,5 +42,10 @@ public class DataValidator extends DataHelper {
     
     public boolean isValid() {
         return !has_log;
+    }
+
+    @Override
+    public ItemStack[] putItemArray(ItemStack[] value) throws IOException {
+        return putImplementation(value);
     }
 }

@@ -561,4 +561,8 @@ public final class SpaceUtil {
         if (volume < 0) return 0;
         return volume;
     }
+
+    public static AxisAlignedBB getBox(Coord at, int R) {
+        return SpaceUtil.createAABB(at.add(-R, -R, -R), at.add(+R, +R, +R));
+    }
 }

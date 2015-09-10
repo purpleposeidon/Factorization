@@ -458,7 +458,7 @@ public class SocketLacerator extends TileEntitySocketBase implements IChargeCond
         charge = data.as(Share.PRIVATE, "charge").put(charge);
         speed = data.as(Share.VISIBLE, "spd").putShort(speed);
         progress = data.as(Share.PRIVATE, "prg").putShort(progress);
-        buffer = data.as(Share.PRIVATE, "buf").putItemArray(buffer);
+        buffer = data.as(Share.PRIVATE, "buf").putItemList(buffer);
         grab_items = data.as(Share.PRIVATE, "grb").putBoolean(grab_items);
         targetHash = data.as(Share.PRIVATE, "hsh").putLong(targetHash);
         grind_items = data.as(Share.PRIVATE, "grn").putBoolean(grind_items);

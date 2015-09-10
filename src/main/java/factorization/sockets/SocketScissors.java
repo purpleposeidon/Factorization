@@ -60,7 +60,7 @@ public class SocketScissors extends TileEntitySocketBase implements ICaptureDrop
     @Override
     public IDataSerializable serialize(String prefix, DataHelper data) throws IOException {
         wasPowered = data.as(Share.PRIVATE, "pow").putBoolean(wasPowered);
-        buffer = data.as(Share.PRIVATE, "buf").putItemArray(buffer);
+        buffer = data.as(Share.PRIVATE, "buf").putItemList(buffer);
         openCount = data.as(Share.VISIBLE, "open").putByte(openCount);
         return this;
     }

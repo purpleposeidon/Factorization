@@ -1,9 +1,11 @@
 package factorization.api.datahelpers;
 
+import factorization.util.DataUtil;
 import io.netty.buffer.ByteBuf;
 
 import java.io.IOException;
 
+import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import cpw.mods.fml.common.network.ByteBufUtils;
 import cpw.mods.fml.relauncher.Side;
@@ -51,4 +53,13 @@ public class DataInByteBuf extends DataHelper {
         return o;
     }
 
+    @Override
+    public ItemStack[] putItemArray(ItemStack[] value) throws IOException {
+        for (int i = 0; i < value.length; i++) {
+            ItemStack is = ItemStack.loadItemStackFromNBT(ByteBufUtils.readTag(dis));
+            if (DataUtil.NULL_ITEM.isItemEqual(is)) is = null;
+            value[i] = is;
+        }
+        return value;
+    }
 }

@@ -5,6 +5,7 @@ import java.util.ArrayDeque;
 import java.util.Collection;
 import java.util.Iterator;
 
+import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import factorization.api.FzColor;
 import factorization.api.datahelpers.DataHelper;
@@ -275,7 +276,12 @@ public class ServoStack implements IDataSerializable, Iterable {
                 return value;
             }
         }
-        
+
+        @Override
+        public ItemStack[] putItemArray(ItemStack[] value) throws IOException {
+            return value;
+        }
+
     }
     
     public DataHelper getDataHelper(boolean reader) {
