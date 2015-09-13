@@ -5,14 +5,17 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
+import java.nio.ByteOrder;
 
+import factorization.shared.NORELEASE;
 import net.minecraft.client.renderer.Tessellator;
+import net.minecraft.client.shader.TesselatorVertexState;
 
-public class ExporterTessellator extends Tessellator {
+public class ExporterTessellatorObj extends Tessellator {
     final File filename;
     OutputStreamWriter out;
     
-    public ExporterTessellator(File filename) {
+    public ExporterTessellatorObj(File filename) {
         this.filename = filename;
         try {
             out = new OutputStreamWriter(new FileOutputStream(filename));
@@ -52,41 +55,6 @@ public class ExporterTessellator extends Tessellator {
     void dumpTextureMap() {
         // :/
     }
-    /*
-    public void writeImage(String par1Str)
-    {
-        BufferedImage bufferedimage = new BufferedImage(this.width, this.height, 2);
-        ByteBuffer bytebuffer = this.getTextureData();
-        byte[] abyte = new byte[this.width * this.height * 4]; 
-        bytebuffer.position(0);
-        bytebuffer.get(abyte);
-
-        for (int i = 0; i < this.width; ++i)
-        {   
-            for (int j = 0; j < this.height; ++j)
-            {   
-                int k = j * this.width * 4 + i * 4;
-                byte b0 = 0;
-                int l = b0 | (abyte[k + 2] & 255) << 0;
-                l |= (abyte[k + 1] & 255) << 8;
-                l |= (abyte[k + 0] & 255) << 16; 
-                l |= (abyte[k + 3] & 255) << 24; 
-                bufferedimage.setRGB(i, j, l); 
-            }   
-        }   
-
-        this.textureData.position(this.width * this.height * 4);
-
-        try
-        {
-            ImageIO.write(bufferedimage, "png", new File(Minecraft.getMinecraftDir(), par1Str));
-        }
-        catch (IOException ioexception)
-        {
-            ioexception.printStackTrace();
-        }
-    }
-    */
     
     int vertexNumber = 0;
     double textureU, textureV;
@@ -94,12 +62,35 @@ public class ExporterTessellator extends Tessellator {
     @Override
     public void setTextureUV(double textureU, double textureV) {
         this.textureU = textureU;
-        this.textureV = textureV;
+        this.textureV = -textureV; // Texture's flipped vertically
     }
     
     @Override
     public void addVertex(double x, double y, double z) {
-        writeLine("v " + x + " " + y + " " + " " + z);
+        x += xOffset;
+        y += yOffset;
+        z += zOffset;
+        if (hasColor) {
+            float r, g, b, a;
+            if (ByteOrder.nativeOrder() == ByteOrder.LITTLE_ENDIAN) {
+                r = color & 0xFF;
+                g = (color >> 8) & 0xFF;
+                b = (color >> 16) & 0xFF;
+                a = (color >> 24) & 0xFF;
+            } else {
+                a = color & 0xFF;
+                b = (color >> 8) & 0xFF;
+                g = (color >> 16) & 0xFF;
+                r = (color >> 24) & 0xFF;
+            }
+            r /= 0xFF;
+            g /= 0xFF;
+            b /= 0xFF;
+            a /= 0xFF;
+            writeLine("v " + x + " " + y + " " + " " + z + " " + r + " " + g + " " + b + " " + a);
+        } else {
+            writeLine("v " + x + " " + y + " " + " " + z);
+        }
         writeLine("vt " + textureU + " " + textureV);
         vertexNumber++;
         if (vertexNumber % 4 == 0) {
@@ -113,5 +104,14 @@ public class ExporterTessellator extends Tessellator {
             throw new IllegalArgumentException("Invalid index");
         }
         return " " + i + "/" + i;
+    }
+
+    @Override
+    public TesselatorVertexState getVertexState(float posX, float posY, float posZ) {
+        if (this.rawBufferIndex <= 0) {
+            NORELEASE.breakpoint();
+            return null;
+        }
+        return super.getVertexState(posX, posY, posZ);
     }
 }

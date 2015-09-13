@@ -16,8 +16,6 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityClientPlayerMP;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.WorldRenderer;
-import net.minecraft.client.renderer.texture.ITextureObject;
-import net.minecraft.client.renderer.texture.TextureUtil;
 import net.minecraft.client.renderer.tileentity.TileEntityRendererDispatcher;
 import net.minecraft.command.ICommand;
 import net.minecraft.command.ICommandSender;
@@ -343,46 +341,41 @@ public class MiscClientCommands implements ICommand {
         }
         
         @cheaty
-        @SideOnly(Side.CLIENT)
-        @help("Dump chunk to .obj")
-        public static String exportChunk() {
-            WorldRenderer[] lizt = mc.renderGlobal.sortedWorldRenderers;
-            double px = mc.thePlayer.posX, py = mc.thePlayer.posY, pz = mc.thePlayer.posZ;
-            for (WorldRenderer wr : lizt) {
-                if (wr.posXMinus < px && px < wr.posXPlus
-                        && wr.posYMinus < py && py < wr.posYPlus
-                        && wr.posZMinus < pz && pz < wr.posZPlus) {
-                    Tessellator real_tess = Tessellator.instance;
-                    File output = new File("./chunkExport.obj");
-                    try {
-                        ExporterTessellator ex = new ExporterTessellator(output);
-                        Tessellator.instance = ex;
-                        wr.markDirty();
-                        wr.updateRenderer(mc.thePlayer);
-                        ex.doneDumping();
-                    } finally {
-                        Tessellator.instance = real_tess;
-                    }
-                    return "Written to " + output;
-                }
-            }
-            return "You aren't in a rendering chunk. Remarkable.";
-        }
-        
-        @cheaty
-        @help("Dump all nearby terrain to a .obj. This can take a while! Watch the console.")
+        @help("Saves terrain to a 3D model. Slow! Watch the console. /f exportWorld [radius] --ply --obj --player-origin --world-origin")
         public static String exportWorld() {
             double maxDist = mc.gameSettings.renderDistanceChunks * 16;
             if (!StringUtils.isNullOrEmpty(arg1)) {
-                maxDist = Double.parseDouble(arg1);
+                try {
+                    maxDist = Double.parseDouble(arg1);
+                } catch (NumberFormatException e) {
+                    // ignored
+                }
             }
             WorldRenderer[] lizt = mc.renderGlobal.sortedWorldRenderers;
             Tessellator real_tess = Tessellator.instance;
-            File output = new File("./worldExport.obj");
+            boolean use_ply = true;
+            boolean at_player = true;
+            for (String arg : args) {
+                if (arg.equalsIgnoreCase("--ply")) {
+                    use_ply = true;
+                } else if (arg.equalsIgnoreCase("--obj")) {
+                    use_ply = false;
+                } else if (arg.equals("--player-origin")) {
+                    at_player = true;
+                } else if (arg.equals("--world-origin")) {
+                    at_player = false;
+                }
+            }
+            File output = new File("./worldExport." + (use_ply ? "ply" : "obj"));
             
             try {
-                ExporterTessellator ex = new ExporterTessellator(output);
-                Tessellator.instance = ex;
+                ExporterTessellatorObj ex_obj = null;
+                ExporterTessellatorPly ex_ply = null;
+                if (use_ply) {
+                    Tessellator.instance = ex_ply = new ExporterTessellatorPly(output);
+                } else {
+                    Tessellator.instance = ex_obj = new ExporterTessellatorObj(output);
+                }
                 int total = lizt.length;
                 double px = mc.thePlayer.posX, py = mc.thePlayer.posY, pz = mc.thePlayer.posZ;
                 int skipped = 0;
@@ -391,6 +384,12 @@ public class MiscClientCommands implements ICommand {
                     double dx = wr.posX - px;
                     double dy = wr.posY - py;
                     double dz = wr.posZ - pz;
+                    /*if (at_player) {
+                        Tessellator.instance.setTranslation(dx, dy, dz);
+                    } else {
+                        Tessellator.instance.setTranslation(wr.posX, wr.posY, wr.posZ);
+                    }*/
+                    Tessellator.instance.setTranslation(0, 0, 0);
                     double dist = Math.sqrt(dx*dx + dy*dy + dz*dz);
                     if (dist > maxDist) {
                         skipped++;
@@ -401,7 +400,11 @@ public class MiscClientCommands implements ICommand {
                     wr.updateRenderer(mc.thePlayer);
                 }
                 System.out.println("Skipped " + skipped + " chunks outside the render distance");
-                ex.doneDumping();
+                if (use_ply) {
+                    ex_ply.doneDumping();
+                } else {
+                    ex_obj.doneDumping();
+                }
             } finally {
                 Tessellator.instance = real_tess;
             }
