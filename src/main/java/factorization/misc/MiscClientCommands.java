@@ -372,7 +372,7 @@ public class MiscClientCommands implements ICommand {
         @cheaty
         @help("Dump all nearby terrain to a .obj. This can take a while! Watch the console.")
         public static String exportWorld() {
-            double maxDist = 256;
+            double maxDist = mc.gameSettings.renderDistanceChunks * 16;
             if (!StringUtils.isNullOrEmpty(arg1)) {
                 maxDist = Double.parseDouble(arg1);
             }
@@ -386,7 +386,7 @@ public class MiscClientCommands implements ICommand {
                 int total = lizt.length;
                 double px = mc.thePlayer.posX, py = mc.thePlayer.posY, pz = mc.thePlayer.posZ;
                 int skipped = 0;
-                for (int i = 0; i < lizt.length; i++) {
+                for (int i = 0; i < total; i++) {
                     WorldRenderer wr = lizt[i];
                     double dx = wr.posX - px;
                     double dy = wr.posY - py;
@@ -400,7 +400,7 @@ public class MiscClientCommands implements ICommand {
                     wr.markDirty();
                     wr.updateRenderer(mc.thePlayer);
                 }
-                System.out.println("Skipped " + skipped + " chunks");
+                System.out.println("Skipped " + skipped + " chunks outside the render distance");
                 ex.doneDumping();
             } finally {
                 Tessellator.instance = real_tess;
