@@ -338,4 +338,8 @@ public abstract class TileEntityCommon extends TileEntity implements ICoord, IFa
     public void blockUpdateTick(Block myself) {
         worldObj.notifyBlockChange(xCoord, yCoord, zCoord, myself);
     }
+
+    public boolean redrawOnSync() {
+        return false;
+    }
 }

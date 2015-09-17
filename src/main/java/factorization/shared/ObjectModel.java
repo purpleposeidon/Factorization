@@ -66,6 +66,24 @@ public class ObjectModel {
         return true;
     }
 
+    public boolean renderBrightISBRH(RenderBlocks rb, IIcon icon, Block block, int x, int y, int z) {
+        if (isbrh_model == null) {
+            isbrh_model = readModel();
+        }
+        if (isbrh_model == null) {
+            return false;
+        }
+        if (rb.overrideBlockTexture != null) {
+            icon = rb.overrideBlockTexture;
+        }
+        Tessellator.instance.setColorOpaque(0xFF, 0xFF, 0xFF);
+        Tessellator.instance.setBrightness(0xF000F0);
+        ModelTessellator tess = new ModelTessellator(icon);
+        tess.setTranslation(x + 0.5, y, z + 0.5);
+        isbrh_model.tessellateAll(tess);
+        return true;
+    }
+
     public boolean renderRotatedISBRH(RenderBlocks rb, IIcon icon, Block block, int x, int y, int z, Quaternion quat) {
         if (isbrh_model == null) {
             isbrh_model = readModel();

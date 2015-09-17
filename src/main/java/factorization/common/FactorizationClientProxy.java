@@ -1,6 +1,8 @@
 package factorization.common;
 
 import factorization.beauty.*;
+import factorization.beauty.wickedness.BlockRenderMisanthropicEgg;
+import factorization.beauty.wickedness.BlockRenderMisanthropicGenerator;
 import factorization.charge.*;
 import factorization.citizen.EntityCitizen;
 import factorization.citizen.RenderCitizen;
@@ -215,6 +217,8 @@ public class FactorizationClientProxy extends FactorizationProxy {
         new BlockRenderBiblioGen();
         new BlockRenderWindMill();
         new BlockRenderWaterWheel();
+        new BlockRenderMisanthropicGenerator();
+        new BlockRenderMisanthropicEgg();
         for (FactoryType ft : new FactoryType[] {
                 FactoryType.SOCKET_EMPTY,
                 FactoryType.SOCKET_LACERATOR,

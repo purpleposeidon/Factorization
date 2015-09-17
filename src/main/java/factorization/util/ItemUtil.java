@@ -226,4 +226,9 @@ public final class ItemUtil {
         if (ores == null || ores.isEmpty()) return null;
         return ores.get(0);
     }
+
+    public static boolean is(ItemStack stack, Item item) {
+        if (stack == null) return false;
+        return stack.getItem() == item;
+    }
 }

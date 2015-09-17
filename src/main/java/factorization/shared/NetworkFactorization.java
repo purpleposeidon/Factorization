@@ -208,6 +208,9 @@ public class NetworkFactorization {
                 DataInByteBuf data = new DataInByteBuf(input, Side.CLIENT);
                 spawn.putData(data);
                 spawn.spawnPacketReceived();
+                if (spawn.redrawOnSync()) {
+                    here.redraw();
+                }
                 return;
             }
 
@@ -356,6 +359,7 @@ public class NetworkFactorization {
         BoilerHeat,
         ShaftGenState,
         MillVelocity,
+        MisanthropicSpawn, MisanthropicCharge,
         
         // Messages to entities; (true) marks that they are entity messages.
         servo_brief(true), servo_item(true), servo_complete(true), servo_stopped(true),

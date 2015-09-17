@@ -109,7 +109,8 @@ public class Registry {
             parasieve_item,
             compression_crafter_item,
             sap_generator_item, anthro_generator_item,
-            shaft_generator_item, steam_to_shaft, wooden_shaft, bibliogen, wind_mill, water_wheel;
+            shaft_generator_item, steam_to_shaft, wooden_shaft, bibliogen, wind_mill, water_wheel,
+            misanthropic_generator, misanthropic_egg;
     public ItemStack silver_ore_item, silver_block_item, lead_block_item,
             dark_iron_block_item;
     public ItemStack is_factory, is_lamp, is_lightair;
@@ -312,6 +313,8 @@ public class Registry {
         mixer_item = FactoryType.MIXER.itemStack();
         crystallizer_item = FactoryType.CRYSTALLIZER.itemStack();
         greenware_item = FactoryType.CERAMIC.itemStack();
+        misanthropic_generator = FactoryType.MISANTHROPIC_GEN.itemStack();
+        misanthropic_egg = FactoryType.MISANTHROPIC_EGG.itemStack();
         if (FzConfig.enable_rocketry) {
             rocket_engine_item_hidden = FactoryType.ROCKETENGINE.itemStack();
         }
@@ -1216,6 +1219,15 @@ public class Registry {
                 'W', new ItemStack(Blocks.wool, 1, red),
                 '-', Blocks.wooden_pressure_plate,
                 'i', Items.glowstone_dust);
+        if (NORELEASE.on) { // Sure you want the misanthropic gen available?
+            oreRecipe(misanthropic_generator,
+                    "q#q",
+                    "q#q",
+                    "#~#",
+                    'q', Items.quartz,
+                    '#', Blocks.obsidian,
+                    '~', Blocks.soul_sand);
+        }
         oreRecipe(steam_to_shaft,
                 " I ",
                 "-B-",

@@ -672,4 +672,9 @@ public class BlockRenderHelper extends Block {
         if (c.w == null) return; // Is that cool?
         tess.instance.setBrightness(getMixedBrightnessForBlock(c.w, c.x, c.y, c.z));
     }
+
+    @Override
+    public int colorMultiplier(IBlockAccess p_149720_1_, int p_149720_2_, int p_149720_3_, int p_149720_4_) {
+        return colors[0];
+    }
 }
