@@ -3,8 +3,6 @@ package factorization.common;
 import cpw.mods.fml.common.registry.GameRegistry;
 import factorization.astro.TileEntityRocketEngine;
 import factorization.beauty.*;
-import factorization.beauty.wickedness.TileEntityMisanthropicEgg;
-import factorization.beauty.wickedness.TileEntityMisanthropicGenerator;
 import factorization.ceramics.TileEntityGreenware;
 import factorization.charge.*;
 import factorization.crafting.TileEntityCompressionCrafter;
@@ -89,8 +87,8 @@ public enum FactoryType {
     WIND_MILL_GEN(55, false, TileEntityWindMill.class, "factory_fluidmill" /* bad name to save a nice windmill */),
     //56 -- The short-lived BLOCK_INTAKE; was an automatic block-breaker...
     WATER_WHEEL_GEN(57, false, TileEntityWaterWheel.class, "factory_water_wheel"),
-    MISANTHROPIC_GEN(58, false, TileEntityMisanthropicGenerator.class, "factory_misanthropic_gen"),
-    MISANTHROPIC_EGG(59, false, TileEntityMisanthropicEgg.class, "factory_misanthropic_egg"),
+    // 58 -- Stupid MISANTHROPIC_GEN
+    // 59 -- And the stupid MISANTHROPIC_EGG
 
     POCKETCRAFTGUI(101, true),
     NONE(102, false)

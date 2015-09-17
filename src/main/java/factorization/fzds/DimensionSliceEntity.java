@@ -15,9 +15,12 @@ import factorization.coremodhooks.IKinematicTracker;
 import factorization.fzds.interfaces.*;
 import factorization.fzds.network.HammerNet;
 import factorization.fzds.network.PacketProxyingPlayer;
+import factorization.notify.Notice;
+import factorization.notify.Style;
 import factorization.shared.Core;
 import factorization.shared.EntityReference;
 import factorization.algos.TortoiseAndHare;
+import factorization.shared.NORELEASE;
 import factorization.util.SpaceUtil;
 import net.minecraft.block.Block;
 import net.minecraft.command.IEntitySelector;
@@ -184,12 +187,12 @@ public class DimensionSliceEntity extends IDeltaChunk implements IFzdsEntryContr
     
     @Override
     public Coord getCorner() {
-        return cornerMin;
+        return cornerMin.copy();
     }
     
     @Override
     public Coord getFarCorner() {
-        return cornerMax;
+        return cornerMax.copy();
     }
     
     @Override
@@ -437,11 +440,29 @@ public class DimensionSliceEntity extends IDeltaChunk implements IFzdsEntryContr
         Coord d = getFarCorner();
         AxisAlignedBB start = null;
         // NORELEASE omfg slow!
+        // :( Can't use chunk.heightMap here! It's actually just the non-opaque blocks,
+        // which can of course still collide/be interacted with!
+        // Some other optimizations tho:
+        // 1. Keep track of the chunk directly (or could use an IWorldAccess cache?)
+        // 2. Iterate over y first for cache efficiency
         World w = c.w;
-        for (int x = c.x; x <= d.x; x++) {
-            for (int y = c.y; y <= d.y; y++) {
+        Chunk chunk = c.getChunk();
+        for (int y = c.y; y <= d.y; y++) {
+            for (int x = c.x; x <= d.x; x++) {
+                if (x >> 4 != chunk.xPosition) {
+                    chunk = c.w.getChunkFromBlockCoords(x, c.z);
+                }
                 for (int z = c.z; z <= d.z; z++) {
-                    Block block = c.w.getBlock(x, y, z);
+                    if (z >> 4 != chunk.zPosition) {
+                        chunk = c.w.getChunkFromBlockCoords(x, z);
+                    }
+                    Block block = chunk.getBlock(x & 15, y, z & 15);
+                    if (NORELEASE.on) {
+                        Block doubleCheck = c.w.getBlock(x, y, z);
+                        if (block != doubleCheck) {
+                            throw new IllegalStateException();
+                        }
+                    }
                     if (block.isAir(c.w, x, y, z)) {
                         continue;
                     }
@@ -625,7 +646,10 @@ public class DimensionSliceEntity extends IDeltaChunk implements IFzdsEntryContr
             Vec3 correctPos = shadow2real(child.parentShadowOrigin);
             Vec3 nextChildAt = SpaceUtil.add(childAt, inst);
             Vec3 error = SpaceUtil.subtract(nextChildAt, correctPos);
-            SpaceUtil.incrScale(error, 0.5); // Okay I wasn't *really* expecting this to work! o_O This reduces jitters
+            NORELEASE.println(error);
+            //SpaceUtil.incrScale(error, 0.5); // Okay I wasn't *really* expecting this to work! o_O This reduces jitters
+            //if (NORELEASE.on) SpaceUtil.incrScale(error, 0.25); // Okay I wasn't *really* expecting this to work! o_O This reduces jitters
+            SpaceUtil.incrScale(error, 1);
             SpaceUtil.incrSubtract(inst, error);
 
             child.updateMotion(inst, rot);
@@ -719,6 +743,7 @@ public class DimensionSliceEntity extends IDeltaChunk implements IFzdsEntryContr
         // NORELEASE TODO This is too slow. Fuck it. Let's bust out a proper physics library.
         // Use an IWorldAccess to synchronize collision areas. We'll need to do this for both Real and Shadow, yeah?
         // MetaAABB will defer to this physics library as well
+        // NOPE! Can't bust out a physics library. Err, why can't we? ISTR looking and finding it wouldn't work....
         List<AxisAlignedBB> collisions = worldObj.getCollidingBoundingBoxes(this, realArea);
         AxisAlignedBB collision = null;
         for (int i = 0; i < collisions.size(); i++) {
@@ -871,7 +896,7 @@ public class DimensionSliceEntity extends IDeltaChunk implements IFzdsEntryContr
     }
     
     @Override
-    public void onEntityUpdate() {
+    public void onEntityUpdate() { // onupdateentity
         if (isDead) return;
         //We don't want to call super, because it does a bunch of stuff that makes no sense for us.
         prevTickRotation.update(rotation);
@@ -1221,6 +1246,9 @@ public class DimensionSliceEntity extends IDeltaChunk implements IFzdsEntryContr
     
     @Override
     public void orderTargetRotation(Quaternion target, int tickTime, Interpolation interp) {
+        if (tickTime < 2) {
+            Core.logWarning("Ordering a fast turn! " + this);
+        }
         target.incrNormalize();
         rotationStart = new Quaternion(getRotation());
         rotationEnd = new Quaternion(target);

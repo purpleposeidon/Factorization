@@ -62,11 +62,16 @@ public enum Technique implements IStateMachine<Technique> {
             if (age == 0) {
                 Vec3 rot = controller.body.getRotation().toRotationVector();
                 double err = Math.abs(rot.xCoord) + Math.abs(rot.zCoord);
-                if (err > 0.01) {
+                if (err > 0.00001) {
+                    controller.body.setRotationalVelocity(new Quaternion());
                     Quaternion bodyRot = controller.body.getRotation();
                     double yRot = bodyRot.toRotationVector().yCoord;
                     Quaternion straightRot = Quaternion.getRotationQuaternionRadians(yRot, ForgeDirection.UP);
-                    controller.bodyLimbInfo.target(straightRot, 1 * controller.getSpeedScale());
+                    if (err > Math.PI / 160) {
+                        controller.bodyLimbInfo.target(straightRot, 1 * controller.getSpeedScale());
+                    } else {
+                        controller.body.setRotation(straightRot);
+                    }
                     return FINISH_MOVE;
                 }
             }
@@ -921,7 +926,7 @@ public enum Technique implements IStateMachine<Technique> {
         public Technique tick(ColossusController controller, int age) {
             if (age % 15 != 0) return this;
             boolean any = false;
-            double n = 1 + (controller.leg_size / 2.0) * (age / 45);
+            double n = 1 + (controller.leg_size / 2.0) * age * age / 500;
             for (LimbInfo li : controller.limbs) {
                 final ReservoirSampler<Coord> sampler = new ReservoirSampler<Coord>((int)n, null);
                 IDeltaChunk idc = li.idc.getEntity();
@@ -1260,7 +1265,7 @@ public enum Technique implements IStateMachine<Technique> {
 
     boolean targetablePlayer(EntityPlayer player, ColossusController controller) {
         if (controller.getHome().distanceSq(new Coord(player)) > distSq) return false;
-        if (player.capabilities.isCreativeMode && !Core.dev_environ) return false;
+        if (player.capabilities.isCreativeMode /*&& !Core.dev_environ*/) return false;
         return true;
     }
     

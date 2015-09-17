@@ -116,7 +116,7 @@ public enum WalkState implements IStateMachine<WalkState> {
             double rotation_distance = (((Math.toDegrees(target_rotation.getAngleBetween(current_rotation)) % 360) + 360) % 360) / 360;
             double rotation_speed = 80;
             double rotation_time = rotation_distance * rotation_speed;
-            if (rotation_time >= 1) {
+            if (rotation_time >= 10) {
                 controller.bodyLimbInfo.setTargetRotation(target_rotation, (int) (rotation_time * controller.getSpeedScale()), Interpolation.SMOOTH);
                 // Now bodyLimbInfo.isTurning() is set.
                 controller.turningDirection = angle > 0 ? 1 : -1;
