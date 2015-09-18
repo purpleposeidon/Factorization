@@ -290,8 +290,6 @@ public class BlockFactorization extends BlockContainer {
         put(itemList, reg.caliometric_burner_item);
         put(itemList, reg.sap_generator_item);
         put(itemList, reg.anthro_generator_item);
-        put(itemList, reg.misanthropic_generator);
-        put(itemList, reg.misanthropic_egg);
         put(itemList, reg.solarboiler_item);
         put(itemList, reg.steamturbine_item);
         put(itemList, reg.wooden_shaft);
