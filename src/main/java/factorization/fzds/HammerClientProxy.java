@@ -98,11 +98,12 @@ public class HammerClientProxy extends HammerProxy {
     static ShadowRenderGlobal shadowRenderGlobal = null;
     void checkForWorldChange() {
         WorldClient currentWorld = Minecraft.getMinecraft().theWorld;
+        if (currentWorld == null) {
+            createClientShadowWorld();
+            return;
+        }
         if (currentWorld != lastWorld) {
             lastWorld = currentWorld;
-            if (lastWorld == null) {
-                return;
-            }
             if (Hammer.worldClient != null) {
                 ((HammerWorldClient)Hammer.worldClient).clearAccesses();
                 Hammer.worldClient.addWorldAccess(shadowRenderGlobal = new ShadowRenderGlobal(currentWorld));
@@ -128,6 +129,7 @@ public class HammerClientProxy extends HammerProxy {
             Hammer.worldClient = null;
             send_queue = null;
             fake_player = null;
+            shadowRenderGlobal = null;
             return;
         }
         send_queue = mc.thePlayer.sendQueue;
@@ -163,6 +165,16 @@ public class HammerClientProxy extends HammerProxy {
         Hammer.worldClient = null;
         send_queue = null;
         fake_player = null;
+        shadowRenderGlobal = null;
+        lastWorld = null;
+        real_player = null;
+        real_world = null;
+        fake_player = null;
+        real_renderglobal = null;
+        _shadowSelected = null;
+        _rayTarget = null;
+        _selectionBlockBounds = null;
+        _hitSlice = null;
         Hammer.clientSlices.clear();
     }
 
