@@ -2,13 +2,23 @@ package factorization.misc;
 
 import cpw.mods.fml.common.eventhandler.EventPriority;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
+import cpw.mods.fml.common.network.ByteBufUtils;
+import cpw.mods.fml.common.network.FMLEventChannel;
+import cpw.mods.fml.common.network.FMLNetworkEvent;
+import cpw.mods.fml.common.network.NetworkRegistry;
+import cpw.mods.fml.common.network.internal.FMLProxyPacket;
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
 import factorization.api.Coord;
 import factorization.common.FzConfig;
 import factorization.util.DataUtil;
 import factorization.util.FzUtil;
 import factorization.util.ItemUtil;
 import factorization.util.PlayerUtil;
+import io.netty.buffer.ByteBuf;
+import io.netty.buffer.Unpooled;
 import net.minecraft.block.Block;
+import net.minecraft.client.Minecraft;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
@@ -29,8 +39,27 @@ import java.util.Iterator;
 import java.util.WeakHashMap;
 
 public class HotBlocks {
+    public static final String channelName = "FZ|hotblocks";
+    public static final FMLEventChannel channel = NetworkRegistry.INSTANCE.newEventDrivenChannel(channelName);
     public static final HotBlocks instance = new HotBlocks();
-    private HotBlocks() { }
+    private HotBlocks() {
+        channel.register(this);
+    }
+
+    private static void send(EntityPlayer player, HotBlock at) {
+        ByteBuf payload = Unpooled.buffer();
+        at.write(payload);
+        FMLProxyPacket packet = new FMLProxyPacket(payload, channelName);
+        channel.sendTo(packet, (EntityPlayerMP) player);
+    }
+
+    @SubscribeEvent
+    @SideOnly(Side.CLIENT)
+    public void addHotblock(FMLNetworkEvent.ClientCustomPacketEvent event) {
+        HotBlock at = HotBlock.read(event.packet.payload());
+        EntityPlayer player = Minecraft.getMinecraft().thePlayer;
+        doHeat(player, at);
+    }
 
     private static class HotBlock {
         final int w, x, y, z, idmd;
@@ -43,6 +72,20 @@ public class HotBlocks {
             this.z = z;
             this.idmd = idmd;
             this.orig = orig;
+        }
+
+        void write(ByteBuf out) {
+            out.writeInt(w);
+            out.writeInt(x);
+            out.writeInt(y);
+            out.writeInt(z);
+            out.writeInt(idmd);
+            ByteBufUtils.writeItemStack(out, orig);
+        }
+
+        static HotBlock read(ByteBuf in) {
+            return new HotBlock(in.readInt(), in.readInt(), in.readInt(), in.readInt(), in.readInt(),
+                    ByteBufUtils.readItemStack(in));
         }
     }
 
@@ -59,24 +102,33 @@ public class HotBlocks {
         return null;
     }
 
+    void doHeat(EntityPlayer player, HotBlock at) {
+        ArrayList<HotBlock> coords;
+        if (!hots.containsKey(player)) {
+            hots.put(player, coords = new ArrayList<HotBlock>());
+        } else {
+            coords = hots.get(player);
+        }
+        coords.add(at);
+        if (coords.size() > HOT_BLOCK_COUNT) {
+            coords.remove(0);
+        }
+    }
+
     @SubscribeEvent(priority = EventPriority.LOWEST) // Act after any cancellations
     public void heatBlock(BlockEvent.PlaceEvent event) {
         if (event.player == null || event.player.isSneaking()) return;
+        if (event.world.isRemote) return;
         if (event.player instanceof FakePlayer) return;
         if (event.block.getBlockHardness(event.world, event.x, event.y, event.z) <= 0F) return;
         if (PlayerUtil.isPlayerCreative(event.player)) return;
-        //if (event.player.isSneaking()) return;
-        ArrayList<HotBlock> coords;
-        if (!hots.containsKey(event.player)) {
-            hots.put(event.player, coords = new ArrayList<HotBlock>());
-        } else {
-            coords = hots.get(event.player);
-        }
         int md = event.world.getBlockMetadata(event.x, event.y, event.z); // Notable for NOT being the same as event.blockMetadata for Railcraft quarried stone! :|
         int idmd = (DataUtil.getId(event.block) << 4) /*+ event.blockMetadata*/;
-        coords.add(new HotBlock(FzUtil.getWorldDimension(event.world), event.x, event.y, event.z, idmd, toItem(event.block, event.world, event.x, event.y, event.z, md)));
-        if (coords.size() > HOT_BLOCK_COUNT) {
-            coords.remove(0);
+        final ItemStack theItem = toItem(event.block, event.world, event.x, event.y, event.z, md);
+        final HotBlock at = new HotBlock(FzUtil.getWorldDimension(event.world), event.x, event.y, event.z, idmd, theItem);
+        doHeat(event.player, at);
+        if (!event.world.isRemote && event.player instanceof EntityPlayerMP) {
+            send((EntityPlayerMP) event.player, at);
         }
     }
 
