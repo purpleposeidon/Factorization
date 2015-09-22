@@ -478,7 +478,7 @@ public class Core {
     
     
     public static enum TabType {
-        ART, CHARGE, OREP, SERVOS, ROCKETRY, TOOLS, BLOCKS, MATERIALS, COLOSSAL;
+        ART, CHARGE, OREP, SERVOS, ROCKETRY, TOOLS, BLOCKS, MATERIALS, COLOSSAL, ARTIFACT;
     }
     
     public static CreativeTabs tabFactorization = new CreativeTabs("factorizationTab") {
