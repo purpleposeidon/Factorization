@@ -46,7 +46,7 @@ public final class ItemUtil {
     }
 
     /**
-     * Compare includes NBT and damage value; ignores stack size
+     * Compare includes NBT and damage value; ignores stack size; nulls can be stacked together
      */
     public static boolean couldMerge(ItemStack a, ItemStack b) {
         if (a == null || b == null) {

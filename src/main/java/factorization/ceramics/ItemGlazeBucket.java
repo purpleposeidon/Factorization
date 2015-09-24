@@ -206,23 +206,35 @@ public class ItemGlazeBucket extends ItemFactorization {
         return new ItemStack(b, 1, getBlockMd(is));
     }
 
+    private ItemStack loadMimicingGlaze(ItemStack is, Coord at, int side, EntityPlayer player) {
+        if (!ItemUtil.identical(is, Core.registry.glaze_base_mimicry)) return is;
+        Block id = at.getId();
+        int md = at.getMd();
+        if (!player.isSneaking()) side = -1;
+        return makeMimicingGlaze(id, md, side);
+    }
+
     @Override
     public ItemStack onItemRightClick(ItemStack is, World w, EntityPlayer player) {
         if (w.isRemote) {
             return is;
         }
         MovingObjectPosition mop = getMovingObjectPositionFromPlayer(w, player, true);
-        if (!isUsable(is)) {
-            return is;
-        }
         if (mop == null) {
             return is;
         }
-        if (mop.typeOfHit != MovingObjectPosition.MovingObjectType.BLOCK || mop.subHit == -1) {
+        if (mop.typeOfHit != MovingObjectPosition.MovingObjectType.BLOCK) {
             return is;
         }
-        TileEntityGreenware clay = (new Coord(w, mop.blockX, mop.blockY, mop.blockZ)).getTE(TileEntityGreenware.class);
+        final Coord at = new Coord(w, mop.blockX, mop.blockY, mop.blockZ);
+        TileEntityGreenware clay = at.getTE(TileEntityGreenware.class);
         if (clay == null) {
+            return loadMimicingGlaze(is, at, mop.sideHit, player);
+        }
+        if (!isUsable(is)) {
+            return is;
+        }
+        if (mop.subHit == -1) {
             return is;
         }
         ClayState state = clay.getState();
