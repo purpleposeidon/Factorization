@@ -89,8 +89,8 @@ public class BlockMatcher extends Block {
     public int getComparatorInputOverride(World world, int x, int y, int z, int side) {
         int md = world.getBlockMetadata(x, y, z);
         ForgeDirection axis = getAxis(md);
-        ForgeDirection dir = ForgeDirection.getOrientation(side);
-        if (axis == dir || axis == dir.getOpposite()) return 0;
+        ForgeDirection mojangSide = SpaceUtil.demojangSide(side);
+        if (axis == mojangSide || axis == mojangSide.getOpposite()) return 0;
         byte match = match(world, x, y, z, axis);
         if (match == 0) return 0;
         return (match * 5) - 4;

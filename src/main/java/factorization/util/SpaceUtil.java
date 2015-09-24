@@ -565,4 +565,16 @@ public final class SpaceUtil {
     public static AxisAlignedBB getBox(Coord at, int R) {
         return SpaceUtil.createAABB(at.add(-R, -R, -R), at.add(+R, +R, +R));
     }
+
+    public static ForgeDirection demojangSide(int side) {
+        switch (side) {
+            case 0: return ForgeDirection.SOUTH;
+            case 1: return ForgeDirection.WEST;
+            case 2: return ForgeDirection.NORTH;
+            case 3: return ForgeDirection.EAST;
+            default:
+            case 4: return ForgeDirection.UP; // Making this up
+            case 5: return ForgeDirection.DOWN; // And this one
+        }
+    }
 }
