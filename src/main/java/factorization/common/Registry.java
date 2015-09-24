@@ -826,6 +826,7 @@ public class Registry {
         };
         GameRegistry.addRecipe(barrel_cart_recipe);
         RecipeSorter.register("factorization:barrel_cart", barrel_cart_recipe.getClass(), Category.SHAPELESS, "");
+        vanillaShapelessRecipe(new ItemStack(Items.minecart), barrelCart);
 
         BarrelUpgradeRecipes.addUpgradeRecipes();
         

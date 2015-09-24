@@ -2,6 +2,7 @@ package factorization.weird;
 
 import com.mojang.authlib.GameProfile;
 import cpw.mods.fml.common.Optional;
+import factorization.common.FactoryType;
 import factorization.shared.Core;
 import factorization.shared.ItemFactorization;
 import mods.railcraft.api.core.items.IMinecartItem;
@@ -137,5 +138,23 @@ public class ItemMinecartDayBarrel extends ItemFactorization implements IMinecar
         ItemStack ret = new ItemStack(this, 1, barrelItem.getItemDamage());
         ret.setTagCompound((NBTTagCompound) barrelItem.getTagCompound().copy());
         return ret;
+    }
+
+    @Override
+    public boolean hasContainerItem(ItemStack stack) {
+        return true;
+    }
+
+    @Override
+    public boolean doesContainerItemLeaveCraftingGrid(ItemStack stack) {
+        return true;
+    }
+
+    @Override
+    public ItemStack getContainerItem(ItemStack stack) {
+        if (stack == null) return null;
+        TileEntityDayBarrel barrel = (TileEntityDayBarrel) FactoryType.DAYBARREL.getRepresentative();
+        barrel.loadFromStack(stack);
+        return barrel.getPickedBlock();
     }
 }
