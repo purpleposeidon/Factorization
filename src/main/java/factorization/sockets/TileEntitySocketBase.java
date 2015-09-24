@@ -82,7 +82,7 @@ public abstract class TileEntitySocketBase extends TileEntityCommon implements I
         return dh.hadError;
     }
 
-    protected AxisAlignedBB getEntityBox(ISocketHolder socket, Coord c, ForgeDirection top, int d) {
+    protected AxisAlignedBB getEntityBox(ISocketHolder socket, Coord c, ForgeDirection top, double d) {
         int one = 1;
         AxisAlignedBB ab = AxisAlignedBB.getBoundingBox(
                 c.x + top.offsetX, c.y + top.offsetY, c.z + top.offsetZ,

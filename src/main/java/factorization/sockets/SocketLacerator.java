@@ -205,7 +205,7 @@ public class SocketLacerator extends TileEntitySocketBase implements IChargeCond
         if (grab_items) {
             grab_items = false;
             
-            for (EntityItem ei : (Iterable<EntityItem>)worldObj.getEntitiesWithinAABB(EntityItem.class, getEntityBox(socket, coord, orientation.top, 1))) {
+            for (EntityItem ei : (Iterable<EntityItem>)worldObj.getEntitiesWithinAABB(EntityItem.class, getEntityBox(socket, coord, orientation.top, 1.75))) {
                 if (ei.isDead) continue;
                 if (ei.ticksExisted > 1) continue;
                 ItemStack is = ei.getEntityItem();
