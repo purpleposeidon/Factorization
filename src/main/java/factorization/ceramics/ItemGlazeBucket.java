@@ -3,6 +3,7 @@ package factorization.ceramics;
 import java.util.ArrayList;
 import java.util.List;
 
+import factorization.common.ItemIcons;
 import factorization.shared.*;
 import factorization.util.DataUtil;
 import factorization.util.ItemUtil;
@@ -10,6 +11,7 @@ import net.minecraft.block.Block;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
+import net.minecraft.init.Items;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
@@ -35,11 +37,20 @@ public class ItemGlazeBucket extends ItemFactorization {
         setNoRepair();
         Core.tab(this, TabType.ART);
     }
-    
+
+    static final int CONTENTS_PASS = 10;
+
     @Override
-    public IIcon getIcon(ItemStack is, int renderPass, EntityPlayer player, ItemStack usingItem, int useRemaining) {
-        if (renderPass == 0) {
-            return getIconFromDamage(0);
+    public IIcon getIcon(ItemStack is, int renderPass) {
+        if (renderPass != CONTENTS_PASS) {
+            if (renderPass != 0) return NORELEASE.just(Items.minecart.getIcon(null, 0));
+            if (!is.hasTagCompound()) return ItemIcons.ceramics$glaze_bucket_empty;
+            if (ItemUtil.couldMerge(is, Core.registry.base_common)) return ItemIcons.ceramics$glaze_bucket_base;
+            if (ItemUtil.couldMerge(is, Core.registry.glaze_base_mimicry)) return ItemIcons.ceramics$glaze_bucket_mimic;
+            if (ItemUtil.couldMerge(is, Core.registry.empty_glaze_bucket)) return ItemIcons.ceramics$glaze_bucket_empty;
+            if (!is.hasTagCompound()) return ItemIcons.ceramics$glaze_bucket_empty;
+            if (is.getTagCompound().hasNoTags()) return ItemIcons.ceramics$glaze_bucket_empty;
+            return super.getIconIndex(is);
         }
         Block block = getBlockId(is);
         if (block == null) {
@@ -50,7 +61,9 @@ public class ItemGlazeBucket extends ItemFactorization {
         try {
             int side = getBlockSide(is);
             if (side == -1) side = 1;
-            return block.getIcon(side, getBlockMd(is));
+            IIcon ret = block.getIcon(side, getBlockMd(is));
+            if (ret == null) ret = BlockIcons.error;
+            return ret;
         } catch (Throwable t) {
             if (!spammed) {
                 t.printStackTrace();
@@ -59,7 +72,17 @@ public class ItemGlazeBucket extends ItemFactorization {
             return BlockIcons.error;
         }
     }
-    
+
+    @Override
+    public boolean requiresMultipleRenderPasses() {
+        return true;
+    }
+
+    @Override
+    public int getRenderPasses(int metadata) {
+        return 1;
+    }
+
     private boolean spammed = false;
     
     @Override
@@ -166,6 +189,7 @@ public class ItemGlazeBucket extends ItemFactorization {
         tag.setBoolean("fake", true);
         setGid(is, unique_id);
         is.setItemDamage(md_for_nei++);
+        addGlaze(is);
         return is;
     }
     

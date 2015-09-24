@@ -584,8 +584,6 @@ public class Registry {
         base_common = glaze_bucket.makeCraftingGlaze("base_common");
         glaze_base_mimicry = glaze_bucket.makeCraftingGlaze("base_mimicry");
         
-        glaze_bucket.addGlaze(glaze_base_mimicry);
-        
         ItemStack lapis = new ItemStack(Items.dye, 1, 4);
         
         shapelessOreRecipe(base_common, empty_glaze_bucket.copy(), Items.water_bucket, new ItemStack(Blocks.sand, 1, OreDictionary.WILDCARD_VALUE), Items.clay_ball);

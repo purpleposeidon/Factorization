@@ -66,7 +66,11 @@ and can be used 64 times before they run out.
 Most blocks can be used in mimicing glazes.
 Water and lava glazes can be crafted using its bucket with the base glaze.
 
+Mimicing glazes can be created by crafting the glaze with a block,
+or by clicking a block with a clean mimicing glaze.
+
 \topic{item.factorization:ceramics/glaze_bucket}
+\topic{item.factorization:ceramics/glaze_bucket.base_common}
 \topic{item.factorization:ceramics/glaze_bucket.base_mimicry}
 
 
