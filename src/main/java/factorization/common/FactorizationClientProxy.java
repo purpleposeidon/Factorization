@@ -1,5 +1,8 @@
 package factorization.common;
 
+import factorization.api.Coord;
+import factorization.artifact.ContainerForge;
+import factorization.artifact.GuiArtifactForge;
 import factorization.beauty.*;
 import factorization.charge.*;
 import factorization.citizen.EntityCitizen;
@@ -92,6 +95,9 @@ public class FactorizationClientProxy extends FactorizationProxy {
         if (ID == FactoryType.POCKETCRAFTGUI.gui) {
             return new GuiPocketTable(new ContainerPocket(player));
         }
+        if (ID == FactoryType.ARTIFACTFORGEGUI.gui) {
+            return new GuiArtifactForge(new ContainerForge(new Coord(world, x, y, z), player));
+        }
         
         TileEntity te = world.getTileEntity(x, y, z);
         if (!(te instanceof TileEntityFactorization)) {
@@ -116,7 +122,7 @@ public class FactorizationClientProxy extends FactorizationProxy {
             gui = new GuiSlag(cont);
         }
         if (ID == FactoryType.MIXER.gui && cont instanceof ContainerMixer) {
-            gui = new GuiMixer((ContainerMixer)cont);
+            gui = new GuiMixer((ContainerMixer) cont);
         }
         if (ID == FactoryType.CRYSTALLIZER.gui) {
             gui = new GuiCrystallizer(cont);

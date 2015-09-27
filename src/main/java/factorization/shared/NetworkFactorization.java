@@ -3,6 +3,7 @@ package factorization.shared;
 import cpw.mods.fml.common.network.ByteBufUtils;
 import cpw.mods.fml.relauncher.Side;
 import factorization.api.datahelpers.DataInByteBuf;
+import factorization.artifact.ContainerForge;
 import factorization.notify.Notice;
 import factorization.util.DataUtil;
 import io.netty.buffer.ByteBuf;
@@ -98,6 +99,18 @@ public class NetworkFactorization {
             return null;
         }
     }
+
+    public FMLProxyPacket playerMessagePacket(MessageType messageType, Object... items) {
+        try {
+            ByteBuf output = Unpooled.buffer();
+            messageType.write(output);
+            writeObjects(output, items);
+            return FzNetDispatch.generate(output);
+        } catch (IOException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
     
     public void prefixEntityPacket(ByteBuf output, Entity to, MessageType messageType) throws IOException {
         messageType.write(output);
@@ -126,6 +139,10 @@ public class NetworkFactorization {
         out.writeByte(cmd.id);
         out.writeByte(arg);
         FzNetDispatch.addPacket(FzNetDispatch.generate(out), player);
+    }
+
+    public void sendPlayerMessage(EntityPlayer player, MessageType messageType, Object... msg) {
+        FzNetDispatch.addPacket(playerMessagePacket(messageType, msg), player);
     }
 
     public void broadcastMessage(EntityPlayer who, Coord src, MessageType messageType, Object... msg) {
@@ -335,6 +352,28 @@ public class NetworkFactorization {
     
     
     private static byte message_type_count = 0;
+
+    public void handlePlayer(MessageType mt, ByteBuf input, EntityPlayer player) {
+        if (mt == MessageType.ArtifactForgeName) {
+            String name = ByteBufUtils.readUTF8String(input);
+            String lore = ByteBufUtils.readUTF8String(input);
+            if (player.openContainer instanceof ContainerForge) {
+                ContainerForge forge = (ContainerForge) player.openContainer;
+                forge.forge.name = name;
+                forge.forge.lore = lore;
+                forge.forge.markDirty();
+                forge.detectAndSendChanges();
+            }
+        } else if (mt == MessageType.ArtifactForgeError) {
+            String err = ByteBufUtils.readUTF8String(input);
+            if (player.openContainer instanceof ContainerForge) {
+                ContainerForge forge = (ContainerForge) player.openContainer;
+                forge.forge.error_message = err;
+                input.readBytes(forge.forge.warnings);
+            }
+        }
+    }
+
     public enum MessageType {
         factorizeCmdChannel,
         PlaySound, EntityParticles(true),
@@ -364,22 +403,30 @@ public class NetworkFactorization {
         // Messages to entities; (true) marks that they are entity messages.
         servo_brief(true), servo_item(true), servo_complete(true), servo_stopped(true),
         entity_sync(true),
-        UtilityGooState(true);
+        UtilityGooState(true),
+
+        // Messages to players; (null) marks this
+        ArtifactForgeName(null), ArtifactForgeError(null);
         
-        public boolean isEntityMessage;
+        public boolean isEntityMessage, isPlayerMessage;
         private static final MessageType[] valuesCache = values();
         
         private final byte id;
         MessageType() {
-            this(false);
+            this(false, false);
         }
         
-        MessageType(boolean isEntity) {
+        MessageType(boolean isEntity, boolean isPlayer) {
             id = message_type_count++;
             if (id < 0) {
                 throw new IllegalArgumentException("Too many message types!");
             }
             isEntityMessage = isEntity;
+            isPlayerMessage = isPlayer;
+        }
+
+        MessageType(Object isPlayer) {
+            this(false, true);
         }
         
         private static MessageType fromId(byte id) {

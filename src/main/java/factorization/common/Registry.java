@@ -11,6 +11,8 @@ import cpw.mods.fml.common.registry.GameRegistry;
 import cpw.mods.fml.common.registry.GameRegistry.Type;
 import cpw.mods.fml.relauncher.Side;
 import factorization.api.IActOnCraft;
+import factorization.artifact.BlockForge;
+import factorization.artifact.ItemPotency;
 import factorization.beauty.ItemGrossFood;
 import factorization.beauty.ItemLeafBomb;
 import factorization.ceramics.ItemGlazeBucket;
@@ -93,6 +95,7 @@ public class Registry {
     public Block gargantuan_block;
     public Block mantlerock_block;
     public BlockMatcher matcher_block;
+    public BlockForge artifact_forge;
 
     public ItemStack servorail_item;
     public ItemStack empty_socket_item, socket_lacerator, socket_robot_hand, socket_shifter;
@@ -154,6 +157,7 @@ public class Registry {
     public ItemGrossFood sap, entheas;
     public ItemLeafBomb leafBomb;
     public BlockBlast blastBlock;
+    public ItemPotency item_potency;
 
     public Material materialMachine = new Material(MapColor.ironColor);
     public Material materialBarrel = new Material(MapColor.woodColor) {{
@@ -194,6 +198,7 @@ public class Registry {
         gargantuan_block = new GargantuanBlock().setBlockName("factorization:gargantuanBrick").setCreativeTab(Core.tabFactorization);
         mantlerock_block = new BlockNetherrack().setBlockName("factorization:mantlerock").setBlockTextureName("factorization:mantlerock").setHardness(1.25F).setResistance(7.0F).setStepSound(Block.soundTypeStone);
         matcher_block = new BlockMatcher();
+        artifact_forge = new BlockForge();
         
         GameRegistry.registerBlock(factory_block, ItemFactorizationBlock.class, "FzBlock");
         GameRegistry.registerBlock(factory_block_barrel, ItemFactorizationBlock.class, "FzBlockBarrel");
@@ -205,6 +210,7 @@ public class Registry {
         GameRegistry.registerBlock(gargantuan_block, ItemGargantuanBlock.class, "GargantuanBlock");
         GameRegistry.registerBlock(mantlerock_block, "MantleRock");
         GameRegistry.registerBlock(matcher_block, "BlockMatcher");
+        GameRegistry.registerBlock(artifact_forge, "ArtifactForge");
         if (DeltaChunk.enabled()) {
             GameRegistry.registerBlock(colossal_block, ColossalBlockItem.class, "ColossalBlock");
             GameRegistry.registerTileEntity(TileEntityColossalHeart.class, "fz_colossal_heart");
@@ -425,6 +431,8 @@ public class Registry {
         sap = new ItemGrossFood("sap", Core.TabType.MATERIALS, false);
         entheas = new ItemGrossFood("entheas", Core.TabType.MATERIALS, true);
         leafBomb = new ItemLeafBomb();
+
+        item_potency = new ItemPotency();
 
         postMakeItems();
     }

@@ -123,6 +123,7 @@ public final class ItemUtil {
     }
 
     public static ItemStack normalDecr(ItemStack is) {
+        if (is == null) return null;
         is.stackSize--;
         return is.stackSize <= 0 ? null : is;
     }

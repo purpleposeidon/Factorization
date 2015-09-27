@@ -38,7 +38,9 @@ public class FzNetEventHandler {
     private void handlePacket(CustomPacketEvent event, boolean isServer, EntityPlayer player) {
         ByteBuf input = event.packet.payload();
         MessageType mt = MessageType.read(input);
-        if (mt.isEntityMessage) {
+        if (mt.isPlayerMessage) {
+            Core.network.handlePlayer(mt, input, player);
+        } else if (mt.isEntityMessage) {
             Core.network.handleEntity(mt, input, player);
         } else {
             switch (mt) {

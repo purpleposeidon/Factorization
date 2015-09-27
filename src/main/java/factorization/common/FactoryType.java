@@ -1,6 +1,7 @@
 package factorization.common;
 
 import cpw.mods.fml.common.registry.GameRegistry;
+import factorization.artifact.TileEntityLegendarium;
 import factorization.astro.TileEntityRocketEngine;
 import factorization.beauty.*;
 import factorization.ceramics.TileEntityGreenware;
@@ -89,9 +90,11 @@ public enum FactoryType {
     WATER_WHEEL_GEN(57, false, TileEntityWaterWheel.class, "factory_water_wheel"),
     // 58 -- Stupid MISANTHROPIC_GEN
     // 59 -- And the stupid MISANTHROPIC_EGG
+    LEGENDARIUM(60, false, TileEntityLegendarium.class, "factory_legendarium"),
 
     POCKETCRAFTGUI(101, true),
-    NONE(102, false)
+    NONE(102, false),
+    ARTIFACTFORGEGUI(103, true)
     ;
 
     public static int MAX_ID = 0;

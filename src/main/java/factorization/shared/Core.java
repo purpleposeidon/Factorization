@@ -15,6 +15,7 @@ import cpw.mods.fml.common.registry.GameRegistry;
 import cpw.mods.fml.common.registry.GameRegistry.Type;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
+import factorization.artifact.InspirationManager;
 import factorization.beauty.EntityLeafBomb;
 import factorization.charge.TileEntitySolarBoiler;
 import factorization.citizen.EntityCitizen;
@@ -227,6 +228,7 @@ public class Core {
         registry.sendIMC();
         ColossusFeature.init();
         PatreonRewards.init();
+        InspirationManager.init();
         compatLoader.init(event);
     }
     

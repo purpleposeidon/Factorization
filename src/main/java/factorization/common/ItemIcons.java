@@ -21,4 +21,6 @@ public class ItemIcons {
 
     public static IIcon tool$matrix_programmer_tilted;
 
+    public static IIcon potencyBottleWasted;
+
 }

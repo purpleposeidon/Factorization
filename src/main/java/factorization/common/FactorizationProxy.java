@@ -1,5 +1,6 @@
 package factorization.common;
 
+import factorization.artifact.ContainerForge;
 import net.minecraft.client.renderer.texture.IIconRegister;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
@@ -27,6 +28,9 @@ public class FactorizationProxy implements IGuiHandler {
     protected Container getContainer(int ID, EntityPlayer player, World world, int x, int y, int z) {
         if (ID == FactoryType.POCKETCRAFTGUI.gui) {
             return new ContainerPocket(player);
+        }
+        if (ID == FactoryType.ARTIFACTFORGEGUI.gui) {
+            return new ContainerForge(new Coord(world, x, y, z), player);
         }
 
         TileEntity te = world.getTileEntity(x, y, z);
