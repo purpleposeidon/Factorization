@@ -3,6 +3,7 @@ package factorization.fzds;
 import cpw.mods.fml.common.network.NetworkRegistry;
 import cpw.mods.fml.common.network.internal.FMLProxyPacket;
 import factorization.aabbdebug.AabbDebugger;
+import factorization.algos.TortoiseAndHare;
 import factorization.api.Coord;
 import factorization.api.DeltaCoord;
 import factorization.api.ICoordFunction;
@@ -15,12 +16,8 @@ import factorization.coremodhooks.IKinematicTracker;
 import factorization.fzds.interfaces.*;
 import factorization.fzds.network.HammerNet;
 import factorization.fzds.network.PacketProxyingPlayer;
-import factorization.notify.Notice;
-import factorization.notify.Style;
 import factorization.shared.Core;
 import factorization.shared.EntityReference;
-import factorization.algos.TortoiseAndHare;
-import factorization.shared.NORELEASE;
 import factorization.util.SpaceUtil;
 import net.minecraft.block.Block;
 import net.minecraft.command.IEntitySelector;
@@ -44,7 +41,10 @@ import net.minecraft.world.chunk.Chunk;
 import org.apache.commons.lang3.ArrayUtils;
 
 import java.io.IOException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
 
 public class DimensionSliceEntity extends IDeltaChunk implements IFzdsEntryControl {
     //Dang, this class is a mess! Code folding, activate!
@@ -457,12 +457,6 @@ public class DimensionSliceEntity extends IDeltaChunk implements IFzdsEntryContr
                         chunk = c.w.getChunkFromBlockCoords(x, z);
                     }
                     Block block = chunk.getBlock(x & 15, y, z & 15);
-                    if (NORELEASE.on) {
-                        Block doubleCheck = c.w.getBlock(x, y, z);
-                        if (block != doubleCheck) {
-                            throw new IllegalStateException();
-                        }
-                    }
                     if (block.isAir(c.w, x, y, z)) {
                         continue;
                     }
@@ -646,7 +640,6 @@ public class DimensionSliceEntity extends IDeltaChunk implements IFzdsEntryContr
             Vec3 correctPos = shadow2real(child.parentShadowOrigin);
             Vec3 nextChildAt = SpaceUtil.add(childAt, inst);
             Vec3 error = SpaceUtil.subtract(nextChildAt, correctPos);
-            NORELEASE.println(error);
             //SpaceUtil.incrScale(error, 0.5); // Okay I wasn't *really* expecting this to work! o_O This reduces jitters
             //if (NORELEASE.on) SpaceUtil.incrScale(error, 0.25); // Okay I wasn't *really* expecting this to work! o_O This reduces jitters
             SpaceUtil.incrScale(error, 1);
