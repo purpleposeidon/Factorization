@@ -43,7 +43,6 @@ public class ItemGlazeBucket extends ItemFactorization {
     @Override
     public IIcon getIcon(ItemStack is, int renderPass) {
         if (renderPass != CONTENTS_PASS) {
-            if (renderPass != 0) return NORELEASE.just(Items.minecart.getIcon(null, 0));
             if (!is.hasTagCompound()) return ItemIcons.ceramics$glaze_bucket_empty;
             if (ItemUtil.couldMerge(is, Core.registry.base_common)) return ItemIcons.ceramics$glaze_bucket_base;
             if (ItemUtil.couldMerge(is, Core.registry.glaze_base_mimicry)) return ItemIcons.ceramics$glaze_bucket_mimic;

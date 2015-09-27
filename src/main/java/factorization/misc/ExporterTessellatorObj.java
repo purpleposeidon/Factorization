@@ -1,15 +1,10 @@
 package factorization.misc;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.OutputStreamWriter;
-import java.nio.ByteOrder;
-
-import factorization.shared.NORELEASE;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.shader.TesselatorVertexState;
+
+import java.io.*;
+import java.nio.ByteOrder;
 
 public class ExporterTessellatorObj extends Tessellator {
     final File filename;
@@ -109,7 +104,6 @@ public class ExporterTessellatorObj extends Tessellator {
     @Override
     public TesselatorVertexState getVertexState(float posX, float posY, float posZ) {
         if (this.rawBufferIndex <= 0) {
-            NORELEASE.breakpoint();
             return null;
         }
         return super.getVertexState(posX, posY, posZ);

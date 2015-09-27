@@ -1,12 +1,10 @@
 package factorization.misc;
 
-import java.io.*;
-import java.nio.ByteOrder;
-
-import factorization.shared.NORELEASE;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.shader.TesselatorVertexState;
 import org.lwjgl.opengl.GL11;
+
+import java.io.*;
 
 public class ExporterTessellatorPly extends Tessellator {
     final File filename, tmp_vert, tmp_face;
@@ -149,7 +147,6 @@ public class ExporterTessellatorPly extends Tessellator {
     @Override
     public TesselatorVertexState getVertexState(float posX, float posY, float posZ) {
         if (this.rawBufferIndex <= 0) {
-            NORELEASE.breakpoint();
             return null; // !!??
         }
         return super.getVertexState(posX, posY, posZ);
