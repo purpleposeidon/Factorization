@@ -7,6 +7,9 @@ import factorization.shared.ItemFactorization;
 import factorization.shared.Sound;
 import factorization.shared.Core.TabType;
 
+import factorization.util.InvUtil;
+import factorization.util.ItemUtil;
+import factorization.util.PlayerUtil;
 import net.minecraft.client.renderer.texture.IIconRegister;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.player.EntityPlayer;
@@ -96,6 +99,9 @@ public class ItemAcidBottle extends ItemFactorization {
         }
         player.attackEntityFrom(acidDrinker, is.getItemDamage() > 0 ? 15 : 10);
         player.getFoodStats().addStats(-20, 0);
+        ItemStack bottle = new ItemStack(Items.glass_bottle);
+        ItemUtil.setLore(bottle, "I drank acid and\nall I got was this\nlousy bottle!".split("\n"));
+        InvUtil.givePlayerItem(player, bottle);
         return is;
     }
     

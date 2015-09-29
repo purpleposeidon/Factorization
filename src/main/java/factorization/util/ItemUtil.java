@@ -4,11 +4,14 @@ import net.minecraft.block.Block;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.NBTTagList;
+import net.minecraft.nbt.NBTTagString;
 import net.minecraft.world.World;
 import net.minecraftforge.oredict.OreDictionary;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Pattern;
 
 /**
  * Operations on ItemStack.
@@ -231,5 +234,16 @@ public final class ItemUtil {
     public static boolean is(ItemStack stack, Item item) {
         if (stack == null) return false;
         return stack.getItem() == item;
+    }
+
+    public static void setLore(ItemStack stack, String[] lore) {
+        NBTTagCompound baseTag = ItemUtil.getTag(stack);
+        NBTTagCompound displayTag = baseTag.getCompoundTag("display");
+        baseTag.setTag("display", displayTag);
+        NBTTagList loreList = new NBTTagList();
+        for (String n : lore) {
+            loreList.appendTag(new NBTTagString(n));
+        }
+        displayTag.setTag("Lore", loreList);
     }
 }

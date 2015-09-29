@@ -260,18 +260,9 @@ public class InventoryForge implements IInventory {
             } else {
                 return err("noname");
             }
-            final NBTTagCompound baseTag = ItemUtil.getTag(output);
-            NBTTagCompound displayTag = baseTag.getCompoundTag("display");
-            baseTag.setTag("display", displayTag);
             if (!StringUtils.isNullOrEmpty(lore)) {
-                String loreColor = takeDye(SLOT_DYE_2);
-                NBTTagList loreList = new NBTTagList();
-                for (String n : lore.split(Pattern.quote("|"))) {
-                    loreList.appendTag(new NBTTagString(loreColor + n));
-                }
-                displayTag.setTag("Lore", loreList);
+                ItemUtil.setLore(output, lore.split(Pattern.quote("|")));
             }
-
             err("lorehint");
             return output;
         }
