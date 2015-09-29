@@ -1268,6 +1268,12 @@ public class Registry {
                 "###",
                 '#', Items.gunpowder);
         shapelessOreRecipe(new ItemStack(Items.gunpowder, 9), blastBlock);
+        oreRecipe(new ItemStack(artifact_forge),
+                "###",
+                " - ",
+                "---",
+                '#', dark_iron_block_item,
+                '-', dark_iron);
 
         if (Core.enable_test_content) {
             TestContent.add();

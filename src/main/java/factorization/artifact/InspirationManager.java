@@ -3,7 +3,11 @@ package factorization.artifact;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import cpw.mods.fml.common.gameevent.PlayerEvent;
 import cpw.mods.fml.common.gameevent.TickEvent;
+import factorization.api.Coord;
 import factorization.shared.Core;
+import factorization.shared.NetworkFactorization;
+import factorization.shared.Sound;
+import factorization.util.FzUtil;
 import factorization.util.PlayerUtil;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
@@ -22,8 +26,8 @@ public class InspirationManager {
     static final StatBase lastArtifact = new StatBase("factorization.artifact.last", new ChatComponentTranslation("factorization.artifact.last.name")).registerStat();
     static final StatBase beenNotified = new StatBase("factorization.artifact.notified", new ChatComponentTranslation("factorization.artifact.notify.name")).registerStat();
     static final boolean DEBUG = Core.dev_environ;
-    private static final int days_per_artifact = 30;
-    private static final int check_tick_rate = 20 * 60 * 15;
+    private static final int days_per_artifact = DEBUG ? 1 : 30;
+    private static final int check_tick_rate = DEBUG ? 20 : 20 * 60 * 15;
 
     public static void init( ){
         instance = new InspirationManager();
@@ -40,6 +44,9 @@ public class InspirationManager {
 
     static int today() {
         final Calendar cal = Calendar.getInstance();
+        if (DEBUG) {
+            return cal.get(Calendar.DAY_OF_YEAR) * 60 * 60 * 365 + cal.get(Calendar.HOUR) * 60 * 60 + cal.get(Calendar.MINUTE) * 60;
+        }
         return cal.get(Calendar.DAY_OF_YEAR) + cal.get(Calendar.YEAR) * 365; // Close enough?
     }
 
@@ -49,18 +56,20 @@ public class InspirationManager {
         return true;
     }
 
+    public static final ChatStyle aqua = new ChatStyle().setColor(EnumChatFormatting.AQUA);
+
     public void poke(EntityPlayer player, boolean isLogin) {
         StatisticsFile statsFile = PlayerUtil.getStatsFile(player);
         if (!canMakeArtifact(statsFile, player)) return;
         int lastNoticeSent = get(statsFile, player, beenNotified);
         boolean update = false;
         if (lastNoticeSent <= 0) {
-            player.addChatMessage(new ChatComponentTranslation("factorization.artifact.cancreate"));
+            player.addChatMessage(new ChatComponentTranslation("factorization.artifact.cancreate").setChatStyle(aqua));
             update = true;
         }
         final int today = today();
         if (lastNoticeSent != today && isLogin) {
-            player.addChatMessage(new ChatComponentTranslation("factorization.artifact.canstillcreate"));
+            player.addChatMessage(new ChatComponentTranslation("factorization.artifact.canstillcreate").setChatStyle(aqua));
             update = true;
         }
         if (update) {
@@ -101,7 +110,7 @@ public class InspirationManager {
 
     public static boolean canMakeArtifact(EntityPlayer player) {
         StatisticsFile statsFile = PlayerUtil.getStatsFile(player);
-        return canMakeArtifact(statsFile, player) || DEBUG || PlayerUtil.isPlayerCreative(player);
+        return canMakeArtifact(statsFile, player) || PlayerUtil.isPlayerCreative(player);
     }
 
     public static void makeArtifact(EntityPlayer player, ItemStack artifact) {
@@ -113,8 +122,13 @@ public class InspirationManager {
         String artifactName = artifact.getDisplayName();
         String toolName = artifact.getUnlocalizedName() + ".name";
         IChatComponent msg = new ChatComponentTranslation(key, name, artifactName, new ChatComponentTranslation(toolName));
-        msg = msg.setChatStyle(new ChatStyle().setColor(EnumChatFormatting.AQUA));
+        msg = msg.setChatStyle(aqua);
         MinecraftServer.getServer().getConfigurationManager().sendChatMsgImpl(msg, false);
         resetArtifactDelay(player);
+        for (Object obj : MinecraftServer.getServer().getConfigurationManager().playerEntityList) {
+            if (!(obj instanceof EntityPlayer)) continue;
+            EntityPlayer peep = (EntityPlayer) obj;
+            Sound.artifactForged.playAt(new Coord(peep));
+        }
     }
 }

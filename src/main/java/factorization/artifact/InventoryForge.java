@@ -245,6 +245,7 @@ public class InventoryForge implements IInventory {
                 anvil.putStackInSlot(1, ench.copy());
                 anvil.updateRepairOutput();
                 ItemStack upgraded = anvil.getSlot(2).getStack();
+                if (upgraded == null) continue;
                 cleanWork(upgraded);
                 if (ItemUtil.couldMerge(output, upgraded)) continue;
                 consume(i);
