@@ -241,7 +241,10 @@ public class HtmlConversionTypesetter extends AbstractTypesetter {
         String[] parts = img.split(":", 2);
         String domain = parts[0];
         String path = parts[1];
-        return root + "resources/" + domain + "/textures/" + path + ".png";
+        if (!path.endsWith(".png")) {
+            path += ".png";
+        }
+        return root + "resources/" + domain + "/textures/" + path;
     }
     
     @Override
