@@ -23,7 +23,7 @@ public class BlockForge extends BlockAnvil {
         Core.tab(this, Core.TabType.ARTIFACT);
         setBlockName("factorization:artifactForge");
         setHardness(5.0F).setResistance(2000.0F);
-        setStepSound(new Block.SoundType("anvil", 0.6F, 0.25F) {
+        setStepSound(new Block.SoundType("anvil", 1.0F, 0.125F) {
             public String getBreakSound() {
                 return "dig.stone";
             }

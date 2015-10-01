@@ -2,6 +2,8 @@ package factorization.artifact;
 
 import factorization.shared.Core;
 import factorization.util.ItemUtil;
+import net.minecraft.enchantment.Enchantment;
+import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.inventory.Container;
@@ -15,6 +17,7 @@ import net.minecraft.util.StringUtils;
 import net.minecraftforge.oredict.OreDictionary;
 
 import java.util.ArrayList;
+import java.util.Map;
 import java.util.regex.Pattern;
 
 public class InventoryForge implements IInventory {
@@ -223,6 +226,25 @@ public class InventoryForge implements IInventory {
             ItemStack output = first.copy();
             consume(SLOT_FIRST);
             consume(SLOT_SECOND);
+            boolean gave_unbreaking = false;
+            {
+                Map<Integer, Integer> /* EnchantId -> enchantLevel */ enchants = EnchantmentHelper.getEnchantments(output);
+                ArrayList<Integer> enchantIds = new ArrayList<Integer>(enchants.keySet());
+                boolean any = false;
+                for (int id : enchantIds) {
+                    Enchantment ench = Enchantment.enchantmentsList[id];
+                    if (ench.getMaxLevel() == 1) continue;
+                    int sneaky_max = Math.min(9, ench.getMaxLevel() * 3 / 2);
+                    int level = enchants.get(id);
+                    if (level >= sneaky_max) continue;
+                    enchants.put(id, level + 1);
+                    gave_unbreaking |= id == Enchantment.unbreaking.effectId;
+                    any = true;
+                }
+                if (any) {
+                    EnchantmentHelper.setEnchantments(enchants, output);
+                }
+            }
 
             // Take the potency bottles
             // Out of order because the potency's expensive & non-negotiable
@@ -254,6 +276,12 @@ public class InventoryForge implements IInventory {
             }
             output.setRepairCost(repairCount + 1);
             if (enchants <= 0) return err("nobooks");
+            if (!gave_unbreaking) {
+                int unbreaking = EnchantmentHelper.getEnchantmentLevel(Enchantment.unbreaking.effectId, output) + 1;
+                Map enchantMap /* EnchantId -> enchantLevel */ = EnchantmentHelper.getEnchantments(output);
+                enchantMap.put(Enchantment.unbreaking.effectId, unbreaking);
+                EnchantmentHelper.setEnchantments(enchantMap, output);
+            }
 
             // Set the name & lore
             if (!StringUtils.isNullOrEmpty(name)) {

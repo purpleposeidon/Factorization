@@ -1,15 +1,24 @@
 package factorization.artifact;
 
+import com.google.common.base.Strings;
 import factorization.api.Coord;
 import factorization.api.datahelpers.DataHelper;
 import factorization.api.datahelpers.Share;
+import factorization.common.BlockIcons;
 import factorization.common.FactoryType;
 import factorization.notify.Notice;
 import factorization.shared.BlockClass;
+import factorization.shared.Core;
 import factorization.shared.TileEntityCommon;
 import factorization.util.FzUtil;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.server.MinecraftServer;
+import net.minecraft.util.IIcon;
+import net.minecraft.world.World;
+import net.minecraft.world.WorldSavedData;
+import net.minecraft.world.chunk.IChunkProvider;
 import net.minecraftforge.common.util.FakePlayer;
 import net.minecraftforge.common.util.ForgeDirection;
 
@@ -20,7 +29,6 @@ public class TileEntityLegendarium extends TileEntityCommon {
     static final int MIN_SIZE = 7; // The queue must be this size before something can be removed
     static final int POSTER_RANGE = 16;
     static final int MAX_USAGES_LEFT = 32;
-    static final int MINIMUM_MAX_TOOL_DURABILITY = 64;
 
     private static final int WAIT_TIME = 7 * 24 * 60 * 60 * 1000;
 
@@ -64,7 +72,6 @@ public class TileEntityLegendarium extends TileEntityCommon {
     static String analyzeItem(ItemStack is) {
         if (is == null) return "noitem";
         if (!isTool(is)) return "not_tool";
-        if (is.getMaxDamage() < MINIMUM_MAX_TOOL_DURABILITY) return "wimpy_tool";
         if (is.getItemDamage() < is.getMaxDamage() - MAX_USAGES_LEFT) return "not_broken";
         return null;
     }
@@ -86,7 +93,7 @@ public class TileEntityLegendarium extends TileEntityCommon {
 
         String analysis = analyzeItem(held);
         if (analysis != null) {
-            new Notice(this, "factorization.legendarium.item." + analysis).sendTo(player);
+            new Notice(this, "factorization.legendarium.item_analysis." + analysis).sendTo(player);
             return true;
         }
 
@@ -121,9 +128,106 @@ public class TileEntityLegendarium extends TileEntityCommon {
         sound("remove");
     }
 
+    static final String legendariumCount = "legendariumCount";
+    public static class LegendariumPopulation extends WorldSavedData {
+        NBTTagCompound data = new NBTTagCompound();
+
+        public LegendariumPopulation(String name) {
+            super(name);
+        }
+
+        @Override
+        public void readFromNBT(NBTTagCompound tag) {
+            data = tag;
+        }
+
+        @Override
+        public void writeToNBT(NBTTagCompound tag) {
+            for (String key : (Iterable<String>) data.func_150296_c()) {
+                tag.setInteger(key, data.getInteger(key));
+            }
+        }
+
+        private static String getName(World world) {
+            final IChunkProvider chunkGenerator = world.provider.createChunkGenerator();
+            return chunkGenerator.getClass().getName();
+        }
+
+        String isFree(World world) {
+            String name = getName(world);
+            return data.getString(getName(world));
+        }
+
+        void setOccupied(Coord src, EntityPlayer user, boolean v) {
+            String who = "someone";
+            if (user != null) who = user.getCommandSenderName();
+            String worldName = getName(src.w);
+            if (v) {
+                data.setString(worldName, src.toShortString());
+                Core.logInfo(who + " placed the hall of legends from " + src + "; worldName=" + worldName);
+            } else if (data.hasKey(worldName)) {
+                data.removeTag(worldName);
+                Core.logInfo(who + " removed the hall of legends from " + src + "; worldName=" + worldName);
+            }
+            save();
+        }
+
+        static LegendariumPopulation load() {
+            World w = MinecraftServer.getServer().worldServerForDimension(0);
+            LegendariumPopulation ret = (LegendariumPopulation) w.loadItemData(LegendariumPopulation.class, legendariumCount);
+            if (ret == null) {
+                ret = new LegendariumPopulation(legendariumCount);
+            }
+            return ret;
+        }
+
+        public void save() {
+            World w = MinecraftServer.getServer().worldServerForDimension(0);
+            w.setItemData(legendariumCount, this);
+            this.setDirty(true);
+            w.perWorldStorage.saveAllData();
+        }
+    }
+
     @Override
     public boolean canPlaceAgainst(EntityPlayer player, Coord c, int side) {
-        //NORELEASE.fixme("1 per dimension class");
-        return super.canPlaceAgainst(player, c, side);
+        if (c.w.isRemote) return true;
+        LegendariumPopulation population = LegendariumPopulation.load();
+        final String free = population.isFree(c.w);
+        if (!Strings.isNullOrEmpty(free)) {
+            new Notice(c, "factorization.legendarium.occupied", free).sendTo(player);
+            return false;
+        }
+        return true;
+    }
+
+    @Override
+    public void onPlacedBy(EntityPlayer player, ItemStack is, int side, float hitX, float hitY, float hitZ) {
+        super.onPlacedBy(player, is, side, hitX, hitY, hitZ);
+        if (worldObj.isRemote) return;
+        LegendariumPopulation population = LegendariumPopulation.load();
+        population.setOccupied(new Coord(this), player, true);
+    }
+
+    @Override
+    protected boolean removedByPlayer(EntityPlayer player, boolean willHarvest) {
+        if (!worldObj.isRemote) {
+            LegendariumPopulation population = LegendariumPopulation.load();
+            population.setOccupied(new Coord(this), player, false);
+        }
+        return super.removedByPlayer(player, willHarvest);
+    }
+
+    @Override
+    protected void onRemove() {
+        super.onRemove();
+        LegendariumPopulation population = LegendariumPopulation.load();
+        population.setOccupied(new Coord(this), null, false);
+    }
+
+    @Override
+    public IIcon getIcon(ForgeDirection dir) {
+        if (dir.offsetY == 0) return BlockIcons.artifact$legendarium_side;
+        return BlockIcons.artifact$legendarium_top;
     }
 }

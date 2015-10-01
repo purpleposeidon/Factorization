@@ -240,7 +240,8 @@ public class FactorizationClientProxy extends FactorizationProxy {
                 FactoryType.SLAGFURNACE,
                 FactoryType.PARASIEVE,
                 FactoryType.CALIOMETRIC_BURNER,
-                FactoryType.CREATIVE_CHARGE
+                FactoryType.CREATIVE_CHARGE,
+                FactoryType.LEGENDARIUM
                 }) {
             FactorizationBlockRender.setDefaultRender(ft);
         }

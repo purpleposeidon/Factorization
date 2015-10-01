@@ -59,6 +59,7 @@ public class InspirationManager {
     public static final ChatStyle aqua = new ChatStyle().setColor(EnumChatFormatting.AQUA);
 
     public void poke(EntityPlayer player, boolean isLogin) {
+        if (PlayerUtil.isPlayerCreative(player)) return;
         StatisticsFile statsFile = PlayerUtil.getStatsFile(player);
         if (!canMakeArtifact(statsFile, player)) return;
         int lastNoticeSent = get(statsFile, player, beenNotified);

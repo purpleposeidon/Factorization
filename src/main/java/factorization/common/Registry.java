@@ -158,6 +158,7 @@ public class Registry {
     public ItemLeafBomb leafBomb;
     public BlockBlast blastBlock;
     public ItemPotency item_potency;
+    public ItemStack legendarium;
 
     public Material materialMachine = new Material(MapColor.ironColor);
     public Material materialBarrel = new Material(MapColor.woodColor) {{
@@ -327,6 +328,7 @@ public class Registry {
             water_wheel = FactoryType.WATER_WHEEL_GEN.itemStack();
             //anchor = FactoryType.ANCHOR.itemStack();
         }
+        legendarium = FactoryType.LEGENDARIUM.itemStack();
 
         //BlockResource stuff
         silver_ore_item = ResourceType.SILVERORE.itemStack("Silver Ore");
@@ -1274,6 +1276,13 @@ public class Registry {
                 "---",
                 '#', dark_iron_block_item,
                 '-', dark_iron);
+        oreRecipe(legendarium,
+                " * ",
+                "-#-",
+                "###",
+                '#', new ItemStack(Blocks.quartz_block, 1, 1),
+                '-', "ingotGold",
+                '*', Items.nether_star);
 
         if (Core.enable_test_content) {
             TestContent.add();

@@ -351,6 +351,8 @@ public class BlockFactorization extends BlockContainer {
                 }
             }
         }
+
+        put(itemList, reg.legendarium);
     }
 
     ArrayList<ItemStack> todaysBarrels = null;
