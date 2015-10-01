@@ -1,11 +1,23 @@
 package factorization.sockets;
 
-import java.io.IOException;
-
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
+import factorization.api.Coord;
+import factorization.api.FzOrientation;
+import factorization.api.Quaternion;
+import factorization.api.datahelpers.DataHelper;
+import factorization.api.datahelpers.IDataSerializable;
+import factorization.api.datahelpers.Share;
+import factorization.common.BlockIcons;
+import factorization.common.FactoryType;
 import factorization.fzds.DeltaChunk;
 import factorization.fzds.HammerEnabled;
-import factorization.shared.*;
+import factorization.servo.RenderServoMotor;
+import factorization.servo.ServoMotor;
+import factorization.shared.BlockRenderHelper;
+import factorization.shared.Core;
 import factorization.util.InvUtil;
+import factorization.util.InvUtil.FzInv;
 import factorization.util.ItemUtil;
 import factorization.util.PlayerUtil;
 import net.minecraft.block.Block;
@@ -20,23 +32,12 @@ import net.minecraft.util.MovingObjectPosition.MovingObjectType;
 import net.minecraft.util.ReportedException;
 import net.minecraft.util.Vec3;
 import net.minecraft.world.World;
+import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.util.ForgeDirection;
-
+import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import org.lwjgl.opengl.GL11;
 
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
-import factorization.api.Coord;
-import factorization.api.FzOrientation;
-import factorization.api.Quaternion;
-import factorization.api.datahelpers.DataHelper;
-import factorization.api.datahelpers.IDataSerializable;
-import factorization.api.datahelpers.Share;
-import factorization.common.BlockIcons;
-import factorization.common.FactoryType;
-import factorization.servo.RenderServoMotor;
-import factorization.servo.ServoMotor;
-import factorization.util.InvUtil.FzInv;
+import java.io.IOException;
 
 public class SocketRobotHand extends TileEntitySocketBase {
     boolean wasPowered = false;
@@ -209,6 +210,11 @@ public class SocketRobotHand extends TileEntitySocketBase {
         final float dz = (float)hitVec.zCoord - (float)z;
         final Item item = itemstack == null ? null : itemstack.getItem();
         final long origItemHash = ItemUtil.getItemHash(itemstack);
+
+        PlayerInteractEvent event = new PlayerInteractEvent(player, PlayerInteractEvent.Action.RIGHT_CLICK_BLOCK, x, y, z, side, world);
+        if (MinecraftForge.EVENT_BUS.post(event)) {
+            return false;
+        }
         
         boolean ret = false;
         do {
