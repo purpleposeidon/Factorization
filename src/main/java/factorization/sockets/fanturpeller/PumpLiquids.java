@@ -21,7 +21,6 @@ import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemBucket;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.ForgeDirection;
 import net.minecraftforge.fluids.BlockFluidFinite;
@@ -56,11 +55,24 @@ public class PumpLiquids extends SocketFanturpeller implements IFluidHandler {
     protected boolean isDrainingTank = false;
     protected boolean isFloodingTank = false;
     private static FluidTankInfo[] no_info = new FluidTankInfo[0];
+    private int available_pumping_activity = 0;
     
     {
         super.isSucking = false;
     }
-    
+
+    public static final int CHARGE_DEPLETION = 10;
+
+    boolean depleteCharge(boolean simulate, int fluidAmount) {
+        if (simulate) {
+            if (fluidAmount < available_pumping_activity) return true;
+            return charge.getValue() > CHARGE_DEPLETION;
+        }
+        available_pumping_activity -= fluidAmount;
+        if (available_pumping_activity > 0) return true;
+        available_pumping_activity += BUCKET;
+        return charge.tryTake(CHARGE_DEPLETION) >= CHARGE_DEPLETION;
+    }
 
     @Override
     public int fill(ForgeDirection from, FluidStack resource, boolean doFill) {
@@ -361,6 +373,7 @@ public class PumpLiquids extends SocketFanturpeller implements IFluidHandler {
         @Override
         public void pumpOut() {
             if (isSucking) return; //don't run backwards
+            if (!depleteCharge(false, buffer.getFluidAmount())) return;
             if (!foundContainers.isEmpty() && buffer.getFluidAmount() > 0) {
                 FoundFluidHandler foundIfh = foundContainers.poll();
                 FluidTank buff = auxBuffer.getFluidAmount() > 0 ? auxBuffer : buffer;
@@ -478,6 +491,7 @@ public class PumpLiquids extends SocketFanturpeller implements IFluidHandler {
         @Override
         public void pumpOut() {
             if (buffer.getFluidAmount() <= 0) return;
+            if (!depleteCharge(false, buffer.getFluidAmount())) return;
             Coord at = new Coord(PumpLiquids.this);
             at.adjust(destinationDirection);
             IFluidHandler te = at.getTE(IFluidHandler.class);
@@ -628,7 +642,7 @@ public class PumpLiquids extends SocketFanturpeller implements IFluidHandler {
 
     @Override
     int getRequiredCharge() {
-        return (int)getTargetSpeed() / 2;
+        return 2;
     }
     
     @SideOnly(Side.CLIENT)
@@ -683,6 +697,7 @@ public class PumpLiquids extends SocketFanturpeller implements IFluidHandler {
         data.as(Share.PRIVATE, "auxBuff").putTank(auxBuffer);
         isDrainingTank = data.as(Share.PRIVATE, "drainTank").putBoolean(isDrainingTank);
         isFloodingTank = data.as(Share.PRIVATE, "floodTank").putBoolean(isFloodingTank);
+        available_pumping_activity = data.as(Share.PRIVATE, "pumpActivity").putInt(available_pumping_activity);
         
         target_speed = 2;
         isSucking = false;
