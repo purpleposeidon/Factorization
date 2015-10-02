@@ -94,7 +94,7 @@ LOG += '' + commit
 print(LOG)
 print
 print "Update targets:"
-for _ in "read forum thread; add build log; paste to forum post; update thread title; post changelog; IRC topic; twitter; patreon; forgecraft".split('; '):
+for _ in "read forum thread; add build log; paste to forum post; update thread title; post changelog; IRC topic; twitter; patreon; forgecraft; personal instance".split('; '):
     print "[ ]", _
 
 open("build.log", 'a').write(LOG+ '\n\n')
