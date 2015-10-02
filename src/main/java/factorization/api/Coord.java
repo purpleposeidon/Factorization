@@ -669,6 +669,7 @@ public final class Coord implements IDataSerializable, ISaneCoord, Comparable<Co
         return b.isReplaceable(w, x, y, z);
     }
 
+    @Deprecated // Inaccurate, ignores transparent blocks
     public boolean isTop() {
         return w.getHeightValue(x, z) == y;
     }
