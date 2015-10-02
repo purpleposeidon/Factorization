@@ -54,6 +54,7 @@ import net.minecraft.init.Blocks;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.launchwrapper.Launch;
+import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.*;
 import net.minecraftforge.common.MinecraftForge;
 import org.apache.logging.log4j.LogManager;
@@ -209,7 +210,7 @@ public class Core {
     
     void registerSimpleTileEntities() {
         FactoryType.registerTileEntities();
-        GameRegistry.registerTileEntity(TileEntityFzNull.class, "fz.null");
+        GameRegistry.registerTileEntity(TileEntityFzNull.class, TileEntityFzNull.mapName);
         GameRegistry.registerTileEntity(BlockDarkIronOre.Glint.class, "fz.glint");
         //TileEntity renderers are registered in the client proxy
 

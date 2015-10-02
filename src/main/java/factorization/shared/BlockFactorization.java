@@ -50,7 +50,9 @@ public class BlockFactorization extends BlockContainer {
         //But when this returned null, it wouldn't remove the real TE. So, the tile entity was both having its block broken, and being moved.
         //Returning a generic TE won't be an issue for us as we always use coord.getTE, and never assume, right?
         //We could possibly have our null TE remove itself.
-        return new TileEntityFzNull();
+        TileEntityFzNull nuller = new TileEntityFzNull();
+        nuller.setWorldObj(world);
+        return nuller;
     }
 
     @Override
