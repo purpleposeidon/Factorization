@@ -405,8 +405,8 @@ public class NetworkFactorization {
         entity_sync(true),
         UtilityGooState(true),
 
-        // Messages to players; (null) marks this
-        ArtifactForgeName(null), ArtifactForgeError(null);
+        // Messages to/from the player
+        ArtifactForgeName(false, true), ArtifactForgeError(false, true);
         
         public boolean isEntityMessage, isPlayerMessage;
         private static final MessageType[] valuesCache = values();
@@ -425,8 +425,8 @@ public class NetworkFactorization {
             isPlayerMessage = isPlayer;
         }
 
-        MessageType(Object isPlayer) {
-            this(false, true);
+        MessageType(boolean isEntity) {
+            this(true, false);
         }
         
         private static MessageType fromId(byte id) {
