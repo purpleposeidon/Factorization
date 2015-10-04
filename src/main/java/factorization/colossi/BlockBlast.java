@@ -25,6 +25,7 @@ public class BlockBlast extends Block {
         setCreativeTab(Core.tabFactorization);
         setHardness(1.5F);
         setResistance(10F);
+        setHarvestLevel("pickaxe", 1);
     }
 
     int blast_radius = 1;
