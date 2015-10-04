@@ -54,7 +54,7 @@ public class ContainerForge extends Container {
         invdx = -4;
         invdy = 10;
         addPlayerSlots(player.inventory);
-        int dx = -4, dy = -3;
+        int dx = -4 - 15, dy = -3;
         s(new ArrayList(), new SlotSane(forge, InventoryForge.SLOT_OUT, 80 + dx, 71 + dy));
         s(toolSlots, new SlotSane(forge, InventoryForge.SLOT_FIRST, 52 + dx, 71 + dy));
         s(toolSlots, new SlotSane(forge, InventoryForge.SLOT_SECOND, 108 + dx, 71 + dy));
@@ -64,7 +64,7 @@ public class ContainerForge extends Container {
         for (int i = InventoryForge.SLOT_ENCHANT_START; i < InventoryForge.SLOT_ENCHANT_END; i++) {
             s(enchantSlots, new SlotSane(forge, i, 0, 20 * (i - InventoryForge.SLOT_ENCHANT_START)));
         }
-        s(dyeSlots, new SlotSane(forge, InventoryForge.SLOT_DYE_1, 152 + dx, 134 + dy));
+        s(dyeSlots, new SlotSane(forge, InventoryForge.SLOT_DYE_1, 152 + 15 + dx, 134 + dy));
     }
 
     void s(ArrayList<Slot> list, Slot slot) {

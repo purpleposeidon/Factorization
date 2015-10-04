@@ -42,8 +42,8 @@ public class GuiArtifactForge extends GuiContainer {
         Keyboard.enableRepeatEvents(true);
         //name_field = makeField(62, 24, 103);
         //lore_field = makeField(62, 64, 103);
-        name_field = makeField(163, 28, 83, name_field, 40);
-        lore_field = makeField(163, 56, 83, lore_field, 40 * 4);
+        name_field = makeField(143, 28, 103, name_field, 40);
+        lore_field = makeField(143, 56, 103, lore_field, 40 * 4);
     }
 
     @Override
@@ -78,11 +78,12 @@ public class GuiArtifactForge extends GuiContainer {
     @Override
     public void drawDefaultBackground() {
         super.drawDefaultBackground();
-        double r = 64;
+        double r = 59;
         double dTheta = Math.PI * 2 / container.enchantSlots.size();
         int i = 0;
-        double speed = Math.PI * 2 / 1024;
-        int cx = 75, cy = 67;
+        double speed = Math.PI * 2 / 10;
+        // 75
+        int cx = 60, cy = 67;
         for (Slot slot : container.enchantSlots) {
             double theta = dTheta * i++ + speed * System.currentTimeMillis() / 1000;
             int x = (int) (cx + Math.cos(theta) * r);
@@ -107,14 +108,22 @@ public class GuiArtifactForge extends GuiContainer {
             drawTexturedModalRect(x0 + slot.xDisplayPosition + 3, y0 + slot.yDisplayPosition + 2, dx, 238, 18, 18);
             i++;
         }
+
+        GL11.glDisable(GL11.GL_LIGHTING);
+        GL11.glDisable(GL11.GL_BLEND);
+        GL11.glPushMatrix();
+        //GL11.glTranslatef(guiLeft, guiTop, 0.0F);
+        if (name_field != null) name_field.drawTextBox();
+        if (lore_field != null) lore_field.drawTextBox();
+        GL11.glPopMatrix();
     }
 
     @Override
     protected void drawGuiContainerForegroundLayer(int p_146979_1_, int p_146979_2_) {
         //fontRendererObj.drawString(I18n.format("factorization:container.artifactforge"), 28, 0, 4210752);
         //fontRendererObj.drawString(I18n.format("container.inventory"), 8, this.ySize - 96 - 14, 4210752);
-        fontRendererObj.drawString(I18n.format("factorization.forge.name"), 176, 16, 4210752);
-        fontRendererObj.drawString(I18n.format("factorization.forge.lore"), 176, 45, 4210752);
+        fontRendererObj.drawString(I18n.format("factorization.forge.name"), 156, 16, 4210752);
+        fontRendererObj.drawString(I18n.format("factorization.forge.lore"), 156, 45, 4210752);
         String err = container.forge.error_message;
         if (err == null) err = "lorehint";
         int dy = 10;
@@ -127,7 +136,7 @@ public class GuiArtifactForge extends GuiContainer {
                 if (i > 1) break;
                 msg = key;
             }
-            fontRendererObj.drawString(msg, 165, y + dy * i, 4210752);
+            fontRendererObj.drawString(msg, 138, y + dy * i, 4210752);
             if (i++ > 10) break;
         }
     }
@@ -135,9 +144,5 @@ public class GuiArtifactForge extends GuiContainer {
     @Override
     public void drawScreen(int mouseX, int mouseY, float partial) {
         super.drawScreen(mouseX, mouseY, partial);
-        GL11.glDisable(GL11.GL_LIGHTING);
-        GL11.glDisable(GL11.GL_BLEND);
-        if (name_field != null) name_field.drawTextBox();
-        if (lore_field != null) lore_field.drawTextBox();
     }
 }

@@ -80,14 +80,29 @@ public class TileEntityLegendarium extends TileEntityCommon {
 
     }
 
+    long getWaitTicks() {
+        long now = System.currentTimeMillis();
+        long to_wait = last_insert_time + WAIT_TIME - now;
+        return (to_wait /* ms */ / 1000) /* s */ * 20 /* ticks */;
+    }
+
     @Override
     public boolean activate(EntityPlayer player, ForgeDirection side) {
         // Store an item
         if (worldObj.isRemote) return true;
         if (isDroid(player)) return false;
         ItemStack held = player.getHeldItem();
-        if (held == null && canRemove()) {
-            new Notice(this, "factorization.legendarium.ready").sendTo(player);
+        if (held == null) {
+            if (canRemove()) {
+                new Notice(this, "factorization.legendarium.canremove").sendTo(player);
+                return true;
+            }
+            long ticks = getWaitTicks();
+            if (ticks > 0) {
+                new Notice(this, "factorization.legendarium.wait", FzUtil.unitify(FzUtil.unit_time, ticks, 2)).sendTo(player);
+            } else {
+                new Notice(this, "factorization.legendarium.caninsert").sendTo(player);
+            }
             return true;
         }
 
@@ -97,14 +112,13 @@ public class TileEntityLegendarium extends TileEntityCommon {
             return true;
         }
 
-        long now = System.currentTimeMillis();
-        long to_wait = last_insert_time + WAIT_TIME - now;
-        if (to_wait > 0) {
-            long ticks = (to_wait /* ms */ / 1000) /* seconds */ * 20 /* ticks */;
+
+        long ticks = getWaitTicks();
+        if (ticks > 0) {
             new Notice(this, "factorization.legendarium.wait", FzUtil.unitify(FzUtil.unit_time, ticks, 2)).sendTo(player);
             return true;
         }
-        last_insert_time = now;
+        last_insert_time = System.currentTimeMillis();
         queue.add(held);
         player.setCurrentItemOrArmor(0, null);
         markDirty();
