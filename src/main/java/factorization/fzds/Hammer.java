@@ -20,6 +20,7 @@ import net.minecraft.entity.Entity;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.management.PlayerManager;
 import net.minecraft.world.World;
+import net.minecraft.world.WorldProvider;
 import net.minecraftforge.common.DimensionManager;
 import net.minecraftforge.common.ForgeChunkManager;
 import net.minecraftforge.event.entity.EntityJoinWorldEvent;
@@ -118,7 +119,13 @@ public class Hammer {
         if (!DimensionManager.shouldLoadSpawn(DeltaChunk.getDimensionId())) {
             throw new RuntimeException("hammerWorld is not loaded");
         }
+        if (!DimensionManager.isDimensionRegistered(DeltaChunk.getDimensionId())) {
+            throw new RuntimeException("Hammer dimension was not registered!?");
+        }
         World hammerWorld = DimensionManager.getWorld(DeltaChunk.getDimensionId());
+        if (!(hammerWorld.provider instanceof HammerWorldProvider)) {
+            throw new RuntimeException("Expected HammerWorldProvider for HammerWorld; is there a dimension ID conflict? Actual provider: " + hammerWorld.provider.getClass());
+        }
         hammerWorld.addWorldAccess(new ServerShadowWorldAccess());
         int view_distance = MinecraftServer.getServer().getConfigurationManager().getViewDistance();
         //the undeobfed method comes after "isPlayerWatchingChunk", also in uses of ServerConfigurationManager.getViewDistance()
