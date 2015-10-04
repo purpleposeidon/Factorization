@@ -63,6 +63,26 @@ public class EntityPoster extends EntityFz {
         }
     }
 
+    public void setItem(ItemStack item) {
+        if (item == null) {
+            item = new ItemStack(Core.registry.spawnPoster);
+        }
+        inv = item;
+    }
+
+    public ItemStack getItem() {
+        if (ItemUtil.is(inv, Core.registry.spawnPoster)) return null;
+        return inv;
+    }
+
+    public boolean isLocked() {
+        return locked;
+    }
+
+    public void setLocked(boolean locked) {
+        this.locked = locked;
+    }
+
     @Override
     public boolean isInRangeToRender3d(double p_145770_1_, double p_145770_3_, double p_145770_5_) {
         return super.isInRangeToRender3d(p_145770_1_, p_145770_3_, p_145770_5_);

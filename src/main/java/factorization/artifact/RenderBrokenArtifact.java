@@ -12,13 +12,21 @@ public class RenderBrokenArtifact implements IItemRenderer {
     int W = 8;
     int S = 16 / W;
     int layerCount = 4;
-    int[] shuffle = new int[W * W * 2 * layerCount];
+    byte[][] shuffles = new byte[10][];
+
     {
+        for (int i = 0; i < shuffles.length; i++) {
+            shuffles[i] = makeShuffle(i);
+        }
+    }
+
+    byte[] makeShuffle(int seed) {
+        byte[] shuffle = new byte[W * W * 2 * layerCount];
         // Construct an "array of (x, y) pairs".
         int index = 0;
         for (int l = 0; l < layerCount; l++) {
-            for (int x = 0; x < W; x++) {
-                for (int y = 0; y < W; y++) {
+            for (byte x = 0; x < W; x++) {
+                for (byte y = 0; y < W; y++) {
                     shuffle[index++] = x;
                     shuffle[index++] = y;
                 }
@@ -26,13 +34,13 @@ public class RenderBrokenArtifact implements IItemRenderer {
         }
         int elem = shuffle.length / 2;
         int randCount = shuffle.length / 2;
-        Random rand = new Random(9);
+        Random rand = new Random(seed);
         for (int n = 0; n < randCount; n++) {
             int s = rand.nextInt(elem);
             int d = rand.nextInt(elem);
             if (rand.nextInt(3) == 0) {
-                int swap0 = shuffle[d * 2 + 0];
-                int swap1 = shuffle[d * 2 + 1];
+                byte swap0 = shuffle[d * 2 + 0];
+                byte swap1 = shuffle[d * 2 + 1];
                 shuffle[d * 2 + 0] = shuffle[s * 2 + 0];
                 shuffle[d * 2 + 1] = shuffle[s * 2 + 1];
                 shuffle[s * 2 + 0] = swap0;
@@ -42,6 +50,7 @@ public class RenderBrokenArtifact implements IItemRenderer {
                 shuffle[s * 2 + 1] = -1;
             }
         }
+        return shuffle;
     }
 
     @Override
@@ -59,14 +68,18 @@ public class RenderBrokenArtifact implements IItemRenderer {
     public void renderItem(ItemRenderType type, ItemStack item, Object... data) {
         ItemStack orig = ItemBrokenArtifact.get(item);
         if (orig == null) return;
+        float tessD = -1.1F / 32F;
+        Tessellator tess = Tessellator.instance;
         if (type == ItemRenderType.ENTITY) {
             GL11.glDisable(GL11.GL_CULL_FACE);
+        } else if (type == ItemRenderType.EQUIPPED) {
+            tess.addTranslation(0, 0, tessD);
         }
         IIcon icon = orig.getIconIndex();
         double d = type == ItemRenderType.INVENTORY ? 1.0 : 1.0/16.0;
-        Tessellator tess = Tessellator.instance;
         tess.startDrawingQuads();
         int index = 0;
+        byte shuffle[] = shuffles[Math.abs(item.getItemDamage()) % shuffles.length];
         for (int loop = 0; loop < layerCount; loop++) {
             for (int x = 0; x < W; x++) {
                 for (int y = 0; y < W; y++) {
@@ -94,13 +107,14 @@ public class RenderBrokenArtifact implements IItemRenderer {
                 }
             }
         }
-        GL11.glEnable(GL11.GL_BLEND);
-        //GL11.glDisable(GL11.GL_BLEND);
-        //GL11.glDisable(GL11.GL_TEXTURE_2D);
+        GL11.glPushAttrib(GL11.GL_COLOR_BUFFER_BIT);
+        GL11.glEnable(GL11.GL_ALPHA_TEST);
         tess.draw();
-        //GL11.glEnable(GL11.GL_TEXTURE_2D);
+        GL11.glPopAttrib();
         if (type == ItemRenderType.ENTITY) {
             GL11.glEnable(GL11.GL_CULL_FACE);
+        } else if (type == ItemRenderType.EQUIPPED) {
+            tess.addTranslation(0, 0, -tessD);
         }
     }
 }

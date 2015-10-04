@@ -2,6 +2,7 @@ package factorization.artifact;
 
 import com.google.common.base.Strings;
 import factorization.api.Coord;
+import factorization.api.ICoordFunction;
 import factorization.api.datahelpers.DataHelper;
 import factorization.api.datahelpers.Share;
 import factorization.common.BlockIcons;
@@ -14,11 +15,15 @@ import factorization.shared.TileEntityCommon;
 import factorization.util.FzUtil;
 import factorization.util.ItemUtil;
 import factorization.util.PlayerUtil;
-import net.minecraft.entity.Entity;
+import factorization.util.SpaceUtil;
+import factorization.weird.poster.EntityPoster;
+import net.minecraft.block.BlockSign;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.tileentity.TileEntitySign;
+import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.IIcon;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldSavedData;
@@ -27,12 +32,13 @@ import net.minecraftforge.common.util.FakePlayer;
 import net.minecraftforge.common.util.ForgeDirection;
 
 import java.io.IOException;
-import java.util.ArrayList;
+import java.util.*;
 
 public class TileEntityLegendarium extends TileEntityCommon {
     static final int MIN_SIZE = 7; // The queue must be this size before something can be removed
     static final int POSTER_RANGE = 16;
     static final int MAX_USAGES_LEFT = 32;
+    static final int SIGN_RANGE = 1;
 
     private static final boolean DEBUG = Core.dev_environ;
 
@@ -78,6 +84,8 @@ public class TileEntityLegendarium extends TileEntityCommon {
     static String analyzeItem(ItemStack is) {
         if (is == null) return "noitem";
         if (!isTool(is)) return "not_tool";
+        if (!is.hasDisplayName()) return "not_artifact";
+        if (!is.isItemEnchanted()) return "not_artifact";
         if (is.getItemDamage() < is.getMaxDamage() - MAX_USAGES_LEFT) return "not_broken";
         return null;
     }
@@ -118,6 +126,11 @@ public class TileEntityLegendarium extends TileEntityCommon {
 
         String analysis = analyzeItem(held);
         if (analysis != null) {
+            if (analysis.equals("not_broken") && Core.dev_environ && player.isSprinting()) {
+                new Notice(this, "<breaking item>").sendTo(player);
+                held.setItemDamage(held.getMaxDamage() - 1);
+                return true;
+            }
             new Notice(this, "factorization.legendarium.item_analysis." + analysis).sendTo(player);
             return true;
         }
@@ -129,10 +142,11 @@ public class TileEntityLegendarium extends TileEntityCommon {
             return true;
         }
         last_insert_time = System.currentTimeMillis();
-        queue.add(held);
+        queue.add(ItemBrokenArtifact.build(held));
         player.setCurrentItemOrArmor(0, null);
         markDirty();
         sound("insert");
+        populatePosters();
         return true;
     }
 
@@ -144,14 +158,24 @@ public class TileEntityLegendarium extends TileEntityCommon {
     public void click(EntityPlayer player) {
         // Remove an item
         if (isDroid(player)) return;
+        if (ItemUtil.is(player.getHeldItem(), Core.registry.spawnPoster)) {
+            if (cleanPosters() == 0) {
+                populatePosters();
+                new Notice(this, "factorization.legendarium.posters.populated").sendTo(player);
+            } else {
+                new Notice(this, "factorization.legendarium.posters.cleaned").sendTo(player);
+            }
+            return;
+        }
         if (!canRemove()) {
             new Notice(this, "factorization.legendarium.notfull").sendTo(player);
             return;
         }
-        final ItemStack artifact = ItemBrokenArtifact.build(queue.remove(0));
+        final ItemStack artifact = queue.remove(0);
         ItemUtil.giveItem(player, new Coord(this), artifact, ForgeDirection.UNKNOWN);
         markDirty();
         sound("remove");
+        populatePosters();
     }
 
     static final String legendariumCount = "legendariumCount";
@@ -240,17 +264,13 @@ public class TileEntityLegendarium extends TileEntityCommon {
         if (worldObj.isRemote) return super.removedByPlayer(player, willHarvest);
         if (!queue.isEmpty()) {
             if (!PlayerUtil.isPlayerCreative(player)) return false;
-            ItemStack got;
-            if (canRemove()) {
-                got = ItemBrokenArtifact.build(queue.remove(0));
-            } else {
-                got = queue.remove(0);
-            }
+            ItemStack got = queue.remove(0);
             ItemUtil.giveItem(player, new Coord(this), got, ForgeDirection.UNKNOWN);
             return false;
         }
         LegendariumPopulation population = LegendariumPopulation.load();
         population.setOccupied(new Coord(this), player, false);
+        cleanPosters();
         return super.removedByPlayer(player, willHarvest);
     }
 
@@ -259,11 +279,141 @@ public class TileEntityLegendarium extends TileEntityCommon {
         super.onRemove();
         LegendariumPopulation population = LegendariumPopulation.load();
         population.setOccupied(new Coord(this), null, false);
+        cleanPosters();
     }
 
     @Override
     public IIcon getIcon(ForgeDirection dir) {
         if (dir.offsetY == 0) return BlockIcons.artifact$legendarium_side;
         return BlockIcons.artifact$legendarium_top;
+    }
+
+    List<EntityPoster> getPosters() {
+        Coord min = new Coord(this).add(-POSTER_RANGE, -POSTER_RANGE, -POSTER_RANGE);
+        Coord max = new Coord(this).add(+POSTER_RANGE, +POSTER_RANGE, +POSTER_RANGE);
+        AxisAlignedBB box = SpaceUtil.createAABB(min, max);
+        List<EntityPoster> ret = worldObj.getEntitiesWithinAABB(EntityPoster.class, box);
+        Collections.sort(ret, new Comparator<EntityPoster>() {
+            @Override
+            public int compare(EntityPoster o1, EntityPoster o2) {
+                double d1 = o1.getDistanceSq(xCoord, yCoord, zCoord);
+                double d2 = o2.getDistanceSq(xCoord, yCoord, zCoord);
+                if (d1 > d2) return +1;
+                if (d1 < d2) return -1;
+                return 0;
+            }
+        });
+        return ret;
+    }
+
+    void iterateSign(EntityPoster poster, ICoordFunction function) {
+        /*Coord min = new Coord(poster).add(-SIGN_RANGE, -SIGN_RANGE, -SIGN_RANGE);
+        Coord max = new Coord(poster).add(+SIGN_RANGE, +SIGN_RANGE, +SIGN_RANGE);
+        Coord.iterateCube(min, max, function);*/
+        for (Coord n : new Coord(poster).getNeighborsAdjacent()) {
+            function.handle(n);
+        }
+    }
+
+    int populatePosters() {
+        int ret = 0;
+        cleanPosters();
+        Iterator<ItemStack> it = queue.iterator();
+
+        for (EntityPoster poster : getPosters()) {
+            if (poster.getItem() != null) continue;
+            if (!it.hasNext()) break;
+            final ItemStack artifact = it.next().copy();
+            poster.setItem(artifact);
+            poster.setLocked(true);
+            poster.syncWithSpawnPacket();
+            ret++;
+            ICoordFunction setSign = new ICoordFunction() {
+                boolean set = false;
+                @Override
+                public void handle(Coord here) {
+                    if (set) return;
+                    if (!(here.getBlock() instanceof BlockSign)) return;
+                    TileEntitySign sign = here.getTE(TileEntitySign.class);
+                    if (sign == null) return;
+                    for (int i = 0; i < sign.signText.length; i++) {
+                        if (!"".equals(sign.signText[i])) return;
+                    }
+                    ItemStack orig = ItemBrokenArtifact.get(artifact);
+                    if (orig == null) return;
+
+                    setSignText(sign, orig);
+                    // TODO: Playername?
+                    here.markBlockForUpdate();
+                    set = true;
+                }
+
+                private void setSignText(TileEntitySign sign, ItemStack orig) {
+                    String name = orig.getDisplayName();
+                    // easy case
+                    int sign_max_len = 15;
+                    if (name.length() < sign_max_len) {
+                        sign.signText[1] = name;
+                        return;
+                    }
+                    name = name.replaceAll("(§.)", "");
+                    // Strip colors & try again
+                    if (name.length() < sign_max_len) {
+                        sign.signText[1] = name;
+                        return;
+                    }
+                    // Ahh, a tough guy, eh? We'll just see 'bout that!
+                    ArrayList<String> out = new ArrayList<String>();
+                    String build = "";
+                    int total = 0;
+                    for (String word : name.split(" ")) {
+                        int l = word.length();
+                        if (l + total + 1 < sign_max_len || total == 0) {
+                            build += " " + word;
+                            total += l + 1;
+                        } else {
+                            out.add(build);
+                            build = word;
+                            total = l;
+                            if (out.size() > 4) break; // bad news: It won't fit.
+                        }
+                    }
+                    int start = 0;
+                    if (out.size() <= 2) start = 1; // And center it vertically
+                    int end = Math.min(sign.signText.length, out.size());
+                    for (int i = start; i < end; i++) {
+                        sign.signText[i] = out.get(i);
+                    }
+                }
+            };
+            iterateSign(poster, setSign);
+        }
+        return ret;
+    }
+
+    int cleanPosters() {
+        int ret = 0;
+        for (EntityPoster poster : getPosters()) {
+            if (!poster.isLocked()) continue;
+            if (!ItemUtil.is(poster.getItem(), Core.registry.brokenTool)) continue;
+            poster.setItem(null);
+            poster.setLocked(false);
+            poster.syncWithSpawnPacket();
+            ret++;
+            ICoordFunction clearSign = new ICoordFunction() {
+                @Override
+                public void handle(Coord here) {
+                    if (!(here.getBlock() instanceof BlockSign)) return;
+                    TileEntitySign sign = here.getTE(TileEntitySign.class);
+                    if (sign == null) return;
+                    for (int i = 0; i < sign.signText.length; i++) {
+                        sign.signText[i] = "";
+                    }
+                    here.markBlockForUpdate();
+                }
+            };
+            iterateSign(poster, clearSign);
+        }
+        return ret;
     }
 }
