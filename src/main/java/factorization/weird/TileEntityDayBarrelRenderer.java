@@ -59,12 +59,11 @@ public class TileEntityDayBarrelRenderer extends TileEntitySpecialRenderer {
                 GL11.glTranslated(0, delta, 0);
             }
         }
+
         
-        
+        GL11.glPushAttrib(GL11.GL_COLOR_BUFFER_BIT | GL11.GL_ENABLE_BIT);
         GL11.glDisable(GL11.GL_BLEND);
         GL11.glDisable(GL11.GL_LIGHTING);
-        
-        GL11.glPushAttrib(GL11.GL_COLOR_BUFFER_BIT);
         GL11.glAlphaFunc(GL11.GL_GREATER, 0.0F);
         
         boolean hasLabel = renderItemCount(is, barrel);
