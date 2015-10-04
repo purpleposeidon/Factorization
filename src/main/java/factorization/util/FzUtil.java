@@ -116,29 +116,29 @@ public class FzUtil {
 
         private UnitBase(long ratio, String unit) {
             this.ratio = ratio;
-            this.unit = unit;
+            this.unit = "factorization.unit." + unit;
         }
     }
 
     public static UnitBase unit_time[] = new UnitBase[] {
-            new UnitBase(1L * 20 * 60 * 60 * 24 * 365 * 1000000000, "long eons"),
-            new UnitBase(1L * 20 * 60 * 60 * 24 * 365 * 1000, "long millenia"),
-            new UnitBase(1L * 20 * 60 * 60 * 24 * 365 * 100, "long centuries"),
-            new UnitBase(1L * 20 * 60 * 60 * 24 * 365, "long years"),
-            new UnitBase(1L * 20 * 60 * 60 * 24 * 30, "long months"), // Mostly! :D
-            new UnitBase(1L * 20 * 60 * 60 * 24 * 7, "long weeks"),
-            new UnitBase(1L * 20 * 60 * 60 * 24, "long days"),
-            new UnitBase(1L * 20 * 60 * 60, "long hours"),
-            new UnitBase(1L * 20 * 60 * 20, "days"), // assuming no sleeping
-            new UnitBase(1L * 20 * 60, "minutes"),
-            new UnitBase(1L * 20, "seconds"),
-            new UnitBase(1L, "ticks"),
+            new UnitBase(1L * 20 * 60 * 60 * 24 * 365 * 1000 * 1000, "time.eons"),
+            new UnitBase(1L * 20 * 60 * 60 * 24 * 365 * 1000, "time.millenia"),
+            new UnitBase(1L * 20 * 60 * 60 * 24 * 365 * 100, "time.centuries"),
+            new UnitBase(1L * 20 * 60 * 60 * 24 * 365, "time.years"),
+            new UnitBase(1L * 20 * 60 * 60 * 24 * 30, "time.months"), // Mostly! :D
+            new UnitBase(1L * 20 * 60 * 60 * 24 * 7, "time.weeks"),
+            new UnitBase(1L * 20 * 60 * 60 * 24, "time.irldays"),
+            new UnitBase(1L * 20 * 60 * 60, "time.hours"),
+            //new UnitBase(1L * 20 * 60 * 20, "time.mcdays"), // skipped due to confusingness
+            new UnitBase(1L * 20 * 60, "time.minutes"),
+            new UnitBase(1L * 20, "time.seconds"),
+            new UnitBase(1L, "time.ticks"),
     };
     public static UnitBase unit_distance_px[] = new UnitBase[] {
-            new UnitBase(1L * 16 * 1000, "kilometers"),
-            new UnitBase(1L * 16 * 16, "chunks"),
-            new UnitBase(1L * 16, "blocks"),
-            new UnitBase(1L, "pixels"),
+            new UnitBase(1L * 16 * 1000, "distance.kilometers"),
+            new UnitBase(1L * 16 * 16, "distance.chunks"),
+            new UnitBase(1L * 16, "distance.blocks"),
+            new UnitBase(1L, "distance.pixels"),
     };
 
     private static UnitBase best(UnitBase[] bases, long value) {
@@ -153,6 +153,18 @@ public class FzUtil {
         return bases[bases.length - 1];
     }
 
+    public static String unitify(String unitName, long value, int max_len) {
+        UnitBase[] base = null;
+        if (unitName.equals("time")) {
+            base = unit_time;
+        } else if (unitName.equals("distance")) {
+            base = unit_distance_px;
+        } else {
+            return "Unknown unit " + unitName + "@" + value;
+        }
+        return unitify(base, value, max_len);
+    }
+
     public static String unitify(UnitBase[] bases, long value, int max_len) {
         String r = "";
         while (max_len-- != 0) {
@@ -161,13 +173,26 @@ public class FzUtil {
             value -= best.ratio * l;
             if (l > 0) {
                 if (!r.isEmpty()) r += " ";
-                r += l + " " + best.unit;
+                String unit = Core.translateExact(best.unit + "." + l);
+                if (unit != null) {
+                    r += unit;
+                } else {
+                    r += l + " " + Core.translateThis(best.unit);
+                }
             } else if (value == 0 && !r.isEmpty()) {
                 return r;
             }
             if (best.ratio == 1 || max_len == 0) break;
         }
         return r;
+    }
+
+    public static String unitTranslateTimeTicks(long value, int max_len) {
+        return "§UNIT§ time " + max_len + " " + value;
+    }
+
+    public static String unitTranslateDistancePixels(long value, int max_len) {
+        return "§UNIT§ distance " + max_len + " " + value;
     }
 
     public static void debugBytes(String header, byte[] d) {

@@ -32,7 +32,7 @@ public class Notice {
 
     /**
      * Creates an in-world notification message, which is sent using
-     * {@link sendTo} or {@link sendToEveryone}. Additional options can be
+     * {@link sendTo} or {@link sendToAll}. Additional options can be
      * provided using {@link withItem}, {@link withStyle}, {@link withWorld},
      * and {@link withUpdater}. <br>
      * <b>Remember to send the Notice!</b><br>

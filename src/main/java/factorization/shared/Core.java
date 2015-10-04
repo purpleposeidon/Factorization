@@ -556,6 +556,17 @@ public class Core {
     }
     
     public static String translateExact(String key) {
+        if (key != null && key.startsWith("§UNIT§")) {
+            // §UNIT§ TIME 2 123456789
+            String[] bits = key.split(" ");
+            if (bits.length != 4) {
+                return key;
+            }
+            String unit = bits[1];
+            int maxParts = Integer.parseInt(bits[2]);
+            Long val = Long.parseLong(bits[3]);
+            return FzUtil.unitify(unit, val, maxParts);
+        }
         String ret = StatCollector.translateToLocal(key);
         //noinspection StringEquality: StatCollector will return the exact same object if translation fails
         if (ret == key) {
