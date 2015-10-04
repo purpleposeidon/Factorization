@@ -125,60 +125,6 @@ public abstract class TileEntityFactorization extends TileEntityCommon
         return Math.copySign(1, c);
     }
 
-    protected Entity ejectItem(ItemStack is, boolean violent, EntityPlayer player, int to_side) {
-        if (worldObj.isRemote) {
-            return null;
-        }
-        if (is == null || is.stackSize == 0) {
-            return null;
-        }
-        if (player == null) {
-            to_side = -1;
-        }
-        double mult = 0.02;
-        if (violent) {
-            mult = 0.2;
-        }
-        Vec3 pos = Vec3.createVectorHelper(xCoord + 0.5, yCoord + 0.5, zCoord + 0.5);
-        Vec3 vel = Vec3.createVectorHelper(0, 0, 0);
-        if (to_side != -1) {
-            ForgeDirection dir = ForgeDirection.getOrientation(to_side);
-            /*
-            ent.motionX = dir.offsetX;
-            ent.motionY = dir.offsetY;
-            ent.motionZ = dir.offsetZ;*/
-            double d = 0.75;
-            pos.xCoord += dir.offsetX*d;
-            pos.yCoord += dir.offsetY*d;
-            pos.zCoord += dir.offsetZ*d;
-            vel.xCoord = dir.offsetX;
-            vel.yCoord = dir.offsetY;
-            vel.zCoord = dir.offsetZ;
-        } else if (player != null) {
-            // point velocity towards player
-            Vec3 vec = Vec3.createVectorHelper(player.posX - xCoord, player.posY - yCoord,
-                    player.posZ - zCoord);
-            vec = vec.normalize();
-            vel = vec;
-            double d = 0.25;
-            // move item to near the edge
-            pos.xCoord += vec.xCoord*d;
-            pos.yCoord += vec.yCoord*d;
-            pos.zCoord += vec.zCoord*d;
-            //Minecraft.getMinecraft().theWorld.spawnParticle("reddust", ent.posX, ent.posY, ent.posZ, 0, 0, 0);
-        } else {
-            // random velocity
-            vel.xCoord = rand.nextGaussian();
-            vel.yCoord = rand.nextGaussian();
-            vel.zCoord = rand.nextGaussian();
-        }
-        Entity ent = getCoord().spawnItem(is);
-        ent.motionX = vel.xCoord*mult;
-        ent.motionY = vel.yCoord*mult;
-        ent.motionZ = vel.zCoord*mult;
-        return ent;
-    }
-
     @Override
     public ItemStack decrStackSize(int i, int amount) {
         ItemStack target = ItemUtil.normalize(getStackInSlot(i));

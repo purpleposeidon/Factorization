@@ -1,10 +1,22 @@
 package factorization.weird;
 
-import java.io.IOException;
-import java.util.ArrayList;
-
+import cpw.mods.fml.common.eventhandler.SubscribeEvent;
+import cpw.mods.fml.common.gameevent.TickEvent;
+import cpw.mods.fml.common.gameevent.TickEvent.ClientTickEvent;
+import cpw.mods.fml.common.network.internal.FMLProxyPacket;
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
+import factorization.api.Coord;
+import factorization.api.FzOrientation;
+import factorization.api.datahelpers.DataHelper;
+import factorization.api.datahelpers.Share;
+import factorization.common.FactoryType;
+import factorization.notify.Notice;
+import factorization.notify.NoticeUpdater;
 import factorization.shared.*;
+import factorization.shared.NetworkFactorization.MessageType;
 import factorization.util.*;
+import factorization.util.InvUtil.FzInv;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockRailBase;
@@ -14,11 +26,9 @@ import net.minecraft.client.renderer.GLAllocation;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.init.Blocks;
-import net.minecraft.init.Items;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
@@ -33,24 +43,10 @@ import net.minecraftforge.common.util.FakePlayer;
 import net.minecraftforge.common.util.ForgeDirection;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.minecraftforge.event.world.ChunkEvent;
-
 import org.lwjgl.opengl.GL11;
 
-import cpw.mods.fml.common.eventhandler.SubscribeEvent;
-import cpw.mods.fml.common.gameevent.TickEvent;
-import cpw.mods.fml.common.gameevent.TickEvent.ClientTickEvent;
-import cpw.mods.fml.common.network.internal.FMLProxyPacket;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
-import factorization.api.Coord;
-import factorization.api.FzOrientation;
-import factorization.api.datahelpers.DataHelper;
-import factorization.api.datahelpers.Share;
-import factorization.common.FactoryType;
-import factorization.notify.Notice;
-import factorization.notify.NoticeUpdater;
-import factorization.util.InvUtil.FzInv;
-import factorization.shared.NetworkFactorization.MessageType;
+import java.io.IOException;
+import java.util.ArrayList;
 
 public class TileEntityDayBarrel extends TileEntityFactorization {
     public ItemStack item;
@@ -817,20 +813,11 @@ public class TileEntityDayBarrel extends TileEntityFactorization {
         if (to_remove > 1 && to_remove == getItemCount()) {
             to_remove--;
         }
-        Entity ent = ejectItem(makeStack(to_remove), false, entityplayer, last_hit_side);
-        if (ent != null && !(entityplayer instanceof FakePlayer)) {
-            if (ent instanceof EntityItem) {
-                EntityItem ei = (EntityItem) ent;
-                ei.delayBeforeCanPickup = 0;
-            }
-            if (origHeldItem != null) {
-                ent.onCollideWithPlayer(entityplayer);
-            } else {
-                ent.onCollideWithPlayer(entityplayer);
-                ItemStack newHeld = entityplayer.getHeldItem();
-                if (newHeld != origHeldItem) {
-                    broadcastMessage(entityplayer, MessageType.BarrelDoubleClickHack);
-                }
+        Entity ent = ItemUtil.giveItem(entityplayer, new Coord(this), makeStack(to_remove), ForgeDirection.getOrientation(last_hit_side));
+        if (ent != null && ent.isDead && !(entityplayer instanceof FakePlayer)) {
+            ItemStack newHeld = entityplayer.getHeldItem();
+            if (newHeld != origHeldItem) {
+                broadcastMessage(entityplayer, MessageType.BarrelDoubleClickHack);
             }
         }
         changeItemCount(-to_remove);
@@ -916,7 +903,7 @@ public class TileEntityDayBarrel extends TileEntityFactorization {
             int to_drop;
             to_drop = Math.min(item.getMaxStackSize(), count);
             count -= to_drop;
-            ejectItem(makeStack(to_drop), getItemCount() > 64 * 16, null, -1);
+            ItemUtil.giveItem(null, new Coord(this), makeStack(to_drop), ForgeDirection.UNKNOWN);
             if (count <= 0) {
                 break;
             }

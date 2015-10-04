@@ -1,12 +1,18 @@
 package factorization.util;
 
+import factorization.api.Coord;
 import net.minecraft.block.Block;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.item.EntityItem;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.nbt.NBTTagString;
+import net.minecraft.util.Vec3;
 import net.minecraft.world.World;
+import net.minecraftforge.common.util.ForgeDirection;
 import net.minecraftforge.oredict.OreDictionary;
 
 import java.util.ArrayList;
@@ -245,5 +251,50 @@ public final class ItemUtil {
             loreList.appendTag(new NBTTagString(n));
         }
         displayTag.setTag("Lore", loreList);
+    }
+
+    public static Entity giveItem(EntityPlayer player, Coord at, ItemStack stack, ForgeDirection side) {
+        if (null == ItemUtil.normalize(stack)) return null;
+        if (at.w.isRemote) return null;
+        Entity ent = at.spawnItem(stack);
+        if (ent == null) { // pretty unlikely
+            player.dropPlayerItemWithRandomChoice(stack, false /* not used? */);
+            return null;
+        }
+        if (ent instanceof EntityItem) {
+            ((EntityItem) ent).delayBeforeCanPickup = 0;
+        }
+        if (player != null) {
+            ent.onCollideWithPlayer(player);
+            if (ent.isDead) return ent; // player got the item
+        }
+
+        Vec3 dir;
+        if (side == ForgeDirection.UNKNOWN && player == null) {
+            if (at.isAir()) {
+                return ent;
+            }
+            side = ForgeDirection.UP; // Last ditch attempt at picking a direction if all else fails
+            for (ForgeDirection fd : ForgeDirection.VALID_DIRECTIONS) {
+                if (at.add(fd).isAir()) {
+                    side = fd;
+                    break;
+                }
+            }
+        }
+        if (side == ForgeDirection.UNKNOWN && player != null) {
+            Vec3 me = at.toVector();
+            Vec3 you = SpaceUtil.fromEntPos(player);
+            dir = SpaceUtil.incrSubtract(you, me);
+            SpaceUtil.normalize(dir);
+        } else {
+            dir = SpaceUtil.fromDirection(side);
+        }
+        Vec3 move = SpaceUtil.scale(dir, 0.5);
+        Vec3 newSpot = SpaceUtil.incrAdd(SpaceUtil.fromEntPos(ent), move);
+        SpaceUtil.toEntPos(ent, newSpot);
+        //SpaceUtil.scale(dir, 0.002);
+        //SpaceUtil.toEntVel(ent, dir);
+        return ent;
     }
 }
