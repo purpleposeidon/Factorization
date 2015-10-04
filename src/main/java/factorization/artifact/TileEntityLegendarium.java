@@ -7,10 +7,14 @@ import factorization.api.datahelpers.Share;
 import factorization.common.BlockIcons;
 import factorization.common.FactoryType;
 import factorization.notify.Notice;
+import factorization.notify.Style;
 import factorization.shared.BlockClass;
 import factorization.shared.Core;
 import factorization.shared.TileEntityCommon;
 import factorization.util.FzUtil;
+import factorization.util.ItemUtil;
+import factorization.util.PlayerUtil;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
@@ -30,7 +34,9 @@ public class TileEntityLegendarium extends TileEntityCommon {
     static final int POSTER_RANGE = 16;
     static final int MAX_USAGES_LEFT = 32;
 
-    private static final int WAIT_TIME = 7 * 24 * 60 * 60 * 1000;
+    private static final boolean DEBUG = Core.dev_environ;
+
+    private static final int WAIT_TIME = DEBUG ? 4 * 1000 : 7 * 24 * 60 * 60 * 1000;
 
     long last_insert_time = 0;
     ArrayList<ItemStack> queue = new ArrayList<ItemStack>();
@@ -94,12 +100,16 @@ public class TileEntityLegendarium extends TileEntityCommon {
         ItemStack held = player.getHeldItem();
         if (held == null) {
             if (canRemove()) {
-                new Notice(this, "factorization.legendarium.canremove").sendTo(player);
+                ItemStack front = queue.get(0);
+                new Notice(this, "factorization.legendarium.canremove")
+                        .withStyle(Style.DRAWITEM)
+                        .withItem(front)
+                        .sendTo(player);
                 return true;
             }
             long ticks = getWaitTicks();
             if (ticks > 0) {
-                new Notice(this, "factorization.legendarium.wait", FzUtil.unitify(FzUtil.unit_time, ticks, 2)).sendTo(player);
+                new Notice(this, "factorization.legendarium.wait", FzUtil.unitTranslateTimeTicks(ticks, 2)).sendTo(player);
             } else {
                 new Notice(this, "factorization.legendarium.caninsert").sendTo(player);
             }
@@ -115,7 +125,7 @@ public class TileEntityLegendarium extends TileEntityCommon {
 
         long ticks = getWaitTicks();
         if (ticks > 0) {
-            new Notice(this, "factorization.legendarium.wait", FzUtil.unitify(FzUtil.unit_time, ticks, 2)).sendTo(player);
+            new Notice(this, "factorization.legendarium.wait", FzUtil.unitTranslateTimeTicks(ticks, 2)).sendTo(player);
             return true;
         }
         last_insert_time = System.currentTimeMillis();
@@ -138,6 +148,8 @@ public class TileEntityLegendarium extends TileEntityCommon {
             new Notice(this, "factorization.legendarium.notfull").sendTo(player);
             return;
         }
+        final ItemStack artifact = ItemBrokenArtifact.build(queue.remove(0));
+        ItemUtil.giveItem(player, new Coord(this), artifact, ForgeDirection.UNKNOWN);
         markDirty();
         sound("remove");
     }
@@ -225,10 +237,20 @@ public class TileEntityLegendarium extends TileEntityCommon {
 
     @Override
     protected boolean removedByPlayer(EntityPlayer player, boolean willHarvest) {
-        if (!worldObj.isRemote) {
-            LegendariumPopulation population = LegendariumPopulation.load();
-            population.setOccupied(new Coord(this), player, false);
+        if (worldObj.isRemote) return super.removedByPlayer(player, willHarvest);
+        if (!queue.isEmpty()) {
+            if (!PlayerUtil.isPlayerCreative(player)) return false;
+            ItemStack got;
+            if (canRemove()) {
+                got = ItemBrokenArtifact.build(queue.remove(0));
+            } else {
+                got = queue.remove(0);
+            }
+            ItemUtil.giveItem(player, new Coord(this), got, ForgeDirection.UNKNOWN);
+            return false;
         }
+        LegendariumPopulation population = LegendariumPopulation.load();
+        population.setOccupied(new Coord(this), player, false);
         return super.removedByPlayer(player, willHarvest);
     }
 

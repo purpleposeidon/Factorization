@@ -3,6 +3,7 @@ package factorization.common;
 import factorization.api.Coord;
 import factorization.artifact.ContainerForge;
 import factorization.artifact.GuiArtifactForge;
+import factorization.artifact.RenderBrokenArtifact;
 import factorization.beauty.*;
 import factorization.charge.*;
 import factorization.citizen.EntityCitizen;
@@ -254,6 +255,7 @@ public class FactorizationClientProxy extends FactorizationProxy {
         MinecraftForgeClient.registerItemRenderer(Core.registry.glaze_bucket, new ItemRenderGlazeBucket());
         MinecraftForgeClient.registerItemRenderer(Core.registry.daybarrel, new DayBarrelItemRenderer(renderBarrel));
         MinecraftForgeClient.registerItemRenderer(Core.registry.twistedBlock, new TwistedRender());
+        MinecraftForgeClient.registerItemRenderer(Core.registry.brokenTool, new RenderBrokenArtifact());
         setTileEntityRendererDispatcher(BlockDarkIronOre.Glint.class, new GlintRenderer());
         Core.loadBus(GooRenderer.INSTANCE);
     }

@@ -12,6 +12,7 @@ import cpw.mods.fml.common.registry.GameRegistry.Type;
 import cpw.mods.fml.relauncher.Side;
 import factorization.api.IActOnCraft;
 import factorization.artifact.BlockForge;
+import factorization.artifact.ItemBrokenArtifact;
 import factorization.artifact.ItemPotency;
 import factorization.beauty.ItemGrossFood;
 import factorization.beauty.ItemLeafBomb;
@@ -159,6 +160,7 @@ public class Registry {
     public BlockBlast blastBlock;
     public ItemPotency item_potency;
     public ItemStack legendarium;
+    public ItemBrokenArtifact brokenTool;
 
     public Material materialMachine = new Material(MapColor.ironColor);
     public Material materialBarrel = new Material(MapColor.woodColor) {{
@@ -168,7 +170,7 @@ public class Registry {
     WorldgenManager worldgenManager;
 
     public static HashMap<String, Item> nameCleanup = new HashMap<String, Item>();
-    
+
     static void registerItem(Item item) {
         String find = Matcher.quoteReplacement("item.factorization:");
         String unlocalizedName = item.getUnlocalizedName();
@@ -435,6 +437,7 @@ public class Registry {
         leafBomb = new ItemLeafBomb();
 
         item_potency = new ItemPotency();
+        brokenTool = new ItemBrokenArtifact();
 
         postMakeItems();
     }
