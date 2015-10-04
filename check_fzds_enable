@@ -1,0 +1,24 @@
+#!/usr/bin/python3
+
+
+import os
+baddies = 0
+for dirpath, dirnames, filenames in os.walk("src/", followlinks=True):
+    for filename in filenames:
+        if not filename.endswith(".java"): continue
+        imports_fzds = False
+        imports_check = False
+        name = dirpath + "/" + filename
+        for line in open(name):
+            if line.startswith("package factorization.fzds"): break
+            if "factorization.fzds.HammerEnabled" in line:
+                imports_check = True
+            elif "factorization.fzds" in line:
+                imports_fzds = True
+            if " class " in line: break
+        if imports_fzds and not imports_check:
+            print(name)
+            baddies += 1
+
+
+raise SystemExit(baddies)
