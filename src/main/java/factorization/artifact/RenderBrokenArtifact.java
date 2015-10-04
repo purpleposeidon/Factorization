@@ -11,7 +11,7 @@ import java.util.Random;
 public class RenderBrokenArtifact implements IItemRenderer {
     int W = 8;
     int S = 16 / W;
-    int layerCount = 4;
+    int layerCount = 2;
     byte[][] shuffles = new byte[10][];
 
     {
@@ -22,34 +22,43 @@ public class RenderBrokenArtifact implements IItemRenderer {
 
     byte[] makeShuffle(int seed) {
         byte[] shuffle = new byte[W * W * 2 * layerCount];
+        Random rand = new Random(seed);
         // Construct an "array of (x, y) pairs".
         int index = 0;
-        for (int l = 0; l < layerCount; l++) {
+        for (int layer = 0; layer < layerCount; layer++) {
+            int start = index;
             for (byte x = 0; x < W; x++) {
                 for (byte y = 0; y < W; y++) {
                     shuffle[index++] = x;
                     shuffle[index++] = y;
                 }
             }
-        }
-        int elem = shuffle.length / 2;
-        int randCount = shuffle.length / 2;
-        Random rand = new Random(seed);
-        for (int n = 0; n < randCount; n++) {
-            int s = rand.nextInt(elem);
-            int d = rand.nextInt(elem);
-            if (rand.nextInt(3) == 0) {
-                byte swap0 = shuffle[d * 2 + 0];
-                byte swap1 = shuffle[d * 2 + 1];
-                shuffle[d * 2 + 0] = shuffle[s * 2 + 0];
-                shuffle[d * 2 + 1] = shuffle[s * 2 + 1];
-                shuffle[s * 2 + 0] = swap0;
-                shuffle[s * 2 + 1] = swap1;
-            } else{
-                shuffle[s * 2 + 0] = -1;
-                shuffle[s * 2 + 1] = -1;
+            int end = index - 2;
+            start /= 2;
+            end /= 2;
+            int len = (end - start);
+            if (layer == 0) {
+                int randCount = len / 2;
+                for (int n = 0; n < randCount; n++) {
+                    int s = start + rand.nextInt(len);
+                    shuffle[s * 2 + 0] = -1;
+                    shuffle[s * 2 + 1] = -1;
+                }
+            } else {
+                int randCount = len / 2;
+                for (int n = 0; n < randCount; n++) {
+                    int s = start + rand.nextInt(len);
+                    int d = start + rand.nextInt(len);
+                    byte swap0 = shuffle[d * 2 + 0];
+                    byte swap1 = shuffle[d * 2 + 1];
+                    shuffle[d * 2 + 0] = shuffle[s * 2 + 0];
+                    shuffle[d * 2 + 1] = shuffle[s * 2 + 1];
+                    shuffle[s * 2 + 0] = swap0;
+                    shuffle[s * 2 + 1] = swap1;
+                }
             }
         }
+
         return shuffle;
     }
 
@@ -68,18 +77,21 @@ public class RenderBrokenArtifact implements IItemRenderer {
     public void renderItem(ItemRenderType type, ItemStack item, Object... data) {
         ItemStack orig = ItemBrokenArtifact.get(item);
         if (orig == null) return;
-        float tessD = -1.1F / 32F;
         Tessellator tess = Tessellator.instance;
         if (type == ItemRenderType.ENTITY) {
             GL11.glDisable(GL11.GL_CULL_FACE);
         } else if (type == ItemRenderType.EQUIPPED) {
-            tess.addTranslation(0, 0, tessD);
+            GL11.glPushMatrix();
+            GL11.glScaled(-1, -1, -1);
+            float posterForwardHack = 1.1F / 32F;
+            GL11.glTranslated(-1, -1, posterForwardHack);
         }
         IIcon icon = orig.getIconIndex();
         double d = type == ItemRenderType.INVENTORY ? 1.0 : 1.0/16.0;
         tess.startDrawingQuads();
         int index = 0;
-        byte shuffle[] = shuffles[Math.abs(item.getItemDamage()) % shuffles.length];
+        int shuffleIndex = Math.abs(item.getItemDamage()) % shuffles.length;
+        byte shuffle[] = shuffles[shuffleIndex]; // Or we could generate it on the fly?
         for (int loop = 0; loop < layerCount; loop++) {
             for (int x = 0; x < W; x++) {
                 for (int y = 0; y < W; y++) {
@@ -114,7 +126,7 @@ public class RenderBrokenArtifact implements IItemRenderer {
         if (type == ItemRenderType.ENTITY) {
             GL11.glEnable(GL11.GL_CULL_FACE);
         } else if (type == ItemRenderType.EQUIPPED) {
-            tess.addTranslation(0, 0, -tessD);
+            GL11.glPopMatrix();
         }
     }
 }
