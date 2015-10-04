@@ -9,10 +9,7 @@ import factorization.shared.Core;
 import factorization.util.FzUtil;
 import factorization.weird.NeptuneCape;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiButton;
-import net.minecraft.client.gui.GuiMainMenu;
-import net.minecraft.client.gui.GuiOptions;
-import net.minecraft.client.gui.GuiSelectWorld;
+import net.minecraft.client.gui.*;
 import net.minecraft.client.resources.IResource;
 import net.minecraft.client.resources.IResourceManager;
 import net.minecraft.client.settings.GameSettings;
@@ -41,7 +38,7 @@ public class MiscClientProxy extends MiscProxy {
     
     @Override
     void initializeClient() {
-        Minecraft.memoryReserve = new byte[0]; // Free up this unused memory. The OOM screen *never* happens.
+        Minecraft.memoryReserve = new byte[0]; // Frees 10MB. Used for OOM screen, but that *never* happens.
         Core.loadBus(this);
         ClientCommandHandler.instance.registerCommand(new MiscClientCommands());
         FMLCommonHandler.instance().bus().register(cth);
@@ -65,10 +62,16 @@ public class MiscClientProxy extends MiscProxy {
     
     @SubscribeEvent
     public void addDifficultyInfo(InitGuiEvent.Post event) {
-        difficulty_button = null;
-        if (!(event.gui instanceof GuiSelectWorld)) return;
+        if (!(event.gui instanceof GuiSelectWorld)) {
+            difficulty_button = null;
+            return;
+        }
+        if (difficulty_button != null) return;
         if (getDifficulty() != EnumDifficulty.PEACEFUL) return;
-        event.buttonList.add(difficulty_button = new GuiButton(-237, 0, 0, ""));
+
+        GuiButton first = (GuiButton) event.buttonList.get(0);
+        first.displayString = "    " + EnumChatFormatting.BOLD + EnumChatFormatting.RED + first.displayString;
+        event.buttonList.add(difficulty_button = new GuiButton(-237, 0, 0, 150, 18, ""));
         updateDifficultyString();
     }
     
