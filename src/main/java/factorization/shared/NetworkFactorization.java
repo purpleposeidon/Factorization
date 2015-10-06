@@ -133,11 +133,11 @@ public class NetworkFactorization {
         }
     }
     
-    public void sendCommand(EntityPlayer player, Command cmd, byte arg) {
+    public void sendCommand(EntityPlayer player, Command cmd, int arg) {
         ByteBuf out = Unpooled.buffer();
         MessageType.factorizeCmdChannel.write(out);
         out.writeByte(cmd.id);
-        out.writeByte(arg);
+        out.writeInt(arg);
         FzNetDispatch.addPacket(FzNetDispatch.generate(out), player);
     }
 
@@ -302,7 +302,7 @@ public class NetworkFactorization {
     
     void handleCmd(ByteBuf data, EntityPlayer player) {
         byte s = data.readByte();
-        byte arg = data.readByte();
+        int arg = data.readInt();
         Command.fromNetwork(player, s, arg);
     }
     

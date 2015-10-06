@@ -2,6 +2,12 @@ package factorization.weird;
 
 import java.util.List;
 
+import cpw.mods.fml.common.eventhandler.SubscribeEvent;
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
+import factorization.common.*;
+import factorization.coremodhooks.UnhandledGuiKeyEvent;
+import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.client.renderer.texture.IIconRegister;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
@@ -9,8 +15,6 @@ import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.StatCollector;
 import net.minecraft.world.World;
-import factorization.common.FactoryType;
-import factorization.common.ItemIcons;
 import factorization.shared.Core;
 import factorization.shared.Core.TabType;
 import factorization.shared.FactorizationTextureLoader;
@@ -22,6 +26,7 @@ public class ItemPocketTable extends ItemFactorization {
         super("tool/pocket_crafting_table", TabType.TOOLS);
         setMaxStackSize(1);
         setFull3D();
+        Core.loadBus(this);
     }
     
     @Override
@@ -107,6 +112,16 @@ public class ItemPocketTable extends ItemFactorization {
                 final String prefix = "item.factorization:tool/pocket_crafting_table.";
                 infoList.add(StatCollector.translateToLocalFormatted(prefix + "yesNEI", key));
             }
+        }
+    }
+
+    @SubscribeEvent
+    @SideOnly(Side.CLIENT)
+    public void craftingTableKey(UnhandledGuiKeyEvent event) {
+        if (!FzConfig.pocket_craft_anywhere) return;
+        if (!(event.gui instanceof GuiContainer)) return;
+        if (FactorizationKeyHandler.pocket_key.getKeyCode() == event.keysym) {
+            Command.craftOpen.call(event.player);
         }
     }
 }

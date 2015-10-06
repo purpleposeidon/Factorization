@@ -250,7 +250,7 @@ public class ContainerPocket extends Container {
         return Core.registry.pocket_table.findPocket(player) != null;
     }
 
-    public void executeCommand(Command cmd, byte arg) {
+    public void executeCommand(Command cmd, int arg) {
         switch (cmd) {
         default: return;
         case craftBalance:
@@ -494,7 +494,7 @@ public class ContainerPocket extends Container {
         updateMatrix();
     }
 
-    void craftFill(byte slot) {
+    void craftFill(int slot) {
         final ItemStack toMove = playerInv.getStackInSlot(slot);
         if (toMove == null) {
             return;

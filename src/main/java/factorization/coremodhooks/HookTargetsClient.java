@@ -21,16 +21,8 @@ import net.minecraftforge.event.world.WorldEvent;
 public class HookTargetsClient {
     public static void keyTyped(char chr, int keysym) {
         Minecraft mc = Minecraft.getMinecraft();
-        if (mc == null || mc.thePlayer == null) return;
-        EntityPlayer player = mc.thePlayer;
-        if (FzConfig.pocket_craft_anywhere) {
-            if (FactorizationKeyHandler.pocket_key.getKeyCode() == keysym) {
-                Command.craftOpen.call(player);
-            }
-        }
-        if (chr == '?') {
-            DocumentationModule.openPageForHilightedItem();
-        }
+        if (mc == null) return;
+        MinecraftForge.EVENT_BUS.post(new UnhandledGuiKeyEvent(chr, keysym, mc.thePlayer, mc.currentScreen));
     }
     
     public static boolean attackButtonPressed() {

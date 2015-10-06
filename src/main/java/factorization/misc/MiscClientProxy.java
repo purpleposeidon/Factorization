@@ -1,19 +1,26 @@
 package factorization.misc;
 
 import cpw.mods.fml.common.FMLCommonHandler;
+import cpw.mods.fml.common.Loader;
 import cpw.mods.fml.common.eventhandler.EventPriority;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import factorization.algos.ReservoirSampler;
+import factorization.common.Command;
 import factorization.common.FzConfig;
+import factorization.coremodhooks.UnhandledGuiKeyEvent;
 import factorization.shared.Core;
+import factorization.truth.DocumentationModule;
 import factorization.util.FzUtil;
 import factorization.weird.NeptuneCape;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.*;
+import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.client.resources.IResource;
 import net.minecraft.client.resources.IResourceManager;
 import net.minecraft.client.settings.GameSettings;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.inventory.Slot;
+import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumChatFormatting;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.EnumDifficulty;
@@ -23,6 +30,7 @@ import net.minecraftforge.client.event.GuiScreenEvent.InitGuiEvent;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
 import net.minecraftforge.client.event.sound.PlaySoundEvent17;
 import org.apache.commons.io.Charsets;
+import org.lwjgl.input.Keyboard;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -215,5 +223,31 @@ public class MiscClientProxy extends MiscProxy {
         }
         if (sampler.size() < 1) return;
         menu.splashText = sampler.getSamples().get(0);
+    }
+
+    @SubscribeEvent
+    public void transferItems(UnhandledGuiKeyEvent event) {
+        if (!(event.gui instanceof GuiContainer)) return;
+        if (event.keysym == 0) return;
+        Slot slot = DocumentationModule.getSlotUnderMouse();
+        if (slot == null) return;
+        ItemStack search = slot.getStack();
+        if (search == null) return;
+        GameSettings gm = Minecraft.getMinecraft().gameSettings;
+        Command command;
+        boolean sneak = Keyboard.isKeyDown(Keyboard.KEY_LSHIFT) || Keyboard.isKeyDown(Keyboard.KEY_RSHIFT);
+        // Ugly!
+        if (event.keysym == gm.keyBindLeft.getKeyCode()) {
+            command = sneak ? Command.itemTransferLeftShift : Command.itemTransferLeft;
+        } else if (event.keysym == gm.keyBindRight.getKeyCode()) {
+            command = sneak ? Command.itemTransferRightShift : Command.itemTransferRight;
+        } else if (event.keysym == gm.keyBindForward.getKeyCode()) {
+            command = sneak ? Command.itemTransferUpShift : Command.itemTransferUp;
+        } else if (event.keysym == gm.keyBindBack.getKeyCode()) {
+            command = sneak ? Command.itemTransferDownShift : Command.itemTransferDown;
+        } else {
+            return;
+        }
+        command.call(event.player, slot.slotNumber);
     }
 }

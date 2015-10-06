@@ -2,11 +2,14 @@ package factorization.truth;
 
 import com.google.common.io.Closeables;
 import cpw.mods.fml.common.FMLCommonHandler;
+import cpw.mods.fml.common.Loader;
 import cpw.mods.fml.common.event.FMLServerStartingEvent;
+import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import factorization.common.FzConfig;
 import factorization.coremodhooks.HookTargetsClient;
+import factorization.coremodhooks.UnhandledGuiKeyEvent;
 import factorization.shared.Core;
 import factorization.truth.export.ExportHtml;
 import factorization.truth.gen.*;
@@ -192,16 +195,20 @@ public class DocumentationModule {
         String name = is.getUnlocalizedName();
         return "\\#{" + name + "} " + is.getDisplayName();
     }
-    
-    @SideOnly(Side.CLIENT)
-    public static void openPageForHilightedItem() {
+
+    public static Slot getSlotUnderMouse() {
         Minecraft mc = Minecraft.getMinecraft();
-        if (!(mc.currentScreen instanceof GuiContainer)) return;
+        if (!(mc.currentScreen instanceof GuiContainer)) return null;
         GuiContainer screen = (GuiContainer) mc.currentScreen;
         //Copied from GuiScreen.handleMouseInput
         int mouseX = Mouse.getEventX() * screen.width / mc.displayWidth;
         int mouseY = screen.height - Mouse.getEventY() * screen.height / mc.displayHeight - 1;
-        Slot slot = screen.getSlotAtPosition(mouseX, mouseY);
+        return screen.getSlotAtPosition(mouseX, mouseY);
+    }
+
+    @SideOnly(Side.CLIENT)
+    public static void openPageForHilightedItem() {
+        Slot slot = getSlotUnderMouse();
         if (slot == null) return;
         tryOpenBookForItem(slot.getStack());
     }
@@ -272,5 +279,21 @@ public class DocumentationModule {
         registerGenerator("mods", new ModDependViewer());
         registerGenerator("worldgen", new WorldgenViewer());
         registerGenerator("eventbus", new EventbusViewer());
+        if (FMLCommonHandler.instance().getSide() == Side.CLIENT) {
+            Core.loadBus(new DocKeyListener());
+        }
+    }
+
+    public static class DocKeyListener {
+        boolean hasNei = Loader.isModLoaded("NotEnoughItems");
+
+        @SubscribeEvent
+        public void keyPress(UnhandledGuiKeyEvent event) {
+            if (event.chr == '?') {
+                DocumentationModule.openPageForHilightedItem();
+            } else if ((event.chr == 'r' || event.chr == 'R') && !hasNei) {
+                DocumentationModule.openPageForHilightedItem();
+            }
+        }
     }
 }
