@@ -28,5 +28,6 @@
 \index{cgi/mods}{Mods}
 \index{cgi/worldgen}{Mod Worldgen}
 \index{cgi/eventbus}{Event Bus}
+\index{cgi/tesrs}{TESRs}
 
 \nl

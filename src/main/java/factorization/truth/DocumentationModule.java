@@ -279,6 +279,7 @@ public class DocumentationModule {
         registerGenerator("mods", new ModDependViewer());
         registerGenerator("worldgen", new WorldgenViewer());
         registerGenerator("eventbus", new EventbusViewer());
+        registerGenerator("tesrs", new TesrViewer());
         if (FMLCommonHandler.instance().getSide() == Side.CLIENT) {
             Core.loadBus(new DocKeyListener());
         }

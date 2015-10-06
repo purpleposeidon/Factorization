@@ -1,6 +1,8 @@
 package factorization.truth.word;
 
 import factorization.shared.Core;
+import factorization.shared.Sound;
+import factorization.util.FzUtil;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiConfirmOpenLink;
 import net.minecraft.client.gui.GuiScreen;

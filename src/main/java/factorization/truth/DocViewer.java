@@ -301,8 +301,9 @@ public class DocViewer extends GuiScreen {
             if (!(thisPage instanceof WordPage)) continue;
             WordPage p = (WordPage) thisPage;
             Word link = p.click(mouseX - getPageLeft(i), mouseY - getPageTop(i));
-            if (link != null && link.getLink() != null) {
-                if (link.onClick()) return;
+            if (link == null) continue;
+            if (link.onClick()) return;
+            if (link.getLink() != null) {
                 if (link.getLink().equals(name)) return;
                 DocViewer newDoc = new DocViewer(domain, link.getLink());
                 state.addNewHistoryEntry(name, getCurrentPageIndex());

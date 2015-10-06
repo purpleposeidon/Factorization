@@ -12,3 +12,4 @@ Charge transimission will be completely rewritten in 0.9, which might require so
 
 The Steam Turbine will be removed soon.
 
+Servos will lose their memory in the 0.9.100 release. You should make sure that you can easily reset your servo systems from a blank servo.

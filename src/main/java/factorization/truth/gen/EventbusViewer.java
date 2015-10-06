@@ -7,6 +7,7 @@ import cpw.mods.fml.common.eventhandler.EventPriority;
 import cpw.mods.fml.common.eventhandler.IEventListener;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import cpw.mods.fml.relauncher.ReflectionHelper;
+import factorization.truth.word.ClipboardWord;
 import factorization.truth.AbstractTypesetter;
 import factorization.truth.word.TextWord;
 import net.minecraftforge.common.MinecraftForge;
@@ -79,8 +80,11 @@ public class EventbusViewer implements IDocGenerator {
                 } else {
                     out.append(a.toString().replace("cpw.mods.fml.common.eventhandler.", "") + "\\nl");
                 }
-                outSplit(out, m.getDeclaringClass().getCanonicalName() + "." + m.getName(), null);
-                out.append("\n\n");
+                final String handlerName = m.getDeclaringClass().getCanonicalName();
+                outSplit(out, handlerName + "." + m.getName(), null);
+                out.append(" [");
+                out.emitWord(new ClipboardWord("/scrap BusRemove " + handlerName + " " + m.getName()));
+                out.append("]\n\n");
             }
         } else if (!eventTypes.isEmpty()) {
             out.append("\\newpage");
