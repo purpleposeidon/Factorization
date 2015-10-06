@@ -55,7 +55,7 @@ public class TileEntityLegendarium extends TileEntityCommon {
 
     @Override
     public BlockClass getBlockClass() {
-        return BlockClass.DarkIron;
+        return BlockClass.Lamp;
     }
 
     @Override
@@ -100,6 +100,10 @@ public class TileEntityLegendarium extends TileEntityCommon {
         return (to_wait /* ms */ / 1000) /* s */ * 20 /* ticks */;
     }
 
+    boolean isOverfull() {
+        return queue.size() > MIN_SIZE;
+    }
+
     @Override
     public boolean activate(EntityPlayer player, ForgeDirection side) {
         // Store an item
@@ -107,7 +111,7 @@ public class TileEntityLegendarium extends TileEntityCommon {
         if (isDroid(player)) return false;
         ItemStack held = player.getHeldItem();
         if (held == null) {
-            if (canRemove()) {
+            if (isOverfull()) {
                 ItemStack front = queue.get(0);
                 new Notice(this, "factorization.legendarium.canremove")
                         .withStyle(Style.DRAWITEM)
@@ -151,12 +155,13 @@ public class TileEntityLegendarium extends TileEntityCommon {
     }
 
     boolean canRemove() {
-        return queue.size() >= MIN_SIZE;
+        return true; //return queue.size() >= MIN_SIZE;
     }
 
     @Override
     public void click(EntityPlayer player) {
         // Remove an item
+        if (queue.isEmpty()) return;
         if (isDroid(player)) return;
         if (ItemUtil.is(player.getHeldItem(), Core.registry.spawnPoster)) {
             if (cleanPosters() == 0) {
@@ -167,7 +172,7 @@ public class TileEntityLegendarium extends TileEntityCommon {
             }
             return;
         }
-        if (!canRemove()) {
+        if (!isOverfull()) {
             new Notice(this, "factorization.legendarium.notfull").sendTo(player);
             return;
         }
@@ -259,27 +264,28 @@ public class TileEntityLegendarium extends TileEntityCommon {
         population.setOccupied(new Coord(this), player, true);
     }
 
+    static ItemStack unwrap(ItemStack is) {
+        ItemStack ret = ItemBrokenArtifact.get(is);
+        if (ret == null) return is;
+        return ret;
+    }
+
     @Override
     protected boolean removedByPlayer(EntityPlayer player, boolean willHarvest) {
-        if (worldObj.isRemote) return super.removedByPlayer(player, willHarvest);
-        if (!queue.isEmpty()) {
-            if (!PlayerUtil.isPlayerCreative(player)) return false;
-            ItemStack got = queue.remove(0);
-            ItemUtil.giveItem(player, new Coord(this), got, ForgeDirection.UNKNOWN);
-            return false;
-        }
-        LegendariumPopulation population = LegendariumPopulation.load();
-        population.setOccupied(new Coord(this), player, false);
-        cleanPosters();
         return super.removedByPlayer(player, willHarvest);
     }
 
     @Override
     protected void onRemove() {
         super.onRemove();
+        cleanPosters();
+        Coord at = new Coord(this);
+        for (ItemStack stack : queue) {
+            at.spawnItem(unwrap(stack));
+        }
+        queue.clear();
         LegendariumPopulation population = LegendariumPopulation.load();
         population.setOccupied(new Coord(this), null, false);
-        cleanPosters();
     }
 
     @Override
