@@ -57,6 +57,16 @@ public class ExportHtml implements ICommand {
                 e.printStackTrace();
             }
         }
+
+        String info = System.getProperty("fz.exportHtml");
+        if (info != null) {
+            System.out.println("Indexing documentation");
+            try {
+                IndexDocumentation.main(info.split(":"));
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
     }
     
     void processFile(String filename) throws IOException {
