@@ -14,12 +14,12 @@ import java.util.Scanner;
 public class Script implements IRevertible {
     static final Logger log = ScrapManager.log;
 
-    final ArrayList<IRevertible> actions = new ArrayList<>();
+    final ArrayList<IRevertible> actions = new ArrayList<IRevertible>();
     final String filename;
     final String simpleName;
     final File scriptFile;
 
-    static ThreadLocal<HashSet<String>> localActive = new ThreadLocal<>();
+    static ThreadLocal<HashSet<String>> localActive = new ThreadLocal();
 
     private static HashSet<String> getLocalActive() {
         HashSet<String> ret = localActive.get();

@@ -28,8 +28,8 @@ public class CompileError extends RuntimeException {
         return msg;
     }
 
-    final ArrayList<String> traces = new ArrayList<>();
-    //final ArrayList<StackTraceElement> traces = new ArrayList<>();
+    final ArrayList<String> traces = new ArrayList<String>();
+    //final ArrayList<StackTraceElement> traces = new ArrayList<StackTraceElement>();
 
     public void addTrace(String filename, int lineNumber, String src) {
         traces.add(filename + ":" + lineNumber + "  " + src);

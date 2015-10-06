@@ -65,10 +65,10 @@ public class ScrapCommand extends CommandBase {
     public List addTabCompletionOptions(ICommandSender sender, String[] args) {
         if (args.length <= 0) return null;
         if (args.length > 1) return null;
-        ArrayList<String> all = new ArrayList<>(ScrapManager.actionClasses.keySet());
+        ArrayList<String> all = new ArrayList<String>(ScrapManager.actionClasses.keySet());
         all.addAll(Arrays.asList("undo", "reload", "reset", "list"));
         String head = args[0];
-        ArrayList<String> ret = new ArrayList<>();
+        ArrayList<String> ret = new ArrayList<String>();
         for (String string : all) {
             if (string.startsWith(head)) ret.add(string);
         }

@@ -85,8 +85,8 @@ public class ScrapManager {
     }
 
 
-    static final ArrayList<IRevertible> actions = new ArrayList<>();
-    public static final HashMap<String, Class<? extends IRevertible>> actionClasses = new HashMap<>();
+    static final ArrayList<IRevertible> actions = new ArrayList<IRevertible>();
+    public static final HashMap<String, Class<? extends IRevertible>> actionClasses = new HashMap();
 
     public static IRevertible compile(String src) throws CompileError{
         Scanner scanner = new Scanner(src);

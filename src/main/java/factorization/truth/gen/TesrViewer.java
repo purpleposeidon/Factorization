@@ -11,7 +11,7 @@ import java.util.Comparator;
 public class TesrViewer implements IDocGenerator {
     @Override
     public void process(AbstractTypesetter out, String arg) {
-        ArrayList<Class> cs = new ArrayList<>(TileEntityRendererDispatcher.instance.mapSpecialRenderers.keySet());
+        ArrayList<Class> cs = new ArrayList<Class>(TileEntityRendererDispatcher.instance.mapSpecialRenderers.keySet());
         Collections.sort(cs, new Comparator<Class>() {
             @Override
             public int compare(Class o1, Class o2) {
