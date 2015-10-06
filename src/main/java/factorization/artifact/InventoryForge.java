@@ -2,6 +2,7 @@ package factorization.artifact;
 
 import factorization.shared.Core;
 import factorization.util.ItemUtil;
+import factorization.util.NumUtil;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.player.EntityPlayer;
@@ -15,6 +16,7 @@ import net.minecraft.nbt.NBTTagList;
 import net.minecraft.nbt.NBTTagString;
 import net.minecraft.util.StringUtils;
 import net.minecraftforge.oredict.OreDictionary;
+import org.omg.IOP.TaggedComponent;
 
 import java.util.ArrayList;
 import java.util.Map;
@@ -210,6 +212,29 @@ public class InventoryForge implements IInventory {
             return i;
         }
 
+        boolean basicallyIdentical(ItemStack a, ItemStack b) {
+            if (a.getItem() != b.getItem()) return false;
+            final int aDmg = a.getItemDamage();
+            final int bDmg = b.getItemDamage();
+            double range = 0.05;
+            double low = aDmg * (1 - range);
+            double high = aDmg * (1 + range);
+            if (!NumUtil.intersect(low, high, bDmg, bDmg)) return false;
+            NBTTagCompound atag = stubTag(a);
+            NBTTagCompound btag = stubTag(b);
+            for (String ignorable : new String[] { "RepairCost", "Meta" /* May want to track creators? */ }) {
+                atag.removeTag(ignorable);
+                btag.removeTag(ignorable);
+            }
+            return atag.equals(btag);
+        }
+
+        private NBTTagCompound stubTag(ItemStack is) {
+            NBTTagCompound tag = is.getTagCompound();
+            if (tag == null) return new NBTTagCompound();
+            return (NBTTagCompound) tag.copy();
+        }
+
         ItemStack buildArtifact(EntityPlayer player, String name, String lore) {
             if (player.worldObj.isRemote) return inv[SLOT_OUT];
             // warn on all slots
@@ -221,7 +246,7 @@ public class InventoryForge implements IInventory {
             final ItemStack second = inv[SLOT_SECOND];
             if (first == null && second == null) return err("notools");
             if (first == null || second == null) return err("pair");
-            if (!ItemUtil.couldMerge(first, second)) return err("notsame");
+            if (!basicallyIdentical(first, second)) return err("notsame");
             if (!TileEntityLegendarium.isTool(first)) return err("nottool");
             ItemStack output = first.copy();
             consume(SLOT_FIRST);

@@ -1280,9 +1280,9 @@ public class Registry {
                 '#', dark_iron_block_item,
                 '-', dark_iron);
         oreRecipe(legendarium,
-                " * ",
-                "-#-",
+                "-*-",
                 "###",
+                "-#-",
                 '#', new ItemStack(Blocks.quartz_block, 1, 1),
                 '-', "ingotGold",
                 '*', Items.nether_star);
