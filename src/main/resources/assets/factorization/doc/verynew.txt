@@ -1,4 +1,2 @@
-\index{chargegen}{\#{factorization.factoryBlock.STEAM_SHAFT} More power!}
-\index{blockmatcher}{\#{tile.BlockMatcher} Block Matching!}
-\index{hotblocks}{\#{item.bucketLava} Hot Blocks!}
-\index{barrel}{\#{item.factorization:barrelCart} Barrel carts!}
+\index{artifactforge}{\#{tile.factorization:artifactForge} Forge Powerful Artifacts!}
+\index{legendarium}{\#{factorization.factoryBlock.LEGENDARIUM} Restore Ancient Tools to Their Former Glory!}

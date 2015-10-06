@@ -1,0 +1,34 @@
+\title{The Hall of Legends}
+
+The Hall of Legends holds near-broken tools until the eventuality that they can be repaired.
+
+Only a limited number of Hall of Legends can exist in the universe;
+there can be only one per class of dimension.
+
+The Hall of Legends accepts one artifact per week.
+(If you think a week lasts 2½ hours, you are quite mistaken.)
+
+Clicking on the block with a tool will submit it.
+The tool must be nearly broken, and also must be named and enchanted;
+artifacts made by the \link{artifactforge}{Artifact Forge} will be suitable,
+as will tools created by more standard means.
+
+Once there are at least seven tools in the Hall of Legends,
+the earliest submitted tool can be removed by punching the block.
+This will give you the shards of the tool,
+which can then be repaired by combinging the shards
+with an undamaged base tool at the anvil for 30 levels.
+
+The Hall will automatically display the shards of the tools it is holding
+in any nearby unoccupied posters.
+The name will be written on a sign,
+if there are any signs next to the poster.
+Posters that have shards in them can not be touched by any mortal means.
+If you want to move the posters around,
+you must punch the Hall with a poster;
+this will remove the shards from the posters.
+Punching the block with a poster again will
+put the shards back into the posters.
+
+
+\topic{factorization.factoryBlock.LEGENDARIUM}

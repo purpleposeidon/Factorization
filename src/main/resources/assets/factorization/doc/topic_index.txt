@@ -1,3 +1,4 @@
+item.factorization:entheas	gen/anthro
 factorization.factoryBlock.CALIOMETRIC_BURNER	gen/calio
 item.factorization:servo/component.fz.instruction.countitems	instructions/interact
 tile.factorization:darkIronOre	ores
@@ -12,6 +13,7 @@ item.factorization:servo/component.fz.instruction.entryaction	instructions/compu
 factorization.factoryBlock.LEYDENJAR	chargestorage
 item.factorization:servo/component.fz.instruction.group	instructions/subroutine
 item.diode	repeater
+item.factorization:ceramics/glaze_bucket.base_common	sculpture
 factorization.factoryBlock.ANTHRO_GEN	gen/anthro
 item.factorization:servo/component.fz.instruction.pulse	instructions/interact
 factorization.factoryBlock.SOLARBOILER	gen/boiler
@@ -47,6 +49,7 @@ item.factorization:servo/component.fz.instruction.spin	instructions/motion
 item.factorization:diamond_cutting_head	lacerator
 item.factorization:diamond_cutting_head	processing
 factorization.factoryBlock.SERVORAIL	servorail
+Artificery	artifact
 item.factorization:servo/component.fz.instruction.dup	instructions/value
 factorization.factoryBlock.CERAMIC	sculpture
 factorization.factoryBlock.WATER_WHEEL_GEN	gen/water

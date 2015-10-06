@@ -9,3 +9,4 @@ Fortunately the \link{gen/calio}{Caliometric Burner}, lacking a heart, is immune
 Entheas is converted to charge just like \link{gen/saptap}{sap}.
 
 \topic{factorization.factoryBlock.ANTHRO_GEN}
+\topic{item.factorization:entheas}

@@ -1,0 +1,5 @@
+\topic{Artificery}
+
+The \{artifactforge}{Artifact Forge} can be used to create a powerful artifact.
+The \{legendarium}{Hall of Legends} can slowly repair damaged tools.
+

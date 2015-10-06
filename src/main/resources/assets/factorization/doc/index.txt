@@ -11,6 +11,7 @@
 \index{charge}{\#{factorization.factoryBlock.SHAFT_GEN} Charge Energy}
 % \index{oreprocessing}{Ore Processing}
 \index{building}{\#{tile.fence} Building}
+\index{artifact}{\#{tile.factorization:artifactForge} Artificery}
 \ifhtml{
     % Disabled since docfigures are presently not supported for the HTML export :P
 }{\index{cookbook}{\#{item.redstone} Designs}}
