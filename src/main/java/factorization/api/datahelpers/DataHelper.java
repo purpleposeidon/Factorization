@@ -59,6 +59,7 @@ public abstract class DataHelper {
      * @return The original value if isWriter() or the sharing does not permit write access; else the read value
      * @throws IOException
      */
+    @Deprecated // Use a non-generic method
     public <E> E put(E o) throws IOException {
         if (!valid) {
             return o;
