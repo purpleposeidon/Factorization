@@ -43,6 +43,7 @@ Structure!
 Depth!
 Texture!
 So lush!
+It mines! It crafts!
 
 #FUTURE
 # Lines that start with a # are comments!
