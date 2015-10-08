@@ -1,6 +1,5 @@
 package factorization.scrap;
 
-import com.sun.org.apache.xalan.internal.xsltc.cmdline.Compile;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.Logger;
 
