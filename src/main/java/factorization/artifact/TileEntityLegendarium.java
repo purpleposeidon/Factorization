@@ -38,7 +38,7 @@ import java.util.*;
 public class TileEntityLegendarium extends TileEntityCommon {
     static final int MIN_SIZE = 7; // The queue must be this size before something can be removed
     static final int POSTER_RANGE = 16;
-    static final int MAX_USAGES_LEFT = 32;
+    static final float MIN_DAMAGE = 0.05F;
     static final int SIGN_RANGE = 1;
 
     private static final boolean DEBUG = Core.dev_environ;
@@ -87,7 +87,7 @@ public class TileEntityLegendarium extends TileEntityCommon {
         if (!isTool(is)) return "not_tool";
         if (!is.hasDisplayName()) return "not_artifact";
         if (!is.isItemEnchanted()) return "not_artifact";
-        if (is.getItemDamage() < is.getMaxDamage() - MAX_USAGES_LEFT) return "not_broken";
+        if (is.getItemDamage() > is.getMaxDamage() * MIN_DAMAGE) return "not_broken";
         return null;
     }
 
