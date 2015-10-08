@@ -59,6 +59,7 @@ public final class PlayerUtil {
             }
             fakePlayerCache.put(where.w, found);
         }
+        found.setHealth(20);
         found.isDead = false;
         found.worldObj = where.w;
         found.where = where;
@@ -69,8 +70,9 @@ public final class PlayerUtil {
     }
 
     public static void recycleFakePlayer(EntityPlayer player) {
-        player.worldObj = null;
+        //player.worldObj = null; causes NPE with Thaumcraft vampire bats. Stored behind a weakref anyways.
         player.isDead = true; // Avoid mob retribution
+        player.setHealth(0);
         if (player instanceof FzFakePlayer) {
             FzFakePlayer p = (FzFakePlayer) player;
             p.where = null;
