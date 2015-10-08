@@ -67,3 +67,10 @@ winch_powered3.ogg
     Creative Commons, Zero License
         http://creativecommons.org/publicdomain/zero/1.0/
     Cropped and mixed with other work.
+
+legendarium_insert.ogg
+    "Breaking Glass", by ngruber
+        http://www.freesound.org/people/ngruber/sounds/204777/
+    Creative Commons, Zero License
+        http://creativecommons.org/publicdomain/zero/1.0/
+    Cropped and pitch changed

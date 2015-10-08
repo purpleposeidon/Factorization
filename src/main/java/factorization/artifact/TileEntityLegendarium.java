@@ -11,6 +11,7 @@ import factorization.notify.Notice;
 import factorization.notify.Style;
 import factorization.shared.BlockClass;
 import factorization.shared.Core;
+import factorization.shared.Sound;
 import factorization.shared.TileEntityCommon;
 import factorization.util.FzUtil;
 import factorization.util.ItemUtil;
@@ -91,7 +92,8 @@ public class TileEntityLegendarium extends TileEntityCommon {
     }
 
     void sound(String name) {
-
+        Sound.legendariumInsert.playAt(this);
+        //worldObj.playSound(xCoord + 0.5, yCoord + 0.5, zCoord + 0.5, "factorization:legendarium_insert", 1, 1, false);
     }
 
     long getWaitTicks() {
@@ -179,7 +181,7 @@ public class TileEntityLegendarium extends TileEntityCommon {
         final ItemStack artifact = queue.remove(0);
         ItemUtil.giveItem(player, new Coord(this), artifact, ForgeDirection.UNKNOWN);
         markDirty();
-        sound("remove");
+        //sound("remove");
         populatePosters();
     }
 

@@ -31,7 +31,8 @@ public enum Sound {
     barrelPunt2("mob.zombie.infect", 0.9, 3.5, true),
     socketInstall("dig.wood", 1.0, 1.0, true),
     servoInstall("mob.slime.attack", 1.0, 1.0, true),
-    artifactForged("random.anvil_use", 1.0, 0.25, true)
+    artifactForged("random.anvil_use", 1.0, 0.25, true),
+    legendariumInsert("factorization:legendarium.insert", 1.0, 1.0, true),
     
     ;
     String src;

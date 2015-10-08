@@ -11,5 +11,7 @@
     "colossus.tech_SUMMON_RETALIATION": {"category": "hostile", "sounds": ["colossus_summon"]},
 
     "winch.powered": {"category": "block", "sounds": ["winch_powered1", "winch_powered2", "winch_powered3"]},
-    "winch.unwind": {"category": "block", "sounds": ["winch_unwind1", "winch_unwind2", "winch_unwind3"]}
+    "winch.unwind": {"category": "block", "sounds": ["winch_unwind1", "winch_unwind2", "winch_unwind3"]},
+
+    "legendarium.insert": {"category": "block", "sounds": ["legendarium_insert"]}
 }
