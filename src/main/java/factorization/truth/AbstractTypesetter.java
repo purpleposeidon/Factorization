@@ -1,7 +1,6 @@
 package factorization.truth;
 
 import com.google.common.base.Strings;
-import factorization.shared.NORELEASE;
 import factorization.truth.api.ITypesetter;
 import factorization.truth.word.TextWord;
 import factorization.truth.word.Word;
