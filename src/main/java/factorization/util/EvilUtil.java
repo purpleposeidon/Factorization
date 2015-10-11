@@ -3,10 +3,14 @@ package factorization.util;
 import factorization.api.Coord;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLiving;
+import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.item.ItemStack;
 import net.minecraft.potion.Potion;
 import net.minecraft.potion.PotionEffect;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.MathHelper;
 import net.minecraft.world.World;
 
 import java.util.Random;
@@ -86,5 +90,38 @@ public class EvilUtil {
             moon *= 2;
         }
         return moon;
+    }
+
+    public static EntityItem throwStack(EntityLivingBase player, ItemStack stack, boolean straightThrow) {
+        if (stack == null) return null;
+        if (stack.stackSize == 0) return null;
+        Random rand = player.worldObj.rand;
+        EntityItem entityitem = new EntityItem(player.worldObj, player.posX, player.posY - 0.30000001192092896D + (double) player.getEyeHeight(), player.posZ, stack);
+        entityitem.delayBeforeCanPickup = 40;
+
+        float f = 0.1F;
+        float f1;
+
+        if (straightThrow) {
+            f1 = rand.nextFloat() * 0.5F;
+            float f2 = rand.nextFloat() * (float) Math.PI * 2.0F;
+            entityitem.motionX = (double) (-MathHelper.sin(f2) * f1);
+            entityitem.motionZ = (double) (MathHelper.cos(f2) * f1);
+            entityitem.motionY = 0.20000000298023224D;
+        } else {
+            f = 0.3F;
+            entityitem.motionX = (double) (-MathHelper.sin(player.rotationYaw / 180.0F * (float) Math.PI) * MathHelper.cos(player.rotationPitch / 180.0F * (float) Math.PI) * f);
+            entityitem.motionZ = (double) (MathHelper.cos(player.rotationYaw / 180.0F * (float) Math.PI) * MathHelper.cos(player.rotationPitch / 180.0F * (float) Math.PI) * f);
+            entityitem.motionY = (double) (-MathHelper.sin(player.rotationPitch / 180.0F * (float) Math.PI) * f + 0.1F);
+            f = 0.02F;
+            f1 = rand.nextFloat() * (float) Math.PI * 2.0F;
+            f *= rand.nextFloat();
+            entityitem.motionX += Math.cos((double) f1) * (double) f;
+            entityitem.motionY += (double) ((rand.nextFloat() - rand.nextFloat()) * 0.1F);
+            entityitem.motionZ += Math.sin((double) f1) * (double) f;
+        }
+
+        player.worldObj.spawnEntityInWorld(entityitem);
+        return entityitem;
     }
 }

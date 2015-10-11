@@ -38,15 +38,15 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.WeakHashMap;
 
-public class HotBlocks {
-    public static final String channelName = "FZ|hotblocks";
+public class BlockUndo {
+    public static final String channelName = "FZ|blockundo";
     public static final FMLEventChannel channel = NetworkRegistry.INSTANCE.newEventDrivenChannel(channelName);
-    public static final HotBlocks instance = new HotBlocks();
-    private HotBlocks() {
+    public static final BlockUndo instance = new BlockUndo();
+    private BlockUndo() {
         channel.register(this);
     }
 
-    private static void send(EntityPlayer player, HotBlock at) {
+    private static void send(EntityPlayer player, PlacedBlock at) {
         ByteBuf payload = Unpooled.buffer();
         at.write(payload);
         FMLProxyPacket packet = new FMLProxyPacket(payload, channelName);
@@ -56,16 +56,16 @@ public class HotBlocks {
     @SubscribeEvent
     @SideOnly(Side.CLIENT)
     public void addHotblock(FMLNetworkEvent.ClientCustomPacketEvent event) {
-        HotBlock at = HotBlock.read(event.packet.payload());
+        PlacedBlock at = PlacedBlock.read(event.packet.payload());
         EntityPlayer player = Minecraft.getMinecraft().thePlayer;
-        doHeat(player, at);
+        markPlacement(player, at);
     }
 
-    private static class HotBlock {
+    private static class PlacedBlock {
         final int w, x, y, z, idmd;
         final ItemStack orig;
 
-        private HotBlock(int w, int x, int y, int z, int idmd, ItemStack orig) {
+        private PlacedBlock(int w, int x, int y, int z, int idmd, ItemStack orig) {
             this.w = w;
             this.x = x;
             this.y = y;
@@ -83,17 +83,17 @@ public class HotBlocks {
             ByteBufUtils.writeItemStack(out, orig);
         }
 
-        static HotBlock read(ByteBuf in) {
-            return new HotBlock(in.readInt(), in.readInt(), in.readInt(), in.readInt(), in.readInt(),
+        static PlacedBlock read(ByteBuf in) {
+            return new PlacedBlock(in.readInt(), in.readInt(), in.readInt(), in.readInt(), in.readInt(),
                     ByteBufUtils.readItemStack(in));
         }
     }
 
-    public static int HOT_BLOCK_COUNT = 5;
+    public static int UNDO_MAX = 5;
     public static float MAX_TRUE_SPEED_STANDARD = 0.25F / 2;
     public static float MAX_TRUE_SPEED_TILEENTITY = 0.125F / 2;
 
-    WeakHashMap<EntityPlayer, ArrayList<HotBlock>> hots = new WeakHashMap<EntityPlayer, ArrayList<HotBlock>>();
+    WeakHashMap<EntityPlayer, ArrayList<PlacedBlock>> hots = new WeakHashMap<EntityPlayer, ArrayList<PlacedBlock>>();
 
     private static ItemStack toItem(Block b, World w, int x, int y, int z, int md) {
         for (ItemStack is : b.getDrops(w, x, y, z, md, 0)) {
@@ -102,21 +102,21 @@ public class HotBlocks {
         return null;
     }
 
-    void doHeat(EntityPlayer player, HotBlock at) {
-        ArrayList<HotBlock> coords;
+    void markPlacement(EntityPlayer player, PlacedBlock at) {
+        ArrayList<PlacedBlock> coords;
         if (!hots.containsKey(player)) {
-            hots.put(player, coords = new ArrayList<HotBlock>());
+            hots.put(player, coords = new ArrayList<PlacedBlock>());
         } else {
             coords = hots.get(player);
         }
         coords.add(at);
-        if (coords.size() > HOT_BLOCK_COUNT) {
+        if (coords.size() > UNDO_MAX) {
             coords.remove(0);
         }
     }
 
     @SubscribeEvent(priority = EventPriority.LOWEST) // Act after any cancellations
-    public void heatBlock(BlockEvent.PlaceEvent event) {
+    public void recordBlock(BlockEvent.PlaceEvent event) {
         if (event.player == null || event.player.isSneaking()) return;
         if (event.world.isRemote) return;
         if (event.player instanceof FakePlayer) return;
@@ -125,8 +125,8 @@ public class HotBlocks {
         int md = event.world.getBlockMetadata(event.x, event.y, event.z); // Notable for NOT being the same as event.blockMetadata for Railcraft quarried stone! :|
         int idmd = (DataUtil.getId(event.block) << 4) /*+ event.blockMetadata*/;
         final ItemStack theItem = toItem(event.block, event.world, event.x, event.y, event.z, md);
-        final HotBlock at = new HotBlock(FzUtil.getWorldDimension(event.world), event.x, event.y, event.z, idmd, theItem);
-        doHeat(event.player, at);
+        final PlacedBlock at = new PlacedBlock(FzUtil.getWorldDimension(event.world), event.x, event.y, event.z, idmd, theItem);
+        markPlacement(event.player, at);
         if (!event.world.isRemote && event.player instanceof EntityPlayerMP) {
             send((EntityPlayerMP) event.player, at);
         }
@@ -170,7 +170,7 @@ public class HotBlocks {
         final int z = event.z;
         final EntityPlayer player = event.entityPlayer;
         if (stillBusy(player)) return;
-        if (!isHot(event, x, y, z, block, md)) return;
+        if (!canUndo(event, x, y, z, block, md)) return;
         // Duplicate logic to figure out what the *actual* break speed will be, so that we don't make this actual break speed too fast
         float hardness = block.getBlockHardness(player.worldObj, x, y, z);
         if (hardness < 0.0F) {
@@ -190,13 +190,13 @@ public class HotBlocks {
         event.newSpeed = Math.max(event.newSpeed * boost, event.newSpeed);
     }
 
-    private boolean isHot(PlayerEvent event, int x, int y, int z, Block block, int metadata) {
+    private boolean canUndo(PlayerEvent event, int x, int y, int z, Block block, int metadata) {
         final EntityPlayer player = event.entityPlayer;
-        ArrayList<HotBlock> coords = hots.get(player);
+        ArrayList<PlacedBlock> coords = hots.get(player);
         if (coords == null) return false;
 
         int w = FzUtil.getWorldDimension(player.worldObj);
-        for (HotBlock hot : coords) {
+        for (PlacedBlock hot : coords) {
             if (hot.w == w && hot.x == x && hot.y == y && hot.z == z) {
                 int idmd = (DataUtil.getId(block) << 4) /*+ metadata*/;
                 if (idmd != hot.idmd) {
@@ -212,9 +212,9 @@ public class HotBlocks {
     public void playerRemovedBlock(BlockEvent.BreakEvent event) {
         EntityPlayer thePlayer = event.getPlayer();
         markBusy(thePlayer);
-        ArrayList<HotBlock> coords = hots.get(thePlayer);
+        ArrayList<PlacedBlock> coords = hots.get(thePlayer);
         if (coords == null) return;
-        HotBlock heat = null;
+        PlacedBlock heat = null;
         final World w = event.world;
         final int x = event.x;
         final int y = event.y;
@@ -223,8 +223,8 @@ public class HotBlocks {
         final int md = event.blockMetadata;
         int wDim = FzUtil.getWorldDimension(w);
         if (PlayerUtil.isPlayerCreative(thePlayer)) return;
-        for (Iterator<HotBlock> iterator = coords.iterator(); iterator.hasNext(); ) {
-            HotBlock hot = iterator.next();
+        for (Iterator<PlacedBlock> iterator = coords.iterator(); iterator.hasNext(); ) {
+            PlacedBlock hot = iterator.next();
             if (hot.w == wDim && hot.x == x && hot.y == y && hot.z == z) {
                 heat = hot;
                 iterator.remove();
@@ -277,7 +277,7 @@ public class HotBlocks {
                 int xp = block.getExpDrop(w, md, 0);
                 block.dropXpOnBlockBreak(w, x, y, z, xp);
             }
-            if (FzConfig.hotblocks_grab) {
+            if (FzConfig.blockundo_grab) {
                 for (Object o : w.getEntitiesWithinAABB(EntityItem.class, box)) {
                     EntityItem ei = (EntityItem) o;
                     int orig_delay = ei.delayBeforeCanPickup;

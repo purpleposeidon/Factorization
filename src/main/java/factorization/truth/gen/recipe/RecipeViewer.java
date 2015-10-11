@@ -1,29 +1,20 @@
 package factorization.truth.gen.recipe;
 
 import cpw.mods.fml.common.event.FMLInterModComms.IMCMessage;
-import cpw.mods.fml.relauncher.ReflectionHelper;
 import factorization.shared.Core;
 import factorization.truth.AbstractTypesetter;
 import factorization.truth.DocumentationModule;
-import factorization.truth.gen.FluidViewer;
-import factorization.truth.gen.IDocGenerator;
+import factorization.truth.api.IDocGenerator;
+import factorization.truth.api.IObjectWriter;
 import factorization.truth.word.ItemWord;
-import factorization.truth.word.TextWord;
 import factorization.truth.word.Word;
 import factorization.util.ItemUtil;
-import net.minecraft.block.Block;
-import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.*;
-import net.minecraft.nbt.NBTBase;
-import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.oredict.OreDictionary;
-import net.minecraftforge.oredict.ShapedOreRecipe;
-import net.minecraftforge.oredict.ShapelessOreRecipe;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
 import java.util.*;
 import java.util.Map.Entry;
 

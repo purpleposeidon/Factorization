@@ -1,15 +1,11 @@
-\title{Hot Blocks}
+\title{Blocks Placement Undo}
 
-You can easily break any block that you have recently placed.
+You can easily break the last six blocks you have recently placed.
 
 This makes it easy to fix misplaced blocks,
 particularly smoothstone, obsidian, and glass.
 
 You do not need the appropriate tool to break blocks in this manner.
-
-If you leave the world, then your hot blocks will be forgotten.
-
-The last 6 blocks you have placed are easily broken.
 
 Some blocks, such as \#{tile.clay}\ Clay will not be broken in the silken manner
 as it is impossible to tell if that's what you actually want.

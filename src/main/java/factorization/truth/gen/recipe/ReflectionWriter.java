@@ -1,5 +1,6 @@
 package factorization.truth.gen.recipe;
 
+import factorization.truth.api.IObjectWriter;
 import factorization.truth.word.TextWord;
 import net.minecraft.item.crafting.IRecipe;
 

@@ -5,6 +5,7 @@ import com.google.common.collect.Multimap;
 import factorization.shared.Core;
 import factorization.truth.AbstractTypesetter;
 import factorization.truth.DocumentationModule;
+import factorization.truth.api.IDocGenerator;
 import factorization.truth.word.ItemWord;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.item.ItemStack;

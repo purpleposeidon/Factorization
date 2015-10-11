@@ -1,4 +1,4 @@
-package factorization.truth.gen;
+package factorization.truth.api;
 
 import factorization.truth.AbstractTypesetter;
 

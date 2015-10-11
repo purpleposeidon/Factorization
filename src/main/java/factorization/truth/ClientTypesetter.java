@@ -1,7 +1,7 @@
 package factorization.truth;
 
 import cpw.mods.fml.common.Loader;
-import factorization.truth.gen.IDocGenerator;
+import factorization.truth.api.IDocGenerator;
 import factorization.truth.word.*;
 import factorization.util.DataUtil;
 import net.minecraft.block.Block;

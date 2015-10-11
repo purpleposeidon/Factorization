@@ -6,7 +6,7 @@ import cpw.mods.fml.common.event.FMLInterModComms;
 import factorization.api.IRotationalEnergySource;
 import factorization.compat.CompatBase;
 import factorization.shared.Core;
-import factorization.truth.gen.recipe.IObjectWriter;
+import factorization.truth.api.IObjectWriter;
 import factorization.truth.word.ItemWord;
 import ic2.api.recipe.Recipes;
 import ic2.core.AdvRecipe;

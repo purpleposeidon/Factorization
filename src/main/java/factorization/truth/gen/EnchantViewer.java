@@ -1,6 +1,7 @@
 package factorization.truth.gen;
 
 import factorization.truth.AbstractTypesetter;
+import factorization.truth.api.IDocGenerator;
 import factorization.truth.word.ItemWord;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.init.Blocks;

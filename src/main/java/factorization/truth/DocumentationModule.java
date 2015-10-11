@@ -11,10 +11,15 @@ import factorization.common.FzConfig;
 import factorization.coremodhooks.HookTargetsClient;
 import factorization.coremodhooks.UnhandledGuiKeyEvent;
 import factorization.shared.Core;
+import factorization.truth.api.IDocBook;
+import factorization.truth.api.IDocGenerator;
+import factorization.truth.api.IManwich;
 import factorization.truth.export.ExportHtml;
 import factorization.truth.gen.*;
 import factorization.truth.gen.recipe.RecipeViewer;
+import factorization.util.DataUtil;
 import factorization.util.FzUtil;
+import factorization.util.PlayerUtil;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufInputStream;
 import io.netty.buffer.Unpooled;
@@ -62,7 +67,7 @@ public class DocumentationModule {
             try {
                 it.getSubItems(it, it.getCreativeTab(), items);
             } catch (Throwable t) {
-                Core.logWarning("Error getting sub-items from item: " + it);
+                Core.logWarning("Error getting sub-items from item: " + it + " " + DataUtil.getName(it));
                 t.printStackTrace();
             }
         }
@@ -78,7 +83,7 @@ public class DocumentationModule {
                 }
                 list.add(is);
             } catch (Throwable t) {
-                Core.logSevere("Error getting names from item: " + is.getItem());
+                Core.logSevere("Error getting names from item: " + is.getItem() + " " + DataUtil.getName(is.getItem()));
                 t.printStackTrace();
             }
         }
@@ -141,7 +146,7 @@ public class DocumentationModule {
             IResource src = irm.getResource(getResourceForName(domain, name));
             return src.getInputStream();
         } catch (Throwable e) {
-            //FIXME: Compiler disagrees with eclipse!
+            // FIXME: Compiler disagrees with eclipse!
             if (e instanceof IOException) {
                 return null;
             }
@@ -209,34 +214,59 @@ public class DocumentationModule {
     @SideOnly(Side.CLIENT)
     public static void openPageForHilightedItem() {
         Slot slot = getSlotUnderMouse();
-        if (slot == null) return;
-        tryOpenBookForItem(slot.getStack());
+        ItemStack stack = slot == null ? null : slot.getStack();
+        tryOpenBookForItem(stack);
     }
 
     public static String default_lookup_domain = "factorization";
     public static String default_recipe_domain = "factorization";
     public static final ArrayList<String> indexed_domains = new ArrayList<String>();
 
+
+    public static final ArrayList<IManwich> manwiches = new ArrayList<IManwich>();
+
+    public static void assembleManwich(IManwich freshManwich) {
+        manwiches.add(freshManwich);
+    }
+
     @SideOnly(Side.CLIENT)
     public static boolean tryOpenBookForItem(ItemStack is) {
         Minecraft mc = Minecraft.getMinecraft();
-        if (is == null) {
-            mc.displayGuiScreen(new DocViewer(default_lookup_domain));
-            return true;
-        }
         EntityPlayer player = mc.thePlayer;
-        if (player != null && !player.capabilities.isCreativeMode && FzConfig.require_book_for_manual) {
-            // TODO: Add manwiches
-            boolean found = false;
+        if (player == null) return false;
+        String found_domain = default_lookup_domain;
+        boolean found = PlayerUtil.isPlayerCreative(player)
+                || !FzConfig.require_book_for_manual;
+        if (!found) {
             for (ItemStack manual : player.inventory.mainInventory) {
                 if (manual == null) continue;
-                if (manual.getItem() != Core.registry.docbook) continue;
-                found = true;
-                break;
+                if (manual.getItem() instanceof IDocBook) {
+                    found_domain = ((IDocBook) (manual.getItem())).getDocumentationDomain();
+                    found = true;
+                    break;
+                }
+            }
+        }
+        if (!found) {
+            IManwich first = null;
+            for (IManwich manwich : manwiches) {
+                if (first == null) first = manwich;
+                if (manwich.hasManual(player) > 0) {
+                    found = true;
+                    found_domain = manwich.getManwichDomain(player);
+                    break;
+                }
             }
             if (!found) {
-                return true;
+                if (first != null) {
+                    first.recommendManwich(player);
+                }
+                return false;
             }
+        }
+        if (is == null) {
+            mc.displayGuiScreen(new DocViewer(found_domain));
+            return true;
         }
         String name = is.getUnlocalizedName();
         for (String domain : indexed_domains) {

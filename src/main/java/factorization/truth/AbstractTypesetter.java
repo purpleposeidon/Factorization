@@ -1,6 +1,7 @@
 package factorization.truth;
 
 import com.google.common.base.Strings;
+import factorization.truth.api.ITypesetter;
 import factorization.truth.word.TextWord;
 import factorization.truth.word.Word;
 import net.minecraft.client.gui.FontRenderer;
@@ -9,7 +10,7 @@ import net.minecraft.util.EnumChatFormatting;
 import java.util.ArrayList;
 import java.util.Locale;
 
-public abstract class AbstractTypesetter {
+public abstract class AbstractTypesetter implements ITypesetter {
     // Super-awesome typesetter version π², by neptunepink
 
     final String domain;

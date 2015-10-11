@@ -2,6 +2,7 @@ package factorization.truth.gen;
 
 import cpw.mods.fml.relauncher.ReflectionHelper;
 import factorization.truth.AbstractTypesetter;
+import factorization.truth.api.IDocGenerator;
 import factorization.truth.word.ItemWord;
 import net.minecraft.util.WeightedRandomChestContent;
 import net.minecraftforge.common.ChestGenHooks;

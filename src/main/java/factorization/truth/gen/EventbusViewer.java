@@ -7,6 +7,7 @@ import cpw.mods.fml.common.eventhandler.EventPriority;
 import cpw.mods.fml.common.eventhandler.IEventListener;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import cpw.mods.fml.relauncher.ReflectionHelper;
+import factorization.truth.api.IDocGenerator;
 import factorization.truth.word.ClipboardWord;
 import factorization.truth.AbstractTypesetter;
 import factorization.truth.word.TextWord;

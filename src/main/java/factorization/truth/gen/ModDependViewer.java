@@ -4,6 +4,7 @@ import cpw.mods.fml.common.Loader;
 import cpw.mods.fml.common.ModContainer;
 import cpw.mods.fml.common.versioning.ArtifactVersion;
 import factorization.truth.AbstractTypesetter;
+import factorization.truth.api.IDocGenerator;
 
 public class ModDependViewer implements IDocGenerator {
     @Override

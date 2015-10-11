@@ -39,6 +39,7 @@ import factorization.shared.*;
 import factorization.shared.Core.TabType;
 import factorization.sockets.ItemSocketPart;
 import factorization.truth.minecraft.ItemDocBook;
+import factorization.truth.minecraft.ItemManSandwich;
 import factorization.twistedblock.ItemTwistedBlock;
 import factorization.util.CraftUtil;
 import factorization.util.DataUtil;
@@ -161,6 +162,7 @@ public class Registry {
     public ItemPotency item_potency;
     public ItemStack legendarium;
     public ItemBrokenArtifact brokenTool;
+    public ItemManSandwich manSandwich;
 
     public Material materialMachine = new Material(MapColor.ironColor);
     public Material materialBarrel = new Material(MapColor.woodColor) {{
@@ -422,6 +424,7 @@ public class Registry {
         barrelCart = new ItemMinecartDayBarrel();
 
         docbook = new ItemDocBook("docbook", TabType.TOOLS);
+        manSandwich = new ItemManSandwich(10, 10, "factorization:mansandwich");
         utiligoo = new ItemGoo("utiligoo", TabType.TOOLS);
         if (DeltaChunk.enabled()) {
             colossusGuide = new ItemColossusGuide("colossusGuide", TabType.TOOLS);
@@ -1152,6 +1155,21 @@ public class Registry {
                 'B', Items.book,
                 '~', new ItemStack(Items.dye, 1, 0), // The book says "ink sac", so you'll have to use an actual ink sac.
                 '>', logicMatrixProgrammer);
+        for (Item meat : new Item[] { Items.cooked_beef, Items.cooked_porkchop, Items.cooked_chicken, Items.cooked_fished }) {
+            oreRecipe(new ItemStack(manSandwich, 1, 0),
+                    "BMM",
+                    "M#M",
+                    "MMB",
+                    '#', docbook,
+                    'M', meat,
+                    'B', Items.bread);
+        }
+        oreRecipe(new ItemStack(manSandwich, 1, 1),
+                "*",
+                "/",
+                "*",
+                '*', Items.blaze_powder,
+                '/', new ItemStack(manSandwich));
         ItemStack tons_of_bonemeal = new ItemStack(Items.dye, 12 /* stacksize */, 15 /* damage value for bonemeal */);
         oreRecipe(tons_of_bonemeal,
                 "MSH",

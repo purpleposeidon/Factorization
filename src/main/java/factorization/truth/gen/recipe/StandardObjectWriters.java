@@ -1,8 +1,8 @@
 package factorization.truth.gen.recipe;
 
 import cpw.mods.fml.relauncher.ReflectionHelper;
-import factorization.api.adapter.Adapter;
 import factorization.api.adapter.GenericAdapter;
+import factorization.truth.api.IObjectWriter;
 import factorization.truth.gen.FluidViewer;
 import factorization.truth.word.ItemWord;
 import factorization.truth.word.TextWord;

@@ -5,7 +5,7 @@ import factorization.shared.Core;
 import factorization.truth.AbstractTypesetter;
 import factorization.truth.DocumentationModule;
 import factorization.truth.Tokenizer;
-import factorization.truth.gen.IDocGenerator;
+import factorization.truth.api.IDocGenerator;
 import factorization.truth.word.ItemWord;
 import factorization.truth.word.TextWord;
 import factorization.truth.word.Word;

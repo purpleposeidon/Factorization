@@ -4,6 +4,7 @@ import cpw.mods.fml.common.IWorldGenerator;
 import cpw.mods.fml.common.registry.GameRegistry;
 import cpw.mods.fml.relauncher.ReflectionHelper;
 import factorization.truth.AbstractTypesetter;
+import factorization.truth.api.IDocGenerator;
 
 import java.util.List;
 

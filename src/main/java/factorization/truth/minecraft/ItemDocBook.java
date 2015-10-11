@@ -9,19 +9,20 @@ import factorization.shared.Core.TabType;
 import factorization.shared.ItemFactorization;
 import factorization.truth.DocViewer;
 import factorization.truth.DocumentationModule;
+import factorization.truth.api.IDocBook;
 import factorization.util.FzUtil;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.world.World;
 
-public class ItemDocBook extends ItemFactorization {
+public class ItemDocBook extends ItemFactorization implements IDocBook {
 
     public ItemDocBook(String name, TabType tabType) {
         super(name, tabType);
         setMaxStackSize(1);
         if (FMLCommonHandler.instance().getSide() == Side.CLIENT) {
-            DocumentationModule.indexed_domains.add("factorization");
+            DocumentationModule.indexed_domains.add(getDocumentationDomain());
         }
     }
     
@@ -51,7 +52,7 @@ public class ItemDocBook extends ItemFactorization {
         if (!world.isRemote) return is;
         Minecraft mc = Minecraft.getMinecraft();
         //HistoryPage ap = DocViewer.popLastPage();
-        mc.displayGuiScreen(new DocViewer("factorization"));
+        mc.displayGuiScreen(new DocViewer(getDocumentationDomain()));
         return is;
     }
     
@@ -60,4 +61,8 @@ public class ItemDocBook extends ItemFactorization {
         DistributeDocs.setGivenBook(player);
     }
 
+    @Override
+    public String getDocumentationDomain() {
+        return "factorization";
+    }
 }

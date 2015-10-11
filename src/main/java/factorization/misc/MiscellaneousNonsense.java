@@ -103,8 +103,8 @@ public class MiscellaneousNonsense {
             }
             Core.logInfo("Endermen griefing disabled for " + i + " blocks.");
         }
-        if (FzConfig.hotblocks) {
-            Core.loadBus(HotBlocks.instance);
+        if (FzConfig.blockundo) {
+            Core.loadBus(BlockUndo.instance);
         }
     }
     

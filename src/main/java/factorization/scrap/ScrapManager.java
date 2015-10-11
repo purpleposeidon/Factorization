@@ -16,7 +16,8 @@ import java.util.Scanner;
 
 @Mod(
         modid = "fz.scrap",
-        version = Core.version
+        version = Core.version,
+        name = "Scrap"
 )
 public class ScrapManager {
     public static Logger log;

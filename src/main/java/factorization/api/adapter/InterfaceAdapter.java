@@ -4,7 +4,7 @@ import java.util.*;
 
 /**
  * Ascribes an interface to a type that might not actually implement it.
- * The implementation's a bit hairy; @see AdapterExample for an easy & fuzzy example.
+ * The implementation's a bit hairy; @see AdapterExample for a warm & fuzzy example.
  * @param <SOURCE> The input type
  * @param <TARGET> The class that the type shall be cast to.
  */
