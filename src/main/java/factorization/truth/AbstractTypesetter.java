@@ -1,6 +1,7 @@
 package factorization.truth;
 
 import com.google.common.base.Strings;
+import factorization.shared.NORELEASE;
 import factorization.truth.api.ITypesetter;
 import factorization.truth.word.TextWord;
 import factorization.truth.word.Word;
@@ -72,9 +73,7 @@ public abstract class AbstractTypesetter implements ITypesetter {
         
         while (tokenizer.nextToken()) {
             final String token = tokenizer.token;
-            if (token.isEmpty()) {
-                break;
-            }
+            if (token.isEmpty()) continue;
             switch (tokenizer.type) {
             default:
                 error(tokenizer.token);

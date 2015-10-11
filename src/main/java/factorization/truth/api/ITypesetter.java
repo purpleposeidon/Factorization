@@ -6,6 +6,7 @@ import factorization.truth.word.Word;
  * NYI.
  */
 public interface ITypesetter {
+    /*
     boolean isClient();
     boolean isHtml();
 
@@ -13,5 +14,5 @@ public interface ITypesetter {
     void emitWord(Word word);
     void emit(String text);
 
-    void process(String text);
+    void process(String text);*/
 }

@@ -17,11 +17,28 @@ Go forth and build cool things!
 scroll: next page \nl
 right click: go back \nl
 escape: close manual \nl
+
+\nl
+\checkmods{any}{NotEnoughItems}{?}{r} in other inventories: lookup item or open manual \nl
+
+\nl
+sneak-click block with manual: lookup block \nl
+
 }
 
 \topic{item.factorization:docbook}
 
+Carrying this book everywhere you go may become burdensome,
+which is why its text has been written to be
+satisfying and easy to digest.
 
-% high in fibre/protein; contents easy to digest
+\topic{item.factorization:mansandwich}
 
+The Manual Sandwich,
+or "Manwich", is high in fiber
+and heaping with protein.
+Eating so much meat in a single sitting is once in a lifetime experience!
+If you're looking for a meal with a little more kick to it,
+try the Spicy Manwich.
 
+\topic{item.factorization:mansandwich.spicy}

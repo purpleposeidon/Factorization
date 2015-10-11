@@ -30,6 +30,7 @@ import net.minecraft.world.World;
 import net.minecraftforge.common.util.FakePlayer;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 
@@ -41,6 +42,7 @@ public class ItemManSandwich extends ItemFood implements IManwich {
         setPotionEffect(Potion.moveSlowdown.getId(), 12 /* 8 seconds long */, 9 /* modifier */, 1.0F /* probability */);
         Core.loadBus(this);
         setUnlocalizedName(itemName);
+        setTextureName(itemName.replaceFirst("item.", ""));
         String n = itemName + ".status";
         manwhichStatus = new StatBase(n, new ChatComponentTranslation(n)).registerStat();
         setMaxStackSize(1);
@@ -120,6 +122,10 @@ public class ItemManSandwich extends ItemFood implements IManwich {
         if (world.isRemote) return;
         if (ent instanceof EntityLivingBase) {
             EntityLivingBase player = (EntityLivingBase) ent;
+            if (ent instanceof EntityPlayer) {
+                EntityPlayer p = (EntityPlayer) ent;
+                if (p.isUsingItem()) return; // Your mouth's got a firm grip on it
+            }
             if (player.hurtTime > 0) {
                 // My manwhich!
                 EvilUtil.throwStack(player, stack, false);
@@ -157,13 +163,16 @@ public class ItemManSandwich extends ItemFood implements IManwich {
             return;
         }
         int nom = hasManual(player);
+        String key;
         if (nom == 1) {
-            list.add(Core.translateThis("item.factorization:mansandwich.nom.once"));
+            key = "item.factorization:mansandwich.nom.once";
         } else if (nom > 1) {
-            list.add(Core.translateThis("item.factorization:mansandwich.nom.many"));
+            key = "item.factorization:mansandwich.nom.many";
         } else {
-            list.add(Core.translateThis("item.factorization:mansandwich.nom.delicious"));
+            key = "item.factorization:mansandwich.nom.delicious";
         }
+        String t = Core.translateThis(key);
+        Collections.addAll(list, t.split("\\\\n"));
         Core.brand(stack, player, list, verbose);
     }
 
@@ -179,8 +188,8 @@ public class ItemManSandwich extends ItemFood implements IManwich {
 
     @Override
     public void registerIcons(IIconRegister reg) {
-        super.registerIcons(reg);
-        spicy = reg.registerIcon(this.getIconString() + "_spicy");
+        itemIcon = reg.registerIcon("factorization:mansandwich");
+        spicy = reg.registerIcon("factorization:mansandwich_spicy");
     }
 
     @Override

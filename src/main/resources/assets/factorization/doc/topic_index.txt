@@ -13,6 +13,7 @@ item.factorization:servo/component.fz.instruction.entryaction	instructions/compu
 factorization.factoryBlock.LEYDENJAR	chargestorage
 item.factorization:servo/component.fz.instruction.group	instructions/subroutine
 item.diode	repeater
+item.factorization:mansandwich	about
 item.factorization:ceramics/glaze_bucket.base_common	sculpture
 factorization.factoryBlock.ANTHRO_GEN	gen/anthro
 item.factorization:servo/component.fz.instruction.pulse	instructions/interact
@@ -20,14 +21,15 @@ factorization.factoryBlock.SOLARBOILER	gen/boiler
 item.factorization:servo/servo	servo
 item.factorization:ceramics/glaze_bucket.base_mimicry	sculpture
 item.factorization:servo/component.fz.instruction.rotatetop	instructions/motion
-item.factorization:servo/component.fz.instruction.setdirection	instructions/motion
 factorization.factoryBlock.STAMPER	stamper
+item.factorization:servo/component.fz.instruction.setdirection	instructions/motion
 factorization.factoryBlock.SLAGFURNACE	slagfurnace
 tile.bookshelf	gen/biblio
 factorization.factoryBlock.PACKAGER	packager
-item.factorization:socket/SOCKET_SHIFTER	itemshifter
 item.factorization:tool/charge_meter	chargemeter
+item.factorization:socket/SOCKET_SHIFTER	itemshifter
 item.factorization:sap	gen/saptap
+factorization.factoryBlock.SHAFT_GEN	gen/charge
 factorization.factoryBlock.COMPRESSIONCRAFTER	compact
 item.factorization:ceramics/glaze_bucket	sculpture
 factorization.factoryBlock.MIXER	mixer
@@ -48,10 +50,12 @@ item.factorization:servo/component.fz.instruction.integervalue	instructions/valu
 item.factorization:servo/component.fz.instruction.spin	instructions/motion
 item.factorization:diamond_cutting_head	lacerator
 item.factorization:diamond_cutting_head	processing
+tile.factorization:artifactForge	artifactforge
+item.factorization:potencyBottle	artifactforge
 factorization.factoryBlock.SERVORAIL	servorail
-Artificery	artifact
 item.factorization:servo/component.fz.instruction.dup	instructions/value
 factorization.factoryBlock.CERAMIC	sculpture
+factorization.factoryBlock.LEGENDARIUM	legendarium
 factorization.factoryBlock.WATER_WHEEL_GEN	gen/water
 item.factorization:socket/scissors	scissors
 item.factorization:servo/decorator.fz.decorator.scancolor	colorscanner
@@ -59,6 +63,7 @@ item.factorization:servo/decorator.fz.decorator.servoGrateGlass	servograte
 item.factorization:chainLink	winch
 tile.hopper	hopper
 item.factorization:servo/decorator.fz.decorator.servoGrateWood	servograte
+item.factorization:docbook	about
 item.factorization:servo/component.fz.instruction.readredstone	instructions/interact
 item.factorization:servo/component.fz.instruction.shifterctrl	instructions/interact
 factorization.factoryBlock.SHAFT	gen/shaft
@@ -76,6 +81,7 @@ item.factorization:twistedBlock	twistingblock
 tile.pistonStickyBase	piston
 factorization.factoryBlock.WIND_MILL_GEN	gen/wind
 tile.BlockMatcher	blockmatcher
+item.factorization:mansandwich.spicy	about
 item.factorization:socket/SOCKET_ROBOTHAND	arm
 item.factorization:servo/component.fz.instruction.cmp	instructions/value
 item.factorization:servo/component.fz.instruction.repeatedInstruction	instructions/compute

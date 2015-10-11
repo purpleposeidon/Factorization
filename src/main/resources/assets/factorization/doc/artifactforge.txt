@@ -16,7 +16,7 @@ First, you need two identical tools.
 You will also need \{u}{three} Bottles of Potency,
 which are created by combinging an empty bottle
 and a bit of \#{item.factorization:entheas} entheas
-in an \link{tile.anvil.intact}{anvil}
+in an \#{tile.anvil.intact}anvil
 for 35 levels.
 Be warned that if you die, any bottles of potency
 that you have made will be ruined.
