@@ -174,7 +174,7 @@ public class TileEntitySapTap extends TileEntityCommon implements ISidedInventor
             if (sap_rate < 10) sap_rate = 10;
         }
         if (player != null) {
-            String sap_units = sap_rate <= 0 ? "∞" : FzUtil.unitify(FzUtil.unit_time, sap_rate, 2);
+            String sap_units = sap_rate <= 0 ? "∞" : FzUtil.unitTranslateTimeTicks(sap_rate, 2);
             new Notice(this, "factorization.factoryBlock.SAP_TAP.info",
                     "" + log_count, "" + leaf_count, "" + effective_logs, sap_units).withStyle(Style.LONG).sendTo(player);
         }
