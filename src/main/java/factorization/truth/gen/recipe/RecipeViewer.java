@@ -2,11 +2,8 @@ package factorization.truth.gen.recipe;
 
 import cpw.mods.fml.common.event.FMLInterModComms.IMCMessage;
 import factorization.shared.Core;
-import factorization.truth.AbstractTypesetter;
 import factorization.truth.DocumentationModule;
-import factorization.truth.api.DocReg;
-import factorization.truth.api.IDocGenerator;
-import factorization.truth.api.IObjectWriter;
+import factorization.truth.api.*;
 import factorization.truth.word.ItemWord;
 import factorization.truth.word.Word;
 import factorization.util.ItemUtil;
@@ -41,7 +38,7 @@ public class RecipeViewer implements IDocGenerator, IObjectWriter<Object> {
      * 		Lists recipes whose output is the itemName
      */
     @Override
-    public void process(AbstractTypesetter out, String arg) {
+    public void process(ITypesetter out, String arg) throws TruthError {
         StandardObjectWriters.setup();
         if (recipeCategories == null || (Core.dev_environ && !Boolean.getBoolean("fz.devNoRecipeRefresh"))) {
             categoryOrder.clear();
@@ -51,9 +48,9 @@ public class RecipeViewer implements IDocGenerator, IObjectWriter<Object> {
             Core.logInfo("Done");
         }
         if (arg == null || arg.equalsIgnoreCase("categories") || arg.isEmpty()) {
-            out.append("\\title{Recipe Categories}\n\n");
+            out.write("\\title{Recipe Categories}\n\n");
             for (String cat : categoryOrder) {
-                out.append(String.format("\\link{cgi/recipes/category/%s}{\\local{%s}}\\nl", cat, cat));
+                out.write(String.format("\\link{cgi/recipes/category/%s}{\\local{%s}}\\nl", cat, cat));
             }
         } else if (arg.startsWith("category/")) {
             String cat = arg.replace("category/", "");
@@ -61,7 +58,7 @@ public class RecipeViewer implements IDocGenerator, IObjectWriter<Object> {
                 ArrayList<ArrayList> recipeList = recipeCategories.get(cat);
                 writeRecipes(out, null, false, cat, recipeList);
             } else {
-                out.error("Category not found: " + arg);
+                throw new TruthError("Category not found: " + arg);
             }
         } else {
             ItemStack matching = null;
@@ -76,11 +73,10 @@ public class RecipeViewer implements IDocGenerator, IObjectWriter<Object> {
                     matching = matchers.get(0);
                 }
                 if (matching == null) {
-                    out.error("Couldn't find item: " + arg);
-                    return;
+                    throw new TruthError("Couldn't find item: " + arg);
                 }
                 //out.emitWord(new ItemWord(matching));
-                out.append("\\nl");
+                out.write("\\nl");
             }
             
             for (String cat : categoryOrder) {
@@ -91,7 +87,7 @@ public class RecipeViewer implements IDocGenerator, IObjectWriter<Object> {
         }
     }
     
-    void writeRecipes(AbstractTypesetter out, ItemStack matching, boolean mustBeResult, String categoryName, ArrayList<ArrayList> recipes) {
+    void writeRecipes(ITypesetter out, ItemStack matching, boolean mustBeResult, String categoryName, ArrayList<ArrayList> recipes) throws TruthError {
         if (matching == null) {
             for (ArrayList recipe : recipes) {
                 writeRecipe(out, recipe);
@@ -103,7 +99,7 @@ public class RecipeViewer implements IDocGenerator, IObjectWriter<Object> {
                     if (first) {
                         first = false;
                         if (categoryName != null) {
-                            out.append("\\u{\\local{" + categoryName + "}}\n\n");
+                            out.write("\\u{\\local{" + categoryName + "}}\n\n");
                         }
                     }
                     writeRecipe(out, recipe);
@@ -136,13 +132,13 @@ public class RecipeViewer implements IDocGenerator, IObjectWriter<Object> {
         return false;
     }
     
-    void writeRecipe(AbstractTypesetter out, ArrayList parts) {
+    void writeRecipe(ITypesetter out, ArrayList parts) {
         try {
             for (Object part : parts) {
                 if (part instanceof String) {
-                    out.append((String) part);
+                    out.write((String) part);
                 } else {
-                    out.emitWord((Word) part);
+                    out.write((Word) part);
                 }
             }
         } catch (Throwable t) {

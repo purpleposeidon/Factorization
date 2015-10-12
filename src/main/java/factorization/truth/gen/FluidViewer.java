@@ -1,7 +1,8 @@
 package factorization.truth.gen;
 
-import factorization.truth.AbstractTypesetter;
 import factorization.truth.api.IDocGenerator;
+import factorization.truth.api.ITypesetter;
+import factorization.truth.api.TruthError;
 import factorization.truth.word.IconWord;
 import factorization.truth.word.ItemWord;
 import factorization.truth.word.Word;
@@ -25,25 +26,25 @@ public class FluidViewer implements IDocGenerator {
     }
 
     @Override
-    public void process(AbstractTypesetter out, String arg) {
+    public void process(ITypesetter out, String arg) throws TruthError {
         for (Entry<String, Fluid> entry : FluidRegistry.getRegisteredFluids().entrySet()) {
             String name = entry.getKey();
             Fluid fluid = entry.getValue();
-            out.append("\\seg \\nl \\nl");
-            out.emitWord(convert(fluid));
-            out.append(" ");
-            out.append(String.format("\\u{%s}", name));
+            out.write("\\seg \\nl \\nl");
+            out.write(convert(fluid));
+            out.write(" ");
+            out.write(String.format("\\u{%s}", name));
             if (fluid.isGaseous()) {
-                out.append("\\nl A gas");
+                out.write("\\nl A gas");
             }
             if (!fluid.canBePlacedInWorld()) {
-                out.append("\\nl Item-only");
+                out.write("\\nl Item-only");
             }
-            out.append(String.format("\\nl Temperature: %s°K", fluid.getTemperature()));
-            out.append(String.format("\\nl Density: %s kg/block", fluid.getDensity()));
-            //out.append(String.format("\\nlViscoscity: %s", fluid.getViscosity()));
+            out.write(String.format("\\nl Temperature: %s°K", fluid.getTemperature()));
+            out.write(String.format("\\nl Density: %s kg/block", fluid.getDensity()));
+            //out.write(String.format("\\nlViscoscity: %s", fluid.getViscosity()));
             
-            out.append("\\endseg");
+            out.write("\\endseg");
         }
     }
 

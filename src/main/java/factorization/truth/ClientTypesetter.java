@@ -3,6 +3,7 @@ package factorization.truth;
 import cpw.mods.fml.common.Loader;
 import factorization.truth.api.DocReg;
 import factorization.truth.api.IDocGenerator;
+import factorization.truth.api.TruthError;
 import factorization.truth.word.*;
 import factorization.util.DataUtil;
 import net.minecraft.block.Block;
@@ -23,7 +24,7 @@ public class ClientTypesetter extends AbstractTypesetter {
     }
 
     @Override
-    protected void handleCommand(Tokenizer tokenizer, final String cmd, final String link, final String style) {
+    protected void handleCommand(Tokenizer tokenizer, final String cmd, final String link, final String style) throws TruthError {
         if (cmd.equals("\\p")) {
             WordPage p = getCurrentPage();
             p.nl();
@@ -34,11 +35,11 @@ public class ClientTypesetter extends AbstractTypesetter {
             getCurrentPage().nl();
         } else if (cmd.equals("\\-")) {
             getCurrentPage().nl();
-            emit(" - ", null);
+            write(" - ", null);
         } else if (cmd.equals("\\") || cmd.equals("\\ ")) {
-            emit(style + " ", link);
+            write(style + " ", link);
         } else if (cmd.equalsIgnoreCase("\\\\")) {
-            emit("\\", link);
+            write("\\", link);
         } else if (cmd.equals("\\newpage")) {
             newPage();
         } else if (cmd.equals("\\leftpage")) {
@@ -48,7 +49,7 @@ public class ClientTypesetter extends AbstractTypesetter {
             }
         } else if (cmd.equals("\\b") || cmd.equals("\\i") || cmd.equals("\\u") || cmd.equals("\\obf")) {
             char mode = cmd.charAt(1);
-            String content = getParameter(cmd, tokenizer);
+            String content = tokenizer.getParameter("paramter content");
             if (content == null) return;
             EnumChatFormatting newStyle;
             if (mode == 'b') {
@@ -60,53 +61,32 @@ public class ClientTypesetter extends AbstractTypesetter {
             } else if (mode == 'o') {
                 newStyle = EnumChatFormatting.OBFUSCATED;
             } else {
-                error("Unknown style: " + cmd);
-                return;
+                throw new TruthError("Unknown style: " + cmd);
             }
-            process(content, link, style + newStyle);
+            write(content, link, style + newStyle);
         } else if (cmd.equals("\\title")) {
-            String val = getParameter(cmd, tokenizer);
-            if (val == null) {
-                error("No content");
-                return;
-            }
-            process(val, link, style + EnumChatFormatting.UNDERLINE + EnumChatFormatting.BOLD);
+            String val = tokenizer.getParameter("No content");
+            write(val, link, style + EnumChatFormatting.UNDERLINE + EnumChatFormatting.BOLD);
         } else if (cmd.equals("\\h1")) {
-            String val = getParameter(cmd, tokenizer);
-            if (val == null) {
-                error("No content");
-                return;
-            }
-            process(val, link, style + EnumChatFormatting.BOLD);
+            String val = tokenizer.getParameter("No content");
+            write(val, link, style + EnumChatFormatting.BOLD);
             getCurrentPage().nl();
         } else if (cmd.equals("\\link") || cmd.equals("\\index")) {
-            String newLink = getParameter(cmd, tokenizer);
-            if (newLink == null) {
-                error("missing destination parameter");
-                return;
-            }
-            String content = getParameter(cmd, tokenizer);
-            if (content == null) {
-                error("missing content parameter");
-                return;
-            }
-            process(content, newLink, style);
+            String newLink = tokenizer.getParameter("missing destination parameter");
+            String content = tokenizer.getParameter("missing content parameter");
+            write(content, newLink, style);
             if (cmd.equals("\\index")) {
                 getCurrentPage().nl();
             }
         } else if (cmd.equals("\\#") || cmd.equals("\\##")) {
-            String itemName = getParameter(cmd, tokenizer);
-            if (itemName == null) {
-                error("No item specified");
-                return;
-            }
+            String itemName = tokenizer.getParameter("No item specified");
             ArrayList<ItemStack> items;
             if (cmd.equals("\\#")) {
                 items = DocumentationModule.lookup(itemName);
             } else {
-                String stackSizeS = getOptionalParameter(tokenizer);
+                String stackSizeS = tokenizer.getOptionalParameter();
                 if (stackSizeS == null) stackSizeS = "1";
-                String dmgS = getOptionalParameter(tokenizer);
+                String dmgS = tokenizer.getOptionalParameter();
                 if (dmgS == null) dmgS = "0";
                 int dmg = Integer.parseInt(dmgS);
                 int stackSize = Integer.parseInt(stackSizeS);
@@ -118,40 +98,31 @@ public class ClientTypesetter extends AbstractTypesetter {
                 } else if (it != null) {
                     items.add(new ItemStack(it, stackSize, dmg));
                 } else {
-                    error("Could not find block or item: " + itemName);
+                    throw new TruthError("Could not find block or item: " + itemName);
                 }
             }
             if (items == null || items.isEmpty()) {
-                error(itemName + " no such item");
-                return;
+                throw new TruthError(itemName + " no such item");
             }
             if (items.size() == 1) {
                 if (link == null) {
-                    emitWord(new ItemWord(items.get(0)));
+                    write(new ItemWord(items.get(0)));
                 } else {
-                    emitWord(new ItemWord(items.get(0), link));
+                    write(new ItemWord(items.get(0), link));
                 }
             } else {
                 ItemStack[] theItems = items.toArray(new ItemStack[items.size()]);
                 if (link == null) {
-                    emitWord(new ItemWord(theItems));
+                    write(new ItemWord(theItems));
                 } else {
-                    emitWord(new ItemWord(theItems, link));
+                    write(new ItemWord(theItems, link));
                 }
             }
         } else if (cmd.equals("\\img") || cmd.equals("\\img%")) {
-            String imgName = getParameter(cmd, tokenizer);
-            if (imgName == null) {
-                error("No img specified");
-                return;
-            }
+            String imgName = tokenizer.getParameter("No img specified");
             double scale = 1;
             if (cmd.equals("\\img%")) {
-                String scaleStr = getParameter(cmd, tokenizer);
-                if (scaleStr == null) {
-                    error("No scale specified");
-                    return;
-                }
+                String scaleStr = tokenizer.getParameter("No scale specified");
                 scale = Double.parseDouble(scaleStr); // exception's fine
             }
             ResourceLocation rl = new ResourceLocation(imgName);
@@ -159,63 +130,52 @@ public class ClientTypesetter extends AbstractTypesetter {
             try {
                 IResource r = mc.getResourceManager().getResource(rl);
                 if (r == null) {
-                    error("Not found: " + imgName);
-                    return;
+                    throw new TruthError("Not found: " + imgName);
                 }
             } catch (Throwable e) {
-                error(e.getMessage());
                 e.printStackTrace();
-                return;
+                throw new TruthError(e.getMessage());
             }
             ImgWord word = new ImgWord(rl, link);
             word.scale(scale);
             word.fitToPage(pageWidth, pageHeight);
-            emitWord(word);
+            write(word);
         } else if (cmd.equals("\\imgx")) {
-            int width = Integer.parseInt(getParameter(cmd, tokenizer));
-            int height = Integer.parseInt(getParameter(cmd, tokenizer));
-            String imgName = getParameter(cmd, tokenizer);
-            if (imgName == null) {
-                error("No img specified");
-                return;
-            }
+            int width = Integer.parseInt(tokenizer.getParameter("image width"));
+            int height = Integer.parseInt(tokenizer.getParameter("image height"));
+            String imgName = tokenizer.getParameter("No img specified");
             ResourceLocation rl = new ResourceLocation(imgName);
             Minecraft mc = Minecraft.getMinecraft();
             try {
                 IResource r = mc.getResourceManager().getResource(rl);
                 if (r == null) {
-                    error("Not found: " + imgName);
-                    return;
+                    throw new TruthError("Not found: " + imgName);
                 }
             } catch (Throwable e) {
-                error(e.getMessage());
                 e.printStackTrace();
-                return;
+                throw new TruthError(e.getMessage());
             }
-            emitWord(new ImgWord(rl, link, width, height));
+            write(new ImgWord(rl, link, width, height));
         } else if (cmd.equals("\\figure")) {
             DocWorld figure = null;
             try {
-                String fig = getParameter(cmd, tokenizer);
-                if (fig == null) return;
+                String fig = tokenizer.getParameter("Encoded document figure");
                 figure = DocumentationModule.loadWorld(fig);
             } catch (Throwable t) {
+                if (t instanceof TruthError) throw (TruthError) t;
                 t.printStackTrace();
-                error("figure is corrupt; see console");
-                return;
+                throw new TruthError("figure is corrupt; see console");
             }
             if (figure == null) {
-                error("figure failed to load");
-                return;
+                throw new TruthError("figure failed to load");
             }
             pages.add(new FigurePage(figure));
         } else if (cmd.equals("\\generate")) {
-            String arg = getParameter(cmd, tokenizer);
+            String arg = tokenizer.getParameter("\\generate path");
             String args[] = arg.split("/", 2);
             IDocGenerator gen = DocReg.generators.get(args[0]);
             if (gen == null) {
-                error("\\generate{" + arg + "}: Not found: " + args[0]);
-                return;
+                throw new TruthError("\\generate{" + arg + "}: Not found: " + args[0]);
             }
             String rest = args.length > 1 ? args[1] : "";
             gen.process(this, rest);
@@ -227,29 +187,14 @@ public class ClientTypesetter extends AbstractTypesetter {
         } else if (cmd.equals("\\endseg")) {
             segmentStart = null;
         } else if (cmd.equals("\\topic")) {
-            String topic = getParameter(cmd, tokenizer);
-            if (topic == null) {
-                error("\\topic missing parameter");
-                return;
-            }
-            append(String.format("\\newpage \\generate{recipes/for/%s}", topic));
+            String topic = tokenizer.getParameter("\\topic missing parameter");
+            write(String.format("\\newpage \\generate{recipes/for/%s}", topic));
             //topics.add(topic);
         } else if (cmd.equals("\\checkmods")) {
-            String mode = getParameter(cmd, tokenizer); // all some none
-            if (mode == null) {
-                error("\\checkmods missing parameter");
-                return;
-            }
-            String modList = getParameter(cmd, tokenizer); //craftguide NotEnoughItems
-            if (modList == null) {
-                error("\\checkmods missing parameter");
-                return;
-            }
-            String content = getParameter(cmd, tokenizer);
-            if (content == null) {
-                error("\\checkmods missing parameter");
-                return;
-            }
+            String mode = tokenizer.getParameter("\\checkmods mod mode: all|none|any"); // all some none
+            String modList = tokenizer.getParameter("\\checkmods list of mods"); //craftguide NotEnoughItems
+            String content = tokenizer.getParameter("\\checkmods when mods installed");
+            String other = tokenizer.getParameter("\\checkmods when mods not installed");
             int count = 0;
             String[] mods = modList.split(" ");
             for (String modId : mods) {
@@ -262,60 +207,32 @@ public class ClientTypesetter extends AbstractTypesetter {
                 good = count == mods.length;
             } else if (mode.equalsIgnoreCase("none")) {
                 good = count == 0;
-            } else if (mode.equalsIgnoreCase("some") || mode.equalsIgnoreCase("any")) {
+            } else if (mode.equalsIgnoreCase("any")) {
                 good = count > 1;
             } else {
-                error("\\checkmods first parameter must be 'all', 'none', or 'any', not '" + mode + "'");
-                return;
+                throw new TruthError("\\checkmods first parameter must be 'all', 'none', or 'any', not '" + mode + "'");
             }
-            String other = getParameter(cmd, tokenizer);
             if (good) {
-                process(content, link, style);
+                write(content, link, style);
             } else if (other != null) {
-                process(other, link, style);
+                write(other, link, style);
             }
         } else if (cmd.equals("\\vpad")) {
-            String height_ = getParameter(cmd, tokenizer);
-            if (height_ == null) {
-                error("\\vpad missing parameter");
-                return;
-            }
-            int height = Integer.parseInt(height_);
-            emitWord(new VerticalSpacerWord(height));
+            int height = Integer.parseInt(tokenizer.getParameter("\\vpad height"));
+            write(new VerticalSpacerWord(height));
         } else if (cmd.equals("\\url")) {
-            String uriLink = getParameter(cmd, tokenizer);
-            if (uriLink == null) {
-                error("\\url missing parameter: uriLink");
-                return;
-            }
-            String content = getParameter(cmd, tokenizer);
-            if (content == null) {
-                error("\\url missing parameter: content");
-                return;
-            }
-            emitWord(new URIWord(content, uriLink));
+            String uriLink = tokenizer.getParameter("\\url missing parameter: uriLink");
+            String content = tokenizer.getParameter("\\url missing parameter: content");
+            write(new URIWord(content, uriLink));
         } else if (cmd.equals("\\ifhtml")) {
-            String trueBranch = getParameter(cmd, tokenizer);
-            String falseBranch = getParameter(cmd, tokenizer);
-            if (trueBranch == null) {
-                error("\\ifhtml missing parameter: trueBranch");
-                return;
-            }
-            if (falseBranch == null) {
-                error("\\ifhtml missing parameter: falseBranch");
-                return;
-            }
-            process(falseBranch, link, style);
+            String trueBranch = tokenizer.getParameter("\\ifhtml missing parameter: trueBranch");
+            String falseBranch = tokenizer.getParameter("\\ifhtml missing parameter: falseBranch");
+            write(falseBranch, link, style);
         } else if (cmd.equals("\\local")) {
-            String localizationKey = getParameter(cmd, tokenizer);
-            if (localizationKey == null) {
-                error("\\local missing parameter: localizationKey");
-                return;
-            }
-            emitWord(new LocalizedWord(localizationKey, link));
+            String localizationKey = tokenizer.getParameter("\\local missing parameter: localizationKey");
+            write(new LocalizedWord(localizationKey, link));
         } else {
-            error("Unknown command: ");
-            emit(cmd, null);
+            throw new TruthError("Unknown command: " + cmd);
         }
     }
 

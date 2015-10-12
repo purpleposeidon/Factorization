@@ -55,7 +55,7 @@ Commands:
 \ifhtml{TRUE}{FALSE}
         Emits the TRUE branch if this is for an HTML export, or else the FALSE branch
 \url{http or https address}{link text}
-        Emits a hyperlink to the World Wide Web!
+        Emits a hyperlink to the World Wide Web.
 \local{localization.key}
         Translates the string given.
         (Not typeset properly? Easy to fix, honestly.)
@@ -70,8 +70,9 @@ Commands swallow following spaces. To actually follow a command with a space, do
 
 
 
-If you are in a dev environment, symlink the resources folder into MC's resource packs folder. This way you can edit the docs, save it, and press 'r' in the doc viewer to refresh.
-(Also, you can press 's' to change color schemes.)
+If you are in a dev environment, symlink the resources folder into MC's resource packs folder.
+This way you can edit the docs, save it, and press 'r' in the doc viewer to refresh.
+Resource packs need not be in zips; they can be unzipped in the resourcepacks directory to allow easier editing.
 
 The commands /fzdoc-serialize and /html-fzdoc-export are only available in a deobf environment, or by passing -Dfz.registerDocCommands=true on the JVM command-line.
 

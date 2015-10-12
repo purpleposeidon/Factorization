@@ -8,9 +8,9 @@ import factorization.notify.Notice;
 import factorization.shared.Core.TabType;
 import factorization.shared.ItemFactorization;
 import factorization.truth.DocViewer;
-import factorization.truth.DocumentationModule;
 import factorization.truth.api.DocReg;
 import factorization.truth.api.IDocBook;
+import factorization.truth.api.IDocModule;
 import factorization.util.FzUtil;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.EntityPlayer;
@@ -40,8 +40,8 @@ public class ItemDocBook extends ItemFactorization implements IDocBook {
         if (hit == null) {
             hit = at.getPickBlock(mc.objectMouseOver);
         }
-        if (hit != null) {
-            DocumentationModule.tryOpenBookForItem(hit);
+        if (hit != null && DocReg.module != null) {
+            DocReg.module.openBookForItem(hit, false);
             Notice.onscreen(player, "%s", hit.getDisplayName());
         }
         return true;

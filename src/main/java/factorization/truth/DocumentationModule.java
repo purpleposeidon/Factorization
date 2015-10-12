@@ -13,6 +13,7 @@ import factorization.coremodhooks.UnhandledGuiKeyEvent;
 import factorization.shared.Core;
 import factorization.truth.api.DocReg;
 import factorization.truth.api.IDocBook;
+import factorization.truth.api.IDocModule;
 import factorization.truth.api.IManwich;
 import factorization.truth.export.ExportHtml;
 import factorization.truth.gen.*;
@@ -43,8 +44,26 @@ import java.util.HashMap;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 
-public class DocumentationModule {
-    public static final DocumentationModule instance = new DocumentationModule();
+public class DocumentationModule implements factorization.truth.api.IDocModule {
+    public static DocumentationModule instance;
+
+    public static void setup() {
+        DocReg.module = instance = new DocumentationModule();
+        DocReg.registerGenerator("items", new ItemListViewer());
+        DocReg.registerGenerator("recipes", new RecipeViewer());
+        DocReg.registerGenerator("enchants", new EnchantViewer());
+        DocReg.registerGenerator("treasure", new TreasureViewer());
+        DocReg.registerGenerator("biomes", new BiomeViewer());
+        DocReg.registerGenerator("fluids", new FluidViewer());
+        DocReg.registerGenerator("oredictionary", new OreDictionaryViewer());
+        DocReg.registerGenerator("mods", new ModDependViewer());
+        DocReg.registerGenerator("worldgen", new WorldgenViewer());
+        DocReg.registerGenerator("eventbus", new EventbusViewer());
+        DocReg.registerGenerator("tesrs", new TesrViewer());
+        if (FMLCommonHandler.instance().getSide() == Side.CLIENT) {
+            Core.loadBus(new DocKeyListener());
+        }
+    }
 
     static HashMap<String, ArrayList<ItemStack>> nameCache = null;
     
@@ -206,21 +225,24 @@ public class DocumentationModule {
         return screen.getSlotAtPosition(mouseX, mouseY);
     }
 
+    @Override
     @SideOnly(Side.CLIENT)
-    public static void openPageForHilightedItem() {
+    public void openPageForHilightedItem() {
         Slot slot = getSlotUnderMouse();
         ItemStack stack = slot == null ? null : slot.getStack();
-        tryOpenBookForItem(stack);
+        openBookForItem(stack, false);
     }
 
 
+    @Override
     @SideOnly(Side.CLIENT)
-    public static boolean tryOpenBookForItem(ItemStack is) {
+    public boolean openBookForItem(ItemStack is, boolean forceOpen) {
         Minecraft mc = Minecraft.getMinecraft();
         EntityPlayer player = mc.thePlayer;
         if (player == null) return false;
         String found_domain = DocReg.default_lookup_domain;
-        boolean found = PlayerUtil.isPlayerCreative(player)
+        boolean found = forceOpen
+                || PlayerUtil.isPlayerCreative(player)
                 || !FzConfig.require_book_for_manual;
         if (!found) {
             for (ItemStack manual : player.inventory.mainInventory) {
@@ -282,23 +304,6 @@ public class DocumentationModule {
         mc.displayGuiScreen(new DocViewer(DocReg.default_recipe_domain, "cgi/recipes/" + name));
         return true;
     }
-    
-    static {
-        DocReg.registerGenerator("items", new ItemListViewer());
-        DocReg.registerGenerator("recipes", new RecipeViewer());
-        DocReg.registerGenerator("enchants", new EnchantViewer());
-        DocReg.registerGenerator("treasure", new TreasureViewer());
-        DocReg.registerGenerator("biomes", new BiomeViewer());
-        DocReg.registerGenerator("fluids", new FluidViewer());
-        DocReg.registerGenerator("oredictionary", new OreDictionaryViewer());
-        DocReg.registerGenerator("mods", new ModDependViewer());
-        DocReg.registerGenerator("worldgen", new WorldgenViewer());
-        DocReg.registerGenerator("eventbus", new EventbusViewer());
-        DocReg.registerGenerator("tesrs", new TesrViewer());
-        if (FMLCommonHandler.instance().getSide() == Side.CLIENT) {
-            Core.loadBus(new DocKeyListener());
-        }
-    }
 
     public static class DocKeyListener {
         boolean hasNei = Loader.isModLoaded("NotEnoughItems");
@@ -308,9 +313,9 @@ public class DocumentationModule {
             // Except NEI's keys might be configurable.
             // TODO: Make these keys configurable tho
             if (event.chr == '?') {
-                DocumentationModule.openPageForHilightedItem();
+                DocReg.module.openPageForHilightedItem();
             } else if ((event.chr == 'r' || event.chr == 'R') && !hasNei) {
-                DocumentationModule.openPageForHilightedItem();
+                DocReg.module.openPageForHilightedItem();
             }
         }
     }

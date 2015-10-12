@@ -1,7 +1,8 @@
 package factorization.truth.gen;
 
-import factorization.truth.AbstractTypesetter;
 import factorization.truth.api.IDocGenerator;
+import factorization.truth.api.ITypesetter;
+import factorization.truth.api.TruthError;
 import factorization.truth.word.ItemWord;
 import net.minecraft.block.Block;
 import net.minecraft.init.Blocks;
@@ -18,7 +19,7 @@ import java.util.ArrayList;
 public class BiomeViewer implements IDocGenerator {
 
     @Override
-    public void process(AbstractTypesetter out, String arg) {
+    public void process(ITypesetter out, String arg) throws TruthError {
         ArrayList<Integer> free = new ArrayList();
         BiomeGenBase[] biomeGenArray = BiomeGenBase.getBiomeGenArray();
         for (int i = 0; i < biomeGenArray.length; i++) {
@@ -27,20 +28,20 @@ public class BiomeViewer implements IDocGenerator {
                 free.add(i);
                 continue;
             }
-            out.append("\\newpage\\title{#" + biome.biomeID + " " + biome.biomeName + "}");
-            out.append("\\nl Temperature: " + biome.temperature);
-            out.append("\\nl Humidity: " + biome.rainfall);
-            out.append(String.format("\\nl Color: #%06X", biome.color));
+            out.write("\\newpage\\title{#" + biome.biomeID + " " + biome.biomeName + "}");
+            out.write("\\nl Temperature: " + biome.temperature);
+            out.write("\\nl Humidity: " + biome.rainfall);
+            out.write(String.format("\\nl Color: #%06X", biome.color));
             if (biome.waterColorMultiplier != 0xFFFFFF) {
-                out.append(String.format("\\nl Water Tint: #%06X", biome.waterColorMultiplier));
+                out.write(String.format("\\nl Water Tint: #%06X", biome.waterColorMultiplier));
             }
-            out.append("\\nl Blocks: ");
-            out.emitWord(new ItemWord(new ItemStack(biome.topBlock)));
-            out.emitWord(new ItemWord(new ItemStack(biome.fillerBlock)));
+            out.write("\\nl Blocks: ");
+            out.write(new ItemWord(new ItemStack(biome.topBlock)));
+            out.write(new ItemWord(new ItemStack(biome.fillerBlock)));
             
             {
                 final BiomeDecorator dec = biome.theBiomeDecorator;
-                out.append("\\nl\\nl");
+                out.write("\\nl\\nl");
                 
                 feature(out, dec.waterlilyPerChunk, Blocks.waterlily);
                 feature(out, dec.treesPerChunk, Blocks.sapling);
@@ -54,31 +55,31 @@ public class BiomeViewer implements IDocGenerator {
                 feature(out, dec.clayPerChunk, Blocks.clay);
                 feature(out, dec.bigMushroomsPerChunk, Blocks.red_mushroom_block);
                 if (dec.generateLakes) {
-                    out.emitWord(new ItemWord(new ItemStack(Items.water_bucket)));
+                    out.write(new ItemWord(new ItemStack(Items.water_bucket)));
                 }
                 
-                out.append("\\nl");
+                out.write("\\nl");
             }
             
             if (biome.canSpawnLightningBolt()) {
-                out.append("\\nl Rainy");
+                out.write("\\nl Rainy");
             }
             
             if (biome.getEnableSnow()) {
-                out.append("\\nl Snowy");
+                out.write("\\nl Snowy");
             }
             
             
             BiomeDictionary.Type[] types = BiomeDictionary.getTypesForBiome(biome);
             if (types == null || types.length == 0) continue;
-            out.append("\\nl \\nl");
+            out.write("\\nl \\nl");
             for (Type t : types) {
-                out.append(" " + t);
+                out.write(" " + t);
             }
         }
-        out.append("\\newpage\\title{Free IDs}\\nl");
+        out.write("\\newpage\\title{Free IDs}\\nl");
         if (free.isEmpty()) {
-            out.append("There are no free biome IDs!");
+            out.write("There are no free biome IDs!");
         } else {
             ArrayList<Integer> contig = new ArrayList();
             int last = -100;
@@ -99,15 +100,15 @@ public class BiomeViewer implements IDocGenerator {
             }
             for (Integer i : contig) {
                 if (i < 0) {
-                    out.append("to " + (-i) + "\\nl");
+                    out.write("to " + (-i) + "\\nl");
                 } else {
-                    out.append(i + " ");
+                    out.write(i + " ");
                 }
             }
         }
     }
     
-    void feature(AbstractTypesetter out, int val, Block symbol) {
+    void feature(ITypesetter out, int val, Block symbol) {
         if (val <= 0) return;
         if (val > 99) val = 99;
         Item it = symbol.getItem(null, 0, 0, 0);
@@ -117,7 +118,7 @@ public class BiomeViewer implements IDocGenerator {
         }
         is.stackSize = val;
         ItemWord word = new ItemWord(is);
-        out.emitWord(word);
+        out.write(word);
     }
 
 }

@@ -1,7 +1,8 @@
 package factorization.truth.gen;
 
-import factorization.truth.AbstractTypesetter;
 import factorization.truth.api.IDocGenerator;
+import factorization.truth.api.ITypesetter;
+import factorization.truth.api.TruthError;
 import factorization.truth.word.ItemWord;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.oredict.OreDictionary;
@@ -13,7 +14,7 @@ import java.util.Collections;
 public class OreDictionaryViewer implements IDocGenerator {
 
     @Override
-    public void process(AbstractTypesetter out, String arg) {
+    public void process(ITypesetter out, String arg) throws TruthError {
         Arrays.asList(OreDictionary.getOreNames());
         ArrayList<String> names = new ArrayList<String>();
         Collections.addAll(names, OreDictionary.getOreNames());
@@ -41,7 +42,7 @@ public class OreDictionaryViewer implements IDocGenerator {
         }
         
         if (!singles.isEmpty()) {
-            if (prev) out.append("\\newpage");
+            if (prev) out.write("\\newpage");
             prev = true;
             for (String name : singles) {
                 show(out, name);
@@ -49,23 +50,23 @@ public class OreDictionaryViewer implements IDocGenerator {
         }
         
         if (!empties.isEmpty()) {
-            if (prev) out.append("\\newpage");
+            if (prev) out.write("\\newpage");
             prev = true;
-            out.append("\\title{Empty Lists}");
+            out.write("\\title{Empty Lists}");
             for (String name : empties) {
-                out.append("\\nl");
-                out.append(name);
+                out.write("\\nl");
+                out.write(name);
             }
         }
     }
     
-    void show(AbstractTypesetter out, String name) {
+    void show(ITypesetter out, String name) throws TruthError {
         ArrayList<ItemStack> ores = OreDictionary.getOres(name);
-        out.append("\\seg");
-        out.append(String.format("\\nl %s: ", name));
+        out.write("\\seg");
+        out.write(String.format("\\nl %s: ", name));
         for (ItemStack is : ores) {
-            out.emitWord(new ItemWord(is));
+            out.write(new ItemWord(is));
         }
-        out.append("\\endseg");
+        out.write("\\endseg");
     }
 }

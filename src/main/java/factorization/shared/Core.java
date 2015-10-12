@@ -200,7 +200,8 @@ public class Core {
         if (FMLCommonHandler.instance().getSide() == Side.CLIENT) {
             isMainClientThread.set(true);
         }
-        
+
+        DocumentationModule.setup();
         FMLInterModComms.sendMessage(Core.modId, "AddRecipeCategory", "Lacerator|factorization.oreprocessing.TileEntityGrinder|recipes");
         FMLInterModComms.sendMessage(Core.modId, "AddRecipeCategory", "Crystallizer|factorization.oreprocessing.TileEntityCrystallizer|recipes");
         FMLInterModComms.sendMessage(Core.modId, "AddRecipeCategory", "Slag Furnace|factorization.oreprocessing.TileEntitySlagFurnace$SlagRecipes|smeltingResults");
@@ -262,7 +263,9 @@ public class Core {
     public void registerServerCommands(FMLServerStartingEvent event) {
         isMainServerThread.set(true);
         serverStarted = true;
-        DocumentationModule.instance.serverStarts(event);
+        if (DocumentationModule.instance != null) {
+            DocumentationModule.instance.serverStarts(event);
+        }
         if (DeltaChunk.enabled()) {
             event.registerServerCommand(new BuildColossusCommand());
         }

@@ -3,9 +3,10 @@ package factorization.truth.gen;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
 import factorization.shared.Core;
-import factorization.truth.AbstractTypesetter;
 import factorization.truth.DocumentationModule;
 import factorization.truth.api.IDocGenerator;
+import factorization.truth.api.ITypesetter;
+import factorization.truth.api.TruthError;
 import factorization.truth.word.ItemWord;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.item.ItemStack;
@@ -16,7 +17,7 @@ import java.util.Map.Entry;
 
 public class ItemListViewer implements IDocGenerator {
     @Override
-    public void process(AbstractTypesetter sb, String arg) {
+    public void process(ITypesetter sb, String arg) throws TruthError {
         if (arg.equalsIgnoreCase("all")) {
             listAll(sb, null);
             return;
@@ -35,7 +36,7 @@ public class ItemListViewer implements IDocGenerator {
         }
     }
     
-    void listTabs(AbstractTypesetter sb) {
+    void listTabs(ITypesetter sb) throws TruthError {
         String ret = "";
         ret += "\\title{Item Categories}\n\n";
         ret += "\n\n\\link{cgi/items/all}{All Items}";
@@ -46,18 +47,18 @@ public class ItemListViewer implements IDocGenerator {
             String text = ct.getTabLabel();
             ret += "\\nl\\link{cgi/items/" + text + "}{" + Core.translateThis("itemGroup." + text) + "}";
         }
-        sb.process(ret, null, "");
+        sb.write(ret, null, "");
     }
     
-    void listAll(AbstractTypesetter sb, CreativeTabs ct) {
+    void listAll(ITypesetter out, CreativeTabs ct) throws TruthError {
         if (ct == null) {
-            sb.append("\\title{All Items}");
+            out.write("\\title{All Items}");
         } else {
             String title = ct.getTabLabel();
             title = Core.translateThis("itemGroup." + title);
-            sb.append("\\title{" + title + "}");
+            out.write("\\title{" + title + "}");
         }
-        sb.append("\n\n");
+        out.write("\n\n");
         int size = DocumentationModule.getNameItemCache().size();
         Multimap<String, ItemStack> found = HashMultimap.<String, ItemStack>create(size, 1);
         ArrayList<String> toSort = new ArrayList();
@@ -79,10 +80,10 @@ public class ItemListViewer implements IDocGenerator {
         for (String name : toSort) {
             for (ItemStack is : found.get(name)) {
                 if (is == null) continue;
-                sb.emitWord(new ItemWord(is));
-                sb.append(" ");
-                sb.emit(name, null);
-                sb.append("\n\n");
+                out.write(new ItemWord(is));
+                out.write(" ");
+                out.write(name, null);
+                out.write("\n\n");
             }
         }
     }

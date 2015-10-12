@@ -2,6 +2,7 @@ package factorization.truth.export;
 
 import factorization.shared.Core;
 import factorization.truth.DocumentationModule;
+import factorization.truth.api.TruthError;
 import factorization.util.PlayerUtil;
 import net.minecraft.command.ICommand;
 import net.minecraft.command.ICommandSender;
@@ -96,7 +97,10 @@ public class ExportHtml implements ICommand {
         try {
             HtmlConversionTypesetter conv = new HtmlConversionTypesetter("factorization", os, root);
             String text = DocumentationModule.readDocument("factorization", filename);
-            conv.processText(text);
+            conv.write(text);
+        } catch (TruthError truthError) {
+            out.println(truthError.getMessage());
+            truthError.printStackTrace();
         } finally {
             out.println("</body>");
             out.println("</html>");

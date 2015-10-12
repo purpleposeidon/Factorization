@@ -1,7 +1,5 @@
 package factorization.truth.api;
 
-import factorization.truth.AbstractTypesetter;
-
 public interface IDocGenerator {
-    void process(AbstractTypesetter out, String arg);
+    void process(ITypesetter out, String arg) throws TruthError;
 }

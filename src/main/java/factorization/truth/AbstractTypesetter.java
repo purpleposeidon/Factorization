@@ -1,7 +1,7 @@
 package factorization.truth;
 
 import com.google.common.base.Strings;
-import factorization.truth.api.ITypesetter;
+import factorization.truth.api.TruthError;
 import factorization.truth.word.TextWord;
 import factorization.truth.word.Word;
 import net.minecraft.client.gui.FontRenderer;
@@ -10,7 +10,7 @@ import net.minecraft.util.EnumChatFormatting;
 import java.util.ArrayList;
 import java.util.Locale;
 
-public abstract class AbstractTypesetter implements ITypesetter {
+public abstract class AbstractTypesetter implements factorization.truth.api.ITypesetter {
     // Super-awesome typesetter version π², by neptunepink
 
     final String domain;
@@ -28,45 +28,22 @@ public abstract class AbstractTypesetter implements ITypesetter {
         this.pageHeight = pageHeight;
     }
     
-    public void processText(String text) {
+    @Override
+    public void write(String text) throws TruthError {
+        write(text, null, "");
+    }
+
+    public void writeErrorMessage(String msg) {
         try {
-            process(text, null, "");
-        } catch (Throwable t) {
-            error("Failed to load document.");
-            t.printStackTrace();
+            write(msg.replace("\\", "\\\\ "), null, "" + EnumChatFormatting.RED + EnumChatFormatting.BOLD);
+        } catch (TruthError truthError) {
+            truthError.printStackTrace();
+            // Oh dear.
         }
-    }
-    
-    public void error(String msg) {
-        process(msg.replace("\\", "\\\\ "), null, "" + EnumChatFormatting.RED + EnumChatFormatting.BOLD);
     }
 
-    public String getParameter(final String cmdName, final Tokenizer tokenizer) {
-        if (!tokenizer.nextToken()) {
-            error("EOF looking for parameter for " + cmdName);
-            return null;
-        }
-        if (tokenizer.type != Tokenizer.TokenType.PARAMETER) {
-            error("Expected parameter for " + cmdName);
-            return null;
-        }
-        return tokenizer.token;
-    }
-
-    public String getOptionalParameter(final Tokenizer tokenizer) {
-        if (!tokenizer.nextToken()) return null;
-        if (tokenizer.type != Tokenizer.TokenType.PARAMETER) {
-            tokenizer.prevToken();
-            return null;
-        }
-        return tokenizer.token;
-    }
-    
-    public void append(final String text) {
-        process(text, null, "");
-    }
-    
-    public void process(final String text, final String link, final String style) {
+    @Override
+    public void write(final String text, final String link, final String style) throws TruthError {
         if (Strings.isNullOrEmpty(text)) return;
         final Tokenizer tokenizer = new Tokenizer(text);
         
@@ -75,26 +52,24 @@ public abstract class AbstractTypesetter implements ITypesetter {
             if (token.isEmpty()) continue;
             switch (tokenizer.type) {
             default:
-                error(tokenizer.token);
-                break;
+                throw new TruthError("Unknown tokentype: " + tokenizer.token);
             case WORD:
-                emit(style + token, link);
+                write(style + token, link);
                 break;
             case PARAMETER:
-                process(token, link, style);
+                write(token, link, style);
                 break;
             case COMMAND:
                 final String cmd = token.toLowerCase(Locale.ROOT);
                 if (cmd.equals("\\include")) {
-                    String name = getParameter(cmd, tokenizer);
+                    String name = tokenizer.getParameter("\\include{page name}");
                     if (name == null) {
-                        error("No page name specified");
-                        return;
+                        throw new TruthError("No page name specified");
                     }
                     String subtext = DocumentationModule.readDocument(domain, name);
-                    process(subtext, link, style);
+                    write(subtext, link, style);
                 } else if (cmd.equals("\\lmp")) {
-                    process("\\link{lmp}{LMP}", link, style);
+                    write("\\link{lmp}{LMP}", link, style);
                 } else {
                     handleCommand(tokenizer, cmd, link, style);
                 }
@@ -103,9 +78,10 @@ public abstract class AbstractTypesetter implements ITypesetter {
         }
     }
     
-    protected abstract void handleCommand(Tokenizer tokenizer, String cmd, String link, String style);
+    protected abstract void handleCommand(Tokenizer tokenizer, String cmd, String link, String style) throws TruthError;
     
-    public void emitWord(Word w) {
+    @Override
+    public void write(Word w) {
         WordPage page = getCurrentPage();
         int len = w.getWidth(font);
         if (len + page.lineLen > pageWidth) {
@@ -132,10 +108,9 @@ public abstract class AbstractTypesetter implements ITypesetter {
         page.add(w);
     }
     
-    public TextWord emit(String text, String link) {
-        TextWord w = new TextWord(text, link);
-        emitWord(w);
-        return w;
+    @Override
+    public void write(String text, String link) {
+        write(new TextWord(text, link));
     }
     
     WordPage current;

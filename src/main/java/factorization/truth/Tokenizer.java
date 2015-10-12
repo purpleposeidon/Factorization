@@ -1,8 +1,33 @@
 package factorization.truth;
 
+import factorization.truth.api.ITokenizer;
+import factorization.truth.api.TruthError;
+
 import static factorization.truth.Tokenizer.TokenType.*;
 
-public class Tokenizer {
+public class Tokenizer implements ITokenizer {
+
+    @Override
+    public String getParameter(String info) throws TruthError {
+        if (!nextToken()) {
+            throw new TruthError("EOF while reading parameter: " + info);
+        }
+        if (type != Tokenizer.TokenType.PARAMETER) {
+            throw new TruthError("Expected parameter, not " + type + ": " + info);
+        }
+        return token;
+    }
+
+    @Override
+    public String getOptionalParameter() {
+        if (!nextToken()) return null;
+        if (type != Tokenizer.TokenType.PARAMETER) {
+            prevToken();
+            return null;
+        }
+        return token;
+    }
+
     public enum TokenType {
         WORD, COMMAND, PARAMETER
     }

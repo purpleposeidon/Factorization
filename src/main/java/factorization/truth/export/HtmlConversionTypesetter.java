@@ -7,6 +7,7 @@ import factorization.truth.DocumentationModule;
 import factorization.truth.Tokenizer;
 import factorization.truth.api.DocReg;
 import factorization.truth.api.IDocGenerator;
+import factorization.truth.api.TruthError;
 import factorization.truth.word.ItemWord;
 import factorization.truth.word.TextWord;
 import factorization.truth.word.Word;
@@ -29,7 +30,7 @@ public class HtmlConversionTypesetter extends AbstractTypesetter {
     static String found_icon = null;
     
     @Override
-    protected void handleCommand(Tokenizer tokenizer, String cmd, String link, String style) {
+    protected void handleCommand(Tokenizer tokenizer, String cmd, String link, String style) throws TruthError {
         if (cmd.equals("\\p")) {
             s("<br>\n", link);
         } else if (cmd.equals("\\nl")) {
@@ -44,7 +45,7 @@ public class HtmlConversionTypesetter extends AbstractTypesetter {
             // NOP
         }  else if (cmd.equals("\\b") || cmd.equals("\\i") || cmd.equals("\\u") || cmd.equals("\\obf")) {
             char mode = cmd.charAt(1);
-            String content = getParameter(cmd, tokenizer);
+            String content = tokenizer.getParameter("styled text");
             if (content == null) return;
             String open, close;
             if (mode == 'b') {
@@ -60,92 +61,61 @@ public class HtmlConversionTypesetter extends AbstractTypesetter {
                 open = "<span class=\"mcobfuscated\">"; // Heh.
                 close = "</span>";
             } else {
-                error("Unknown style: " + cmd);
-                return;
+                throw new TruthError("Unknown style: " + cmd);
             }
             s(open, null);
-            process(content, link, style);
+            write(content, link, style);
             s(close, null);
         } else if (cmd.equals("\\title")) {
             s("\n\n<h1>", null);
-            String val = getParameter(cmd, tokenizer);
-            if (val == null) {
-                error("No content");
-                return;
-            }
-            process(val, link, style);
+            String val = tokenizer.getParameter("title text");
+            write(val, link, style);
             s("</h1>\n", null);
         } else if (cmd.equals("\\h1")) {
-            String val = getParameter(cmd, tokenizer);
-            if (val == null) {
-                error("No content");
-                return;
-            }
+            String val = tokenizer.getParameter("header text");
             s("<h2>", null);
-            process(val, link, style);
+            write(val, link, style);
             s("</h2>\n", null);
         } else if (cmd.equals("\\link") || cmd.equals("\\index")) {
-            String newLink = getParameter(cmd, tokenizer);
-            if (newLink == null) {
-                error("missing destination parameter");
-                return;
-            }
-            String content = getParameter(cmd, tokenizer);
-            if (content == null) {
-                error("missing content parameter");
-                return;
-            }
+            String newLink = tokenizer.getParameter("missing link destination parameter");
+            String content = tokenizer.getParameter("missing link content parameter");
             String ref = newLink;
             if (!newLink.contains("://")) {
                 ref = root + newLink + ".html";
             }
             s("<a href=\"" + ref + "\">", null);
-            process(content, newLink, style);
+            write(content, newLink, style);
             s("</a>", null);
             if (cmd.equals("\\index")) {
                 s("<br>\n", null);
             }
             ExportHtml.visitLink(newLink);
         } else if (cmd.equals("\\#")) {
-            String itemName = getParameter(cmd, tokenizer);
-            if (itemName == null) {
-                error("No item specified");
-                return;
-            }
+            String itemName = tokenizer.getParameter("No item specified");
             ArrayList<ItemStack> items = DocumentationModule.lookup(itemName);
             if (items == null) {
-                error(itemName + " no such item");
-                return;
+                throw new TruthError(itemName + " no such item");
             }
             // NOTE: This could miss items. Hrm.
             ItemStack theItem = items.get(0);
             putItem(theItem, link);
         } else if (cmd.equals("\\img")) {
-            String imgName = getParameter(cmd, tokenizer);
-            if (imgName == null) {
-                error("No img specified");
-                return;
-            }
+            String imgName = tokenizer.getParameter("No img specified");
             s("<img src=\"" + img(imgName) + "\" />", link);
         } else if (cmd.equals("\\imgx")) {
-            int width = Integer.parseInt(getParameter(cmd, tokenizer));
-            int height = Integer.parseInt(getParameter(cmd, tokenizer));
-            String imgName = getParameter(cmd, tokenizer);
-            if (imgName == null) {
-                error("No img specified");
-                return;
-            }
+            int width = Integer.parseInt(tokenizer.getParameter("img width"));
+            int height = Integer.parseInt(tokenizer.getParameter("img height"));
+            String imgName = tokenizer.getParameter("No img specified");
             s(String.format("<img width=%s height=%s src=\"%s\" />", width, height, img(imgName)), link);
         } else if (cmd.equals("\\figure")) {
             // Prooobably not going to implement this one ;)
-            String arg = getParameter(cmd, tokenizer);
+            tokenizer.getParameter("encoded figure");
         } else if (cmd.equals("\\generate")) {
-            String arg = getParameter(cmd, tokenizer);
+            String arg = tokenizer.getParameter("\\generate parameter");
             String args[] = arg.split("/", 2);
             IDocGenerator gen = DocReg.generators.get(args[0]);
             if (gen == null) {
-                error("\\generate{" + arg + "}: Not found: " + args[0]);
-                return;
+                throw new TruthError("\\generate{" + arg + "}: Not found: " + args[0]);
             }
             String rest = args.length > 1 ? args[1] : "";
             gen.process(this, rest);
@@ -154,30 +124,14 @@ public class HtmlConversionTypesetter extends AbstractTypesetter {
         } else if (cmd.equals("\\endseg")) {
             // NOP
         } else if (cmd.equals("\\topic")) {
-            String topic = getParameter(cmd, tokenizer);
-            if (topic == null) {
-                error("\\topic missing parameter");
-                return;
-            }
+            String topic = tokenizer.getParameter("topic name");
             String sub = String.format("\\newpage \\generate{recipes/for/%s}", topic);
-            append(sub);
+            write(sub);
         } else if (cmd.equals("\\checkmods")) {
             // Eh. Heh. Oh boy...
-            String mode = getParameter(cmd, tokenizer); // all some none
-            if (mode == null) {
-                error("\\checkmods missing parameter");
-                return;
-            }
-            String modList = getParameter(cmd, tokenizer); //craftguide NotEnoughItems
-            if (modList == null) {
-                error("\\checkmods missing parameter");
-                return;
-            }
-            String content = getParameter(cmd, tokenizer);
-            if (content == null) {
-                error("\\checkmods missing parameter");
-                return;
-            }
+            String mode = tokenizer.getParameter("mode (all|some|none)");
+            String modList = tokenizer.getParameter("space separated modID list");
+            String content = tokenizer.getParameter("content");
             int count = 0;
             String[] mods = modList.split(" ");
             for (String modId : mods) {
@@ -193,37 +147,31 @@ public class HtmlConversionTypesetter extends AbstractTypesetter {
             } else if (mode.equalsIgnoreCase("some") || mode.equalsIgnoreCase("any")) {
                 good = count > 1;
             } else {
-                error("\\checkmods first parameter must be 'all', 'none', or 'some', not " + mode);
-                return;
+                throw new TruthError("\\checkmods first parameter must be 'all', 'none', or 'some', not " + mode);
             }
-            String other = getParameter(cmd, tokenizer);
+            String other = tokenizer.getOptionalParameter();
             if (good) {
-                process(content, link, style);
+                write(content, link, style);
             } else if (other != null) {
-                process(other, link, style);
+                write(other, link, style);
             }
         } else if (cmd.equals("\\ifhtml")) {
-            String trueBranch = getParameter(cmd, tokenizer);
-            String falseBranch = getParameter(cmd, tokenizer);
-            process(trueBranch, link, style);
+            String trueBranch = tokenizer.getParameter("true branch");
+            tokenizer.getParameter("false branch");
+            write(trueBranch, link, style);
         } else if (cmd.equals("\\vpad")) {
-            getParameter(cmd, tokenizer);
+            tokenizer.getParameter("vpad amount");
         } else if (cmd.equals("\\-")) {
             s("<br> •", null);
         } else if (cmd.equals("\\url")) {
-            String url = getParameter(cmd, tokenizer);
-            String content = getParameter(cmd, tokenizer);
-            process(content, url, style);
+            String url = tokenizer.getParameter("url target");
+            String content = tokenizer.getParameter("link content");
+            write(content, url, style);
         } else if (cmd.equals("\\local")) {
-            String localizationKey = getParameter(cmd, tokenizer);
-            if (localizationKey == null) {
-                error("\\local missing parameter: localizationKey");
-                return;
-            }
+            String localizationKey = tokenizer.getParameter("localization key");
             s(Core.translate(localizationKey), link);
         } else {
-            error("Unknown command: ");
-            emit(cmd, null);
+            throw new TruthError("Unknown command " + cmd);
         }
     }
 
@@ -247,24 +195,23 @@ public class HtmlConversionTypesetter extends AbstractTypesetter {
         }
         return root + "resources/" + domain + "/textures/" + path;
     }
-    
+
     @Override
-    public void error(String msg) {
+    public void writeErrorMessage(String msg) {
         s("<span class=\"manualerror\">" + msg + "</s>", null);
     }
     
     @Override
-    public TextWord emit(String text, String link) {
+    public void write(String text, String link) {
         s(esc(text), link);
-        return null;
     }
 
     @Override
-    public void emitWord(Word w) {
+    public void write(Word w) {
         // LAMELY IMPLEMENTED! :O
         if (w instanceof TextWord) {
             TextWord tw = (TextWord) w;
-            emit(tw.text, tw.getLink());
+            write(tw.text, tw.getLink());
         } else if (w instanceof ItemWord) {
             ItemWord iw = (ItemWord) w;
             ItemStack is = iw.getItem();

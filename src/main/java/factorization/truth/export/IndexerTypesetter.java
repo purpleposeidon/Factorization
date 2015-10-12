@@ -4,6 +4,7 @@ package factorization.truth.export;
 import factorization.truth.AbstractTypesetter;
 import factorization.truth.Tokenizer;
 import factorization.truth.WordPage;
+import factorization.truth.api.TruthError;
 import factorization.truth.word.Word;
 
 public class IndexerTypesetter extends AbstractTypesetter {
@@ -19,20 +20,13 @@ public class IndexerTypesetter extends AbstractTypesetter {
     }
 
     @Override
-    protected void handleCommand(Tokenizer tokenizer, String cmd, String link, String style) {
+    protected void handleCommand(Tokenizer tokenizer, String cmd, String link, String style) throws TruthError {
         if (cmd.equalsIgnoreCase("\\topic")) {
-            String subject = getParameter(cmd, tokenizer);
-            if (subject == null) {
-                printError("Missing item name parameter");
-                return;
-            }
+            String subject = tokenizer.getParameter("topic item name");
             IndexDocumentation.foundTopic(subject, filename);
         } else if (cmd.equalsIgnoreCase("\\link") || cmd.equalsIgnoreCase("\\index")) {
-            String target = getParameter(cmd, tokenizer);
-            if (target == null) {
-                printError("Missing a link target");
-                return;
-            }
+            String target = tokenizer.getParameter("link target");
+            tokenizer.getParameter("link content");
             IndexDocumentation.foundLink(target);
         }
         
@@ -43,5 +37,5 @@ public class IndexerTypesetter extends AbstractTypesetter {
     public WordPage newPage() { return null; }
     
     @Override
-    public void emitWord(Word w) { }
+    public void write(Word w) { }
 }

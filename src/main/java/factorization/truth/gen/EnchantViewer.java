@@ -1,7 +1,8 @@
 package factorization.truth.gen;
 
-import factorization.truth.AbstractTypesetter;
 import factorization.truth.api.IDocGenerator;
+import factorization.truth.api.ITypesetter;
+import factorization.truth.api.TruthError;
 import factorization.truth.word.ItemWord;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.init.Blocks;
@@ -13,8 +14,8 @@ import java.util.ArrayList;
 public class EnchantViewer implements IDocGenerator {
 
     @Override
-    public void process(AbstractTypesetter out, String arg) {
-        ArrayList<ItemStack> all_items = new ArrayList(); // Yikes! :o
+    public void process(ITypesetter out, String arg) throws TruthError {
+        ArrayList<ItemStack> all_items = new ArrayList<ItemStack>(); // Yikes! :o
         for (Object obj : Item.itemRegistry) {
             if (obj instanceof Item) {
                 all_items.add(new ItemStack((Item) obj));
@@ -24,15 +25,15 @@ public class EnchantViewer implements IDocGenerator {
             if (ench == null) continue;
             int min = ench.getMinLevel();
             int max = ench.getMaxLevel();
-            out.append("\\seg");
-            out.append("\\nl \\b{" + ench.getTranslatedName(min) + "}");
-            out.append("\\nl " + ench.getClass().getSimpleName());
+            out.write("\\seg");
+            out.write("\\nl \\b{" + ench.getTranslatedName(min) + "}");
+            out.write("\\nl " + ench.getClass().getSimpleName());
             if (min != max) {
-                out.append("\\nl Potencies: " + min + " to " + max);
+                out.write("\\nl Potencies: " + min + " to " + max);
             }
-            out.append("\\nl");
+            out.write("\\nl");
             
-            ArrayList<ItemStack> can_enchant = new ArrayList();
+            ArrayList<ItemStack> can_enchant = new ArrayList<ItemStack>();
             for (ItemStack is : all_items) {
                 if (ench.canApplyAtEnchantingTable(is)) {
                     can_enchant.add(is);
@@ -40,7 +41,7 @@ public class EnchantViewer implements IDocGenerator {
             }
             listUsage(out, new ItemStack(Blocks.enchanting_table), can_enchant);
             
-            ArrayList<ItemStack> can_apply = new ArrayList();
+            ArrayList<ItemStack> can_apply = new ArrayList<ItemStack>();
             for (ItemStack is : all_items) {
                 if (ench.canApply(is)) {
                     can_apply.add(is);
@@ -49,20 +50,20 @@ public class EnchantViewer implements IDocGenerator {
             listUsage(out, new ItemStack(Blocks.anvil), can_apply);
             
             
-            out.append("\\endseg\\nl");
+            out.write("\\endseg\\nl");
         }
     }
     
-    void listUsage(AbstractTypesetter out, ItemStack tool, ArrayList<ItemStack> appliesTo) {
-        out.append("\\nl");
-        out.emitWord(new ItemWord(tool));
+    void listUsage(ITypesetter out, ItemStack tool, ArrayList<ItemStack> appliesTo) throws TruthError {
+        out.write("\\nl");
+        out.write(new ItemWord(tool));
         if (appliesTo.size() == 0) {
-            out.append(" ➤ Nothing");
+            out.write(" ➤ Nothing");
         } else {
-            out.append(" ➤");
-            out.emitWord(new ItemWord(appliesTo.toArray(new ItemStack[0])));
+            out.write(" ➤");
+            out.write(new ItemWord(appliesTo.toArray(new ItemStack[appliesTo.size()])));
         }
-        out.append("\\nl");
+        out.write("\\nl");
     }
 
 }

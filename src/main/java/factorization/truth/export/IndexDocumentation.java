@@ -2,7 +2,7 @@ package factorization.truth.export;
 
 import com.google.common.collect.ArrayListMultimap;
 import factorization.truth.DocumentationModule;
-import net.minecraft.client.resources.IReloadableResourceManager;
+import factorization.truth.api.TruthError;
 import net.minecraft.client.resources.IResource;
 import net.minecraft.client.resources.IResourceManager;
 import net.minecraft.client.resources.SimpleReloadableResourceManager;
@@ -91,7 +91,11 @@ public class IndexDocumentation {
             String link = pendingLinks.remove(0);
             String text = DocumentationModule.readDocument(domain, link);
             IndexerTypesetter ts = new IndexerTypesetter(domain, link);
-            ts.processText(text);
+            try {
+                ts.write(text);
+            } catch (TruthError truthError) {
+                truthError.printStackTrace();
+            }
         }
         
         for (Entry<String, String> entry : index.entries()) {

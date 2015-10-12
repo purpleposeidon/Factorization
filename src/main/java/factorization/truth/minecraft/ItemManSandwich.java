@@ -47,7 +47,7 @@ public class ItemManSandwich extends ItemFood implements IManwich {
         manwhichStatus = new StatBase(n, new ChatComponentTranslation(n)).registerStat();
         setMaxStackSize(1);
         setHasSubtypes(true);
-        DocReg.assembleManwich(this);
+        DocReg.registerManwich(this);
     }
 
     @Override

@@ -1,8 +1,9 @@
 package factorization.truth.gen;
 
 import cpw.mods.fml.relauncher.ReflectionHelper;
-import factorization.truth.AbstractTypesetter;
 import factorization.truth.api.IDocGenerator;
+import factorization.truth.api.ITypesetter;
+import factorization.truth.api.TruthError;
 import factorization.truth.word.ItemWord;
 import net.minecraft.util.WeightedRandomChestContent;
 import net.minecraftforge.common.ChestGenHooks;
@@ -15,25 +16,25 @@ import java.util.Map;
 public class TreasureViewer implements IDocGenerator {
 
     @Override
-    public void process(AbstractTypesetter out, String arg) {
+    public void process(ITypesetter out, String arg) throws TruthError {
         Map<String, ChestGenHooks> chestHooks = ReflectionHelper.<Map<String, ChestGenHooks>, ChestGenHooks>getPrivateValue(ChestGenHooks.class, null, "chestInfo");
-        ArrayList<String> names = new ArrayList(chestHooks.keySet());
+        ArrayList<String> names = new ArrayList<String>(chestHooks.keySet());
         Collections.sort(names);
         for (String chestName : names) {
             ChestGenHooks hook = chestHooks.get(chestName);
-            ArrayList<WeightedRandomChestContent> content = ReflectionHelper.<ArrayList<WeightedRandomChestContent>, ChestGenHooks>getPrivateValue(ChestGenHooks.class, hook, "contents");
+            ArrayList<WeightedRandomChestContent> content = ReflectionHelper.getPrivateValue(ChestGenHooks.class, hook, "contents");
             if (content == null || content.isEmpty()) continue;
-            content = new ArrayList(content);
+            content = new ArrayList<WeightedRandomChestContent>(content);
             Collections.sort(content, new Comparator<WeightedRandomChestContent>() {
                 @Override
                 public int compare(WeightedRandomChestContent a, WeightedRandomChestContent b) {
                     return b.itemWeight - a.itemWeight;
                 }
             });
-            out.append("\\newpage \\title{Treasure: " + chestName + "}");
+            out.write("\\newpage \\title{Treasure: " + chestName + "}");
             boolean can_blob = false;
             for (WeightedRandomChestContent item : content) {
-                if (!can_blob) out.append("\\p");
+                if (!can_blob) out.write("\\p");
                 String descr = null;
                 if (item.theMinimumChanceToGenerateItem == item.theMaximumChanceToGenerateItem) {
                     if (item.theMinimumChanceToGenerateItem != 1) {
@@ -44,14 +45,14 @@ public class TreasureViewer implements IDocGenerator {
                 }
                 if (descr == null) {
                     can_blob = true;
-                    out.emitWord(new ItemWord(item.theItemId));
+                    out.write(new ItemWord(item.theItemId));
                 } else {
                     if (can_blob) {
                         can_blob = false;
-                        out.append("\\p");
+                        out.write("\\p");
                     }
-                    out.emitWord(new ItemWord(item.theItemId));
-                    out.append(descr);
+                    out.write(new ItemWord(item.theItemId));
+                    out.write(descr);
                 }
             }
         }

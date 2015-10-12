@@ -3,19 +3,19 @@ package factorization.truth.gen;
 import cpw.mods.fml.common.Loader;
 import cpw.mods.fml.common.ModContainer;
 import cpw.mods.fml.common.versioning.ArtifactVersion;
-import factorization.truth.AbstractTypesetter;
 import factorization.truth.api.IDocGenerator;
+import factorization.truth.api.ITypesetter;
+import factorization.truth.api.TruthError;
 
 public class ModDependViewer implements IDocGenerator {
     @Override
-    public void process(AbstractTypesetter out, String arg) {
+    public void process(ITypesetter out, String arg) throws TruthError {
         if ("".equals(arg)) listMods(out);
         else showMod(out, arg);
     }
 
-    private void showMod(AbstractTypesetter out, String arg) {
+    private void showMod(ITypesetter out, String arg) throws TruthError {
         ModContainer mod = null;
-        String humanName;
         for (ModContainer it : Loader.instance().getActiveModList()) {
             if (it.getModId().equals(arg)) {
                 mod = it;
@@ -23,31 +23,31 @@ public class ModDependViewer implements IDocGenerator {
             }
         }
         if (mod == null) {
-            out.append("Mod not found: " + arg);
+            out.write("Mod not found: " + arg);
             return;
         }
-        out.append(String.format("\\title{%s}\n\n", mod.getName()));
-        out.append("Modid: " + arg + "\n\n");
+        out.write(String.format("\\title{%s}\n\n", mod.getName()));
+        out.write("Modid: " + arg + "\n\n");
         if (!mod.getDependencies().isEmpty()) {
-            out.append("\\b{Dependencies}\n\n");
+            out.write("\\b{Dependencies}\n\n");
             for (ArtifactVersion version : mod.getDependencies()) {
                 String link = String.format("\\link{cgi/mods/%s}{%s}", version.getLabel(), version.getLabel());
-                out.append(link + ": " + version.getRangeString() + "\\nl");
+                out.write(link + ": " + version.getRangeString() + "\\nl");
             }
         }
         if (!mod.getDependants().isEmpty()) {
-            out.append("\\b{Dependents}\n\n");
+            out.write("\\b{Dependents}\n\n");
             for (ArtifactVersion version : mod.getDependants()) {
                 String link = String.format("\\link{cgi/mods/%s}{%s}", version.getLabel(), version.getLabel());
-                out.append(link + ": " + version.getRangeString() + "\\nl");
+                out.write(link + ": " + version.getRangeString() + "\\nl");
             }
         }
     }
 
-    private void listMods(AbstractTypesetter out) {
-        out.append("\\title{Installed Mods}\n\n");
+    private void listMods(ITypesetter out) throws TruthError {
+        out.write("\\title{Installed Mods}\n\n");
         for (ModContainer mod : Loader.instance().getActiveModList()) {
-            out.append(String.format("\\link{cgi/mods/%s}{%s}\n\n", mod.getModId(), mod.getName()));
+            out.write(String.format("\\link{cgi/mods/%s}{%s}\n\n", mod.getModId(), mod.getName()));
         }
     }
 }
