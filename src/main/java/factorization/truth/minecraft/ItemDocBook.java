@@ -9,6 +9,7 @@ import factorization.shared.Core.TabType;
 import factorization.shared.ItemFactorization;
 import factorization.truth.DocViewer;
 import factorization.truth.DocumentationModule;
+import factorization.truth.api.DocReg;
 import factorization.truth.api.IDocBook;
 import factorization.util.FzUtil;
 import net.minecraft.client.Minecraft;
@@ -22,7 +23,7 @@ public class ItemDocBook extends ItemFactorization implements IDocBook {
         super(name, tabType);
         setMaxStackSize(1);
         if (FMLCommonHandler.instance().getSide() == Side.CLIENT) {
-            DocumentationModule.indexed_domains.add(getDocumentationDomain());
+            DocReg.indexed_domains.add(getDocumentationDomain());
         }
     }
     

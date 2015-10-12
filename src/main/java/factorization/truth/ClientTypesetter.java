@@ -1,6 +1,7 @@
 package factorization.truth;
 
 import cpw.mods.fml.common.Loader;
+import factorization.truth.api.DocReg;
 import factorization.truth.api.IDocGenerator;
 import factorization.truth.word.*;
 import factorization.util.DataUtil;
@@ -211,7 +212,7 @@ public class ClientTypesetter extends AbstractTypesetter {
         } else if (cmd.equals("\\generate")) {
             String arg = getParameter(cmd, tokenizer);
             String args[] = arg.split("/", 2);
-            IDocGenerator gen = DocumentationModule.generators.get(args[0]);
+            IDocGenerator gen = DocReg.generators.get(args[0]);
             if (gen == null) {
                 error("\\generate{" + arg + "}: Not found: " + args[0]);
                 return;

@@ -4,7 +4,7 @@ import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import factorization.shared.Core;
-import factorization.truth.DocumentationModule;
+import factorization.truth.api.DocReg;
 import factorization.truth.api.IManwich;
 import factorization.util.EvilUtil;
 import factorization.util.ItemUtil;
@@ -47,7 +47,7 @@ public class ItemManSandwich extends ItemFood implements IManwich {
         manwhichStatus = new StatBase(n, new ChatComponentTranslation(n)).registerStat();
         setMaxStackSize(1);
         setHasSubtypes(true);
-        DocumentationModule.assembleManwich(this);
+        DocReg.assembleManwich(this);
     }
 
     @Override

@@ -11,8 +11,8 @@ import factorization.common.FzConfig;
 import factorization.coremodhooks.HookTargetsClient;
 import factorization.coremodhooks.UnhandledGuiKeyEvent;
 import factorization.shared.Core;
+import factorization.truth.api.DocReg;
 import factorization.truth.api.IDocBook;
-import factorization.truth.api.IDocGenerator;
 import factorization.truth.api.IManwich;
 import factorization.truth.export.ExportHtml;
 import factorization.truth.gen.*;
@@ -45,8 +45,7 @@ import java.util.zip.GZIPOutputStream;
 
 public class DocumentationModule {
     public static final DocumentationModule instance = new DocumentationModule();
-    public static final HashMap<String, IDocGenerator> generators = new HashMap<String, IDocGenerator>();
-    
+
     static HashMap<String, ArrayList<ItemStack>> nameCache = null;
     
     public static ArrayList<ItemStack> lookup(String name) {
@@ -88,11 +87,7 @@ public class DocumentationModule {
             }
         }
     }
-    
-    public static void registerGenerator(String name, IDocGenerator gen) {
-        generators.put(name, gen);
-    }
-    
+
     public void serverStarts(FMLServerStartingEvent event) {
         if (FMLCommonHandler.instance().getSide() == Side.CLIENT) {
             if (Core.dev_environ || Boolean.getBoolean("fz.registerDocCommands")) {
@@ -218,23 +213,13 @@ public class DocumentationModule {
         tryOpenBookForItem(stack);
     }
 
-    public static String default_lookup_domain = "factorization";
-    public static String default_recipe_domain = "factorization";
-    public static final ArrayList<String> indexed_domains = new ArrayList<String>();
-
-
-    public static final ArrayList<IManwich> manwiches = new ArrayList<IManwich>();
-
-    public static void assembleManwich(IManwich freshManwich) {
-        manwiches.add(freshManwich);
-    }
 
     @SideOnly(Side.CLIENT)
     public static boolean tryOpenBookForItem(ItemStack is) {
         Minecraft mc = Minecraft.getMinecraft();
         EntityPlayer player = mc.thePlayer;
         if (player == null) return false;
-        String found_domain = default_lookup_domain;
+        String found_domain = DocReg.default_lookup_domain;
         boolean found = PlayerUtil.isPlayerCreative(player)
                 || !FzConfig.require_book_for_manual;
         if (!found) {
@@ -249,7 +234,7 @@ public class DocumentationModule {
         }
         if (!found) {
             IManwich first = null;
-            for (IManwich manwich : manwiches) {
+            for (IManwich manwich : DocReg.manwiches) {
                 if (first == null) first = manwich;
                 if (manwich.hasManual(player) > 0) {
                     found = true;
@@ -269,7 +254,7 @@ public class DocumentationModule {
             return true;
         }
         String name = is.getUnlocalizedName();
-        for (String domain : indexed_domains) {
+        for (String domain : DocReg.indexed_domains) {
             InputStream topic_index = getDocumentResource(domain, "topic_index");
             if (topic_index == null) return false;
             BufferedReader br = new BufferedReader(new InputStreamReader(topic_index));
@@ -294,22 +279,22 @@ public class DocumentationModule {
                 FzUtil.closeNoisily("closing topic_index", topic_index);
             }
         }
-        mc.displayGuiScreen(new DocViewer(default_recipe_domain, "cgi/recipes/" + name));
+        mc.displayGuiScreen(new DocViewer(DocReg.default_recipe_domain, "cgi/recipes/" + name));
         return true;
     }
     
     static {
-        registerGenerator("items", new ItemListViewer());
-        registerGenerator("recipes", new RecipeViewer());
-        registerGenerator("enchants", new EnchantViewer());
-        registerGenerator("treasure", new TreasureViewer());
-        registerGenerator("biomes", new BiomeViewer());
-        registerGenerator("fluids", new FluidViewer());
-        registerGenerator("oredictionary", new OreDictionaryViewer());
-        registerGenerator("mods", new ModDependViewer());
-        registerGenerator("worldgen", new WorldgenViewer());
-        registerGenerator("eventbus", new EventbusViewer());
-        registerGenerator("tesrs", new TesrViewer());
+        DocReg.registerGenerator("items", new ItemListViewer());
+        DocReg.registerGenerator("recipes", new RecipeViewer());
+        DocReg.registerGenerator("enchants", new EnchantViewer());
+        DocReg.registerGenerator("treasure", new TreasureViewer());
+        DocReg.registerGenerator("biomes", new BiomeViewer());
+        DocReg.registerGenerator("fluids", new FluidViewer());
+        DocReg.registerGenerator("oredictionary", new OreDictionaryViewer());
+        DocReg.registerGenerator("mods", new ModDependViewer());
+        DocReg.registerGenerator("worldgen", new WorldgenViewer());
+        DocReg.registerGenerator("eventbus", new EventbusViewer());
+        DocReg.registerGenerator("tesrs", new TesrViewer());
         if (FMLCommonHandler.instance().getSide() == Side.CLIENT) {
             Core.loadBus(new DocKeyListener());
         }
@@ -320,6 +305,8 @@ public class DocumentationModule {
 
         @SubscribeEvent
         public void keyPress(UnhandledGuiKeyEvent event) {
+            // Except NEI's keys might be configurable.
+            // TODO: Make these keys configurable tho
             if (event.chr == '?') {
                 DocumentationModule.openPageForHilightedItem();
             } else if ((event.chr == 'r' || event.chr == 'R') && !hasNei) {

@@ -4,6 +4,7 @@ import cpw.mods.fml.common.event.FMLInterModComms.IMCMessage;
 import factorization.shared.Core;
 import factorization.truth.AbstractTypesetter;
 import factorization.truth.DocumentationModule;
+import factorization.truth.api.DocReg;
 import factorization.truth.api.IDocGenerator;
 import factorization.truth.api.IObjectWriter;
 import factorization.truth.word.ItemWord;
@@ -148,8 +149,7 @@ public class RecipeViewer implements IDocGenerator, IObjectWriter<Object> {
             t.printStackTrace();
         }
     }
-    
-    static TreeMap<String, Iterable> customRecipes = new TreeMap<String, Iterable>();
+
     public static void handleImc(IMCMessage message) throws ClassNotFoundException, NoSuchFieldException, IllegalAccessException {
         if (!message.key.equals("AddRecipeCategory")) return;
         String[] cmd = message.getStringValue().split("\\|");
@@ -174,15 +174,13 @@ public class RecipeViewer implements IDocGenerator, IObjectWriter<Object> {
             }
             if (found != null) {
                 obj = found;
-            } else {
-                return;
             }
         }
         if (obj instanceof Map) {
             obj = ((Map) obj).entrySet();
         }
         if (obj instanceof Iterable) {
-            customRecipes.put(key, (Iterable) obj);
+            DocReg.registerRecipeList(key, (Iterable) obj);
         } else {
             Core.logWarning("Unable to load recipe list provided by IMC message, obtained object is neither Iterable nor Map: " + message.getStringValue());
         }
@@ -197,7 +195,7 @@ public class RecipeViewer implements IDocGenerator, IObjectWriter<Object> {
         }
         putCategory("Ore Dictionary", ores.entrySet());
         
-        for (Entry<String, Iterable> entry : customRecipes.entrySet()) {
+        for (Entry<String, Iterable> entry : DocReg.customRecipes.entrySet()) {
             putCategory(entry.getKey(), entry.getValue());
         }
     }

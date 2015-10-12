@@ -5,6 +5,7 @@ import factorization.shared.Core;
 import factorization.truth.AbstractTypesetter;
 import factorization.truth.DocumentationModule;
 import factorization.truth.Tokenizer;
+import factorization.truth.api.DocReg;
 import factorization.truth.api.IDocGenerator;
 import factorization.truth.word.ItemWord;
 import factorization.truth.word.TextWord;
@@ -141,7 +142,7 @@ public class HtmlConversionTypesetter extends AbstractTypesetter {
         } else if (cmd.equals("\\generate")) {
             String arg = getParameter(cmd, tokenizer);
             String args[] = arg.split("/", 2);
-            IDocGenerator gen = DocumentationModule.generators.get(args[0]);
+            IDocGenerator gen = DocReg.generators.get(args[0]);
             if (gen == null) {
                 error("\\generate{" + arg + "}: Not found: " + args[0]);
                 return;
