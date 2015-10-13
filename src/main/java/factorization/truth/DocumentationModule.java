@@ -91,8 +91,8 @@ public class DocumentationModule implements factorization.truth.api.IDocModule {
         reg("newpage", new CmdNewpage());
         reg("leftpage", new CmdLeftpage());
         reg("b", new CmdStyle(EnumChatFormatting.BOLD, "b"));
-        reg("i", new CmdStyle(EnumChatFormatting.BOLD, "i"));
-        reg("u", new CmdStyle(EnumChatFormatting.BOLD, "u"));
+        reg("i", new CmdStyle(EnumChatFormatting.ITALIC, "i"));
+        reg("u", new CmdStyle(EnumChatFormatting.UNDERLINE, "u"));
         reg("title", new CmdTitle());
         reg("h1", new CmdHeader());
         reg("link", new CmdLink(false));
@@ -109,6 +109,7 @@ public class DocumentationModule implements factorization.truth.api.IDocModule {
         reg("ifhtml", new CmdIfHtml());
         reg("url", new CmdUrl());
         reg("local", new CmdLocal());
+        reg("for", new CmdFor());
     }
 
     static HashMap<String, ArrayList<ItemStack>> nameCache = null;
@@ -367,10 +368,15 @@ public class DocumentationModule implements factorization.truth.api.IDocModule {
     }
 
     public static void handleImc(FMLInterModComms.IMCMessage message) throws ClassNotFoundException, NoSuchFieldException, IllegalAccessException {
-        if (!message.key.equals("SetDocVar")) return;
-        String[] parts = message.key.split(":", 1);
+        if (!message.key.equals("DocVar")) return;
+        String[] parts = message.key.split("=", 1);
         String key = parts[0];
         String val = parts[1];
-        DocReg.setVariable(key, val);
+        if (key.endsWith("+")) {
+            key = key.replace("+", "");
+            DocReg.appendVariable(key, val);
+        } else {
+            DocReg.setVariable(key, val);
+        }
     }
 }

@@ -28,7 +28,6 @@ public class ItemWord extends Word {
     }
 
     public ItemWord(ItemStack is) {
-        super();
         this.is = is;
         cleanWildlings();
     }
@@ -41,7 +40,12 @@ public class ItemWord extends Word {
     public ItemWord(Collection<ItemStack> entries) {
         this(entries.toArray(new ItemStack[entries.size()]));
     }
-    
+
+    public void setDefaultLink() {
+        if (is != null) setLink(getDefaultHyperlink(is));
+        else if (entries != null) setLink(getDefaultHyperlink(entries));
+    }
+
     static String getDefaultHyperlink(ItemStack is) {
         if (is == null) return null;
         if (is.getItem() == null) {

@@ -13,6 +13,7 @@ import net.minecraft.item.ItemStack;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.Map.Entry;
 
 public class ItemListViewer implements IDocGenerator {
@@ -75,7 +76,7 @@ public class ItemListViewer implements IDocGenerator {
                 found.put(name, is);
             }
         }
-        Collections.sort(toSort);
+        Collections.sort(toSort, String.CASE_INSENSITIVE_ORDER);
         
         for (String name : toSort) {
             for (ItemStack is : found.get(name)) {

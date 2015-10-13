@@ -7,6 +7,7 @@ import factorization.truth.word.Word;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumChatFormatting;
+import net.minecraft.util.StringUtils;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -31,10 +32,16 @@ public class ClientTypesetter extends AbstractTypesetter implements IClientTypes
 
     @Override
     public void write(Word w) {
-        if (active_link != null && w.getLink() == null) {
-            w.setLink(active_link);
+        if (w.getLink() == null) {
+            if (active_link != null) {
+                w.setLink(active_link);
+            } else if (w instanceof ItemWord) {
+                ((ItemWord) w).setDefaultLink();
+            }
         }
-        w.setStyle(active_style);
+        if (!StringUtils.isNullOrEmpty(active_style)) {
+            w.setStyle(active_style);
+        }
 
         WordPage page = getCurrentPage();
         int len = w.getWidth(font);
@@ -126,7 +133,7 @@ public class ClientTypesetter extends AbstractTypesetter implements IClientTypes
     @Override
     public void writeErrorMessage(String msg) {
         try {
-            write(msg.replace("\\", "\\\\ "), null, "" + EnumChatFormatting.RED + EnumChatFormatting.BOLD);
+            write(msg.replace("\\", "\\\\ "), null, "" + EnumChatFormatting.RED);
         } catch (TruthError truthError) {
             truthError.printStackTrace();
             // Oh dear.

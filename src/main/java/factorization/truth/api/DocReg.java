@@ -53,6 +53,15 @@ public class DocReg {
         return ret;
     }
 
+    public static void appendVariable(String name, String value) {
+        String orig = getVariable(name);
+        if (orig.isEmpty()) {
+            setVariable(name, value);
+        } else {
+            setVariable(name, orig + "\n" + value);
+        }
+    }
+
     /**
      * This object is able to open the book. It may be null, particularly on servers.
      */
