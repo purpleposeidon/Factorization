@@ -7,7 +7,7 @@ import net.minecraft.client.gui.FontRenderer;
 import java.util.ArrayList;
 
 public class WordPage extends AbstractPage {
-    ArrayList<ArrayList<Word>> text = new ArrayList<ArrayList<Word>>();
+    public ArrayList<ArrayList<Word>> text = new ArrayList<ArrayList<Word>>();
     public static int TEXT_HEIGHT = 9;
     int lineLen = 0;
     FontRenderer font;
@@ -35,7 +35,7 @@ public class WordPage extends AbstractPage {
         }
     }
     
-    void nl() {
+    public void nl() {
         ArrayList<Word> newLine = new ArrayList<Word>();
         newLine.add(new TextWord("", null));
         text.add(newLine);

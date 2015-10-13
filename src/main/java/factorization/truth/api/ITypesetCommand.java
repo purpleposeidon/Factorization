@@ -1,10 +1,6 @@
 package factorization.truth.api;
 
-import factorization.truth.TypesetCommands;
-
-/**
- * @see TypesetCommands
- */
 public interface ITypesetCommand {
-    void handle(ITypesetter out);
+    void callClient(ITypesetter out, ITokenizer tokenizer) throws TruthError;
+    void callHTML(ITypesetter out, ITokenizer tokenizer) throws TruthError;
 }

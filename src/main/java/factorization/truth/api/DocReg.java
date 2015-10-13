@@ -1,5 +1,7 @@
 package factorization.truth.api;
 
+import net.minecraft.util.StringUtils;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.TreeMap;
@@ -36,6 +38,20 @@ public class DocReg {
         commands.put(name, cmd);
     }
 
+    public static void setVariable(String name, String value) {
+        if (StringUtils.isNullOrEmpty(value)) {
+            doc_vars.remove(name);
+        } else {
+            doc_vars.put(name, value);
+        }
+    }
+
+    public static String getVariable(String name) {
+        String ret = doc_vars.get(name);
+        if (ret == null) return "";
+        return ret;
+    }
+
     /**
      * This object is able to open the book. It may be null, particularly on servers.
      */
@@ -48,4 +64,5 @@ public class DocReg {
     public static final ArrayList<IManwich> manwiches = new ArrayList<IManwich>();
     public static final TreeMap<String, Iterable> customRecipes = new TreeMap<String, Iterable>();
     public static final HashMap<String, ITypesetCommand> commands = new HashMap<String, ITypesetCommand>();
+    public static final HashMap<String, String> doc_vars = new HashMap<String, String>();
 }

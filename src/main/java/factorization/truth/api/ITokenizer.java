@@ -10,7 +10,7 @@ public interface ITokenizer {
     String getParameter(String info) throws TruthError;
 
     /**
-     * @return either null or the text of a following parameter.
+     * @return null or the text of a following parameter.
      */
     String getOptionalParameter();
 }

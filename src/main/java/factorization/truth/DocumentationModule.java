@@ -3,6 +3,8 @@ package factorization.truth;
 import com.google.common.io.Closeables;
 import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.Loader;
+import cpw.mods.fml.common.ModContainer;
+import cpw.mods.fml.common.event.FMLInterModComms;
 import cpw.mods.fml.common.event.FMLServerStartingEvent;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import cpw.mods.fml.relauncher.Side;
@@ -62,6 +64,10 @@ public class DocumentationModule implements factorization.truth.api.IDocModule {
         DocReg.registerGenerator("tesrs", new TesrViewer());
         if (FMLCommonHandler.instance().getSide() == Side.CLIENT) {
             Core.loadBus(new DocKeyListener());
+        }
+
+        for (ModContainer mod : Loader.instance().getActiveModList()) {
+            DocReg.setVariable("mod:" + mod.getModId(), mod.getName());
         }
     }
 
@@ -318,5 +324,13 @@ public class DocumentationModule implements factorization.truth.api.IDocModule {
                 DocReg.module.openPageForHilightedItem();
             }
         }
+    }
+
+    public static void handleImc(FMLInterModComms.IMCMessage message) throws ClassNotFoundException, NoSuchFieldException, IllegalAccessException {
+        if (!message.key.equals("SetDocVar")) return;
+        String[] parts = message.key.split(":", 1);
+        String key = parts[0];
+        String val = parts[1];
+        DocReg.setVariable(key, val);
     }
 }

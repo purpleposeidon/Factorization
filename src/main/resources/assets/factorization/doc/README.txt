@@ -25,10 +25,10 @@ Commands:
         Use /f copylocalkey to get the localization key of an item.
 \img{domain:path/to/image.png}
         Embeds an image. Scaled to fit. The paths used for images are ResourceLocations.
-\imgx{width}{height}{domain:path/to/image.png}
-        Embeds an image, using the provided width and height (untested)
-\img%{domain:path/to/image.png}{0.50 or something}
+\img{domain:path/to/image.png}{0.50 or something}
         Embeds an image that's been scaled down (Untested)
+\img{width}{height}{domain:path/to/image.png}
+        Embeds an image, using the provided width and height (untested)
 \figure{<base64-encoded compressed NBT data>}
         Embeds a figure.
         Figures are created by standing on a pillar made of gold blocks, with two gold block extensions at the base of the figure, and running the /fzdoc-serialize command.

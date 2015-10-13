@@ -22,7 +22,7 @@ public class FigurePage extends AbstractPage {
     double rotationX = 90+45, rotationY = 45;
     int display_list = -1;
     
-    FigurePage(DocWorld figure) {
+    public FigurePage(DocWorld figure) {
         this.figure = figure;
         eyeball = new EntityLiving(figure) {};
     }

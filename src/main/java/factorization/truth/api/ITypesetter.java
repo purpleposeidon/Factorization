@@ -30,4 +30,15 @@ public interface ITypesetter {
      *             NORELEASE: delete?
      */
     void write(String text, String link);
+
+    /**
+     * Write HTML; use for HTML exporting.
+     * @param text Some HTML.
+     *             NORELEASE: ditch getInfo(); have this be just the top two methods; add IClientTypesetter && IHtmlTypesetter; bless InternalCmd
+     */
+    void html(String text);
+
+    TypesetInfo getInfo();
+
+    String getVariable(String name);
 }

@@ -18,8 +18,8 @@ import java.io.InputStream;
 import java.util.HashMap;
 
 public class ImgWord extends Word {
-    final ResourceLocation resource;
-    int width = 12, height = 12;
+    public final ResourceLocation resource;
+    public int width = 12, height = 12;
     public ImgWord(ResourceLocation resource, String hyperlink) {
         super(hyperlink);
         this.resource = resource;

@@ -1,6 +1,7 @@
 package factorization.truth;
 
 import com.google.common.base.Strings;
+import factorization.truth.api.DocReg;
 import factorization.truth.api.TruthError;
 import factorization.truth.word.TextWord;
 import factorization.truth.word.Word;
@@ -15,11 +16,11 @@ public abstract class AbstractTypesetter implements factorization.truth.api.ITyp
 
     final String domain;
     final FontRenderer font;
-    final int pageWidth, pageHeight;
+    public final int pageWidth, pageHeight;
     
-    protected ArrayList<AbstractPage> pages = new ArrayList<AbstractPage>();
+    public ArrayList<AbstractPage> pages = new ArrayList<AbstractPage>();
     private ArrayList<AbstractPage> afterBuffer = new ArrayList<AbstractPage>();
-    protected ArrayList<Word> segmentStart = null;
+    public ArrayList<Word> segmentStart = null;
     
     public AbstractTypesetter(String domain, FontRenderer font, int pageWidth, int pageHeight) {
         this.domain = domain;
@@ -61,18 +62,7 @@ public abstract class AbstractTypesetter implements factorization.truth.api.ITyp
                 break;
             case COMMAND:
                 final String cmd = token.toLowerCase(Locale.ROOT);
-                if (cmd.equals("\\include")) {
-                    String name = tokenizer.getParameter("\\include{page name}");
-                    if (name == null) {
-                        throw new TruthError("No page name specified");
-                    }
-                    String subtext = DocumentationModule.readDocument(domain, name);
-                    write(subtext, link, style);
-                } else if (cmd.equals("\\lmp")) {
-                    write("\\link{lmp}{LMP}", link, style);
-                } else {
-                    handleCommand(tokenizer, cmd, link, style);
-                }
+                handleCommand(tokenizer, cmd, link, style);
                 break;
             }
         }
@@ -138,5 +128,10 @@ public abstract class AbstractTypesetter implements factorization.truth.api.ITyp
     public ArrayList<AbstractPage> getPages() {
         emptyBuffer();
         return pages;
+    }
+
+    @Override
+    public String getVariable(String name) {
+        return DocReg.getVariable(name);
     }
 }
