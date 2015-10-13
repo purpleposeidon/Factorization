@@ -13,7 +13,6 @@ Commands:
 \b{content}
 \i{content}
 \u{content}
-\obf{content}
         Apply text stylings to the content.
 \title  Emit a title
 \h1     Emit a header
