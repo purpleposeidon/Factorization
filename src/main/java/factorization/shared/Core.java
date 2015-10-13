@@ -30,14 +30,14 @@ import factorization.compat.CompatModuleLoader;
 import factorization.coremod.AtVerifier;
 import factorization.coremod.LoadingPlugin;
 import factorization.darkiron.BlockDarkIronOre;
-import factorization.truth.minecraft.DistributeDocs;
-import factorization.truth.DocumentationModule;
-import factorization.truth.gen.recipe.RecipeViewer;
 import factorization.fzds.DeltaChunk;
 import factorization.fzds.Hammer;
 import factorization.mechanics.MechanismsFeature;
 import factorization.oreprocessing.FactorizationOreProcessingHandler;
 import factorization.servo.ServoMotor;
+import factorization.truth.DocumentationModule;
+import factorization.truth.gen.recipe.RecipeViewer;
+import factorization.truth.minecraft.DistributeDocs;
 import factorization.util.DataUtil;
 import factorization.util.FzUtil;
 import factorization.weird.EntityMinecartDayBarrel;
@@ -54,7 +54,6 @@ import net.minecraft.init.Blocks;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.launchwrapper.Launch;
-import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.*;
 import net.minecraftforge.common.MinecraftForge;
 import org.apache.logging.log4j.LogManager;
@@ -239,6 +238,7 @@ public class Core {
         for (IMCMessage message : event.getMessages()) {
             try {
                 RecipeViewer.handleImc(message);
+                DocumentationModule.handleImc(message);
             } catch (Throwable t) {
                 t.printStackTrace();
             }
