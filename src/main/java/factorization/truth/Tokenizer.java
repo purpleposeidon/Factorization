@@ -113,12 +113,22 @@ public class Tokenizer implements ITokenizer {
         final int start = scan;
         while (true) {
             scan++;
-            if (scan >= src.length() ) {
+            if (scan >= src.length()) {
                 break;
             }
             char c = src.charAt(scan);
             if (Character.isWhitespace(c) || c == '\\' || c == '{') {
                 break;
+            }
+            if (c == '.' || c == '-' || c == '_') {
+                // breaks if an alphanumeric is following
+                if (scan + 1 < src.length()) {
+                    char peak = src.charAt(scan + 1);
+                    if (Character.isLetterOrDigit(peak)) {
+                        scan++;
+                        break;
+                    }
+                }
             }
         }
         emit(WORD, start, scan);
