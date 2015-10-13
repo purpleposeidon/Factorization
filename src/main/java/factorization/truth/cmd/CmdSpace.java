@@ -1,18 +1,17 @@
 package factorization.truth.cmd;
 
-import factorization.truth.ClientTypesetter;
 import factorization.truth.api.*;
-import factorization.truth.export.HtmlConversionTypesetter;
+import factorization.truth.word.TextWord;
 
-public class CmdSpace extends InternalCmd {
+public class CmdSpace implements ITypesetCommand {
 
     @Override
-    protected void callClient(ClientTypesetter out, ITokenizer tokenizer) throws TruthError {
-        out.write(" ", out.getInfo().link);
+    public void callClient(IClientTypesetter out, ITokenizer tokenizer) throws TruthError {
+        out.write(new TextWord(" "));
     }
 
     @Override
-    protected void callHtml(HtmlConversionTypesetter out, ITokenizer tokenizer) throws TruthError {
+    public void callHTML(IHtmlTypesetter out, ITokenizer tokenizer) throws TruthError {
         out.html(" ");
     }
 }

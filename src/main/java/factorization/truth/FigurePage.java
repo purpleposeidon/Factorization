@@ -1,6 +1,7 @@
 package factorization.truth;
 
 import factorization.shared.Core;
+import factorization.truth.api.AbstractPage;
 import factorization.util.RenderUtil;
 import factorization.weird.TileEntityDayBarrel;
 import net.minecraft.client.Minecraft;
@@ -30,13 +31,13 @@ public class FigurePage extends AbstractPage {
     double origRotationX, origRotationY;
     
     @Override
-    void mouseDragStart() {
+    public void mouseDragStart() {
         origRotationX = rotationX;
         origRotationY = rotationY;
     }
     
     @Override
-    void mouseDrag(int dx, int dy) {
+    public void mouseDrag(int dx, int dy) {
         rotationX = origRotationX + dy;
         rotationY = origRotationY - dx;
     }
@@ -47,7 +48,7 @@ public class FigurePage extends AbstractPage {
     EntityLivingBase eyeball;
     
     @Override
-    void draw(DocViewer doc, int ox, int oy, String hovered) {
+    public void draw(DocViewer doc, int ox, int oy, String hovered) {
         RenderUtil.checkGLError("FigurePage -- before render");
         if (wr == null) {
             GL11.glPushAttrib(GL11.GL_ALL_ATTRIB_BITS);
@@ -134,7 +135,7 @@ public class FigurePage extends AbstractPage {
     }
     
     @Override
-    void closed() {
+    public void closed() {
         if (display_list == -1) {
             return;
         }

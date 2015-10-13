@@ -3,7 +3,6 @@ package factorization.truth.gen;
 import factorization.truth.api.IDocGenerator;
 import factorization.truth.api.ITypesetter;
 import factorization.truth.api.TruthError;
-import factorization.truth.word.ItemWord;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.Item;
@@ -56,12 +55,12 @@ public class EnchantViewer implements IDocGenerator {
     
     void listUsage(ITypesetter out, ItemStack tool, ArrayList<ItemStack> appliesTo) throws TruthError {
         out.write("\\nl");
-        out.write(new ItemWord(tool));
+        out.write(tool);
         if (appliesTo.size() == 0) {
             out.write(" ➤ Nothing");
         } else {
             out.write(" ➤");
-            out.write(new ItemWord(appliesTo.toArray(new ItemStack[appliesTo.size()])));
+            out.write(appliesTo);
         }
         out.write("\\nl");
     }

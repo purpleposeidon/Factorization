@@ -15,8 +15,9 @@ import factorization.coremodhooks.UnhandledGuiKeyEvent;
 import factorization.shared.Core;
 import factorization.truth.api.DocReg;
 import factorization.truth.api.IDocBook;
-import factorization.truth.api.IDocModule;
 import factorization.truth.api.IManwich;
+import factorization.truth.api.ITypesetCommand;
+import factorization.truth.cmd.*;
 import factorization.truth.export.ExportHtml;
 import factorization.truth.gen.*;
 import factorization.truth.gen.recipe.RecipeViewer;
@@ -37,6 +38,7 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompressedStreamTools;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.util.EnumChatFormatting;
 import net.minecraft.util.ResourceLocation;
 import org.lwjgl.input.Mouse;
 
@@ -69,6 +71,44 @@ public class DocumentationModule implements factorization.truth.api.IDocModule {
         for (ModContainer mod : Loader.instance().getActiveModList()) {
             DocReg.setVariable("mod:" + mod.getModId(), mod.getName());
         }
+
+        registerCommands();
+    }
+
+    private static void reg(String name, ITypesetCommand cmd) {
+        DocReg.registerCommand("\\" + name, cmd);
+    }
+
+    private static void registerCommands() {
+        reg("include", new CmdInclude());
+        reg("lmp", new CmdMacro("\\link{lmp}{LMP}"));
+        reg("p", new CmdP());
+        reg("-", new CmdDash());
+        reg("", new CmdSpace());
+        reg(" ", new CmdSpace());
+        reg("\\", new CmdSlash());
+        reg("nl", new CmdNl());
+        reg("newpage", new CmdNewpage());
+        reg("leftpage", new CmdLeftpage());
+        reg("b", new CmdStyle(EnumChatFormatting.BOLD, "b"));
+        reg("i", new CmdStyle(EnumChatFormatting.BOLD, "i"));
+        reg("u", new CmdStyle(EnumChatFormatting.BOLD, "u"));
+        reg("title", new CmdTitle());
+        reg("h1", new CmdHeader());
+        reg("link", new CmdLink(false));
+        reg("index", new CmdLink(true));
+        reg("#", new CmdItem());
+        reg("img", new CmdImg());
+        reg("figure", new CmdFigure());
+        reg("generate", new CmdGenerate());
+        reg("seg", new CmdSegStart());
+        reg("endseg", new CmdSegEnd());
+        reg("topic", new CmdTopic());
+        reg("checkmods", new CmdCheckMods());
+        reg("vpad", new CmdVpad());
+        reg("ifhtml", new CmdIfHtml());
+        reg("url", new CmdUrl());
+        reg("local", new CmdLocal());
     }
 
     static HashMap<String, ArrayList<ItemStack>> nameCache = null;

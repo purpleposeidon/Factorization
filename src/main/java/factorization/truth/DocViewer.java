@@ -1,5 +1,6 @@
 package factorization.truth;
 
+import factorization.truth.api.AbstractPage;
 import factorization.truth.api.TruthError;
 import factorization.truth.minecraft.GuiButtonNextPage;
 import factorization.truth.word.Word;
@@ -157,7 +158,7 @@ public class DocViewer extends GuiScreen {
     }
     
     Document getDocument(String name) {
-        AbstractTypesetter ts = new ClientTypesetter(domain, mc.fontRenderer, getPageWidth(0), getPageHeight(0));
+        ClientTypesetter ts = new ClientTypesetter(domain, mc.fontRenderer, getPageWidth(0), getPageHeight(0));
         try {
             ts.write(DocumentationModule.readDocument(domain, name));
         } catch (TruthError truthError) {

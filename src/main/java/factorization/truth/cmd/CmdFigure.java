@@ -1,16 +1,13 @@
 package factorization.truth.cmd;
 
-import factorization.truth.ClientTypesetter;
 import factorization.truth.DocWorld;
 import factorization.truth.DocumentationModule;
 import factorization.truth.FigurePage;
-import factorization.truth.api.ITokenizer;
-import factorization.truth.api.TruthError;
-import factorization.truth.export.HtmlConversionTypesetter;
+import factorization.truth.api.*;
 
-public class CmdFigure extends InternalCmd {
+public class CmdFigure implements ITypesetCommand {
     @Override
-    protected void callClient(ClientTypesetter out, ITokenizer tokenizer) throws TruthError {
+    public void callClient(IClientTypesetter out, ITokenizer tokenizer) throws TruthError {
         DocWorld figure = null;
         try {
             String fig = tokenizer.getParameter("Encoded document figure");
@@ -23,12 +20,12 @@ public class CmdFigure extends InternalCmd {
         if (figure == null) {
             throw new TruthError("figure failed to load");
         }
-        out.pages.add(new FigurePage(figure));
+        out.addPage(new FigurePage(figure));
         // TODO: It'd be better to use a Word for this.
     }
 
     @Override
-    protected void callHtml(HtmlConversionTypesetter out, ITokenizer tokenizer) throws TruthError {
+    public void callHTML(IHtmlTypesetter out, ITokenizer tokenizer) throws TruthError {
         // Gosh, that'd be interesting.
         tokenizer.getParameter("encoded figure");
     }

@@ -3,7 +3,6 @@ package factorization.truth.gen;
 import factorization.truth.api.IDocGenerator;
 import factorization.truth.api.ITypesetter;
 import factorization.truth.api.TruthError;
-import factorization.truth.word.ItemWord;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.oredict.OreDictionary;
 
@@ -65,7 +64,7 @@ public class OreDictionaryViewer implements IDocGenerator {
         out.write("\\seg");
         out.write(String.format("\\nl %s: ", name));
         for (ItemStack is : ores) {
-            out.write(new ItemWord(is));
+            out.write(is);
         }
         out.write("\\endseg");
     }

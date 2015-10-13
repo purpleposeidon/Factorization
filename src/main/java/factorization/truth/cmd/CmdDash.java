@@ -1,19 +1,17 @@
 package factorization.truth.cmd;
 
-import factorization.truth.ClientTypesetter;
-import factorization.truth.api.ITokenizer;
-import factorization.truth.api.TruthError;
-import factorization.truth.export.HtmlConversionTypesetter;
+import factorization.truth.WordPage;
+import factorization.truth.api.*;
 
-public class CmdDash extends InternalCmd {
+public class CmdDash implements ITypesetCommand {
     @Override
-    protected void callClient(ClientTypesetter out, ITokenizer tokenizer) throws TruthError {
-        out.getCurrentPage().nl();
-        out.write(" - ", null);
+    public void callClient(IClientTypesetter out, ITokenizer tokenizer) throws TruthError {
+        ((WordPage) out.getCurrentPage()).nl();
+        out.write(" - ");
     }
 
     @Override
-    protected void callHtml(HtmlConversionTypesetter out, ITokenizer tokenizer) throws TruthError {
+    public void callHTML(IHtmlTypesetter out, ITokenizer tokenizer) throws TruthError {
         out.html("<br> •");
     }
 }

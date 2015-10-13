@@ -1,11 +1,7 @@
 package factorization.truth.cmd;
 
-import factorization.truth.ClientTypesetter;
 import factorization.truth.DocumentationModule;
-import factorization.truth.api.ITokenizer;
-import factorization.truth.api.ITypesetter;
-import factorization.truth.api.TruthError;
-import factorization.truth.export.HtmlConversionTypesetter;
+import factorization.truth.api.*;
 import factorization.truth.word.ItemWord;
 import factorization.util.DataUtil;
 import net.minecraft.block.Block;
@@ -14,7 +10,7 @@ import net.minecraft.item.ItemStack;
 
 import java.util.ArrayList;
 
-public class CmdItem extends InternalCmd {
+public class CmdItem implements ITypesetCommand {
 
     ItemWord getWord(ITypesetter out, ITokenizer tokenizer) throws TruthError {
         String itemName = tokenizer.getParameter("No item specified");
@@ -44,30 +40,21 @@ public class CmdItem extends InternalCmd {
         if (items == null || items.isEmpty()) {
             throw new TruthError(itemName + " no such item");
         }
-        String link = out.getInfo().link;
         if (items.size() == 1) {
-            if (link == null) {
-                return new ItemWord(items.get(0));
-            } else {
-                return new ItemWord(items.get(0), link);
-            }
+            return new ItemWord(items.get(0));
         } else {
             ItemStack[] theItems = items.toArray(new ItemStack[items.size()]);
-            if (link == null) {
-                return new ItemWord(theItems);
-            } else {
-                return new ItemWord(theItems, link);
-            }
+            return new ItemWord(theItems);
         }
     }
 
     @Override
-    protected void callClient(ClientTypesetter out, ITokenizer tokenizer) throws TruthError {
+    public void callClient(IClientTypesetter out, ITokenizer tokenizer) throws TruthError {
         out.write(getWord(out, tokenizer));
     }
 
     @Override
-    protected void callHtml(HtmlConversionTypesetter out, ITokenizer tokenizer) throws TruthError {
+    public void callHTML(IHtmlTypesetter out, ITokenizer tokenizer) throws TruthError {
         ItemWord word = getWord(out, tokenizer);
         // NOTE: This could miss items. Hrm.
         out.putItem(word.getItem(), word.getLink());

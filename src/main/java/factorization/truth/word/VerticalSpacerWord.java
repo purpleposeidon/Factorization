@@ -7,7 +7,6 @@ public class VerticalSpacerWord extends Word {
     final int vertSize;
     
     public VerticalSpacerWord(int vertSize) {
-        super(null);
         this.vertSize = vertSize;
     }
 

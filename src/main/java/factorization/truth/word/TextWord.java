@@ -8,13 +8,8 @@ import net.minecraft.util.EnumChatFormatting;
 public class TextWord extends Word {
     public final String text;
 
-    public TextWord(String text, String hyperlink) {
-        super(hyperlink);
-        this.text = text;
-    }
-
     public TextWord(String text) {
-        this(text, null);
+        this.text = text;
     }
     
     @Override
@@ -30,7 +25,7 @@ public class TextWord extends Word {
     
     @Override
     public int draw(DocViewer page, int x, int y, boolean hover) {
-        String t = text;
+        String t = style + text;
         int color = getLinkColor(page, hover);
         if (getLink() != null) {
             t = EnumChatFormatting.UNDERLINE + text;

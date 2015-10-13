@@ -2,6 +2,7 @@ package factorization.truth.gen.recipe;
 
 import cpw.mods.fml.common.event.FMLInterModComms.IMCMessage;
 import factorization.shared.Core;
+import factorization.truth.ClientTypesetter;
 import factorization.truth.DocumentationModule;
 import factorization.truth.api.*;
 import factorization.truth.word.ItemWord;
@@ -134,11 +135,12 @@ public class RecipeViewer implements IDocGenerator, IObjectWriter<Object> {
     
     void writeRecipe(ITypesetter out, ArrayList parts) {
         try {
+            ClientTypesetter cout = (ClientTypesetter) out;
             for (Object part : parts) {
                 if (part instanceof String) {
                     out.write((String) part);
                 } else {
-                    out.write((Word) part);
+                    cout.write((Word) part);
                 }
             }
         } catch (Throwable t) {

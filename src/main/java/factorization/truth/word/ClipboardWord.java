@@ -7,7 +7,7 @@ public class ClipboardWord extends TextWord {
     final String clipboard;
 
     public ClipboardWord(String toCopy) {
-        super("[X]", null);
+        super("[X]");
         this.clipboard = toCopy;
         // TODO: Clipboard icon
     }

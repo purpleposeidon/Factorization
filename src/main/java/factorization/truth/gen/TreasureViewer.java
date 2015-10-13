@@ -4,7 +4,6 @@ import cpw.mods.fml.relauncher.ReflectionHelper;
 import factorization.truth.api.IDocGenerator;
 import factorization.truth.api.ITypesetter;
 import factorization.truth.api.TruthError;
-import factorization.truth.word.ItemWord;
 import net.minecraft.util.WeightedRandomChestContent;
 import net.minecraftforge.common.ChestGenHooks;
 
@@ -45,13 +44,13 @@ public class TreasureViewer implements IDocGenerator {
                 }
                 if (descr == null) {
                     can_blob = true;
-                    out.write(new ItemWord(item.theItemId));
+                    out.write(item.theItemId);
                 } else {
                     if (can_blob) {
                         can_blob = false;
                         out.write("\\p");
                     }
-                    out.write(new ItemWord(item.theItemId));
+                    out.write(item.theItemId);
                     out.write(descr);
                 }
             }

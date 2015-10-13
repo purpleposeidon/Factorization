@@ -3,7 +3,6 @@ package factorization.truth.gen;
 import factorization.truth.api.IDocGenerator;
 import factorization.truth.api.ITypesetter;
 import factorization.truth.api.TruthError;
-import factorization.truth.word.ItemWord;
 import net.minecraft.block.Block;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
@@ -20,7 +19,7 @@ public class BiomeViewer implements IDocGenerator {
 
     @Override
     public void process(ITypesetter out, String arg) throws TruthError {
-        ArrayList<Integer> free = new ArrayList();
+        ArrayList<Integer> free = new ArrayList<Integer>();
         BiomeGenBase[] biomeGenArray = BiomeGenBase.getBiomeGenArray();
         for (int i = 0; i < biomeGenArray.length; i++) {
             BiomeGenBase biome = biomeGenArray[i];
@@ -36,8 +35,8 @@ public class BiomeViewer implements IDocGenerator {
                 out.write(String.format("\\nl Water Tint: #%06X", biome.waterColorMultiplier));
             }
             out.write("\\nl Blocks: ");
-            out.write(new ItemWord(new ItemStack(biome.topBlock)));
-            out.write(new ItemWord(new ItemStack(biome.fillerBlock)));
+            out.write(new ItemStack(biome.topBlock));
+            out.write(new ItemStack(biome.fillerBlock));
             
             {
                 final BiomeDecorator dec = biome.theBiomeDecorator;
@@ -55,7 +54,7 @@ public class BiomeViewer implements IDocGenerator {
                 feature(out, dec.clayPerChunk, Blocks.clay);
                 feature(out, dec.bigMushroomsPerChunk, Blocks.red_mushroom_block);
                 if (dec.generateLakes) {
-                    out.write(new ItemWord(new ItemStack(Items.water_bucket)));
+                    out.write(new ItemStack(Items.water_bucket));
                 }
                 
                 out.write("\\nl");
@@ -81,7 +80,7 @@ public class BiomeViewer implements IDocGenerator {
         if (free.isEmpty()) {
             out.write("There are no free biome IDs!");
         } else {
-            ArrayList<Integer> contig = new ArrayList();
+            ArrayList<Integer> contig = new ArrayList<Integer>();
             int last = -100;
             boolean firstContig = false;
             for (Integer i : free) {
@@ -117,8 +116,7 @@ public class BiomeViewer implements IDocGenerator {
             is = new ItemStack(Blocks.tallgrass, 0, 1);
         }
         is.stackSize = val;
-        ItemWord word = new ItemWord(is);
-        out.write(word);
+        out.write(is);
     }
 
 }

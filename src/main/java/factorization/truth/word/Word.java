@@ -4,12 +4,17 @@ import factorization.truth.DocViewer;
 import net.minecraft.client.gui.FontRenderer;
 
 public abstract class Word {
-    private final String hyperlink;
-    
-    public Word(String hyperlink) {
-        this.hyperlink = hyperlink;
+    private String hyperlink;
+    protected String style = "";
+
+    public void setLink(String link) {
+        this.hyperlink = link;
     }
-    
+
+    public void setStyle(String style) {
+        this.style = style;
+    }
+
     public String getLink() {
         return hyperlink;
     }
@@ -34,5 +39,9 @@ public abstract class Word {
 
     public boolean onClick() {
         return false;
+    }
+
+    public String getStyle() {
+        return style;
     }
 }

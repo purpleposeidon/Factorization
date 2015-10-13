@@ -15,8 +15,7 @@ public class IconWord extends Word {
     private final IIcon icon;
     private final boolean isBlock;
     
-    public IconWord(String hyperlink, IIcon icon, int texture) {
-        super(hyperlink);
+    public IconWord(IIcon icon, int texture) {
         if (icon == null) icon = BlockIcons.error;
         this.icon = icon;
         isBlock = texture == BLOCK_TEXTURE;

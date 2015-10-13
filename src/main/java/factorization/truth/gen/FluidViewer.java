@@ -1,5 +1,6 @@
 package factorization.truth.gen;
 
+import factorization.truth.api.IClientTypesetter;
 import factorization.truth.api.IDocGenerator;
 import factorization.truth.api.ITypesetter;
 import factorization.truth.api.TruthError;
@@ -21,17 +22,18 @@ public class FluidViewer implements IDocGenerator {
             return new ItemWord(is);
         } else {
             IIcon icon = fluid.getIcon();
-            return new IconWord(null, icon, IconWord.BLOCK_TEXTURE);
+            return new IconWord(icon, IconWord.BLOCK_TEXTURE);
         }
     }
 
     @Override
     public void process(ITypesetter out, String arg) throws TruthError {
+        IClientTypesetter cout = (IClientTypesetter) out;
         for (Entry<String, Fluid> entry : FluidRegistry.getRegisteredFluids().entrySet()) {
             String name = entry.getKey();
             Fluid fluid = entry.getValue();
             out.write("\\seg \\nl \\nl");
-            out.write(convert(fluid));
+            cout.write(convert(fluid));
             out.write(" ");
             out.write(String.format("\\u{%s}", name));
             if (fluid.isGaseous()) {

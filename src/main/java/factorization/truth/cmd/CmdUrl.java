@@ -1,23 +1,22 @@
 package factorization.truth.cmd;
 
-import factorization.truth.ClientTypesetter;
-import factorization.truth.api.ITokenizer;
-import factorization.truth.api.TruthError;
-import factorization.truth.export.HtmlConversionTypesetter;
+import factorization.truth.api.*;
 import factorization.truth.word.URIWord;
 
-public class CmdUrl extends InternalCmd {
+public class CmdUrl implements ITypesetCommand {
     @Override
-    protected void callClient(ClientTypesetter out, ITokenizer tokenizer) throws TruthError {
+    public void callClient(IClientTypesetter out, ITokenizer tokenizer) throws TruthError {
         String uriLink = tokenizer.getParameter("\\url missing parameter: uriLink");
         String content = tokenizer.getParameter("\\url missing parameter: content");
         out.write(new URIWord(content, uriLink));
     }
 
     @Override
-    protected void callHtml(HtmlConversionTypesetter out, ITokenizer tokenizer) throws TruthError {
+    public void callHTML(IHtmlTypesetter out, ITokenizer tokenizer) throws TruthError {
         String url = tokenizer.getParameter("url target");
         String content = tokenizer.getParameter("link content");
-        out.write(content, url, out.getInfo().style);
+        out.html("<a href=\"" + url + "\">");
+        out.write(content);
+        out.html("</a>");
     }
 }

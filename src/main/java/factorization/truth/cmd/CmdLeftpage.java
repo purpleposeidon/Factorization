@@ -1,21 +1,18 @@
 package factorization.truth.cmd;
 
-import factorization.truth.ClientTypesetter;
-import factorization.truth.api.ITokenizer;
-import factorization.truth.api.TruthError;
-import factorization.truth.export.HtmlConversionTypesetter;
+import factorization.truth.api.*;
 
-public class CmdLeftpage extends InternalCmd {
+public class CmdLeftpage implements ITypesetCommand {
     @Override
-    protected void callClient(ClientTypesetter out, ITokenizer tokenizer) throws TruthError {
-        int need = 1 + (out.pages.size() % 2);
+    public void callClient(IClientTypesetter out, ITokenizer tokenizer) throws TruthError {
+        int need = 1 + (out.getPages().size() % 2);
         for (int i = 0; i < need; i++) {
             out.newPage();
         }
     }
 
     @Override
-    protected void callHtml(HtmlConversionTypesetter out, ITokenizer tokenizer) throws TruthError {
+    public void callHTML(IHtmlTypesetter out, ITokenizer tokenizer) throws TruthError {
         // NOP
     }
 }

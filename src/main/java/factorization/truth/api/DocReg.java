@@ -4,6 +4,7 @@ import net.minecraft.util.StringUtils;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.TreeMap;
 
 public class DocReg {
@@ -35,7 +36,7 @@ public class DocReg {
     }
 
     public static void registerCommand(String name, ITypesetCommand cmd) {
-        commands.put(name, cmd);
+        commands.put(name.toLowerCase(Locale.ROOT), cmd);
     }
 
     public static void setVariable(String name, String value) {

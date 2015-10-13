@@ -47,7 +47,7 @@ public class ItemListViewer implements IDocGenerator {
             String text = ct.getTabLabel();
             ret += "\\nl\\link{cgi/items/" + text + "}{" + Core.translateThis("itemGroup." + text) + "}";
         }
-        sb.write(ret, null, "");
+        sb.write(ret);
     }
     
     void listAll(ITypesetter out, CreativeTabs ct) throws TruthError {
@@ -60,8 +60,8 @@ public class ItemListViewer implements IDocGenerator {
         }
         out.write("\n\n");
         int size = DocumentationModule.getNameItemCache().size();
-        Multimap<String, ItemStack> found = HashMultimap.<String, ItemStack>create(size, 1);
-        ArrayList<String> toSort = new ArrayList();
+        Multimap<String, ItemStack> found = HashMultimap.create(size, 1);
+        ArrayList<String> toSort = new ArrayList<String>();
         for (Entry<String, ArrayList<ItemStack>> pair : DocumentationModule.getNameItemCache().entrySet()) {
             ArrayList<ItemStack> items = pair.getValue();
             for (ItemStack is : items) {
@@ -80,9 +80,9 @@ public class ItemListViewer implements IDocGenerator {
         for (String name : toSort) {
             for (ItemStack is : found.get(name)) {
                 if (is == null) continue;
-                out.write(new ItemWord(is));
+                out.write(is);
                 out.write(" ");
-                out.write(name, null);
+                out.write(name);
                 out.write("\n\n");
             }
         }

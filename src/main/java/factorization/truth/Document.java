@@ -1,5 +1,7 @@
 package factorization.truth;
 
+import factorization.truth.api.AbstractPage;
+
 import java.util.ArrayList;
 
 public class Document {

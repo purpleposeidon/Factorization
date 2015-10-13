@@ -1,5 +1,6 @@
 package factorization.truth;
 
+import factorization.truth.api.AbstractPage;
 import factorization.truth.word.TextWord;
 import factorization.truth.word.Word;
 import net.minecraft.client.gui.FontRenderer;
@@ -24,7 +25,9 @@ public class WordPage extends AbstractPage {
         if (word instanceof TextWord) {
             TextWord tw = (TextWord) word;
             if (tw.text.equals("\t")) {
-                word = new TextWord("    ", word.getLink());
+                word = new TextWord("    ");
+                word.setLink(tw.getLink());
+                word.setStyle(tw.getStyle());
             } else if (lineLen == 0 && tw.text.trim().isEmpty()) {
                 return;
             }
@@ -37,7 +40,7 @@ public class WordPage extends AbstractPage {
     
     public void nl() {
         ArrayList<Word> newLine = new ArrayList<Word>();
-        newLine.add(new TextWord("", null));
+        newLine.add(new TextWord(""));
         text.add(newLine);
         lineLen = 0;
     }
@@ -84,7 +87,7 @@ public class WordPage extends AbstractPage {
     }
     
     @Override
-    void draw(DocViewer doc, int ox, int oy, String hoveredLink) {
+    public void draw(DocViewer doc, int ox, int oy, String hoveredLink) {
         int y = 0;
         try {
             for (ArrayList<Word> line : text) {

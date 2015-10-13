@@ -1,7 +1,10 @@
 package factorization.truth.cmd;
 
 import factorization.truth.DocumentationModule;
-import factorization.truth.api.*;
+import factorization.truth.api.AgnosticCommand;
+import factorization.truth.api.ITokenizer;
+import factorization.truth.api.ITypesetter;
+import factorization.truth.api.TruthError;
 
 public class CmdInclude extends AgnosticCommand {
     @Override
@@ -10,8 +13,7 @@ public class CmdInclude extends AgnosticCommand {
         if (name == null) {
             throw new TruthError("No page name specified");
         }
-        TypesetInfo info = out.getInfo();
-        String subtext = DocumentationModule.readDocument(info.domain, name);
-        out.write(subtext, info.link, info.style);
+        String subtext = DocumentationModule.readDocument(out.getDomain(), name);
+        out.write(subtext);
     }
 }

@@ -1,12 +1,9 @@
 package factorization.truth.cmd;
 
-import factorization.truth.ClientTypesetter;
-import factorization.truth.api.ITokenizer;
-import factorization.truth.api.TruthError;
-import factorization.truth.export.HtmlConversionTypesetter;
+import factorization.truth.api.*;
 import net.minecraft.util.EnumChatFormatting;
 
-public class CmdStyle extends InternalCmd {
+public class CmdStyle implements ITypesetCommand {
     EnumChatFormatting mc;
     String html;
     public CmdStyle(EnumChatFormatting chatStyle, String htmlTag) {
@@ -15,13 +12,13 @@ public class CmdStyle extends InternalCmd {
     }
 
     @Override
-    protected void callClient(ClientTypesetter out, ITokenizer tokenizer) throws TruthError {
+    public void callClient(IClientTypesetter out, ITokenizer tokenizer) throws TruthError {
         String content = tokenizer.getParameter("paramter content");
-        out.write(content, out.getInfo().link, out.getInfo().style + mc);
+        out.write(content, null, "" + mc);
     }
 
     @Override
-    protected void callHtml(HtmlConversionTypesetter out, ITokenizer tokenizer) throws TruthError {
+    public void callHTML(IHtmlTypesetter out, ITokenizer tokenizer) throws TruthError {
         String content = tokenizer.getParameter("styled text");
         String open = "<" + html + ">";
         String close = "</" + html + ">";

@@ -1,16 +1,13 @@
 package factorization.truth.cmd;
 
-import factorization.truth.ClientTypesetter;
 import factorization.truth.WordPage;
-import factorization.truth.api.ITokenizer;
-import factorization.truth.api.TruthError;
-import factorization.truth.export.HtmlConversionTypesetter;
+import factorization.truth.api.*;
 
-public class CmdP extends InternalCmd {
+public class CmdP implements ITypesetCommand {
 
     @Override
-    protected void callClient(ClientTypesetter out, ITokenizer tokenizer) throws TruthError {
-        WordPage p = out.getCurrentPage();
+    public void callClient(IClientTypesetter out, ITokenizer tokenizer) throws TruthError {
+        WordPage p = (WordPage) out.getCurrentPage();
         p.nl();
         if (out.getCurrentPage() == p) {
             p.nl();
@@ -18,7 +15,7 @@ public class CmdP extends InternalCmd {
     }
 
     @Override
-    protected void callHtml(HtmlConversionTypesetter out, ITokenizer tokenizer) throws TruthError {
+    public void callHTML(IHtmlTypesetter out, ITokenizer tokenizer) throws TruthError {
         out.html("<br>\n");
     }
 }

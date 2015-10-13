@@ -1,16 +1,12 @@
 package factorization.truth.cmd;
 
-import factorization.truth.ClientTypesetter;
-import factorization.truth.api.ITokenizer;
-import factorization.truth.api.ITypesetter;
-import factorization.truth.api.TruthError;
-import factorization.truth.export.HtmlConversionTypesetter;
+import factorization.truth.api.*;
 import factorization.truth.word.ImgWord;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.IResource;
 import net.minecraft.util.ResourceLocation;
 
-public class CmdImg extends InternalCmd {
+public class CmdImg implements ITypesetCommand {
     ImgWord getImg(ITypesetter out, ITokenizer tokenizer) throws TruthError {
         String imgName = tokenizer.getParameter("domain:path/to/image.png");
         String scaleOrWidth = tokenizer.getOptionalParameter();
@@ -32,9 +28,9 @@ public class CmdImg extends InternalCmd {
         if (heightS != null) {
             int width = Integer.parseInt(scaleOrWidth);
             int height = Integer.parseInt(heightS);
-            img = new ImgWord(rl, out.getInfo().link, width, height);
+            img = new ImgWord(rl, width, height);
         } else {
-            img = new ImgWord(rl, out.getInfo().link);
+            img = new ImgWord(rl);
             if (scaleOrWidth != null) {
                 img.scale(Double.parseDouble(scaleOrWidth));
             }
@@ -43,14 +39,14 @@ public class CmdImg extends InternalCmd {
     }
 
     @Override
-    protected void callClient(ClientTypesetter out, ITokenizer tokenizer) throws TruthError {
+    public void callClient(IClientTypesetter out, ITokenizer tokenizer) throws TruthError {
         ImgWord img = getImg(out, tokenizer);
-        img.fitToPage(out.pageWidth, out.pageHeight);
+        img.fitToPage(out.getPageWidth(), out.getPageHeight());
         out.write(img);
     }
 
     @Override
-    protected void callHtml(HtmlConversionTypesetter out, ITokenizer tokenizer) throws TruthError {
+    public void callHTML(IHtmlTypesetter out, ITokenizer tokenizer) throws TruthError {
         ImgWord img = getImg(out, tokenizer);
         final int width = img.width;
         final int height = img.height;

@@ -28,30 +28,14 @@ public class ItemWord extends Word {
     }
 
     public ItemWord(ItemStack is) {
-        super(getDefaultHyperlink(sanitize(is)));
+        super();
         this.is = is;
         cleanWildlings();
     }
-    
     public ItemWord(ItemStack[] entries) {
-        this(entries, getDefaultHyperlink(entries));
-    }
-
-    public ItemWord(ItemStack[] entries, String hyperlink) {
-        super(hyperlink);
         if (entries.length == 0) entries = null;
         this.entries = entries;
         cleanWildlings();
-    }
-    
-    public ItemWord(ItemStack is, String hyperlink) {
-        super(hyperlink);
-        this.is = sanitize(is);
-        cleanWildlings();
-    }
-
-    public ItemWord(Collection<ItemStack> entries, String hyperlink) {
-        this(entries.toArray(new ItemStack[entries.size()]), hyperlink);
     }
 
     public ItemWord(Collection<ItemStack> entries) {

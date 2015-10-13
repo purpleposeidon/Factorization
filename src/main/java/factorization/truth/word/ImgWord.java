@@ -20,14 +20,13 @@ import java.util.HashMap;
 public class ImgWord extends Word {
     public final ResourceLocation resource;
     public int width = 12, height = 12;
-    public ImgWord(ResourceLocation resource, String hyperlink) {
-        super(hyperlink);
+    public ImgWord(ResourceLocation resource) {
         this.resource = resource;
         autosize();
     }
 
-    public ImgWord(ResourceLocation resource, String hyperlink, int width, int height) {
-        this(resource, hyperlink);
+    public ImgWord(ResourceLocation resource, int width, int height) {
+        this(resource);
         this.width = width;
         this.height = height;
     }

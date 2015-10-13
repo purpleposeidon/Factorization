@@ -80,19 +80,18 @@ class StandardObjectWriters {
             if (knownOres.contains(val)) {
                 List<ItemStack> ores = OreDictionary.getOres(val);
                 if (!ores.isEmpty()) {
-                    String link = null;
-                    out.add(new ItemWord(ores.toArray(new ItemStack[ores.size()]), link));
+                    out.add(new ItemWord(ores.toArray(new ItemStack[ores.size()])));
                     return;
                 }
             }
-            out.add(new TextWord(val, null));
+            out.add(new TextWord(val));
         }
     }
 
     private static class WriteObjectToString implements IObjectWriter<Object> {
         @Override
         public void writeObject(List out, Object val, IObjectWriter<Object> generic) {
-            out.add(new TextWord(val.toString(), null));
+            out.add(new TextWord(val.toString()));
         }
     }
 
@@ -100,7 +99,7 @@ class StandardObjectWriters {
         @Override
         public void writeObject(List out, FluidStack val, IObjectWriter<Object> generic) {
             out.add(FluidViewer.convert(val.getFluid()));
-            out.add(new TextWord("" + val.amount, null));
+            out.add(new TextWord("" + val.amount));
             // TODO: Link to fluid viewer
         }
     }
