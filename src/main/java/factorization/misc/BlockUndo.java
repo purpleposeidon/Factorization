@@ -28,6 +28,7 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.world.World;
+import net.minecraftforge.common.DimensionManager;
 import net.minecraftforge.common.ForgeHooks;
 import net.minecraftforge.common.util.FakePlayer;
 import net.minecraftforge.event.entity.player.PlayerEvent;
@@ -36,7 +37,6 @@ import net.minecraftforge.event.world.BlockEvent;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.WeakHashMap;
 
 public class BlockUndo {
     public static final String channelName = "FZ|blockundo";
@@ -55,7 +55,7 @@ public class BlockUndo {
 
     @SubscribeEvent
     @SideOnly(Side.CLIENT)
-    public void addHotblock(FMLNetworkEvent.ClientCustomPacketEvent event) {
+    public void addBlockUndo(FMLNetworkEvent.ClientCustomPacketEvent event) {
         PlacedBlock at = PlacedBlock.read(event.packet.payload());
         EntityPlayer player = Minecraft.getMinecraft().thePlayer;
         markPlacement(player, at);
@@ -74,6 +74,11 @@ public class BlockUndo {
             this.orig = orig;
         }
 
+        @Override
+        public String toString() {
+            return x + " " + z;
+        }
+
         void write(ByteBuf out) {
             out.writeInt(w);
             out.writeInt(x);
@@ -89,11 +94,15 @@ public class BlockUndo {
         }
     }
 
-    public static int UNDO_MAX = 5;
+    public static int UNDO_MAX = 6;
     public static float MAX_TRUE_SPEED_STANDARD = 0.25F / 2;
     public static float MAX_TRUE_SPEED_TILEENTITY = 0.125F / 2;
 
-    WeakHashMap<EntityPlayer, ArrayList<PlacedBlock>> hots = new WeakHashMap<EntityPlayer, ArrayList<PlacedBlock>>();
+    HashMap<String, ArrayList<PlacedBlock>> recentlyPlaced = new HashMap<String, ArrayList<PlacedBlock>>();
+
+    private static String getName(EntityPlayer player) {
+        return player.getCommandSenderName() + " #" + player.worldObj.isRemote;
+    }
 
     private static ItemStack toItem(Block b, World w, int x, int y, int z, int md) {
         for (ItemStack is : b.getDrops(w, x, y, z, md, 0)) {
@@ -104,10 +113,21 @@ public class BlockUndo {
 
     void markPlacement(EntityPlayer player, PlacedBlock at) {
         ArrayList<PlacedBlock> coords;
-        if (!hots.containsKey(player)) {
-            hots.put(player, coords = new ArrayList<PlacedBlock>());
+        String playerName = getName(player);
+        if (!recentlyPlaced.containsKey(playerName)) {
+            recentlyPlaced.put(playerName, coords = new ArrayList<PlacedBlock>());
         } else {
-            coords = hots.get(player);
+            coords = recentlyPlaced.get(playerName);
+        }
+        for (Iterator<PlacedBlock> it = coords.iterator(); it.hasNext(); ) {
+            PlacedBlock c = it.next();
+            World w = DimensionManager.getWorld(c.w);
+            if (w.isAirBlock(c.x, c.y, c.z)) {
+                it.remove();
+            }
+            if (c.x == at.x && c.y == at.y && c.z == at.z) {
+                it.remove();
+            }
         }
         coords.add(at);
         if (coords.size() > UNDO_MAX) {
@@ -192,7 +212,7 @@ public class BlockUndo {
 
     private boolean canUndo(PlayerEvent event, int x, int y, int z, Block block, int metadata) {
         final EntityPlayer player = event.entityPlayer;
-        ArrayList<PlacedBlock> coords = hots.get(player);
+        ArrayList<PlacedBlock> coords = recentlyPlaced.get(getName(player));
         if (coords == null) return false;
 
         int w = FzUtil.getWorldDimension(player.worldObj);
@@ -212,7 +232,7 @@ public class BlockUndo {
     public void playerRemovedBlock(BlockEvent.BreakEvent event) {
         EntityPlayer thePlayer = event.getPlayer();
         markBusy(thePlayer);
-        ArrayList<PlacedBlock> coords = hots.get(thePlayer);
+        ArrayList<PlacedBlock> coords = recentlyPlaced.get(getName(thePlayer));
         if (coords == null) return;
         PlacedBlock heat = null;
         final World w = event.world;
