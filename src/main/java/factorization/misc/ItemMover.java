@@ -36,13 +36,13 @@ public class ItemMover {
 
         if (!slot.canTakeStack(player) || !slot.isItemValid(search)) return;
         Slot stock = getRestockSlot(player, slot, search);
-        if (stock != null) {
+        /*if (stock != null) {
             if (stock.yDisplayPosition < slot.yDisplayPosition) {
                 motion = -motion;
             }
         } else {
             motion = reevaluateMotion(slot, player, motion);
-        }
+        }*/
 
         if (motion <= -1) {
             // move all but 1 into buffer, shift-click the 1 item, restore buffer
