@@ -9,7 +9,9 @@ import factorization.truth.word.ItemWord;
 import factorization.truth.word.Word;
 import factorization.util.ItemUtil;
 import net.minecraft.item.ItemStack;
-import net.minecraft.item.crafting.*;
+import net.minecraft.item.crafting.CraftingManager;
+import net.minecraft.item.crafting.FurnaceRecipes;
+import net.minecraft.item.crafting.IRecipe;
 import net.minecraftforge.oredict.OreDictionary;
 
 import java.lang.reflect.Field;
@@ -57,38 +59,42 @@ public class RecipeViewer implements IDocGenerator, IObjectWriter<Object> {
             String cat = arg.replace("category/", "");
             if (recipeCategories.containsKey(cat)) {
                 ArrayList<ArrayList> recipeList = recipeCategories.get(cat);
-                writeRecipes(out, null, false, cat, recipeList);
+                writeRecipes(out, null, false, cat, recipeList, null);
             } else {
                 throw new TruthError("Category not found: " + arg);
             }
         } else {
-            ItemStack matching = null;
+            ArrayList<ItemStack> matchers = null;
             boolean mustBeResult = false;
             if (!arg.equalsIgnoreCase("all")) {
                 if (arg.startsWith("for/")) {
                     mustBeResult = true;
                     arg = arg.replace("for/", "");
                 }
-                ArrayList<ItemStack> matchers = DocumentationModule.getNameItemCache().get(arg);
-                if (matchers != null && !matchers.isEmpty()) {
-                    matching = matchers.get(0);
-                }
-                if (matching == null) {
+                matchers = DocumentationModule.getNameItemCache().get(arg);
+                if (matchers == null || matchers.size() == 0) {
                     throw new TruthError("Couldn't find item: " + arg);
                 }
                 //out.emitWord(new ItemWord(matching));
                 out.write("\\nl");
             }
-            
-            for (String cat : categoryOrder) {
-                ArrayList<ArrayList> recipeList = recipeCategories.get(cat);
-                writeRecipes(out, matching, mustBeResult, cat, recipeList);
+
+            if (matchers == null) {
+                matchers = new ArrayList<ItemStack>();
+                matchers.add(null);
+            }
+            HashSet<ArrayList> previously_found = new HashSet<ArrayList>();
+            for (ItemStack matching : matchers) {
+                for (String cat : categoryOrder) {
+                    ArrayList<ArrayList> recipeList = recipeCategories.get(cat);
+                    writeRecipes(out, matching, mustBeResult, cat, recipeList, previously_found);
+                }
             }
             
         }
     }
     
-    void writeRecipes(ITypesetter out, ItemStack matching, boolean mustBeResult, String categoryName, ArrayList<ArrayList> recipes) throws TruthError {
+    void writeRecipes(ITypesetter out, ItemStack matching, boolean mustBeResult, String categoryName, ArrayList<ArrayList> recipes, HashSet<ArrayList> previously_found) throws TruthError {
         if (matching == null) {
             for (ArrayList recipe : recipes) {
                 writeRecipe(out, recipe);
@@ -97,6 +103,7 @@ public class RecipeViewer implements IDocGenerator, IObjectWriter<Object> {
             boolean first = true;
             for (ArrayList recipe : recipes) {
                 if (recipeMatches(recipe, matching, mustBeResult)) {
+                    if (previously_found != null && !previously_found.add(recipe)) continue;
                     if (first) {
                         first = false;
                         if (categoryName != null) {
@@ -114,7 +121,10 @@ public class RecipeViewer implements IDocGenerator, IObjectWriter<Object> {
             if (part instanceof ItemWord) {
                 ItemWord iw = (ItemWord) part;
                 if (iw.is != null) {
-                    if (ItemUtil.identical(iw.is, matching) || ItemUtil.wildcardSimilar(iw.is, matching)) {
+                    /*if (ItemUtil.identical(iw.is, matching) || ItemUtil.wildcardSimilar(iw.is, matching)) {
+                        return true;
+                    }*/
+                    if (ItemUtil.swordSimilar(iw.is, matching)) {
                         return true;
                     }
                 }
@@ -134,8 +144,10 @@ public class RecipeViewer implements IDocGenerator, IObjectWriter<Object> {
     }
     
     void writeRecipe(ITypesetter out, ArrayList parts) {
+        if (parts.isEmpty()) return;
         try {
             ClientTypesetter cout = (ClientTypesetter) out;
+            cout.write("\\seg");
             for (Object part : parts) {
                 if (part instanceof String) {
                     out.write((String) part);
@@ -143,6 +155,7 @@ public class RecipeViewer implements IDocGenerator, IObjectWriter<Object> {
                     cout.write((Word) part);
                 }
             }
+            cout.write("\\endseg\\nl");
         } catch (Throwable t) {
             t.printStackTrace();
         }
@@ -245,9 +258,6 @@ public class RecipeViewer implements IDocGenerator, IObjectWriter<Object> {
     }
 
     public void addRecipe(List out, Object obj) {
-        if (recursion == 0) {
-            out.add("\\seg");
-        }
         if (obj instanceof IRecipe) {
             genericRecipePrefix(out, (IRecipe) obj);
         }
@@ -256,10 +266,6 @@ public class RecipeViewer implements IDocGenerator, IObjectWriter<Object> {
         writer.writeObject(out, obj, this);
         if (out.size() == origLen) {
             out.add(obj.toString());
-        }
-        if (recursion == 0) {
-            out.add("\\endseg");
-            out.add("\\nl");
         }
     }
     
