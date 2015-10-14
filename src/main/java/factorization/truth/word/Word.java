@@ -4,8 +4,9 @@ import factorization.truth.DocViewer;
 import net.minecraft.client.gui.FontRenderer;
 
 public abstract class Word {
+    private static final String default_style = "";
     private String hyperlink;
-    protected String style = "";
+    protected String style = default_style;
 
     public void setLink(String link) {
         this.hyperlink = link;

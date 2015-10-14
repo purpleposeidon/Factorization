@@ -7,6 +7,7 @@ import net.minecraft.util.EnumChatFormatting;
 
 public class TextWord extends Word {
     public final String text;
+    private short width_cache = -1;
 
     public TextWord(String text) {
         this.text = text;
@@ -16,22 +17,36 @@ public class TextWord extends Word {
     public String toString() {
         return text + " ==> " + getLink();
     }
-    
+
+    private static final String LINK_STYLE = "" + EnumChatFormatting.UNDERLINE;
+    @Override
+    public void setLink(String link) {
+        super.setLink(link);
+        if (style.isEmpty()) {
+            setStyle(LINK_STYLE);
+        } else {
+            setStyle(getStyle() + LINK_STYLE);
+        }
+    }
+
     @Override
     public int getWidth(FontRenderer font) {
+        if (width_cache != -1) return width_cache;
         if (font == null) return 0;
-        return font.getStringWidth(text);
+        return width_cache = (short) font.getStringWidth(style + text);
     }
-    
+
+    @Override
+    public void setStyle(String style) {
+        super.setStyle(style);
+        width_cache = -1;
+    }
+
     @Override
     public int draw(DocViewer page, int x, int y, boolean hover) {
-        String t = style + text;
         int color = getLinkColor(page, hover);
-        if (getLink() != null) {
-            t = EnumChatFormatting.UNDERLINE + text;
-        }
-        page.getFont().drawString(t, x, y, color); // The return value of drawString isn't helpful.
-        return page.getFont().getStringWidth(text);
+        page.getFont().drawString(style + text, x, y, color);
+        return getWidth(page.getFont()); // The return value of drawString isn't helpful.
     }
     
     @Override

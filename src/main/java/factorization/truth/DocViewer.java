@@ -64,7 +64,7 @@ public class DocViewer extends GuiScreen {
             this.offset = offset;
         }
     }
-    
+
     
     int getPageWidth(int pageNum) {
         return (width*40/100);
@@ -158,7 +158,7 @@ public class DocViewer extends GuiScreen {
     }
     
     Document getDocument(String name) {
-        ClientTypesetter ts = new ClientTypesetter(domain, mc.fontRenderer, getPageWidth(0), getPageHeight(0));
+        ClientTypesetter ts = new ClientTypesetter(domain, mc.fontRenderer, getPageWidth(0), getPageHeight(0) - 13*2 /* GuiButtonNextPage.height */);
         try {
             ts.write(DocumentationModule.readDocument(domain, name));
         } catch (TruthError truthError) {
