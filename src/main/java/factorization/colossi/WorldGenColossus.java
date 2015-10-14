@@ -244,8 +244,7 @@ public class WorldGenColossus implements IWorldGenerator {
         WATER,
         RIVER,
         OCEAN,
-        BEACH,
-        DENSE
+        BEACH
     };
     
     boolean isBadBiome(World w, int chunkX, int chunkZ) {
