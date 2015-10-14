@@ -1,5 +1,6 @@
 \title{The Factorization Manual}
 \nl
+\for{fzversion}{v. %1}
 % \i{v. @FZVERSION@}
 \nl
 

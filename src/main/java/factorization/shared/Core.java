@@ -204,6 +204,7 @@ public class Core {
         FMLInterModComms.sendMessage(Core.modId, "AddRecipeCategory", "Lacerator|factorization.oreprocessing.TileEntityGrinder|recipes");
         FMLInterModComms.sendMessage(Core.modId, "AddRecipeCategory", "Crystallizer|factorization.oreprocessing.TileEntityCrystallizer|recipes");
         FMLInterModComms.sendMessage(Core.modId, "AddRecipeCategory", "Slag Furnace|factorization.oreprocessing.TileEntitySlagFurnace$SlagRecipes|smeltingResults");
+        FMLInterModComms.sendMessage(Core.modId, "DocVar", "fzverion=" + Core.version);
         compatLoader.loadCompat();
         compatLoader.preinit(event);
     }
