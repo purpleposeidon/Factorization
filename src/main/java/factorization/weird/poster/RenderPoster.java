@@ -35,6 +35,8 @@ public class RenderPoster extends RenderEntity {
             GL11.glPopMatrix();
         }
         GL11.glEnable(GL12.GL_RESCALE_NORMAL);
+        GL11.glEnable(GL11.GL_ALPHA_TEST); // This should always be enabled; some other mod's derping things up tho; we can leave it on
+        GL11.glEnable(GL11.GL_BLEND); // Not so sure about this one. Probably okay?
         poster.rot.glRotate();
         double s = poster.scale;
         GL11.glScaled(s, s, s);
