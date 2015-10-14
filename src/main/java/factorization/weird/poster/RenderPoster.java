@@ -34,9 +34,10 @@ public class RenderPoster extends RenderEntity {
             GL11.glEnable(GL11.GL_TEXTURE_2D);
             GL11.glPopMatrix();
         }
+        GL11.glPushAttrib(GL11.GL_ENABLE_BIT);
         GL11.glEnable(GL12.GL_RESCALE_NORMAL);
         GL11.glEnable(GL11.GL_ALPHA_TEST); // This should always be enabled; some other mod's derping things up tho; we can leave it on
-        GL11.glEnable(GL11.GL_BLEND); // Not so sure about this one. Probably okay?
+        GL11.glDisable(GL11.GL_BLEND); // NORELEASE: Does this fix that 'no alpha' issue I was having?
         poster.rot.glRotate();
         double s = poster.scale;
         GL11.glScaled(s, s, s);
@@ -45,8 +46,9 @@ public class RenderPoster extends RenderEntity {
         } catch (Throwable t) {
             t.printStackTrace();
             poster.inv = new ItemStack(Blocks.fire); // Hopefully fire doesn't also somehow error out.
+        } finally {
+            GL11.glPopAttrib();
         }
-        GL11.glDisable(GL12.GL_RESCALE_NORMAL);
         GL11.glPopMatrix();
     }
 
