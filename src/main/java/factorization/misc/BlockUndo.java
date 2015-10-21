@@ -11,6 +11,7 @@ import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import factorization.api.Coord;
 import factorization.common.FzConfig;
+import factorization.shared.NORELEASE;
 import factorization.util.DataUtil;
 import factorization.util.FzUtil;
 import factorization.util.ItemUtil;
@@ -97,6 +98,7 @@ public class BlockUndo {
     public static int UNDO_MAX = 6;
     public static float MAX_TRUE_SPEED_STANDARD = 0.25F / 2;
     public static float MAX_TRUE_SPEED_TILEENTITY = 0.125F / 2;
+    public static float ANTI_WARP_SPEED = 64;
 
     HashMap<String, ArrayList<PlacedBlock>> recentlyPlaced = new HashMap<String, ArrayList<PlacedBlock>>();
 
@@ -137,7 +139,7 @@ public class BlockUndo {
 
     @SubscribeEvent(priority = EventPriority.LOWEST) // Act after any cancellations
     public void recordBlock(BlockEvent.PlaceEvent event) {
-        if (event.player == null || event.player.isSneaking()) return;
+        if (event.player == null) return;
         if (event.world.isRemote) return;
         if (event.player instanceof FakePlayer) return;
         if (event.block.getBlockHardness(event.world, event.x, event.y, event.z) <= 0F) return;
@@ -208,6 +210,9 @@ public class BlockUndo {
         if (true_speed > max_true_speed) return;
         float boost = max_true_speed * hardness * harvestingSpeed;
         event.newSpeed = Math.max(event.newSpeed * boost, event.newSpeed);
+        event.newSpeed = Math.min(ANTI_WARP_SPEED, event.newSpeed);
+        // ... this code is wrong. It's suuuper fast for enderchests. Everything too complicated?
+        // Maybe just a single blind speed, and be done with it?
     }
 
     private boolean canUndo(PlayerEvent event, int x, int y, int z, Block block, int metadata) {
