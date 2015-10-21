@@ -259,7 +259,10 @@ public class InventoryForge implements IInventory {
                 for (int id : enchantIds) {
                     Enchantment ench = Enchantment.enchantmentsList[id];
                     if (ench.getMaxLevel() == 1) continue;
-                    int sneaky_max = Math.min(9, ench.getMaxLevel() * 3 / 2);
+                    int enchMax = ench.getMaxLevel();
+                    int extra = enchMax * 3 / 2;
+                    if (extra > 4) extra = 4;
+                    int sneaky_max = enchMax + extra;
                     int level = enchants.get(id);
                     if (level >= sneaky_max) continue;
                     enchants.put(id, level + 1);
