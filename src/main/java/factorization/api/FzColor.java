@@ -7,6 +7,10 @@ import net.minecraft.block.BlockColored;
 import net.minecraft.block.BlockStainedGlass;
 import net.minecraft.block.BlockStainedGlassPane;
 import net.minecraft.item.ItemStack;
+import net.minecraftforge.oredict.OreDictionary;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public enum FzColor {
     NO_COLOR(null, 0xFFFFFF),
@@ -29,12 +33,30 @@ public enum FzColor {
     
     public final String dyeName;
     public final int hex; // The color values are from ItemDye
+    private final List<ItemStack> ore_entries;
     
     FzColor(String dyeName, int hex) {
         this.dyeName = dyeName;
         this.hex = hex;
+        if (dyeName == null) {
+            ore_entries = new ArrayList<ItemStack>();
+        } else {
+            ore_entries = OreDictionary.getOres(dyeName);
+        }
     }
-    
+
+    public int getR() {
+        return ((this.hex & 0xFF0000) >> 16);
+    }
+
+    public int getG() {
+        return ((this.hex & 0x00FF00) >> 8);
+    }
+
+    public int getB() {
+        return (this.hex & 0x0000FF);
+    }
+
     public float getRed() {
         return ((this.hex & 0xFF0000) >> 16) / 255F;
     }
@@ -106,9 +128,7 @@ public enum FzColor {
     public static FzColor fromItem(ItemStack is) {
         if (is == null) return NO_COLOR;
         for (FzColor color : VALID_COLORS) {
-            if (ItemUtil.oreDictionarySimilar(color.dyeName, is)) {
-                return color;
-            }
+            if (ItemUtil.oreDictionarySimilarEfficient(color.ore_entries, is)) return color;
         }
         return NO_COLOR;
     }

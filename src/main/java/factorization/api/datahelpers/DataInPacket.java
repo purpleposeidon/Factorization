@@ -61,4 +61,16 @@ public class DataInPacket extends DataHelper {
         }
         return value;
     }
+
+    @Override
+    public int[] putIntArray(int[] value) throws IOException {
+        int len = dis.readInt();
+        if (value == null || value.length != len) {
+            value = new int[len]; // Yeah, this could be a denial of service :/
+        }
+        for (int i = 0; i < len; i++) {
+            value[i] = dis.readInt();
+        }
+        return value;
+    }
 }

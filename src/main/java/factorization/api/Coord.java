@@ -1,16 +1,21 @@
 package factorization.api;
 
-import factorization.shared.*;
+import com.google.common.io.ByteArrayDataInput;
+import com.google.common.io.ByteArrayDataOutput;
+import cpw.mods.fml.common.network.internal.FMLProxyPacket;
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
+import factorization.api.datahelpers.DataHelper;
+import factorization.api.datahelpers.IDataSerializable;
+import factorization.notify.ISaneCoord;
+import factorization.shared.BlockHelper;
+import factorization.shared.Core;
+import factorization.shared.NetworkFactorization.MessageType;
+import factorization.shared.TileEntityCommon;
 import factorization.util.FzUtil;
 import factorization.util.ItemUtil;
 import factorization.util.SpaceUtil;
 import io.netty.buffer.ByteBuf;
-
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Random;
-
 import net.minecraft.block.Block;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.item.EntityItem;
@@ -32,16 +37,11 @@ import net.minecraftforge.fluids.Fluid;
 import net.minecraftforge.fluids.FluidRegistry;
 import net.minecraftforge.fluids.IFluidBlock;
 
-import com.google.common.io.ByteArrayDataInput;
-import com.google.common.io.ByteArrayDataOutput;
-
-import cpw.mods.fml.common.network.internal.FMLProxyPacket;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
-import factorization.api.datahelpers.DataHelper;
-import factorization.api.datahelpers.IDataSerializable;
-import factorization.notify.ISaneCoord;
-import factorization.shared.NetworkFactorization.MessageType;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Random;
 
 // Note: The rules for holding on to references to Coord are the same as for holding on to World.
 // Don't keep references to them outside of things that are in worlds to avoid mem-leaks; or be careful about it.
@@ -270,6 +270,13 @@ public final class Coord implements IDataSerializable, ISaneCoord, Comparable<Co
         return dx * dx + dy * dy + dz * dz;
     }
 
+    public double distanceSq(Entity ent) {
+        double dx = x - ent.posX;
+        double dy = y - ent.posY;
+        double dz = z - ent.posZ;
+        return dx * dx + dy * dy + dz * dz;
+    }
+
     public int distanceManhatten(Coord o) {
         if (o == null) {
             return 0;
@@ -286,7 +293,7 @@ public final class Coord implements IDataSerializable, ISaneCoord, Comparable<Co
         return ret;
     }
     
-    public <T> Iterable<T> getAdjacentTEs(Class<T> clazz) {
+    public <T> List<T> getAdjacentTEs(Class<T> clazz) {
         ArrayList<T> ret = new ArrayList<T>(6);
         for (Coord n : getNeighborsAdjacent()) {
             T toAdd = n.getTE(clazz);
@@ -1103,5 +1110,13 @@ public final class Coord implements IDataSerializable, ISaneCoord, Comparable<Co
 
     public boolean isNormalCube() {
         return w.getBlock(x, y, z).isNormalCube(w, x, y, z);
+    }
+
+    public boolean isInvalid() {
+        return x == 0 && y == -1 && z == 0;
+    }
+
+    public static Coord getInvalid() {
+        return new Coord(null, 0, -1, 0);
     }
 }

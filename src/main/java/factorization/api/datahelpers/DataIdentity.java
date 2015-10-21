@@ -29,4 +29,9 @@ public class DataIdentity extends DataHelper {
     public ItemStack[] putItemArray(ItemStack[] value) throws IOException {
         return value;
     }
+
+    @Override
+    public int[] putIntArray(int[] value) throws IOException {
+        return value;
+    }
 }

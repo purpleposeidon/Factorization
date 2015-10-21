@@ -64,4 +64,13 @@ public class DataOutByteBuf extends DataHelper {
         }
         return value;
     }
+
+    @Override
+    public int[] putIntArray(int[] value) throws IOException {
+        dos.writeInt(value.length);
+        for (int v : value) {
+            dos.writeInt(v);
+        }
+        return value;
+    }
 }

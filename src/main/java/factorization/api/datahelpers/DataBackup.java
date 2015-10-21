@@ -41,4 +41,9 @@ public class DataBackup extends DataHelper {
     public ItemStack[] putItemArray(ItemStack[] value) throws IOException {
         return putImplementation(value);
     }
+
+    @Override
+    public int[] putIntArray(int[] value) throws IOException {
+        return putImplementation(value);
+    }
 }

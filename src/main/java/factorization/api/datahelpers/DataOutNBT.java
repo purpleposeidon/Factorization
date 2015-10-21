@@ -84,4 +84,10 @@ public class DataOutNBT extends DataHelperNBT {
         tag.setTag(name, buffer);
         return value;
     }
+
+    @Override
+    public int[] putIntArray(int[] value) throws IOException {
+        tag.setIntArray(name, value);
+        return value;
+    }
 }

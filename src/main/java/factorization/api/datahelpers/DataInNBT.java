@@ -91,4 +91,9 @@ public class DataInNBT extends DataHelperNBT {
         }
         return value;
     }
+
+    @Override
+    public int[] putIntArray(int[] value) throws IOException {
+        return tag.getIntArray(name);
+    }
 }

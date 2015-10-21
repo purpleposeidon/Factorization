@@ -346,6 +346,11 @@ public class GuiDataConfig extends GuiScreen {
             public ItemStack[] putItemArray(ItemStack[] value) throws IOException {
                 return value;
             }
+
+            @Override
+            public int[] putIntArray(int[] value) throws IOException {
+                return value;
+            }
         });
     }
     

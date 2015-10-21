@@ -282,6 +282,10 @@ public class ServoStack implements IDataSerializable, Iterable {
             return value;
         }
 
+        @Override
+        public int[] putIntArray(int[] value) throws IOException {
+            return value;
+        }
     }
     
     public DataHelper getDataHelper(boolean reader) {

@@ -218,4 +218,14 @@ public final class PlayerUtil {
         }
         return ItemUtil.normalize(stack);
     }
+
+    public static void consumeHeldItem(EntityPlayer player) {
+        if (isPlayerCreative(player)) return;
+        ItemStack held = player.getHeldItem();
+        if (held == null) return;
+        held.stackSize--;
+        if (held.stackSize <= 0) {
+            player.setCurrentItemOrArmor(0, null);
+        }
+    }
 }

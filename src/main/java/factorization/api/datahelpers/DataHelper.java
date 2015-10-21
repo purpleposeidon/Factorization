@@ -1,5 +1,6 @@
 package factorization.api.datahelpers;
 
+import com.typesafe.config.ConfigException;
 import factorization.api.FzOrientation;
 import factorization.util.DataUtil;
 import net.minecraft.item.ItemStack;
@@ -101,6 +102,11 @@ public abstract class DataHelper {
         }
         return putImplementation(o);
     }
+
+    public <E extends IDataSerializable> E putIDS(E val) throws IOException {
+        if (val == null) throw new NullPointerException();
+        return put(val);
+    }
     
     /** Reads or writes a value, and returns what was read or written.
      * Here is a template for all the types: <pre>
@@ -134,6 +140,7 @@ for t in "Boolean Byte Short Int Long Float Double String FzOrientation ItemStac
     public final float putFloat(float value) throws IOException { return (float)put(value); }
     public final double putDouble(double value) throws IOException { return (double)put(value); }
     public final UUID putUUID(UUID value) throws IOException { return (UUID)put(value); }
+    public abstract int[] putIntArray(int[] value) throws IOException;
     
     public final String putString(String value) throws IOException { return (String)put(value); }
     public final FzOrientation putFzOrientation(FzOrientation value) throws IOException { return (FzOrientation)put(value); }

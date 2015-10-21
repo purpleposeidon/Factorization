@@ -5,6 +5,7 @@ import java.io.IOException;
 import factorization.api.datahelpers.DataHelper;
 import factorization.api.datahelpers.Share;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.Vec3;
 
 public class LoggerDataHelper extends DataHelper {
     ServoMotor motor;
@@ -42,6 +43,11 @@ public class LoggerDataHelper extends DataHelper {
 
     @Override
     public ItemStack[] putItemArray(ItemStack[] value) throws IOException {
+        return putImplementation(value);
+    }
+
+    @Override
+    public int[] putIntArray(int[] value) throws IOException {
         return putImplementation(value);
     }
 }
