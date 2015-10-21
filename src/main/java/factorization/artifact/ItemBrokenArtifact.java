@@ -9,6 +9,7 @@ import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.ItemTool;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraftforge.event.AnvilUpdateEvent;
 import net.minecraftforge.event.entity.player.AnvilRepairEvent;
@@ -59,8 +60,18 @@ public class ItemBrokenArtifact extends ItemFactorization {
         ItemStack held = get(is);
         if (held == null) return;
         ItemStack fresh = new ItemStack(held.getItem());
-        String got = Core.translateWithCorrectableFormat("item.factorization:brokenArtifact.repairhint", fresh.getDisplayName());
+        ItemStack repair = new ItemStack(getRepairItem(fresh));
+        String got = Core.translateWithCorrectableFormat("item.factorization:brokenArtifact.repairhint", repair.getDisplayName());
         Collections.addAll(list, got.split("\\\\n"));
+    }
+
+    public Item getRepairItem(ItemStack held) {
+        Item template = held.getItem();
+
+        if (template instanceof ItemTool) {
+            return ((ItemTool) template).func_150913_i(/*getToolMaterial*/).func_150995_f(/*getRepairItem*/);
+        }
+        return template;
     }
 
     @SubscribeEvent
@@ -70,7 +81,8 @@ public class ItemBrokenArtifact extends ItemFactorization {
         if (!ItemUtil.is(left, this)) return;
         ItemStack held = get(left);
         if (held == null) return;
-        Item template = held.getItem();
+        Item template = getRepairItem(held);
+
         if (!ItemUtil.is(right, template)) return;
         if (right.getItemDamage() != 0) return;
         // Check for enchants? Previous repairs? Nah.
