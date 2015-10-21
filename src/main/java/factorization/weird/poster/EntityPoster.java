@@ -19,6 +19,7 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.AxisAlignedBB;
+import net.minecraft.util.MathHelper;
 import net.minecraft.util.MovingObjectPosition;
 import net.minecraft.util.Vec3;
 import net.minecraft.world.World;
@@ -234,5 +235,15 @@ public class EntityPoster extends EntityFz {
     @Override
     public ItemStack getPickedResult(MovingObjectPosition target) {
         return inv.copy();
+    }
+
+    @Override
+    public int getBrightnessForRender(float partial) {
+        // Modified version of super; prevents us from rendering odly when there's a block above.
+        int x = MathHelper.floor_double(posX);
+        int z = MathHelper.floor_double(posZ);
+
+        if (!worldObj.blockExists(x, 0, z)) return 0;
+        return worldObj.getLightBrightnessForSkyBlocks(x, MathHelper.floor_double(posY - 0.5), z, 0);
     }
 }
