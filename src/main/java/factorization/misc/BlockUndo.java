@@ -11,7 +11,6 @@ import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import factorization.api.Coord;
 import factorization.common.FzConfig;
-import factorization.shared.NORELEASE;
 import factorization.util.DataUtil;
 import factorization.util.FzUtil;
 import factorization.util.ItemUtil;
