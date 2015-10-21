@@ -16,7 +16,7 @@ as will tools created by more standard means.
 Once there are at least seven tools in the Hall of Legends,
 the earliest submitted tool can be removed by punching the block.
 This will give you the shards of the tool,
-which can then be repaired by combinging the shards
+which can then be repaired by combining the shards
 with an undamaged base tool at the anvil for 30 levels.
 
 The Hall will automatically display the shards of the tools it is holding
@@ -29,6 +29,8 @@ you must punch the Hall with a poster;
 this will remove the shards from the posters.
 Punching the block with a poster again will
 put the shards back into the posters.
+
+A redstone signal is emitted when an artifact can be submitted.
 
 
 \topic{factorization.factoryBlock.LEGENDARIUM}

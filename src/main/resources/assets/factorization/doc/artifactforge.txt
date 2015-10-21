@@ -14,7 +14,7 @@ There are several materials that are absolutely required for creating artifacts.
 First, you need two identical tools.
 
 You will also need \{u}{three} Bottles of Potency,
-which are created by combinging an empty bottle
+which are created by combining an empty bottle
 and a bit of \#{item.factorization:entheas} entheas
 in an \#{tile.anvil.intact}anvil
 for 35 levels.

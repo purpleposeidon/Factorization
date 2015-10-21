@@ -15,9 +15,9 @@ import factorization.shared.Sound;
 import factorization.shared.TileEntityCommon;
 import factorization.util.FzUtil;
 import factorization.util.ItemUtil;
-import factorization.util.PlayerUtil;
 import factorization.util.SpaceUtil;
 import factorization.weird.poster.EntityPoster;
+import net.minecraft.block.Block;
 import net.minecraft.block.BlockSign;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
@@ -426,5 +426,27 @@ public class TileEntityLegendarium extends TileEntityCommon {
             iterateSign(poster, clearSign);
         }
         return ret;
+    }
+
+    @Override
+    public boolean power() {
+        return getWaitTicks() <= 0;
+    }
+
+    @Override
+    public void blockUpdateTick(Block myself) {
+        super.blockUpdateTick(myself);
+        scheduleTick();
+    }
+
+    void scheduleTick() {
+        worldObj.scheduleBlockUpdate(xCoord, yCoord, zCoord, new Coord(this).getBlock(), (int) getWaitTicks());
+    }
+
+    @Override
+    public void markDirty() {
+        super.markDirty();
+        scheduleTick();
+        new Coord(this).w.notifyBlocksOfNeighborChange(new Coord(this).x, new Coord(this).y, new Coord(this).z, new Coord(this).getBlock());
     }
 }
