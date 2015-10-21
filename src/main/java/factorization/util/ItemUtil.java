@@ -106,6 +106,13 @@ public final class ItemUtil {
         return similar(template, stranger);
     }
 
+    public static boolean oreDictionarySimilarEfficient(List<ItemStack> oreEntries, ItemStack stranger) {
+        for (ItemStack is : oreEntries) {
+            if (wildcardSimilar(is, stranger)) return true;
+        }
+        return false;
+    }
+
     public static boolean oreDictionarySimilar(Object template, ItemStack stranger) {
         if (template instanceof String) {
             ArrayList<ItemStack> ores = OreDictionary.getOres((String) template);
@@ -255,6 +262,7 @@ public final class ItemUtil {
 
     public static Entity giveItem(EntityPlayer player, Coord at, ItemStack stack, ForgeDirection side) {
         if (null == ItemUtil.normalize(stack)) return null;
+        if (at == null) at = new Coord(player);
         if (at.w.isRemote) return null;
         Entity ent = at.spawnItem(stack);
         if (ent == null) { // pretty unlikely

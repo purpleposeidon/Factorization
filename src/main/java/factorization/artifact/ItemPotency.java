@@ -4,6 +4,7 @@ import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import factorization.common.ItemIcons;
 import factorization.shared.Core;
 import factorization.shared.ItemCraftingComponent;
+import factorization.util.EvilUtil;
 import factorization.util.ItemUtil;
 import factorization.util.PlayerUtil;
 import net.minecraft.entity.Entity;
@@ -18,6 +19,7 @@ import net.minecraft.stats.StatisticsFile;
 import net.minecraft.util.IIcon;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.FakePlayer;
+import net.minecraftforge.common.util.ForgeDirection;
 import net.minecraftforge.event.AnvilUpdateEvent;
 import net.minecraftforge.event.entity.player.AnvilRepairEvent;
 
@@ -98,18 +100,27 @@ public class ItemPotency extends ItemCraftingComponent {
         Item botl = Items.glass_bottle;
         boolean hasBotl = ItemUtil.is(left, botl) || ItemUtil.is(right, botl);
         boolean hasEnth = ItemUtil.is(left, enth) || ItemUtil.is(right, enth);
-        if (hasBotl && hasEnth && left.stackSize == 1 && right.stackSize == 1) {
-            event.output = new ItemStack(this);
-            event.cost = 35;
-            event.materialCost = 1;
-        }
+        if (!hasBotl || !hasEnth) return;
+        event.output = new ItemStack(this);
+        event.cost = 35;
+        event.materialCost = 1;
     }
 
     @SubscribeEvent
     public void setupAnvilOutput(AnvilRepairEvent event) {
-        if (event.entityPlayer.worldObj.isRemote) return;
-        ItemStack output = event.right; // Great job, Forge!
+        // Great job, Forge!
+        ItemStack output = event.right;
+        ItemStack right = event.left; // The right side's fine
+        ItemStack left = event.output;
         if (!ItemUtil.is(output, this)) return;
+        // But the left side eats everything, so give the item back
+        if (left.stackSize > 1) {
+            int free = left.stackSize - 1;
+            ItemStack toGive = left.splitStack(free);
+            ItemUtil.giveItem(event.entityPlayer, null, toGive, ForgeDirection.UNKNOWN);
+        }
+
+        if (event.entityPlayer.worldObj.isRemote) return;
         this.onUpdate(output, event.entityPlayer.worldObj, event.entityPlayer, 0, false);
         if (!(event.entityPlayer instanceof FakePlayer)) {
             Core.proxy.updatePlayerInventory(event.entityPlayer);

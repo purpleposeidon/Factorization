@@ -17,7 +17,7 @@ Once there are at least seven tools in the Hall of Legends,
 the earliest submitted tool can be removed by punching the block.
 This will give you the shards of the tool,
 which can then be repaired by combining the shards
-with an undamaged base tool at the anvil for 30 levels.
+with the appropriate repair item at the anvil for 30 levels.
 
 The Hall will automatically display the shards of the tools it is holding
 in any nearby unoccupied posters.
