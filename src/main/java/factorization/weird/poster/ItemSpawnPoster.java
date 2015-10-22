@@ -4,6 +4,7 @@ import factorization.api.Coord;
 import factorization.api.Quaternion;
 import factorization.shared.Core;
 import factorization.shared.ItemFactorization;
+import factorization.util.ItemUtil;
 import factorization.util.PlayerUtil;
 import factorization.util.SpaceUtil;
 import net.minecraft.entity.player.EntityPlayer;
@@ -108,9 +109,13 @@ public class ItemSpawnPoster extends ItemFactorization {
             bounds = plane.addCoord(dir.offsetX * pix, dir.offsetY * pix, dir.offsetZ * pix);
 
             for (Object ent : w.getEntitiesWithinAABB(EntityPoster.class, bounds)) {
-                //new Notice(ent, "Already occupied").sendTo(player);
-                return true; // Don't be ridiculous
-                // (Well, vanilla item frames let you do it...)
+                if (ent instanceof EntityPoster) {
+                    EntityPoster poster = (EntityPoster) ent;
+                    if (ItemUtil.is(poster.inv, Core.registry.spawnPoster)) return true;
+                    // Allow multiple posters if there are no empty ones
+                } else {
+                    return true;
+                }
             }
             final double xwidth = plane.maxX - plane.minX;
             final double ywidth = plane.maxY - plane.minY;
