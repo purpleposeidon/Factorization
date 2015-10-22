@@ -15,6 +15,7 @@ import cpw.mods.fml.common.network.internal.FMLProxyPacket;
 import cpw.mods.fml.relauncher.Side;
 import factorization.common.FzConfig;
 import factorization.shared.Core;
+import factorization.util.FzUtil;
 import factorization.util.PlayerUtil;
 import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
@@ -54,7 +55,7 @@ public class MiscellaneousNonsense {
     
     @EventHandler
     public void setParent(FMLPreInitializationEvent event) {
-        event.getModMetadata().parent = Core.modId;
+        FzUtil.setCoreParent(event);
     }
     
     @EventHandler

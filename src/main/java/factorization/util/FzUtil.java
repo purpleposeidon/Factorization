@@ -1,6 +1,8 @@
 package factorization.util;
 
 import com.google.common.collect.Multimap;
+import cpw.mods.fml.common.Loader;
+import cpw.mods.fml.common.event.FMLPreInitializationEvent;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import factorization.api.Coord;
@@ -201,5 +203,12 @@ public class FzUtil {
             System.out.print(" " + Integer.toString(b));
         }
         System.out.println();
+    }
+
+    public static void setCoreParent(FMLPreInitializationEvent event) {
+        final String FZ = "factorization";
+        if (Loader.isModLoaded(FZ)) {
+            event.getModMetadata().parent = FZ;
+        }
     }
 }

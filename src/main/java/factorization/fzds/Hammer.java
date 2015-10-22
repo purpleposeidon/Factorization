@@ -16,6 +16,7 @@ import cpw.mods.fml.relauncher.Side;
 import factorization.fzds.network.*;
 import factorization.mechanics.TileEntityComparatorMechanism;
 import factorization.shared.Core;
+import factorization.util.FzUtil;
 import net.minecraft.entity.Entity;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.management.PlayerManager;
@@ -29,7 +30,11 @@ import org.apache.logging.log4j.Logger;
 
 import java.io.File;
 
-@Mod(modid = Hammer.modId, name = Hammer.name, version = Core.version)
+@Mod(
+        modid = Hammer.modId,
+        name = Hammer.name,
+        version = Core.version
+)
 public class Hammer {
     final String[] Lore = new String[] {
             "At twilight's end, the shadow's crossed,",
@@ -69,7 +74,7 @@ public class Hammer {
     
     @EventHandler
     public void setup(FMLPreInitializationEvent event) {
-        event.getModMetadata().parent = Core.modId;
+        FzUtil.setCoreParent(event);
         if (!DeltaChunk.enabled()) return;
         final File configFile = event.getSuggestedConfigurationFile();
         File base = configFile.getParentFile();

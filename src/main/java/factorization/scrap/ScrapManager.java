@@ -7,6 +7,7 @@ import cpw.mods.fml.common.event.FMLServerStartedEvent;
 import cpw.mods.fml.common.event.FMLServerStartingEvent;
 import cpw.mods.fml.relauncher.Side;
 import factorization.shared.Core;
+import factorization.util.FzUtil;
 import org.apache.logging.log4j.Logger;
 
 import java.lang.reflect.Constructor;
@@ -24,6 +25,7 @@ public class ScrapManager {
 
     @Mod.EventHandler
     public void registerActions(FMLPreInitializationEvent event) {
+        FzUtil.setCoreParent(event);
         log = event.getModLog();
         actionClasses.put("SetMaxDamage", SetMaxDamage.class);
         actionClasses.put("SetMaxSize", SetMaxSize.class);

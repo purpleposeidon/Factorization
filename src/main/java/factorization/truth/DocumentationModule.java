@@ -50,7 +50,11 @@ import java.util.HashMap;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 
-@Mod(modid = DocumentationModule.modid, name = "Truth")
+@Mod(
+        modid = DocumentationModule.modid,
+        name = "Truth",
+        version = Core.version
+)
 public class DocumentationModule implements factorization.truth.api.IDocModule {
     public static final String modid = "factorization.truth";
     public static DocumentationModule instance;
@@ -61,6 +65,7 @@ public class DocumentationModule implements factorization.truth.api.IDocModule {
 
     @Mod.EventHandler
     public void init(FMLPreInitializationEvent event) {
+        FzUtil.setCoreParent(event);
         DocReg.registerGenerator("items", new ItemListViewer());
         DocReg.registerGenerator("recipes", new RecipeViewer());
         DocReg.registerGenerator("enchants", new EnchantViewer());

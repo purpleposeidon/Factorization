@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.Iterator;
 
+import factorization.util.FzUtil;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
@@ -27,7 +28,11 @@ import cpw.mods.fml.common.network.NetworkRegistry.TargetPoint;
 import cpw.mods.fml.common.network.internal.FMLProxyPacket;
 import cpw.mods.fml.relauncher.Side;
 
-@Mod(modid = NotifyImplementation.modId, name = NotifyImplementation.name, version = NotifyImplementation.version)
+@Mod(
+        modid = NotifyImplementation.modId,
+        name = NotifyImplementation.name,
+        version = NotifyImplementation.version
+)
 public class NotifyImplementation {
     public static final String modId = "factorization.notify";
     public static final String name = "Factorization Notification System";
@@ -53,10 +58,7 @@ public class NotifyImplementation {
     
     @EventHandler
     public void setParent(FMLPreInitializationEvent event) {
-        final String FZ = "factorization";
-        if (Loader.isModLoaded(FZ)) {
-            event.getModMetadata().parent = FZ;
-        }
+        FzUtil.setCoreParent(event);
     }
     
     @EventHandler

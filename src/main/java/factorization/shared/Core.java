@@ -6,7 +6,6 @@ import cpw.mods.fml.common.Mod.EventHandler;
 import cpw.mods.fml.common.ModContainer;
 import cpw.mods.fml.common.SidedProxy;
 import cpw.mods.fml.common.event.*;
-import cpw.mods.fml.common.event.FMLInterModComms.IMCMessage;
 import cpw.mods.fml.common.event.FMLMissingMappingsEvent.Action;
 import cpw.mods.fml.common.event.FMLMissingMappingsEvent.MissingMapping;
 import cpw.mods.fml.common.network.NetworkRegistry;
@@ -35,8 +34,6 @@ import factorization.fzds.HammerEnabled;
 import factorization.mechanics.MechanismsFeature;
 import factorization.oreprocessing.FactorizationOreProcessingHandler;
 import factorization.servo.ServoMotor;
-import factorization.truth.DocumentationModule;
-import factorization.truth.gen.recipe.RecipeViewer;
 import factorization.truth.minecraft.DistributeDocs;
 import factorization.util.DataUtil;
 import factorization.util.FzUtil;
@@ -68,15 +65,14 @@ import java.util.*;
         name = Core.name,
         version = Core.version,
         acceptedMinecraftVersions = "1.7.10",
-        dependencies = "required-after: " + Hammer.modId,
+        dependencies = "required-after:" + Hammer.modId,
         guiFactory = "factorization.common.FzConfigGuiFactory"
 )
 public class Core {
-    //We should repackage stuff. And rename the API package possibly.
     public static final String modId = "factorization";
     public static final String name = "Factorization";
-    //The comment below is a marker used by the build script.
     public static final String version = "@FZVERSION@";
+    //The above comment is replaced by the build script.
 
     public Core() {
         instance = this;
@@ -171,8 +167,8 @@ public class Core {
 
     @EventHandler
     public void load(FMLPreInitializationEvent event) {
-        checkJar();
         initializeLogging(event.getModLog());
+        checkJar();
         checkForge();
         Core.loadBus(registry);
         fzconfig.loadConfig(event.getSuggestedConfigurationFile());
@@ -200,11 +196,11 @@ public class Core {
             isMainClientThread.set(true);
         }
 
-        DocumentationModule.setup();
-        FMLInterModComms.sendMessage(Core.modId, "AddRecipeCategory", "Lacerator|factorization.oreprocessing.TileEntityGrinder|recipes");
-        FMLInterModComms.sendMessage(Core.modId, "AddRecipeCategory", "Crystallizer|factorization.oreprocessing.TileEntityCrystallizer|recipes");
-        FMLInterModComms.sendMessage(Core.modId, "AddRecipeCategory", "Slag Furnace|factorization.oreprocessing.TileEntitySlagFurnace$SlagRecipes|smeltingResults");
-        FMLInterModComms.sendMessage(Core.modId, "DocVar", "fzverion=" + Core.version);
+        String truth = "factorization.truth";
+        FMLInterModComms.sendMessage(truth, "AddRecipeCategory", "Lacerator|factorization.oreprocessing.TileEntityGrinder|recipes");
+        FMLInterModComms.sendMessage(truth, "AddRecipeCategory", "Crystallizer|factorization.oreprocessing.TileEntityCrystallizer|recipes");
+        FMLInterModComms.sendMessage(truth, "AddRecipeCategory", "Slag Furnace|factorization.oreprocessing.TileEntitySlagFurnace$SlagRecipes|smeltingResults");
+        FMLInterModComms.sendMessage(truth, "DocVar", "fzverion=" + Core.version);
         compatLoader.loadCompat();
         compatLoader.preinit(event);
     }
@@ -233,18 +229,6 @@ public class Core {
         InspirationManager.init();
         compatLoader.init(event);
     }
-    
-    @EventHandler
-    public void handleIMC(FMLInterModComms.IMCEvent event) {
-        for (IMCMessage message : event.getMessages()) {
-            try {
-                RecipeViewer.handleImc(message);
-                DocumentationModule.handleImc(message);
-            } catch (Throwable t) {
-                t.printStackTrace();
-            }
-        }
-    }
 
     @EventHandler
     public void modsLoaded(FMLPostInitializationEvent event) {
@@ -264,9 +248,6 @@ public class Core {
     public void registerServerCommands(FMLServerStartingEvent event) {
         isMainServerThread.set(true);
         serverStarted = true;
-        if (DocumentationModule.instance != null) {
-            DocumentationModule.instance.serverStarts(event);
-        }
         if (HammerEnabled.ENABLED) {
             event.registerServerCommand(new BuildColossusCommand());
         }
