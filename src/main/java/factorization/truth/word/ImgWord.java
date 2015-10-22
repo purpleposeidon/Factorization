@@ -47,7 +47,7 @@ public class ImgWord extends Word {
     }
 
     @Override
-    public int getPaddingBelow() {
+    public int getWordHeight() {
         return height - getPaddingAbove();
     }
 

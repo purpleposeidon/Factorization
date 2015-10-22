@@ -62,7 +62,7 @@ public class IconWord extends Word {
     }
     
     @Override
-    public int getPaddingBelow() {
+    public int getWordHeight() {
         return WordPage.TEXT_HEIGHT + getPaddingAbove();
     }
 

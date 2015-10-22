@@ -3,8 +3,10 @@ package factorization.truth;
 import com.google.common.io.Closeables;
 import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.Loader;
+import cpw.mods.fml.common.Mod;
 import cpw.mods.fml.common.ModContainer;
 import cpw.mods.fml.common.event.FMLInterModComms;
+import cpw.mods.fml.common.event.FMLPreInitializationEvent;
 import cpw.mods.fml.common.event.FMLServerStartingEvent;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import cpw.mods.fml.relauncher.Side;
@@ -48,11 +50,17 @@ import java.util.HashMap;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 
+@Mod(modid = DocumentationModule.modid, name = "Truth")
 public class DocumentationModule implements factorization.truth.api.IDocModule {
+    public static final String modid = "factorization.truth";
     public static DocumentationModule instance;
 
-    public static void setup() {
-        DocReg.module = instance = new DocumentationModule();
+    public DocumentationModule() {
+        DocReg.module = instance = this;
+    }
+
+    @Mod.EventHandler
+    public void init(FMLPreInitializationEvent event) {
         DocReg.registerGenerator("items", new ItemListViewer());
         DocReg.registerGenerator("recipes", new RecipeViewer());
         DocReg.registerGenerator("enchants", new EnchantViewer());
@@ -154,6 +162,7 @@ public class DocumentationModule implements factorization.truth.api.IDocModule {
         }
     }
 
+    @Mod.EventHandler
     public void serverStarts(FMLServerStartingEvent event) {
         if (FMLCommonHandler.instance().getSide() == Side.CLIENT) {
             if (Core.dev_environ || Boolean.getBoolean("fz.registerDocCommands")) {
@@ -367,7 +376,19 @@ public class DocumentationModule implements factorization.truth.api.IDocModule {
         }
     }
 
-    public static void handleImc(FMLInterModComms.IMCMessage message) throws ClassNotFoundException, NoSuchFieldException, IllegalAccessException {
+    @Mod.EventHandler
+    public void handleImc(FMLInterModComms.IMCEvent event) {
+        for (FMLInterModComms.IMCMessage message : event.getMessages()) {
+            try {
+                RecipeViewer.handleImc(message);
+                handleImc(message);
+            } catch (Throwable t) {
+                t.printStackTrace();
+            }
+        }
+    }
+
+    private void handleImc(FMLInterModComms.IMCMessage message) throws ClassNotFoundException, NoSuchFieldException, IllegalAccessException {
         if (!message.key.equals("DocVar")) return;
         String[] parts = message.key.split("=", 1);
         String key = parts[0];

@@ -6,7 +6,6 @@ public interface IHtmlTypesetter extends ITypesetter {
     /**
      * Write HTML; use for HTML exporting.
      * @param text Some HTML.
-     *             NORELEASE: ditch getInfo(); have this be just the top two methods; add IClientTypesetter && IHtmlTypesetter; bless InternalCmd
      */
     void html(String text);
 

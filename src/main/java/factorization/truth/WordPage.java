@@ -81,7 +81,7 @@ public class WordPage extends AbstractPage {
         int padUp = 0, padDown = 0;
         for (IWord word : line) {
             padUp = Math.max(word.getPaddingAbove(), padUp);
-            padDown = Math.max(word.getPaddingBelow(), padDown);
+            padDown = Math.max(word.getWordHeight(), padDown);
         }
         return new int[] {padUp, padDown};
     }

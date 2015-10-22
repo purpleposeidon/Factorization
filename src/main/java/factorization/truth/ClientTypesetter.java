@@ -3,7 +3,6 @@ package factorization.truth;
 import factorization.truth.api.*;
 import factorization.truth.word.ItemWord;
 import factorization.truth.word.TextWord;
-import factorization.truth.word.Word;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumChatFormatting;
@@ -55,7 +54,7 @@ public class ClientTypesetter extends AbstractTypesetter implements IClientTypes
             total_height += paddingTop + paddingBottom;
         }
 
-        if (total_height + w.getPaddingAbove() + w.getPaddingBelow() > pageHeight) {
+        if (total_height + w.getPaddingAbove() + w.getWordHeight() > pageHeight) {
             WordPage oldPage = page;
             ArrayList<IWord> oldSeg = segmentStart;
             newPage();

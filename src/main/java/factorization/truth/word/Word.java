@@ -24,13 +24,12 @@ public abstract class Word implements IWord {
     
     public abstract int getWidth(FontRenderer font);
     public abstract int draw(int x, int y, boolean hover, FontRenderer font);
-    public abstract void writeHtml(IHtmlTypesetter out);
 
     @Override
     public void drawHover(int mouseX, int mouseY) { }
     
     public int getPaddingAbove() { return 1; }
-    public int getPaddingBelow() { return 1; }
+    public int getWordHeight() { return 1; }
     
     public int getLinkColor(boolean hover) {
         boolean dark = DocViewer.dark();

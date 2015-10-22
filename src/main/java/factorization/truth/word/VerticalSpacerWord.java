@@ -26,7 +26,7 @@ public class VerticalSpacerWord extends Word {
     }
     
     @Override
-    public int getPaddingBelow() {
+    public int getWordHeight() {
         return vertSize;
     }
 
