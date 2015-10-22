@@ -24,12 +24,31 @@ protips/
 other/
 DeSrg/
 at.cfg
+backup.sh
+fznei.zip
+chicken_chunks_crap/
+apis/
+all_events.txt
+documentation_property
+blender/nice-noise-2.blend
+blender/worldgen.blend
+letter
+fz_code_style.xml
+MinecraftForge
+OUT/
 
-# #Symlinked directories
-# lang
-# fzsrc
-# textures
+
+#Symlinked directories
+lang
+fzsrc
+textures
+resources
+sound_assets
+screenshots
+minecraft_textures
 
 # (I've likely derped up my intellij setup somehow)
 src/main/java/GradleStart.java
 src/main/java/GradleStartServer.java
+
+
