@@ -75,6 +75,7 @@ public class InventoryForge implements IInventory {
         inv[slot] = stack;
         if (slot == SLOT_OUT && !player.worldObj.isRemote) {
             new ArtifactBuilder(false).buildArtifact(player, name, lore);
+            container.detectAndSendChanges();
         }
     }
 
@@ -97,7 +98,6 @@ public class InventoryForge implements IInventory {
     public void markDirty() {
         if (player.worldObj.isRemote) return;
         inv[SLOT_OUT] = new ArtifactBuilder(true).buildArtifact(player, name, lore);
-        container.detectAndSendChanges();
     }
 
     @Override
