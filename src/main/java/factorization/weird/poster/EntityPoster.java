@@ -244,6 +244,10 @@ public class EntityPoster extends EntityFz {
         int z = MathHelper.floor_double(posZ);
 
         if (!worldObj.blockExists(x, 0, z)) return 0;
-        return worldObj.getLightBrightnessForSkyBlocks(x, MathHelper.floor_double(posY - 0.5), z, 0);
+        double d = -0.5;
+        if (ForgeDirection.UP == top) {
+            d = +0;
+        }
+        return worldObj.getLightBrightnessForSkyBlocks(x, MathHelper.floor_double(posY + d), z, 0);
     }
 }
