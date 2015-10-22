@@ -225,13 +225,13 @@ public class DocumentationModule implements factorization.truth.api.IDocModule {
             for (StackTraceElement ste : e.getStackTrace()) {
                 txt += "\n\n    at " + ste.getFileName() + "(" + ste.getFileName() + ":" + ste.getLineNumber() + ")";
             }
-            return "\\obf{5*5*5*2*2 Internal Server Error\n\nAn error was encountered while trying to execute your request.}\n\n" + txt;
+            return "\\5*5*5*2*2 Internal Server Error\n\nAn error was encountered while trying to execute your request.\n\n" + txt;
         }
     }
     
     private static String readContents(String name, InputStream is) throws IOException {
         if (is == null) {
-            return "\\obf{101*2*2 Not Found:} " + name;
+            return "\\101*2*2 Not Found: " + name;
         }
         StringBuilder build = new StringBuilder();
         byte[] buf = new byte[1024];
