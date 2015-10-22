@@ -30,8 +30,8 @@ import factorization.compat.CompatModuleLoader;
 import factorization.coremod.AtVerifier;
 import factorization.coremod.LoadingPlugin;
 import factorization.darkiron.BlockDarkIronOre;
-import factorization.fzds.DeltaChunk;
 import factorization.fzds.Hammer;
+import factorization.fzds.HammerEnabled;
 import factorization.mechanics.MechanismsFeature;
 import factorization.oreprocessing.FactorizationOreProcessingHandler;
 import factorization.servo.ServoMotor;
@@ -267,7 +267,7 @@ public class Core {
         if (DocumentationModule.instance != null) {
             DocumentationModule.instance.serverStarts(event);
         }
-        if (DeltaChunk.enabled()) {
+        if (HammerEnabled.ENABLED) {
             event.registerServerCommand(new BuildColossusCommand());
         }
     }
