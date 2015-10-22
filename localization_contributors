@@ -1,0 +1,3 @@
+#!/bin/sh
+cd lang
+git log | grep Author | sort | uniq | line.py "_.split(':')[1].strip().split('<')[0].strip()" | sort | uniq
