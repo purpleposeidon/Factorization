@@ -1,0 +1,79 @@
+------------------------------------------------------------
+All tasks runnable from root project
+------------------------------------------------------------
+
+Build tasks
+-----------
+apiClasses - Assembles classes 'api'.
+assemble - Assembles the outputs of this project.
+build - Assembles and tests this project.
+buildDependents - Assembles and tests this project and all projects that depend on it.
+buildNeeded - Assembles and tests this project and all projects it depends on.
+classes - Assembles classes 'main'.
+clean - Deletes the build directory.
+jar - Assembles a jar archive containing the main classes.
+testClasses - Assembles classes 'test'.
+
+Build Setup tasks
+-----------------
+init - Initializes a new Gradle build. [incubating]
+wrapper - Generates Gradle wrapper files. [incubating]
+
+Documentation tasks
+-------------------
+javadoc - Generates Javadoc API documentation for the main source code.
+
+ForgeGradle tasks
+-----------------
+cleanCache - Cleares the ForgeGradle cache. DONT RUN THIS unless you want a fresh start, or the dev tells you to.
+debugClient - Runs the Minecraft client in debug mode
+debugServer - Runs the Minecraft serevr in debug mode
+runClient - Runs the Minecraft client
+runServer - Runs the Minecraft Server
+setupCIWorkspace - Sets up the bare minimum to build a minecraft mod. Idea for CI servers
+setupDecompWorkspace - DevWorkspace + the deobfuscated Minecraft source linked as a source jar.
+setupDevWorkspace - CIWorkspace + natives and assets to run and test Minecraft
+
+Help tasks
+----------
+dependencies - Displays all dependencies declared in root project 'factorization'.
+dependencyInsight - Displays the insight into a specific dependency in root project 'factorization'.
+help - Displays a help message
+projects - Displays the sub-projects of root project 'factorization'.
+properties - Displays the properties of root project 'factorization'.
+tasks - Displays the tasks runnable from root project 'factorization'.
+
+IDE tasks
+---------
+cleanEclipse - Cleans all Eclipse files.
+cleanIdea - Cleans IDEA project files (IML, IPR)
+eclipse - Generates all Eclipse files.
+idea - Generates IDEA project files (IML, IPR, IWS)
+
+Upload tasks
+------------
+uploadArchives - Uploads all artifacts belonging to configuration ':archives'
+
+Verification tasks
+------------------
+check - Runs all checks.
+test - Runs the unit tests.
+
+Other tasks
+-----------
+afterEclipseImport
+cleanIdeaWorkspace
+deobfJar
+genIntellijRuns
+install - Installs the 'archives' artifacts into the local Maven repository.
+writeFzFile
+
+Rules
+-----
+Pattern: build<ConfigurationName>: Assembles the artifacts of a configuration.
+Pattern: upload<ConfigurationName>: Assembles and uploads the artifacts belonging to a configuration.
+Pattern: clean<TaskName>: Cleans the output files of a task.
+
+To see all tasks and more detail, run with --all.
+
+
