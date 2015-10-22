@@ -1,6 +1,15 @@
 This system is TeX-inspired. Just read the manual's source in this directory for examples!
 
-Commands:
+If you are in a dev environment, symlink the resources folder into MC's resource packs folder.
+This way you can edit the docs, save it, and press 'r' in the doc viewer to refresh.
+(Resource packs need not be in zips; they can be unzipped in the resourcepacks directory to allow easier editing.)
+
+The commands /fzdoc-serialize and /html-fzdoc-export are only available in a deobf environment, or by passing -Dfz.registerDocCommands=true on the JVM command-line.
+
++------------------------+
+| Documentation Commands |
++------------------------+
+
 \p      Starts a new paragraph
 \nl     Emits a newline; different from \p
 \-      Bulleted list item
@@ -60,6 +69,10 @@ Commands:
         (Not typeset properly? Easy to fix, honestly.)
 \include{name}
         Copies in the contents of a file.
+\for{varname}{text body, where %1 is replaced}
+        Loops over the lines in varname. For each line, %1 is replaced with the text of the line.
+
+I've probably missed some commands.
 
 A '%' marks a line-comment.
 Multiple spaces are ignored.
@@ -67,14 +80,23 @@ A single newline is ignored.
 Two or more newlines create a real single newline.
 Commands swallow following spaces. To actually follow a command with a space, do something like "\this\ " to expressly emit a space.
 
+TODO: macro system
+
++--------------+
+| IMC Commands |
++--------------+
+
+To register a custom recipe list:
+    Send to mod: "factorization.truth"
+    MessageType: "AddRecipeCategory"
+    Format: "category localization key|reference.to.classContainingRecipes|nameOfStaticFieldIterable"
+    The field's value must either be Iterable or a Map, or it must be an object with a 'getRecipes' method returning Iterable or Map.
 
 
-If you are in a dev environment, symlink the resources folder into MC's resource packs folder.
-This way you can edit the docs, save it, and press 'r' in the doc viewer to refresh.
-Resource packs need not be in zips; they can be unzipped in the resourcepacks directory to allow easier editing.
+To add an entry to Factorization's main page list:
+    Send to mod: "factorization.truth"
+    MessageType: "DocVar"
+    format: "extraindex+={linkname}{\#{Some item} link body}"
+This can be used with other \for commands, and can also be invoked with '=' instead of '+='
 
-The commands /fzdoc-serialize and /html-fzdoc-export are only available in a deobf environment, or by passing -Dfz.registerDocCommands=true on the JVM command-line.
 
-TODO: Proper macro system? :P
-
-I've probably missed some commands.
