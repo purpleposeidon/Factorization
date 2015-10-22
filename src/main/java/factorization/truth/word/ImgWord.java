@@ -1,6 +1,6 @@
 package factorization.truth.word;
 
-import factorization.truth.DocViewer;
+import factorization.truth.api.IHtmlTypesetter;
 import factorization.util.FzUtil;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
@@ -52,9 +52,9 @@ public class ImgWord extends Word {
     }
 
     @Override
-    public int draw(DocViewer doc, int x, int y, boolean hover) {
+    public int draw(int x, int y, boolean hover, FontRenderer font) {
         int z = 0;
-        doc.mc.renderEngine.bindTexture(resource); // memleak goes here! :|
+        Minecraft.getMinecraft().renderEngine.bindTexture(resource); // memleak goes here! :|
         Tessellator tess = new Tessellator();
         GL11.glColor4f(1, 1, 1, 1);
         tess.startDrawingQuads();
@@ -105,5 +105,11 @@ public class ImgWord extends Word {
             }
         }
         scale(s);
+    }
+
+    @Override
+    public void writeHtml(IHtmlTypesetter out) {
+        final String imgPath = out.img(resource.toString());
+        out.html(String.format("<img width=%s height=%s src=\"%s\" />", width, height, imgPath));
     }
 }

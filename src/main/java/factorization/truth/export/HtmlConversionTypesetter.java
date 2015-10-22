@@ -113,4 +113,9 @@ public class HtmlConversionTypesetter extends AbstractTypesetter implements IHtm
             break;
         }
     }
+
+    @Override
+    public void write(IWord word) {
+        ((Word) word).writeHtml(this);
+    }
 }

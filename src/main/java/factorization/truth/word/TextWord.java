@@ -1,7 +1,7 @@
 package factorization.truth.word;
 
-import factorization.truth.DocViewer;
 import factorization.truth.WordPage;
+import factorization.truth.api.IHtmlTypesetter;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.util.EnumChatFormatting;
 
@@ -43,12 +43,17 @@ public class TextWord extends Word {
     }
 
     @Override
-    public int draw(DocViewer page, int x, int y, boolean hover) {
-        int color = getLinkColor(page, hover);
-        page.getFont().drawString(style + text, x, y, color);
-        return getWidth(page.getFont()); // The return value of drawString isn't helpful.
+    public int draw(int x, int y, boolean hover, FontRenderer font) {
+        int color = getLinkColor(hover);
+        font.drawString(style + text, x, y, color);
+        return getWidth(font); // The return value of drawString isn't helpful.
     }
-    
+
+    @Override
+    public void writeHtml(IHtmlTypesetter out) {
+        out.html(text);
+    }
+
     @Override
     public int getPaddingAbove() {
         return 2;

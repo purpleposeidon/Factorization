@@ -2,10 +2,7 @@ package factorization.truth.export;
 
 
 import factorization.truth.ClientTypesetter;
-import factorization.truth.Tokenizer;
-import factorization.truth.WordPage;
-import factorization.truth.api.TruthError;
-import factorization.truth.word.Word;
+import factorization.truth.api.IWord;
 
 public class IndexerTypesetter extends ClientTypesetter {
     String filename;
@@ -21,7 +18,7 @@ public class IndexerTypesetter extends ClientTypesetter {
     }
 
     @Override
-    public void write(Word w) {
+    public void write(IWord w) {
         if (active_link != null) {
             IndexDocumentation.foundLink(active_link);
         }

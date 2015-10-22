@@ -2,7 +2,6 @@ package factorization.truth.gen.recipe;
 
 import cpw.mods.fml.common.event.FMLInterModComms.IMCMessage;
 import factorization.shared.Core;
-import factorization.truth.ClientTypesetter;
 import factorization.truth.DocumentationModule;
 import factorization.truth.api.*;
 import factorization.truth.word.ItemWord;
@@ -43,7 +42,7 @@ public class RecipeViewer implements IDocGenerator, IObjectWriter<Object> {
     @Override
     public void process(ITypesetter out, String arg) throws TruthError {
         StandardObjectWriters.setup();
-        if (recipeCategories == null || (Core.dev_environ && !Boolean.getBoolean("fz.devNoRecipeRefresh"))) {
+        if (recipeCategories == null || Boolean.getBoolean("fz.forceRecipeRefresh")) {
             categoryOrder.clear();
             recipeCategories = new HashMap<String, ArrayList<ArrayList>>();
             Core.logInfo("Loading recipe list");
@@ -146,16 +145,15 @@ public class RecipeViewer implements IDocGenerator, IObjectWriter<Object> {
     void writeRecipe(ITypesetter out, ArrayList parts) {
         if (parts.isEmpty()) return;
         try {
-            ClientTypesetter cout = (ClientTypesetter) out;
-            cout.write("\\seg");
+            out.write("\\seg");
             for (Object part : parts) {
                 if (part instanceof String) {
                     out.write((String) part);
                 } else {
-                    cout.write((Word) part);
+                    out.write((Word) part);
                 }
             }
-            cout.write("\\endseg\\nl");
+            out.write("\\endseg\\nl");
         } catch (Throwable t) {
             t.printStackTrace();
         }

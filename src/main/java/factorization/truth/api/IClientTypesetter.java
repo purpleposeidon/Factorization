@@ -9,7 +9,7 @@ public interface IClientTypesetter extends ITypesetter {
      * Send a word directly to the typesetter. The contents of the word will not be word-wrapped.
      * @param w the Word
      */
-    void write(Word w);
+    void write(IWord w);
 
     /**
      * Similar to {@link ITypesetter#write(String)}, but the text will also have the link/style applied.

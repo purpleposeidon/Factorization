@@ -19,7 +19,7 @@ public class ClientTypesetter extends AbstractTypesetter implements IClientTypes
 
     public ArrayList<AbstractPage> pages = new ArrayList<AbstractPage>();
     private ArrayList<AbstractPage> afterBuffer = new ArrayList<AbstractPage>();
-    public ArrayList<Word> segmentStart = null;
+    public ArrayList<IWord> segmentStart = null;
 
     public String active_link = null, active_style = "";
 
@@ -31,7 +31,7 @@ public class ClientTypesetter extends AbstractTypesetter implements IClientTypes
     }
 
     @Override
-    public void write(Word w) {
+    public void write(IWord w) {
         if (w.getLink() == null) {
             if (active_link != null) {
                 w.setLink(active_link);
@@ -49,7 +49,7 @@ public class ClientTypesetter extends AbstractTypesetter implements IClientTypes
             page.nl();
         }
         int total_height = 0;
-        for (ArrayList<Word> line : page.text) {
+        for (ArrayList<IWord> line : page.text) {
             int[] padding = page.getVerticalPadding(line);
             int paddingTop = padding[0], paddingBottom = padding[1];
             total_height += paddingTop + paddingBottom;
@@ -57,7 +57,7 @@ public class ClientTypesetter extends AbstractTypesetter implements IClientTypes
 
         if (total_height + w.getPaddingAbove() + w.getPaddingBelow() > pageHeight) {
             WordPage oldPage = page;
-            ArrayList<Word> oldSeg = segmentStart;
+            ArrayList<IWord> oldSeg = segmentStart;
             newPage();
             page = current;
             if (oldSeg != null) {

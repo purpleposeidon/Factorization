@@ -23,6 +23,12 @@ public interface ITypesetter {
     String getDomain();
 
     /**
+     * Appends an IWord to the document.
+     * @param word The word to add
+     */
+    void write(IWord word);
+
+    /**
      * Writes an ItemStack. (This can also be done via {@link ITypesetter#write(String)})
      * @param stack The itemstack.
      */

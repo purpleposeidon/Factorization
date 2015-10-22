@@ -1,6 +1,5 @@
 package factorization.truth.gen;
 
-import factorization.truth.api.IClientTypesetter;
 import factorization.truth.api.IDocGenerator;
 import factorization.truth.api.ITypesetter;
 import factorization.truth.api.TruthError;
@@ -22,15 +21,9 @@ public class TesrViewer implements IDocGenerator {
             }
         });
         out.write("\\title{TESRs}\n\n");
-        IClientTypesetter cout = null;
-        if (out instanceof IClientTypesetter) {
-            cout = (IClientTypesetter) out;
-        }
         for (Class c : cs) {
             out.write("\n\n" + c.getCanonicalName() + " ");
-            if (cout != null) {
-                cout.write(new ClipboardWord("/scrap DeregisterTesr " + c.getCanonicalName()));
-            }
+            out.write(new ClipboardWord("/scrap DeregisterTesr " + c.getCanonicalName()));
         }
     }
 }

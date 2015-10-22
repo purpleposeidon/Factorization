@@ -1,6 +1,7 @@
 package factorization.truth;
 
 import factorization.truth.api.AbstractPage;
+import factorization.truth.api.IWord;
 import factorization.truth.api.TruthError;
 import factorization.truth.minecraft.GuiButtonNextPage;
 import factorization.truth.word.Word;
@@ -12,6 +13,7 @@ import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.client.gui.inventory.GuiInventory;
 import net.minecraft.client.renderer.OpenGlHelper;
 import net.minecraft.client.renderer.RenderHelper;
+import net.minecraft.client.renderer.texture.TextureManager;
 import net.minecraft.item.ItemStack;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
@@ -265,7 +267,7 @@ public class DocViewer extends GuiScreen {
     void drawPage(int id, int mouseX, int mouseY, int pass) {
         AbstractPage page = getPage(id);
         if (page == null) return;
-        Word hovered = null;
+        IWord hovered = null;
         String hoveredLink = null;
         if (page instanceof WordPage) {
             WordPage p = (WordPage) page;
@@ -277,20 +279,24 @@ public class DocViewer extends GuiScreen {
         if (pass == 0) {
             page.draw(this, getPageLeft(id), getPageTop(id), hoveredLink);
         } else if (pass == 1 && hovered != null) {
-            hovered.drawHover(this, mouseX, mouseY);
+            hovered.drawHover(mouseX, mouseY);
         }
     }
     
-    public void drawItem(ItemStack is, int x, int y) {
+    public static void drawItem(ItemStack is, int x, int y, FontRenderer font) {
         GL11.glEnable(GL11.GL_DEPTH_TEST);
-        GuiContainer.itemRender.renderItemAndEffectIntoGUI(fontRendererObj, this.mc.getTextureManager(), is, x, y);
-        GuiContainer.itemRender.renderItemOverlayIntoGUI(fontRendererObj, this.mc.getTextureManager(), is, x, y);
+        TextureManager tm = Minecraft.getMinecraft().getTextureManager();
+        GuiContainer.itemRender.renderItemAndEffectIntoGUI(font, tm, is, x, y);
+        GuiContainer.itemRender.renderItemOverlayIntoGUI(font, tm, is, x, y);
     }
-    
-    public void drawItemTip(ItemStack is, int x, int y) {
-        renderToolTip(is, x, y);
+
+    public static void drawItemTip(ItemStack is, int x, int y) {
+        DocViewer me = get();
+        if (me != null) {
+            me.renderToolTip(is, x, y);
+        }
     }
-    
+
     boolean hot = true;
     
     @Override
@@ -306,7 +312,7 @@ public class DocViewer extends GuiScreen {
             AbstractPage thisPage = getPage(i);
             if (!(thisPage instanceof WordPage)) continue;
             WordPage p = (WordPage) thisPage;
-            Word link = p.click(mouseX - getPageLeft(i), mouseY - getPageTop(i));
+            IWord link = p.click(mouseX - getPageLeft(i), mouseY - getPageTop(i));
             if (link == null) continue;
             if (link.onClick()) return;
             if (link.getLink() != null) {
@@ -425,5 +431,19 @@ public class DocViewer extends GuiScreen {
 
     public boolean isDark() {
         return state.dark_color_scheme;
+    }
+
+    public static DocViewer get() {
+        GuiScreen ret = Minecraft.getMinecraft().currentScreen;
+        if (ret instanceof DocViewer) {
+            return (DocViewer) ret;
+        }
+        return null;
+    }
+
+    public static boolean dark() {
+        DocViewer me = get();
+        if (me == null) return false;
+        return me.isDark();
     }
 }

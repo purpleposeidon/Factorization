@@ -10,7 +10,7 @@ import java.util.ArrayList;
 public class CmdSegStart implements ITypesetCommand {
     @Override
     public void callClient(IClientTypesetter out, ITokenizer tokenizer) throws TruthError {
-        ArrayList<ArrayList<Word>> lines = ((WordPage)out.getCurrentPage()).text;
+        ArrayList<ArrayList<IWord>> lines = ((WordPage)out.getCurrentPage()).text;
         if (!lines.isEmpty()) {
             ((ClientTypesetter) out).segmentStart = lines.get(lines.size() - 1);
         }

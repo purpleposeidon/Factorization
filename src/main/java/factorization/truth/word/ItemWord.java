@@ -2,6 +2,7 @@ package factorization.truth.word;
 
 import factorization.truth.DocViewer;
 import factorization.truth.WordPage;
+import factorization.truth.api.IHtmlTypesetter;
 import factorization.util.ItemUtil;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.renderer.Tessellator;
@@ -151,14 +152,14 @@ public class ItemWord extends Word {
     }
 
     @Override
-    public int draw(DocViewer doc, int x, int y, boolean hover) {
+    public int draw(int x, int y, boolean hover, FontRenderer font) {
         ItemStack toDraw = getItem();
         if (toDraw == null) return 16;
         y -= 4;
         
         {
             GL11.glDisable(GL11.GL_TEXTURE_2D);
-            float gray = doc.isDark() ? 0.2F : 139F/0xFF;
+            float gray = DocViewer.dark() ? 0.2F : 139F/0xFF;
             GL11.glColor3f(gray, gray, gray);
             
             float z = 0;
@@ -172,7 +173,7 @@ public class ItemWord extends Word {
             GL11.glEnd();
             
             if (hover) {
-                int color = getLinkColor(doc, hover);
+                int color = getLinkColor(hover);
                 byte r = (byte) ((color >> 16) & 0xFF);
                 byte g = (byte) ((color >> 8) & 0xFF);
                 byte b = (byte) ((color >> 0) & 0xFF);
@@ -193,7 +194,7 @@ public class ItemWord extends Word {
         
         GL11.glPushAttrib(GL11.GL_ALL_ATTRIB_BITS);
         try {
-            doc.drawItem(toDraw, x, y);
+            DocViewer.drawItem(toDraw, x, y, font);
         } catch (Throwable t) {
             t.printStackTrace();
             itemErrored();
@@ -208,16 +209,25 @@ public class ItemWord extends Word {
     }
     
     @Override
-    public void drawHover(DocViewer doc, int mouseX, int mouseY) {
+    public void drawHover(int mouseX, int mouseY) {
         ItemStack toDraw = getItem();
         if (toDraw == null) return;
         GL11.glPushAttrib(GL11.GL_ALL_ATTRIB_BITS);
         try {
-            doc.drawItemTip(toDraw, mouseX, mouseY);
+            DocViewer.drawItemTip(toDraw, mouseX, mouseY);
         } catch (Throwable t) {
             t.printStackTrace();
             itemErrored();
         }
         GL11.glPopAttrib();
+    }
+
+    @Override
+    public void writeHtml(IHtmlTypesetter out) {
+        if (entries != null) {
+            out.write(entries);
+        } else {
+            out.write(is);
+        }
     }
 }

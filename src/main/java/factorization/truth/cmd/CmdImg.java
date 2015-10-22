@@ -48,9 +48,6 @@ public class CmdImg implements ITypesetCommand {
     @Override
     public void callHTML(IHtmlTypesetter out, ITokenizer tokenizer) throws TruthError {
         ImgWord img = getImg(out, tokenizer);
-        final int width = img.width;
-        final int height = img.height;
-        final String img1 = out.img(img.resource.toString());
-        out.html(String.format("<img width=%s height=%s src=\"%s\" />", width, height, img1));
+        img.writeHtml(out);
     }
 }

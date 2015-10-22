@@ -1,6 +1,6 @@
 package factorization.truth.word;
 
-import factorization.truth.DocViewer;
+import factorization.truth.api.IHtmlTypesetter;
 import net.minecraft.client.gui.FontRenderer;
 
 public class VerticalSpacerWord extends Word {
@@ -16,7 +16,7 @@ public class VerticalSpacerWord extends Word {
     }
 
     @Override
-    public int draw(DocViewer doc, int x, int y, boolean hover) {
+    public int draw(int x, int y, boolean hover, FontRenderer font) {
         return 0;
     }
     
@@ -30,4 +30,8 @@ public class VerticalSpacerWord extends Word {
         return vertSize;
     }
 
+    @Override
+    public void writeHtml(IHtmlTypesetter out) {
+        // Nada
+    }
 }

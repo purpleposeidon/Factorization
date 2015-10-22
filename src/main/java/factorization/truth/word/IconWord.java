@@ -2,8 +2,9 @@ package factorization.truth.word;
 
 import factorization.common.BlockIcons;
 import factorization.shared.Core;
-import factorization.truth.DocViewer;
 import factorization.truth.WordPage;
+import factorization.truth.api.IHtmlTypesetter;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.util.IIcon;
@@ -22,7 +23,7 @@ public class IconWord extends Word {
     }
 
     @Override
-    public int draw(DocViewer doc, int x, int y, boolean hover) {
+    public int draw(int x, int y, boolean hover, FontRenderer font) {
         y -= 4;
         int width = getWidth(null);
         int height = 16;
@@ -31,7 +32,7 @@ public class IconWord extends Word {
         double v0 = icon.getMinV();
         double u1 = icon.getMaxU();
         double v1 = icon.getMaxV();
-        doc.mc.renderEngine.bindTexture(isBlock ? Core.blockAtlas : Core.itemAtlas);
+        Minecraft.getMinecraft().renderEngine.bindTexture(isBlock ? Core.blockAtlas : Core.itemAtlas);
         Tessellator tess = new Tessellator();
         GL11.glColor4f(1, 1, 1, 1);
         tess.startDrawingQuads();
@@ -42,7 +43,14 @@ public class IconWord extends Word {
         tess.draw();
         return 16;
     }
-    
+
+    @Override
+    public void writeHtml(IHtmlTypesetter out) {
+        out.html(icon.getIconName()); // TODO?
+        //final String imgPath = out.img(resource.toString());
+        //out.html(String.format("<img width=%s height=%s src=\"%s\" />", width, height, imgPath));
+    }
+
     @Override
     public int getWidth(FontRenderer font) {
         return 16;

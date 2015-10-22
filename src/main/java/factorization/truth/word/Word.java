@@ -1,9 +1,11 @@
 package factorization.truth.word;
 
 import factorization.truth.DocViewer;
+import factorization.truth.api.IHtmlTypesetter;
+import factorization.truth.api.IWord;
 import net.minecraft.client.gui.FontRenderer;
 
-public abstract class Word {
+public abstract class Word implements IWord {
     private static final String default_style = "";
     private String hyperlink;
     protected String style = default_style;
@@ -21,15 +23,17 @@ public abstract class Word {
     }
     
     public abstract int getWidth(FontRenderer font);
-    public abstract int draw(DocViewer doc, int x, int y, boolean hover);
+    public abstract int draw(int x, int y, boolean hover, FontRenderer font);
+    public abstract void writeHtml(IHtmlTypesetter out);
 
-    public void drawHover(DocViewer doc, int mouseX, int mouseY) { }
+    @Override
+    public void drawHover(int mouseX, int mouseY) { }
     
     public int getPaddingAbove() { return 1; }
     public int getPaddingBelow() { return 1; }
     
-    public int getLinkColor(DocViewer doc, boolean hover) {
-        boolean dark = doc.isDark();
+    public int getLinkColor(boolean hover) {
+        boolean dark = DocViewer.dark();
         int color = dark ? 0xEEEEEE : 0x111111;
         if (getLink() != null) {
             if (hover) color = dark ? 0xFF0080 : 0x441111;

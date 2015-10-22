@@ -7,7 +7,6 @@ import cpw.mods.fml.common.eventhandler.EventPriority;
 import cpw.mods.fml.common.eventhandler.IEventListener;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import cpw.mods.fml.relauncher.ReflectionHelper;
-import factorization.truth.api.IClientTypesetter;
 import factorization.truth.api.IDocGenerator;
 import factorization.truth.api.ITypesetter;
 import factorization.truth.api.TruthError;
@@ -24,14 +23,13 @@ public class EventbusViewer implements IDocGenerator {
     @Override
     public void process(ITypesetter out, String arg) throws TruthError {
         if ("".equals(arg)) arg = null;
-        IClientTypesetter cout = (IClientTypesetter) out;
-        inspectBus(cout, MinecraftForge.EVENT_BUS, "Forge Event Bus", arg);
-        inspectBus(cout, FMLCommonHandler.instance().bus(), "FML Event Bus", arg);
-        inspectBus(cout, MinecraftForge.ORE_GEN_BUS, "Ore Gen Bus", arg);
-        inspectBus(cout, MinecraftForge.TERRAIN_GEN_BUS, "Terrain Gen Bus", arg);
+        inspectBus(out, MinecraftForge.EVENT_BUS, "Forge Event Bus", arg);
+        inspectBus(out, FMLCommonHandler.instance().bus(), "FML Event Bus", arg);
+        inspectBus(out, MinecraftForge.ORE_GEN_BUS, "Ore Gen Bus", arg);
+        inspectBus(out, MinecraftForge.TERRAIN_GEN_BUS, "Terrain Gen Bus", arg);
     }
 
-    void inspectBus(IClientTypesetter out, EventBus bus, String busName, String matchEvent) throws TruthError {
+    void inspectBus(ITypesetter out, EventBus bus, String busName, String matchEvent) throws TruthError {
         ConcurrentHashMap<Object, ArrayList<IEventListener>> listeners = ReflectionHelper.getPrivateValue(EventBus.class, bus, "listeners");
         if (listeners == null) {
             out.write("Reflection failed!");
@@ -117,7 +115,7 @@ public class EventbusViewer implements IDocGenerator {
 
     Splitter split = Splitter.on(Pattern.compile("(?=[.=A-Z])"));
 
-    void outSplit(IClientTypesetter out, String text, String link) {
+    void outSplit(ITypesetter out, String text, String link) {
         for (String t : split.split(text)) {
             final TextWord word = new TextWord(t);
             word.setLink(link);

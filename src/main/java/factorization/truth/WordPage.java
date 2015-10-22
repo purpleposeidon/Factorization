@@ -1,14 +1,14 @@
 package factorization.truth;
 
 import factorization.truth.api.AbstractPage;
+import factorization.truth.api.IWord;
 import factorization.truth.word.TextWord;
-import factorization.truth.word.Word;
 import net.minecraft.client.gui.FontRenderer;
 
 import java.util.ArrayList;
 
 public class WordPage extends AbstractPage {
-    public ArrayList<ArrayList<Word>> text = new ArrayList<ArrayList<Word>>();
+    public ArrayList<ArrayList<IWord>> text = new ArrayList<ArrayList<IWord>>();
     public static int TEXT_HEIGHT = 9;
     int lineLen = 0;
     FontRenderer font;
@@ -21,7 +21,7 @@ public class WordPage extends AbstractPage {
         nl();
     }
     
-    void add(Word word) {
+    void add(IWord word) {
         if (word instanceof TextWord) {
             TextWord tw = (TextWord) word;
             if (tw.text.equals("\t")) {
@@ -39,15 +39,15 @@ public class WordPage extends AbstractPage {
     }
     
     public void nl() {
-        ArrayList<Word> newLine = new ArrayList<Word>();
+        ArrayList<IWord> newLine = new ArrayList<IWord>();
         newLine.add(new TextWord(""));
         text.add(newLine);
         lineLen = 0;
     }
     
-    Word click(int relativeX, int relativeY) {
+    IWord click(int relativeX, int relativeY) {
         int y = 0;
-        for (ArrayList<Word> line : text) {
+        for (ArrayList<IWord> line : text) {
             if (y > relativeY) break;
             int[] padding = getVerticalPadding(line);
             int paddingTop = padding[0], paddingBottom = padding[1];
@@ -58,7 +58,7 @@ public class WordPage extends AbstractPage {
             }
             y += paddingTop;
             int x = 0;
-            for (Word word : line) {
+            for (IWord word : line) {
                 int width = word.getWidth(font);
                 if (x <= relativeX && relativeX <= x + width) {
                     return word;
@@ -77,9 +77,9 @@ public class WordPage extends AbstractPage {
      * @return the "tuple" int[] { padUp, padDown }
      * TODO: Custom ArrayList that keeps track of the padding
      */
-    int[] getVerticalPadding(ArrayList<Word> line) {
+    int[] getVerticalPadding(ArrayList<IWord> line) {
         int padUp = 0, padDown = 0;
-        for (Word word : line) {
+        for (IWord word : line) {
             padUp = Math.max(word.getPaddingAbove(), padUp);
             padDown = Math.max(word.getPaddingBelow(), padDown);
         }
@@ -90,13 +90,14 @@ public class WordPage extends AbstractPage {
     public void draw(DocViewer doc, int ox, int oy, String hoveredLink) {
         int y = 0;
         try {
-            for (ArrayList<Word> line : text) {
+            for (ArrayList<IWord> line : text) {
                 int x = 0;
                 int[] padding = getVerticalPadding(line);
                 int paddingTop = padding[0], paddingBottom = padding[1];
                 y += paddingTop;
-                for (Word word : line) {
-                    x += word.draw(doc, ox + x, oy + y, hoveredLink != null && hoveredLink.equals(word.getLink()));
+                for (IWord word : line) {
+                    boolean hover = hoveredLink != null && hoveredLink.equals(word.getLink());
+                    x += word.draw(ox + x, oy + y, hover, font);
                 }
                 y += paddingBottom;
             }

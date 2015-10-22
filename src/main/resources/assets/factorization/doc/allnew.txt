@@ -3,7 +3,7 @@
 \include{verynew}
 \index{chargegen}{\#{factorization.factoryBlock.STEAM_SHAFT} More power!}
 \index{blockmatcher}{\#{tile.BlockMatcher} Block Matching!}
-\index{hotblocks}{\#{item.bucketLava} Hot Blocks!}
+\index{blockundo}{\#{block.obsidian} Undo Block Placement!}
 \index{barrel}{\#{item.factorization:barrelCart} Barrel carts!}
 \index{poster}{\#{item.factorization:spawnPoster} Put items on Posters!}
 \index{hinge}{\#{factorization.factoryBlock.HINGE} Hinge (more features!)} 
