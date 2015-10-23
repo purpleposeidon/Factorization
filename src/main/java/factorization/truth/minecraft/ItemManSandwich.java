@@ -48,6 +48,7 @@ public class ItemManSandwich extends ItemFood implements IManwich {
         setMaxStackSize(1);
         setHasSubtypes(true);
         DocReg.registerManwich(this);
+        Core.tab(this, Core.TabType.TOOLS);
     }
 
     @Override

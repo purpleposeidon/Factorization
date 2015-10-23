@@ -28,6 +28,7 @@ public class ItemPotency extends ItemCraftingComponent {
         super("potencyBottle");
         setMaxStackSize(3);
         Core.loadBus(this);
+        Core.tab(this, Core.TabType.ARTIFACT);
     }
 
     @Override
