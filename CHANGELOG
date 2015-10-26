@@ -1,3 +1,18 @@
+0.8.99
+  Socket parts on servos can no longer interact with servo rails
+  Added /f exportTextures
+  Blockundo actually work on servers
+  Fix BlockMatcher bug reported by broomstone
+  Add a barrelcart uncrafting recipe
+  Mimicing glazes can now be loaded by (shift) clicking on a block w/ an unset mimicing glaze bucket, in addition to the crafting recipe.
+  Better glaze item icons & item rendering
+  Added a stub for mod scripting called 'scrap'; currently just a stub for changing things that annoy me and finding/patching bugs in other mods. Lets you change: maxstacksize, maxdamage, tesrs, entity renderers, and the event bus.
+  Use (shift-)WASD (or whatever your player movement controls are set to) in inventories to quickly transfer some items around.
+  Buffered screwpump energy efficiency. Again.
+  Added the Artifact Forge and the Hall of Legends
+  Added the manwich. Allows access to the manual's contents without carrying a manual everywhere. The manwich stays in your stomach until you die; spicy manwiches last longer.
+  Behind-the-scenes code cleanup & APIification
+
 0.8.98
   Rebalanced the water wheel
   Fixed display of narrow IC2 recipes in FZ manual

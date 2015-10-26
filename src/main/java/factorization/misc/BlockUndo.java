@@ -125,8 +125,7 @@ public class BlockUndo {
             World w = DimensionManager.getWorld(c.w);
             if (w.isAirBlock(c.x, c.y, c.z)) {
                 it.remove();
-            }
-            if (c.x == at.x && c.y == at.y && c.z == at.z) {
+            } else if (c.x == at.x && c.y == at.y && c.z == at.z) {
                 it.remove();
             }
         }
@@ -285,7 +284,7 @@ public class BlockUndo {
         tool.setItemDamage(tool.getMaxDamage());
         tool.addEnchantment(Enchantment.silkTouch, 1);
         tool.stackSize = 0;
-        EntityPlayer fake_player = PlayerUtil.makePlayer(new Coord(w, x, y, z), "HotBlocks");
+        EntityPlayer fake_player = PlayerUtil.makePlayer(new Coord(w, x, y, z), "BlockUndo");
         fake_player.setCurrentItemOrArmor(0, tool);
         {
             double r = 0.5;

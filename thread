@@ -35,6 +35,15 @@ Or [url=http://purpleposeidon.github.io/FzDocs/]here's an outside-of-Minecraft c
 You can encourage and guide further development of Factorization through my [url="http://www.patreon.com/neptunepink"][img]http://i.imgur.com/srYEtgV.png[/img]Patreon[/url].
 
 [spoiler]
+Factorization 1.7.10-0.8.98
+[url="https://www.mediafire.com/?jm3a8azbg84v0z3"]MediaFire[/url], or
+[url="http://dl.dropbox.com/u/76265666/old/Factorization-1.7.10-0.8.98.jar"]DropBox[/url]
+Built on 2015-09-05 against Minecraft Forge 1.7.10-10.13.2.1230
+[url="http://dl.dropbox.com/u/76265666/changelogs/Changelog-1.7.10-0.8.98.txt"]Changelog[/url]
+[url="http://dl.dropbox.com/u/76265666/old/Factorization-1.7.10-0.8.98-dev.jar"]Deobf for Mod Authors[/url]
+d93c87670bfc2723adff0ef62a953d9bdc3e7cbe
+
+[spoiler]
 Factorization 1.7.10-0.8.97
 [url="https://www.mediafire.com/?n831i9jnf4sxs92"]MediaFire[/url], or
 [url="http://dl.dropbox.com/u/76265666/old/Factorization-1.7.10-0.8.97.jar"]DropBox[/url]
@@ -42,7 +51,6 @@ Built on 2015-09-03 against Minecraft Forge 1.7.10-10.13.2.1230
 [url="http://dl.dropbox.com/u/76265666/changelogs/Changelog-1.7.10-0.8.97.txt"]Changelog[/url]
 [url="http://dl.dropbox.com/u/76265666/old/Factorization-1.7.10-0.8.97-dev.jar"]Deobf for Mod Authors[/url]
 
-[spoiler]
 Factorization 1.7.10-0.8.95
 [url="https://www.mediafire.com/?la78vbwfud0l0oq"]MediaFire[/url], or
 [url="http://dl.dropbox.com/u/76265666/old/Factorization-1.7.10-0.8.95.jar"]DropBox[/url]
@@ -253,3 +261,4 @@ FZ includes uses Creative Commons sound assets, including:
 Hammer (or FZDS, for FactoriZation Dimensional Slices) is a WIP engine upgrade for Minecraft that gives it the ability to move and rotate chunks arbitrarily. It is used to implement the Colossi and the Twisting Block, with more things to come. Unfortunately there are some bugs that happen with Optifine & bukkit/spigot/cauldron right now, and I'm not really able to fix them. However there will also be bugs with other mods, so please let me know about them.  Hammer can be disabled by editing hammerChannels.cfg.
 
 If you're having problems with a colossus or anything else that uses Hammer, you can use the "/fzds +" select and "/fzds remove" to kill them. Or it can be disabled from hammerChannels.cfg.
+
