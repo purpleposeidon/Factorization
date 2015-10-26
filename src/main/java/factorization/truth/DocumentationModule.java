@@ -395,7 +395,7 @@ public class DocumentationModule implements factorization.truth.api.IDocModule {
 
     private void handleImc(FMLInterModComms.IMCMessage message) throws ClassNotFoundException, NoSuchFieldException, IllegalAccessException {
         if (!message.key.equals("DocVar")) return;
-        String[] parts = message.key.split("=", 1);
+        String[] parts = message.getStringValue().split("=", 1);
         String key = parts[0];
         String val = parts[1];
         if (key.endsWith("+")) {
