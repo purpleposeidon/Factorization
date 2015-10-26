@@ -41,7 +41,7 @@ import java.util.UUID;
 import java.util.WeakHashMap;
 
 public final class PlayerUtil {
-    private static final UUID FZ_UUID = null; //UUID.fromString("f979c78a-f80d-46b1-9c49-0121ea8850e6");
+    private static final UUID FZ_UUID = UUID.fromString("f979c78a-f80d-46b1-9c49-0121ea8850e6");
     private static HashMap<String, WeakHashMap<World, FzFakePlayer>> usedPlayerCache = new HashMap();
 
     public static EntityPlayer makePlayer(final Coord where, String use) {
