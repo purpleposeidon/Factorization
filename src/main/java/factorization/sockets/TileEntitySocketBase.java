@@ -214,7 +214,7 @@ public abstract class TileEntitySocketBase extends TileEntityCommon implements I
         return FactoryType.SOCKET_EMPTY.itemStack();
     }
     
-    private static float[] pitch = new float[] {-90, 90, 0, 0, 0, 0, 0};
+    private static float[] pitch = new float[] {90, -90, 0, 0, 0, 0, 0};
     private static float[] yaw = new float[] {0, 0, 180, 0, 90, -90, 0};
     
     protected EntityPlayer getFakePlayer() {
