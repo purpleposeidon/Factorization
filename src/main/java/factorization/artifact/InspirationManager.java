@@ -5,9 +5,7 @@ import cpw.mods.fml.common.gameevent.PlayerEvent;
 import cpw.mods.fml.common.gameevent.TickEvent;
 import factorization.api.Coord;
 import factorization.shared.Core;
-import factorization.shared.NetworkFactorization;
 import factorization.shared.Sound;
-import factorization.util.FzUtil;
 import factorization.util.PlayerUtil;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
@@ -20,6 +18,7 @@ import net.minecraft.util.EnumChatFormatting;
 import net.minecraft.util.IChatComponent;
 
 import java.util.Calendar;
+import java.util.Locale;
 
 public class InspirationManager {
     static InspirationManager instance;
@@ -117,7 +116,7 @@ public class InspirationManager {
     public static void makeArtifact(EntityPlayer player, ItemStack artifact) {
         String name = player.getCommandSenderName();
         String key = "factorization.artifact.announce";
-        if (name.toLowerCase().startsWith("urist")) {
+        if (name.toLowerCase(Locale.ROOT).startsWith("urist")) {
             key += ".urist";
         }
         String artifactName = artifact.getDisplayName();
