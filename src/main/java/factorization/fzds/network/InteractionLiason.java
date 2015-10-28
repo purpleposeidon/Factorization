@@ -1,6 +1,5 @@
 package factorization.fzds.network;
 
-import com.mojang.authlib.GameProfile;
 import cpw.mods.fml.common.network.handshake.NetworkDispatcher;
 import factorization.fzds.ShadowPlayerAligner;
 import factorization.fzds.interfaces.IDeltaChunk;
@@ -9,7 +8,6 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelOutboundHandlerAdapter;
 import io.netty.channel.ChannelPromise;
 import io.netty.channel.embedded.EmbeddedChannel;
-import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.network.EnumConnectionState;
@@ -27,7 +25,8 @@ import java.util.WeakHashMap;
 public class InteractionLiason extends EntityPlayerMP implements IFzdsShenanigans {
     static final WeakHashMap<EntityPlayerMP, InteractionLiason> activeLiasons = new WeakHashMap<EntityPlayerMP, InteractionLiason>();
 
-    private static final GameProfile liasonGameProfile = new GameProfile(null /*UUID.fromString("69f64f91-665e-457d-ad32-f6082d0b8a71")*/ , "[FzdsInteractionLiason]");
+    //private static final GameProfile liasonGameProfile = new GameProfile(null /*UUID.fromString("69f64f91-665e-457d-ad32-f6082d0b8a71")*/ , "[FzdsInteractionLiason]");
+    // Using the real player's GameProfile for things like permissions checks.
     private final InventoryPlayer original_inventory;
     private ShadowPlayerAligner aligner;
     private NetworkManager networkManager;
@@ -36,7 +35,7 @@ public class InteractionLiason extends EntityPlayerMP implements IFzdsShenanigan
     private EmbeddedChannel proxiedChannel = new EmbeddedChannel(new LiasonHandler());
 
     public InteractionLiason(WorldServer world, ItemInWorldManager itemManager, EntityPlayerMP realPlayer, IDeltaChunk idc) {
-        super(MinecraftServer.getServer(), world, liasonGameProfile, itemManager);
+        super(MinecraftServer.getServer(), world, realPlayer.getGameProfile(), itemManager);
         original_inventory = this.inventory;
         realPlayerRef = new WeakReference<EntityPlayerMP>(realPlayer);
         initLiason();
