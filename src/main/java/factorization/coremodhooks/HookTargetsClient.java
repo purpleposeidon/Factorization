@@ -4,7 +4,6 @@ import cpw.mods.fml.common.eventhandler.EventBus;
 import factorization.util.SpaceUtil;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.MovingObjectPosition;
 import net.minecraft.util.MovingObjectPosition.MovingObjectType;
@@ -12,10 +11,6 @@ import net.minecraft.util.Vec3;
 import net.minecraft.world.World;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraftforge.common.MinecraftForge;
-import factorization.common.Command;
-import factorization.common.FactorizationKeyHandler;
-import factorization.common.FzConfig;
-import factorization.truth.DocumentationModule;
 import net.minecraftforge.event.world.WorldEvent;
 
 public class HookTargetsClient {
@@ -97,9 +92,9 @@ public class HookTargetsClient {
         return new MovingObjectPosition(null, hit);
     }
 
-    public static ThreadLocal<Boolean> abort = new ThreadLocal<Boolean>();
+    public static ThreadLocal<Boolean> clientWorldLoadEventAbort = new ThreadLocal<Boolean>();
     public static boolean abortClientLoadEvent(EventBus bus, WorldEvent.Load event) {
-        if (abort.get() == Boolean.TRUE) return false;
+        if (clientWorldLoadEventAbort.get() == Boolean.TRUE) return false;
         return bus.post(event);
     }
 }

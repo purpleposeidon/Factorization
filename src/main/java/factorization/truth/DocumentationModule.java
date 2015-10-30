@@ -126,11 +126,11 @@ public class DocumentationModule implements factorization.truth.api.IDocModule {
     }
 
     static HashMap<String, ArrayList<ItemStack>> nameCache = null;
-    
+
     public static ArrayList<ItemStack> lookup(String name) {
         return getNameItemCache().get(name);
     }
-    
+
     public static HashMap<String, ArrayList<ItemStack>> getNameItemCache() {
         if (nameCache == null) {
             loadCache();
@@ -176,10 +176,10 @@ public class DocumentationModule implements factorization.truth.api.IDocModule {
             }
         }
     }
-    
+
     //NBT write -> compress -> base64 encode
     //base64 decode -> decompress -> NBT load
-    
+
     static String encodeNBT(NBTTagCompound tag) throws IOException {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         DataOutputStream dos = new DataOutputStream(new GZIPOutputStream(baos));
@@ -189,32 +189,33 @@ public class DocumentationModule implements factorization.truth.api.IDocModule {
         ByteBuf enc = Base64.encode(Unpooled.copiedBuffer(compressedData));
         return new String(enc.array());
     }
-    
+
     static NBTTagCompound decodeNBT(String contents) throws IOException {
         ByteBuf decoded = Base64.decode(Unpooled.copiedBuffer(contents.getBytes()));
         ByteBufInputStream bais = new ByteBufInputStream(decoded);
         return CompressedStreamTools.read(new DataInputStream(new GZIPInputStream(bais)));
     }
-    
+
+    @SideOnly(Side.CLIENT)
     public static DocWorld loadWorld(String text) {
         try {
-            HookTargetsClient.abort.set(Boolean.TRUE);
+            HookTargetsClient.clientWorldLoadEventAbort.set(Boolean.TRUE);
             NBTTagCompound tag = decodeNBT(text);
             return new DocWorld(tag);
         } catch (IOException e) {
             e.printStackTrace();
             return null;
         } finally {
-            HookTargetsClient.abort.remove();
+            HookTargetsClient.clientWorldLoadEventAbort.remove();
         }
     }
-    
+
     public static ResourceLocation getResourceForName(String domain, String name) {
         return new ResourceLocation(domain, "doc/" + name + ".txt");
     }
-    
+
     public static IResourceManager overrideResourceManager = null;
-    
+
     public static InputStream getDocumentResource(String domain, String name) {
         try {
             IResourceManager irm = overrideResourceManager != null ? overrideResourceManager : Minecraft.getMinecraft().getResourceManager();
@@ -229,7 +230,7 @@ public class DocumentationModule implements factorization.truth.api.IDocModule {
             return null;
         }
     }
-    
+
     public static String readDocument(String domain, String name) {
         try {
             return dispatchDocument(domain, name);
@@ -242,7 +243,7 @@ public class DocumentationModule implements factorization.truth.api.IDocModule {
             return "\\5*5*5*2*2 Internal Server Error\n\nAn error was encountered while trying to execute your request.\n\n" + txt;
         }
     }
-    
+
     private static String readContents(String name, InputStream is) throws IOException {
         if (is == null) {
             return "\\101*2*2 Not Found: " + name;
@@ -255,7 +256,7 @@ public class DocumentationModule implements factorization.truth.api.IDocModule {
         }
         return build.toString();
     }
-    
+
     private static String dispatchDocument(String domain, String name) throws IOException {
         //NORELEASE: Okay. The document *really* needs to be cached. Things are getting expensive...
         if (name.startsWith("cgi/")) {
