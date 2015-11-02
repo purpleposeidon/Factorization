@@ -182,12 +182,14 @@ public class ItemManSandwich extends ItemFood implements IManwich {
     IIcon spicy;
 
     @Override
+    @SideOnly(Side.CLIENT)
     public IIcon getIconFromDamage(int damage) {
         if (damage > 0) return spicy;
         return super.getIconFromDamage(damage);
     }
 
     @Override
+    @SideOnly(Side.CLIENT)
     public void registerIcons(IIconRegister reg) {
         itemIcon = reg.registerIcon("factorization:mansandwich");
         spicy = reg.registerIcon("factorization:mansandwich_spicy");

@@ -1,6 +1,8 @@
 package factorization.artifact;
 
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
 import factorization.shared.Core;
 import factorization.shared.ItemFactorization;
 import factorization.util.ItemUtil;
@@ -12,7 +14,6 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.item.ItemTool;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraftforge.event.AnvilUpdateEvent;
-import net.minecraftforge.event.entity.player.AnvilRepairEvent;
 
 import java.util.Collections;
 import java.util.List;
@@ -35,6 +36,7 @@ public class ItemBrokenArtifact extends ItemFactorization {
     }
 
     @Override
+    @SideOnly(Side.CLIENT)
     public void registerIcons(IIconRegister register) { }
 
     public static ItemStack get(ItemStack orig) {
