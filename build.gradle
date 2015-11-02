@@ -23,6 +23,7 @@ if (System.getenv("ALLOW_NORELEASE") != null) {
     version = version + "-norelease"
     print "ALLOW_NORELEASE is enabled\n"
 }
+
 group = "factorization"
 archivesBaseName = "Factorization"
 
@@ -68,7 +69,11 @@ repositories {
 
 
 dependencies {
-    compile 'codechicken:NotEnoughItems:1.7.10-1.0.2.15:dev'
+    if (System.getenv("DISABLE_CBBS") == null) {
+        // How exactly do you set a variable? Tried 'ext.cbbs', but that doesn't work in places.
+        // That's pretty silly.
+        compile 'codechicken:NotEnoughItems:1.7.10-1.0.2.15:dev'
+    }
     api 'net.industrial-craft:industrialcraft-2:2.2.767-experimental:dev'
     // you may put jars on which you depend on in ./libs
     // or you may define them like so..
@@ -91,6 +96,9 @@ compileJava {
         exclude "factorization/shared/NORELEASE.java"
     }
     exclude "Gradle*.java"
+    if (System.getenv("DISABLE_CBBS") != null) {
+        exclude "factorization/nei/**.java"
+    }
 }
 
 task writeFzFile {
