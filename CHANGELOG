@@ -1,3 +1,6 @@
+0.8.99b
+  Fixed bugs! The server starts now!
+
 0.8.99
   Socket parts on servos can no longer interact with servo rails
   Added /f exportTextures
@@ -10,8 +13,9 @@
   Use (shift-)WASD (or whatever your player movement controls are set to) in inventories to quickly transfer some items around.
   Buffered screwpump energy efficiency. Again.
   Added the Artifact Forge and the Hall of Legends
-  Added the manwich. Allows access to the manual's contents without carrying a manual everywhere. The manwich stays in your stomach until you die; spicy manwiches last longer.
+  Added the manwich. Lets you store the manual in your stomach for hands-free reference. The manwich stays in your stomach until you die; spicy manwiches last longer.
   Behind-the-scenes code cleanup & APIification
+  Fixed bugs related to firing IC2 mining lasers from robot arms
 
 0.8.98
   Rebalanced the water wheel
