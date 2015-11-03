@@ -103,7 +103,7 @@ public class ItemPotency extends ItemCraftingComponent {
         boolean hasEnth = ItemUtil.is(left, enth) || ItemUtil.is(right, enth);
         if (!hasBotl || !hasEnth) return;
         event.output = new ItemStack(this);
-        event.cost = 35;
+        event.cost = 30;
         event.materialCost = 1;
     }
 

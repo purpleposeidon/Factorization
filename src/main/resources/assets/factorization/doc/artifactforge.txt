@@ -17,7 +17,7 @@ You will also need \{u}{three} Bottles of Potency,
 which are created by combining an empty bottle
 and a bit of \#{item.factorization:entheas} entheas
 in an \#{tile.anvil.intact}anvil
-for 35 levels.
+for 30 levels.
 Be warned that if you die, any bottles of potency
 that you have made will be ruined.
 Also, bottles of potency are personal to each and every
