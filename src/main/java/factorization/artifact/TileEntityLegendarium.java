@@ -7,6 +7,7 @@ import factorization.api.datahelpers.DataHelper;
 import factorization.api.datahelpers.Share;
 import factorization.common.BlockIcons;
 import factorization.common.FactoryType;
+import factorization.common.FzConfig;
 import factorization.notify.Notice;
 import factorization.notify.Style;
 import factorization.shared.BlockClass;
@@ -36,7 +37,7 @@ import java.io.IOException;
 import java.util.*;
 
 public class TileEntityLegendarium extends TileEntityCommon {
-    static final int MIN_SIZE = 7; // The queue must be this size before something can be removed
+    static final int MIN_SIZE = FzConfig.legendarium_queue_size; // The queue must be this size before something can be removed
     static final int POSTER_RANGE = 16;
     static final float MIN_DAMAGE = 0.10F;
     static final int DAMAGE_PAD = 24;
@@ -44,7 +45,7 @@ public class TileEntityLegendarium extends TileEntityCommon {
 
     private static final boolean DEBUG = Core.dev_environ;
 
-    private static final int WAIT_TIME = DEBUG ? 4 * 1000 : 7 * 24 * 60 * 60 * 1000;
+    private static final int WAIT_TIME = DEBUG ? 4 * 1000 : FzConfig.legendarium_delay_hours * 60 * 60 * 1000;
 
     long last_insert_time = 0;
     ArrayList<ItemStack> queue = new ArrayList<ItemStack>();

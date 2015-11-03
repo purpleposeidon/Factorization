@@ -69,6 +69,8 @@ public class FzConfig {
     public static boolean mirror_sunbeams = true;
     public static boolean ic2_kinetic_compat = true;
     public static Graylist<Block> lacerator_block_graylist;
+    public static int legendarium_queue_size = 7;
+    public static int legendarium_delay_hours = 24 * 5;
     public static String f = "f";
     
     public static boolean enable_retrogen = false;
@@ -80,7 +82,6 @@ public class FzConfig {
     public ArrayList<Property> editable_runtime = new ArrayList<Property>();
 
     private boolean can_edit_main = false, can_edit_runtime = false;
-    private boolean loaded_once = false;
 
     FzConfig editMain() {
         can_edit_main = true;
@@ -152,7 +153,6 @@ public class FzConfig {
 
         readConfigSettings();
         saveConfigSettings();
-        loaded_once = true;
     }
 
     public void saveConfigSettings() {
@@ -243,6 +243,8 @@ public class FzConfig {
         f = getStringConfig("miscClientCommand", "client", f, "Use this to change the /f command to avoid conflict with the Factions bukkit plugin");
         ic2_kinetic_compat = getBoolConfig("ic2KineticCompat", "server", ic2_kinetic_compat, "Compatability with IC2's IKineticSource");
         getStringConfig("README", "fzds", "See hammerChannels.cfg for FZDS-related configuration", "");
+        legendarium_delay_hours = getIntConfig("legendariumDelayHours", "server", legendarium_delay_hours, "How many hours must pass before the legendarium can be used again");
+        legendarium_queue_size = getIntConfig("legendariumQueueSize", "server", legendarium_queue_size, "The legendarium must have this many items before an artifact can be reforged.");
 
         if (!DeltaChunk.enabled()) {
             gen_colossi = false;
