@@ -16,4 +16,4 @@ Servos will lose their memory in the 0.9.100 release. You should make sure that 
 
 Existing sculptures may not necessarily survive MC 1.8
 
-
+Don't stockpile utility goo.
