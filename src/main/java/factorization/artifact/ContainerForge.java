@@ -6,8 +6,10 @@ import factorization.shared.NetworkFactorization;
 import factorization.util.InvUtil;
 import factorization.util.ItemUtil;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.inventory.Container;
+import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.StringUtils;
@@ -74,7 +76,7 @@ public class ContainerForge extends Container {
 
     @Override
     public boolean canInteractWith(EntityPlayer player) {
-        return orig.distanceSq(new Coord(player)) < 36;
+        return orig.distanceSq(new Coord(player)) < 36  && orig.getBlock() == Core.registry.artifact_forge;
     }
 
 
@@ -116,14 +118,23 @@ public class ContainerForge extends Container {
     @Override
     public void putStackInSlot(int slot, ItemStack stack) {
         super.putStackInSlot(slot, stack);
+        forge.markDirty();
         detectAndSendChanges();
     }
 
     @Override
     public void detectAndSendChanges() {
+        if (forge.isDirty && !((EntityPlayerMP) player).isChangingQuantityOnly) {
+            forge.rebuildArtifact();
+        }
         super.detectAndSendChanges();
         if (player.worldObj.isRemote) return;
         String new_err = forge.error_message == null ? "" : forge.error_message;
         Core.network.sendPlayerMessage(player, NetworkFactorization.MessageType.ArtifactForgeError, new_err, forge.warnings);
+    }
+
+    @Override
+    public void onCraftMatrixChanged(IInventory inv) {
+        super.onCraftMatrixChanged(inv);
     }
 }

@@ -37,6 +37,7 @@ public class InventoryForge implements IInventory {
 
     ItemStack[] inv = new ItemStack[SIZE];
     public byte[] warnings = new byte[SIZE];
+    boolean isDirty = true;
 
     public InventoryForge(EntityPlayer player, Container container) {
         this.player = player;
@@ -75,7 +76,7 @@ public class InventoryForge implements IInventory {
         inv[slot] = stack;
         if (slot == SLOT_OUT && !player.worldObj.isRemote) {
             new ArtifactBuilder(false).buildArtifact(player, name, lore);
-            container.detectAndSendChanges();
+            //container.detectAndSendChanges();
         }
     }
 
@@ -97,7 +98,13 @@ public class InventoryForge implements IInventory {
     @Override
     public void markDirty() {
         if (player.worldObj.isRemote) return;
-        inv[SLOT_OUT] = new ArtifactBuilder(true).buildArtifact(player, name, lore);
+        isDirty = true;
+    }
+
+    void rebuildArtifact() {
+        ItemStack newArtifact = new ArtifactBuilder(true).buildArtifact(player, name, lore);
+        inv[SLOT_OUT] = newArtifact;
+        isDirty = false;
     }
 
     @Override
