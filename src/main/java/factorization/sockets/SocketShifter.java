@@ -226,6 +226,10 @@ public class SocketShifter extends TileEntitySocketBase {
                     continue;
                 }
                 ItemStack is = pullInv.get(pull);
+                if (is == null) continue;
+                if (is.getMaxStackSize() < transferLimit) {
+                    continue; // bottles
+                }
                 int freeForIs = pushInv.getFreeSpaceFor(is, transferLimit);
                 if (freeForIs < transferLimit) {
                     continue;
