@@ -89,6 +89,10 @@ public class ItemBrokenArtifact extends ItemFactorization {
         if (right.getItemDamage() != 0) return;
         // Check for enchants? Previous repairs? Nah.
         held.setItemDamage(0);
+        int oldCost = held.getRepairCost();
+        if (oldCost > 0) {
+            held.setRepairCost(oldCost / 2);
+        }
         event.output = held.copy();
         event.cost = 30;
         event.materialCost = 1;
