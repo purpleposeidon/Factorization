@@ -250,4 +250,9 @@ public class EntityPoster extends EntityFz {
         }
         return worldObj.getLightBrightnessForSkyBlocks(x, MathHelper.floor_double(posY + d), z, 0);
     }
+
+    @Override
+    public boolean isInRangeToRenderDist(double dist) {
+        return dist < 32 * 32;
+    }
 }
