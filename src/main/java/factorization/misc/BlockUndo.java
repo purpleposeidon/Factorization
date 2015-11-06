@@ -123,7 +123,7 @@ public class BlockUndo {
         for (Iterator<PlacedBlock> it = coords.iterator(); it.hasNext(); ) {
             PlacedBlock c = it.next();
             World w = DimensionManager.getWorld(c.w);
-            if (w.isAirBlock(c.x, c.y, c.z)) {
+            if (w == null || w.isAirBlock(c.x, c.y, c.z)) {
                 it.remove();
             } else if (c.x == at.x && c.y == at.y && c.z == at.z) {
                 it.remove();
