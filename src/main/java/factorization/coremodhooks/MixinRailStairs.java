@@ -25,7 +25,7 @@ public class MixinRailStairs extends BlockRailBase {
         }
         if (ent instanceof EntityPlayer) {
             final double h = 0.5;
-            final double w = 0.5;
+            final double w = 0.25;
             final double s = 6.0 / 16.0;
             AxisAlignedBB box = null;
             BlockRailBase me = this;
