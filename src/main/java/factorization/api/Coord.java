@@ -8,10 +8,8 @@ import cpw.mods.fml.relauncher.SideOnly;
 import factorization.api.datahelpers.DataHelper;
 import factorization.api.datahelpers.IDataSerializable;
 import factorization.notify.ISaneCoord;
-import factorization.shared.BlockHelper;
-import factorization.shared.Core;
+import factorization.shared.*;
 import factorization.shared.NetworkFactorization.MessageType;
-import factorization.shared.TileEntityCommon;
 import factorization.util.FzUtil;
 import factorization.util.ItemUtil;
 import factorization.util.SpaceUtil;
@@ -19,10 +17,15 @@ import io.netty.buffer.ByteBuf;
 import net.minecraft.block.Block;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.item.EntityItem;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.network.Packet;
+import net.minecraft.network.play.server.S21PacketChunkData;
+import net.minecraft.server.management.PlayerManager;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.ChunkCoordinates;
@@ -30,6 +33,7 @@ import net.minecraft.util.MovingObjectPosition;
 import net.minecraft.util.Vec3;
 import net.minecraft.world.EnumSkyBlock;
 import net.minecraft.world.World;
+import net.minecraft.world.WorldServer;
 import net.minecraft.world.biome.BiomeGenBase;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraftforge.common.util.ForgeDirection;
@@ -602,6 +606,33 @@ public final class Coord implements IDataSerializable, ISaneCoord, Comparable<Co
     
     public BiomeGenBase getBiome() {
         return w.getBiomeGenForCoords(x, z);
+    }
+
+    public void setBiome(BiomeGenBase biome) {
+        Chunk chunk = getChunk();
+        byte[] biomeData = chunk.getBiomeArray();
+        if (biomeData == null) return;
+        final int index = (z & 0xF) << 4 | (x & 0xF);
+        biomeData[index] = (byte) (biome.biomeID & 0xFF);
+    }
+
+    public void resyncChunksFull() {
+        if (w.isRemote) return;
+        Chunk chunk = getChunk();
+        final WorldServer world = (WorldServer) chunk.worldObj;
+        final PlayerManager pm = world.getPlayerManager();
+        PlayerManager.PlayerInstance watcher = pm.getOrCreateChunkWatcher(chunk.xPosition, chunk.zPosition, false);
+        if (watcher == null) return;
+        ArrayList<EntityPlayerMP> players = new ArrayList<EntityPlayerMP>();
+        players.addAll(watcher.playersWatchingChunk);
+        for (EntityPlayerMP player : players) {
+            watcher.removePlayer(player);
+            watcher.addPlayer(player);
+        }
+
+
+        Packet packet = new S21PacketChunkData(chunk, true, -1);
+        FzNetDispatch.addPacketFrom(packet, chunk);
     }
 
     public Block getBlock() {

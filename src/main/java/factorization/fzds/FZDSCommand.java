@@ -24,6 +24,7 @@ import net.minecraft.util.EnumChatFormatting;
 import net.minecraft.util.Vec3;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;
+import net.minecraft.world.biome.BiomeGenBase;
 import net.minecraftforge.common.DimensionManager;
 import net.minecraftforge.common.util.ForgeDirection;
 
@@ -1085,6 +1086,36 @@ public class FZDSCommand extends CommandBase {
             }
             
         }, Requires.SLICE_SELECTED);
+        add(new SubCommand("setbiome", "x,y,z", "x,y,z", "biomeId") {
+            @Override
+            String details() {
+                return "Changes the biome ID; see the manual's reference section for biomes";
+            }
+
+            @Override
+            void call(String[] args) {
+                Coord origin = new Coord(world, 0, 0, 0);
+                Coord low = origin.add(DeltaCoord.parse(args[0]));
+                Coord upr = origin.add(DeltaCoord.parse(args[1]));
+                Coord.sort(low, upr);
+                low.y = upr.y;
+                int biomeId = Integer.parseInt(args[2]);
+                final BiomeGenBase biome = BiomeGenBase.getBiome(biomeId);
+                Coord.iterateCube(low, upr, new ICoordFunction() {
+                    @Override
+                    public void handle(Coord here) {
+                        here.setBiome(biome);
+                    }
+                });
+
+                Coord.iterateChunks(low, upr, new ICoordFunction() {
+                    @Override
+                    public void handle(Coord here) {
+                        here.resyncChunksFull();
+                    }
+                });
+            }
+        }, Requires.CREATIVE, Requires.PLAYER);
     }
     
     private static void clearDseArea(IDeltaChunk idc) {
