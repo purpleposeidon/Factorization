@@ -278,7 +278,7 @@ public class PumpLiquids extends SocketFanturpeller implements IFluidHandler {
         @Override
         public void suckIn() {
             if (isSucking) return; //don't run backwards
-            if (buffer.getFluidAmount() > 0 && !isDrainingTank) return;
+            if (auxBuffer.getFluidAmount() > 0) return;
             if (updateFrontier()) return;
             if (delay > 0) {
                 delay--;
@@ -289,14 +289,12 @@ public class PumpLiquids extends SocketFanturpeller implements IFluidHandler {
             if (pc == null) {
                 FoundFluidHandler foundIfh = foundContainers.poll();
                 if (foundIfh == null) {
-                    auxBuffer.fill(buffer.drain(BUCKET, true), true);
                     reset();
                     return;
                 }
-                FluidStack resource = new FluidStack(targetFluid, buffer.getCapacity() - buffer.getFluidAmount());
+                FluidStack resource = new FluidStack(targetFluid, auxBuffer.getCapacity() - auxBuffer.getFluidAmount());
                 FluidStack gotten = foundIfh.te.drain(foundIfh.dir, resource, true);
-                buffer.fill(gotten, true);
-                isDrainingTank = (buffer.getFluidAmount() % 1000) != 0;
+                auxBuffer.fill(gotten, true);
                 return;
             }
             if (!pc.verifyConnection(this, worldObj)) {
@@ -307,7 +305,7 @@ public class PumpLiquids extends SocketFanturpeller implements IFluidHandler {
                 // Fluid (likely water) has refilled in above us
                 reset();
             } else {
-                buffer.setFluid(drainBlock(pc, true));
+                auxBuffer.setFluid(drainBlock(pc, true));
             }
         }
 
@@ -319,7 +317,7 @@ public class PumpLiquids extends SocketFanturpeller implements IFluidHandler {
         }
         
         int getMaxDistance() {
-            return 64*target_speed;
+            return 81;
         }
     }
     
@@ -695,7 +693,7 @@ public class PumpLiquids extends SocketFanturpeller implements IFluidHandler {
         super.serialize(prefix, data);
         data.as(Share.PRIVATE, "buff").putTank(buffer);
         data.as(Share.PRIVATE, "auxBuff").putTank(auxBuffer);
-        isDrainingTank = data.as(Share.PRIVATE, "drainTank").putBoolean(isDrainingTank);
+        isDrainingTank = data.as(Share.PRIVATE, "drainTank").putBoolean(isDrainingTank); // NORELEASE: rm
         isFloodingTank = data.as(Share.PRIVATE, "floodTank").putBoolean(isFloodingTank);
         available_pumping_activity = data.as(Share.PRIVATE, "pumpActivity").putInt(available_pumping_activity);
         
