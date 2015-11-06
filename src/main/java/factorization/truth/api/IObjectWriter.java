@@ -15,7 +15,7 @@ public interface IObjectWriter<T> {
      * @param out          A list of Words and Strings.
      * @param val          The object that's being examined. Possibly just 'this'; if val implements IObjectWriter,
      *                     then val.writeObject() is what is being called.
-     * @param generic      A converter that can handles arbitrary objects, including ItemStacks and many other typical
+     * @param generic      A converter that can handles arbitrary objects, including ItemStacks and many other typical types.
      */
     void writeObject(List out, T val, IObjectWriter<Object> generic);
 }

@@ -1,13 +1,15 @@
 package factorization.truth.gen.recipe;
 
+import factorization.shared.NORELEASE;
 import factorization.truth.api.IObjectWriter;
 import factorization.truth.word.TextWord;
 import net.minecraft.item.crafting.IRecipe;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 public class ReflectionWriter implements IObjectWriter<Object> {
     int recursion = 0;
@@ -31,7 +33,7 @@ public class ReflectionWriter implements IObjectWriter<Object> {
         return false;
     }
 
-    void addRecipeWithReflection(List out, Object val, IObjectWriter<Object> generic) throws IllegalArgumentException, IllegalAccessException {
+    void addRecipeWithReflection(List out, Object val, IObjectWriter<Object> generic) throws IllegalArgumentException, IllegalAccessException, InvocationTargetException {
         if (recursion > 4) {
             out.add(new TextWord("…"));
             return;
@@ -44,32 +46,61 @@ public class ReflectionWriter implements IObjectWriter<Object> {
         }
     }
 
-    void do_addRecipeWithReflection(List out, Object val, IObjectWriter<Object> generic) throws IllegalArgumentException, IllegalAccessException {
+    void do_addRecipeWithReflection(List out, Object val, IObjectWriter<Object> generic) throws IllegalArgumentException, IllegalAccessException, InvocationTargetException {
         if (writeDirect(out, val, generic)) {
             return; // ItemStack/String/Number/isArray/Collection/NBTBase/Entry
+        }
+        if (val.getClass().getCanonicalName().contains("erebus")) {
+            NORELEASE.breakpoint();
         }
         Object recipeOutput = this; // Just any ol' non-null object
         if (val instanceof IRecipe) {
             recipeOutput = RecipeViewer.genericRecipePrefix(out, (IRecipe) val);
         }
-        Field[] fields = val.getClass().getDeclaredFields();
+        ArrayList<String> properties = new ArrayList<String>();
+        HashSet<Object> seen = new HashSet<Object>();
+        final Class<?> valClass = val.getClass();
+        for (Method method : valClass.getMethods()) {
+            if (method.getParameterTypes().length != 0) continue;
+            if (method.getReturnType() == Void.TYPE) continue;
+            if ((method.getModifiers() & Modifier.STATIC) != 0) continue;
+            if (method.getDeclaringClass() != valClass) continue;
+            String name = method.getName();
+            if ("toString".equals(name) || "hashCode".equals(name) || "clone".equals(name)) continue;
+            if (name.startsWith("get")) {
+                properties.add(name = name.replaceFirst("get", "").toLowerCase(Locale.ROOT));
+            }
+            Object v = method.invoke(val);
+            if (v == recipeOutput || v == null) continue;
+            if (seen.add(v)) {
+                put(out, generic, name, v);
+            }
+        }
+        Field[] fields = valClass.getDeclaredFields();
         for (Field f : fields) {
             if (f.getName().contains("$")) continue;
-            int modifiers = f.getModifiers();
-            if ((modifiers & Modifier.STATIC) != 0) continue;
+            if (properties.contains(f.getName())) continue;
+            if ((f.getModifiers() & Modifier.STATIC) != 0) continue;
             if (!f.isAccessible()) {
                 f.setAccessible(true);
             }
             Object v = f.get(val);
             if (v == recipeOutput || v == null) continue;
-            ArrayList tmp = new ArrayList();
-            if (writeDirect(tmp, v, generic)) {
-                out.add(f.getName() + ": ");
-                out.addAll(tmp);
-                out.add("\\nl ");
-            } else {
-                addRecipeWithReflection(out, v, generic);
+            if (seen.add(v)) {
+                put(out, generic, f.getName(), v);
             }
+        }
+    }
+
+    private void put(List out, IObjectWriter<Object> generic, String name, Object v) throws IllegalAccessException, InvocationTargetException {
+        //if (name.toLowerCase(Locale.ROOT).equals("output")) return;
+        ArrayList tmp = new ArrayList();
+        if (writeDirect(tmp, v, generic)) {
+            out.add(name + ": ");
+            out.addAll(tmp);
+            out.add("\\nl ");
+        } else {
+            addRecipeWithReflection(out, v, generic);
         }
     }
 }

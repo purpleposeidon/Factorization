@@ -3,6 +3,7 @@ package factorization.truth;
 import factorization.truth.api.AbstractPage;
 import factorization.truth.api.IWord;
 import factorization.truth.api.TruthError;
+import factorization.truth.gen.recipe.RecipeViewer;
 import factorization.truth.minecraft.GuiButtonNextPage;
 import factorization.truth.word.Word;
 import net.minecraft.client.Minecraft;
@@ -377,6 +378,9 @@ public class DocViewer extends GuiScreen {
             state.dark_color_scheme ^= true;
         } else if (keySym == mc.gameSettings.keyBindInventory.getKeyCode()) {
             mc.displayGuiScreen(new GuiInventory(mc.thePlayer));
+        } else if (chr == 'l') {
+            RecipeViewer.resetCache();
+            initGui();
         } else {
             super.keyTyped(chr, keySym);
         }

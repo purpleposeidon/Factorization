@@ -1,6 +1,7 @@
 package factorization.truth.gen.recipe;
 
 import cpw.mods.fml.relauncher.ReflectionHelper;
+import factorization.api.adapter.Adapter;
 import factorization.api.adapter.GenericAdapter;
 import factorization.truth.api.IObjectWriter;
 import factorization.truth.gen.FluidViewer;
@@ -19,6 +20,7 @@ import net.minecraftforge.oredict.OreDictionary;
 import net.minecraftforge.oredict.ShapedOreRecipe;
 import net.minecraftforge.oredict.ShapelessOreRecipe;
 
+import java.lang.reflect.Array;
 import java.util.*;
 
 class StandardObjectWriters {
@@ -46,6 +48,7 @@ class StandardObjectWriters {
         reg(ShapelessRecipes.class, new WriteShapelessRecipe());
         reg(Map.Entry.class, new WriteEntry());
 
+        IObjectWriter.adapter.register(new ArrayAdapter());
         IObjectWriter.adapter.setFallbackAdapter(new GenericAdapter<Object, IObjectWriter>(Object.class, new ReflectionWriter()));
     }
 
@@ -99,7 +102,13 @@ class StandardObjectWriters {
         @Override
         public void writeObject(List out, FluidStack val, IObjectWriter<Object> generic) {
             out.add(FluidViewer.convert(val.getFluid()));
-            out.add(new TextWord("" + val.amount));
+            out.add(new TextWord(val.getLocalizedName()));
+            if (val.amount == 0) return;
+            if (val.amount % 1000 == 0) {
+                out.add(new TextWord(" " + (val.amount / 1000) + "B"));
+            } else {
+                out.add(new TextWord(" " + val.amount + "mB"));
+            }
             // TODO: Link to fluid viewer
         }
     }
@@ -217,6 +226,35 @@ class StandardObjectWriters {
             generic.writeObject(out, val.getKey(), generic);
             out.add(" ➤ ");
             generic.writeObject(out, val.getValue(), generic);
+        }
+    }
+
+    private static class ArrayAdapter implements Adapter<Object,IObjectWriter>, IObjectWriter<Object> {
+        @Override
+        public IObjectWriter adapt(Object val) {
+            return this;
+        }
+
+        @Override
+        public boolean canAdapt(Class<?> valClass) {
+            return valClass.isArray();
+        }
+
+        @Override
+        public int priority() {
+            return 10;
+        }
+
+        @Override
+        public void writeObject(List out, Object val, IObjectWriter<Object> generic) {
+            out.add("[");
+            int len = Array.getLength(val);
+            for (int i = 0; i < len; i++) {
+                if (i > 0) out.add(", ");
+                Object v = Array.get(val, i);
+                generic.writeObject(out, v, generic);
+            }
+            out.add("]");
         }
     }
 }

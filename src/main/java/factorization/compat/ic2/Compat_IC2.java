@@ -6,6 +6,7 @@ import cpw.mods.fml.common.event.FMLInterModComms;
 import factorization.api.IRotationalEnergySource;
 import factorization.compat.CompatBase;
 import factorization.shared.Core;
+import factorization.truth.DocumentationModule;
 import factorization.truth.api.IObjectWriter;
 import factorization.truth.word.ItemWord;
 import ic2.api.recipe.Recipes;
@@ -29,7 +30,7 @@ public class Compat_IC2 extends CompatBase {
             if ((modifiers & Modifier.STATIC) == 0) continue;
             field.setAccessible(true);
             String name = field.getName();
-            FMLInterModComms.sendMessage(Core.modId, "AddRecipeCategory", "fzdoc.ic2.recipe." + name + "|ic2.api.recipe.Recipes|" + name);
+            FMLInterModComms.sendMessage(DocumentationModule.modid, "AddRecipeCategory", "fzdoc.ic2.recipe." + name + "|ic2.api.recipe.Recipes|" + name);
         }
         IObjectWriter.adapter.register(AdvRecipe.class, new WriteShapedRecipe());
         IObjectWriter.adapter.register(AdvShapelessRecipe.class, new WriteShapelessRecipe());

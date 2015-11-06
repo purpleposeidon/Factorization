@@ -12,7 +12,7 @@ import java.util.Locale;
 public class CompatModuleLoader extends CompatBase {
     ArrayList<CompatBase> modules = new ArrayList<CompatBase>();
 
-    String[] mod_compats = new String[] {"IC2", "Railcraft"};
+    String[] mod_compats = new String[] {"IC2", "Railcraft", "erebus"};
     String base_name = getClass().getCanonicalName().replace(getClass().getSimpleName(), "");
     
     public void loadCompat() {
@@ -22,6 +22,7 @@ public class CompatModuleLoader extends CompatBase {
                 Core.logInfo(mod  + " not loaded; not loading compatibility module");
                 continue;
             }
+            // TODO: Config options
             try {
                 String name = base_name + mod.toLowerCase(Locale.ROOT) + ".Compat_" + mod;
                 Class<? extends CompatBase> compatClass = (Class<? extends CompatBase>) cl.loadClass(name);

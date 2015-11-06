@@ -19,6 +19,17 @@ import java.util.*;
 import java.util.Map.Entry;
 
 public class RecipeViewer implements IDocGenerator, IObjectWriter<Object> {
+    static RecipeViewer instance;
+
+    public RecipeViewer() {
+        if (instance == null) instance = this;
+    }
+
+    public static void resetCache() {
+        if (instance == null) return;
+        instance.recipeCategories = null;
+    }
+
     HashMap<String, ArrayList<ArrayList>> recipeCategories = null;
     ArrayList<String> categoryOrder = new ArrayList<String>();
     
