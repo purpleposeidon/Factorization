@@ -2,7 +2,6 @@ package factorization.compat.ic2;
 
 import factorization.api.IRotationalEnergySource;
 import factorization.api.adapter.Adapter;
-import factorization.shared.NORELEASE;
 import ic2.api.energy.tile.IKineticSource;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraftforge.common.util.ForgeDirection;
@@ -24,7 +23,7 @@ public class RotationalEnergySourceAdapter implements Adapter<TileEntity, IRotat
     }
 
     private static class Kinetic2Rotational implements IRotationalEnergySource {
-        public static double IC2_FZ_RATIO = 2500;
+        public static double IC2_FZ_RATIO = 1500;
         public static double IC2_ANGULAR_VELOCITY_RATIO = 1.0 / 1000.0;
 
         private final TileEntity baseTe;
@@ -48,7 +47,6 @@ public class RotationalEnergySourceAdapter implements Adapter<TileEntity, IRotat
 
         @Override
         public double takeEnergy(ForgeDirection direction, double maxPower) {
-            IC2_FZ_RATIO = NORELEASE.just(1500);
             final int avail = base.requestkineticenergy(direction, (int) (maxPower * IC2_FZ_RATIO));
             last_velocity = avail;
             return avail / IC2_FZ_RATIO;
