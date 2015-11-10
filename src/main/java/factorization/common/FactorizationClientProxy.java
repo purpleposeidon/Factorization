@@ -12,6 +12,7 @@ import factorization.mechanics.BlockRenderHinge;
 import factorization.mechanics.SocketPoweredCrank;
 import factorization.mechanics.TileEntityHinge;
 import factorization.mechanics.TileEntityHingeRenderer;
+import factorization.rendersorting.RenderSorter;
 import factorization.shared.*;
 import factorization.weird.*;
 import factorization.weird.poster.EntityPoster;
@@ -78,8 +79,13 @@ import factorization.wrath.TileEntityWrathLamp;
 
 public class FactorizationClientProxy extends FactorizationProxy {
     public FactorizationKeyHandler keyHandler = new FactorizationKeyHandler();
+    public RenderSorter renderSorter;
+
     public FactorizationClientProxy() {
         Core.loadBus(this);
+        if (FzConfig.sort_renderers) {
+            Core.loadBus(renderSorter = new RenderSorter());
+        }
     }
 
     @Override

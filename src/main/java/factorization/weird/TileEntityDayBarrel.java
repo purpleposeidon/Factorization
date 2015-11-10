@@ -13,6 +13,8 @@ import factorization.api.datahelpers.Share;
 import factorization.common.FactoryType;
 import factorization.notify.Notice;
 import factorization.notify.NoticeUpdater;
+import factorization.rendersorting.ISortableRenderer;
+import factorization.rendersorting.RenderSorter;
 import factorization.shared.*;
 import factorization.shared.NetworkFactorization.MessageType;
 import factorization.util.*;
@@ -37,6 +39,7 @@ import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.IIcon;
 import net.minecraft.util.MovingObjectPosition;
 import net.minecraft.util.Vec3;
+import net.minecraftforge.client.IItemRenderer;
 import net.minecraftforge.client.event.RenderWorldLastEvent;
 import net.minecraftforge.common.ForgeHooks;
 import net.minecraftforge.common.util.FakePlayer;
@@ -48,7 +51,7 @@ import org.lwjgl.opengl.GL11;
 import java.io.IOException;
 import java.util.ArrayList;
 
-public class TileEntityDayBarrel extends TileEntityFactorization {
+public class TileEntityDayBarrel extends TileEntityFactorization implements ISortableRenderer<TileEntityDayBarrel> {
     public ItemStack item;
     private ItemStack topStack;
     private int middleCount;
@@ -64,7 +67,7 @@ public class TileEntityDayBarrel extends TileEntityFactorization {
     Object notice_target = this;
     
     private static final int maxStackDrop = 64*64*2;
-    
+
     public static enum Type {
         NORMAL, SILKY, HOPPING, LARGER, STICKY, CREATIVE;
         
@@ -1231,5 +1234,10 @@ public class TileEntityDayBarrel extends TileEntityFactorization {
     public int getFlamability() {
         // The creative barrel I give you can't burn, so won't check for CREATIVE.
         return isWooden() ? 20 : 0;
+    }
+
+    @Override
+    public int compareRenderer(TileEntityDayBarrel other) {
+        return RenderSorter.compareItemRender(item, other.item, IItemRenderer.ItemRenderType.INVENTORY);
     }
 }

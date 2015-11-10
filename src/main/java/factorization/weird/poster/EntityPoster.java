@@ -6,6 +6,8 @@ import factorization.api.Coord;
 import factorization.api.Quaternion;
 import factorization.api.datahelpers.DataHelper;
 import factorization.api.datahelpers.Share;
+import factorization.rendersorting.ISortableRenderer;
+import factorization.rendersorting.RenderSorter;
 import factorization.shared.Core;
 import factorization.shared.EntityFz;
 import factorization.util.ItemUtil;
@@ -23,11 +25,12 @@ import net.minecraft.util.MathHelper;
 import net.minecraft.util.MovingObjectPosition;
 import net.minecraft.util.Vec3;
 import net.minecraft.world.World;
+import net.minecraftforge.client.IItemRenderer;
 import net.minecraftforge.common.util.ForgeDirection;
 
 import java.io.IOException;
 
-public class EntityPoster extends EntityFz {
+public class EntityPoster extends EntityFz implements ISortableRenderer<EntityPoster> {
     public ItemStack inv = new ItemStack(Core.registry.spawnPoster);
     public Quaternion rot = new Quaternion();
     public double scale = 1.0;
@@ -254,5 +257,10 @@ public class EntityPoster extends EntityFz {
     @Override
     public boolean isInRangeToRenderDist(double dist) {
         return dist < 32 * 32;
+    }
+
+    @Override
+    public int compareRenderer(EntityPoster other) {
+        return RenderSorter.compareItemRender(inv, other.inv, IItemRenderer.ItemRenderType.ENTITY);
     }
 }

@@ -1,5 +1,7 @@
 package factorization.common;
 
+import cpw.mods.fml.common.FMLCommonHandler;
+import cpw.mods.fml.common.Loader;
 import cpw.mods.fml.common.registry.EntityRegistry;
 import factorization.fzds.DeltaChunk;
 import factorization.shared.Core;
@@ -77,6 +79,7 @@ public class FzConfig {
     public static String retrogen_key = "DEFAULT";
     public static boolean retrogen_silver = false;
     public static boolean retrogen_dark_iron = false;
+    public static boolean sort_renderers = !Loader.isModLoaded("optifine"); // Just as a guess.
 
     public ArrayList<Property> editable_main = new ArrayList<Property>();
     public ArrayList<Property> editable_runtime = new ArrayList<Property>();
@@ -192,6 +195,7 @@ public class FzConfig {
             large_servo_instructions = editMain().getBoolConfig("largeServoInstructions", "client", large_servo_instructions, "Render servo instructions extra-large. This can also be toggled on and off using '/f servoInstructionSize'.");
             show_time_on_fullscreen = editRun().getBoolConfig("showTimeOnFullscreen", "client", show_time_on_fullscreen, "If true, show the time every half hour");
             mirror_sunbeams = editRun().getBoolConfig("drawMirrorSunbeams", "client", mirror_sunbeams, "If false, mirrors won't draw sunbeams");
+            sort_renderers = getBoolConfig("sortRenderers", "client", sort_renderers, "Use advanced Entity & TileEntity sorting techniques to optimize rendering, particularly for FZ entities.");
         }
 
 
