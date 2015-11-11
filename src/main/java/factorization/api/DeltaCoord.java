@@ -14,7 +14,6 @@ public class DeltaCoord implements IDataSerializable {
     public int x, y, z;
 
     public static final DeltaCoord ZERO = new DeltaCoord();
-
     public DeltaCoord() {
         x = y = z = 0;
     }
@@ -75,11 +74,22 @@ public class DeltaCoord implements IDataSerializable {
             d(0, 0, -1),
             d(0, 0, +1) };
     
-    public static DeltaCoord planeNeighbors[] = {
+    public static DeltaCoord flatNeighbors[] = {
         d(+1, 0, 0),
         d(-1, 0, 0),
         d(0, 0, -1),
         d(0, 0, +1) };
+
+    public static final DeltaCoord[] directNeighborsPlusMe = new DeltaCoord[] {
+            d(0, 0, 0),
+            d(-1, 0, 0),
+            d(+1, 0, 0),
+            d(0, -1, 0),
+            d(0, +1, 0),
+            d(0, 0, -1),
+            d(0, 0, +1),
+    };
+
 
     public double getAngleHorizontal() {
         return Math.atan2(z, -x);
