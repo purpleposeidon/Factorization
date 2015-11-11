@@ -17,7 +17,7 @@ import factorization.crafting.TileEntityMixer;
 import factorization.crafting.TileEntityStamper;
 import factorization.oreprocessing.TileEntityCrystallizer;
 import factorization.oreprocessing.TileEntitySlagFurnace;
-import factorization.servo.TileEntityParaSieve;
+import factorization.redstone.TileEntityParaSieve;
 import factorization.shared.TileEntityFactorization;
 
 public class ContainerFactorization extends Container {

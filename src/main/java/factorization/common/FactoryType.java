@@ -15,7 +15,7 @@ import factorization.mechanics.SocketPoweredCrank;
 import factorization.mechanics.TileEntityHinge;
 import factorization.oreprocessing.TileEntityCrystallizer;
 import factorization.oreprocessing.TileEntitySlagFurnace;
-import factorization.servo.TileEntityParaSieve;
+import factorization.redstone.TileEntityParaSieve;
 import factorization.servo.TileEntityServoRail;
 import factorization.shared.Core;
 import factorization.shared.TileEntityCommon;

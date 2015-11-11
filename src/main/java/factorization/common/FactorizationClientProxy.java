@@ -64,7 +64,7 @@ import factorization.oreprocessing.TileEntityCrystallizer;
 import factorization.oreprocessing.TileEntityCrystallizerRender;
 import factorization.oreprocessing.TileEntityGrinderRender;
 import factorization.servo.BlockRenderServoRail;
-import factorization.servo.GuiParasieve;
+import factorization.redstone.GuiParasieve;
 import factorization.servo.RenderServoMotor;
 import factorization.servo.ServoMotor;
 import factorization.sockets.BlockRenderSocketBase;

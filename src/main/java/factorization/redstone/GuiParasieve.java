@@ -1,5 +1,6 @@
-package factorization.servo;
+package factorization.redstone;
 
+import factorization.redstone.TileEntityParaSieve;
 import org.lwjgl.opengl.GL11;
 
 import factorization.common.ContainerFactorization;
