@@ -3,6 +3,7 @@ package factorization.util;
 import factorization.api.Coord;
 import factorization.api.DeltaCoord;
 import factorization.api.FzOrientation;
+import factorization.api.Quaternion;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.AxisAlignedBB;
@@ -11,6 +12,7 @@ import net.minecraft.util.Vec3;
 import net.minecraftforge.common.util.ForgeDirection;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Random;
 
@@ -576,5 +578,36 @@ public final class SpaceUtil {
             case 4: return ForgeDirection.UP; // Making this up
             case 5: return ForgeDirection.DOWN; // And this one
         }
+    }
+
+    /**
+     * Rotate the allowed direction that is nearest to the rotated dir.
+     * @param dir The original direction
+     * @param rot The rotation to apply
+     * @param allow The directions that may be used.
+     * @return A novel direction
+     */
+    public static ForgeDirection rotateDirection(ForgeDirection dir, Quaternion rot, Iterable<ForgeDirection> allow) {
+        Vec3 v = fromDirection(dir);
+        rot.applyRotation(v);
+        ForgeDirection best = ForgeDirection.UNKNOWN;
+        double bestDot = Double.POSITIVE_INFINITY;
+        for (ForgeDirection fd : allow) {
+            Vec3 f = fromDirection(fd);
+            rot.applyRotation(f);
+            double dot = v.dotProduct(f);
+            if (dot < bestDot) {
+                bestDot = dot;
+                best = fd;
+            }
+        }
+        return best;
+    }
+
+    public static ForgeDirection rotateDirectionAndExclude(ForgeDirection dir, Quaternion rot, Collection<ForgeDirection> allow) {
+        ForgeDirection ret = rotateDirection(dir, rot, allow);
+        allow.remove(ret);
+        allow.remove(ret.getOpposite());
+        return ret;
     }
 }
