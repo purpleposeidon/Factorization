@@ -14,7 +14,7 @@ import factorization.api.datahelpers.Share;
 import factorization.shared.Core;
 
 public class MotionHandler {
-    public final ServoMotor motor;
+    public final AbstractServoMachine motor;
     
     Coord pos_prev, pos_next;
     float pos_progress;
@@ -36,7 +36,7 @@ public class MotionHandler {
     private static final double normal_speed_double = 0.0875;
     private static final double max_speed_double = normal_speed_double*4;
     
-    public MotionHandler(ServoMotor motor) {
+    public MotionHandler(AbstractServoMachine motor) {
         this.motor = motor;
         pos_prev = new Coord(motor.worldObj, 0, 0, 0);
         pos_next = pos_prev.copy();
@@ -109,7 +109,7 @@ public class MotionHandler {
         }
         long now = motor.worldObj.getTotalWorldTime();
         if (should_accelerate && now % 3 == 0) {
-            if (Core.cheat_servo_energy || motor.extractCharge(2)) {
+            if (Core.cheat_servo_energy || motor.extractAccelerationEnergy()) {
                 accelerate();
             }
         }

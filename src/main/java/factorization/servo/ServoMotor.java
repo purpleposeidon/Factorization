@@ -41,8 +41,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public class ServoMotor extends Entity implements IEntityAdditionalSpawnData, IEntityMessage, IInventory, ISocketHolder {
-    public final MotionHandler motionHandler = new MotionHandler(this);
+public class ServoMotor extends AbstractServoMachine implements IInventory, ISocketHolder {
     public Executioner executioner = new Executioner(this);
     public TileEntitySocketBase socket = new SocketEmpty();
     public boolean isSocketActive = false;
@@ -73,50 +72,11 @@ public class ServoMotor extends Entity implements IEntityAdditionalSpawnData, IE
     
     
     // Serialization
-    
-    @Override
-    protected void readEntityFromNBT(NBTTagCompound nbttagcompound) {
-        try {
-            putData(new DataInNBT(nbttagcompound));
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-    
-    @Override
-    protected void writeEntityToNBT(NBTTagCompound nbttagcompound) {
-        try {
-            putData(new DataOutNBT(nbttagcompound));
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
 
     @Override
-    public void readSpawnData(ByteBuf data) {
-        try {
-            putData(new DataInPacket(new ByteBufInputStream(data), Side.CLIENT));
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (IllegalStateException e) {
-            e.printStackTrace(); //Hrm! Why? (I mean, besides the obvious.)
-        }
-    }
-
-    @Override
-    public void writeSpawnData(ByteBuf data) {
-        try {
-            putData(new DataOutPacket(new ByteBufOutputStream(data), Side.SERVER));
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (IllegalStateException e) {
-            e.printStackTrace(); //Hrm! Why? (I mean, besides the obvious.)
-        }
-    }
-
-    void putData(DataHelper data) throws IOException {
+    public void putData(DataHelper data) throws IOException {
+        super.putData(data);
         executioner.putData(data);
-        motionHandler.putData(data);
         
         final byte invSize = data.as(Share.VISIBLE, "inv#").putByte((byte) inv.length);
         resizeInventory(invSize);
@@ -151,21 +111,7 @@ public class ServoMotor extends Entity implements IEntityAdditionalSpawnData, IE
     
     
     // Networking
-    
-    void broadcast(MessageType message_type, Object... msg) {
-        FMLProxyPacket p = Core.network.entityPacket(this, message_type, msg);
-        Core.network.broadcastPacket(null, getCurrentPos(), p);
-    }
-    
-    public void broadcastBriefUpdate() {
-        Coord a = getCurrentPos();
-        Coord b = getNextPos();
-        broadcast(MessageType.servo_brief, (byte) motionHandler.orientation.ordinal(), motionHandler.speed_b,
-                a.x, a.y, a.z,
-                b.x, b.y, b.z,
-                motionHandler.pos_progress);
-    }
-    
+
     @Override
     public boolean handleMessageFromClient(MessageType messageType, ByteBuf input) throws IOException {
         if (messageType == MessageType.DataHelperEditOnEntity) {
@@ -180,6 +126,9 @@ public class ServoMotor extends Entity implements IEntityAdditionalSpawnData, IE
     @Override
     @SideOnly(Side.CLIENT)
     public boolean handleMessageFromServer(MessageType messageType, ByteBuf input) throws IOException {
+        if (super.handleMessageFromServer(messageType, input)) {
+            return true;
+        }
         switch (messageType) {
         case OpenDataHelperGuiOnEntity:
             if (!worldObj.isRemote) {
@@ -225,9 +174,6 @@ public class ServoMotor extends Entity implements IEntityAdditionalSpawnData, IE
             } catch (IOException e) {
                 e.printStackTrace();
             }
-            return true;
-        case servo_stopped:
-            motionHandler.stopped = input.readBoolean();
             return true;
         case TileEntityMessageOnEntity:
             MessageType subMsg = MessageType.read(input);
@@ -279,16 +225,18 @@ public class ServoMotor extends Entity implements IEntityAdditionalSpawnData, IE
             }
         }
     }
-    
-    void updateSocket() {
+
+    @Override
+    public void updateSocket() {
         Coord here = getCurrentPos();
         here.setAsTileEntityLocation(socket);
         socket.facing = motionHandler.orientation.top;
         socket.genericUpdate(this, here, isSocketActive ^ isSocketPulsed);
         isSocketPulsed = false;
     }
-    
-    void onEnterNewBlock() {
+
+    @Override
+    public void onEnterNewBlock() {
         if (worldObj.isRemote) {
             return;
         }
@@ -325,56 +273,9 @@ public class ServoMotor extends Entity implements IEntityAdditionalSpawnData, IE
         executioner.putError(error);
     }
 
-    public Coord getCurrentPos() {
-        return motionHandler.pos_prev;
-    }
-    
-    public Coord getNextPos() {
-        return motionHandler.pos_next;
-    }
 
-    public FzOrientation getOrientation() {
-        return motionHandler.orientation;
-    }
-    
-    public void setOrientation(FzOrientation orientation) {
-        motionHandler.orientation = orientation;
-    }
-    
-    public void changeOrientation(ForgeDirection fd) {
-        motionHandler.changeOrientation(fd);
-    }
-    
-    public void setNextDirection(ForgeDirection direction) {
-        motionHandler.nextDirection = direction;
-    }
-    
-    public void setTargetSpeed(byte newTarget) {
-        motionHandler.setTargetSpeed((byte) (newTarget - 1));
-    }
-    
-    public byte getTargetSpeed() {
-        return (byte) (motionHandler.target_speed_index + 1);
-    }
-    
-    public void penalizeSpeed() {
-        motionHandler.penalizeSpeed();
-    }
-    
-    public void setStopped(boolean stop) {
-        motionHandler.setStopped(stop);
-    }
-    
-    public boolean isStopped() {
-        return motionHandler.stopped;
-    }
-    
-    
-    
-    
-    
-    
-    
+
+
     
     // Entity behavior
     
@@ -698,15 +599,6 @@ public class ServoMotor extends Entity implements IEntityAdditionalSpawnData, IE
     }
     
     @Override
-    public boolean extractCharge(int amount) {
-        IChargeConductor wire = getCurrentPos().getTE(IChargeConductor.class);
-        if (wire == null) {
-            return false;
-        }
-        return wire.getCharge().tryTake(amount) >= amount;
-    }
-    
-    @Override
     public void sendMessage(MessageType msgType, Object... msg) {
         Object[] buff = new Object[msg.length + 1];
         System.arraycopy(msg, 0, buff, 1, msg.length);
@@ -718,5 +610,10 @@ public class ServoMotor extends Entity implements IEntityAdditionalSpawnData, IE
     @Override
     public Vec3 getPos() {
         return SpaceUtil.fromEntPos(this);
+    }
+
+    @Override
+    public boolean extractAccelerationEnergy() {
+        return extractCharge(2);
     }
 }
