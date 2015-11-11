@@ -1012,8 +1012,8 @@ public class DimensionSliceEntity extends IDeltaChunk implements IFzdsEntryContr
         }
         
     }
-    
-    private void removeItemEntities() {
+
+    public void removeItemEntities() {
         //Move entities outside the bounds in the shadow world into the real world
         World w = cornerMin.w;
         for (int x = cornerMin.x - 16; x <= cornerMax.x + 16; x += 16) {
