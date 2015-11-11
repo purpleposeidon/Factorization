@@ -19,7 +19,6 @@ public class MotionHandler {
     Coord pos_prev, pos_next;
     float pos_progress;
     FzOrientation prevOrientation = FzOrientation.UNKNOWN, orientation = FzOrientation.UNKNOWN;
-    FzOrientation pendingClientOrientation = FzOrientation.UNKNOWN;
     ForgeDirection nextDirection = ForgeDirection.UNKNOWN, lastDirection = ForgeDirection.UNKNOWN;
     byte speed_b;
     byte target_speed_index = 2;
@@ -51,8 +50,8 @@ public class MotionHandler {
         setTargetSpeed(data.as(Share.VISIBLE, "speedt").putByte(target_speed_index));
         accumulated_motion = data.as(Share.VISIBLE, "accumulated_motion").putDouble(accumulated_motion);
         stopped = data.as(Share.VISIBLE, "stop").putBoolean(stopped);
-        pos_next = data.as(Share.VISIBLE, "pos_next").put(pos_next);
-        pos_prev = data.as(Share.VISIBLE, "pos_prev").put(pos_prev);
+        pos_next = data.as(Share.VISIBLE, "pos_next").putIDS(pos_next);
+        pos_prev = data.as(Share.VISIBLE, "pos_prev").putIDS(pos_prev);
         pos_progress = data.as(Share.VISIBLE, "pos_progress").putFloat(pos_progress);
         if (target_speed_index < 0) {
             target_speed_index = 0;
@@ -109,7 +108,6 @@ public class MotionHandler {
             return;
         }
         long now = motor.worldObj.getTotalWorldTime();
-        int m = 1 + target_speed_index;
         if (should_accelerate && now % 3 == 0) {
             if (Core.cheat_servo_energy || motor.extractCharge(2)) {
                 accelerate();
@@ -148,13 +146,6 @@ public class MotionHandler {
         return validDirection(d, desperate);
     }
     
-    static int similarity(FzOrientation base, FzOrientation novel) {
-        int score = 0;
-        //if pointing in plane, we want them to face the same direction
-        
-        return score;
-    }
-    
     
     boolean pickNextOrientation() {
         boolean ret = pickNextOrientation_impl();
@@ -191,6 +182,7 @@ public class MotionHandler {
         int available_nonbackwards_directions = 0;
         Coord look = pos_next.copy();
         int all_count = 0;
+        //noinspection ForLoopReplaceableByForEach
         for (int i = 0; i < dirs.size(); i++) {
             ForgeDirection fd = dirs.get(i);
             look.set(pos_next);
