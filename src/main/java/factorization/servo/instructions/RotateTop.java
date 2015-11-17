@@ -2,6 +2,8 @@ package factorization.servo.instructions;
 
 import java.io.IOException;
 
+import factorization.servo.AbstractServoMachine;
+import factorization.servo.stepper.StepperEngine;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.IIcon;
@@ -38,12 +40,21 @@ public class RotateTop extends Instruction {
         return false;
     }
 
-    @Override
-    public void motorHit(ServoMotor motor) {
+    void hit(AbstractServoMachine motor) {
         FzOrientation o = motor.getOrientation().pointTopTo(top.getOpposite());
         if (o != FzOrientation.UNKNOWN) {
             motor.setOrientation(o);
         }
+    }
+
+    @Override
+    public void motorHit(ServoMotor motor) {
+        hit(motor);
+    }
+
+    @Override
+    public void stepperHit(StepperEngine engine) {
+        hit(engine);
     }
 
     @Override

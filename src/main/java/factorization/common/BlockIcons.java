@@ -67,7 +67,7 @@ public class BlockIcons {
         rocket_engine_top, rocket_engine_bottom_hole, rocket_engine_nozzle, rocket_engine_valid, rocket_engine_invalid;
     
     public static IIcon servo$rail, servo$rail_comment;
-    public static IIcon servo$model$chasis, servo$model$sprocket;
+    public static IIcon servo$model$chasis, servo$model$sprocket, servo$model$stepper;
     
     public static IIcon ceramics$bisque, ceramics$dry, ceramics$stand, ceramics$rawglaze;
     

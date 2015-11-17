@@ -2,6 +2,8 @@ package factorization.servo.instructions;
 
 import java.io.IOException;
 
+import factorization.servo.AbstractServoMachine;
+import factorization.servo.stepper.StepperEngine;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
 import net.minecraft.init.Items;
@@ -44,8 +46,7 @@ public class Spin extends Instruction {
         return new ItemStack(Items.string);
     }
 
-    @Override
-    public void motorHit(ServoMotor motor) {
+    void hit(AbstractServoMachine motor) {
         ForgeDirection newTop = motor.getOrientation().top;
         for (int i = cc ? 3 : 1; i > 0; i--) {
             newTop = newTop.getRotation(motor.getOrientation().facing);
@@ -54,6 +55,16 @@ public class Spin extends Instruction {
         if (next != FzOrientation.UNKNOWN) {
             motor.setOrientation(next);
         }
+    }
+
+    @Override
+    public void motorHit(ServoMotor motor) {
+        hit(motor);
+    }
+
+    @Override
+    public void stepperHit(StepperEngine engine) {
+        hit(engine);
     }
 
     @Override

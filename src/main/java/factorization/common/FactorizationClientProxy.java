@@ -13,6 +13,8 @@ import factorization.mechanics.SocketPoweredCrank;
 import factorization.mechanics.TileEntityHinge;
 import factorization.mechanics.TileEntityHingeRenderer;
 import factorization.rendersorting.RenderSorter;
+import factorization.servo.stepper.RenderStepperEngine;
+import factorization.servo.stepper.StepperEngine;
 import factorization.shared.*;
 import factorization.weird.*;
 import factorization.weird.poster.EntityPoster;
@@ -195,6 +197,7 @@ public class FactorizationClientProxy extends FactorizationProxy {
 
         RenderingRegistry.registerEntityRenderingHandler(TileEntityWrathLamp.RelightTask.class, new EmptyRender());
         RenderingRegistry.registerEntityRenderingHandler(ServoMotor.class, new RenderServoMotor());
+        RenderingRegistry.registerEntityRenderingHandler(StepperEngine.class, new RenderStepperEngine());
         RenderingRegistry.registerEntityRenderingHandler(ColossusController.class, new ColossusControllerRenderer());
         RenderingRegistry.registerEntityRenderingHandler(EntityPoster.class, new RenderPoster());
         RenderingRegistry.registerEntityRenderingHandler(EntityCitizen.class, new RenderCitizen());

@@ -3,7 +3,9 @@ package factorization.servo;
 import java.io.IOException;
 import java.util.ArrayList;
 
+import factorization.api.DeltaCoord;
 import factorization.util.SpaceUtil;
+import net.minecraft.util.Vec3;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraftforge.common.util.ForgeDirection;
 import factorization.api.Coord;
@@ -17,19 +19,19 @@ public class MotionHandler {
     public final AbstractServoMachine motor;
     
     Coord pos_prev, pos_next;
-    float pos_progress;
-    FzOrientation prevOrientation = FzOrientation.UNKNOWN, orientation = FzOrientation.UNKNOWN;
-    ForgeDirection nextDirection = ForgeDirection.UNKNOWN, lastDirection = ForgeDirection.UNKNOWN;
+    public float pos_progress;
+    public FzOrientation prevOrientation = FzOrientation.UNKNOWN, orientation = FzOrientation.UNKNOWN;
+    public ForgeDirection nextDirection = ForgeDirection.UNKNOWN, lastDirection = ForgeDirection.UNKNOWN;
     byte speed_b;
     byte target_speed_index = 2;
     static final byte max_speed_b = 127;
     double accumulated_motion;
     boolean stopped = false;
-    FzColor color = FzColor.NO_COLOR;
+    public FzColor color = FzColor.NO_COLOR;
     
     //For client-side rendering
-    double sprocket_rotation = 0, prev_sprocket_rotation = 0;
-    double servo_reorient = 0, prev_servo_reorient = 0;
+    public double sprocket_rotation = 0, prev_sprocket_rotation = 0;
+    public double servo_reorient = 0, prev_servo_reorient = 0;
 
     private static final byte normal_speed_byte = (byte) (max_speed_b/4);
     private static final byte[] target_speeds_b = {normal_speed_byte/3, normal_speed_byte/2, normal_speed_byte, normal_speed_byte*2, normal_speed_byte*4};
@@ -42,7 +44,7 @@ public class MotionHandler {
         pos_next = pos_prev.copy();
     }
     
-    void putData(DataHelper data) throws IOException {
+    protected void putData(DataHelper data) throws IOException {
         orientation = data.as(Share.VISIBLE, "Orient").putFzOrientation(orientation);
         nextDirection = data.as(Share.VISIBLE, "nextDir").putEnum(nextDirection);
         lastDirection = data.as(Share.VISIBLE, "lastDir").putEnum(lastDirection);
@@ -113,6 +115,12 @@ public class MotionHandler {
                 accelerate();
             }
         }
+    }
+
+    public Vec3 getVelocity() {
+        double speed = getProperSpeed();
+        Vec3 direction = pos_next.difference(pos_prev).toVector().normalize();
+        return SpaceUtil.incrScale(direction, speed);
     }
     
     public void penalizeSpeed() {
@@ -249,10 +257,8 @@ public class MotionHandler {
             }
         }
         if (validDirection(opposite, true)) {
-            orientation = FzOrientation.fromDirection(opposite).pointTopTo(top);
-            if (orientation != FzOrientation.UNKNOWN) {
-                return true;
-            }
+            changeOrientation(opposite);
+            return true;
         }
         orientation = FzOrientation.UNKNOWN;
         return false;
@@ -263,7 +269,7 @@ public class MotionHandler {
         speed_b = (byte) Math.min(speed_b, max_speed_b);
     }
     
-    void moveMotor() {
+    protected void moveMotor() {
         if (accumulated_motion == 0) {
             return;
         }
@@ -296,11 +302,14 @@ public class MotionHandler {
         stopped = newState;
     }
     
-    void updateServoMotion() {
+    protected void updateServoMotion() {
         prev_sprocket_rotation = sprocket_rotation;
         prev_servo_reorient = servo_reorient;
         doMotionLogic();
         interpolatePosition(pos_progress);
+    }
+
+    protected void tryUnstop() {
         if (stopped && motor.getCurrentPos().isWeaklyPowered()) {
             setStopped(false);
         }

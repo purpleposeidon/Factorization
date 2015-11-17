@@ -18,8 +18,8 @@ import factorization.shared.ItemCraftingComponent;
 
 public class ItemServoMotor extends ItemCraftingComponent {
 
-    public ItemServoMotor() {
-        super("servo/servo");
+    public ItemServoMotor(String name) {
+        super("servo/" + name);
         Core.tab(this, TabType.SERVOS);
         setMaxStackSize(16);
     }
@@ -27,6 +27,10 @@ public class ItemServoMotor extends ItemCraftingComponent {
     @Override
     public boolean onItemUse(ItemStack is, EntityPlayer player, World w, int x, int y, int z, int side, float vecX, float vecY, float vecZ) {
         return false;
+    }
+
+    protected AbstractServoMachine makeMachine(World w) {
+        return new ServoMotor(w);
     }
     
     @Override
@@ -38,7 +42,7 @@ public class ItemServoMotor extends ItemCraftingComponent {
         if (w.isRemote) {
             return false;
         }
-        ServoMotor motor = new ServoMotor(w);
+        AbstractServoMachine motor = makeMachine(w);
         motor.posX = c.x;
         motor.posY = c.y;
         motor.posZ = c.z;

@@ -41,7 +41,7 @@ public class TileEntityServoRail extends TileEntityCommon implements IChargeCond
     public static final float width = 7F/16F;
     
     Charge charge = new Charge(this);
-    Decorator decoration = null;
+    public Decorator decoration = null;
     public byte priority = 0;
     String comment = "";
     FzColor color = FzColor.NO_COLOR;

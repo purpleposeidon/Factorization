@@ -10,6 +10,7 @@ import cpw.mods.fml.common.registry.ExistingSubstitutionException;
 import cpw.mods.fml.common.registry.GameRegistry;
 import cpw.mods.fml.common.registry.GameRegistry.Type;
 import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.repackage.com.nothome.delta.Delta;
 import factorization.api.IActOnCraft;
 import factorization.artifact.BlockForge;
 import factorization.artifact.ItemBrokenArtifact;
@@ -27,6 +28,7 @@ import factorization.charge.TileEntityLeydenJar;
 import factorization.colossi.*;
 import factorization.darkiron.BlockDarkIronOre;
 import factorization.fzds.DeltaChunk;
+import factorization.fzds.HammerEnabled;
 import factorization.mechanics.ItemDarkIronChain;
 import factorization.oreprocessing.ItemOreProcessing;
 import factorization.oreprocessing.ItemOreProcessing.OreType;
@@ -35,6 +37,7 @@ import factorization.oreprocessing.TileEntityGrinder;
 import factorization.oreprocessing.TileEntitySlagFurnace;
 import factorization.redstone.BlockMatcher;
 import factorization.servo.*;
+import factorization.servo.stepper.ItemStepperEngine;
 import factorization.shared.*;
 import factorization.shared.Core.TabType;
 import factorization.sockets.ItemSocketPart;
@@ -140,6 +143,7 @@ public class Registry {
     public ItemCraftingComponent nether_powder, rocket_fuel;
     public ItemBlockProxy rocket_engine;
     public ItemServoMotor servo_placer;
+    public ItemServoMotor stepper_placer;
     public ItemServoRailWidget servo_widget_instruction, servo_widget_decor;
     public ItemStack dark_iron_sprocket, servo_motor;
     public ItemCraftingComponent giant_scissors;
@@ -402,7 +406,10 @@ public class Registry {
         }
         
         //Servos
-        servo_placer = new ItemServoMotor();
+        servo_placer = new ItemServoMotor("servo");
+        if (HammerEnabled.ENABLED) {
+            stepper_placer = new ItemStepperEngine("stepper");
+        }
         servo_widget_decor = new ItemServoRailWidget("servo/decorator");
         servo_widget_instruction = new ItemServoRailWidget("servo/component");
         servo_widget_decor.setMaxStackSize(16);
@@ -426,7 +433,7 @@ public class Registry {
         docbook = new ItemDocBook("docbook", TabType.TOOLS);
         manSandwich = new ItemManSandwich(10, 10, "factorization:mansandwich");
         utiligoo = new ItemGoo("utiligoo", TabType.TOOLS);
-        if (DeltaChunk.enabled()) {
+        if (HammerEnabled.ENABLED) {
             colossusGuide = new ItemColossusGuide("colossusGuide", TabType.TOOLS);
             twistedBlock = new ItemTwistedBlock();
             darkIronChain = new ItemDarkIronChain("darkIronChain", TabType.TOOLS);

@@ -41,7 +41,7 @@ public class DeltaChunk {
         return w.isRemote ? Hammer.clientSlices : Hammer.serverSlices;
     }
 
-    static Iterable<IDeltaChunk> getAllSlices(World w) {
+    public static Iterable<IDeltaChunk> getAllSlices(World w) {
         DeltaChunkMap dm = getSlices(w);
         ArrayList<IDeltaChunk> ret = new ArrayList<IDeltaChunk>();
         if (dm == null) return ret;
@@ -102,6 +102,7 @@ public class DeltaChunk {
     }
     
     public static IDeltaChunk allocateSlice(World spawnWorld, int channel, DeltaCoord size) {
+        if (spawnWorld.isRemote) throw new IllegalArgumentException("Attempted client-side DSE allocation!");
         Coord base = Hammer.hammerInfo.takeCell(channel, size);
         Coord end = base.add(size);
         wipeRegion(base, end);

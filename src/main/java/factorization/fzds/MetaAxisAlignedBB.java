@@ -272,18 +272,21 @@ public class MetaAxisAlignedBB extends AxisAlignedBB implements IFzdsShenanigans
         return currentOffset;
     }
 
-
-    @Override
-    public boolean intersectsWith(AxisAlignedBB collider) {
-        if (!idc.realArea.intersectsWith(collider)) return false;
+    public AxisAlignedBB intersectsWithGet(AxisAlignedBB collider) {
+        if (!idc.realArea.intersectsWith(collider)) return null;
         List<AxisAlignedBB> shadowBoxes = getShadowBoxesInRealBox(collider);
         for (AxisAlignedBB shadowBox : shadowBoxes) {
             AxisAlignedBB realShadow = convertShadowBoxToRealBox(shadowBox);
             if (realShadow.intersectsWith(collider)) {
-                return true;
+                return shadowBox;
             }
         }
-        return false;
+        return null;
+    }
+
+    @Override
+    public boolean intersectsWith(AxisAlignedBB collider) {
+        return intersectsWithGet(collider) == null;
     }
     
     @Override

@@ -2,6 +2,8 @@ package factorization.servo.instructions;
 
 import java.io.IOException;
 
+import factorization.servo.AbstractServoMachine;
+import factorization.servo.stepper.StepperEngine;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
@@ -36,13 +38,22 @@ public class SetDirection extends Instruction {
         return false;
     }
 
-    @Override
-    public void motorHit(ServoMotor motor) {
+    void hit(AbstractServoMachine motor) {
         ForgeDirection d = dir.getOpposite();
         motor.setNextDirection(d);
         if (d == motor.getOrientation().facing.getOpposite()) {
             motor.changeOrientation(d);
         }
+    }
+
+    @Override
+    public void motorHit(ServoMotor motor) {
+        hit(motor);
+    }
+
+    @Override
+    public void stepperHit(StepperEngine engine) {
+        hit(engine);
     }
 
     @Override

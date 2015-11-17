@@ -10,7 +10,7 @@ public class HammerEnabled {
     public static final boolean ENABLED = isEnabled();
 
     private static boolean isEnabled() {
-        final String the_devil = "Bukkit, Craftbukkit, Cauldron, or MCPC+";
+        final String the_devil = "Bukkit, Craftbukkit, Cauldron, KCauldron, or MCPC+";
         boolean init = true;
         try {
             Class cl = Class.forName("org.bukkit.Bukkit");

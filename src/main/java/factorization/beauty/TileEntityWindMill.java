@@ -24,6 +24,7 @@ import net.minecraft.block.*;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.DamageSource;
 import net.minecraft.util.IIcon;
 import net.minecraft.util.Vec3;
@@ -128,6 +129,7 @@ public class TileEntityWindMill extends TileEntityCommon implements IRotationalE
     @Override public void beforeUpdate(IDeltaChunk idc) { }
     @Override public void afterUpdate(IDeltaChunk idc) { }
     @Override public boolean onAttacked(IDeltaChunk idc, DamageSource damageSource, float damage) { return false; }
+    @Override public CollisionAction collidedWithWorld(World realWorld, AxisAlignedBB realBox, World shadowWorld, AxisAlignedBB shadowBox) { return CollisionAction.STOP_BEFORE; }
 
     @Override
     public void putData(DataHelper data) throws IOException {

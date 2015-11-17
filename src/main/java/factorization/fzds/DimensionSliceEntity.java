@@ -732,30 +732,44 @@ public class DimensionSliceEntity extends IDeltaChunk implements IFzdsEntryContr
         updateRealArea();
     }
 
+    @Override
+    public void findAnyCollidingBox() {
+        collideWithWorld(null, false, posX, posY, posZ, null);
+    }
+
     private boolean collideWithWorld(Vec3 mot, boolean moved, double prevX, double prevY, double prevZ, Quaternion prevRotation) {
         // NORELEASE TODO This is too slow. Fuck it. Let's bust out a proper physics library.
         // Use an IWorldAccess to synchronize collision areas. We'll need to do this for both Real and Shadow, yeah?
         // MetaAABB will defer to this physics library as well
         // NOPE! Can't bust out a physics library. Err, why can't we? ISTR looking and finding it wouldn't work....
-        List<AxisAlignedBB> collisions = worldObj.getCollidingBoundingBoxes(this, realArea);
+        // TODO What if we 'rendered' all the collision boxes to a 3D boolean array?
+        List<AxisAlignedBB> collisions = worldObj.getCollidingBoundingBoxes(this, realArea); // FIXME: SLOW!
         AxisAlignedBB collision = null;
-        for (int i = 0; i < collisions.size(); i++) {
+        IDCController.CollisionAction action = IDCController.CollisionAction.IGNORE;
+        for (int i = 0; i < collisions.size(); i++) { // FIXME: SLOW!
             AxisAlignedBB solid = collisions.get(i);
             if (solid.getClass() != AxisAlignedBB.class) continue;
-            if (metaAABB.intersectsWith(solid)) {
+            AxisAlignedBB hit = metaAABB.intersectsWithGet(solid);
+            if (hit != null) {
+                action = controller.collidedWithWorld(worldObj, solid, getCorner().w, hit);
+                if (action == IDCController.CollisionAction.IGNORE) {
+                    continue;
+                }
                 collision = solid;
                 break;
             }
         }
         if (collision != null) {
             // XXX TODO: This is lame; should at least iterate closer (or do it properly)
-            if (mot != null) {
-                posX = prevX;
-                posY = prevY;
-                posZ = prevZ;
-            }
-            if (prevRotation != null) {
-                setRotation(prevRotation);
+            if (action == IDCController.CollisionAction.STOP_BEFORE) {
+                if (mot != null) {
+                    posX = prevX;
+                    posY = prevY;
+                    posZ = prevZ;
+                }
+                if (prevRotation != null) {
+                    setRotation(prevRotation);
+                }
             }
             setVelocity(0, 0, 0);
             rotationalVelocity.update(1, 0, 0, 0);

@@ -125,7 +125,7 @@ public class BlockRenderServoRail extends FactorizationBlockRender {
         return FactoryType.SERVORAIL;
     }
 
-    static IIcon[] coloredRails = new IIcon[FzColor.VALID_COLORS.length];
+    public static IIcon[] coloredRails = new IIcon[FzColor.VALID_COLORS.length];
     public static void registerColoredIcons(IIconRegister reg) {
         for (int i = 0; i < FzColor.VALID_COLORS.length; i++) {
             FzColor color = FzColor.VALID_COLORS[i];

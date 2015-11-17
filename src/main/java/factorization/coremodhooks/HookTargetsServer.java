@@ -53,10 +53,18 @@ public class HookTargetsServer {
         for (Entity ent : constant_colliders) {
             if (ent == collider) continue;
             if (filter == null || filter.isEntityApplicable(ent)) {
+                //AxisAlignedBB ebox = ent.getBoundingBox();
+                //if (ebox == null) continue;
+                //if (!box.intersectsWith(ebox)) continue;
+                // NOTE: The boxes are being compared backwards from the usual way so that the (presumably) vanilla box can get a crude check
                 found.add(ent);
                 Entity[] parts = ent.getParts();
                 if (parts == null) continue;
                 for (Entity part : parts) {
+                    //AxisAlignedBB pbox = ent.getBoundingBox();
+                    //if (pbox == null) continue;
+                    //if (!pbox.intersectsWith(box)) continue;
+                    // Swapped again
                     found.add(part);
                 }
             }

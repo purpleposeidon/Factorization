@@ -14,4 +14,8 @@ public class FastBag<E> extends ArrayList<E> {
         super.remove(size() - 1);
         return old;
     }
+
+    public E removeAny() {
+        return super.remove(size() - 1);
+    }
 }

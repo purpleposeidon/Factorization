@@ -248,8 +248,8 @@ public abstract class IDeltaChunk extends EntityFz {
         return new Coord(worldObj, (int) Math.floor(s.xCoord), (int) Math.floor(s.yCoord), (int) Math.floor(s.zCoord));
     }
 
-    public Coord real2shadowCoord(Coord shadowCoord) {
-        Coord ret = shadowCoord.copy();
+    public Coord real2shadowCoord(Coord realCoord) {
+        Coord ret = realCoord.copy();
         real2shadow(ret);
         return ret;
     }
@@ -354,4 +354,18 @@ public abstract class IDeltaChunk extends EntityFz {
         this.motionY = vy;
         this.motionZ = vz;
     }
+
+    /**
+     * Vec3 version of {@link IDeltaChunk#setVelocity(double, double, double)}.
+     * @param v The new velocity.
+     */
+    public void setVelocity(Vec3 v) {
+        setVelocity(v.xCoord, v.yCoord, v.zCoord);
+    }
+
+    /**
+     * Checks if the IDC's area is clear. If it is not clear, then the controller is
+     * notified using {@link IDCController#collidedWithWorld(World, AxisAlignedBB, World, AxisAlignedBB)}.
+     */
+    public abstract void findAnyCollidingBox();
 }

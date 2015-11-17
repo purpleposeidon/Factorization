@@ -9,7 +9,7 @@ import java.io.IOException;
 import java.util.UUID;
 
 /**
- * A reference to an Entity by UUID.
+ * A reference to an Entity by UUID. This allows tracking entities after deserialization.
  */
 public class EntityReference<E extends Entity> implements IDataSerializable {
     public static interface OnFound<E extends Entity> {
@@ -116,5 +116,8 @@ public class EntityReference<E extends Entity> implements IDataSerializable {
         if (!entityFound()) return true; // Probably still alive!
         return !tracked_entity.isDead;
     }
-    
+
+    public UUID getUUID() {
+        return entity_uuid;
+    }
 }

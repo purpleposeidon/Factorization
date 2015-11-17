@@ -301,6 +301,11 @@ public class TileEntityHinge extends TileEntityCommon implements IDCController {
     @Override
     public boolean onAttacked(IDeltaChunk idc, DamageSource damageSource, float damage) { return false; }
 
+    @Override
+    public CollisionAction collidedWithWorld(World realWorld, AxisAlignedBB realBox, World shadowWorld, AxisAlignedBB shadowBox) {
+        return CollisionAction.STOP_BEFORE;
+    }
+
     IDeltaChunk getIdc() {
         return idcRef.getEntity();
     }

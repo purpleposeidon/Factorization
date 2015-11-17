@@ -1,45 +1,34 @@
-package factorization.servo;
-
-import java.util.Iterator;
-
-import factorization.fzds.DeltaChunk;
-import factorization.fzds.Hammer;
-import factorization.fzds.HammerEnabled;
-import factorization.shared.*;
-import factorization.util.NumUtil;
-import net.minecraft.block.Block;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.FontRenderer;
-import net.minecraft.client.renderer.RenderBlocks;
-import net.minecraft.client.renderer.Tessellator;
-import net.minecraft.client.renderer.entity.RenderEntity;
-import net.minecraft.client.renderer.entity.RenderItem;
-import net.minecraft.client.renderer.entity.RenderManager;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityLiving;
-import net.minecraft.entity.monster.EntityEnderman;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.item.ItemBlock;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.AxisAlignedBB;
-import net.minecraft.util.IIcon;
-import net.minecraft.util.MovingObjectPosition;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.Vec3;
-import net.minecraftforge.common.util.ForgeDirection;
-
-import org.lwjgl.opengl.GL11;
-import org.lwjgl.opengl.GL12;
+package factorization.servo.stepper;
 
 import factorization.api.FzColor;
 import factorization.api.FzOrientation;
 import factorization.api.Quaternion;
 import factorization.common.BlockIcons;
-import factorization.sockets.TileEntitySocketBase;
+import factorization.fzds.DeltaChunk;
+import factorization.fzds.Hammer;
+import factorization.fzds.HammerEnabled;
+import factorization.servo.BlockRenderServoRail;
+import factorization.servo.TileEntityServoRail;
+import factorization.shared.BlockRenderHelper;
+import factorization.shared.Core;
+import factorization.shared.ObjectModel;
+import factorization.util.NumUtil;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.Tessellator;
+import net.minecraft.client.renderer.entity.RenderEntity;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.item.ItemStack;
+import net.minecraft.util.AxisAlignedBB;
+import net.minecraft.util.IIcon;
+import net.minecraft.util.MovingObjectPosition;
+import net.minecraft.util.ResourceLocation;
+import org.lwjgl.opengl.GL11;
+import org.lwjgl.opengl.GL12;
 
-public class RenderServoMotor extends RenderEntity {
+public class RenderStepperEngine extends RenderEntity {
     ObjectModel sprocket = new ObjectModel(Core.getResource("models/servo/sprocket.obj"));
-    ObjectModel chasis = new ObjectModel(Core.getResource("models/servo/chasis.obj"));
+    ObjectModel chasis = new ObjectModel(Core.getResource("models/servo/stepper.obj"));
 
     float interp(double a, double b, double part) {
         double d = a - b;
@@ -47,7 +36,7 @@ public class RenderServoMotor extends RenderEntity {
         double v;
         // h(x,k) = (sin(x∙pi∙4.5)^2)∙x
         // v = Math.pow(Math.sin(r*Math.PI*4.5), 2)*r;
-        
+
         v = Math.min(1, r * r * 4);
         return (float) v;
     }
@@ -64,7 +53,7 @@ public class RenderServoMotor extends RenderEntity {
             mop = Hammer.proxy.getShadowHit();
         }
         boolean highlighted = mop != null && mop.entityHit == ent;
-        ServoMotor motor = (ServoMotor) ent;
+        StepperEngine motor = (StepperEngine) ent;
 
         GL11.glPushMatrix();
         GL11.glEnable(GL12.GL_RESCALE_NORMAL);
@@ -76,9 +65,7 @@ public class RenderServoMotor extends RenderEntity {
         orientMotor(motor, partial, reorientInterpolation);
 
         renderMainModel(motor, partial, reorientInterpolation, false);
-        renderSocketAttachment(motor, motor.socket, partial);
-        
-        boolean render_details = false;
+
         if (highlighted) {
             GL11.glDisable(GL11.GL_TEXTURE_2D);
             GL11.glPushAttrib(GL11.GL_COLOR_BUFFER_BIT | GL11.GL_LIGHTING_BIT);
@@ -94,35 +81,26 @@ public class RenderServoMotor extends RenderEntity {
             ab.offset(ab.minX, ab.minY, ab.minZ);
             GL11.glPopAttrib();
             GL11.glEnable(GL11.GL_TEXTURE_2D);
-            
+
             EntityPlayer player = Core.proxy.getClientPlayer();
             if (player != null) {
                 for (int i = 0; i < 9; i++) {
                     ItemStack is = player.inventory.getStackInSlot(i);
                     if (is == null) continue;
                     if (is.getItem() == Core.registry.logicMatrixProgrammer) {
-                        render_details = true;
                         break;
                     }
                 }
             }
         }
-        
-        renderInventory(motor, partial);
+
         GL11.glPopMatrix();
-        if (render_details) {
-            GL11.glDisable(GL11.GL_DEPTH_TEST);
-            GL11.glRotatef(-RenderManager.instance.playerViewY, 0.0F, 1.0F, 0.0F);
-            GL11.glRotatef(RenderManager.instance.playerViewX, 1.0F, 0.0F, 0.0F);
-            renderStacks(motor);
-            GL11.glEnable(GL11.GL_DEPTH_TEST);
-        }
         GL11.glPopMatrix();
         motor.motionHandler.interpolatePosition(motor.motionHandler.pos_progress);
         GL11.glDisable(GL12.GL_RESCALE_NORMAL);
         Core.profileEndRender();
     }
-    
+
     void drawOutlinedBoundingBox(AxisAlignedBB par1AxisAlignedBB) {
         Tessellator tessellator = Tessellator.instance;
         tessellator.startDrawing(3);
@@ -150,14 +128,14 @@ public class RenderServoMotor extends RenderEntity {
         tessellator.addVertex(par1AxisAlignedBB.minX, par1AxisAlignedBB.maxY, par1AxisAlignedBB.maxZ);
         tessellator.draw();
     }
-    
-    void orientMotor(ServoMotor motor, float partial, float reorientInterpolation) {
+
+    void orientMotor(StepperEngine motor, float partial, float reorientInterpolation) {
         final FzOrientation orientation = motor.motionHandler.orientation;
         FzOrientation prevOrientation = motor.motionHandler.prevOrientation;
         if (prevOrientation == FzOrientation.UNKNOWN) {
             prevOrientation = orientation;
         }
-        
+
         if (debug_servo_orientation) {
             GL11.glDisable(GL11.GL_LIGHTING);
             GL11.glDisable(GL11.GL_TEXTURE_2D);
@@ -208,51 +186,29 @@ public class RenderServoMotor extends RenderEntity {
             GL11.glEnable(GL11.GL_LIGHTING);
         }
     }
-    
-    void renderSocketAttachment(ServoMotor motor, TileEntitySocketBase socket, float partial) {
-        socket.xCoord = socket.yCoord = socket.zCoord = 0;
-        socket.facing = ForgeDirection.UP;
-        socket.renderInServo(motor, partial);
-    }
 
-    void renderInventory(ServoMotor motor, float partial) {
-        if (motor.inv.length == 0) return;
-        ItemStack is = motor.inv[0];
-        if (is == null) {
-            return;
-        }
-        dummy_entity.worldObj = motor.worldObj;
-        motor.socket.renderItemOnServo(this, motor, is, partial);
-        dummy_entity.worldObj = null;
-    }
-    
-    
+
     @Override
     protected ResourceLocation getEntityTexture(Entity ent) {
         return Core.blockAtlas;
     }
-    
-    void renderMainModel(ServoMotor motor, float partial, double ro, boolean hilighting) {
+
+    void renderMainModel(StepperEngine motor, float partial, double ro, boolean hilighting) {
         GL11.glPushMatrix();
         bindTexture(Core.blockAtlas);
-        chasis.render(BlockIcons.servo$model$chasis);
-        
+        chasis.render(BlockIcons.servo$model$stepper);
+
         FzColor c = motor.motionHandler.color;
         renderServoColor(c);
         GL11.glColor3f(c.getRed(), c.getGreen(), c.getBlue());
 
         // Determine the sprocket location & rotation
-        double rail_width = TileEntityServoRail.width;
-        double radius = 0.56 /* from sprocket center to the outer edge of the ring (excluding the teeth) */
-                    + 0.06305 /* half the width of the teeth */;
+        double radius = 0.5;
         double constant = Math.PI * 2 * (radius);
         double partial_rotation = NumUtil.interp((float) motor.motionHandler.prev_sprocket_rotation, (float) motor.motionHandler.sprocket_rotation, partial);
         final double angle = constant * partial_rotation;
 
-        radius = 0.25 - 1.0 / 48.0;
-        radius = -4.0/16.0;
-
-        float rd = (float) (radius + rail_width);
+        float rd = (float) radius;
         if (motor.motionHandler.orientation != motor.motionHandler.prevOrientation && motor.motionHandler.prevOrientation != FzOrientation.UNKNOWN) {
             // This could use some work: only stretch if the new direction is parallel to the old gear direction.
             double stretch_interp = ro * 2;
@@ -264,142 +220,28 @@ public class RenderServoMotor extends RenderEntity {
             }
         }
         // Render them
+        float o = 8F/16F;
         float height_d = 2F/16F;
         GL11.glRotatef(180, 1, 0, 0);
         {
             GL11.glPushMatrix();
-            GL11.glTranslatef(0, height_d, rd);
+            GL11.glTranslatef(o, height_d, rd);
             GL11.glRotatef((float) Math.toDegrees(angle), 0, 1, 0);
             sprocket.render(BlockIcons.servo$model$sprocket);
             GL11.glPopMatrix();
         }
         {
             GL11.glPushMatrix();
-            GL11.glTranslatef(0, height_d, -rd);
+            GL11.glTranslatef(o, height_d, -rd);
             GL11.glRotatef((float) Math.toDegrees(-angle) + 360F / 9F, 0, 1, 0);
             sprocket.render(BlockIcons.servo$model$sprocket);
             GL11.glPopMatrix();
         }
-        
+
         GL11.glColor3f(1, 1, 1);
         GL11.glPopMatrix();
     }
-    
-    static EntityLiving dummy_entity = new EntityEnderman(null);
 
-    public void renderItem(ItemStack is) {
-        // Copied from RenderBiped.renderEquippedItems
-        GL11.glPushMatrix();
-        //float s = 0.75F;
-        //GL11.glScalef(s, s, s);
-        float s = 1 / 4F;
-        //s *= 0.75F;
-        GL11.glScalef(s, s, s);
-        
-        // Pre-emptively undo transformations that the item renderer does so
-        // that we don't get a stupid angle. Minecraft render code is terrible.
-        boolean needRotationFix = true;
-        if (is.getItem() instanceof ItemBlock) {
-            Block block = Block.getBlockFromItem(is.getItem());
-            if (block != null && RenderBlocks.renderItemIn3d(block.getRenderType())) {
-                needRotationFix = false;
-            }
-        }
-        if (needRotationFix) {
-            GL11.glTranslatef(0.9375F, 0.0625F, -0.0F);
-            GL11.glRotatef(-335.0F, 0.0F, 0.0F, 1.0F);
-            GL11.glRotatef(-50.0F, 0.0F, 1.0F, 0.0F);
-        }
-        
-        float scale = 1.5F;
-        GL11.glScalef(scale, scale, scale);
-        
-        int itemColor = is.getItem().getColorFromItemStack(is, 0);
-        float cr = (float)(itemColor >> 16 & 255) / 255.0F;
-        float cg = (float)(itemColor >> 8 & 255) / 255.0F;
-        float cb = (float)(itemColor & 255) / 255.0F;
-        GL11.glColor4f(cr, cg, cb, 1.0F);
-        
-        this.renderManager.itemRenderer.renderItem(dummy_entity, is, 0);
-
-        if (is.getItem().requiresMultipleRenderPasses()) {
-            for (int x = 1; x < is.getItem().getRenderPasses(is.getItemDamage()); x++) {
-                this.renderManager.itemRenderer.renderItem(dummy_entity, is, x);
-            }
-        }
-        GL11.glPopMatrix();
-    }
-    
-    void renderStacks(ServoMotor motor) {
-        GL11.glDisable(GL11.GL_LIGHTING);
-        GL11.glPushMatrix();
-        
-        float scale = 4F/128F;
-        GL11.glScalef(scale, scale, scale);
-        renderStack(motor.getArgStack(), scale, 0);
-        renderStack(motor.getInstructionsStack(), scale, 1);
-        renderStack(motor.getEntryInstructionStack(), scale, 2);
-        
-        FzColor color = motor.motionHandler.color;
-        if (color != FzColor.NO_COLOR) {
-            FontRenderer fr = getFontRendererFromRenderManager();
-            String text = "" + color;
-            int width = fr.getStringWidth(text);
-            GL11.glRotatef(180, 0, 0, 1);
-            GL11.glTranslatef(-width/4F, 10, 0);
-            float s = 0.5F;
-            GL11.glScalef(s, s, s);
-            fr.drawString(text, 0, 0, 0xDAC9D0, true);
-        }
-        
-        GL11.glPopMatrix();
-        GL11.glEnable(GL11.GL_LIGHTING);
-    }
-    
-    void renderStack(ServoStack ss, float scale, int i) {
-        if (i != 0 && ss.getSize() == 0) return;
-        GL11.glPushMatrix();
-        GL11.glRotatef(180, 0, 0, 1);
-        GL11.glTranslatef(0, -(0.9F)/scale, 0);
-        int color = 0xFFFFCF;
-        if (i == 0) {
-            GL11.glTranslatef(0, 0, 0);
-        } else if (i == 1) {
-            GL11.glTranslatef(-32, 8*ss.getSize(), 0);
-            color = 0xCFFFCF;
-        } else if (i == 2) {
-            GL11.glTranslatef(32, 8*ss.getSize(), 0);
-            color = 0xEFEFEF;
-        }
-        renderStackWithColor(ss, color);
-        GL11.glPopMatrix();
-    }
-    
-    boolean renderStackWithColor(ServoStack stack, int color) {
-        FontRenderer fr = getFontRendererFromRenderManager();
-        int count = stack.getSize();
-        if (count == 0) {
-            fr.drawString("_", 0, 0, color, true);
-            return false;
-        }
-        GL11.glPushMatrix();
-        float s = 7.0F/count;
-        if (s > 1) {
-            s = 1;
-        }
-        GL11.glScalef(s, s, s);
-        GL11.glTranslatef(0, count*7.5F, 0);
-        fr.drawString("_", 0, 0, color, true);
-        Iterator<Object> it = stack.descendingIterator();
-        while (it.hasNext()) {
-            Object o = it.next();
-            GL11.glTranslatef(0, -10, 0);;
-            fr.drawString(o != null ? o.toString() : "null", 0, 0, color, true);
-        }
-        GL11.glPopMatrix();
-        return true;
-    }
-    
     void renderServoColor(FzColor color) {
         if (color == FzColor.NO_COLOR) return;
         IIcon colorIcon = BlockRenderServoRail.coloredRails[color.toVanillaColorIndex()];

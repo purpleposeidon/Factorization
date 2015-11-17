@@ -1,5 +1,6 @@
 package factorization.servo;
 
+import factorization.servo.stepper.StepperEngine;
 import net.minecraft.client.renderer.RenderBlocks;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.entity.player.EntityPlayer;
@@ -19,6 +20,8 @@ public abstract class Decorator extends ServoComponent {
     public boolean preMotorHit(ServoMotor motor) {
         return false;
     }
+
+    public void stepperHit(StepperEngine engine) { }
     
     @SideOnly(Side.CLIENT)
     private static class StretchedIIcon implements IIcon {

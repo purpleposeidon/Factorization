@@ -54,14 +54,6 @@ public class ServoMotor extends AbstractServoMachine implements IInventory, ISoc
         setSize(1, 1);
         isImmuneToFire = true;
     }
-    
-    /**
-     * You <b>must</b> call this method instead of using worldObj.spawnEntityInWorld!
-     */
-    public void spawnServoMotor() {
-        motionHandler.beforeSpawn();
-        worldObj.spawnEntityInWorld(this);
-    }
 
     public void syncWithSpawnPacket() {
         if (worldObj.isRemote) return;
@@ -148,33 +140,6 @@ public class ServoMotor extends AbstractServoMachine implements IInventory, ISoc
                 inv[index] = DataUtil.readStack(input);
             }
             return true;
-        case servo_brief:
-            Coord a = getCurrentPos();
-            Coord b = getNextPos();
-            FzOrientation no = FzOrientation.getOrientation(input.readByte());
-            if (no != motionHandler.prevOrientation) {
-                motionHandler.orientation = no;
-            }
-            motionHandler.speed_b = input.readByte();
-            a.x = input.readInt();
-            a.y = input.readInt();
-            a.z = input.readInt();
-            b.x = input.readInt();
-            b.y = input.readInt();
-            b.z = input.readInt();
-            motionHandler.pos_progress = input.readFloat();
-            if (motionHandler.speed_b > 0) {
-                motionHandler.stopped = false;
-            }
-            return true;
-        case servo_complete:
-            try {
-                DataHelper data = new DataInByteBuf(input, Side.CLIENT);
-                putData(data);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-            return true;
         case TileEntityMessageOnEntity:
             MessageType subMsg = MessageType.read(input);
             return socket.handleMessageFromServer(subMsg, input);
@@ -189,40 +154,25 @@ public class ServoMotor extends AbstractServoMachine implements IInventory, ISoc
     
     
     // Main logic
-    
+
     @Override
-    public void onEntityUpdate() { // updateEntity tick
-        super.onEntityUpdate();
-        if (isDead) {
+    public void updateServoLogic() {
+        if (worldObj.isRemote) {
+            executioner.tick();
             return;
         }
-        if (worldObj.isRemote) {
-            motionHandler.updateServoMotion();
-            executioner.tick();
-        } else {
-            if (!getNextPos().blockExists()) return;
-            byte orig_speed = motionHandler.speed_b;
-            FzOrientation orig_or = motionHandler.orientation;
-            motionHandler.updateServoMotion();
-            executioner.tick();
-            if (orig_speed != motionHandler.speed_b || orig_or != motionHandler.orientation) {
-                broadcastBriefUpdate();
-                //NOTE: Could be spammy. Speed might be too important to not send tho.
-            }
-            
-            if (executioner.stacks_changed) {
-                try {
-                    executioner.stacks_changed = false;
-                    ByteBuf buf = Unpooled.buffer();
-                    Core.network.prefixEntityPacket(buf, this, MessageType.servo_complete);
-                    DataHelper data = new DataOutByteBuf(buf, Side.SERVER);
-                    putData(data);
-                    FMLProxyPacket toSend = Core.network.entityPacket(buf);
-                    Core.network.broadcastPacket(null, getCurrentPos(), toSend);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
+        executioner.tick();
+        if (!executioner.stacks_changed) return;
+        try {
+            executioner.stacks_changed = false;
+            ByteBuf buf = Unpooled.buffer();
+            Core.network.prefixEntityPacket(buf, this, NetworkFactorization.MessageType.servo_complete);
+            DataHelper data = new DataOutByteBuf(buf, Side.SERVER);
+            putData(data);
+            FMLProxyPacket toSend = Core.network.entityPacket(buf);
+            Core.network.broadcastPacket(null, getCurrentPos(), toSend);
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 
@@ -347,32 +297,8 @@ public class ServoMotor extends AbstractServoMachine implements IInventory, ISoc
         return false;
     }
     
-    @Override
-    public boolean attackEntityFrom(DamageSource damageSource, float damage) {
-        if (damageSource instanceof EntityDamageSourceIndirect) {
-            return false;
-        }
-        Entity src = damageSource.getSourceOfDamage();
-        if (!(src instanceof EntityPlayer)) {
-            return false;
-        }
-        if (isDead) {
-            return false;
-        }
-        EntityPlayer player = (EntityPlayer) src;
-        despawn(player.capabilities.isCreativeMode);
-        return true;
-    }
-    
-    void despawn(boolean creativeModeHit) {
-        if (worldObj.isRemote) {
-            return;
-        }
-        setDead();
-        if (creativeModeHit) {
-            return;
-        }
-        ArrayList<ItemStack> toDrop = new ArrayList();
+    protected void dropItemsOnBreak() {
+        ArrayList<ItemStack> toDrop = new ArrayList<ItemStack>();
         toDrop.add(new ItemStack(Core.registry.servo_placer));
         toDrop.addAll(Arrays.asList(inv));
         if (socket != null) {
@@ -380,6 +306,7 @@ public class ServoMotor extends AbstractServoMachine implements IInventory, ISoc
             FactoryType ft = socket.getFactoryType();
             while (ft != null) {
                 TileEntitySocketBase sb = (TileEntitySocketBase) ft.getRepresentative();
+                if (sb == null) break;
                 final ItemStack is = sb.getCreatingItem();
                 if (is != null) toDrop.add(is.copy());
                 ft = sb.getParentFactoryType();
@@ -392,39 +319,6 @@ public class ServoMotor extends AbstractServoMachine implements IInventory, ISoc
         for (ItemStack is : toDrop) {
             InvUtil.spawnItemStack(this, is);
         }
-    }
-
-    @Override
-    public boolean canBeCollidedWith() {
-        return true;
-    }
-
-    @Override
-    @SideOnly(Side.CLIENT)
-    public void setPositionAndRotation2(double x, double y, double z, float yaw, float pitch, int three) {
-        // The servers sends crappy packets. TODO: Sure would be nice if it didn't send those packets...
-    }
-
-    @Override
-    public void setPosition(double x, double y, double z) {
-        // super.setPosition(x, y, z); //Super does some stupid shit to the bounding box. Does not mess with the chunk location or anything like that.
-        this.posX = x;
-        this.posY = y;
-        this.posZ = z;
-        double dp = 1;
-        this.boundingBox.setBounds(x, y, z, x + dp, y + dp, z + dp);
-        /*
-        double neg_size = -0.25;
-        double pos_size = 0.75;
-        double height = 2F/16F;
-        double dy = 0.5;
-        this.boundingBox.setBounds(x - neg_size, dy + y - height, z - neg_size, x + pos_size, dy + y + height, z + pos_size);
-        */
-    }
-
-    @Override
-    public void setPositionAndRotation(double x, double y, double z, float yaw, float pitch) {
-        super.setPositionAndRotation(x, y, z, yaw, pitch);
     }
     
     public void resizeInventory(int newSize) {

@@ -14,8 +14,10 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntityComparator;
+import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.DamageSource;
 import net.minecraft.util.Vec3;
+import net.minecraft.world.World;
 import org.apache.commons.lang3.ArrayUtils;
 
 /**
@@ -263,6 +265,11 @@ public class MechanicsController implements IDCController {
 
     @Override
     public boolean onAttacked(IDeltaChunk idc, DamageSource damageSource, float damage) { return false; }
+
+    @Override
+    public CollisionAction collidedWithWorld(World realWorld, AxisAlignedBB realBox, World shadowWorld, AxisAlignedBB shadowBox) {
+        return CollisionAction.STOP_BEFORE;
+    }
 
     /**
      * Returns an EntityReference that will call MechanicsController.rejoin for you.
