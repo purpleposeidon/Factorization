@@ -286,7 +286,7 @@ public class MetaAxisAlignedBB extends AxisAlignedBB implements IFzdsShenanigans
 
     @Override
     public boolean intersectsWith(AxisAlignedBB collider) {
-        return intersectsWithGet(collider) == null;
+        return intersectsWithGet(collider) != null;
     }
     
     @Override
