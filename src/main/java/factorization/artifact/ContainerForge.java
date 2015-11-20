@@ -124,7 +124,7 @@ public class ContainerForge extends Container {
 
     @Override
     public void detectAndSendChanges() {
-        if (forge.isDirty && !((EntityPlayerMP) player).isChangingQuantityOnly) {
+        if (forge.isDirty && player instanceof EntityPlayerMP && !((EntityPlayerMP) player).isChangingQuantityOnly) {
             forge.rebuildArtifact();
         }
         super.detectAndSendChanges();
