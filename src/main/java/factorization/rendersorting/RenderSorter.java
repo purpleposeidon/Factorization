@@ -99,34 +99,19 @@ public class RenderSorter implements Comparator<Object> {
 
     private static boolean client = FMLCommonHandler.instance().getSide() == Side.CLIENT;
 
-    public static int compareItemRender(ItemStack a, ItemStack b, IItemRenderer.ItemRenderType renderType) {
-        // a more complex than b? -1
-        // b more complex than a? +1
-        if (a == b) return 0;
-        if (a == null) return -1;
-        if (b == null) return +1;
-        // The enchantment effect adds another bind
-        if (a.hasEffect(0)) return -1;
-        if (b.hasEffect(0)) return +1;
+    private static int getComplexity(ItemStack a, IItemRenderer.ItemRenderType renderType) {
+        if (a == null) return 0;
+        if (a.hasEffect(0)) return 100;
         IItemRenderer ar = MinecraftForgeClient.getItemRenderer(a, renderType);
-        IItemRenderer br = MinecraftForgeClient.getItemRenderer(b, renderType);
-        if (ar == null && br == null) {
-            // standard block/item render
-            // (Or possibly some shenanigans have occured from the IItemRenderer.handleRenderType call)
-            int as = a.getItemSpriteNumber();
-            int bs = b.getItemSpriteNumber();
-            if (as == bs) return 0;
-            return as > bs ? -1 : +1;
-        }
-        // Same item renderer. They can still do arbitrary things, but there is no good sorting here.
-        if (ar == br) return 0;
-        if (ar != null && br != null) {
-            // Different; can sort by class reasonably.
-            String na = ar.getClass().getCanonicalName();
-            String nb = br.getClass().getCanonicalName();
-            return na.compareTo(nb);
-        }
-        // Move the simpler one away from the crazy renderers
-        return ar == null ? +1 : -1;
+        if (ar == null) return 10 + a.getItemSpriteNumber();
+        return 1000 + Math.abs(ar.getClass().hashCode() % Short.MAX_VALUE);
+    }
+
+    public static int compareItemRender(ItemStack a, ItemStack b, IItemRenderer.ItemRenderType renderType) {
+        int ac = getComplexity(a, renderType);
+        int bc = getComplexity(b, renderType);
+        if (ac == bc) return 0;
+        if (ac < bc) return -1;
+        return +1;
     }
 }
