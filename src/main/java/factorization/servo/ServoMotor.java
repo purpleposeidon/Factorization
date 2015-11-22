@@ -2,7 +2,6 @@ package factorization.servo;
 
 import cpw.mods.fml.common.network.internal.FMLNetworkHandler;
 import cpw.mods.fml.common.network.internal.FMLProxyPacket;
-import cpw.mods.fml.common.registry.IEntityAdditionalSpawnData;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import factorization.api.*;
@@ -20,9 +19,6 @@ import factorization.util.InvUtil.FzInv;
 import factorization.util.ItemUtil;
 import factorization.util.SpaceUtil;
 import io.netty.buffer.ByteBuf;
-import io.netty.buffer.ByteBufInputStream;
-import io.netty.buffer.ByteBufOutputStream;
-import io.netty.buffer.Unpooled;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
@@ -163,18 +159,10 @@ public class ServoMotor extends AbstractServoMachine implements IInventory, ISoc
         }
         executioner.tick();
         if (!executioner.stacks_changed) return;
-        try {
-            executioner.stacks_changed = false;
-            ByteBuf buf = Unpooled.buffer();
-            Core.network.prefixEntityPacket(buf, this, NetworkFactorization.MessageType.servo_complete);
-            DataHelper data = new DataOutByteBuf(buf, Side.SERVER);
-            putData(data);
-            FMLProxyPacket toSend = Core.network.entityPacket(buf);
-            Core.network.broadcastPacket(null, getCurrentPos(), toSend);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        executioner.stacks_changed = false;
+        broadcastFullUpdate();
     }
+
 
     @Override
     public void updateSocket() {

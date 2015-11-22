@@ -9,12 +9,15 @@ import factorization.api.FzOrientation;
 import factorization.api.IChargeConductor;
 import factorization.api.IEntityMessage;
 import factorization.api.datahelpers.*;
+import factorization.servo.stepper.StepperEngine;
 import factorization.shared.Core;
+import factorization.shared.NORELEASE;
 import factorization.shared.NetworkFactorization;
 import factorization.util.PlayerUtil;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufInputStream;
 import io.netty.buffer.ByteBufOutputStream;
+import io.netty.buffer.Unpooled;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.nbt.NBTTagCompound;
@@ -100,6 +103,19 @@ public abstract class AbstractServoMachine extends Entity implements IEntityAddi
                 motionHandler.pos_progress);
     }
 
+    public void broadcastFullUpdate() {
+        try {
+            ByteBuf buf = Unpooled.buffer();
+            Core.network.prefixEntityPacket(buf, this, NetworkFactorization.MessageType.servo_complete);
+            DataHelper data = new DataOutByteBuf(buf, Side.SERVER);
+            putData(data);
+            FMLProxyPacket toSend = Core.network.entityPacket(buf);
+            Core.network.broadcastPacket(null, getCurrentPos(), toSend);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
     @Override
     public boolean handleMessageFromClient(NetworkFactorization.MessageType messageType, ByteBuf input) throws IOException {
         return false;
@@ -116,9 +132,7 @@ public abstract class AbstractServoMachine extends Entity implements IEntityAddi
             Coord a = getCurrentPos();
             Coord b = getNextPos();
             FzOrientation no = FzOrientation.getOrientation(input.readByte());
-            if (no != motionHandler.prevOrientation) {
-                motionHandler.orientation = no;
-            }
+            setOrientation(no);
             motionHandler.speed_b = input.readByte();
             a.x = input.readInt();
             a.y = input.readInt();
@@ -210,6 +224,7 @@ public abstract class AbstractServoMachine extends Entity implements IEntityAddi
         if (isDead) {
             return;
         }
+        //NORELEASE.println(worldObj.isRemote, "\t", motionHandler.orientation);
         if (worldObj.isRemote) {
             motionHandler.updateServoMotion();
             updateServoLogic();

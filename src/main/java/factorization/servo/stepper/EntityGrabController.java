@@ -10,6 +10,7 @@ import factorization.fzds.interfaces.IDCController;
 import factorization.fzds.interfaces.IDeltaChunk;
 import factorization.shared.EntityFz;
 import factorization.shared.EntityReference;
+import factorization.shared.NORELEASE;
 import factorization.util.SpaceUtil;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
@@ -39,9 +40,10 @@ public class EntityGrabController extends EntityFz implements IDCController {
         super(w);
     }
 
-    public EntityGrabController(Entity holder, DropMode dropMode) {
+    public EntityGrabController(Entity holder, IDeltaChunk idc, DropMode dropMode) {
         super(holder.worldObj);
         this.holderRef.trackEntity(holder);
+        this.idcRef.trackEntity(idc);
         this.dropMode = dropMode;
         SpaceUtil.toEntPos(this, SpaceUtil.fromEntPos(holder));
     }
@@ -70,6 +72,7 @@ public class EntityGrabController extends EntityFz implements IDCController {
 
     @Override
     public void onUpdate() {
+        if (worldObj.isRemote) return;
         super.onUpdate();
         IDeltaChunk idc = idcRef.getEntity();
         Entity holder = holderRef.getEntity();
@@ -131,8 +134,22 @@ public class EntityGrabController extends EntityFz implements IDCController {
     @Override public boolean breakBlock(IDeltaChunk idc, EntityPlayer player, Coord at, byte sideHit) { return true; }
     @Override public boolean hitBlock(IDeltaChunk idc, EntityPlayer player, Coord at, byte sideHit) { return true; }
     @Override public boolean useBlock(IDeltaChunk idc, EntityPlayer player, Coord at, byte sideHit) { return true; }
-    @Override public void beforeUpdate(IDeltaChunk idc) { }
-    @Override public void afterUpdate(IDeltaChunk idc) { }
+    @Override public void beforeUpdate(IDeltaChunk idc) {
+        Entity holder = holderRef.getEntity();
+        if (holder == null) {
+            idc.setVelocity(0, 0, 0);
+            return;
+        }
+        double dx = holder.posX - holder.prevPosX;
+        double dy = holder.posY - holder.prevPosY;
+        double dz = holder.posZ - holder.prevPosZ;
+        idc.setVelocity(dx, dy, dz);
+    }
+    @Override public void afterUpdate(IDeltaChunk idc) {
+        Entity holder = holderRef.getEntity();
+        if (holder == null) return;
+        idc.setPosition(holder.posX, holder.posY, holder.posZ);
+    }
     @Override public boolean onAttacked(IDeltaChunk idc, DamageSource damageSource, float damage) { return false; }
     @Override public CollisionAction collidedWithWorld(World realWorld, AxisAlignedBB realBox, World shadowWorld, AxisAlignedBB shadowBox) {
         hitReal = realBox.copy();

@@ -324,8 +324,11 @@ public class MotionHandler {
     
     private void doLogic() {
         if (stopped) {
-            motor.updateSocket();
-            return;
+            tryUnstop();
+            if (stopped) {
+                motor.updateSocket();
+                return;
+            }
         }
         if (orientation == FzOrientation.UNKNOWN) {
             pickNextOrientation();

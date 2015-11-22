@@ -25,6 +25,7 @@ public class StepperEngine extends AbstractServoMachine {
     public StepperEngine(World w) {
         super(w);
         setSize(1, 1);
+        grabber.setWorld(w);
     }
 
     @Override
@@ -39,7 +40,7 @@ public class StepperEngine extends AbstractServoMachine {
     @Override
     public void putData(DataHelper data) throws IOException {
         super.putData(data);
-        grabber.serialize("", data);
+        data.as(Share.VISIBLE, "grabber").putIDS(grabber);
         number_of_grabbed_blocks = data.as(Share.VISIBLE, "numberOfGrabbedBlocks").putInt(number_of_grabbed_blocks);
     }
 
@@ -96,7 +97,7 @@ public class StepperEngine extends AbstractServoMachine {
         Coord front = getCurrentPos().add(getOrientation().top);
         if (grabExistingIdc(front)) return;
         grabNewIdc(front);
-
+        broadcastFullUpdate();
     }
 
     private void grabNewIdc(Coord front) {
@@ -132,8 +133,8 @@ public class StepperEngine extends AbstractServoMachine {
                 DeltaCapability.INTERACT,
                 DeltaCapability.BLOCK_PLACE,
                 DeltaCapability.BLOCK_MINE,
-                DeltaCapability.REMOVE_ITEM_ENTITIES,
-                DeltaCapability.COLLIDE_WITH_WORLD
+                DeltaCapability.REMOVE_ITEM_ENTITIES
+                /* NORELEASE: DeltaCapability.COLLIDE_WITH_WORLD */
                 );
         idc.setPosition(posX, posY, posZ);
         worldObj.spawnEntityInWorld(idc);
@@ -159,10 +160,11 @@ public class StepperEngine extends AbstractServoMachine {
 
     private void grabIdc(IDeltaChunk idc) {
         NORELEASE.fixme("translate the origin so that the origin's located at ourselves");
-        EntityGrabController egc = new EntityGrabController(idc, DropMode.EVENTUALLY);
+        EntityGrabController egc = new EntityGrabController(this, idc, DropMode.EVENTUALLY);
         worldObj.spawnEntityInWorld(egc);
         egc.mountEntity(this);
         grabber.trackEntity(egc);
+        idc.setController(egc);
     }
 
     public void fzdsRelease() {
@@ -177,6 +179,7 @@ public class StepperEngine extends AbstractServoMachine {
         egc.release();
         egc.mountEntity(null);
         grabber.trackEntity(null);
+        broadcastFullUpdate();
     }
 
     @Override

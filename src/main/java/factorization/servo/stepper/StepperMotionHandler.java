@@ -46,7 +46,7 @@ public class StepperMotionHandler extends MotionHandler {
         FzOrientation orig = orientation;
         super.changeOrientation(dir);
         if (orientation == orig) return;
-        if (orig != FzOrientation.UNKNOWN /* First call; being spawned */) setStopped(true);
+        if (orig != FzOrientation.UNKNOWN /* was not just spawned */) setStopped(true);
         if (!engine.grabbed()) {
             turnThrough(Quaternion.fromOrientation(orig), Quaternion.fromOrientation(orientation));
             return;
@@ -98,7 +98,7 @@ public class StepperMotionHandler extends MotionHandler {
 
     @Override
     protected void updateServoMotion() {
-        if (!engine.grabbed()) {
+        if (!engine.grabbed() || engine.worldObj.isRemote) {
             super.updateServoMotion();
             if (stepperReorient > 0) {
                 stepperReorient--;
@@ -107,10 +107,12 @@ public class StepperMotionHandler extends MotionHandler {
             return;
         }
         EntityGrabController grabber = engine.grabber.getEntity();
-        if (grabber == null) return;
+        if (grabber == null) {
+            return;
+        }
         IDeltaChunk idc = grabber.idcRef.getEntity();
         if (idc == null) return;
-        if (waitForObstructionClear(grabber, idc)) return;
+        if (!idc.worldObj.isRemote && waitForObstructionClear(grabber, idc)) return;
         if (stepperReorient > 0) {
             stepperReorient--;
             setStopped(false);
