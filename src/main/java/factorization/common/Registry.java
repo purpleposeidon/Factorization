@@ -407,7 +407,7 @@ public class Registry {
         
         //Servos
         servo_placer = new ItemServoMotor("servo");
-        if (HammerEnabled.ENABLED) {
+        if (HammerEnabled.ENABLED && Core.dev_environ) {
             stepper_placer = new ItemStepperEngine("stepper");
         }
         servo_widget_decor = new ItemServoRailWidget("servo/decorator");
