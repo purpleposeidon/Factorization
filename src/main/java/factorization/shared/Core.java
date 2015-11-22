@@ -34,6 +34,7 @@ import factorization.fzds.HammerEnabled;
 import factorization.mechanics.MechanismsFeature;
 import factorization.oreprocessing.FactorizationOreProcessingHandler;
 import factorization.servo.ServoMotor;
+import factorization.servo.stepper.EntityGrabController;
 import factorization.servo.stepper.StepperEngine;
 import factorization.truth.minecraft.DistributeDocs;
 import factorization.util.DataUtil;
@@ -221,6 +222,7 @@ public class Core {
         EntityRegistry.registerModEntity(EntityMinecartDayBarrel.class, "fz_minecart_barrel", 5, this, 80, 3, true);
         EntityRegistry.registerModEntity(EntityLeafBomb.class, "fz_leaf_bomb", 6, this, 64, 10, true);
         EntityRegistry.registerModEntity(StepperEngine.class, "fz_stepper_engine", 7, Core.instance, 100, 1, true);
+        EntityRegistry.registerModEntity(EntityGrabController.class, "fz_grab_controller", 8, Core.instance, 100, 1, true);
     }
     
     @EventHandler
