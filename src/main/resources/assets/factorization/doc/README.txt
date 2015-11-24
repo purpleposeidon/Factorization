@@ -86,17 +86,58 @@ TODO: macro system
 | IMC Commands |
 +--------------+
 
-To register a custom recipe list:
-    Send to mod: "factorization.truth"
-    MessageType: "AddRecipeCategory"
-    Format: "category localization key|reference.to.classContainingRecipes|nameOfStaticFieldIterable"
-    The field's value must either be Iterable or a Map, or it must be an object with a 'getRecipes' method returning Iterable or Map.
-
-
 To add an entry to Factorization's main page list:
     Send to mod: "factorization.truth"
     MessageType: "DocVar"
     format: "extraindex+={linkname}{\#{Some item} link body}"
 This can be used with other \for commands, and can also be invoked with '=' instead of '+='
+
+
+To register a custom recipe list:
+    Send to mod: "factorization.truth"
+    MessageType: "AddRecipeCategory"
+    Format: String "category localization key|reference.to.classContainingRecipes|nameOfStaticFieldIterable"
+    The field's value must either be Iterable or a Map, or it must be an object with a 'getRecipes' method returning Iterable or Map.
+
+AddRecipeCategory can have pretty ugly output. To make it a bit nicer:
+    Send to mod: "factorization.truth"
+    MessageType: "AddRecipeCategoryGuided"
+    Format: {
+                "category": "Same syntax as AddRecipeCategory",
+                "output": ["<ReflectionExpression>"],
+                "input": ["<ReflectionExpression>"],
+                "catalyst": ["<ReflectionExpression>"],
+                "text": "text put underneath each recipe; perhaps used for special instructions. Uses FzDoc formatting. Optional."
+            }
+The components of the recipe will be printed in the order shown. "category" must be specified; the other ones are optional-ish.
+A ReflectionExpression is a series of actions separated by periods, which can be one of:
+    - field access: none of the below symbols
+    - method invokation: ends with "()"; no parameters may be passed in, and the function may not return void
+    - NBTTagCompound access: wrapped 'single quotes'.
+
+If a null is returned anywhere, 'null' will be the result of the expression.
+Fields and parameters are neither obfuscated nor deobfuscated; use only your own mod's & standard java stuff.
+If you need something more complicated, register an IObjectWriter.
+(Honestly, registering IObjectWriter may in fact be easier... but this doesn't give you an API dependency.)
+
+If the ReflectionExpression ends with a '#', then everything after is used as a localization key.
+
+Example:
+        /** Convenience function for making NBT lists of strings */
+        public static NBTTagList list(String ...args) {
+            NBTTagList ret = new NBTTagList();
+            for (String a : args) ret.appendTag(new NBTTagString(a));
+            return ret;
+        }
+
+        NBTTagCompound tag = new NBTTagCompound();
+        tag.setString("category", "tile.railcraft.machine.alpha.rock.crusher.name|factorization.compat.railcraft.Compat_Railcraft|crusher_recipes");
+        tag.setTag("input", list("getInput()#Input"));
+        tag.setTag("output", list("getPossibleOuputs()#Output"));
+        FMLInterModComms.sendMessage("factorization.truth", "AddRecipeCategoryGuided", tag);
+
+
+A more complex ReflectionExpression example, this time for IC2's thermal centrifuge:
+    "getValue().metadata.'minHeat'#Heat"
 
 

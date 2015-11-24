@@ -11,6 +11,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.CraftingManager;
 import net.minecraft.item.crafting.FurnaceRecipes;
 import net.minecraft.item.crafting.IRecipe;
+import net.minecraft.nbt.NBTTagCompound;
 import net.minecraftforge.oredict.OreDictionary;
 
 import java.lang.reflect.Field;
@@ -31,6 +32,7 @@ public class RecipeViewer implements IDocGenerator, IObjectWriter<Object> {
     }
 
     HashMap<String, ArrayList<ArrayList>> recipeCategories = null;
+    HashMap<String, IObjectWriter<Object>> guiders = new HashMap<String, IObjectWriter<Object>>();
     ArrayList<String> categoryOrder = new ArrayList<String>();
     
     /** USAGE
@@ -97,17 +99,20 @@ public class RecipeViewer implements IDocGenerator, IObjectWriter<Object> {
             for (ItemStack matching : matchers) {
                 for (String cat : categoryOrder) {
                     ArrayList<ArrayList> recipeList = recipeCategories.get(cat);
-                    writeRecipes(out, matching, mustBeResult, cat, recipeList, previously_found);
+                    int got = writeRecipes(out, matching, mustBeResult, cat, recipeList, previously_found);
+                    if (got > 0) out.write("\\nl");
                 }
             }
             
         }
     }
     
-    void writeRecipes(ITypesetter out, ItemStack matching, boolean mustBeResult, String categoryName, ArrayList<ArrayList> recipes, HashSet<ArrayList> previously_found) throws TruthError {
+    int writeRecipes(ITypesetter out, ItemStack matching, boolean mustBeResult, String categoryName, ArrayList<ArrayList> recipes, HashSet<ArrayList> previously_found) throws TruthError {
+        int got = 0;
         if (matching == null) {
             for (ArrayList recipe : recipes) {
                 writeRecipe(out, recipe);
+                got++;
             }
         } else {
             boolean first = true;
@@ -121,9 +126,11 @@ public class RecipeViewer implements IDocGenerator, IObjectWriter<Object> {
                         }
                     }
                     writeRecipe(out, recipe);
+                    got++;
                 }
             }
         }
+        return got;
     }
     
     boolean recipeMatches(ArrayList recipe, ItemStack matching, boolean mustBeResult) {
@@ -170,9 +177,18 @@ public class RecipeViewer implements IDocGenerator, IObjectWriter<Object> {
         }
     }
 
-    public static void handleImc(IMCMessage message) throws ClassNotFoundException, NoSuchFieldException, IllegalAccessException {
-        if (!message.key.equals("AddRecipeCategory")) return;
-        String[] cmd = message.getStringValue().split("\\|");
+    public static void handleImc(IMCMessage message) throws Throwable {
+        if (message.key.equals("AddRecipeCategory")) {
+            addRecipeCategory(message.getStringValue());
+        } else if (message.key.equals("AddRecipeCategoryGuided")) {
+            NBTTagCompound tag = message.getNBTValue();
+            addRecipeCategory(tag.getString("category"));
+            GuidedReflectionWriter.register(tag);
+        }
+    }
+
+    static void addRecipeCategory(String msg) throws ClassNotFoundException, NoSuchFieldException, IllegalAccessException {
+        String[] cmd = msg.split("\\|");
         String key = cmd[0];
         String className = cmd[1];
         String fieldName = cmd[2];
@@ -202,7 +218,7 @@ public class RecipeViewer implements IDocGenerator, IObjectWriter<Object> {
         if (obj instanceof Iterable) {
             DocReg.registerRecipeList(key, (Iterable) obj);
         } else {
-            Core.logWarning("Unable to load recipe list provided by IMC message, obtained object is neither Iterable nor Map: " + message.getStringValue());
+            Core.logWarning("Unable to load recipe list provided by IMC message, obtained object is neither Iterable nor Map: " + msg);
         }
     }
 
@@ -222,7 +238,9 @@ public class RecipeViewer implements IDocGenerator, IObjectWriter<Object> {
     
     void putCategory(String label, Iterable list) {
         try {
-            recipeCategories.put(label, addAll(list));
+            IObjectWriter<Object> guide = guiders.get(label);
+            if (guide == null) guide = this;
+            recipeCategories.put(label, addAll(guide, list));
             categoryOrder.add(label);
         } catch (Throwable t) {
             t.printStackTrace();
@@ -230,12 +248,12 @@ public class RecipeViewer implements IDocGenerator, IObjectWriter<Object> {
     }
     
     int recursion;
-    private ArrayList<ArrayList> addAll(Iterable list) {
+    private ArrayList<ArrayList> addAll(IObjectWriter<Object> guide, Iterable list) {
         ArrayList<ArrayList> generated = new ArrayList<ArrayList>();
         for (Object obj : list) {
             ArrayList entry = new ArrayList();
             recursion = 0;
-            addRecipe(entry, obj);
+            guide.writeObject(entry, obj, this);
             if (!entry.isEmpty()) {
                 generated.add(entry);
             }
@@ -243,7 +261,7 @@ public class RecipeViewer implements IDocGenerator, IObjectWriter<Object> {
         return generated;
     }
     
-    static String getDisplayName(ItemStack is) {
+    public static String getDisplayName(ItemStack is) {
         if (is == null) return "null";
         try {
             return is.getDisplayName();
@@ -253,7 +271,7 @@ public class RecipeViewer implements IDocGenerator, IObjectWriter<Object> {
         }
     }
 
-    static int MAX_RECURSION = 4;
+    static int MAX_RECURSION = 5;
 
     @Override
     public void writeObject(List out, Object val, IObjectWriter<Object> generic) {
@@ -280,6 +298,10 @@ public class RecipeViewer implements IDocGenerator, IObjectWriter<Object> {
     
     public static Object genericRecipePrefix(List sb, IRecipe recipe) {
         ItemStack output = recipe.getRecipeOutput();
+        return genericRecipePrefix(sb, output);
+    }
+
+    public static ItemStack genericRecipePrefix(List sb, ItemStack output) {
         if (output == null) return null;
         if (output.getItem() == null) return null;
         sb.add(new ItemWord(output));

@@ -59,6 +59,7 @@ public class ReflectionWriter implements IObjectWriter<Object> {
         ArrayList<String> properties = new ArrayList<String>();
         HashSet<Object> seen = new HashSet<Object>();
         final Class<?> valClass = val.getClass();
+        if ((valClass.getModifiers() & Modifier.PUBLIC) == 0) return;
         for (Method method : valClass.getMethods()) {
             if (method.getParameterTypes().length != 0) continue;
             if (method.getReturnType() == Void.TYPE) continue;

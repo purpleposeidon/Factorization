@@ -13,15 +13,34 @@ import ic2.api.recipe.Recipes;
 import ic2.core.AdvRecipe;
 import ic2.core.AdvShapelessRecipe;
 import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.NBTTagList;
+import net.minecraft.nbt.NBTTagString;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class Compat_IC2 extends CompatBase {
+    List<String> handled = new ArrayList<String>();
+
     @Override
     public void init(FMLInitializationEvent event) {
         IRotationalEnergySource.adapter.register(new RotationalEnergySourceAdapter());
+
+        NBTTagCompound tag;
+        {
+            tag = standardIc2Recipe("blockcutter");
+            tag.setTag("catalyst", list("getValue().metadata.'hardness'#Blade Tier"));
+            imc(tag);
+        }
+        {
+            tag = standardIc2Recipe("centrifuge");
+            tag.setTag("catalyst", list("getValue().metadata.'minHeat'#Heat"));
+            imc(tag);
+        }
 
         Class cl = Recipes.class;
         for (Field field : cl.getFields()) {
@@ -30,10 +49,24 @@ public class Compat_IC2 extends CompatBase {
             if ((modifiers & Modifier.STATIC) == 0) continue;
             field.setAccessible(true);
             String name = field.getName();
+            if (handled.contains(name)) continue;
             FMLInterModComms.sendMessage(DocumentationModule.modid, "AddRecipeCategory", "fzdoc.ic2.recipe." + name + "|ic2.api.recipe.Recipes|" + name);
         }
         IObjectWriter.adapter.register(AdvRecipe.class, new WriteShapedRecipe());
         IObjectWriter.adapter.register(AdvShapelessRecipe.class, new WriteShapelessRecipe());
+    }
+
+    NBTTagCompound standardIc2Recipe(String name) {
+        handled.add(name);
+        NBTTagCompound tag = new NBTTagCompound();
+        tag.setString("category", "fzdoc.ic2.recipe." + name + "|ic2.api.recipe.Recipes|" + name);
+        tag.setTag("input", list("getKey().getInputs()#Input"));
+        tag.setTag("output", list("getValue().items"));
+        return tag;
+    }
+
+    void imc(NBTTagCompound tag) {
+        FMLInterModComms.sendMessage(DocumentationModule.modid, "AddRecipeCategoryGuided", tag);
     }
 
     private static class WriteShapedRecipe implements IObjectWriter<AdvRecipe> {

@@ -10,6 +10,7 @@ import mods.railcraft.api.crafting.ICokeOvenRecipe;
 import mods.railcraft.api.crafting.IRockCrusherRecipe;
 import mods.railcraft.api.crafting.RailcraftCraftingManager;
 import net.minecraft.item.crafting.IRecipe;
+import net.minecraft.nbt.NBTTagCompound;
 
 import java.util.List;
 
@@ -27,8 +28,14 @@ public class Compat_Railcraft extends CompatBase {
         blast_furnace = RailcraftCraftingManager.blastFurnace.getRecipes();
 
         FMLInterModComms.sendMessage(DocumentationModule.modid, "AddRecipeCategory", "tile.railcraft.machine.alpha.rolling.machine.name|factorization.compat.railcraft.Compat_Railcraft|rollingmachine_recipes");
-        FMLInterModComms.sendMessage(DocumentationModule.modid, "AddRecipeCategory", "tile.railcraft.machine.alpha.rock.crusher.name|factorization.compat.railcraft.Compat_Railcraft|crusher_recipes");
+        //FMLInterModComms.sendMessage(DocumentationModule.modid, "AddRecipeCategory", "tile.railcraft.machine.alpha.rock.crusher.name|factorization.compat.railcraft.Compat_Railcraft|crusher_recipes");
         FMLInterModComms.sendMessage(DocumentationModule.modid, "AddRecipeCategory", "railcraft.gui.coke.oven|factorization.compat.railcraft.Compat_Railcraft|coke_oven");
         FMLInterModComms.sendMessage(DocumentationModule.modid, "AddRecipeCategory", "railcraft.gui.blast.furnace|factorization.compat.railcraft.Compat_Railcraft|blast_furnace");
+
+        NBTTagCompound tag = new NBTTagCompound();
+        tag.setString("category", "tile.railcraft.machine.alpha.rock.crusher.name|factorization.compat.railcraft.Compat_Railcraft|crusher_recipes");
+        tag.setTag("input", list("getInput()"));
+        tag.setTag("output", list("getPossibleOuputs()"));
+        FMLInterModComms.sendMessage(DocumentationModule.modid, "AddRecipeCategoryGuided", tag);
     }
 }
