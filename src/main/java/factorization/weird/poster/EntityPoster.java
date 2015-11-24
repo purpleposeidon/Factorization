@@ -200,6 +200,7 @@ public class EntityPoster extends EntityFz implements ISortableRenderer<EntityPo
         ItemStack held = player.getHeldItem();
         if (held == null) return false;
         if (inv.getItem() == Core.registry.spawnPoster) {
+            if (held.getItem() == Core.registry.spawnPoster) return true;
             inv = player.getHeldItem().splitStack(1);
             syncWithSpawnPacket();
             return true;
