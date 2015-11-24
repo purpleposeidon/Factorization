@@ -5,8 +5,8 @@ The Hall of Legends holds near-broken tools until the eventuality that they can 
 Only a limited number of Hall of Legends can exist in the universe;
 there can be only one per class of dimension.
 
-The Hall of Legends accepts one artifact per week.
-(If you think a week lasts 2½ hours, you are quite mistaken.)
+The Hall of Legends accepts one artifact every 5 days.
+(If you think this means it takes less than 2 hours, you are quite mistaken.)
 
 Clicking on the block with a tool will submit it.
 The tool must be nearly broken, and also must be named and enchanted;
