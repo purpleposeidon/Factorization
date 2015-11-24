@@ -96,7 +96,7 @@ public class EntityCitizen extends EntityFz {
         spinning = data.as(Share.VISIBLE, "citizenSpin").putBoolean(spinning);
         visible = data.as(Share.VISIBLE, "visible").putBoolean(visible);
         player_lost_visibility_state = data.as(Share.PRIVATE, "playerLostVis").putBoolean(player_lost_visibility_state);
-        data.as(Share.PRIVATE, "playerRef").put(playerRef);
+        data.as(Share.PRIVATE, "playerRef").putIDS(playerRef);
     }
 
     @Override

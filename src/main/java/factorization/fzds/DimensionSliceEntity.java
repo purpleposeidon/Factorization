@@ -211,11 +211,11 @@ public class DimensionSliceEntity extends IDeltaChunk implements IFzdsEntryContr
     @Override
     protected void putData(DataHelper data) throws IOException {
         capabilities = data.as(Share.VISIBLE, "cap").putLong(capabilities);
-        rotation = data.as(Share.VISIBLE, "r").put(rotation);
-        rotationalVelocity = data.as(Share.VISIBLE, "w").put(rotationalVelocity);
+        rotation = data.as(Share.VISIBLE, "r").putIDS(rotation);
+        rotationalVelocity = data.as(Share.VISIBLE, "w").putIDS(rotationalVelocity);
         centerOffset = data.as(Share.VISIBLE, "co").putVec3(centerOffset);
-        cornerMin = data.as(Share.VISIBLE, "min").put(cornerMin);
-        cornerMax = data.as(Share.VISIBLE, "max").put(cornerMax);
+        cornerMin = data.as(Share.VISIBLE, "min").putIDS(cornerMin);
+        cornerMax = data.as(Share.VISIBLE, "max").putIDS(cornerMax);
         partName = data.as(Share.VISIBLE, "partName").putString(partName);
         if (can(DeltaCapability.SCALE)) {
             scale = data.as(Share.VISIBLE, "incrScale").putFloat(scale);

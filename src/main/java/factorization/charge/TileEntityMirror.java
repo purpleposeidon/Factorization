@@ -57,7 +57,7 @@ public class TileEntityMirror extends TileEntityCommon {
         if (reflection_target == null) {
             reflection_target = getCoord();
         }
-        reflection_target = data.as(Share.VISIBLE, "target").put(reflection_target);
+        reflection_target = data.as(Share.VISIBLE, "target").putIDS(reflection_target);
         if (reflection_target.equals(getCoord())) {
             reflection_target = null;
         } else if (data.isReader()) {

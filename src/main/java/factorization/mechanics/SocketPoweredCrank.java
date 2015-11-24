@@ -69,7 +69,7 @@ public class SocketPoweredCrank extends TileEntitySocketBase implements IChargeC
 
     @Override
     public IDataSerializable serialize(String prefix, DataHelper data) throws IOException {
-        charge = data.as(Share.PRIVATE, "charge").put(charge);
+        charge = data.as(Share.PRIVATE, "charge").putIDS(charge);
         data.as(Share.VISIBLE, "hookedEntity");
         hookedIdc.serialize(prefix, data);
         hookLocation = data.as(Share.VISIBLE, "hookLocation").putVec3(hookLocation);
@@ -78,7 +78,7 @@ public class SocketPoweredCrank extends TileEntitySocketBase implements IChargeC
             chainDraw = null;
             chainDelta = 0;
         }
-        hookDelta = data.as(Share.PRIVATE, "hookDelta").put(hookDelta);
+        hookDelta = data.as(Share.PRIVATE, "hookDelta").putIDS(hookDelta);
         powerTime = data.as(Share.PRIVATE, "powerTime").putByte(powerTime);
         return this;
     }

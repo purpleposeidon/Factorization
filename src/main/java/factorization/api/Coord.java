@@ -821,9 +821,9 @@ public final class Coord implements IDataSerializable, ISaneCoord, Comparable<Co
     
     @Override
     public IDataSerializable serialize(String prefix, DataHelper data) throws IOException {
-        x = data.asSameShare(prefix + "x").put(x);
-        y = data.asSameShare(prefix + "y").put(y);
-        z = data.asSameShare(prefix + "z").put(z);
+        x = data.asSameShare(prefix + "x").putInt(x);
+        y = data.asSameShare(prefix + "y").putInt(y);
+        z = data.asSameShare(prefix + "z").putInt(z);
         return this;
     }
 

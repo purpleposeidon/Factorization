@@ -455,7 +455,7 @@ public class SocketLacerator extends TileEntitySocketBase implements IChargeCond
     
     @Override
     public IDataSerializable serialize(String prefix, DataHelper data) throws IOException {
-        charge = data.as(Share.PRIVATE, "charge").put(charge);
+        charge = data.as(Share.PRIVATE, "charge").putIDS(charge);
         speed = data.as(Share.VISIBLE, "spd").putShort(speed);
         progress = data.as(Share.PRIVATE, "prg").putShort(progress);
         buffer = data.as(Share.PRIVATE, "buf").putItemList(buffer);

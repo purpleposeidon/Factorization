@@ -47,7 +47,7 @@ public class TileEntityShaft extends TileEntityCommon implements IRotationalEner
     public void putData(DataHelper data) throws IOException {
         axis = data.as(Share.VISIBLE, "axis").putEnum(axis);
         if (srcPos == null) srcPos = getCoord();
-        srcPos = data.as(Share.VISIBLE, "src").put(srcPos);
+        srcPos = data.as(Share.VISIBLE, "src").putIDS(srcPos);
         srcConnection = data.as(Share.VISIBLE, "connectDir").putEnum(srcConnection);
         if (data.isReader()) {
             _src = null;

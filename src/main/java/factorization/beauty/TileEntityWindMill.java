@@ -135,7 +135,7 @@ public class TileEntityWindMill extends TileEntityCommon implements IRotationalE
     public void putData(DataHelper data) throws IOException {
         sailDirection = data.as(Share.VISIBLE, "sailDirection").putEnum(sailDirection);
         dirty = data.as(Share.PRIVATE, "dirty").putBoolean(dirty);
-        data.as(Share.VISIBLE, "idcRef").put(idcRef);
+        data.as(Share.VISIBLE, "idcRef").putIDS(idcRef);
         power_per_tick = data.as(Share.VISIBLE, "powerPerTick").putDouble(power_per_tick);
         power_this_tick = data.as(Share.VISIBLE, "powerThisTick").putDouble(power_this_tick);
         target_velocity = data.as(Share.VISIBLE, "targetVelocity").putDouble(target_velocity);

@@ -154,7 +154,7 @@ public class TileEntityHinge extends TileEntityCommon implements IDCController {
     @Override
     public void putData(DataHelper data) throws IOException {
         facing = data.as(Share.VISIBLE, "facing").putEnum(facing);
-        data.as(Share.VISIBLE, "ref").put(idcRef);
+        data.as(Share.VISIBLE, "ref").putIDS(idcRef);
         dseOffset = data.as(Share.PRIVATE, "dseOffset").putVec3(dseOffset);
     }
 

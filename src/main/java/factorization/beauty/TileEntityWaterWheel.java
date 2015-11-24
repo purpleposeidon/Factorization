@@ -119,7 +119,7 @@ public class TileEntityWaterWheel extends TileEntityCommon implements IRotationa
     @Override
     public void putData(DataHelper data) throws IOException {
         wheelDirection = data.as(Share.VISIBLE, "wheelDirection").putEnum(wheelDirection);
-        data.as(Share.VISIBLE, "idcRef").put(idcRef);
+        data.as(Share.VISIBLE, "idcRef").putIDS(idcRef);
         power_per_tick = data.as(Share.VISIBLE, "powerPerTick").putDouble(power_per_tick);
         power_this_tick = data.as(Share.VISIBLE, "powerThisTick").putDouble(power_this_tick);
         target_velocity = data.as(Share.VISIBLE, "targetVelocity").putDouble(target_velocity);

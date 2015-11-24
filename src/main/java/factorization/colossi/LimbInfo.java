@@ -40,8 +40,8 @@ class LimbInfo {
         side = data.as(Share.VISIBLE, "limbSide" + index).putEnum(side);
         parity = data.as(Share.VISIBLE, "limbParity" + index).putByte(parity);
         length = data.as(Share.VISIBLE, "limbLength" + index).putInt(length);
-        idc = data.as(Share.VISIBLE, "entUuid" + index).put(idc);
-        lastTurnDirection = data.as(Share.VISIBLE, "lastTurnDir" + index).put(lastTurnDirection);
+        idc = data.as(Share.VISIBLE, "entUuid" + index).putIDS(idc);
+        lastTurnDirection = data.as(Share.VISIBLE, "lastTurnDir" + index).putByte(lastTurnDirection);
     }
     
     boolean limbSwingParity() {

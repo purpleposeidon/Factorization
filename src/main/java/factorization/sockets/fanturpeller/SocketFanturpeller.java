@@ -48,8 +48,8 @@ public abstract class SocketFanturpeller extends TileEntitySocketBase implements
 
     @Override
     public IDataSerializable serialize(String prefix, DataHelper data) throws IOException {
-        charge = data.as(Share.PRIVATE, "charge").put(charge);
-        isSucking = data.as(Share.MUTABLE, "suck").put(isSucking);
+        charge = data.as(Share.PRIVATE, "charge").putIDS(charge);
+        isSucking = data.as(Share.MUTABLE, "suck").putBoolean(isSucking);
         target_speed = data.as(Share.MUTABLE, "target_speed").putByte(target_speed);
         if (target_speed < 0) target_speed = 0;
         if (target_speed > 3) target_speed = 3;

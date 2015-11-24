@@ -89,7 +89,7 @@ public abstract class ServoComponent implements IDataSerializable {
         }
         try {
             ServoComponent decor = componentClass.newInstance();
-            (new DataInNBT(tag)).as(Share.VISIBLE, "sc").put(decor);
+            (new DataInNBT(tag)).as(Share.VISIBLE, "sc").putIDS(decor);
             return decor;
         } catch (Throwable e) {
             e.printStackTrace();
@@ -100,7 +100,7 @@ public abstract class ServoComponent implements IDataSerializable {
     protected final void save(NBTTagCompound tag) {
         tag.setString(componentTagKey, getName());
         try {
-            (new DataOutNBT(tag)).as(Share.VISIBLE, "sc").put(this);
+            (new DataOutNBT(tag)).as(Share.VISIBLE, "sc").putIDS(this);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -108,7 +108,7 @@ public abstract class ServoComponent implements IDataSerializable {
     
     void writeToPacket(DataOutputStream dos) throws IOException {
         dos.writeShort(getNetworkId());
-        (new DataOutPacket(dos, Side.SERVER)).as(Share.VISIBLE, "sc").put(this);
+        (new DataOutPacket(dos, Side.SERVER)).as(Share.VISIBLE, "sc").putIDS(this);
     }
     
     static ServoComponent readFromPacket(ByteBuf dis) throws IOException {
@@ -120,7 +120,7 @@ public abstract class ServoComponent implements IDataSerializable {
         }
         try {
             ServoComponent decor = componentClass.newInstance();
-            (new DataInByteBuf(dis, Side.CLIENT)).as(Share.VISIBLE, "sc").put(decor);
+            (new DataInByteBuf(dis, Side.CLIENT)).as(Share.VISIBLE, "sc").putIDS(decor);
             return decor;
         } catch (IOException e) {
             throw e;

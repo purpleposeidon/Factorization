@@ -167,10 +167,10 @@ public class EntityPoster extends EntityFz implements ISortableRenderer<EntityPo
     @Override
     protected void putData(DataHelper data) throws IOException {
         inv = data.as(Share.VISIBLE, "inv").putItemStack(inv);
-        rot = data.as(Share.VISIBLE, "rot").put(rot);
-        scale = data.as(Share.VISIBLE, "scale").put(scale);
-        base_rotation = data.as(Share.PRIVATE, "baseRot").put(base_rotation);
-        base_scale = data.as(Share.PRIVATE, "baseScale").put(base_scale);
+        rot = data.as(Share.VISIBLE, "rot").putIDS(rot);
+        scale = data.as(Share.VISIBLE, "scale").putDouble(scale);
+        base_rotation = data.as(Share.PRIVATE, "baseRot").putIDS(base_rotation);
+        base_scale = data.as(Share.PRIVATE, "baseScale").putDouble(base_scale);
         spin_normal = data.as(Share.PRIVATE, "spinNormal").putShort(spin_normal);
         spin_vertical = data.as(Share.PRIVATE, "spinVertical").putShort(spin_vertical);
         spin_tilt = data.as(Share.PRIVATE, "spinTilt").putShort(spin_tilt);

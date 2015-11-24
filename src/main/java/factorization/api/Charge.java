@@ -208,7 +208,7 @@ public class Charge implements IDataSerializable {
     
     @Override
     public IDataSerializable serialize(String prefix, DataHelper data) throws IOException {
-        int new_val = data.as(Share.PRIVATE, prefix + "charge").put(getValue());
+        int new_val = data.as(Share.PRIVATE, prefix + "charge").putInt(getValue());
         if (data.isReader()) {
             setValue(new_val);
         }
