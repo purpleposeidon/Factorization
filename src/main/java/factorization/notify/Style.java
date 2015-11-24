@@ -43,5 +43,9 @@ public enum Style {
      * This will enlarge messages far away from the camera so that they occupy about the same area on the screen as nearby messages.
      * You will likely want to pass in DRAWFAR with this one.
      */
-    SCALE_SIZE
+    SCALE_SIZE,
+    /**
+     * The message will stay around for up to 60 seconds.
+     */
+    VERY_LONG
 }

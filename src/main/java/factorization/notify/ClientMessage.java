@@ -28,7 +28,7 @@ class ClientMessage {
     boolean position_important = false;
     boolean show_item = false;
     
-    static final int SHORT_TIME = 6, LONG_TIME = 11;
+    static final int SHORT_TIME = 6, LONG_TIME = 11, VERY_LONG_TIME = 60;
 
     public ClientMessage(World world, Object locus, ItemStack item, String format, String... args) {
         this.world = world;

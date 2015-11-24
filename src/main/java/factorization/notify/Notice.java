@@ -204,6 +204,12 @@ public class Notice {
             changed |= a == b;
         }
     }
+
+    int getLifetime() {
+        if (style.contains(Style.VERY_LONG)) return ClientMessage.VERY_LONG_TIME;
+        if (style.contains(Style.LONG)) return ClientMessage.LONG_TIME;
+        return ClientMessage.SHORT_TIME;
+    }
     
     boolean isInvalid() {
         int maxAge = 20 * (style.contains(Style.LONG) ? ClientMessage.LONG_TIME : ClientMessage.SHORT_TIME);
