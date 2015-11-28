@@ -83,12 +83,7 @@ public class TileEntityParaSieve extends TileEntityFactorization implements ISid
     public ForgeDirection getFacing() {
         return ForgeDirection.getOrientation(facing_direction).getOpposite();
     }
-    
-    @Override
-    protected boolean canFaceVert() {
-        return true;
-    }
-    
+
     static Coord hereCache = new Coord(null, 0, 0, 0);
     private boolean isPowered() {
         if (redstone_cache == -1) {

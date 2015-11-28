@@ -9,9 +9,7 @@ import factorization.api.FzOrientation;
 import factorization.api.IChargeConductor;
 import factorization.api.IEntityMessage;
 import factorization.api.datahelpers.*;
-import factorization.servo.stepper.StepperEngine;
 import factorization.shared.Core;
-import factorization.shared.NORELEASE;
 import factorization.shared.NetworkFactorization;
 import factorization.util.PlayerUtil;
 import io.netty.buffer.ByteBuf;
@@ -224,7 +222,6 @@ public abstract class AbstractServoMachine extends Entity implements IEntityAddi
         if (isDead) {
             return;
         }
-        //NORELEASE.println(worldObj.isRemote, "\t", motionHandler.orientation);
         if (worldObj.isRemote) {
             motionHandler.updateServoMotion();
             updateServoLogic();

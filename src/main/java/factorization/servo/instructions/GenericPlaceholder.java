@@ -5,7 +5,6 @@ import factorization.api.datahelpers.IDataSerializable;
 import factorization.servo.Instruction;
 import factorization.servo.ServoComponent;
 import factorization.servo.ServoMotor;
-import factorization.shared.NORELEASE;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.IIcon;

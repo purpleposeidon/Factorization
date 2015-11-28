@@ -11,7 +11,6 @@ import factorization.servo.MotionHandler;
 import factorization.servo.TileEntityServoRail;
 import factorization.shared.Core;
 import factorization.shared.EntityReference;
-import factorization.shared.NORELEASE;
 import factorization.shared.NetworkFactorization;
 import factorization.util.SpaceUtil;
 import io.netty.buffer.ByteBuf;
@@ -159,7 +158,7 @@ public class StepperEngine extends AbstractServoMachine {
     }
 
     private void grabIdc(IDeltaChunk idc) {
-        NORELEASE.fixme("translate the origin so that the origin's located at ourselves");
+        //NORELEASE.fixme("translate the origin so that the origin's located at ourselves");
         EntityGrabController egc = new EntityGrabController(this, idc, DropMode.EVENTUALLY);
         worldObj.spawnEntityInWorld(egc);
         egc.mountEntity(this);

@@ -10,7 +10,6 @@ import factorization.fzds.interfaces.IDCController;
 import factorization.fzds.interfaces.IDeltaChunk;
 import factorization.shared.EntityFz;
 import factorization.shared.EntityReference;
-import factorization.shared.NORELEASE;
 import factorization.util.SpaceUtil;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;

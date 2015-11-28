@@ -7,7 +7,6 @@ import factorization.api.datahelpers.Share;
 import factorization.fzds.interfaces.IDeltaChunk;
 import factorization.fzds.interfaces.Interpolation;
 import factorization.servo.MotionHandler;
-import factorization.shared.NORELEASE;
 import net.minecraftforge.common.util.ForgeDirection;
 
 import java.io.IOException;
@@ -87,7 +86,7 @@ public class StepperMotionHandler extends MotionHandler {
             obstruction = EnumObstructionKind.NONE;
             return false;
         }
-        NORELEASE.fixme("Emit sparks");
+        // NORELEASE.fixme("Emit sparks");
         grabber.hitReal = grabber.hitShadow = null;
         return true;
     }
