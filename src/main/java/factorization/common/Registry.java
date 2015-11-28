@@ -68,7 +68,9 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.FurnaceRecipes;
 import net.minecraft.item.crafting.IRecipe;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.util.WeightedRandomFishable;
 import net.minecraft.world.World;
+import net.minecraftforge.common.FishingHooks;
 import net.minecraftforge.event.entity.player.EntityItemPickupEvent;
 import net.minecraftforge.fluids.Fluid;
 import net.minecraftforge.fluids.FluidRegistry;
@@ -1177,6 +1179,9 @@ public class Registry {
                 "*",
                 '*', Items.blaze_powder,
                 '/', new ItemStack(manSandwich));
+        FishingHooks.addJunk(new WeightedRandomFishable(new ItemStack(docbook), 10));
+        FishingHooks.addTreasure(new WeightedRandomFishable(new ItemStack(manSandwich, 1, 1), 1));
+        FishingHooks.addTreasure(new WeightedRandomFishable(new ItemStack(manSandwich), 1));
         ItemStack tons_of_bonemeal = new ItemStack(Items.dye, 12 /* stacksize */, 15 /* damage value for bonemeal */);
         oreRecipe(tons_of_bonemeal,
                 "MSH",
