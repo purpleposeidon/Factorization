@@ -42,7 +42,7 @@ import java.util.List;
 import java.util.Random;
 
 public abstract class TileEntityCommon extends TileEntity implements ICoord, IFactoryType {
-    public static final byte serialization_version = 1;
+    public static final byte serialization_version = 2;
     public static final String serialization_version_key = ".";
 
     protected static Random rand = new Random();
@@ -174,21 +174,17 @@ public abstract class TileEntityCommon extends TileEntity implements ICoord, IFa
     public boolean isBlockSolidOnSide(int side) {
         return true;
     }
-    
-    public boolean takeUpgrade(ItemStack is) {
-        return false;
-    }
 
     @Override
     public final void writeToNBT(NBTTagCompound tag) {
         super.writeToNBT(tag);
-        tag.setByte(serialization_version_key, serialization_version);
         if (customName != null) {
             tag.setString("customName", customName);
         }
         if (worldObj != null && power()) {
             tag.setLong("rps", pulseTime);
         }
+        tag.setByte(serialization_version_key, serialization_version);
         try {
             DataHelper data = new DataOutNBT(tag);
             putData(data);
@@ -208,14 +204,27 @@ public abstract class TileEntityCommon extends TileEntity implements ICoord, IFa
         }
         byte v = tag.getByte(serialization_version_key);
         if (v < serialization_version) {
-            MigrationHelper.migrate(v, this.getFactoryType(), this, tag);
-            markDirty(); // Make sure we get saved
+            if (MigrationHelper.migrate(v, this.getFactoryType(), this, tag)) {
+                needMarkDirty = true;
+            }
+            // By only marking dirty if MigrationHelper returns true, there is a small potential for migration to
+            // happen multiple times. This is a good thing.
         }
         try {
             DataHelper data = new DataInNBT(tag);
             putData(data);
         } catch (IOException e) {
             e.printStackTrace();
+        }
+    }
+
+    boolean needMarkDirty = false;
+    @Override
+    public void validate() {
+        super.validate();
+        if (needMarkDirty) {
+            markDirty();
+            needMarkDirty = false;
         }
     }
 

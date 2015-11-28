@@ -3,6 +3,8 @@ package factorization.sockets;
 import static org.lwjgl.opengl.GL11.*;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import factorization.api.datahelpers.*;
@@ -18,6 +20,7 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.IIcon;
@@ -50,6 +53,7 @@ public abstract class TileEntitySocketBase extends TileEntityCommon implements I
      * 		Some things might call this's ISocketHolder methods rather than the passed in ISocketHolder's methods
      */
     public ForgeDirection facing = ForgeDirection.UP;
+    protected ItemStack[] parts = new ItemStack[3];
 
     @Override
     public final BlockClass getBlockClass() {
@@ -62,9 +66,26 @@ public abstract class TileEntitySocketBase extends TileEntityCommon implements I
         facing = ForgeDirection.getOrientation(side);
     }
 
+    public void migrate1to2() {
+        ArrayList<ItemStack> legacyParts = new ArrayList<ItemStack>(3);
+        TileEntitySocketBase self = this;
+        while (true) {
+            legacyParts.add(self.getCreatingItem());
+            FactoryType ft = getParentFactoryType();
+            if (ft == null) break;
+            self = (TileEntitySocketBase) ft.getRepresentative();
+            if (self == null) break;
+        }
+        Collections.reverse(legacyParts);
+        for (int i = 0; i < legacyParts.size(); i++) {
+            parts[i] = legacyParts.get(i);
+        }
+    }
+
     @Override
     public final void putData(DataHelper data) throws IOException {
         facing = data.as(Share.VISIBLE, "fc").putEnum(facing);
+        parts = data.as(Share.PRIVATE, "socketParts").putItemArray(parts);
         serialize("", data);
     }
 

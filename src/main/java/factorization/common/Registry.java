@@ -10,7 +10,6 @@ import cpw.mods.fml.common.registry.ExistingSubstitutionException;
 import cpw.mods.fml.common.registry.GameRegistry;
 import cpw.mods.fml.common.registry.GameRegistry.Type;
 import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.repackage.com.nothome.delta.Delta;
 import factorization.api.IActOnCraft;
 import factorization.artifact.BlockForge;
 import factorization.artifact.ItemBrokenArtifact;
