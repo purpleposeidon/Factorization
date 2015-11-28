@@ -81,9 +81,6 @@ public abstract class TileEntityCommon extends TileEntity implements ICoord, IFa
         }
     }
 
-    protected void sendFullDescription(EntityPlayer player) {
-    }
-
     public boolean canPlaceAgainst(EntityPlayer player, Coord c, int side) {
         return true;
     }
@@ -162,7 +159,6 @@ public abstract class TileEntityCommon extends TileEntity implements ICoord, IFa
 
         if (type.hasGui) {
             if (!entityplayer.worldObj.isRemote) {
-                sendFullDescription(entityplayer);
                 entityplayer.openGui(Core.instance, type.gui, worldObj, xCoord, yCoord, zCoord);
             }
             return true;
