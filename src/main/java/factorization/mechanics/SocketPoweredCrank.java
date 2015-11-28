@@ -368,7 +368,7 @@ public class SocketPoweredCrank extends TileEntitySocketBase implements IChargeC
         getCoord().setAsTileEntityLocation(sbm);
         sbm.facing = facing;
         sbm.renderStatic(motor, tess);
-        sbm.setWorldObj(null); // Don't leak the world (TODO: Unset all worldObj for all representitives when the world unload?)
+        sbm.setWorldObj(null); // Don't leak the world (TODO: Unset all worldObj for all representitives when the world unloads?)
     }
 
 

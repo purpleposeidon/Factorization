@@ -217,7 +217,7 @@ public class ItemSculptingTool extends ItemFactorization {
                     }
                 }
                 if (theSlab == null || materialCount < neededClay) {
-                    new Notice(here, "Need wood slab\nAnd %s clay", "" + neededClay).send(player); //TODO: Localize properly
+                    new Notice(here, "item.factorization:sculptTool.MOLD.needs", "" + neededClay).send(player);
                     return false;
                 }
                 inv.pull(theSlab, 1, false);
