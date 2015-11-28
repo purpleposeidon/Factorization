@@ -239,6 +239,7 @@ public class ColossalBlock extends Block {
             }
             if (realPlayer.worldObj == world) return true;
             return giveUserAuthentication(held, realPlayer, at);
+            NORELEASE.fixme("Wither test: player should be able to survive a wither while grabbed by a citizen");
         }*/
         if (PlayerUtil.isPlayerCreative(player)) {
             TileEntityColossalHeart heart = at.getTE(TileEntityColossalHeart.class);
