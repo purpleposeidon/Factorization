@@ -46,6 +46,7 @@ public class ColossusController extends EntityFz implements IBossDisplayData, ID
     private Coord home = null;
     private boolean been_hurt = false;
     boolean confused = false;
+    static String creeper_tag = "fz:colossus_spawned_creeper";
     
     
     static Technique[] offensives, idlers, defensives;

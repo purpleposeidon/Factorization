@@ -21,11 +21,13 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.item.EntityFallingBlock;
 import net.minecraft.entity.item.EntityFireworkRocket;
 import net.minecraft.entity.item.EntityItem;
+import net.minecraft.entity.monster.EntityCreeper;
 import net.minecraft.entity.monster.EntityZombie;
 import net.minecraft.entity.passive.EntityChicken;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.potion.Potion;
 import net.minecraft.potion.PotionEffect;
 import net.minecraft.util.Vec3;
@@ -263,44 +265,18 @@ public enum Technique implements IStateMachine<Technique> {
         public void onExitState(ColossusController controller, Technique nextState) {
             playNoise(controller);
             Random rand = controller.worldObj.rand;
-            int baby = 3 + rand.nextInt(controller.getDestroyedCracks());
-            int forever = 999999;
-            while (baby-- > 0) {
-                EntityZombie zombie = new EntityZombie(controller.worldObj);
-                final boolean jockey = rand.nextDouble() > 0.98;
-                zombie.setChild(false);
-                zombie.addPotionEffect(new PotionEffect(Potion.damageBoost.getId(), forever, 1, true));
-                zombie.addPotionEffect(new PotionEffect(Potion.invisibility.getId(), forever, 1, false));
-                zombie.addPotionEffect(new PotionEffect(Potion.fireResistance.getId(), forever, 1, true));
-                if (!jockey) {
-                    zombie.addPotionEffect(new PotionEffect(Potion.jump.getId(), 20 * 5, 3, true));
-                }
-
-                zombie.setCurrentItemOrArmor(4, new ItemStack(Core.registry.blastBlock));
-                zombie.setEquipmentDropChance(4, 1);
-                zombie.setCurrentItemOrArmor(3, new ItemStack(Items.fire_charge));
-                zombie.setEquipmentDropChance(3, 1);
-                zombie.livingSoundTime = Integer.MIN_VALUE;
-                zombie.setFire(forever);
-                zombie.setCanPickUpLoot(false);
-                zombie.func_110163_bv(); // 'persistenceRequired = true'
-
+            int mobs = 3 + rand.nextInt(1 + controller.getDestroyedCracks());
+            if (mobs > 8) mobs = 8;
+            while (mobs-- > 0) {
+                EntityCreeper creeper = new EntityCreeper(controller.worldObj);
+                creeper.addPotionEffect(new PotionEffect(Potion.jump.getId(), 20 * 5, 3, true));
                 double ex = controller.posX + rng(controller);
                 double ey = controller.posY + controller.height;
                 double ez = controller.posZ + rng(controller);
-
-                zombie.setPosition(ex, ey, ez);
-                if (jockey) {
-                    EntityChicken chicken = new EntityChicken(controller.worldObj);
-                    chicken.setPosition(ex, ey, ez);
-                    zombie.mountEntity(chicken);
-                    chicken.addPotionEffect(new PotionEffect(Potion.invisibility.getId(), forever, 1, false));
-                    chicken.func_152117_i(true); // Sets 'chicken jockey', makes it despawn & not lay eggs
-                    chicken.livingSoundTime = Integer.MIN_VALUE; // Unfortunately it's only a temporary stiffling
-                    controller.worldObj.spawnEntityInWorld(chicken);
-                }
-
-                controller.worldObj.spawnEntityInWorld(zombie);
+                creeper.setPosition(ex, ey, ez);
+                controller.worldObj.spawnEntityInWorld(creeper);
+                NBTTagCompound data = creeper.getEntityData();
+                data.setBoolean(ColossusController.creeper_tag, true);
             }
         }
     },
@@ -899,6 +875,7 @@ public enum Technique implements IStateMachine<Technique> {
             fallAxis = rotation.multiply(fallAxis);
             controller.body.orderTargetRotation(fallAxis, (int) (20 * 2.5 /* 2.5 seconds for the fall sound to hit */), Interpolation.SQUARE);
             controller.setTarget(null);
+            removeMyCreepers(controller);
         }
         
         @Override
@@ -1165,6 +1142,12 @@ public enum Technique implements IStateMachine<Technique> {
             }
             return super.tick(controller, age);
         }
+
+        @Override
+        public void onEnterState(ColossusController controller, Technique prevState) {
+            super.onEnterState(controller, prevState);
+            removeMyCreepers(controller);
+        }
     },
 
     DEAD {
@@ -1277,5 +1260,28 @@ public enum Technique implements IStateMachine<Technique> {
         float volume = 10; // Loud like a ghast!
         float pitch = 1;
         controller.worldObj.playSoundAtEntity(controller, "factorization:colossus.tech_" + this, volume, pitch);
+    }
+
+    void removeMyCreepers(ColossusController controller) {
+        Coord at = new Coord(controller);
+        int d = 64;
+        Coord min = at.add(-d, -d, -d);
+        Coord max = at.add(+d, +d, +d);
+        Coord.iterateChunks(min, max, new ICoordFunction() {
+            @Override
+            public void handle(Coord here) {
+                if (!here.blockExists()) return;
+                for (List list : here.getChunk().entityLists) {
+                    for (Object obj : list) {
+                        if (obj instanceof EntityCreeper) {
+                            EntityCreeper creeper = (EntityCreeper) obj;
+                            if (creeper.getEntityData().getBoolean(ColossusController.creeper_tag)) {
+                                creeper.setHealth(0);
+                            }
+                        }
+                    }
+                }
+            }
+        });
     }
 }
