@@ -71,7 +71,7 @@ public abstract class TileEntitySocketBase extends TileEntityCommon implements I
         TileEntitySocketBase self = this;
         while (true) {
             legacyParts.add(self.getCreatingItem());
-            FactoryType ft = getParentFactoryType();
+            FactoryType ft = self.getParentFactoryType();
             if (ft == null) break;
             self = (TileEntitySocketBase) ft.getRepresentative();
             if (self == null) break;
