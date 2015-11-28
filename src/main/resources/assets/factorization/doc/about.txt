@@ -29,15 +29,14 @@ sneak-click block with manual: lookup block \nl
 \topic{item.factorization:docbook}
 
 Carrying this book everywhere you go may become burdensome,
-which is why its text has been written to be
-satisfying and easy to digest.
+which is why, with careful editing, we have ensured that it may be easily digested.
 
 \topic{item.factorization:mansandwich}
 
 The Manual Sandwich,
 or "Manwich", is high in fiber
-and heaping with protein.
-Eating so much meat in a single sitting is once in a lifetime experience!
+and overflowing with protein.
+Eating so much meat in a single sitting is a once in a lifetime experience!
 If you're looking for a meal with a little more kick to it,
 try the Spicy Manwich.
 
