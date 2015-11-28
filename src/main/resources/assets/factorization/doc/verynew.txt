@@ -1,2 +1,2 @@
-\index{artifactforge}{\#{tile.factorization:artifactForge} Forge Powerful Artifacts!}
-\index{legendarium}{\#{factorization.factoryBlock.LEGENDARIUM} Restore Ancient Tools to Their Former Glory!}
+--> \link{deprecation}{1.8 world updating! Read me!} <--
+

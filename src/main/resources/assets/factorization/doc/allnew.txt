@@ -1,6 +1,8 @@
 \title{New!}
 
 \include{verynew}
+\index{artifactforge}{\#{tile.factorization:artifactForge} Forge Powerful Artifacts!}
+\index{legendarium}{\#{factorization.factoryBlock.LEGENDARIUM} Restore Ancient Tools to Their Former Glory!}
 \index{chargegen}{\#{factorization.factoryBlock.STEAM_SHAFT} More power!}
 \index{blockmatcher}{\#{tile.BlockMatcher} Block Matching!}
 \index{blockundo}{\#{tile.obsidian} Undo Block Placement!}
