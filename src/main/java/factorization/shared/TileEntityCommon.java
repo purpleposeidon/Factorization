@@ -45,7 +45,6 @@ public abstract class TileEntityCommon extends TileEntity implements ICoord, IFa
     public static final byte serialization_version = 2;
     public static final String serialization_version_key = ".";
 
-    protected static Random rand = new Random();
     public String customName = null;
 
     public abstract BlockClass getBlockClass();

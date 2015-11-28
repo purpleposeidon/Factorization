@@ -189,9 +189,9 @@ public class TileEntitySlagFurnace extends TileEntityFactorization implements IF
         return current_recipe.isUnblocked(this);
     }
 
-    static int getRandomSize(float f) {
+    int getRandomSize(float f) {
         int i = (int) f;
-        if (f - i > rand.nextFloat()) {
+        if (f - i > worldObj.rand.nextFloat()) {
             i += 1;
         }
         return i;
@@ -283,8 +283,8 @@ public class TileEntitySlagFurnace extends TileEntityFactorization implements IF
             }
             ItemStack fo0 = furnaceItemStacks[outputSlotIndex + 0];
             ItemStack fo1 = furnaceItemStacks[outputSlotIndex + 1];
-            fo0.stackSize += getRandomSize(prob1);
-            fo1.stackSize += getRandomSize(prob2);
+            fo0.stackSize += machine.getRandomSize(prob1);
+            fo1.stackSize += machine.getRandomSize(prob2);
             if (fo0.stackSize > fo0.getMaxStackSize()) {
                 fo0.stackSize = fo0.getMaxStackSize();
             }

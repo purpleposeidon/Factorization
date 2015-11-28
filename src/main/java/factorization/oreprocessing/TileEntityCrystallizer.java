@@ -309,7 +309,7 @@ public class TileEntityCrystallizer extends TileEntityFactorization implements I
 
         private void applyTo(TileEntityCrystallizer crys, int slot) {
             int delta = (int) output_count;
-            if (delta != output_count && rand.nextFloat() < (output_count - delta)) {
+            if (delta != output_count && crys.worldObj.rand.nextFloat() < (output_count - delta)) {
                 delta++;
             }
             if (crys.output != null && crys.output.stackSize + delta > crys.output.getMaxStackSize()) {

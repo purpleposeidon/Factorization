@@ -215,7 +215,7 @@ public class TileEntityMirror extends TileEntityCommon {
     boolean gotten_info_packet = false;
     
     void setNextCheck() {
-        next_check = 80 + rand.nextInt(20);
+        next_check = 80 + worldObj.rand.nextInt(20);
     }
 
     public boolean last_drawn_as_lit = false;

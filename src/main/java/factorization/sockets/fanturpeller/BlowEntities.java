@@ -144,7 +144,7 @@ public class BlowEntities extends SocketFanturpeller implements IEntitySelector 
             int count = target_speed - 1;
             if (count <= 0) {
                 count = 1;
-                if (rand.nextBoolean()) {
+                if (worldObj.rand.nextBoolean()) {
                     return;
                 }
             }
@@ -193,7 +193,7 @@ public class BlowEntities extends SocketFanturpeller implements IEntitySelector 
 
     double pick(double min, double max) {
         double d = max - min;
-        return min + d*rand.nextDouble();
+        return min + d * worldObj.rand.nextDouble();
     }
     
     void suckEntity(Entity ent, int front_range, ForgeDirection dir, double s) {
@@ -256,7 +256,7 @@ public class BlowEntities extends SocketFanturpeller implements IEntitySelector 
                 }
             }
             if (!worldObj.isRemote && ghast.getHealth() > 0) {
-                ghast.rotationYaw += rand.nextGaussian()*12;
+                ghast.rotationYaw += worldObj.rand.nextGaussian()*12;
             }
             
         } else if (ent instanceof EntityChicken) {

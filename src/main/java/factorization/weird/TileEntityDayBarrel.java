@@ -790,7 +790,7 @@ public class TileEntityDayBarrel extends TileEntityFactorization implements ISor
         last_hit_side = -1;
         player.addExhaustion(0.5F);
         ItemStack is = player.getHeldItem();
-        if (is != null && is.isItemStackDamageable() && rand.nextInt(4) == 0) {
+        if (is != null && is.isItemStackDamageable() && worldObj.rand.nextInt(4) == 0) {
             is.damageItem(distance, player);
             if (is.stackSize <= 0) {
                 player.destroyCurrentEquippedItem();

@@ -241,7 +241,7 @@ public class SocketLacerator extends TileEntitySocketBase implements IChargeCond
                 output.stackSize = 0;
                 int min = (int) gr.probability;
                 output.stackSize += min;
-                output.stackSize += rand.nextFloat() < (gr.probability - min) ? 1 : 0;
+                output.stackSize += worldObj.rand.nextFloat() < (gr.probability - min) ? 1 : 0;
                 is = output;
                 appliedRecipe = true;
                 break;
@@ -267,7 +267,7 @@ public class SocketLacerator extends TileEntitySocketBase implements IChargeCond
     }
     
     boolean workCheck() {
-        return speed > min_speed && rand.nextInt(max_speed) < speed/4;
+        return speed > min_speed && worldObj.rand.nextInt(max_speed) < speed/4;
     }
     
     public static final DamageSource laceration = new DamageSource("laceration") {
@@ -324,7 +324,7 @@ public class SocketLacerator extends TileEntitySocketBase implements IChargeCond
             if (cantDoWork(socket)) return !grab_items;
             socket.extractCharge(1); //It's fine if it fails
             float damage = 4F*speed/max_speed;
-            if (elb.getHealth() <= damage && rand.nextInt(20) == 1) { 
+            if (elb.getHealth() <= damage && worldObj.rand.nextInt(20) == 1) {
                 elb.recentlyHit = 100;
             }
             if (elb.attackEntityFrom(laceration, damage)) {
@@ -377,7 +377,7 @@ public class SocketLacerator extends TileEntitySocketBase implements IChargeCond
                 progress = 0;
             } else {
                 progress++;
-                if (socket == this && rand.nextInt(4) == 0) {
+                if (socket == this && worldObj.rand.nextInt(4) == 0) {
                     // Torsion!?
                     TileEntity partner = mopWorld.getTileEntity(mop.blockX + facing.offsetX, mop.blockY + facing.offsetY, mop.blockZ + facing.offsetZ);
                     if (partner instanceof SocketLacerator) {
@@ -612,7 +612,7 @@ public class SocketLacerator extends TileEntitySocketBase implements IChargeCond
             if (particle.motionY > speed/4) {
                 particle.motionY *= 3;
             }
-            particle.multipleParticleScaleBy(1 + rand.nextFloat()*2/3);
+            particle.multipleParticleScaleBy(1 + worldObj.rand.nextFloat()*2/3);
             origER.addEffect(particle);
         }
     }
