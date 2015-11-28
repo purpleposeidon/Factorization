@@ -122,7 +122,7 @@ public abstract class TileEntityCommon extends TileEntity implements ICoord, IFa
         byte v = tag.getByte(serialization_version_key);
         if (v < serialization_version) {
             if (MigrationHelper.migrate(v, this.getFactoryType(), this, tag)) {
-                needMarkDirty = true;
+                TeMigrationDirtier.instance.register(this);
             }
             // By only marking dirty if MigrationHelper returns true, there is a small potential for migration to
             // happen multiple times. This is a good thing.
@@ -132,16 +132,6 @@ public abstract class TileEntityCommon extends TileEntity implements ICoord, IFa
             putData(data);
         } catch (IOException e) {
             e.printStackTrace();
-        }
-    }
-
-    boolean needMarkDirty = false;
-    @Override
-    public void validate() {
-        super.validate();
-        if (needMarkDirty) {
-            markDirty();
-            needMarkDirty = false;
         }
     }
 
@@ -350,5 +340,4 @@ public abstract class TileEntityCommon extends TileEntity implements ICoord, IFa
     public void blockUpdateTick(Block myself) {
         worldObj.notifyBlockChange(xCoord, yCoord, zCoord, myself);
     }
-
 }
