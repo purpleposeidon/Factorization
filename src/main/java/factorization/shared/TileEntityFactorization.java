@@ -1,27 +1,24 @@
 package factorization.shared;
 
-import java.io.IOException;
-
+import factorization.api.Coord;
+import factorization.api.ICoord;
+import factorization.api.IFactoryType;
 import factorization.api.datahelpers.DataHelper;
 import factorization.api.datahelpers.Share;
+import factorization.common.FactoryType;
+import factorization.shared.NetworkFactorization.MessageType;
 import factorization.util.InvUtil;
 import factorization.util.ItemUtil;
 import io.netty.buffer.ByteBuf;
-import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.ISidedInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
-import net.minecraft.util.Vec3;
 import net.minecraftforge.common.util.Constants;
-import net.minecraftforge.common.util.ForgeDirection;
-import factorization.api.Coord;
-import factorization.api.ICoord;
-import factorization.api.IFactoryType;
-import factorization.common.FactoryType;
-import factorization.shared.NetworkFactorization.MessageType;
+
+import java.io.IOException;
 
 public abstract class TileEntityFactorization extends TileEntityCommon
         implements IInventory, ISidedInventory, ICoord, IFactoryType {
@@ -31,7 +28,7 @@ public abstract class TileEntityFactorization extends TileEntityCommon
     public byte facing_direction = 3;
 
     //Runtime
-    protected boolean need_logic_check = true;
+    protected transient boolean need_logic_check = true;
 
     @Override
     public abstract FactoryType getFactoryType();
@@ -45,10 +42,6 @@ public abstract class TileEntityFactorization extends TileEntityCommon
         return 4;
     }
 
-    protected boolean canFaceVert() {
-        return false;
-    }
-
     @Override
     public void onPlacedBy(EntityPlayer player, ItemStack is, int side, float hitX, float hitY, float hitZ) {
         super.onPlacedBy(player, is, side, hitX, hitY, hitZ);
@@ -58,50 +51,8 @@ public abstract class TileEntityFactorization extends TileEntityCommon
         facing_direction = (byte) side;
     }
 
-    void setFacingDirectionFromEntity(Entity player) {
-        float yaw = player.rotationYaw % 360F;
-        if (yaw < 0) {
-            yaw += 360F;
-        }
-
-        if (canFaceVert()) {
-            if (player.rotationPitch <= -45F) {
-                facing_direction = 0; //-Y
-                return;
-            }
-            else if (player.rotationPitch >= 65F) {
-                facing_direction = 1; //+Y
-                return;
-            }
-        }
-        int y = ((int) yaw) / 45;
-        switch (y) {
-        case 7:
-        case 0:
-            facing_direction = 2;
-            break;
-        case 1:
-        case 2:
-            facing_direction = 5;
-            break;
-        case 3:
-        case 4:
-            facing_direction = 3;
-            break;
-        case 5:
-        case 6:
-            facing_direction = 4;
-            break;
-        }
-    }
-
     protected void needLogic() {
         need_logic_check = true;
-    }
-
-    @Override
-    public final Coord getCoord() {
-        return new Coord(this);
     }
 
     @Override
@@ -111,18 +62,10 @@ public abstract class TileEntityFactorization extends TileEntityCommon
     }
 
     public void dropContents() {
-        // XXX TODO: ModLoader.genericContainerRemoval
         Coord here = getCoord();
         for (int i = 0; i < getSizeInventory(); i++) {
             InvUtil.spawnItemStack(here, getStackInSlot(i));
         }
-    }
-    
-    double round(double c) {
-        if (Math.abs(c) < 0.5) {
-            return 0;
-        }
-        return Math.copySign(1, c);
     }
 
     @Override
@@ -133,9 +76,8 @@ public abstract class TileEntityFactorization extends TileEntityCommon
         }
 
         if (target.stackSize <= amount) {
-            ItemStack ret = target;
             setInventorySlotContents(i, null);
-            return ret;
+            return target;
         }
 
         ItemStack ret = target.splitStack(amount);
@@ -171,12 +113,7 @@ public abstract class TileEntityFactorization extends TileEntityCommon
     @Override
     public final void closeInventory() {
     }
-    
-    /*@Override
-    public boolean acceptsStackInSlot(int i, ItemStack itemstack) {
-        return true;
-    }*/
-    
+
     @Override
     public boolean hasCustomInventoryName() {
         return false;
@@ -219,23 +156,6 @@ public abstract class TileEntityFactorization extends TileEntityCommon
             invlist.appendTag(comp);
         }
         tag.setTag("Items", invlist);
-    }
-
-    protected static void saveItem(String name, NBTTagCompound tag, ItemStack is) {
-        // TODO: Are these two as used as they could be?
-        if (is == null) {
-            return;
-        }
-        NBTTagCompound itag = new NBTTagCompound();
-        is.writeToNBT(itag);
-        tag.setTag(name, itag);
-    }
-
-    protected static ItemStack readItem(String name, NBTTagCompound tag) {
-        if (tag.hasKey(name)) {
-            return ItemStack.loadItemStackFromNBT(tag.getCompoundTag(name));
-        }
-        return null;
     }
 
     @Override

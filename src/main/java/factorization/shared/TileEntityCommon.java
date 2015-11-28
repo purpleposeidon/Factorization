@@ -47,14 +47,27 @@ public abstract class TileEntityCommon extends TileEntity implements ICoord, IFa
 
     public String customName = null;
 
+
     public abstract BlockClass getBlockClass();
 
     public abstract void putData(DataHelper data) throws IOException;
-    
-    @SideOnly(Side.CLIENT)
-    public IIcon getIcon(ForgeDirection dir) {
-        return BlockIcons.error;
+
+    @Override
+    public final Coord getCoord() {
+        return new Coord(this);
     }
+
+    @Override
+    public String toString() {
+        return getFactoryType() + " at " + getCoord();
+    }
+
+    public void representYoSelf() {
+        Core.loadBus(this);
+    }
+
+    public void mappingsChanged(FMLModIdMappingEvent event) { }
+
 
     @Override
     public FMLProxyPacket getDescriptionPacket() {
@@ -75,99 +88,8 @@ public abstract class TileEntityCommon extends TileEntity implements ICoord, IFa
         }
     }
 
-    protected void onRemove() {
-        if (this instanceof IChargeConductor) {
-            ((IChargeConductor) this).getCharge().remove();
-        }
-    }
-
-    public boolean canPlaceAgainst(EntityPlayer player, Coord c, int side) {
-        return true;
-    }
-    
-    public void onPlacedBy(EntityPlayer player, ItemStack is, int side, float hitX, float hitY, float hitZ) {
-        if (is != null && is.hasTagCompound()) {
-            loadFromStack(is);
-        }
-    }
-    
     public void loadFromStack(ItemStack is) {
         customName = ItemUtil.getCustomItemName(is);
-    }
-    
-    protected boolean removedByPlayer(EntityPlayer player, boolean willHarvest) {
-        return worldObj.setBlockToAir(xCoord, yCoord, zCoord);
-    }
-    
-    public void click(EntityPlayer entityplayer) {
-    }
-
-    /** Called when there's a block update. */
-    public void neighborChanged() {
-    }
-
-    public void neighborChanged(Block neighbor) {
-        neighborChanged();
-    }
-    
-    private long pulseTime = -1000;
-    
-    public void pulse() {
-        Coord here = getCoord();
-        if (here.w.isRemote) {
-            return;
-        }
-        long now = worldObj.getTotalWorldTime();
-        if (pulseTime + 4 >= now) {
-            return;
-        }
-        pulseTime = now;
-        here.notifyNeighbors();
-        here.scheduleUpdate(4);
-    }
-    
-    public boolean power() {
-        return pulseTime + 4 > worldObj.getTotalWorldTime();
-    }
-
-    public AxisAlignedBB getCollisionBoundingBoxFromPool() {
-        setBlockBounds(Core.registry.resource_block);
-        AxisAlignedBB ret = Core.registry.resource_block.getCollisionBoundingBoxFromPool(worldObj, xCoord, yCoord, zCoord);
-        Core.registry.resource_block.setBlockBounds(0, 0, 0, 1, 1, 1);
-        return ret;
-    }
-    
-    public boolean addCollisionBoxesToList(Block block, AxisAlignedBB aabb, List list, Entity entity) {
-        return false;
-    }
-
-    public MovingObjectPosition collisionRayTrace(Vec3 startVec, Vec3 endVec) {
-        return Blocks.stone.collisionRayTrace(worldObj, xCoord, yCoord, zCoord, startVec, endVec);
-    }
-
-    public void setBlockBounds(Block b) {
-        b.setBlockBounds(0, 0, 0, 1, 1, 1);
-    }
-
-    @Override
-    public Coord getCoord() {
-        return new Coord(this);
-    }
-
-    public boolean activate(EntityPlayer entityplayer, ForgeDirection side) {
-        FactoryType type = getFactoryType();
-
-        if (type.hasGui) {
-            if (!entityplayer.worldObj.isRemote) {
-                entityplayer.openGui(Core.instance, type.gui, worldObj, xCoord, yCoord, zCoord);
-            }
-            return true;
-        }
-        return false;
-    }
-
-    public boolean isBlockSolidOnSide(int side) {
-        return true;
     }
 
     @Override
@@ -187,7 +109,7 @@ public abstract class TileEntityCommon extends TileEntity implements ICoord, IFa
             e.printStackTrace();
         }
     }
-    
+
     @Override
     public final void readFromNBT(NBTTagCompound tag) {
         super.readFromNBT(tag);
@@ -237,7 +159,7 @@ public abstract class TileEntityCommon extends TileEntity implements ICoord, IFa
             tag.setTag(bufferName, buffer);
         }
     }
-    
+
     protected final void readBuffer(String bufferName, NBTTagCompound tag, ArrayList<ItemStack> outputBuffer) {
         outputBuffer.clear();
         if (tag.hasKey(bufferName)) {
@@ -251,7 +173,7 @@ public abstract class TileEntityCommon extends TileEntity implements ICoord, IFa
             }
         }
     }
-    
+
     public boolean handleMessageFromServer(MessageType messageType, ByteBuf input) throws IOException {
         return false;
     }
@@ -264,11 +186,104 @@ public abstract class TileEntityCommon extends TileEntity implements ICoord, IFa
     public void broadcastMessage(EntityPlayer who, MessageType messageType, Object... msg) {
         Core.network.broadcastMessage(who, getCoord(), messageType, msg);
     }
-    
+
     public void broadcastMessage(EntityPlayer who, FMLProxyPacket toSend) {
         Core.network.broadcastPacket(who, getCoord(), toSend);
     }
-    
+
+    public void spawnPacketReceived() { }
+
+    public boolean redrawOnSync() {
+        return false;
+    }
+
+
+    protected void onRemove() {
+        if (this instanceof IChargeConductor) {
+            ((IChargeConductor) this).getCharge().remove();
+        }
+    }
+
+    public boolean canPlaceAgainst(EntityPlayer player, Coord c, int side) {
+        return true;
+    }
+
+    public void onPlacedBy(EntityPlayer player, ItemStack is, int side, float hitX, float hitY, float hitZ) {
+        if (is != null && is.hasTagCompound()) {
+            loadFromStack(is);
+        }
+    }
+
+    protected boolean removedByPlayer(EntityPlayer player, boolean willHarvest) {
+        return worldObj.setBlockToAir(xCoord, yCoord, zCoord);
+    }
+
+    public void click(EntityPlayer entityplayer) {
+    }
+
+    /** Called when there's a block update. */
+    public void neighborChanged() {
+    }
+
+    public void neighborChanged(Block neighbor) {
+        neighborChanged();
+    }
+
+    private long pulseTime = -1000;
+
+    public void pulse() {
+        Coord here = getCoord();
+        if (here.w.isRemote) {
+            return;
+        }
+        long now = worldObj.getTotalWorldTime();
+        if (pulseTime + 4 >= now) {
+            return;
+        }
+        pulseTime = now;
+        here.notifyNeighbors();
+        here.scheduleUpdate(4);
+    }
+
+    public boolean power() {
+        return pulseTime + 4 > worldObj.getTotalWorldTime();
+    }
+
+    public AxisAlignedBB getCollisionBoundingBoxFromPool() {
+        setBlockBounds(Core.registry.resource_block);
+        AxisAlignedBB ret = Core.registry.resource_block.getCollisionBoundingBoxFromPool(worldObj, xCoord, yCoord, zCoord);
+        Core.registry.resource_block.setBlockBounds(0, 0, 0, 1, 1, 1);
+        return ret;
+    }
+
+    public boolean addCollisionBoxesToList(Block block, AxisAlignedBB aabb, List list, Entity entity) {
+        return false;
+    }
+
+    public MovingObjectPosition collisionRayTrace(Vec3 startVec, Vec3 endVec) {
+        return Blocks.stone.collisionRayTrace(worldObj, xCoord, yCoord, zCoord, startVec, endVec);
+    }
+
+    public void setBlockBounds(Block b) {
+        b.setBlockBounds(0, 0, 0, 1, 1, 1);
+    }
+
+    public boolean activate(EntityPlayer entityplayer, ForgeDirection side) {
+        FactoryType type = getFactoryType();
+
+        if (type.hasGui) {
+            if (!entityplayer.worldObj.isRemote) {
+                entityplayer.openGui(Core.instance, type.gui, worldObj, xCoord, yCoord, zCoord);
+            }
+            return true;
+        }
+        return false;
+    }
+
+    public boolean isBlockSolidOnSide(int side) {
+        return true;
+    }
+
     @Override
     public void invalidate() {
         if (this instanceof IChargeConductor) {
@@ -277,15 +292,15 @@ public abstract class TileEntityCommon extends TileEntity implements ICoord, IFa
         }
         super.invalidate();
     }
-    
+
     /** Looks like we're doing "face towards this axis" */
     public boolean rotate(ForgeDirection axis) {
         return false;
     }
-    
+
     public static final ForgeDirection[] empty_rotation_array = new ForgeDirection[0];
-    public static final ForgeDirection[] flat_rotation_array = new ForgeDirection[] { 
-        ForgeDirection.NORTH, ForgeDirection.SOUTH, ForgeDirection.WEST, ForgeDirection.EAST
+    public static final ForgeDirection[] flat_rotation_array = new ForgeDirection[] {
+            ForgeDirection.NORTH, ForgeDirection.SOUTH, ForgeDirection.WEST, ForgeDirection.EAST
     };
     public static final ForgeDirection[] full_rotation_array = new ForgeDirection[6];
     static {
@@ -296,53 +311,44 @@ public abstract class TileEntityCommon extends TileEntity implements ICoord, IFa
     public ForgeDirection[] getValidRotations() {
         return empty_rotation_array;
     }
-    
+
     //Requires the BlockClass to be MachineDynamicLightable
     public int getDynamicLight() {
         return 0;
     }
-    
+
     public int getComparatorValue(ForgeDirection side) {
         if (this instanceof IInventory) {
             return Container.calcRedstoneFromInventory((IInventory) this);
         }
         return 0;
     }
-    
-    @Override
-    public String toString() {
-        return getFactoryType() + " at " + getCoord();
-    }
-    
-    
+
+
     public ItemStack getDroppedBlock() {
         return new ItemStack(Core.registry.item_factorization, 1, getFactoryType().md);
     }
-    
+
     public ItemStack getPickedBlock() {
         return getDroppedBlock();
     }
-    
+
     /** Called when there's a comparatory-inventory-ish update */
     public void onNeighborTileChanged(int tilex, int tiley, int tilez) {}
-    
-    public void representYoSelf() {
-        Core.loadBus(this);
-    }
-
-    public void mappingsChanged(FMLModIdMappingEvent event) { }
-    
-    public void spawnDisplayTickParticles(Random rand) { }
 
     public boolean recolourBlock(ForgeDirection side, FzColor fzColor) { return false; }
 
-    public void spawnPacketReceived() { }
+    @SideOnly(Side.CLIENT)
+    public IIcon getIcon(ForgeDirection dir) {
+        return BlockIcons.error;
+    }
+
+
+
+    public void spawnDisplayTickParticles(Random rand) { }
 
     public void blockUpdateTick(Block myself) {
         worldObj.notifyBlockChange(xCoord, yCoord, zCoord, myself);
     }
 
-    public boolean redrawOnSync() {
-        return false;
-    }
 }
