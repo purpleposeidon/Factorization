@@ -1,3 +1,27 @@
+0.8.100
+  IMPORTANT: Back up your world before applying this update!
+    (Improvements have been made to serialization code, which may possibly break worlds. Please alert me to any issues so that I can fix them if needed.)
+    (Also I said in on the Deprecation page that servo memory will break. I believe I have in fact managed to avoid this.)
+  This is probably the last 1.7.10 release???
+  Made the /point command stay around for way longer.
+  Added a new IMC message for the DocViewer to improve the output of reflectively examined recipes
+  Posters no longer eat other posters.
+  Colossi spawn creepers instead of zombies.
+
+0.8.99d
+  Added /fzds setbiome
+  Added Erebus recipeViewer IMC
+  Sloped rails can now be walked up in tight spaces
+  Screwpump should be able to handle pumping more complicated tank/pipe/flooding setups
+  IC2 kinetic energy conversion ratios buffed
+  Fixed block undo imediately crashing servers
+  Fixed hideous artifact forge output update bug.
+  Fixed IC2/Railcraft recipeviewer IMC generation
+
+0.8.99c
+  Made bottles of potency cost 30 levels intead of 35
+  Hall of legends is now more configurable, and the delay is 5 days instead of 7.
+
 0.8.99b
   Fixed bugs! The server starts now!
 
@@ -39,7 +63,7 @@
   Added (kind of badly done) IC2 & Railcraft fzdoc recipe integration
   
 0.8.96b
-  Hotblocks: go into your inventory when broken; will break quickly if broken with the correct tool, but won't silk-touch
+  Blockundo: go into your inventory when broken; will break quickly if broken with the correct tool, but won't silk-touch
 
 0.8.96
   Deleted all anime references from the manual
