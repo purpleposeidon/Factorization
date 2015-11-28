@@ -5,6 +5,7 @@ import cpw.mods.fml.common.Optional;
 import factorization.common.FactoryType;
 import factorization.shared.Core;
 import factorization.shared.ItemFactorization;
+import factorization.util.LangUtil;
 import mods.railcraft.api.core.items.IMinecartItem;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockDispenser;
@@ -93,7 +94,7 @@ public class ItemMinecartDayBarrel extends ItemFactorization implements IMinecar
     public String getItemStackDisplayName(ItemStack is) {
         if (is.hasTagCompound()) {
             String name = Core.registry.daybarrel.getItemStackDisplayName(is);
-            return Core.translateWithCorrectableFormat("item.factorization:barrelCart.known", name);
+            return LangUtil.translateWithCorrectableFormat("item.factorization:barrelCart.known", name);
         }
         return super.getItemStackDisplayName(is);
     }

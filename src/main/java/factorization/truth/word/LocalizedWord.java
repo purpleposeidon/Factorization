@@ -1,9 +1,9 @@
 package factorization.truth.word;
 
-import factorization.shared.Core;
+import factorization.util.LangUtil;
 
 public class LocalizedWord extends TextWord {
     public LocalizedWord(String text) {
-        super(Core.translateThis(text));
+        super(LangUtil.translateThis(text));
     }
 }

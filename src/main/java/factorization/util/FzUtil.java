@@ -16,7 +16,6 @@ import net.minecraft.entity.ai.attributes.ServersideAttributeMap;
 import net.minecraft.item.ItemStack;
 import net.minecraft.world.World;
 import net.minecraftforge.common.DimensionManager;
-import net.minecraftforge.common.util.ForgeDirection;
 
 import java.awt.*;
 import java.awt.datatransfer.StringSelection;
@@ -175,11 +174,11 @@ public class FzUtil {
             value -= best.ratio * l;
             if (l > 0) {
                 if (!r.isEmpty()) r += " ";
-                String unit = Core.translateExact(best.unit + "." + l);
+                String unit = LangUtil.translateExact(best.unit + "." + l);
                 if (unit != null) {
                     r += unit;
                 } else {
-                    r += l + " " + Core.translateThis(best.unit);
+                    r += l + " " + LangUtil.translateThis(best.unit);
                 }
             } else if (value == 0 && !r.isEmpty()) {
                 return r;

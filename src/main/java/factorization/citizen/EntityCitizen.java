@@ -13,6 +13,7 @@ import factorization.shared.EntityFz;
 import factorization.shared.EntityReference;
 import factorization.util.InvUtil;
 import factorization.util.ItemUtil;
+import factorization.util.LangUtil;
 import factorization.util.SpaceUtil;
 import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
@@ -198,7 +199,7 @@ public class EntityCitizen extends EntityFz {
                 syncData();
                 break;
             case say:
-                current_text = Core.translateExact("fz.ent.citizen.say." + arg);
+                current_text = LangUtil.translateExact("fz.ent.citizen.say." + arg);
                 text_time = 0;
                 max_text_time = se.duration;
                 text_msg_index = ticks;

@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import factorization.api.datahelpers.*;
+import factorization.util.LangUtil;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import net.minecraft.client.Minecraft;
@@ -14,7 +15,6 @@ import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.renderer.texture.TextureManager;
 import net.minecraft.entity.Entity;
-import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.IIcon;
 
@@ -60,7 +60,7 @@ public class GuiDataConfig extends GuiScreen {
             this.object = object;
             this.objectType = object.getClass();
             this.posY = posY;
-            this.label = Core.translate(getTrans());
+            this.label = LangUtil.translate(getTrans());
             if (this.getClass() == Field.class) {
                 color = 0xAAAAAA;
             }
@@ -128,7 +128,7 @@ public class GuiDataConfig extends GuiScreen {
         @Override
         void initGui() {
             super.initGui();
-            button = button(0, Core.tryTranslate(getTrans() + "." + val, "" + val));
+            button = button(0, LangUtil.tryTranslate(getTrans() + "." + val, "" + val));
         }
         
         @Override
@@ -150,7 +150,7 @@ public class GuiDataConfig extends GuiScreen {
         }
         
         String transVal() {
-            return Core.tryTranslate(getTrans() + "." + val, "" + val);
+            return LangUtil.tryTranslate(getTrans() + "." + val, "" + val);
         }
         
         @Override
@@ -217,7 +217,7 @@ public class GuiDataConfig extends GuiScreen {
         @Override
         void initGui() {
             super.initGui();
-            button = button(0, Core.tryTranslate(getTrans() + "." + val, "" + val));
+            button = button(0, LangUtil.tryTranslate(getTrans() + "." + val, "" + val));
         }
         
         @Override

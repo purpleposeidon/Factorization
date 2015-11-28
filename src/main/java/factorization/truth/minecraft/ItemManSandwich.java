@@ -8,6 +8,7 @@ import factorization.truth.api.DocReg;
 import factorization.truth.api.IManwich;
 import factorization.util.EvilUtil;
 import factorization.util.ItemUtil;
+import factorization.util.LangUtil;
 import factorization.util.PlayerUtil;
 import net.minecraft.block.Block;
 import net.minecraft.client.renderer.texture.IIconRegister;
@@ -172,7 +173,7 @@ public class ItemManSandwich extends ItemFood implements IManwich {
         } else {
             key = "item.factorization:mansandwich.nom.delicious";
         }
-        String t = Core.translateThis(key);
+        String t = LangUtil.translateThis(key);
         Collections.addAll(list, t.split("\\\\n"));
         Core.brand(stack, player, list, verbose);
     }

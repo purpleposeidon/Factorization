@@ -2,18 +2,16 @@ package factorization.truth.gen;
 
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
-import factorization.shared.Core;
 import factorization.truth.DocumentationModule;
 import factorization.truth.api.IDocGenerator;
 import factorization.truth.api.ITypesetter;
 import factorization.truth.api.TruthError;
-import factorization.truth.word.ItemWord;
+import factorization.util.LangUtil;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.item.ItemStack;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.Map.Entry;
 
 public class ItemListViewer implements IDocGenerator {
@@ -46,7 +44,7 @@ public class ItemListViewer implements IDocGenerator {
                 continue;
             }
             String text = ct.getTabLabel();
-            ret += "\\nl\\link{cgi/items/" + text + "}{" + Core.translateThis("itemGroup." + text) + "}";
+            ret += "\\nl\\link{cgi/items/" + text + "}{" + LangUtil.translateThis("itemGroup." + text) + "}";
         }
         sb.write(ret);
     }
@@ -56,7 +54,7 @@ public class ItemListViewer implements IDocGenerator {
             out.write("\\title{All Items}");
         } else {
             String title = ct.getTabLabel();
-            title = Core.translateThis("itemGroup." + title);
+            title = LangUtil.translateThis("itemGroup." + title);
             out.write("\\title{" + title + "}");
         }
         out.write("\n\n");

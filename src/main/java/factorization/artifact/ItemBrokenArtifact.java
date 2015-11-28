@@ -6,6 +6,7 @@ import cpw.mods.fml.relauncher.SideOnly;
 import factorization.shared.Core;
 import factorization.shared.ItemFactorization;
 import factorization.util.ItemUtil;
+import factorization.util.LangUtil;
 import net.minecraft.client.renderer.texture.IIconRegister;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.player.EntityPlayer;
@@ -51,7 +52,7 @@ public class ItemBrokenArtifact extends ItemFactorization {
     public String getItemStackDisplayName(ItemStack is) {
         ItemStack held = get(is);
         if (held == null) return super.getUnlocalizedNameInefficiently(is);
-        return Core.translateWithCorrectableFormat("item.factorization:brokenArtifact.shards", held.getDisplayName());
+        return LangUtil.translateWithCorrectableFormat("item.factorization:brokenArtifact.shards", held.getDisplayName());
     }
 
     @Override
@@ -63,7 +64,7 @@ public class ItemBrokenArtifact extends ItemFactorization {
         if (held == null) return;
         ItemStack fresh = new ItemStack(held.getItem());
         ItemStack repair = new ItemStack(getRepairItem(fresh));
-        String got = Core.translateWithCorrectableFormat("item.factorization:brokenArtifact.repairhint", repair.getDisplayName());
+        String got = LangUtil.translateWithCorrectableFormat("item.factorization:brokenArtifact.repairhint", repair.getDisplayName());
         Collections.addAll(list, got.split("\\\\n"));
     }
 

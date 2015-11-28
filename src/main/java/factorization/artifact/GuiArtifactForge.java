@@ -2,6 +2,7 @@ package factorization.artifact;
 
 import factorization.shared.Core;
 import factorization.shared.NetworkFactorization;
+import factorization.util.LangUtil;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiTextField;
 import net.minecraft.client.gui.inventory.GuiContainer;
@@ -131,7 +132,7 @@ public class GuiArtifactForge extends GuiContainer {
         int i = 1;
         while (true) {
             String key = "factorization.forge.err." + err + "." + i;
-            String msg = Core.translateExact(key);
+            String msg = LangUtil.translateExact(key);
             if (msg == null) {
                 if (i > 1) break;
                 msg = key;

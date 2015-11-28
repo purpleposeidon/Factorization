@@ -3,7 +3,7 @@ package factorization.sockets;
 import java.util.ArrayList;
 import java.util.List;
 
-import factorization.shared.Core;
+import factorization.util.LangUtil;
 import net.minecraft.client.renderer.texture.IIconRegister;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.player.EntityPlayer;
@@ -13,7 +13,6 @@ import net.minecraft.util.IIcon;
 import net.minecraft.world.World;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
-import factorization.api.Coord;
 import factorization.common.FactoryType;
 import factorization.shared.Core.TabType;
 import factorization.shared.ItemFactorization;
@@ -114,6 +113,6 @@ public class ItemSocketPart extends ItemFactorization {
     
     @Override
     protected void addExtraInformation(ItemStack is, EntityPlayer player, List list, boolean verbose) {
-        list.add(Core.translate("item.factorization:socket_info"));
+        list.add(LangUtil.translate("item.factorization:socket_info"));
     }
 }

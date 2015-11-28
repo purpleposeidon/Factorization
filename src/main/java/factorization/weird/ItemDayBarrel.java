@@ -2,6 +2,7 @@ package factorization.weird;
 
 import java.util.List;
 
+import factorization.util.LangUtil;
 import net.minecraft.client.renderer.texture.IIconRegister;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
@@ -39,8 +40,8 @@ public class ItemDayBarrel extends ItemBlockProxy {
         if (upgrade != Type.NORMAL) {
             lookup = "factorization.factoryBlock.DAYBARREL.format2";
         }
-        String type = Core.translate("factorization.factoryBlock.DAYBARREL." + upgrade);
-        return Core.translateWithCorrectableFormat(lookup, type, TileEntityDayBarrel.getLog(is).getDisplayName());
+        String type = LangUtil.translate("factorization.factoryBlock.DAYBARREL." + upgrade);
+        return LangUtil.translateWithCorrectableFormat(lookup, type, TileEntityDayBarrel.getLog(is).getDisplayName());
     }
     
     @Override
@@ -48,7 +49,7 @@ public class ItemDayBarrel extends ItemBlockProxy {
     protected void addExtraInformation(ItemStack is, EntityPlayer player, List list, boolean verbose) {
         Type upgrade = TileEntityDayBarrel.getUpgrade(is);
         if (upgrade == Type.SILKY) {
-            list.add(Core.translateThis("factorization.factoryBlock.DAYBARREL.SILKY.silkhint"));
+            list.add(LangUtil.translateThis("factorization.factoryBlock.DAYBARREL.SILKY.silkhint"));
             TileEntityDayBarrel db = (TileEntityDayBarrel) FactoryType.DAYBARREL.getRepresentative();
             db.loadFromStack(is);
             int count = db.getItemCount();

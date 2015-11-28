@@ -7,11 +7,11 @@ import factorization.common.ItemIcons;
 import factorization.shared.*;
 import factorization.util.DataUtil;
 import factorization.util.ItemUtil;
+import factorization.util.LangUtil;
 import net.minecraft.block.Block;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
-import net.minecraft.init.Items;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
@@ -101,7 +101,7 @@ public class ItemGlazeBucket extends ItemFactorization {
         if (isMimic(is)) {
             ItemStack hint = getSource(is);
             if (hint != null && hint.getItem() != null) {
-                return Core.translate(getUnlocalizedName() + ".mimicry_prefix") + " " + hint.getDisplayName();
+                return LangUtil.translate(getUnlocalizedName() + ".mimicry_prefix") + " " + hint.getDisplayName();
             }
         }
         return base;

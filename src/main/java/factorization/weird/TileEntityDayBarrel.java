@@ -611,7 +611,7 @@ public class TileEntityDayBarrel extends TileEntityFactorization implements ISor
         boolean veryNew = taint(held);
 
         if (!itemMatch(held)) {
-            if (Core.getTranslationKey(held.getItem()).equals(Core.getTranslationKey(item))) {
+            if (LangUtil.getTranslationKey(held.getItem()).equals(LangUtil.getTranslationKey(item))) {
                 new Notice(notice_target, "That item is different").send(entityplayer);
             } else {
                 info(entityplayer);

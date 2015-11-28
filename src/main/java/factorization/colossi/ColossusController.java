@@ -11,10 +11,10 @@ import factorization.fzds.interfaces.IDeltaChunk;
 import factorization.fzds.interfaces.Interpolation;
 import factorization.shared.Core;
 import factorization.shared.EntityFz;
+import factorization.util.LangUtil;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.boss.IBossDisplayData;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.ChatComponentTranslation;
 import net.minecraft.util.DamageSource;
@@ -355,7 +355,7 @@ public class ColossusController extends EntityFz implements IBossDisplayData, ID
         }
         if (max_names == -1) {
             try {
-                max_names = Integer.parseInt(Core.translate("colossus.name.count"));
+                max_names = Integer.parseInt(LangUtil.translate("colossus.name.count"));
             } catch (NumberFormatException e) {
                 max_names = 1;
             } 

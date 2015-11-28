@@ -73,8 +73,7 @@ import java.util.*;
 public class Core {
     public static final String modId = "factorization";
     public static final String name = "Factorization";
-    public static final String version = "@FZVERSION@";
-    //The above comment is replaced by the build script.
+    public static final String version = "@FZVERSION@"; // Modified by build script, but we have to live with this in dev environ.
 
     public Core() {
         instance = this;
@@ -166,6 +165,30 @@ public class Core {
     }
 
     void checkForge() { }
+
+    private static void validateEnvironment() {
+        if (!LoadingPlugin.pluginInvoked) {
+            String fml = "-Dfml.coreMods.load=factorization.coremod.LoadingPlugin";
+            String ignore = "-Dfz.ignoreMissingCoremod=true";
+            if ("".equals(System.getProperty("fz.ignoreMissingCoremod", ""))) {
+                String dev = dev_environ ? "You're in a dev environ, so this is to be expected.\n" : "";
+                throw new IllegalStateException("Coremod didn't load! Is your installation broken?\n" +
+                        "Weird. It really is supposed to load, y'know...\n" +
+                        "Anyways, try adding this flag to the JVM command line: " + fml + "\n" +
+                        dev +
+                        "(If the '-Dfml.coreMods.load' property is already being passed with another coremod, instead add the FZ coremod class with a comma.)\n" +
+                        "If you want to force loading to continue anyways, without the coremod, " +
+                        "pass the following flag, but many things (including blowing up diamond blocks) will be broken: " + ignore);
+            } else {
+                System.err.println("Coremod did not load! But continuing anyways; as per VM flag " + ignore);
+            }
+        }
+        if (!dev_environ) {
+            if ("".equals(System.getProperty("fz.dontVerifyAt", ""))) {
+                AtVerifier.verify();
+            }
+        }
+    }
 
     @EventHandler
     public void load(FMLPreInitializationEvent event) {
@@ -269,7 +292,7 @@ public class Core {
         InputStream is = null;
         final String dead_list = "/factorization_dead_items";
         try {
-            HashSet<String> found = new HashSet();
+            HashSet<String> found = new HashSet<String>();
             URL url = getClass().getResource(dead_list);
             is = url.openStream();
             BufferedReader br = new BufferedReader(new InputStreamReader(is));
@@ -284,7 +307,7 @@ public class Core {
         } catch (IOException e) {
             Core.logSevere("Failed to load " + dead_list);
             e.printStackTrace();
-            return new HashSet();
+            return new HashSet<String>();
         } finally {
             FzUtil.closeNoisily("closing " + dead_list, is);
         }
@@ -318,6 +341,7 @@ public class Core {
     
     @EventHandler
     public void replaceDerpyNames(FMLMissingMappingsEvent event) {
+        // NORELEASE: Can remove in 1.8
         Object[][] corrections = new Object[][] {
                 {"factorization:tile.null", Core.registry.factory_block},
                 {"factorization:FZ factory", Core.registry.factory_block},
@@ -446,7 +470,7 @@ public class Core {
         if (player != null && proxy.isClientHoldingShift()) {
             addTranslationHints(name + ".shift", list, shiftFormat);
         }
-        ArrayList<String> untranslated = new ArrayList();
+        ArrayList<String> untranslated = new ArrayList<String>();
         if (it instanceof ItemFactorization) {
             ((ItemFactorization) it).addExtraInformation(is, player, untranslated, verbose);
         }
@@ -469,7 +493,7 @@ public class Core {
     }
     
     
-    public static enum TabType {
+    public enum TabType {
         ART, CHARGE, OREP, SERVOS, ROCKETRY, TOOLS, BLOCKS, MATERIALS, COLOSSAL, ARTIFACT;
     }
     
@@ -489,111 +513,7 @@ public class Core {
         block.setCreativeTab(tabFactorization);
         return block;
     }
-    
-    public static String getProperKey(ItemStack is) {
-        String n = is.getUnlocalizedName();
-        if (n == null || n.length() == 0) {
-            n = "???";
-        }
-        return n;
-    }
-    
-    public static String getTranslationKey(ItemStack is) {
-        //Get the key for translating is.
-        if (is == null) {
-            return "<null itemstack; bug?>";
-        }
-        try {
-            String s = is.getDisplayName();
-            if (s != null && s.length() > 0) {
-                return s;
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        String key = getProperKey(is);
-        if (canTranslate(key + ".name")) {
-            return key + ".name";
-        }
-        if (canTranslate(key)) {
-            return key;
-        }
-        return key + ".name";
-    }
-    
-    static boolean canTranslate(String str) {
-        String ret = StatCollector.translateToLocal(str);
-        if (ret == null || ret.length() == 0) {
-            return false;
-        }
-        return !ret.equals(str);
-    }
-    
-    public static String getTranslationKey(Item i) {
-        if (i == null) {
-            return "<null item; bug?>";
-        }
-        return i.getUnlocalizedName() + ".name";
-    }
-    
-    public static String translate(String key) {
-        return ("" + StatCollector.translateToLocal(key + ".name")).trim();
-    }
-    
-    public static String translateThis(String key) {
-        return ("" + StatCollector.translateToLocal(key)).trim();
-    }
-    
-    public static String translateExact(String key) {
-        if (key != null && key.startsWith("§UNIT§")) {
-            // §UNIT§ TIME 2 123456789
-            String[] bits = key.split(" ");
-            if (bits.length != 4) {
-                return key;
-            }
-            String unit = bits[1];
-            int maxParts = Integer.parseInt(bits[2]);
-            Long val = Long.parseLong(bits[3]);
-            return FzUtil.unitify(unit, val, maxParts);
-        }
-        String ret = StatCollector.translateToLocal(key);
-        //noinspection StringEquality: StatCollector will return the exact same object if translation fails
-        if (ret == key) {
-            return null;
-        }
-        return ret;
-    }
-    
-    public static String tryTranslate(String key, String fallback) {
-        String ret = translateExact(key);
-        if (ret == null) {
-            return fallback;
-        }
-        return ret;
-    }
-    
-    public static boolean canTranslateExact(String key) {
-        return translateExact(key) != null;
-    }
-    
-    public static String translateWithCorrectableFormat(String key, Object... params) {
-        String format = translate(key);
-        String ret = String.format(format, params);
-        String correctedTranslation = translateExact("factorization.replace:" + ret);
-        if (correctedTranslation != null) {
-            return correctedTranslation;
-        }
-        return ret;
-    }
-    
-    public static void sendChatMessage(boolean raw, ICommandSender sender, String msg) {
-        sender.addChatMessage(raw ? new ChatComponentText(msg) : new ChatComponentTranslation(msg));
-    }
-    
-    public static void sendUnlocalizedChatMessage(ICommandSender sender, String format, Object... params) {
-        sender.addChatMessage(new ChatComponentTranslation(format, params));
-    }
-    
+
     @SideOnly(Side.CLIENT)
     public static IIcon texture(IIconRegister reg, String name) {
         name = name.replace('.', '/');
@@ -623,29 +543,5 @@ public class Core {
         //@SubscribeEvent is the annotation the eventbus, *NOT* @EventHandler; that one is for mod containers.
         FMLCommonHandler.instance().bus().register(obj);
         MinecraftForge.EVENT_BUS.register(obj);
-    }
-    
-    private static void validateEnvironment() {
-        if (!LoadingPlugin.pluginInvoked) {
-            String fml = "-Dfml.coreMods.load=factorization.coremod.LoadingPlugin";
-            String ignore = "-Dfz.ignoreMissingCoremod=true";
-            if ("".equals(System.getProperty("fz.ignoreMissingCoremod", ""))) {
-                String dev = dev_environ ? "You're in a dev environ, so this is to be expected.\n" : "";
-                throw new IllegalStateException("Coremod didn't load! Is your installation broken?\n" +
-                        "Weird. It really is supposed to load, y'know...\n" +
-                        "Anyways, try adding this flag to the JVM command line: " + fml + "\n" +
-                        dev +
-                        "(If the '-Dfml.coreMods.load' property is already being passed with another coremod, instead add the FZ coremod class with a comma.)\n" +
-                        "If you want to force loading to continue anyways, without the coremod, " +
-                        "pass the following flag, but many things (including blowing up diamond blocks) will be broken: " + ignore);
-            } else {
-                System.err.println("Coremod did not load! But continuing anyways; as per VM flag " + ignore);
-            }
-        }
-        if (!dev_environ) {
-            if ("".equals(System.getProperty("fz.dontVerifyAt", ""))) {
-                AtVerifier.verify();
-            }
-        }
     }
 }

@@ -4,6 +4,7 @@ import java.lang.ref.WeakReference;
 import java.util.*;
 import java.util.Map.Entry;
 
+import factorization.util.LangUtil;
 import factorization.util.PlayerUtil;
 import factorization.util.SpaceUtil;
 import net.minecraft.client.Minecraft;
@@ -179,7 +180,7 @@ public class FZDSCommand extends CommandBase {
         }
         
         void sendChat(String msg) {
-            Core.sendChatMessage(true, sender, msg);
+            LangUtil.sendChatMessage(true, sender, msg);
         }
     }
     
@@ -222,7 +223,7 @@ public class FZDSCommand extends CommandBase {
             boolean op = PlayerUtil.isPlayerOpped(player);
             boolean cr = player.capabilities.isCreativeMode;
             if (!(op || cr)) {
-                Core.sendChatMessage(true, sender, "You must be op or in creative mode to use these commands");
+                LangUtil.sendChatMessage(true, sender, "You must be op or in creative mode to use these commands");
                 return;
             }
         }
@@ -239,7 +240,7 @@ public class FZDSCommand extends CommandBase {
                 }
             }
         }
-        Core.sendChatMessage(true, sender, "Not a command");
+        LangUtil.sendChatMessage(true, sender, "Not a command");
     }
     
     private static WeakReference<IDeltaChunk> currentSelection = new WeakReference<IDeltaChunk>(null);
