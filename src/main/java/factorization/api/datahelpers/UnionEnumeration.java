@@ -54,7 +54,17 @@ public class UnionEnumeration {
     final Map<Class<?>, Integer> indexMap = new HashMap<Class<?>, Integer>();
 
     public byte getIndex(Object val) {
-        return (byte) (int) indexMap.get(val.getClass());
+        Class k = val.getClass();
+        Integer integer;
+        while (true) {
+            if (k == null) {
+                throw new IllegalArgumentException("Type is not registered to be serialized: " + val + ", a " + val.getClass());
+            }
+            integer = indexMap.get(val.getClass());
+            if (integer != null) break;
+            k = k.getSuperclass();
+        }
+        return (byte) (int) integer;
     }
 
     public Object byIndex(byte b) {

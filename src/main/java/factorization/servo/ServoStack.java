@@ -142,7 +142,8 @@ public class ServoStack implements IDataSerializable, Iterable {
         return contents.size();
     }
 
-    static final UnionEnumeration stackableTypes = UnionEnumeration.build(
+    static UnionEnumeration buildUnion() {
+        UnionEnumeration ret = UnionEnumeration.build(
             // These odd void types were space for expanding. Not hard to be backwards compat.
             Void.TYPE, null, // 0
             Void.TYPE, null, // 1
@@ -163,10 +164,12 @@ public class ServoStack implements IDataSerializable, Iterable {
             Double.class, 0D,
             String.class, "",
             FzColor.class, FzColor.BLACK);
-    static {
-        if (stackableTypes.getIndex(false) != 10) throw new AssertionError(); // Should be 10 for compat
-        if (stackableTypes.getIndex(new GenericPlaceholder()) != 9) throw new AssertionError(); // And likewise for insn
+        if (ret.getIndex(false) != 10) throw new AssertionError(); // Should be 10 for compat
+        if (ret.getIndex(new GenericPlaceholder()) != 9) throw new AssertionError(); // And likewise for insn
+        return ret;
     }
+
+    static final UnionEnumeration stackableTypes = buildUnion();
 
     @Override
     public IDataSerializable serialize(String prefix, DataHelper data) throws IOException {

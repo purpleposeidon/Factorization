@@ -222,13 +222,13 @@ public abstract class ServoComponent implements IDataSerializable {
     static {
         //registerRecursivelyFromPackage("factorization.common.servo.actuators");
         //registerRecursivelyFromPackage("factorization.common.servo.instructions");
-        Class[] decorations = new Class[] {
+        Class<? extends ServoComponent>[] decorations = (Class<? extends ServoComponent>[])new Class[] {
                 WoodenServoGrate.class,
                 GlassServoGrate.class,
                 IronServoGrate.class,
                 ScanColor.class,
         };
-        Class[] instructions = new Class[] {
+        Class<? extends ServoComponent>[] instructions = (Class<? extends ServoComponent>[])new Class[] {
                 // Color by class, sort by color
                 // Cyan: Motion instructions
                 EntryControl.class,
@@ -261,8 +261,8 @@ public abstract class ServoComponent implements IDataSerializable {
                 InstructionGroup.class,
         };
 
-        for (Class cl : decorations) register(cl, sorted_decors);
-        for (Class cl : instructions) register(cl, sorted_instructions);
+        for (Class<? extends ServoComponent> cl : decorations) register(cl, sorted_decors);
+        for (Class<? extends ServoComponent> cl : instructions) register(cl, sorted_instructions);
     }
     
     public static void setupRecipes() {
