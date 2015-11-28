@@ -1,13 +1,11 @@
 package factorization.api.datahelpers;
 
-import net.minecraft.item.ItemStack;
-
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
-public class DataBackup extends DataHelper {
-    Map<String, Object> fields = new HashMap();
+public class DataBackup extends MergedDataHelper {
+    Map<String, Object> fields = new HashMap<String, Object>();
     boolean isReading = true; //Else: isRestoring
     
     @Override
@@ -35,15 +33,5 @@ public class DataBackup extends DataHelper {
     
     public void restoring() {
         isReading = false;
-    }
-
-    @Override
-    public ItemStack[] putItemArray(ItemStack[] value) throws IOException {
-        return putImplementation(value);
-    }
-
-    @Override
-    public int[] putIntArray(int[] value) throws IOException {
-        return putImplementation(value);
     }
 }

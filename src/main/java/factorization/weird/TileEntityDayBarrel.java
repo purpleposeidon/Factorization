@@ -98,7 +98,16 @@ public class TileEntityDayBarrel extends TileEntityFactorization implements ISor
     @Override
     public void putData(DataHelper data) throws IOException {
         item = data.as(Share.VISIBLE, "item").putItemStack(item);
-        int count = data.as(Share.VISIBLE, "count").putInt(getItemCount());
+        if (item != null && item.getItem() == null) {
+            NORELEASE.breakpoint();
+        }
+        int count;
+        try {
+            count = data.as(Share.VISIBLE, "count").putInt(getItemCount());
+        } catch (Throwable t) {
+            t.printStackTrace();
+            count = 0;
+        }
         orientation = data.as(Share.VISIBLE, "dir").putFzOrientation(orientation);
         if (data.isReader()) {
             setItemCount(count);

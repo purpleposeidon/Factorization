@@ -1,14 +1,13 @@
 package factorization.api.datahelpers;
 
-import factorization.util.DataUtil;
-import io.netty.buffer.ByteBuf;
-
-import java.io.IOException;
-
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
 import cpw.mods.fml.common.network.ByteBufUtils;
 import cpw.mods.fml.relauncher.Side;
+import factorization.util.DataUtil;
+import io.netty.buffer.ByteBuf;
+import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NBTTagCompound;
+
+import java.io.IOException;
 
 public class DataInByteBuf extends DataHelper {
     private final ByteBuf dis;
@@ -23,34 +22,55 @@ public class DataInByteBuf extends DataHelper {
     protected boolean shouldStore(Share share) {
         return share.is_public;
     }
-    
+
     @Override
     public boolean isReader() {
         return true;
     }
-    
+
     @Override
-    protected <E> E putImplementation(E o) throws IOException {
-        if (o instanceof Boolean) {
-            return (E) (Boolean) dis.readBoolean();
-        } else if (o instanceof Byte) {
-            return (E) (Byte) dis.readByte();
-        } else if (o instanceof Short) {
-            return (E) (Short) dis.readShort();
-        } else if (o instanceof Integer) {
-            return (E) (Integer) dis.readInt();
-        } else if (o instanceof Long) {
-            return (E) (Long) dis.readLong();
-        } else if (o instanceof Float) {
-            return (E) (Float) dis.readFloat();
-        } else if (o instanceof Double) {
-            return (E) (Double) dis.readDouble();
-        } else if (o instanceof String) {
-            return (E) (String) ByteBufUtils.readUTF8String(dis);
-        } else if (o instanceof NBTTagCompound) {
-            return (E) (NBTTagCompound) ByteBufUtils.readTag(dis);
-        }
-        return o;
+    public boolean putBoolean(boolean value) throws IOException {
+        return dis.readBoolean();
+    }
+
+    @Override
+    public byte putByte(byte value) throws IOException {
+        return dis.readByte();
+    }
+
+    @Override
+    public short putShort(short value) throws IOException {
+        return dis.readShort();
+    }
+
+    @Override
+    public int putInt(int value) throws IOException {
+        return dis.readInt();
+    }
+
+    @Override
+    public long putLong(long value) throws IOException {
+        return dis.readLong();
+    }
+
+    @Override
+    public float putFloat(float value) throws IOException {
+        return dis.readFloat();
+    }
+
+    @Override
+    public double putDouble(double value) throws IOException {
+        return dis.readDouble();
+    }
+
+    @Override
+    public String putString(String value) throws IOException {
+        return ByteBufUtils.readUTF8String(dis);
+    }
+
+    @Override
+    public NBTTagCompound putTag(NBTTagCompound value) throws IOException {
+        return ByteBufUtils.readTag(dis);
     }
 
     @Override

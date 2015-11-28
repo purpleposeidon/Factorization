@@ -9,7 +9,10 @@ public class TileEntityFzNull extends TileEntity {
     @Override
     public void readFromNBT(NBTTagCompound tag) {
         // Hack for pistronics: load the TE specified by that tag at this position.
-        if (worldObj == null) return;
+        if (worldObj == null) {
+            super.readFromNBT(tag);
+            return;
+        }
         if (mapName.equals(tag.getString("id"))) return; // Avoid recursion death
         {
             int origX = tag.getInteger("x");

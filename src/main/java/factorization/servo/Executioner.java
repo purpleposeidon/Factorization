@@ -118,9 +118,9 @@ public class Executioner {
     }
     
     void putData(DataHelper data) throws IOException {
-        argumentStack = data.as(Share.VISIBLE, "stack4" /* 4 is for compatibility */).put(argumentStack);
-        pendingInstructions = data.as(Share.VISIBLE, "pendingInstructions").put(pendingInstructions);
-        enterBlockInstructions = data.as(Share.VISIBLE, "enterBlockInstructions").put(enterBlockInstructions);
+        argumentStack = data.as(Share.VISIBLE, "stack4" /* 4 is for compatibility */).putIDS(argumentStack);
+        pendingInstructions = data.as(Share.VISIBLE, "pendingInstructions").putIDS(pendingInstructions);
+        enterBlockInstructions = data.as(Share.VISIBLE, "enterBlockInstructions").putIDS(enterBlockInstructions);
         jmp = data.as(Share.VISIBLE, "jmp").putByte(jmp);
         cpu_blocked = data.as(Share.VISIBLE, "cpuBlock").putBoolean(cpu_blocked);
         entry_action = data.as(Share.VISIBLE, "entryAction").putEnum(entry_action);

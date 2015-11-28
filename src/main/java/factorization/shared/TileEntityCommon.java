@@ -59,7 +59,6 @@ public abstract class TileEntityCommon extends TileEntity implements ICoord, IFa
 
     @Override
     public FMLProxyPacket getDescriptionPacket() {
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
         ByteBuf buf = Unpooled.buffer();
         DataOutByteBuf data = new DataOutByteBuf(buf, Side.SERVER);
         try {

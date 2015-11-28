@@ -231,12 +231,12 @@ public class DimensionSliceEntity extends IDeltaChunk implements IFzdsEntryContr
                 initCorners();
             }
         }
-        /*parent =*/ data.as(Share.VISIBLE, "parent").put(parent);
+        /*parent =*/ data.as(Share.VISIBLE, "parent").putIDS(parent);
         parentShadowOrigin = data.as(Share.VISIBLE, "parentShadowOrigin").putVec3(parentShadowOrigin);
         entityUniqueID = data.as(Share.VISIBLE, "entityUUID").putUUID(entityUniqueID);
         
-        rotationStart = data.as(Share.VISIBLE, "rotStart").put(rotationStart);
-        rotationEnd = data.as(Share.VISIBLE, "rotEnd").put(rotationEnd);
+        rotationStart = data.as(Share.VISIBLE, "rotStart").putIDS(rotationStart);
+        rotationEnd = data.as(Share.VISIBLE, "rotEnd").putIDS(rotationEnd);
         orderTimeStart = data.as(Share.VISIBLE, "rotOrdStart").putLong(orderTimeStart);
         orderTimeEnd = data.as(Share.VISIBLE, "rotOrdEnd").putLong(orderTimeEnd);
         orderInterp = data.as(Share.VISIBLE, "orderInterp").putEnum(orderInterp);

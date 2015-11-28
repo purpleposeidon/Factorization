@@ -29,7 +29,7 @@ public class InstructionGroup extends Instruction {
     @Override
     public IDataSerializable serialize(String prefix, DataHelper data)
             throws IOException {
-        stuff = data.as(Share.VISIBLE, "contents").put(stuff);
+        stuff = data.as(Share.VISIBLE, "contents").putIDS(stuff);
         return this;
     }
 

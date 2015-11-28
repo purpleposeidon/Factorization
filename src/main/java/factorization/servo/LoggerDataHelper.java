@@ -3,11 +3,12 @@ package factorization.servo;
 import java.io.IOException;
 
 import factorization.api.datahelpers.DataHelper;
+import factorization.api.datahelpers.MergedDataHelper;
 import factorization.api.datahelpers.Share;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.Vec3;
 
-public class LoggerDataHelper extends DataHelper {
+public class LoggerDataHelper extends MergedDataHelper {
     ServoMotor motor;
     public boolean hadError = false;
     
@@ -24,10 +25,10 @@ public class LoggerDataHelper extends DataHelper {
     public boolean isReader() {
         return false;
     }
-    
+
     @Override
-    public boolean isWriter() {
-        return false;
+    public boolean isValid() {
+        return false; // Hmm. Not sure!
     }
 
     @Override
@@ -39,15 +40,5 @@ public class LoggerDataHelper extends DataHelper {
     public void log(String message) {
         motor.putError(message);
         hadError = true;
-    }
-
-    @Override
-    public ItemStack[] putItemArray(ItemStack[] value) throws IOException {
-        return putImplementation(value);
-    }
-
-    @Override
-    public int[] putIntArray(int[] value) throws IOException {
-        return putImplementation(value);
     }
 }

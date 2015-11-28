@@ -18,7 +18,7 @@ import java.io.DataInput;
 import java.io.IOException;
 
 public final class DataUtil {
-    public static final ItemStack NULL_ITEM = new ItemStack((Item) null, 0, 0);
+    public static final ItemStack NULL_ITEM = new ItemStack((Item) null, 0, 0); // Forge may throw a huge hissy fit over this at some point.
 
     public static void writeTank(NBTTagCompound tag, FluidTank tank, String name) {
         FluidStack ls = tank.getFluid();

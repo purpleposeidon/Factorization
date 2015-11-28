@@ -74,7 +74,7 @@ public abstract class ServoComponent implements IDataSerializable {
         return o;
     }
 
-    static ServoComponent load(NBTTagCompound tag) {
+    protected static ServoComponent load(NBTTagCompound tag) {
         if (tag == null || !tag.hasKey(componentTagKey)) {
             return null;
         }

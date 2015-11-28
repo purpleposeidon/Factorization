@@ -29,31 +29,59 @@ public class DataOutByteBuf extends DataHelper {
     public boolean isReader() {
         return false;
     }
-    
+
     @Override
-    protected <E> E putImplementation(E value) throws IOException {
-        if (value instanceof Boolean) {
-            dos.writeBoolean((Boolean)value);
-        } else if (value instanceof Byte) {
-            dos.writeByte((Byte)value);
-        } else if (value instanceof Short) {
-            dos.writeShort((Short)value);
-        } else if (value instanceof Integer) {
-            dos.writeInt((Integer)value);
-        } else if (value instanceof Long) {
-            dos.writeLong((Long) value);
-        } else if (value instanceof Float) {
-            dos.writeFloat((Float) value);
-        } else if (value instanceof Double) {
-            dos.writeDouble((Double) value);
-        } else if (value instanceof String) {
-            ByteBufUtils.writeUTF8String(dos, (String) value);
-        } else if (value instanceof NBTTagCompound) {
-            ByteBufUtils.writeTag(dos, (NBTTagCompound) value);
-        } else if (value == null) {
-            throw new NullPointerException("Can't put null!");
-        }
-        return (E) value;
+    public boolean putBoolean(boolean value) throws IOException {
+        dos.writeBoolean(value);
+        return value;
+    }
+
+    @Override
+    public byte putByte(byte value) throws IOException {
+        dos.writeByte(value);
+        return value;
+    }
+
+    @Override
+    public short putShort(short value) throws IOException {
+        dos.writeShort(value);
+        return value;
+    }
+
+    @Override
+    public int putInt(int value) throws IOException {
+        dos.writeInt(value);
+        return value;
+    }
+
+    @Override
+    public long putLong(long value) throws IOException {
+        dos.writeLong(value);
+        return value;
+    }
+
+    @Override
+    public float putFloat(float value) throws IOException {
+        dos.writeFloat(value);
+        return value;
+    }
+
+    @Override
+    public double putDouble(double value) throws IOException {
+        dos.writeDouble(value);
+        return value;
+    }
+
+    @Override
+    public String putString(String value) throws IOException {
+        ByteBufUtils.writeUTF8String(dos, value);
+        return value;
+    }
+
+    @Override
+    public NBTTagCompound putTag(NBTTagCompound value) throws IOException {
+        ByteBufUtils.writeTag(dos, value);
+        return value;
     }
 
     @Override

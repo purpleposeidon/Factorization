@@ -22,7 +22,61 @@ public class DataOutNBT extends DataHelperNBT {
     public NBTTagCompound getTag() {
         return tag;
     }
-    
+
+    @Override
+    public boolean putBoolean(boolean value) throws IOException {
+        tag.setBoolean(name, value);
+        return value;
+    }
+
+    @Override
+    public byte putByte(byte value) throws IOException {
+        tag.setByte(name, value);
+        return value;
+    }
+
+    @Override
+    public short putShort(short value) throws IOException {
+        tag.setShort(name, value);
+        return value;
+    }
+
+    @Override
+    public int putInt(int value) throws IOException {
+        tag.setInteger(name, value);
+        return value;
+    }
+
+    @Override
+    public long putLong(long value) throws IOException {
+        tag.setLong(name, value);
+        return value;
+    }
+
+    @Override
+    public float putFloat(float value) throws IOException {
+        tag.setFloat(name, value);
+        return value;
+    }
+
+    @Override
+    public double putDouble(double value) throws IOException {
+        tag.setDouble(name, value);
+        return value;
+    }
+
+    @Override
+    public String putString(String value) throws IOException {
+        tag.setString(name, value);
+        return value;
+    }
+
+    @Override
+    public NBTTagCompound putTag(NBTTagCompound value) throws IOException {
+        tag.setTag(name, value);
+        return value;
+    }
+
     @Override
     protected boolean shouldStore(Share share) {
         return !share.is_transient;
@@ -32,31 +86,6 @@ public class DataOutNBT extends DataHelperNBT {
     public boolean isReader() {
         return false;
     }
-    
-    @Override
-    protected <E> E putImplementation(E value) throws IOException {
-        if (value instanceof Boolean) {
-            tag.setBoolean(name, (Boolean) value);
-        } else if (value instanceof Byte) {
-            tag.setByte(name, (Byte) value);
-        } else if (value instanceof Short) {
-            tag.setShort(name, (Short) value);
-        } else if (value instanceof Integer) {
-            tag.setInteger(name, (Integer) value);
-        } else if (value instanceof Long) {
-            tag.setLong(name, (Long) value);
-        } else if (value instanceof Float) {
-            tag.setFloat(name, (Float) value);
-        } else if (value instanceof Double) {
-            tag.setDouble(name, (Double) value);
-        } else if (value instanceof String) {
-            tag.setString(name, (String) value);
-        } else if (value instanceof NBTTagCompound) {
-            tag.setTag(name, (NBTTagCompound) value);
-        }
-        return value;
-    }
-
 
     @Override
     protected ArrayList<ItemStack> putItemList_efficient(ArrayList<ItemStack> value) throws IOException {

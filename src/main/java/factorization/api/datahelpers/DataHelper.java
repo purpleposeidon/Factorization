@@ -1,6 +1,5 @@
 package factorization.api.datahelpers;
 
-import com.typesafe.config.ConfigException;
 import factorization.api.FzOrientation;
 import factorization.util.DataUtil;
 import net.minecraft.item.ItemStack;
@@ -11,167 +10,138 @@ import net.minecraftforge.fluids.FluidTank;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.UUID;
 
+/**
+ * The put* family of methods will save or load a value.
+ * First call {@link DataHelper#as} to set the name that should be used and how it should be Shared.
+ * For the {@link IDataSerializable}, the name will be used as a prefix.
+ * If writing, the original will be returned. If reading, the loaded value will be returned.
+ * Must be able to handle these types: Boolean, Byte, Short, Integer, Float, Double, String, ItemStack, IDataSerializable, Enum
+ * Each put* method takes some type of parameter. In most cases it can not be null.
+ * Each put* method returns the original value if isWriter(), otherwise it reads the new value. In the case of putIDS,
+ * the value may or may not be modified, depending on its semantics.
+ * Each put* method may throw an IOException.
+ */
 public abstract class DataHelper {
-    /***
-     * The field name; used for serializing to/from NBT.
+    /**
+     * Set the name
+     * @param share Set the context for sharing (eg, does the data get sent to the client?)
+     * @param set_name Set the name, (nearly always) used by NBT.
+     * @return The object to be used with put*()
      */
-    protected String name;
-    /***
-     * If true, whatever is getting put needs to be saved/loaded. Set by {@link DataHelper#as}.
-     */
-    protected boolean valid;
-    
     public DataHelper as(Share share, String set_name) {
         name = set_name;
-        valid = shouldStore(share);
-        return this;
+        if (shouldStore(share)) return this;
+        return DataIdentity.instance;
     }
-    
+
+    /**
+     * @param share The context that the DataHelper is being used in
+     * @return true if the data should be considered, else false.
+     */
+    protected abstract boolean shouldStore(Share share);
+
+    /**
+     * Like {@link DataHelper#as(Share, String)}, but leaves the Share mode unchanged.
+     * @param set_name Set the name
+     * @return The object to be used with put*()
+     */
     public DataHelper asSameShare(String set_name) {
         name = set_name;
         return this;
     }
-    
-    protected abstract boolean shouldStore(Share share);
+
+    /***
+     * The field name; used for serializing to/from NBT.
+     */
+    protected String name;
+
+    /**
+     * @return true if the DataHelper is an input context, and thus some things may need to be constructed.
+     */
     public abstract boolean isReader();
-    public boolean isWriter() {
+
+    /**
+     * @return true if the DataHelper is in an output context.
+     */
+    public final boolean isWriter() {
         return !isReader();
     }
-    
-    public NBTTagCompound getTag() {
-        return null;
-    }
-    
+
+    /**
+     * @return true if the DataHelper is based off of an NBT tag.
+     */
     public boolean isNBT() {
         return false;
     }
-    
-    
+
     /**
-     * The put function will save or load a value.
-     * First call {@link DataHelper#as} to set the name that should be used and how it should be Shared.
-     * For the {@link IDataSerializable}, the name will be used as a prefix.
-     * If writing, the original will be returned. If reading, the loaded value will be returned.
-     * Must be able to handle these types: Boolean, Byte, Short, Integer, Float, Double, String, ItemStack, IDataSerializable, Enum
-     * @param o An object. It must never be null.
-     * @return The original value if isWriter() or the sharing does not permit write access; else the read value
-     * @throws IOException
+     * @return the NBT tag the DataHelper is using, or null if there is no tag.
      */
-    @Deprecated // Use a non-generic method
-    public <E> E put(E o) throws IOException {
-        if (!valid) {
-            return o;
-        }
-        if (o instanceof IDataSerializable) {
-            return (E) ((IDataSerializable) o).serialize(name, this);
-        }
-        if (o instanceof Enum) {
-            Enum value = (Enum) o;
-            int i = putInt(value.ordinal());
-            if (isWriter()) {
-                return (E) value;
-            }
-            return (E) value.getDeclaringClass().getEnumConstants()[i];
-        }
-        if (o instanceof ItemStack) {
-            ItemStack value = (ItemStack) o;
-            NBTTagCompound writtenTag = value.writeToNBT(new NBTTagCompound());
-            if (isReader()) {
-                return (E) ItemStack.loadItemStackFromNBT(put(writtenTag));
-            } else {
-                put(writtenTag);
-                return o;
-            }
-        }
-        if (o instanceof UUID) {
-            UUID uuid = (UUID) o;
-            String base_name = name;
-            if (isReader()) {
-                long msb = asSameShare(base_name + "MSB").putLong(0);
-                long lsb = asSameShare(base_name + "LSB").putLong(0);
-                return (E) new UUID(msb, lsb);
-            } else {
-                asSameShare(base_name + "MSB").putLong(uuid.getMostSignificantBits());
-                asSameShare(base_name + "LSB").putLong(uuid.getLeastSignificantBits());
-                return (E) uuid;
-            }
-            
-        }
-        return putImplementation(o);
+    public NBTTagCompound getTag() {
+        return null;
     }
+
+    /**
+     * @param name NBT key
+     * @return true if this is an NBT context and the tag has the given name.
+     */
+    public boolean hasLegacy(String name) {
+        return false;
+    }
+
+    /**
+     * @return true if shouldStore() evaluated to true.
+     */
+    public boolean isValid() {
+        return true;
+    }
+
+    /**
+     * @param message A message to associate with whatever's going on; used in more esoteric contexts.
+     */
+    public void log(String message) {}
 
     public <E extends IDataSerializable> E putIDS(E val) throws IOException {
         if (val == null) throw new NullPointerException();
-        return put(val);
-    }
-    
-    /** Reads or writes a value, and returns what was read or written.
-     * Here is a template for all the types: <pre>
-        if (o instanceof Boolean) {
-        } else if (o instanceof Byte) {
-        } else if (o instanceof Short) {
-        } else if (o instanceof Integer) {
-        } else if (o instanceof Long) {
-        } else if (o instanceof Float) {
-        } else if (o instanceof Double) {		
-        } else if (o instanceof String) {
-        } else if (o instanceof NBTTagCompound) {
-        }
-        </pre>
-        The actual list is: Boolean Byte Short Integer Long Float Double String
-     * @throws IOException
-     */
-    protected abstract <E> E putImplementation(E o) throws IOException;
-    
-    /*
-     * For compatability with old code:
-     * 
-for t in "Boolean Byte Short Int Long Float Double String FzOrientation ItemStack".split():
-    print("""public final _ put%(_ value) throws IOException { return (_)put(value); }""".replace('_', t.lower()).replace('%', t))
-     */
-    public final boolean putBoolean(boolean value) throws IOException { return (boolean)put(value); }
-    public final byte putByte(byte value) throws IOException { return (byte)put(value); }
-    public final short putShort(short value) throws IOException { return (short)put(value); }
-    public final int putInt(int value) throws IOException { return (int)put(value); }
-    public final long putLong(long value) throws IOException { return (long)put(value); }
-    public final float putFloat(float value) throws IOException { return (float)put(value); }
-    public final double putDouble(double value) throws IOException { return (double)put(value); }
-    public final UUID putUUID(UUID value) throws IOException { return (UUID)put(value); }
-    public abstract int[] putIntArray(int[] value) throws IOException;
-    
-    public final String putString(String value) throws IOException { return (String)put(value); }
-    public final FzOrientation putFzOrientation(FzOrientation value) throws IOException { return (FzOrientation)put(value); }
-    public final ItemStack putItemStack(ItemStack value) throws IOException {
-        if (value == null) {
-            value = DataUtil.NULL_ITEM;
-        }
-        ItemStack ret = put(value);
-        if (ret != null && ret.getItem() == null) {
-            return null;
-        }
-        return ret;
+        return (E) val.serialize(name, this);
     }
 
-    public final ArrayList<ItemStack> putItemList(ArrayList<ItemStack> value) throws IOException {
-        if (!valid) return value;
+    /*
+     * For compatability with old code:
+     *
+all_types = "IDataSerializable Boolean Byte Short Int Long Float Double String FzOrientation UUID ItemStack ItemList IntArray NBTTagCompound FluidTank AxisAlignedBB Vec3 Enum".split()
+for t in all_types:
+    print("""public final _ put%(_ value) throws IOException { return (_)put(value); }""".replace('_', t.lower()).replace('%', t))
+     */
+    public abstract boolean putBoolean(boolean value) throws IOException;
+    public abstract byte putByte(byte value) throws IOException;
+    public abstract short putShort(short value) throws IOException;
+    public abstract int putInt(int value) throws IOException;
+    public abstract long putLong(long value) throws IOException;
+    public abstract float putFloat(float value) throws IOException;
+    public abstract double putDouble(double value) throws IOException;
+    public abstract String putString(String value) throws IOException;
+    public abstract int[] putIntArray(int[] value) throws IOException;
+    public abstract NBTTagCompound putTag(NBTTagCompound value) throws IOException;
+    public abstract ItemStack[] putItemArray(ItemStack[] value) throws IOException;
+
+    public ArrayList<ItemStack> putItemList(ArrayList<ItemStack> value) throws IOException {
         if (isReader() && hasLegacy(name + "_len")) {
+            //noinspection deprecation
             return putItemArray_legacy(value);
         }
         return putItemList_efficient(value);
     }
 
     protected ArrayList<ItemStack> putItemList_efficient(ArrayList<ItemStack> value) throws IOException {
+        //noinspection deprecation
         return putItemArray_legacy(value);
     }
 
-    public abstract ItemStack[] putItemArray(ItemStack[] value) throws IOException;
-
-
     @Deprecated
-    public final ArrayList<ItemStack> putItemArray_legacy(ArrayList<ItemStack> value) throws IOException {
+    private ArrayList<ItemStack> putItemArray_legacy(ArrayList<ItemStack> value) throws IOException {
         String prefix = name;
         int len = asSameShare(prefix + "_len").putInt(value.size());
         if (isReader()) {
@@ -188,11 +158,40 @@ for t in "Boolean Byte Short Int Long Float Double String FzOrientation ItemStac
         return value;
     }
 
-    public final NBTTagCompound putTag(NBTTagCompound value) throws IOException {
-        return (NBTTagCompound)put(value);
+    public FzOrientation putFzOrientation(FzOrientation value) throws IOException {
+        return putEnum(value);
     }
 
-    public final FluidTank putTank(FluidTank tank) throws IOException {
+    public UUID putUUID(UUID uuid) throws IOException {
+        String base_name = name;
+        if (isReader()) {
+            long msb = asSameShare(base_name + "MSB").putLong(0);
+            long lsb = asSameShare(base_name + "LSB").putLong(0);
+            return new UUID(msb, lsb);
+        } else {
+            asSameShare(base_name + "MSB").putLong(uuid.getMostSignificantBits());
+            asSameShare(base_name + "LSB").putLong(uuid.getLeastSignificantBits());
+            return uuid;
+        }
+    }
+
+    public ItemStack putItemStack(ItemStack value) throws IOException {
+        if (isReader()) {
+            NBTTagCompound tag = putTag(new NBTTagCompound());
+            ItemStack ret = ItemStack.loadItemStackFromNBT(tag);
+            if (ret != null && ret.getItem() == null /* Indicating the NULL_ITEM */) {
+                return null;
+            }
+            return ret;
+        } else {
+            ItemStack it = value == null ? DataUtil.NULL_ITEM : value;
+            NBTTagCompound writtenTag = it.writeToNBT(new NBTTagCompound());
+            putTag(writtenTag);
+            return value;
+        }
+    }
+
+    public FluidTank putTank(FluidTank tank) throws IOException {
         if (isWriter()) {
             NBTTagCompound tag = new NBTTagCompound();
             tank.writeToNBT(tag);
@@ -214,7 +213,7 @@ for t in "Boolean Byte Short Int Long Float Double String FzOrientation ItemStac
         box.maxZ = asSameShare(name + ".maxZ").putDouble(box.maxZ);
         return box;
     }
-    
+
     public Vec3 putVec3(Vec3 val) throws IOException {
         String prefix = name;
         val.xCoord = asSameShare(prefix + ".x").putDouble(val.xCoord);
@@ -223,17 +222,52 @@ for t in "Boolean Byte Short Int Long Float Double String FzOrientation ItemStac
         name = prefix;
         return val;
     }
-                                    
 
-    public final <E extends Enum> E putEnum(E value) throws IOException { return (E)put(value); }
-    
-    public void log(String message) {}
-    
-    public boolean hasLegacy(String name) {
-        return false;
+    public <E extends Enum> E putEnum(E value) throws IOException {
+        int i = putInt(value.ordinal());
+        if (isWriter()) {
+            return value;
+        }
+        return (E) value.getDeclaringClass().getEnumConstants()[i];
     }
-    
-    public boolean isValid() {
-        return valid;
+
+    public Object putUnion(UnionEnumeration classes, Object val) throws IOException {
+        Class<?> k;
+        if (isWriter()) {
+            byte index = classes.getIndex(val);
+            asSameShare(name + ".type").putByte(index);
+            k = classes.classByIndex(index);
+        } else {
+            byte index = asSameShare(name + ".type").putByte((byte) 0xFF);
+            val = classes.byIndex(index);
+            k = classes.classByIndex(index);
+            if (val == null) throw new IOException("Tried to load invalid type with index: " + index);
+        }
+        asSameShare(name);
+        /*
+for t in all_types:
+    print("""if (k == %.class) return put%((%) val);""".replace('_', t.lower()).replace('%', t))
+         */
+        if (k == IDataSerializable.class) return putIDS((IDataSerializable) val);
+        if (k == Boolean.class) return putBoolean((Boolean) val);
+        if (k == Byte.class) return putByte((Byte) val);
+        if (k == Short.class) return putShort((Short) val);
+        if (k == Integer.class) return putInt((Integer) val);
+        if (k == Long.class) return putLong((Long) val);
+        if (k == Float.class) return putFloat((Float) val);
+        if (k == Double.class) return putDouble((Double) val);
+        if (k == String.class) return putString((String) val);
+        if (k == FzOrientation.class) return putFzOrientation((FzOrientation) val);
+        if (k == UUID.class) return putUUID((UUID) val);
+        if (k == ItemStack.class) return putItemStack((ItemStack) val);
+        // if (k == ItemList.class) return putItemList((ItemList) val); // Type erasure means I can't tell...
+        if (k == int[].class) return putIntArray((int[]) val);
+        if (k == NBTTagCompound.class) return putTag((NBTTagCompound) val);
+        if (k == FluidTank.class) return putTank((FluidTank) val);
+        if (k == AxisAlignedBB.class) return putBox((AxisAlignedBB) val);
+        if (k == Vec3.class) return putVec3((Vec3) val);
+        if (k == Enum.class) return putEnum((Enum) val);
+        // End generated code. Gotta poke it a tad tho.
+        throw new IOException("Unhandled class: " + k);
     }
 }

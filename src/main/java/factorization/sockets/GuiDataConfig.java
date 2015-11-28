@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
+import factorization.api.datahelpers.*;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import net.minecraft.client.Minecraft;
@@ -20,13 +21,6 @@ import net.minecraft.util.IIcon;
 import org.lwjgl.input.Keyboard;
 
 import factorization.api.Coord;
-import factorization.api.datahelpers.DataBackup;
-import factorization.api.datahelpers.DataHelper;
-import factorization.api.datahelpers.DataOutPacket;
-import factorization.api.datahelpers.DataOutByteBufEdited;
-import factorization.api.datahelpers.DataValidator;
-import factorization.api.datahelpers.IDataSerializable;
-import factorization.api.datahelpers.Share;
 import factorization.shared.Core;
 import factorization.shared.FzNetDispatch;
 import factorization.shared.NetworkFactorization.MessageType;
@@ -297,7 +291,7 @@ public class GuiDataConfig extends GuiScreen {
     
     void initFields() throws IOException {
         fields.clear();
-        ids.serialize("", new DataHelper() {
+        ids.serialize("", new MergedDataHelper() {
             int count = 0;
             
             @Override
@@ -306,21 +300,7 @@ public class GuiDataConfig extends GuiScreen {
             }
             
             @Override
-            public <E> E put(E o) throws IOException {
-                if (!valid) {
-                    return o;
-                }
-                if (o instanceof Enum) {
-                    return (E) putImplementation(o);
-                }
-                return super.put(o);
-            }
-            
-            @Override
             protected <E> E putImplementation(E o) throws IOException {
-                if (!valid) {
-                    return o;
-                }
                 int fieldStart = 100;
                 int fieldHeight = 24;
                 int posY = count*fieldHeight + fieldStart;
@@ -340,16 +320,6 @@ public class GuiDataConfig extends GuiScreen {
             @Override
             public boolean isReader() {
                 return true;
-            }
-
-            @Override
-            public ItemStack[] putItemArray(ItemStack[] value) throws IOException {
-                return value;
-            }
-
-            @Override
-            public int[] putIntArray(int[] value) throws IOException {
-                return value;
             }
         });
     }
