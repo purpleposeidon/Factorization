@@ -33,7 +33,7 @@ public class GenericPlaceholder extends Instruction {
 
     @Override
     public String getName() {
-        return null;
+        return "fz.instruction.generic";
     }
 
     @Override
