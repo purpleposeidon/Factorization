@@ -66,6 +66,11 @@ public class ItemBrokenArtifact extends ItemFactorization {
         ItemStack repair = new ItemStack(getRepairItem(fresh));
         String got = LangUtil.translateWithCorrectableFormat("item.factorization:brokenArtifact.repairhint", repair.getDisplayName());
         Collections.addAll(list, got.split("\\\\n"));
+        List infos = held.getTooltip(player, false);
+        if (!infos.isEmpty()) {
+            list.add("");
+            list.addAll(infos);
+        }
     }
 
     public Item getRepairItem(ItemStack held) {
