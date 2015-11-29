@@ -148,7 +148,7 @@ public class EntityPoster extends EntityFz implements ISortableRenderer<EntityPo
             if (droppedItem.getItem() == Core.registry.spawnPoster) {
                 setDead();
             } else {
-                syncWithSpawnPacket();
+                syncData();
             }
             if (player.capabilities.isCreativeMode) return false;
             Entity newItem = at.spawnItem(droppedItem);
@@ -160,7 +160,7 @@ public class EntityPoster extends EntityFz implements ISortableRenderer<EntityPo
             return true;
         }
         updateValues();
-        syncWithSpawnPacket();
+        syncData();
         return true;
     }
 
@@ -202,14 +202,14 @@ public class EntityPoster extends EntityFz implements ISortableRenderer<EntityPo
         if (inv.getItem() == Core.registry.spawnPoster) {
             if (held.getItem() == Core.registry.spawnPoster) return true;
             inv = player.getHeldItem().splitStack(1);
-            syncWithSpawnPacket();
+            syncData();
             return true;
         }
         int d = player.isSneaking() ? -1 : +1;
         if (ItemUtil.swordSimilar(inv, held)) {
             delta_scale += d;
             updateValues();
-            syncWithSpawnPacket();
+            syncData();
             return true;
         }
         final boolean hasPoster = held.getItem() == Core.registry.spawnPoster;
@@ -230,7 +230,7 @@ public class EntityPoster extends EntityFz implements ISortableRenderer<EntityPo
                 }
             }
             updateValues();
-            syncWithSpawnPacket();
+            syncData();
             return true;
         }
         return super.interactFirst(player);

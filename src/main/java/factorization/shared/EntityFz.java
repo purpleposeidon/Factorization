@@ -67,13 +67,8 @@ public abstract class EntityFz extends Entity implements IEntityAdditionalSpawnD
         }
     }
 
-    public void syncWithSpawnPacket() {
-        if (worldObj.isRemote) return;
-        Packet p = FMLNetworkHandler.getEntitySpawningPacket(this);
-        FzNetDispatch.addPacketFrom(p, this);
-    }
-
     public void syncData() {
+        // Rember 'syncWithSpawnPacket'? Broken. In a subtle-ish way. Don't use it. Use this.
         ByteBuf output = Unpooled.buffer();
         try {
             Core.network.prefixEntityPacket(output, this, NetworkFactorization.MessageType.entity_sync);

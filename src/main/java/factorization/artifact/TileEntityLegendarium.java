@@ -338,7 +338,7 @@ public class TileEntityLegendarium extends TileEntityCommon {
             final ItemStack artifact = it.next().copy();
             poster.setItem(artifact);
             poster.setLocked(true);
-            poster.syncWithSpawnPacket();
+            poster.syncData();
             ret++;
             ICoordFunction setSign = new ICoordFunction() {
                 boolean set = false;
@@ -410,7 +410,7 @@ public class TileEntityLegendarium extends TileEntityCommon {
             if (!ItemUtil.is(poster.getItem(), Core.registry.brokenTool)) continue;
             poster.setItem(null);
             poster.setLocked(false);
-            poster.syncWithSpawnPacket();
+            poster.syncData();
             ret++;
             ICoordFunction clearSign = new ICoordFunction() {
                 @Override
