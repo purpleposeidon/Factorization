@@ -235,7 +235,7 @@ public class GuiDataConfig extends GuiScreen {
         
         @Override
         void put(Map<String, Object> map) {
-            map.put(name, val.ordinal());
+            map.put(name, val);
         }
     }
     

@@ -35,7 +35,7 @@ import org.lwjgl.opengl.GL11;
 import java.io.IOException;
 
 public class SocketShifter extends TileEntitySocketBase {
-    public static enum ShifterMode {
+    public enum ShifterMode {
         MODE_STREAM, MODE_PULSE_EXACT, MODE_PULSE_SOME;
     }
     //public boolean streamMode = true; // be like a hopper or a filter
@@ -69,6 +69,7 @@ public class SocketShifter extends TileEntitySocketBase {
     public IDataSerializable serialize(String prefix, DataHelper data) throws IOException {
         exporting = data.as(Share.MUTABLE, "exp").putBoolean(exporting);
         if (data.hasLegacy("strm")) {
+            // NORELEASE: Remove branch in 1.8
             mode = data.as(Share.MUTABLE, "strm").putBoolean(true) ? ShifterMode.MODE_STREAM : ShifterMode.MODE_PULSE_EXACT;
         } else {
             mode = data.as(Share.MUTABLE, "mode").putEnum(mode);
