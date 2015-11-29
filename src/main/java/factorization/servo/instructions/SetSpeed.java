@@ -2,6 +2,7 @@ package factorization.servo.instructions;
 
 import java.io.IOException;
 
+import factorization.api.datahelpers.Share;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
 import net.minecraft.init.Items;
@@ -20,7 +21,11 @@ public class SetSpeed extends Instruction {
     byte speed = 3;
     @Override
     public IDataSerializable putData(String prefix, DataHelper data) throws IOException {
-        speed = data.putByte(speed);
+        if (data.isReader() && data.isNBT() && !data.hasLegacy(prefix + "speedB")) {
+            speed = data.as(Share.VISIBLE, "sc").putByte(speed);
+        } else {
+            speed = data.as(Share.VISIBLE, prefix + "speedB").putByte(speed);
+        }
         return this;
     }
 
