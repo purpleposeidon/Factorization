@@ -62,7 +62,7 @@ public class SetDirection extends Instruction {
     }
     
     @Override
-    public IDataSerializable serialize(String prefix, DataHelper data) throws IOException {
+    public IDataSerializable putData(String prefix, DataHelper data) throws IOException {
         dir = data.as(Share.MUTABLE, "dir").putEnum(dir);
         return this;
     }

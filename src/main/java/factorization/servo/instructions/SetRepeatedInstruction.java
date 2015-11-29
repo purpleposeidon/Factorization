@@ -15,7 +15,7 @@ import factorization.shared.Core;
 public class SetRepeatedInstruction extends Instruction {
 
     @Override
-    public IDataSerializable serialize(String prefix, DataHelper data) throws IOException {
+    public IDataSerializable putData(String prefix, DataHelper data) throws IOException {
         return this;
     }
 

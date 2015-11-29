@@ -20,7 +20,7 @@ public class EntryControl extends Instruction {
     public boolean blocking = false;
     
     @Override
-    public IDataSerializable serialize(String prefix, DataHelper data) throws IOException {
+    public IDataSerializable putData(String prefix, DataHelper data) throws IOException {
         blocking = data.asSameShare("block").putBoolean(blocking);
         return this;
     }

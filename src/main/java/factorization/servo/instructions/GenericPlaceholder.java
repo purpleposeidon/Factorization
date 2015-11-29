@@ -37,9 +37,13 @@ public class GenericPlaceholder extends Instruction {
     }
 
     @Override
-    public IDataSerializable serialize(String prefix, DataHelper data) throws IOException {
-        if (data.isWriter()) return this; // Better not happen!
-        NBTTagCompound tag = data.asSameShare(prefix).putTag(new NBTTagCompound());
-        return ServoComponent.load(tag);
+    public IDataSerializable putData(String prefix, DataHelper data) throws IOException {
+        if (data.isWriter()) {
+            return this; // Better not happen!
+        }
+        if (data.isNBT()) {
+            return ServoComponent.load(data.getTag());
+        }
+        return this;
     }
 }

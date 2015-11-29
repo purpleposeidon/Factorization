@@ -17,7 +17,7 @@ import factorization.util.InvUtil.FzInv;
 public class CountItems extends Instruction {
 
     @Override
-    public IDataSerializable serialize(String prefix, DataHelper data) throws IOException {
+    public IDataSerializable putData(String prefix, DataHelper data) throws IOException {
         return this;
     }
 

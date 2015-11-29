@@ -233,22 +233,24 @@ for t in all_types:
 
     public Object putUnion(UnionEnumeration classes, Object val) throws IOException {
         Class<?> k;
+        String origName = name;
+        String typeName = origName + ".type";
         if (isWriter()) {
             byte index = classes.getIndex(val);
-            asSameShare(name + ".type").putByte(index);
+            asSameShare(typeName).putByte(index);
             k = classes.classByIndex(index);
         } else {
-            byte index = asSameShare(name + ".type").putByte((byte) 0xFF);
+            byte index = asSameShare(typeName).putByte((byte) 0xFF);
             val = classes.byIndex(index);
             k = classes.classByIndex(index);
             if (val == null) throw new IOException("Tried to load invalid type with index: " + index);
         }
-        asSameShare(name);
+        asSameShare(origName);
         /*
 for t in all_types:
     print("""if (k == %.class) return put%((%) val);""".replace('_', t.lower()).replace('%', t))
          */
-        if (k == IDataSerializable.class) return putIDS((IDataSerializable) val);
+        if (val instanceof IDataSerializable) return putIDS((IDataSerializable) val);
         if (k == Boolean.class) return putBoolean((Boolean) val);
         if (k == Byte.class) return putByte((Byte) val);
         if (k == Short.class) return putShort((Short) val);
@@ -266,7 +268,7 @@ for t in all_types:
         if (k == FluidTank.class) return putTank((FluidTank) val);
         if (k == AxisAlignedBB.class) return putBox((AxisAlignedBB) val);
         if (k == Vec3.class) return putVec3((Vec3) val);
-        if (k == Enum.class) return putEnum((Enum) val);
+        if (val instanceof Enum) return putEnum((Enum) val);
         // End generated code. Gotta poke it a tad tho.
         throw new IOException("Unhandled class: " + k);
     }

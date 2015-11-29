@@ -21,7 +21,7 @@ public class SetEntryAction extends Instruction {
     EntryAction mode = EntryAction.ENTRY_EXECUTE;
     
     @Override
-    public IDataSerializable serialize(String prefix, DataHelper data) throws IOException {
+    public IDataSerializable putData(String prefix, DataHelper data) throws IOException {
         mode = data.asSameShare("mode").putEnum(mode);
         return this;
     }

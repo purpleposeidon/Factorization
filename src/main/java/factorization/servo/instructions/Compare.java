@@ -50,7 +50,7 @@ public class Compare extends Instruction {
     CmpType cmp = CmpType.EQ;
     
     @Override
-    public IDataSerializable serialize(String prefix, DataHelper data) throws IOException {
+    public IDataSerializable putData(String prefix, DataHelper data) throws IOException {
         cmp = data.as(Share.VISIBLE, "cmp").putEnum(cmp);
         return this;
     }

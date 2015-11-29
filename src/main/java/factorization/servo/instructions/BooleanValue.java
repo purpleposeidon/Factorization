@@ -20,7 +20,7 @@ import factorization.servo.ServoMotor;
 public class BooleanValue extends Instruction {
     boolean val = true;
     @Override
-    public IDataSerializable serialize(String prefix, DataHelper data) throws IOException {
+    public IDataSerializable putData(String prefix, DataHelper data) throws IOException {
         val = data.as(Share.VISIBLE, "val").putBoolean(val);
         return this;
     }

@@ -23,7 +23,7 @@ import factorization.shared.Core;
 
 public class ScanColor extends Decorator {
     @Override
-    public IDataSerializable serialize(String prefix, DataHelper data) throws IOException {
+    public IDataSerializable putData(String prefix, DataHelper data) throws IOException {
         return this;
     }
     

@@ -19,7 +19,7 @@ import factorization.servo.ServoMotor;
 public class SetSpeed extends Instruction {
     byte speed = 3;
     @Override
-    public IDataSerializable serialize(String prefix, DataHelper data) throws IOException {
+    public IDataSerializable putData(String prefix, DataHelper data) throws IOException {
         speed = data.putByte(speed);
         return this;
     }

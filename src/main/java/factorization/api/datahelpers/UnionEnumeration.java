@@ -1,7 +1,5 @@
 package factorization.api.datahelpers;
 
-import factorization.servo.LoggerDataHelper;
-
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
@@ -39,7 +37,7 @@ public class UnionEnumeration {
         for (int i = 0; i < parts.length; i += 2) {
             Class<?> klass = (Class<?>) parts[i];
             Object val = parts[i + 1];
-            if (val != null && klass != val.getClass()) throw new IllegalArgumentException("default value does not match class");
+            if (val != null && !klass.isInstance(val)) throw new IllegalArgumentException("default value does not match class");
             classes[i / 2] = klass;
             zeros[i / 2] = val;
             if (val == null ^ klass == Void.TYPE) {
@@ -60,7 +58,7 @@ public class UnionEnumeration {
             if (k == null) {
                 throw new IllegalArgumentException("Type is not registered to be serialized: " + val + ", a " + val.getClass());
             }
-            integer = indexMap.get(val.getClass());
+            integer = indexMap.get(k);
             if (integer != null) break;
             k = k.getSuperclass();
         }

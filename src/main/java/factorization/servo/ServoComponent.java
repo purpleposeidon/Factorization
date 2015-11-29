@@ -50,7 +50,7 @@ public abstract class ServoComponent implements IDataSerializable {
     private static BiMap<Short, Class<? extends ServoComponent>> the_idMap = null;
     private static BiMap<Short, Class<? extends ServoComponent>> getPacketIdMap() {
         if (the_idMap == null) {
-            ArrayList<String> names = new ArrayList(componentMap.keySet());
+            ArrayList<String> names = new ArrayList<String>(componentMap.keySet());
             Collections.sort(names);
             ImmutableBiMap.Builder<Short, Class<? extends ServoComponent>> builder = ImmutableBiMap.<Short, Class<? extends ServoComponent>>builder();
             for (short i = 0; i < names.size(); i++) {
@@ -74,6 +74,32 @@ public abstract class ServoComponent implements IDataSerializable {
         return o;
     }
 
+    @Override
+    public final IDataSerializable serialize(String prefix, DataHelper data) throws IOException {
+        if (data.isReader()) {
+            String componentName;
+            if (data.hasLegacy(componentTagKey)) {
+                componentName = data.asSameShare(componentTagKey).putString(getName());
+            } else {
+                componentName = data.asSameShare(prefix + componentTagKey).putString(getName());
+            }
+            Class<? extends ServoComponent> componentClass = getComponent(componentName);
+            ServoComponent sc;
+            try {
+                sc = componentClass.newInstance();
+            } catch (Throwable e) {
+                e.printStackTrace();
+                return this;
+            }
+            return sc.putData(prefix, data);
+        } else {
+            data.asSameShare(prefix + componentTagKey).putString(getName());
+            return putData(prefix, data);
+        }
+    }
+
+    protected abstract IDataSerializable putData(String prefix, DataHelper data) throws IOException;
+
     protected static ServoComponent load(NBTTagCompound tag) {
         if (tag == null || !tag.hasKey(componentTagKey)) {
             return null;
@@ -89,8 +115,7 @@ public abstract class ServoComponent implements IDataSerializable {
         }
         try {
             ServoComponent decor = componentClass.newInstance();
-            (new DataInNBT(tag)).as(Share.VISIBLE, "sc").putIDS(decor);
-            return decor;
+            return new DataInNBT(tag).as(Share.VISIBLE, "sc").putIDS(decor);
         } catch (Throwable e) {
             e.printStackTrace();
             return null;
@@ -188,33 +213,6 @@ public abstract class ServoComponent implements IDataSerializable {
     public void addInformation(List info) {
         //info.add("Servo Component");
     }
-    
-    /*public static void registerRecursivelyFromPackage(String packageName) {
-        ClassLoader loader = ServoComponent.class.getClassLoader();
-        ClassPath cp;
-        try {
-            cp = ClassPath.from(loader);
-        } catch (IOException e1) {
-            e1.printStackTrace();
-            return;
-        }
-        for (ClassPath.ClassInfo ci : cp.getTopLevelClassesRecursive(packageName)) {
-            Class<?> someClass;
-            try {
-                someClass = loader.loadClass(ci.getName());
-            } catch (ClassNotFoundException e) {
-                e.printStackTrace();
-                continue;
-            }
-            if (ServoComponent.class.isAssignableFrom(someClass)) {
-                if (someClass.isInterface() || Modifier.isAbstract(someClass.getModifiers())) {
-                    continue;
-                }
-                Class<? extends ServoComponent> cl = (Class<? extends ServoComponent>) someClass;
-                ServoComponent.register(cl);
-            }
-        }
-    }*/
 
     static ArrayList<ItemStack> sorted_instructions = new ArrayList<ItemStack>();
     static ArrayList<ItemStack> sorted_decors = new ArrayList<ItemStack>();

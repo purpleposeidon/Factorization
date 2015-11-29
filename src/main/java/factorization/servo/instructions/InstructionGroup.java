@@ -27,7 +27,7 @@ public class InstructionGroup extends Instruction {
     ServoStack stuff = new ServoStack(new Executioner(null));
     
     @Override
-    public IDataSerializable serialize(String prefix, DataHelper data)
+    public IDataSerializable putData(String prefix, DataHelper data)
             throws IOException {
         stuff = data.as(Share.VISIBLE, "contents").putIDS(stuff);
         return this;

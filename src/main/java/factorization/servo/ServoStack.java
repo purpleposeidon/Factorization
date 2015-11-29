@@ -154,7 +154,7 @@ public class ServoStack implements IDataSerializable, Iterable {
             Void.TYPE, null, // 6
             Void.TYPE, null, // 7
             Void.TYPE, null, // 8
-            GenericPlaceholder.class, new GenericPlaceholder(), // 9
+            Instruction.class, new GenericPlaceholder(), // 9
             Boolean.class, false,
             Byte.class, (byte) 0,
             Short.class, (short) 0,
@@ -203,7 +203,7 @@ public class ServoStack implements IDataSerializable, Iterable {
     }
 
     Object readObject(DataHelper data, String entryName) throws IOException {
-        return data.asSameShare(entryName).putUnion(stackableTypes, new GenericPlaceholder());
+        return data.asSameShare(entryName).putUnion(stackableTypes, null);
     }
 
 

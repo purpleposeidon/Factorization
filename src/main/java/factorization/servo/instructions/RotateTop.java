@@ -63,7 +63,7 @@ public class RotateTop extends Instruction {
     }
     
     @Override
-    public IDataSerializable serialize(String prefix, DataHelper data) throws IOException {
+    public IDataSerializable putData(String prefix, DataHelper data) throws IOException {
         top = data.as(Share.MUTABLE, "top").putEnum(top);
         return this;
     }

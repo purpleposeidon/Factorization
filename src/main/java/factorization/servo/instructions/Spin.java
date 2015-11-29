@@ -24,7 +24,7 @@ public class Spin extends Instruction {
     boolean cc = true;
     
     @Override
-    public IDataSerializable serialize(String prefix, DataHelper data) throws IOException {
+    public IDataSerializable putData(String prefix, DataHelper data) throws IOException {
         cc = data.as(Share.VISIBLE, prefix + "cc").putBoolean(cc);
         return this;
     }

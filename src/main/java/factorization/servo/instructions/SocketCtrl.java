@@ -22,7 +22,7 @@ public class SocketCtrl extends Instruction {
     byte mode = MODE_PULSE;
 
     @Override
-    public IDataSerializable serialize(String prefix, DataHelper data) throws IOException {
+    public IDataSerializable putData(String prefix, DataHelper data) throws IOException {
         mode = data.as(Share.VISIBLE, "mode").putByte(mode);
         return this;
     }

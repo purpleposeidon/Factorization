@@ -20,7 +20,7 @@ public class IntegerValue extends Instruction {
     private int val = 1;
 
     @Override
-    public IDataSerializable serialize(String prefix, DataHelper data) throws IOException {
+    public IDataSerializable putData(String prefix, DataHelper data) throws IOException {
         setVal(data.asSameShare(prefix + "val").putInt(getVal()));
         return this;
     }

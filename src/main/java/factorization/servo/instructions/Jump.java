@@ -21,7 +21,7 @@ import factorization.servo.ServoStack;
 public class Jump extends Instruction {
     byte mode = Executioner.JMP_NEXT_INSTRUCTION;
     @Override
-    public IDataSerializable serialize(String prefix, DataHelper data) throws IOException {
+    public IDataSerializable putData(String prefix, DataHelper data) throws IOException {
         mode = data.as(Share.MUTABLE, "mode").putByte(mode);
         return this;
     }
