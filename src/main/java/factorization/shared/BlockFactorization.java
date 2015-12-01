@@ -258,7 +258,7 @@ public class BlockFactorization extends BlockContainer {
             destroyedTE = null;
         }
         ItemStack is = f.getDroppedBlock();
-        ret.add(is);
+        if (is != null) ret.add(is);
         return ret;
     }
 
