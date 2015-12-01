@@ -38,13 +38,13 @@ OUT/
 
 
 #Symlinked directories
-lang
-fzsrc
-textures
-resources
-sound_assets
-screenshots
-minecraft_textures
+/lang
+/fzsrc
+/textures
+/resources
+/sound_assets
+/screenshots
+/minecraft_textures
 
 # (I've likely derped up my intellij setup somehow)
 src/main/java/GradleStart.java
