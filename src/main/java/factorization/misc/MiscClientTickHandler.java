@@ -7,13 +7,14 @@ import factorization.api.ICoordFunction;
 import factorization.util.FzUtil;
 import factorization.util.ItemUtil;
 import factorization.util.PlayerUtil;
-import factorization.weird.TileEntityDayBarrel;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.audio.PositionedSoundRecord;
 import net.minecraft.client.gui.GuiMainMenu;
+import net.minecraft.client.settings.GameSettings;
 import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.*;
 import net.minecraft.world.World;
@@ -52,142 +53,145 @@ public class MiscClientTickHandler {
             }
             hit = true;
             LagssieWatchDog.start();
+            setupPickBlockKey();
         }
         count++;
     }
 
     private ItemStack[] swaps = new ItemStack[9];
 
-    int slot_on_trigger = -1;
-    boolean has_activated = true;
-
+    boolean was_activated = true;
     private void checkPickBlockKey() {
         if (!FzConfig.fix_middle_click) return;
         EntityPlayer player = mc.thePlayer;
         if (player == null) {
             return;
         }
-        int slot = player.inventory.currentItem;
-        boolean keyPressed = mc.gameSettings.keyBindPickBlock.getIsKeyPressed();
+        boolean keyPressed = pickBlock.getIsKeyPressed();
         if (!keyPressed) {
-            slot_on_trigger = -1;
+            was_activated = false;
             return;
         }
-        if (slot_on_trigger == -1) {
-            slot_on_trigger = slot;
-            has_activated = false;
-            return;
-        }
-        if (has_activated) return;
-        has_activated = true;
-        if (PlayerUtil.isPlayerCreative(player)) {
-            // I suppose we could try pulling from the player's inventory.
-            // And creative mode inventories tend to get super-ugly cluttered with duplicate crap...
-            // But it doesn't work. Oh well.
-            return;
-        }
+        if (was_activated) return;
+        was_activated = true;
         if (mc.currentScreen != null) {
             return;
         }
-        MovingObjectPosition mop = mc.objectMouseOver;
-        if (mop == null || mop.typeOfHit != MovingObjectPosition.MovingObjectType.BLOCK) {
+        if (PlayerUtil.isPlayerCreative(player)) {
+            // I suppose we could try pulling from the player's inventory.
+            // And creative mode inventories tend to get super-ugly cluttered with duplicate crap...
+            // But it doesn't work. :(
+            mc.func_147112_ai();
             return;
         }
-        Coord here = new Coord(player.worldObj, mop);
+        MovingObjectPosition mop = mc.objectMouseOver;
+        if (mop == null) return;
         List<ItemStack> validItems = new ArrayList<ItemStack>();
-        final ItemStack held = player.getHeldItem();
-        if (vanillaSatisfied(mop, here, player)) {
-            if (held == null) return;
-            ItemStack replace = swaps[player.inventory.currentItem];
-            if (replace == null) return;
-            boolean already_found = false;
-            for (int i = 0; i < 9; i++) {
-                ItemStack is = player.inventory.getStackInSlot(i);
-                if (is == null) continue;
-                if (ItemUtil.couldMerge(is, replace)) {
-                    already_found = true;
+        int slot = player.inventory.currentItem;
+        if (swaps.length != InventoryPlayer.getHotbarSize()) {
+            swaps = new ItemStack[InventoryPlayer.getHotbarSize()];
+        }
+        if (slot >= 0 && 0 < swaps.length && swaps[slot] != null) {
+            ItemStack origSwap = swaps[slot];
+            swaps[slot] = null;
+            boolean movedDown = false;
+            for (int i = 0; i < InventoryPlayer.getHotbarSize(); i++) {
+                if (ItemUtil.identical(origSwap, player.inventory.getStackInSlot(i))) {
+                    movedDown = true;
                     break;
                 }
             }
-            if (!already_found) {
-                validItems.add(replace);
-            }
+            if (!movedDown) validItems.add(origSwap);
+            // If the NBT changes (eg, drill recharging) it's still the same ItemStack object, right? Not sure.
+            // If the object changes, then this code'll have difficulties.
         }
-        // Search the inventory for the exact block. Failing that, search for the broken version
-        if (validItems.isEmpty()) {
+        if (mop.typeOfHit == MovingObjectPosition.MovingObjectType.BLOCK) {
+            Coord here = Coord.fromMop(player.worldObj, mop);
             validItems.add(here.getPickBlock(mop));
             validItems.add(here.getBrokenBlock());
             validItems.add(new ItemStack(here.getId(), 1, here.getMd()));
             ItemStack b = FzUtil.getReifiedBarrel(here);
             if (b != null) validItems.add(b);
+        } else if (mop.typeOfHit == MovingObjectPosition.MovingObjectType.ENTITY) {
+            validItems.add(mop.entityHit.getPickedResult(mop));
         }
+
+        final ItemStack held = player.getHeldItem();
+        for (Iterator<ItemStack> it = validItems.iterator(); it.hasNext(); ) {
+            // Don't match items that you're holding.
+            if (ItemUtil.identical(it.next(), held)) it.remove();
+        }
+        if (validItems.isEmpty()) return;
+
         int firstEmpty = -1;
         if (held == null) {
             firstEmpty = player.inventory.currentItem;
         }
-        for (int i = 0; i < player.inventory.mainInventory.length; i++) {
+        // Find a valid stack. If it's on the hotbar, change the hotbar index; else move it to an appropriate space.
+        for (int invSlot = 0; invSlot < player.inventory.mainInventory.length; invSlot++) {
             for (ItemStack needle : validItems) {
-                if (needle == null) {
-                    continue;
-                }
-                ItemStack hay = player.inventory.mainInventory[i];
-                if (hay == null && firstEmpty == -1 && i < 9) {
-                    firstEmpty = i;
+                if (needle == null) continue;
+                ItemStack hay = player.inventory.mainInventory[invSlot];
+                if (hay == null && firstEmpty == -1 && invSlot < 9) {
+                    firstEmpty = invSlot;
                 }
                 if (hay == null || !ItemUtil.couldMerge(needle, hay)) {
                     continue;
                 }
-                if (i < 9) {
-                    player.inventory.currentItem = i;
+                if (invSlot < 9) {
+                    player.inventory.currentItem = invSlot;
                     return;
                 }
                 if (firstEmpty != -1) {
                     player.inventory.currentItem = firstEmpty;
                 }
-                int targetSlot = player.inventory.currentItem;
-                mc.playerController.windowClick(player.inventoryContainer.windowId, i, targetSlot, 2, player);
-                if (held != null) {
-                    if (swaps[player.inventory.currentItem] == null) {
-                        swaps[player.inventory.currentItem] = held;
-                    } else {
-                        boolean canReplace = false;
-                        for (int bar = 0; bar < 9; bar++) {
-                            ItemStack barItem = player.inventory.getStackInSlot(bar);
-                            if (barItem == null) continue;
-                            if (barItem == swaps[player.inventory.currentItem]) {
-                                canReplace = true;
-                                break;
-                            }
-                        }
-                        if (canReplace) {
-                            swaps[player.inventory.currentItem] = held;
-                        }
-                    }
-                }
+                swapify(player, held, invSlot);
                 return;
             }
         }
     }
-    
-    private boolean vanillaSatisfied(MovingObjectPosition mop, Coord here, EntityPlayer player) {
-        ItemStack held = player.inventory.getStackInSlot(player.inventory.currentItem);
-        if (held == null) return false;
-        final ItemStack pickBlock = here.getPickBlock(mop);
-        if (pickBlock != null && ItemUtil.couldMerge(held, pickBlock)) {
-            return true;
+
+    private void swapify(EntityPlayer player, ItemStack held, int invSlot) {
+        int targetSlot = player.inventory.currentItem;
+        mc.playerController.windowClick(player.inventoryContainer.windowId, invSlot, targetSlot, 2, player);
+        if (held == null) return;
+        if (swaps[targetSlot] == null) {
+            swaps[targetSlot] = held;
+            return;
         }
-        final ItemStack brokenBlock = here.getBrokenBlock();
-        if (brokenBlock != null && ItemUtil.couldMerge(held, brokenBlock)) {
-            return true;
+        boolean canReplace = false;
+        for (int barSlot = 0; barSlot < 9; barSlot++) {
+            ItemStack barItem = player.inventory.getStackInSlot(barSlot);
+            if (barItem == null) continue;
+            if (barItem == swaps[targetSlot]) {
+                canReplace = true;
+                break;
+            }
         }
-        return false;
+        if (canReplace) {
+            swaps[targetSlot] = held;
+        }
     }
-    
+
     static KeyBinding sprint = new KeyBinding("Sprint (FZ)", 0, "key.categories.movement");
+    static KeyBinding pickBlock = new KeyBinding("Pick Block (FZ)", 0, "key.categories.gameplay");
     static {
         ClientRegistry.registerKeyBinding(sprint);
+        if (FzConfig.fix_middle_click) {
+            ClientRegistry.registerKeyBinding(pickBlock);
+        }
     }
-    
+
+    static void setupPickBlockKey() {
+        if (!FzConfig.fix_middle_click) return;
+        GameSettings gs = Minecraft.getMinecraft().gameSettings;
+        if (gs.keyBindPickBlock.keyCode != 0 && pickBlock.keyCode == 0) {
+            pickBlock.keyCode = gs.keyBindPickBlock.keyCode;
+            gs.keyBindPickBlock.keyCode = 0;
+            MiscClientCommands.miscCommands.savesettings();
+        }
+    }
+
     boolean prevState = false;
     private void checkSprintKey() {
         if (mc.currentScreen != null) {
