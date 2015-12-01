@@ -7,6 +7,7 @@
   Added a new IMC message for the DocViewer to improve the output of reflectively examined recipes
   Posters no longer eat other posters.
   Colossi spawn creepers instead of zombies.
+  FZ's pickblock had far too much derpage when interacting with MC's. FZ pick block has been rewritten to use a new keybinding that steals the vanilla key. 
 
 0.8.99d
   Added /fzds setbiome
