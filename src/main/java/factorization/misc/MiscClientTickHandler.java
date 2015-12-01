@@ -185,9 +185,9 @@ public class MiscClientTickHandler {
     static void setupPickBlockKey() {
         if (!FzConfig.fix_middle_click) return;
         GameSettings gs = Minecraft.getMinecraft().gameSettings;
-        if (gs.keyBindPickBlock.keyCode != 0 && pickBlock.keyCode == 0) {
-            pickBlock.keyCode = gs.keyBindPickBlock.keyCode;
-            gs.keyBindPickBlock.keyCode = 0;
+        if (gs.keyBindPickBlock.getKeyCode() != 0 && pickBlock.getKeyCode() == 0) {
+            pickBlock.setKeyCode(gs.keyBindPickBlock.getKeyCode());
+            gs.keyBindPickBlock.setKeyCode(0);
             MiscClientCommands.miscCommands.savesettings();
         }
     }
