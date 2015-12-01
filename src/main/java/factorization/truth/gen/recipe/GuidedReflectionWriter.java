@@ -75,7 +75,6 @@ public class GuidedReflectionWriter<T> implements IObjectWriter<T> {
         if (!StringUtils.isNullOrEmpty(text)) {
             out.add(text);
         }
-        //out.add(NORELEASE.just("\\nl")); // This shouldn't be required.
     }
 
     private void write(ReflectionExpression[] exprList, List out, T val, IObjectWriter<Object> generic) {

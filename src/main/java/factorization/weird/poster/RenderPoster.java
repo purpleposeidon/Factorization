@@ -37,7 +37,7 @@ public class RenderPoster extends RenderEntity {
         GL11.glPushAttrib(GL11.GL_ENABLE_BIT);
         GL11.glEnable(GL12.GL_RESCALE_NORMAL);
         GL11.glEnable(GL11.GL_ALPHA_TEST); // This should always be enabled; some other mod's derping things up tho; we can leave it on
-        GL11.glDisable(GL11.GL_BLEND); // NORELEASE: Does this fix that 'no alpha' issue I was having?
+        GL11.glDisable(GL11.GL_BLEND); // seems to fix that 'no alpha' issue I was having?
         poster.rot.glRotate();
         double s = poster.scale;
         GL11.glScaled(s, s, s);

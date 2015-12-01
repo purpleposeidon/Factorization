@@ -1190,7 +1190,7 @@ public class Registry {
                 'H', Blocks.hay_block,
                 'n', Items.nether_wart,
                 'X', Items.bone);
-        shapelessOreRecipe(new ItemStack(utiligoo, 32), // NORELEASE: Temporary recipe!
+        shapelessOreRecipe(new ItemStack(utiligoo, 32), // Temporary recipe! Utiligoo item itself should be temporary.
                 Blocks.red_mushroom,
                 Items.diamond,
                 Items.diamond,

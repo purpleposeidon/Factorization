@@ -237,7 +237,7 @@ public class Core {
         //TileEntity renderers are registered in the client proxy
 
         // See EntityTracker.addEntityToTracker for reference on what the three last values should be
-        EntityRegistry.registerModEntity(TileEntityWrathLamp.RelightTask.class, "factory_relight_task", 0, Core.instance, 1, 10, false); // NORELEASE: rename to fz_; is safe here.
+        EntityRegistry.registerModEntity(TileEntityWrathLamp.RelightTask.class, "fz_relight_task", 0, Core.instance, 1, 10, false);
         EntityRegistry.registerModEntity(ServoMotor.class, "factory_servo", 1, Core.instance, 100, 1, true);
         EntityRegistry.registerModEntity(ColossusController.class, "fz_colossal_controller", 2, Core.instance, 256, 20, false);
         EntityRegistry.registerModEntity(EntityPoster.class, "fz_entity_poster", 3, Core.instance, 160, Integer.MAX_VALUE, false);
@@ -246,6 +246,7 @@ public class Core {
         EntityRegistry.registerModEntity(EntityLeafBomb.class, "fz_leaf_bomb", 6, this, 64, 10, true);
         EntityRegistry.registerModEntity(StepperEngine.class, "fz_stepper_engine", 7, Core.instance, 100, 1, true);
         EntityRegistry.registerModEntity(EntityGrabController.class, "fz_grab_controller", 8, Core.instance, 100, 1, true);
+        // The "fz_" prefix isn't necessary these days; FML adds a prefix.
     }
     
     @EventHandler

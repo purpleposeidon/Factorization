@@ -52,7 +52,6 @@ public class PumpLiquids extends SocketFanturpeller implements IFluidHandler {
     protected static final int BUCKET = FluidContainerRegistry.BUCKET_VOLUME;
     protected FluidTank buffer = new FluidTank(BUCKET);
     protected FluidTank auxBuffer = new FluidTank(BUCKET);
-    protected boolean isDrainingTank = false;
     protected boolean isFloodingTank = false;
     private static FluidTankInfo[] no_info = new FluidTankInfo[0];
     private int available_pumping_activity = 0;
@@ -693,7 +692,6 @@ public class PumpLiquids extends SocketFanturpeller implements IFluidHandler {
         super.serialize(prefix, data);
         data.as(Share.PRIVATE, "buff").putTank(buffer);
         data.as(Share.PRIVATE, "auxBuff").putTank(auxBuffer);
-        isDrainingTank = data.as(Share.PRIVATE, "drainTank").putBoolean(isDrainingTank); // NORELEASE: rm
         isFloodingTank = data.as(Share.PRIVATE, "floodTank").putBoolean(isFloodingTank);
         available_pumping_activity = data.as(Share.PRIVATE, "pumpActivity").putInt(available_pumping_activity);
         

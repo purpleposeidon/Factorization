@@ -11,17 +11,17 @@ import cpw.mods.fml.common.event.FMLServerStoppingEvent;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import cpw.mods.fml.common.network.FMLNetworkEvent;
 import cpw.mods.fml.common.registry.EntityRegistry;
-import cpw.mods.fml.common.registry.GameRegistry;
 import cpw.mods.fml.relauncher.Side;
-import factorization.fzds.network.*;
-import factorization.mechanics.TileEntityComparatorMechanism;
+import factorization.fzds.network.FzdsPacketRegistry;
+import factorization.fzds.network.HammerNet;
+import factorization.fzds.network.PPPChunkLoader;
+import factorization.fzds.network.WrappedPacket;
 import factorization.shared.Core;
 import factorization.util.FzUtil;
 import net.minecraft.entity.Entity;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.management.PlayerManager;
 import net.minecraft.world.World;
-import net.minecraft.world.WorldProvider;
 import net.minecraftforge.common.DimensionManager;
 import net.minecraftforge.common.ForgeChunkManager;
 import net.minecraftforge.event.entity.EntityJoinWorldEvent;
@@ -107,7 +107,6 @@ public class Hammer {
         if (log_client_chunking && FMLCommonHandler.instance().getSide() == Side.CLIENT) {
             Core.loadBus(new ChunkLogger());
         }
-        GameRegistry.registerTileEntity(TileEntityComparatorMechanism.class, "fzds_comparator");
     }
 
     @EventHandler

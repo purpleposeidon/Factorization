@@ -53,7 +53,8 @@ public class BlockMatcher extends Block {
         // 2: Same material
         // 3: Same block
         // 4: Same MD
-        // NORELEASE TODO: Barrels
+        // NORELEASE TODO: Barrels. Not just 'are the items identical', but 'is this item the same as that block'.
+        // This stuff may be easier in 1.8.
         @SuppressWarnings("UnnecessaryLocalVariable")
         ForgeDirection dir1 = axis;
         ForgeDirection dir2 = axis.getOpposite();

@@ -463,7 +463,6 @@ public class HammerClientProxy extends HammerProxy {
                 ShadowPlayerAligner aligner = new ShadowPlayerAligner(realPlayer, fakePlayer, ray.parent);
                 aligner.apply(); // Change the player's look to shadow rotation
                 WorldSettings.GameType origType = mc.playerController.currentGameType;
-                // NORELEASE: Can we, uhm, not? mc.playerController.currentGameType = WorldSettings.GameType.CREATIVE;
                 try {
                     mc.entityRenderer.getMouseOver(1F);
                 } finally {

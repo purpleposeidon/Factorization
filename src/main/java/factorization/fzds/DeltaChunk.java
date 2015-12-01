@@ -61,7 +61,7 @@ public class DeltaChunk {
     
     static Set<IDeltaChunk> getSlicesInRange(World w, int lx, int ly, int lz, int hx, int hy, int hz) {
         THashSet<IDeltaChunk> found_deltachunks = new THashSet<IDeltaChunk>(10);
-        DeltaChunkMap map = DeltaChunk.getSlices(w); // NORELEASE: This guy keeps hold of dead DSEs?
+        DeltaChunkMap map = DeltaChunk.getSlices(w); // NORELEASE: This guy keeps hold of dead DSEs? Such as after save reload.
         IDeltaChunk last_found = null;
         for (int x = lx; x <= hx; x += 16) {
             for (int z = lz; z <= hz; z += 16) {
