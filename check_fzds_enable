@@ -17,8 +17,10 @@ for dirpath, dirnames, filenames in os.walk("src/", followlinks=True):
                 imports_fzds = True
             if " class " in line: break
         if imports_fzds and not imports_check:
-            print(name)
+            if baddies == 0: print("The following classes may be using FZDS without checking if it is enabled:")
+            print("\t", name)
             baddies += 1
 
 
+if baddies == 0: print("No suspicious FZDS usages!")
 raise SystemExit(baddies)
