@@ -13,6 +13,11 @@ public class HammerWorldProvider extends WorldProvider {
         super.registerWorldChunkManager();
         setAllowedSpawnTypes(false, false);
     }
+
+    @Override
+    public void setAllowedSpawnTypes(boolean hostiles, boolean peacefuls) {
+        super.setAllowedSpawnTypes(false, false);
+    }
     
     @Override
     public String getDimensionName() {
