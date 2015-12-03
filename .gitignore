@@ -10,7 +10,6 @@ DeSrg/fields.csv
 DeSrg/methods.csv
 build/
 fzversion
--i
 last_fz
 build.log
 bin/
