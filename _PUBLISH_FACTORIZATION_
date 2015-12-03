@@ -20,7 +20,7 @@ def getMinecraftVersion():
 def run(cmd, expect_exit_code=0):
   print "> ", cmd
   exit_code = os.system(cmd)
-  if expect_exit_code != exit_code:
+  if expect_exit_code != exit_code and expect_exit_code != None:
       print "> Exit code = ", exit_code
       if expect_exit_code != any: raise SystemExit(exit_code)
 
@@ -71,8 +71,13 @@ run("dropbox_uploader.sh upload " + oldfile + " Public/old/" + filename)
 run("dropbox_uploader.sh upload " + devify(oldfile) + " Public/old/" + devify(filename))
 
 #Mediafire
-run("mediafire upload --quiet " + oldfile + " > " + mfurl)
-mediafire_url = open(mfurl).read().strip().strip("()").strip()
+run("mediafire upload --quiet " + oldfile + " > " + mfurl, expect_exit_code=None)
+mediafire_url = ""
+try:
+    mediafire_url = open(mfurl).read().strip().strip("()").strip()
+except Exception as e:
+    print(e)
+
 if mediafire_url == "":
   print("Mediafire upload failed! Lameness! Enter the URL to use:")
   mediafire_url = raw_input()
