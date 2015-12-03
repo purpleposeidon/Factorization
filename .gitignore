@@ -5,27 +5,18 @@
 *.blend1
 *.blend2
 .*
-eclipse/
 DeSrg/fields.csv
 DeSrg/methods.csv
 build/
 fzversion
 last_fz
 build.log
-bin/
-out/
-OUT/
-factorization.iml
-factorization.ipr
-factorization.irs
-factorization.iws
 DeSrg/
-at.cfg
 backup.sh
 fznei.zip
 apis/
 all_events.txt
-
+src/main/Factorization.iml
 
 #Symlinked directories
 /lang
@@ -35,11 +26,9 @@ all_events.txt
 /screenshots
 /minecraft_textures
 
-# (I've likely derped up my intellij setup somehow)
-src/main/java/GradleStart.java
-src/main/java/GradleStartServer.java
-
-src/main/java/codechicken/
-
+#Symlinked files
+at.cfg
 QUICK_BUGS
 parables/
+
+
