@@ -1,4 +1,4 @@
-* A tab has a width of 4 spaces. Unfortunately, there's inconsistency with tabs vs. spaces; just roll with it and don't try to clean it up.
+* A tab has a width of 4 spaces.
 * Opening braces go on the same line. I will cut you.
 * Do not use reflection to poke at Minecraft's privates; always use the AT.
 * Make use of Coord, ForgeDirection, and Vec3; avoid decomposing them. All world+pos operations are available via Coord, including handy things like "spawn this ItemStack as an Entity"

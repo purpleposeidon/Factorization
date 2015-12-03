@@ -1,5 +1,0 @@
-
-convert -crop 16x16 ../lava_still.png lava_%04d.png
-convert /tmp/molten_gold/*.png -append molten_gold.png
-
-
