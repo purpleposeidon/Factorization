@@ -1,7 +1,0 @@
-#!/bin/sh
-
-export BUILD_NUMBER=9999
-./gradlew ciWriteBuildNumber
-./gradlew genPatches
-./gradlew buildPackages
-

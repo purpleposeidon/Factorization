@@ -13,23 +13,18 @@ fzversion
 last_fz
 build.log
 bin/
+out/
+OUT/
 factorization.iml
 factorization.ipr
 factorization.irs
 factorization.iws
-out/
-protips/
 DeSrg/
 at.cfg
 backup.sh
 fznei.zip
 apis/
 all_events.txt
-documentation_property
-letter
-fz_code_style.xml
-MinecraftForge
-OUT/
 
 
 #Symlinked directories
@@ -37,7 +32,6 @@ OUT/
 /fzsrc
 /textures
 /resources
-/sound_assets
 /screenshots
 /minecraft_textures
 
@@ -48,4 +42,4 @@ src/main/java/GradleStartServer.java
 src/main/java/codechicken/
 
 QUICK_BUGS
-fables/
+parables/
