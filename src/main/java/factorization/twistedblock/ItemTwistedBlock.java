@@ -41,7 +41,7 @@ public class ItemTwistedBlock extends ItemBlockProxy {
             float hitX, float hitY, float hitZ, int metadata) {
         if (world.isRemote) return false;
         if (player instanceof FakePlayer) return false;
-        Coord at = new Coord(world, x, y, z);
+        Coord at = new Coord(world, pos);
         if (world == DeltaChunk.getWorld(world)) {
             // Do the twist!
             IDeltaChunk[] found = DeltaChunk.getSlicesContainingPoint(at);

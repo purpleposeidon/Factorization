@@ -36,7 +36,7 @@ public class BlockForge extends BlockAnvil {
     public boolean onBlockActivated(World w, BlockPos pos, EntityPlayer player, int side, float vx, float vy, float vz) {
         if (w.isRemote) return true;
         if (InspirationManager.canMakeArtifact(player)) {
-            player.openGui(Core.instance, FactoryType.ARTIFACTFORGEGUI.gui, w, x, y, z);
+            player.openGui(Core.instance, FactoryType.ARTIFACTFORGEGUI.gui, w, pos);
         } else {
             player.addChatMessage(new ChatComponentTranslation("factorization.forge.wait").setChatStyle(InspirationManager.aqua));
         }

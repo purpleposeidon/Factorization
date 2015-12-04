@@ -17,7 +17,7 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 
 public class Quaternion implements IDataSerializable {
-    public double w, x, y, z;
+    public double w, pos;
     
     //Data functions
     public Quaternion() {
@@ -179,7 +179,7 @@ public class Quaternion implements IDataSerializable {
     }
     
     public Vec3 toVector() {
-        return new Vec3(x, y, z);
+        return new Vec3(pos);
     }
     
     /**

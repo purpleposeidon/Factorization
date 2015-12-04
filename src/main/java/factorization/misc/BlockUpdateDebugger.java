@@ -11,12 +11,12 @@ import net.minecraft.world.IWorldAccess;
 public class BlockUpdateDebugger implements IWorldAccess {
     @Override
     public void markBlockForUpdate(BlockPos pos) {
-        markBlockRangeForRenderUpdate(x, y, z, x, y, z);
+        markBlockRangeForRenderUpdate(pos, pos);
     }
 
     @Override
     public void markBlockForRenderUpdate(BlockPos pos) {
-        markBlockRangeForRenderUpdate(x, y, z, x, y, z);
+        markBlockRangeForRenderUpdate(pos, pos);
     }
 
     long last_time = -1;

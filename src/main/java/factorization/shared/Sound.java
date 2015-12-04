@@ -67,7 +67,7 @@ public enum Sound {
         if (w.isRemote) {
             return;
         }
-        Core.network.broadcastMessage(null, new Coord(w, x, y, z), MessageType.PlaySound, index);
+        Core.network.broadcastMessage(null, new Coord(w, pos), MessageType.PlaySound, index);
     }
 
     public static void receive(Coord coord, ByteBuf input) {
@@ -91,7 +91,7 @@ public enum Sound {
 
     public void playAt(World world, double x, double y, double z) {
         if (FMLCommonHandler.instance().getEffectiveSide() == Side.CLIENT) {
-            world.playSound(x, y, z, src, volume, pitch, false);
+            world.playSound(pos, src, volume, pitch, false);
         }
         share(world, (int) x, (int) y, (int) z);
     }

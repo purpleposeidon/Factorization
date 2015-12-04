@@ -23,7 +23,7 @@ public final class ServerShadowWorldAccess implements IWorldAccess {
 
     @Override
     public void playRecord(String sound, BlockPos pos) {
-        final Coord here = new Coord(world, x, y, z);
+        final Coord here = new Coord(world, pos);
         for (IDeltaChunk idc : DeltaChunk.getSlicesContainingPoint(here)) {
             Coord at = here.copy();
             idc.shadow2real(at);
@@ -33,7 +33,7 @@ public final class ServerShadowWorldAccess implements IWorldAccess {
 
     @Override
     public void playAuxSFX(EntityPlayer player, int soundType, BlockPos pos, int soundData) {
-        final Coord here = new Coord(world, x, y, z);
+        final Coord here = new Coord(world, pos);
         for (IDeltaChunk idc : DeltaChunk.getSlicesContainingPoint(here)) {
             Coord at = here.copy();
             idc.shadow2real(at);
@@ -43,7 +43,7 @@ public final class ServerShadowWorldAccess implements IWorldAccess {
 
     @Override
     public void playSoundToNearExcept(EntityPlayer player, String sound, double x, double y, double z, float volume, float pitch) {
-        final Coord here = new Coord(world, x, y, z);
+        final Coord here = new Coord(world, pos);
         for (IDeltaChunk idc : DeltaChunk.getSlicesContainingPoint(here)) {
             Coord at = here.copy();
             idc.shadow2real(at);
@@ -56,11 +56,11 @@ public final class ServerShadowWorldAccess implements IWorldAccess {
 
     @Override
     public void broadcastSound(int soundType, BlockPos pos, int type) {
-        final Coord here = new Coord(world, x, y, z);
+        final Coord here = new Coord(world, pos);
         for (IDeltaChunk idc : DeltaChunk.getSlicesContainingPoint(here)) {
             Coord at = here.copy();
             idc.shadow2real(at);
-            at.w.playBroadcastSound(soundType, x, y, z, type);
+            at.w.playBroadcastSound(soundType, pos, type);
         }
     }
 
@@ -71,12 +71,12 @@ public final class ServerShadowWorldAccess implements IWorldAccess {
 
     @Override
     public void markBlockForUpdate(BlockPos pos) {
-        markBlocksForUpdate(x, y, z, x, y, z);
+        markBlocksForUpdate(pos, pos);
     }
 
     @Override
     public void markBlockForRenderUpdate(BlockPos pos) {
-        markBlocksForUpdate(x, y, z, x, y, z);
+        markBlocksForUpdate(pos, pos);
     }
 
     void markBlocksForUpdate(int lx, int ly, int lz, int hx, int hy, int hz) {

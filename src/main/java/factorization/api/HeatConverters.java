@@ -13,7 +13,7 @@ public class HeatConverters {
 
     public static IFurnaceHeatable convert(World w, BlockPos pos) {
         for (IHeatConverter conv : converters) {
-            IFurnaceHeatable toastable = conv.convert(w, x, y, z);
+            IFurnaceHeatable toastable = conv.convert(w, pos);
             if (toastable != null) return toastable;
         }
         return null;

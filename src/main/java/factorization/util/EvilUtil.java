@@ -55,7 +55,7 @@ public class EvilUtil {
         double x = te.getPos().getX() + randNear(random, range);
         double y = te.getPos().getY() + randNear(random, range);
         double z = te.getPos().getZ() + randNear(random, range);
-        ent.setLocationAndAngles(x, y, z, random.nextFloat() * 360.0F, 0.0F);
+        ent.setLocationAndAngles(pos, random.nextFloat() * 360.0F, 0.0F);
     }
 
     public static void givePotion(EntityLiving ent, Potion potion, int level, boolean ambient) {

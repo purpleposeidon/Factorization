@@ -253,12 +253,12 @@ public abstract class AbstractServoMachine extends Entity implements IEntityAddi
 
     @Override
     public void setPosition(double x, double y, double z) {
-        // super.setPosition(x, y, z); //Super does some stupid shit to the bounding box. Does not mess with the chunk location or anything like that.
+        // super.setPosition(pos); //Super does some stupid shit to the bounding box. Does not mess with the chunk location or anything like that.
         this.posX = x;
         this.posY = y;
         this.posZ = z;
         double dp = 1;
-        this.boundingBox.setBounds(x, y, z, x + dp, y + dp, z + dp);
+        this.boundingBox.setBounds(pos, x + dp, y + dp, z + dp);
         /*
         double neg_size = -0.25;
         double pos_size = 0.75;
@@ -270,7 +270,7 @@ public abstract class AbstractServoMachine extends Entity implements IEntityAddi
 
     @Override
     public void setPositionAndRotation(double x, double y, double z, float yaw, float pitch) {
-        super.setPositionAndRotation(x, y, z, yaw, pitch);
+        super.setPositionAndRotation(pos, yaw, pitch);
     }
 
     protected MotionHandler newMotionHandler() {

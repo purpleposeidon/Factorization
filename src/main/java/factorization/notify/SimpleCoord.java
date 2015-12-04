@@ -4,7 +4,7 @@ import net.minecraft.world.World;
 
 public class SimpleCoord implements ISaneCoord {
     World w;
-    int x, y, z;
+    int pos;
     
     public SimpleCoord(World w, int x, int y, int z) {
         this.w = w;

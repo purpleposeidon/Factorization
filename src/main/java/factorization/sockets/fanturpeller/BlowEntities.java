@@ -155,7 +155,7 @@ public class BlowEntities extends SocketFanturpeller implements IEntitySelector 
                 double y = pick(area.minY, area.maxY) + d.getDirectionVec().getY()*ds;
                 double z = pick(area.minZ, area.maxZ) + d.getDirectionVec().getZ()*ds;
                 //Good ones: explode, cloud, smoke, snowshovel
-                worldObj.spawnParticle("cloud", x, y, z, facing.getDirectionVec().getX()*s, facing.getDirectionVec().getY()*s, facing.getDirectionVec().getZ()*s);
+                worldObj.spawnParticle("cloud", pos, facing.getDirectionVec().getX()*s, facing.getDirectionVec().getY()*s, facing.getDirectionVec().getZ()*s);
             }
         }
     }

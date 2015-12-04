@@ -457,11 +457,11 @@ public class DimensionSliceEntity extends IDeltaChunk implements IFzdsEntryContr
                         chunk = c.w.getChunkFromBlockCoords(x, z);
                     }
                     Block block = chunk.getBlock(x & 15, y, z & 15);
-                    if (block.isAir(c.w, x, y, z)) {
+                    if (block.isAir(c.w, pos)) {
                         continue;
                     }
                     if (start == null) {
-                        start = new AxisAlignedBB(x, y, z, x + 1, y + 1, z + 1);
+                        start = new AxisAlignedBB(pos, x + 1, y + 1, z + 1);
                     } else {
                         start.minX = Math.min(start.minX, x);
                         start.minY = Math.min(start.minY, y);
@@ -1169,8 +1169,8 @@ public class DimensionSliceEntity extends IDeltaChunk implements IFzdsEntryContr
     @Override
     public void setPositionAndRotation2(double x, double y, double z, float yaw, float pitch, int the_number_three) {
         // This function is disabled because entity position packets call it with insufficiently precise variables.
-//		this.setPosition(x, y, z);
-//		this.setRotation(yaw, pitch);
+//      this.setPosition(pos);
+//      this.setRotation(yaw, pitch);
     }
     
     @Override

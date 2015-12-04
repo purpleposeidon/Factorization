@@ -111,7 +111,7 @@ public class MetaAxisAlignedBB extends AxisAlignedBB implements IFzdsShenanigans
                             }
 
                             final Block block = chunk.getBlock(x & 0xF, y, z & 0xF);
-                            block.addCollisionBoxesToList(shadowWorld, x, y, z, box, ret, idc);
+                            block.addCollisionBoxesToList(shadowWorld, pos, box, ret, idc);
                         }
                     }
                 }

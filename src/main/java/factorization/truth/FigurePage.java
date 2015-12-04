@@ -114,7 +114,7 @@ public class FigurePage extends AbstractPage {
             rm.renderPosY = ent.posY;
             rm.renderPosZ = ent.posZ;
             GL11.glPushMatrix();
-            GL11.glTranslated(x, y, z);
+            GL11.glTranslated(pos);
             //GL11.glTranslated(ent.posX, ent.posY, ent.posZ);
             rm.renderEntitySimple(ent, 0);
             GL11.glPopMatrix();

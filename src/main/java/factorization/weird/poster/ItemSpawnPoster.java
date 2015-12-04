@@ -24,7 +24,7 @@ public class ItemSpawnPoster extends ItemFactorization {
     @Override
     public boolean onItemUse(ItemStack is, EntityPlayer player, World w, BlockPos pos, int side, float hitX, float hitY, float hitZ) {
         if (w.isRemote) return false;
-        final PosterPlacer placer = new PosterPlacer(is, player, w, x, y, z, side);
+        final PosterPlacer placer = new PosterPlacer(is, player, w, pos, side);
         if (placer.invoke()) return false;
         placer.spawn();
         return true;
@@ -60,7 +60,7 @@ public class ItemSpawnPoster extends ItemFactorization {
             this.y = y;
             this.z = z;
             this.side = side;
-            this.at = new Coord(w, x, y, z);
+            this.at = new Coord(w, pos);
             this.dir = SpaceUtil.getOrientation(side);
         }
 

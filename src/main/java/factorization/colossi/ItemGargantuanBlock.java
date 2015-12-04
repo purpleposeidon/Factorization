@@ -20,7 +20,7 @@ public class ItemGargantuanBlock extends ItemBlock {
     public boolean placeBlockAt(ItemStack stack, EntityPlayer player, World world, BlockPos pos, int side, float hitX, float hitY, float hitZ, int metadata) {
         EnumFacing dir = SpaceUtil.getOrientation(side);
         if (dir == null) return false;
-        Coord me = new Coord(world, x, y, z);
+        Coord me = new Coord(world, pos);
         Coord mate = me.add(dir);
         if (!mate.isReplacable()) return false;
         if (!world.canPlaceEntityOnSide(this.field_150939_a, mate.x, mate.y, mate.z, false, side, player, stack)) return false;

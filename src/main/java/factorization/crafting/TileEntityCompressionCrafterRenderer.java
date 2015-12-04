@@ -199,11 +199,11 @@ public class TileEntityCompressionCrafterRenderer extends TileEntitySpecialRende
             for (int x = lowerCorner.x; x <= upperCorner.x; x++) {
                 for (int y = lowerCorner.y; y <= upperCorner.y; y++) {
                     for (int z = lowerCorner.z; z <= upperCorner.z; z++) {
-                        Block b = w.getBlock(x, y, z);
+                        Block b = w.getBlock(pos);
                         if (b == null) {
                             if (renderPass == 3) {
                                 if (contentSize == null) {
-                                    contentSize = new AxisAlignedBB(x, y, z, x + 1, y + 1, z + 1);
+                                    contentSize = new AxisAlignedBB(pos, x + 1, y + 1, z + 1);
                                 } else {
                                     contentSize.minX = Math.min(contentSize.minX, x);
                                     contentSize.maxX = Math.max(contentSize.maxX, x + 1);
@@ -217,9 +217,9 @@ public class TileEntityCompressionCrafterRenderer extends TileEntitySpecialRende
                         }
                         if (renderPass == 3) {
                             if (contentSize == null) {
-                                contentSize = b.getSelectedBoundingBoxFromPool(w, x, y, z);
+                                contentSize = b.getSelectedBoundingBoxFromPool(w, pos);
                             } else {
-                                AxisAlignedBB extend = b.getSelectedBoundingBoxFromPool(w, x, y, z);
+                                AxisAlignedBB extend = b.getSelectedBoundingBoxFromPool(w, pos);
                                 if (extend != null) {
                                     contentSize.minX = Math.min(contentSize.minX, extend.minX);
                                     contentSize.maxX = Math.max(contentSize.maxX, extend.maxX);
@@ -230,7 +230,7 @@ public class TileEntityCompressionCrafterRenderer extends TileEntitySpecialRende
                                 }
                             }
                             TileEntity te;
-                            if ((te = w.getTileEntity(x, y, z)) != null) {
+                            if ((te = w.getTileEntity(pos)) != null) {
                                 Tessellator.instance = tesrator;
                                 TileEntityRendererDispatcher.instance.renderTileEntity(te, partial);
                                 Tessellator.instance = tess;
@@ -238,7 +238,7 @@ public class TileEntityCompressionCrafterRenderer extends TileEntitySpecialRende
                             continue;
                         }
                         if (b.canRenderInPass(renderPass)) {
-                            rb.renderBlockByRenderType(b, x, y, z);
+                            rb.renderBlockByRenderType(b, pos);
                         }
                     }
                 }

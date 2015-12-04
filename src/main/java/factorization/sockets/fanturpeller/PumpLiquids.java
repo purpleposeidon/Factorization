@@ -108,7 +108,7 @@ public class PumpLiquids extends SocketFanturpeller implements IFluidHandler {
     }
     
     static final class PumpCoord {
-        final int x, y, z;
+        final int pos;
         final short pathDistance;
         final PumpCoord parent;
         PumpCoord(Coord at, PumpCoord parent, int pathDistance) {

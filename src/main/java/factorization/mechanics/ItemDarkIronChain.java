@@ -32,7 +32,7 @@ public class ItemDarkIronChain extends ItemFactorization {
     @Override
     public boolean onItemUseFirst(ItemStack is, EntityPlayer player, World world, BlockPos pos, int side, float hitX, float hitY, float hitZ) {
         if (world.isRemote) return false;
-        Coord at = new Coord(world, x, y, z);
+        Coord at = new Coord(world, pos);
         if (player.isSneaking()) {
             clearPos(is, "real");
             clearPos(is, "shadow");
@@ -120,7 +120,7 @@ public class ItemDarkIronChain extends ItemFactorization {
         int x = tag.getInteger(name + ":x");
         int y = tag.getInteger(name + ":y");
         int z = tag.getInteger(name + ":z");
-        return new Coord(w, x, y, z);
+        return new Coord(w, pos);
     }
 
     EnumFacing loadSide(ItemStack is, String name) {

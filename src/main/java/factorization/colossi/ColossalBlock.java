@@ -81,7 +81,7 @@ public class ColossalBlock extends Block {
     @Override
     @SideOnly(Side.CLIENT)
     public IIcon getIcon(IBlockAccess w, BlockPos pos, int side) {
-        int md = w.getBlockMetadata(x, y, z);
+        int md = w.getBlockMetadata(pos);
         if (md == MD_EYE || md == MD_EYE_OPEN) {
             // This is here rather than up there so that the item form doesn't look lame
             if (side != EAST) return BlockIcons.colossi$mask;
@@ -108,24 +108,24 @@ public class ColossalBlock extends Block {
     
     @Override
     public float getBlockHardness(World world, BlockPos pos) {
-        int md = world.getBlockMetadata(x, y, z);
+        int md = world.getBlockMetadata(pos);
         if (md == MD_BODY_CRACKED || md == MD_MASK_CRACKED) {
             return 6; // 10
         }
         if (md == MD_MASK) {
             for (EnumFacing dir : EnumFacing.VALUES) {
                 if (isSupportive(world, x + dir.getDirectionVec().getX(), y + dir.getDirectionVec().getY(), z + dir.getDirectionVec().getZ())) {
-                    return super.getBlockHardness(world, x, y, z);
+                    return super.getBlockHardness(world, pos);
                 }
             }
             return 50; // 100
         }
-        return super.getBlockHardness(world, x, y, z);
+        return super.getBlockHardness(world, pos);
     }
     
     boolean isSupportive(World world, BlockPos pos) {
-        if (world.getBlock(x, y, z) != this) return false;
-        int md = world.getBlockMetadata(x, y, z);
+        if (world.getBlock(pos) != this) return false;
+        int md = world.getBlockMetadata(pos);
         return md == MD_BODY || md == MD_BODY_COVERED || md == MD_EYE || md == MD_EYE_OPEN || md == MD_CORE;
     }
     
@@ -170,7 +170,7 @@ public class ColossalBlock extends Block {
             ret.add(new ItemStack(Core.registry.logicMatrixProgrammer));
         }
         if (md == MD_BODY_CRACKED || md == MD_MASK_CRACKED) {
-            Coord me = new Coord(world, x, y, z);
+            Coord me = new Coord(world, pos);
             Coord back = me.add(EnumFacing.WEST);
             if (back.getBlock() == this && back.getMd() == MD_CORE) {
                 TransferLib.move(back, me, true, true);
@@ -184,7 +184,7 @@ public class ColossalBlock extends Block {
     @Override
     public void randomDisplayTick(World world, BlockPos pos, Random rand) {
         if (world.provider.dimensionId != DeltaChunk.getDimensionId()) return;
-        int md = world.getBlockMetadata(x, y, z);
+        int md = world.getBlockMetadata(pos);
         int r = md == MD_BODY_CRACKED ? 4 : 2;
         float px = x - 0.5F + rand.nextFloat()*r;
         float py = y - 0.5F + rand.nextFloat()*r;
@@ -217,14 +217,14 @@ public class ColossalBlock extends Block {
     
     @Override
     public ItemStack getPickBlock(MovingObjectPosition target, World world, BlockPos pos) {
-        return new ItemStack(this, 1, world.getBlockMetadata(x, y, z));
+        return new ItemStack(this, 1, world.getBlockMetadata(pos));
     }
     
     @Override
     public boolean onBlockActivated(World world, BlockPos pos, EntityPlayer player, int side, float vecX, float vecY, float vecZ) {
         if (world.isRemote) return false;
         if (player == null) return false;
-        Coord at = new Coord(world, x, y, z);
+        Coord at = new Coord(world, pos);
         ItemStack held = player.getHeldItem();
         int md = at.getMd();
         if (md != MD_CORE) return false;
@@ -286,11 +286,11 @@ public class ColossalBlock extends Block {
 
     @Override
     public void onBlockPlacedBy(World world, BlockPos pos, EntityLivingBase player, ItemStack is) {
-        super.onBlockPlacedBy(world, x, y, z, player, is);
+        super.onBlockPlacedBy(world, pos, player, is);
         if (is.getItemDamage() != MD_CORE) {
             return;
         }
-        Coord at = new Coord(world, x, y, z);
+        Coord at = new Coord(world, pos);
         at.setTE(new TileEntityColossalHeart());
     }
     
@@ -301,10 +301,10 @@ public class ColossalBlock extends Block {
     
     @Override
     public void breakBlock(World world, BlockPos pos, Block block, int md) {
-        super.breakBlock(world, x, y, z, block, md);
+        super.breakBlock(world, pos, block, md);
         if (world.isRemote) return;
         if (world == DeltaChunk.getServerShadowWorld()) return;
-        Coord at = new Coord(world, x, y, z);
+        Coord at = new Coord(world, pos);
         if (md == MD_BODY_CRACKED || md == MD_MASK_CRACKED) {
             for (Coord neighbor : at.getNeighborsAdjacent()) {
                 if (neighbor.getBlock() == this && neighbor.getMd() == MD_BODY) {

@@ -150,7 +150,7 @@ public class ItemSculptingTool extends ItemFactorization {
         if (w.isRemote) {
             return true;
         }
-        Coord here = new Coord(w, x, y, z);
+        Coord here = new Coord(w, pos);
         TileEntityGreenware gw = here.getTE(TileEntityGreenware.class);
         if (gw == null) {
             if (player.isSneaking()) {

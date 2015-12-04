@@ -59,7 +59,7 @@ class ShadowRenderGlobal implements IWorldAccess {
     @Override
     public void playSound(String sound, double x, double y, double z, float volume, float pitch) {
         if (sound == null) return; // Odd. Has happened a few times tho.
-        Vec3 realCoords = DeltaChunk.shadow2nearestReal(Minecraft.getMinecraft().thePlayer, x, y, z);
+        Vec3 realCoords = DeltaChunk.shadow2nearestReal(Minecraft.getMinecraft().thePlayer, pos);
         if (realCoords == null) {
             return;
         }
@@ -69,14 +69,14 @@ class ShadowRenderGlobal implements IWorldAccess {
     @Override
     public void playSoundToNearExcept(EntityPlayer entityplayer, String sound, double x, double y, double z, float volume, float pitch) {
         if (entityplayer != Minecraft.getMinecraft().thePlayer) {
-            playSound(sound, x, y, z, volume, pitch);
+            playSound(sound, pos, volume, pitch);
         }
     }
 
 
     @Override
     public void playRecord(String recordName, BlockPos pos) {
-        Vec3 realCoords = DeltaChunk.shadow2nearestReal(Minecraft.getMinecraft().thePlayer, x, y, z);
+        Vec3 realCoords = DeltaChunk.shadow2nearestReal(Minecraft.getMinecraft().thePlayer, pos);
         if (realCoords == null) {
             return;
         }
@@ -85,17 +85,17 @@ class ShadowRenderGlobal implements IWorldAccess {
 
     @Override
     public void broadcastSound(int soundType, BlockPos pos, int type) {
-        final Coord here = new Coord(DeltaChunk.getClientShadowWorld(), x, y, z);
+        final Coord here = new Coord(DeltaChunk.getClientShadowWorld(), pos);
         for (IDeltaChunk idc : DeltaChunk.getSlicesContainingPoint(here)) {
             Coord at = here.copy();
             idc.shadow2real(at);
-            at.w.playBroadcastSound(soundType, x, y, z, type);
+            at.w.playBroadcastSound(soundType, pos, type);
         }
     }
 
     @Override
     public void playAuxSFX(EntityPlayer player, int soundType, BlockPos pos, int soundData) {
-        final Coord here = new Coord(DeltaChunk.getClientShadowWorld(), x, y, z);
+        final Coord here = new Coord(DeltaChunk.getClientShadowWorld(), pos);
         for (IDeltaChunk idc : DeltaChunk.getSlicesContainingPoint(here)) {
             Coord at = here.copy();
             idc.shadow2real(at);
@@ -105,7 +105,7 @@ class ShadowRenderGlobal implements IWorldAccess {
 
     @Override
     public void spawnParticle(String particle, double x, double y, double z, double vx, double vy, double vz) {
-        Vec3 realCoords = DeltaChunk.shadow2nearestReal(Minecraft.getMinecraft().thePlayer, x, y, z);
+        Vec3 realCoords = DeltaChunk.shadow2nearestReal(Minecraft.getMinecraft().thePlayer, pos);
         if (realCoords == null) {
             return;
         }

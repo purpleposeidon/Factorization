@@ -36,10 +36,10 @@ public class BlockDarkIronOre extends Block {
         if (te_particles > 80) {
             return;
         }
-        if (!inRange(x, y, z, Minecraft.getMinecraft().thePlayer)) {
+        if (!inRange(pos, Minecraft.getMinecraft().thePlayer)) {
             return;
         }
-        if (world.getTileEntity(x, y, z) != null) {
+        if (world.getTileEntity(pos) != null) {
             return;
         }
         for (EnumFacing dir : EnumFacing.VALUES) {
@@ -47,8 +47,8 @@ public class BlockDarkIronOre extends Block {
                 continue;
             }
             TileEntity te = new Glint();
-            world.setTileEntity(x, y, z, te);
-            world.markBlockForUpdate(x, y, z);
+            world.setTileEntity(pos, te);
+            world.markBlockForUpdate(pos);
             return;
         }
     }

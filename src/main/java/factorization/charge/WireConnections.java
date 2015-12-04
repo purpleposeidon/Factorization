@@ -231,7 +231,7 @@ public class WireConnections {
     public MovingObjectPosition collisionRayTrace(World w, BlockPos pos, Vec3 startVec, Vec3 endVec) {
         for (WireRenderingCube part : getParts()) {
             part.toBlockBounds(Core.registry.resource_block);
-            MovingObjectPosition ret = Core.registry.resource_block.collisionRayTrace(w, x, y, z, startVec, endVec);
+            MovingObjectPosition ret = Core.registry.resource_block.collisionRayTrace(w, pos, startVec, endVec);
             if (ret != null) {
                 Core.registry.resource_block.setBlockBounds(0, 0, 0, 1, 1, 1);
                 return ret;

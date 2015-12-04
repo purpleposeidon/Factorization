@@ -10,7 +10,7 @@ import net.minecraft.world.World;
 class DefaultHeatConverter implements HeatConverters.IHeatConverter {
     @Override
     public IFurnaceHeatable convert(World w, BlockPos pos) {
-        TileEntity te = w.getTileEntity(x, y, z);
+        TileEntity te = w.getTileEntity(pos);
         if (te instanceof IFurnaceHeatable) return (IFurnaceHeatable) te;
         if (te instanceof TileEntityFurnace) return new FurnaceHeating((TileEntityFurnace) te);
         return null;

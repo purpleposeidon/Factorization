@@ -112,7 +112,7 @@ class ClientMessage {
             final double x = interp(e.prevPosX, e.posX, partial) + w / 2;
             final double y = interp(e.prevPosY, e.posY, partial) + eye_height;
             final double z = interp(e.prevPosZ, e.posZ, partial) + w / 2;
-            return new Vec3(x, y, z);
+            return new Vec3(pos);
         }
         if (locus instanceof TileEntity) {
             TileEntity te = ((TileEntity) locus);

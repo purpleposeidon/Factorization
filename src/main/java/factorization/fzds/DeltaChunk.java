@@ -257,7 +257,7 @@ public class DeltaChunk {
         for (int x = a.x; x <= b.x; x++) {
             for (int y = a.y; y <= b.y; y++) {
                 for (int z = a.z; z <= b.z; z++) {
-                    c.set(a.w, x, y, z);
+                    c.set(a.w, pos);
                     if (c.isAir()) continue;
                     dest.set(c);
                     selected.shadow2real(dest);
@@ -295,7 +295,7 @@ public class DeltaChunk {
         for (int x = a.x; x < b.x; x++) {
             for (int y = a.y; y < b.y; y++) {
                 for (int z = a.z; z < b.z; z++) {
-                    c.set(a.w, x, y, z);
+                    c.set(a.w, pos);
                     selected.shadow2real(c);
                     c.markBlockForUpdate();
                 }

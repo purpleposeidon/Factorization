@@ -138,7 +138,7 @@ public class HammerNet {
         double x = dis.readDouble();
         double y = dis.readDouble();
         double z = dis.readDouble();
-        Vec3 vec = new Vec3(x, y, z);
+        Vec3 vec = new Vec3(pos);
         dse.setRotationalCenterOffset(vec);
     }
     
@@ -179,11 +179,11 @@ public class HammerNet {
             int z = dis.readInt();
             byte sideHit = dis.readByte();
             if (type == HammerNetType.digFinish) {
-                breakBlock(idc, player, dis, x, y, z, sideHit);
+                breakBlock(idc, player, dis, pos, sideHit);
             } else if (type == HammerNetType.digStart) {
-                punchBlock(idc, player, dis, x, y, z, sideHit);
+                punchBlock(idc, player, dis, pos, sideHit);
             }
-            idc.blocksChanged(x, y, z);
+            idc.blocksChanged(pos);
         } else if (type == HammerNetType.rightClickBlock) {
             /*if (!idc.can(DeltaCapability.BLOCK_PLACE)) {
                 Core.logWarning("%s tried to use an item on IDC that doesn't permit that %s", player, idc);
@@ -199,12 +199,12 @@ public class HammerNet {
             try {
                 dont_check_range = false;
                 active_idc = idc;
-                clickBlock(idc, player, x, y, z, sideHit, vecX, vecY, vecZ);
+                clickBlock(idc, player, pos, sideHit, vecX, vecY, vecZ);
             } finally {
                 dont_check_range = true;
                 active_idc = null;
             }
-            idc.blocksChanged(x, y, z);
+            idc.blocksChanged(pos);
         } else if (type == HammerNetType.leftClickBlock) {
             int x = dis.readInt();
             int y = dis.readInt();
@@ -213,7 +213,7 @@ public class HammerNet {
             float vecX = dis.readFloat();
             float vecY = dis.readFloat();
             float vecZ = dis.readFloat();
-            leftClickBlock(idc, player, dis, x, y, z, sideHit, vecX, vecY, vecZ);
+            leftClickBlock(idc, player, dis, pos, sideHit, vecX, vecY, vecZ);
         } else if (type == HammerNetType.rightClickEntity || type == HammerNetType.leftClickEntity) {
             int entId = dis.readInt();
             Entity hitEnt = idc.getCorner().w.getEntityByID(entId);
@@ -271,7 +271,7 @@ public class HammerNet {
     }
     
     void breakBlock(IDeltaChunk idc, EntityPlayerMP player, ByteBuf dis, int x, int y, int z, byte sideHit) {
-        Coord at = new Coord(DeltaChunk.getServerShadowWorld(), x, y, z);
+        Coord at = new Coord(DeltaChunk.getServerShadowWorld(), pos);
         if (at.isAir()) return;
         if (!blockInReach(idc, player, at)) return;
         if (idc.getController().breakBlock(idc, player, at, sideHit)) return;
@@ -286,25 +286,25 @@ public class HammerNet {
     }
     
     void punchBlock(IDeltaChunk idc, EntityPlayerMP player, ByteBuf dis, int x, int y, int z, byte sideHit) {
-        Coord at = new Coord(DeltaChunk.getServerShadowWorld(), x, y, z);
+        Coord at = new Coord(DeltaChunk.getServerShadowWorld(), pos);
         if (at.isAir()) return;
         if (!blockInReach(idc, player, at)) return;
         if (idc.getController().hitBlock(idc, player, at, sideHit)) return;
         Block block = at.getBlock();
         WorldServer shadow_world = (WorldServer) DeltaChunk.getServerShadowWorld();
         InteractionLiason liason = getLiason(shadow_world, player, idc);
-        block.onBlockClicked(shadow_world, x, y, z, liason);
+        block.onBlockClicked(shadow_world, pos, liason);
         liason.finishUsingLiason();
     }
 
     void leftClickBlock(IDeltaChunk idc, EntityPlayerMP player, ByteBuf dis, int x, int y, int z, byte sideHit, float vecX, float vecY, float vecZ) {
-        Coord at = new Coord(DeltaChunk.getServerShadowWorld(), x, y, z);
+        Coord at = new Coord(DeltaChunk.getServerShadowWorld(), pos);
         if (at.isAir()) return;
         if (!blockInReach(idc, player, at)) return;
         if (idc.getController().hitBlock(idc, player, at, sideHit)) return;
         // TODO: Liason?
         Block block = at.getBlock();
-        block.onBlockClicked(at.w, x, y, z, player);
+        block.onBlockClicked(at.w, pos, player);
     }
 
     void clickEntity(IDeltaChunk idc, EntityPlayerMP player, Entity hitEnt, boolean leftClick) {
@@ -327,14 +327,14 @@ public class HammerNet {
     private boolean do_click(IDeltaChunk idc, WorldServer world, EntityPlayerMP player, int x, int y, int z, byte sideHit, float vecX, float vecY, float vecZ) {
         // Copy of PlayerControllerMP.onPlayerRightClick
         ItemStack is = player.getHeldItem();
-        if (is != null && is.getItem().onItemUseFirst(is, player, world, x, y, z, sideHit, vecX, vecY, vecZ)) {
+        if (is != null && is.getItem().onItemUseFirst(is, player, world, pos, sideHit, vecX, vecY, vecZ)) {
             return true;
         }
         boolean ret = false;
 
         if (!player.isSneaking() || player.getHeldItem() == null
-                || player.getHeldItem().getItem().doesSneakBypassUse(world, x, y, z, player)) {
-            ret = world.getBlock(x, y, z).onBlockActivated(world, x, y, z, player, sideHit, vecX, vecY, vecZ);
+                || player.getHeldItem().getItem().doesSneakBypassUse(world, pos, player)) {
+            ret = world.getBlock(pos).onBlockActivated(world, pos, player, sideHit, vecX, vecY, vecZ);
         }
 
         if (ret) {
@@ -344,13 +344,13 @@ public class HammerNet {
         } else if (PlayerUtil.isPlayerCreative(player)) {
             int j1 = is.getItemDamage();
             int i1 = is.stackSize;
-            boolean flag1 = is.tryPlaceItemIntoWorld(player, world, x, y, z,
+            boolean flag1 = is.tryPlaceItemIntoWorld(player, world, pos,
                     sideHit, vecX, vecY, vecZ);
             is.setItemDamage(j1);
             is.stackSize = i1;
             return flag1;
         } else {
-            if (!is.tryPlaceItemIntoWorld(player, world, x, y, z, sideHit, vecX, vecY, vecZ)) {
+            if (!is.tryPlaceItemIntoWorld(player, world, pos, sideHit, vecX, vecY, vecZ)) {
                 return false;
             }
             if (is.stackSize <= 0) {
@@ -362,14 +362,14 @@ public class HammerNet {
     
     void clickBlock(IDeltaChunk idc, EntityPlayerMP real_player, int x, int y, int z, byte sideHit, float vecX, float vecY, float vecZ) throws IOException {
         WorldServer shadowWorld = (WorldServer) DeltaChunk.getServerShadowWorld();
-        Coord at = new Coord(shadowWorld, x, y, z);
+        Coord at = new Coord(shadowWorld, pos);
         if (at.isAir()) return;
         if (!blockInReach(idc, real_player, at)) return;
         if (idc.getController().useBlock(idc, real_player, at, sideHit)) return;
         
         InteractionLiason liason = getLiason(shadowWorld, real_player, idc);
         try {
-            do_click(idc, shadowWorld, liason, x, y, z, sideHit, vecX, vecY, vecZ);
+            do_click(idc, shadowWorld, liason, pos, sideHit, vecX, vecY, vecZ);
         } catch (Throwable t) {
             t.printStackTrace();
         }

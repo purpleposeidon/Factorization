@@ -62,7 +62,7 @@ public class BlockUndo {
     }
 
     private static class PlacedBlock {
-        final int w, x, y, z, idmd;
+        final int w, pos, idmd;
         final ItemStack orig;
 
         private PlacedBlock(int w, BlockPos pos, int idmd, ItemStack orig) {
@@ -106,7 +106,7 @@ public class BlockUndo {
     }
 
     private static ItemStack toItem(Block b, World w, BlockPos pos, int md) {
-        for (ItemStack is : b.getDrops(w, x, y, z, md, 0)) {
+        for (ItemStack is : b.getDrops(w, pos, md, 0)) {
             return is;
         }
         return null;
@@ -190,7 +190,7 @@ public class BlockUndo {
         final int z = event.z;
         final EntityPlayer player = event.entityPlayer;
         if (stillBusy(player)) return;
-        if (!canUndo(event, x, y, z, block, md)) return;
+        if (!canUndo(event, pos, block, md)) return;
         // Duplicate logic to figure out what the *actual* break speed will be, so that we don't make this actual break speed too fast
         float hardness = block.getBlockHardness(player.world, pos);
         if (hardness < 0.0F) {
@@ -257,7 +257,7 @@ public class BlockUndo {
         if (heat == null || !(thePlayer instanceof EntityPlayerMP)) {
             return;
         }
-        if (!ItemUtil.identical(heat.orig, toItem(block, w, x, y, z, md))) {
+        if (!ItemUtil.identical(heat.orig, toItem(block, w, pos, md))) {
             return;
         }
         EntityPlayerMP real_player = (EntityPlayerMP) thePlayer;
@@ -271,7 +271,7 @@ public class BlockUndo {
             return;
         }
         if (block.getItemDropped(md, thePlayer.worldObj.rand, 0) != DataUtil.getItem(block)) {
-            if (!real_player.isSneaking() && block.getBlockHardness(w, x, y, z) < 1) {
+            if (!real_player.isSneaking() && block.getBlockHardness(w, pos) < 1) {
                 return;
             }
         }
@@ -284,21 +284,21 @@ public class BlockUndo {
         tool.setItemDamage(tool.getMaxDamage());
         tool.addEnchantment(Enchantment.silkTouch, 1);
         tool.stackSize = 0;
-        EntityPlayer fake_player = PlayerUtil.makePlayer(new Coord(w, x, y, z), "BlockUndo");
+        EntityPlayer fake_player = PlayerUtil.makePlayer(new Coord(w, pos), "BlockUndo");
         fake_player.setCurrentItemOrArmor(0, tool);
         {
             double r = 0.5;
             AxisAlignedBB box = new AxisAlignedBB(x - r, y - r, z - r, x + 1 + r, y + 1 + r, z + 1 + r);
-            block.onBlockHarvested(w, x, y, z, md, fake_player);
-            boolean canDestroy = block.removedByPlayer(w, fake_player, x, y, z, true);
+            block.onBlockHarvested(w, pos, md, fake_player);
+            boolean canDestroy = block.removedByPlayer(w, fake_player, pos, true);
 
             if (canDestroy) {
-                block.onBlockDestroyedByPlayer(w, x, y, z, md);
+                block.onBlockDestroyedByPlayer(w, pos, md);
             }
-            block.harvestBlock(w, fake_player, x, y, z, md);
+            block.harvestBlock(w, fake_player, pos, md);
             if (canDestroy) {
                 int xp = block.getExpDrop(w, md, 0);
-                block.dropXpOnBlockBreak(w, x, y, z, xp);
+                block.dropXpOnBlockBreak(w, pos, xp);
             }
             if (FzConfig.blockundo_grab) {
                 for (Object o : w.getEntitiesWithinAABB(EntityItem.class, box)) {

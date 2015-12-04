@@ -502,7 +502,7 @@ public class FZDSCommand extends CommandBase {
                         for (int x = lower.x; x <= upper.x; x++) {
                             for (int y = lower.y; y <= upper.y; y++) {
                                 for (int z = lower.z; z <= upper.z; z++) {
-                                    here.set(here.w, x, y, z);
+                                    here.set(here.w, pos);
                                     destination.include(here);
                                 }
                             }
@@ -555,7 +555,7 @@ public class FZDSCommand extends CommandBase {
                         for (int x = lower.x; x <= upper.x; x++) {
                             for (int y = lower.y; y <= upper.y; y++) {
                                 for (int z = lower.z; z <= upper.z; z++) {
-                                    here.set(here.w, x, y, z);
+                                    here.set(here.w, pos);
                                     destination.include(here);
                                 }
                             }
@@ -833,24 +833,24 @@ public class FZDSCommand extends CommandBase {
                     } else if (type == 'v') {
                         selected.addVelocity(x/20, y/20, z/20);
                     } else if (type == 'r') {
-                        selected.getRotation().incrAdd(new Quaternion(w, x, y, z));
+                        selected.getRotation().incrAdd(new Quaternion(w, pos));
                     } else if (type == 'w') {
-                        selected.getRotationalVelocity().incrAdd(new Quaternion(w, x, y, z));
+                        selected.getRotationalVelocity().incrAdd(new Quaternion(w, pos));
                     } else {
                         sendChat("Not a command?");
                     }
                 } else if (args[0].equals("=")) {
                     if (type == 'd' || type == 's') {
-                        selected.setPosition(x, y, z);
+                        selected.setPosition(pos);
                     } else if (type == 'v') {
                         selected.motionX = 0;
                         selected.motionY = 0;
                         selected.motionZ = 0;
                         selected.addVelocity(x/20, y/20, z/20);
                     } else if (type == 'r') {
-                        selected.setRotation((new Quaternion(w, x, y, z)));
+                        selected.setRotation((new Quaternion(w, pos)));
                     } else if (type == 'w') {
-                        Quaternion omega = (new Quaternion(w, x, y, z));
+                        Quaternion omega = (new Quaternion(w, pos));
                         selected.setRotationalVelocity(omega);
                     } else {
                         sendChat("Not a command?");

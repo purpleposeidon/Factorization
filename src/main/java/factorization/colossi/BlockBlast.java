@@ -28,13 +28,13 @@ public class BlockBlast extends Block {
 
     @Override
     public void onNeighborBlockChange(World world, BlockPos pos, Block block) {
-        world.scheduleBlockUpdate(x, y, z, this, 6 + world.rand.nextInt(4));
+        world.scheduleBlockUpdate(pos, this, 6 + world.rand.nextInt(4));
     }
 
     @Override
     public void onNeighborChange(IBlockAccess world, BlockPos pos, int tileX, int tileY, int tileZ) {
         /*if (world instanceof World) {
-            onNeighborBlockChange((World) world, x, y, z, world.getBlock(tileX, tileY, tileZ));
+            onNeighborBlockChange((World) world, pos, world.getBlock(tileX, tileY, tileZ));
         }*/
     }
 
@@ -54,14 +54,14 @@ public class BlockBlast extends Block {
 
     @Override
     public float getExplosionResistance(Entity explosion, World world, BlockPos pos, double explosionX, double explosionY, double explosionZ) {
-        world.setBlockMetadataWithNotify(x, y, z, 1, 0);
-        onNeighborBlockChange(world, x, y, z, this);
-        return super.getExplosionResistance(explosion, world, x, y, z, explosionX, explosionY, explosionZ);
+        world.setBlockMetadataWithNotify(pos, 1, 0);
+        onNeighborBlockChange(world, pos, this);
+        return super.getExplosionResistance(explosion, world, pos, explosionX, explosionY, explosionZ);
     }
 
     @Override
     public void updateTick(World world, BlockPos pos, Random rand) {
-        boolean boom = world.getBlockMetadata(x, y, z) == 1;
+        boolean boom = world.getBlockMetadata(pos) == 1;
         if (!boom) {
             for (EnumFacing dir : EnumFacing.VALUES) {
                 int atX = x + dir.getDirectionVec().getX();
@@ -77,8 +77,8 @@ public class BlockBlast extends Block {
         }
         if (!boom) return;
         boom(world, x + 0.5, y + 0.5, z + 0.5);
-        world.setBlockToAir(x, y, z);
-        this.onBlockExploded(world, x, y, z, null);
+        world.setBlockToAir(pos);
+        this.onBlockExploded(world, pos, null);
     }
     
     double explosionSize = 8;

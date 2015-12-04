@@ -109,7 +109,7 @@ public class NotifyImplementation {
                 }
                 if (world != null && !failed) {
                     int dimension = world.getWorldInfo().getVanillaDimension();
-                    target = new TargetPoint(dimension, x, y, z, range);
+                    target = new TargetPoint(dimension, pos, range);
                 }
             }
             if (args == null) args = new String[0];

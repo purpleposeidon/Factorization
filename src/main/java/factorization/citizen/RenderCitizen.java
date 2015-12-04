@@ -27,7 +27,7 @@ public class RenderCitizen extends RenderEntity {
 
         Minecraft.getMinecraft().getTextureManager().bindTexture(getEntityTexture(ent));
         GL11.glPushMatrix();
-        GL11.glTranslated(x, y, z);
+        GL11.glTranslated(pos);
 
         float t = (partial + citizen.spinning_ticks) / EntityCitizen.TICKS_PER_SPIN;
         if (t < 0) t = 0;

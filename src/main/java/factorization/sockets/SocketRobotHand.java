@@ -210,7 +210,7 @@ public class SocketRobotHand extends TileEntitySocketBase {
         final Item item = itemstack == null ? null : itemstack.getItem();
         final long origItemHash = ItemUtil.getItemHash(itemstack);
 
-        PlayerInteractEvent event = new PlayerInteractEvent(player, PlayerInteractEvent.Action.RIGHT_CLICK_BLOCK, x, y, z, side, world);
+        PlayerInteractEvent event = new PlayerInteractEvent(player, PlayerInteractEvent.Action.RIGHT_CLICK_BLOCK, pos, side, world);
         if (MinecraftForge.EVENT_BUS.post(event)) {
             return false;
         }
@@ -220,7 +220,7 @@ public class SocketRobotHand extends TileEntitySocketBase {
             //PlayerControllerMP.onPlayerRightClick
             if (firstTry && itemstack != null) {
                 ItemStack orig = itemstack.copy();
-                if (item.onItemUseFirst(itemstack, player, world, x, y, z, side, dx, dy, dz)) {
+                if (item.onItemUseFirst(itemstack, player, world, pos, side, dx, dy, dz)) {
                     ret = true;
                     break;
                 }
@@ -230,10 +230,10 @@ public class SocketRobotHand extends TileEntitySocketBase {
                 }
             }
             
-            if (!player.isSneaking() || itemstack == null || item.doesSneakBypassUse(world, x, y, z, player)) {
-                Block blockId = world.getBlock(x, y, z);
+            if (!player.isSneaking() || itemstack == null || item.doesSneakBypassUse(world, pos, player)) {
+                Block blockId = world.getBlock(pos);
             
-                if (blockId != null && blockId.onBlockActivated(world, x, y, z, player, side, dx, dy, dz)) {
+                if (blockId != null && blockId.onBlockActivated(world, pos, player, side, dx, dy, dz)) {
                     ret = true;
                     break;
                 }
@@ -242,7 +242,7 @@ public class SocketRobotHand extends TileEntitySocketBase {
                 ret = false;
                 break;
             }
-            ret = itemstack.tryPlaceItemIntoWorld(player, world, x, y, z, side, dx, dy, dz);
+            ret = itemstack.tryPlaceItemIntoWorld(player, world, pos, side, dx, dy, dz);
             break;
         } while (false);
         if (itemstack == null) {

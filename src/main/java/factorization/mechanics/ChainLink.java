@@ -84,8 +84,8 @@ public class ChainLink {
         int x = (int) at.xCoord;
         int y = (int) at.yCoord;
         int z = (int) at.zCoord;
-        Block b = world.getBlock(x, y, z);
-        int brightness = b.getMixedBrightnessForBlock(world, x, y, z);
+        Block b = world.getBlock(pos);
+        int brightness = b.getMixedBrightnessForBlock(world, pos);
         tess.setBrightness(brightness);
     }
 

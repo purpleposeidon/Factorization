@@ -36,7 +36,7 @@ public class ItemBlockProxy extends ItemFactorization {
             float hitX, float hitY, float hitZ, int metadata) {
         proxy.stackSize = stack.stackSize;
         proxy.setTagCompound(stack.getTagCompound());
-        boolean ret = theBlockItem.placeBlockAt(proxy, player, world, x, y, z, side, hitX, hitY, hitZ, metadata);
+        boolean ret = theBlockItem.placeBlockAt(proxy, player, world, pos, side, hitX, hitY, hitZ, metadata);
         stack.stackSize = proxy.stackSize;
         return ret;
     }

@@ -28,7 +28,7 @@ public class EntityMinecartDayBarrel extends EntityMinecart implements IInventor
     }
 
     public EntityMinecartDayBarrel(World world, double x, double y, double z) {
-        super(world, x, y, z);
+        super(world, pos);
     }
 
     @Override

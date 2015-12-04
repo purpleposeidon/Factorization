@@ -34,7 +34,7 @@ public class ItemDocBook extends ItemFactorization implements IDocBook {
         if (!world.isRemote) return false;
         if (!player.isSneaking()) return false;
         Minecraft mc = Minecraft.getMinecraft();
-        Coord at = new Coord(world, x, y, z);
+        Coord at = new Coord(world, pos);
         ItemStack hit = FzUtil.getReifiedBarrel(at);
         if (hit == null) {
             hit = at.getPickBlock(mc.objectMouseOver);

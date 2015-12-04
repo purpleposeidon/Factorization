@@ -164,7 +164,7 @@ public class NetworkFactorization {
             int x = input.readInt();
             int y = input.readInt();
             int z = input.readInt();
-            Coord here = new Coord(world, x, y, z);
+            Coord here = new Coord(world, pos);
             
             if (Core.debug_network) {
                 if (world.isRemote) {
@@ -189,7 +189,7 @@ public class NetworkFactorization {
             }
             
             if (messageType == MessageType.RedrawOnClient && world.isRemote) {
-                world.markBlockForUpdate(x, y, z);
+                world.markBlockForUpdate(pos);
                 return;
             }
 
@@ -204,7 +204,7 @@ public class NetworkFactorization {
                 }
                 TileEntityCommon spawn = here.getTE(TileEntityCommon.class);
                 if (spawn != null && spawn.getFactoryType() != ft) {
-                    world.removeTileEntity(x, y, z);
+                    world.removeTileEntity(pos);
                     spawn = null;
                 }
                 if (spawn == null) {
@@ -214,7 +214,7 @@ public class NetworkFactorization {
                         return;
                     }
                     spawn.setWorldObj(world);
-                    world.setTileEntity(x, y, z, spawn);
+                    world.setTileEntity(pos, spawn);
                 }
 
                 DataInByteBuf data = new DataInByteBuf(input, Side.CLIENT);
@@ -232,7 +232,7 @@ public class NetworkFactorization {
 
             TileEntityCommon tec = here.getTE(TileEntityCommon.class);
             if (tec == null) {
-                handleForeignMessage(world, x, y, z, tec, messageType, input);
+                handleForeignMessage(world, pos, tec, messageType, input);
                 return;
             }
             boolean handled;
@@ -242,7 +242,7 @@ public class NetworkFactorization {
                 handled = tec.handleMessageFromClient(messageType, input);
             }
             if (!handled) {
-                handleForeignMessage(world, x, y, z, tec, messageType, input);
+                handleForeignMessage(world, pos, tec, messageType, input);
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -253,7 +253,7 @@ public class NetworkFactorization {
         if (!world.isRemote) {
             //Nothing for the server to deal with
         } else {
-            Coord here = new Coord(world, x, y, z);
+            Coord here = new Coord(world, pos);
             switch (messageType) {
             case PlaySound:
                 Sound.receive(here, input);

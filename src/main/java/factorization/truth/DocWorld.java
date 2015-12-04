@@ -102,7 +102,7 @@ public class DocWorld extends WorldClient {
     
     @Override
     public Block getBlock(BlockPos pos) {
-        int i = getIndex(x, y, z);
+        int i = getIndex(pos);
         if (i == -1) return Blocks.air;
         int id = blockIds[i];
         if (id == -10) {
@@ -118,7 +118,7 @@ public class DocWorld extends WorldClient {
     
     @Override
     public int getBlockMetadata(BlockPos pos) {
-        int i = getIndex(x, y, z);
+        int i = getIndex(pos);
         if (i == -1) return 0;
         return blockMetadatas[i];
     }
@@ -174,17 +174,17 @@ public class DocWorld extends WorldClient {
     Chunk myChunk = new Chunk(this, 0, 0) {
         @Override
         public Block getBlock(BlockPos pos) {
-            return DocWorld.this.getBlock(x, y, z);
+            return DocWorld.this.getBlock(pos);
         }
         
         @Override
         public TileEntity func_150806_e(BlockPos pos) {
-            return DocWorld.this.getTileEntity(x, y, z);
+            return DocWorld.this.getTileEntity(pos);
         }
         
         @Override
         public TileEntity getTileEntityUnsafe(BlockPos pos) {
-            return DocWorld.this.getTileEntity(x, y, z);
+            return DocWorld.this.getTileEntity(pos);
         }
         
         @Override
@@ -194,7 +194,7 @@ public class DocWorld extends WorldClient {
         
         @Override
         public int getBlockMetadata(BlockPos pos) {
-            return DocWorld.this.getBlockMetadata(x, y, z);
+            return DocWorld.this.getBlockMetadata(pos);
         }		
         
     };

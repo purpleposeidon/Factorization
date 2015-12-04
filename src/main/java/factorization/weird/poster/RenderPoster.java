@@ -24,7 +24,7 @@ public class RenderPoster extends RenderEntity {
         final MovingObjectPosition mop = mc.objectMouseOver;
         boolean selected = mop != null && mop.entityHit == ent;
         GL11.glPushMatrix();
-        GL11.glTranslated(x, y, z);
+        GL11.glTranslated(pos);
         if (selected && !mc.gameSettings.hideGUI) {
             GL11.glPushMatrix();
             // They ordinarily don't move, so no need to bother w/ interpolation

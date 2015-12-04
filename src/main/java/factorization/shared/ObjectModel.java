@@ -56,7 +56,7 @@ public class ObjectModel {
             icon = rb.overrideBlockTexture;
         }
         Tessellator.instance.setColorOpaque(0xFF, 0xFF, 0xFF);
-        int brightness = block.getMixedBrightnessForBlock(rb.blockAccess, x, y, z);
+        int brightness = block.getMixedBrightnessForBlock(rb.blockAccess, pos);
         Tessellator.instance.setBrightness(brightness);
         ModelTessellator tess = new ModelTessellator(icon);
         tess.setTranslation(x + 0.5, y, z + 0.5);
@@ -93,7 +93,7 @@ public class ObjectModel {
             icon = rb.overrideBlockTexture;
         }
         Tessellator.instance.setColorOpaque(0xFF, 0xFF, 0xFF);
-        int brightness = block.getMixedBrightnessForBlock(rb.blockAccess, x, y, z);
+        int brightness = block.getMixedBrightnessForBlock(rb.blockAccess, pos);
         Tessellator.instance.setBrightness(brightness);
         RotatedModelTessellator tess = new RotatedModelTessellator(icon, quat);
         tess.setTranslation(x + 0.5, y, z + 0.5);
@@ -134,7 +134,7 @@ public class ObjectModel {
 
         @Override
         public void setNormal(float x, float y, float z) {
-            Tessellator.instance.setNormal(x, y, z);
+            Tessellator.instance.setNormal(pos);
         }
     }
 

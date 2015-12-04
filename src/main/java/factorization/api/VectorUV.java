@@ -7,7 +7,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 public class VectorUV {
-    public double x, y, z, u, v;
+    public double pos, u, v;
     
     public VectorUV() {
         this(0, 0, 0);
@@ -72,7 +72,7 @@ public class VectorUV {
     }
 
     public VectorUV copy() {
-        return new VectorUV(x, y, z, u, v);
+        return new VectorUV(pos, u, v);
     }
     
     public VectorUV negate() {
@@ -94,7 +94,7 @@ public class VectorUV {
         double x = tag.getFloat(prefix+"x");
         double y = tag.getFloat(prefix+"y");
         double z = tag.getFloat(prefix+"z");
-        return new VectorUV(x, y, z);
+        return new VectorUV(pos);
     }
     
     public static VectorUV readFromDataInput(DataInput input) throws IOException {

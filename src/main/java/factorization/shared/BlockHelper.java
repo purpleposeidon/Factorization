@@ -124,21 +124,21 @@ public class BlockHelper
             case PISTON_EXTENSION:
                 return null;
             case USE_GET_DAMAGE_VALUE:
-                return new ItemStack(block, 1, block.getDamageValue(world, x, y, z));
+                return new ItemStack(block, 1, block.getDamageValue(world, pos));
             case USE_ID_DROPPED:
             case BED:
-                md = world.getBlockMetadata(x, y, z);
+                md = world.getBlockMetadata(pos);
                 return makeItemStack(block.getItemDropped(md, world.rand, 0), 1, 0);
             case USE_GET_BLOCK_DROPPED:
-                md = world.getBlockMetadata(x, y, z);
-                ArrayList<ItemStack> drops = block.getDrops(world, x, y, z, md, 0);
+                md = world.getBlockMetadata(pos);
+                ArrayList<ItemStack> drops = block.getDrops(world, pos, md, 0);
                 if (drops.isEmpty())
                 {
                     return null;
                 }
                 return drops.get(0);
             case CLONE_MD:
-                md = world.getBlockMetadata(x, y, z);
+                md = world.getBlockMetadata(pos);
                 return new ItemStack(block, 1, md);
             case STEM:
                 if (block == Blocks.pumpkin_stem)
@@ -154,16 +154,16 @@ public class BlockHelper
                     return null;
                 }
             case SLAB:
-                md = world.getBlockMetadata(x, y, z);
+                md = world.getBlockMetadata(pos);
                 int dropped = block.quantityDropped(world.rand);
                 return makeItemStack(block.getItemDropped(md, world.rand, 0), dropped, block.damageDropped(md));
             case CAKE:
-                md = world.getBlockMetadata(x, y, z);
+                md = world.getBlockMetadata(pos);
                 return md == 0 ? new ItemStack(Items.cake) : null;
             case CROP:
-                return new ItemStack(block.getItemDropped(0, world.rand, 0), 1, block.getDamageValue(world, x, y, z));
+                return new ItemStack(block.getItemDropped(0, world.rand, 0), 1, block.getDamageValue(world, pos));
             case DOOR:
-                md = world.getBlockMetadata(x, y, z);
+                md = world.getBlockMetadata(pos);
                 Item doorId = block.getItemDropped(md, world.rand, 0);
                 if (doorId == null)
                 {

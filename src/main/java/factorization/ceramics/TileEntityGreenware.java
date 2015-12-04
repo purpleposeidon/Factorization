@@ -652,7 +652,7 @@ public class TileEntityGreenware extends TileEntityCommon implements IFurnaceHea
         for (int x = -1; x <= 1; x++) {
             for (int y = -1; y <= 1; y++) {
                 for (int z = -1; z <= 1; z++) {
-                    Coord c = getCoord().add(x, y, z);
+                    Coord c = getCoord().add(pos);
                     TileEntityExtension tex = c.getTE(TileEntityExtension.class);
                     if (tex != null && tex.getParent() == this) {
                         c.setAir();
@@ -839,7 +839,7 @@ public class TileEntityGreenware extends TileEntityCommon implements IFurnaceHea
             }
         }
         return shortest;
-        // return super.collisionRayTrace(w, x, y, z, startVec, endVec);
+        // return super.collisionRayTrace(w, pos, startVec, endVec);
     }
 
     private void offsetVector(Vec3 player, Vec3 v) {

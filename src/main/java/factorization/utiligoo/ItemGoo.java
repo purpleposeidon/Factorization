@@ -63,7 +63,7 @@ public class ItemGoo extends ItemFactorization {
             return false;
         }
         GooData data = GooData.getNullGooData(is, world);
-        if (data != null && data.checkWorld(player, new Coord(world, x, y, z))) return false;
+        if (data != null && data.checkWorld(player, new Coord(world, pos))) return false;
         if (player.isSneaking()) {
             if (data == null) return false;
             EnumFacing fd = SpaceUtil.getOrientation(side);
@@ -102,11 +102,11 @@ public class ItemGoo extends ItemFactorization {
             int iy = data.coords[i + 1];
             int iz = data.coords[i + 2];
             if (x == ix && y == iy && z == iz) {
-                expandSelection(is, data, player, world, x, y, z, SpaceUtil.getOrientation(side));
+                expandSelection(is, data, player, world, pos, SpaceUtil.getOrientation(side));
                 return true;
             }
         }
-        data.coords = ArrayUtils.addAll(data.coords, x, y, z);
+        data.coords = ArrayUtils.addAll(data.coords, pos);
         data.dimensionId = world.provider.dimensionId;
         data.markDirty();
         is.stackSize--;
@@ -228,7 +228,7 @@ public class ItemGoo extends ItemFactorization {
     }
     
     private void expandSelection(ItemStack is, GooData data, EntityPlayer player, World world, BlockPos pos, EnumFacing dir) {
-        Coord src = new Coord(world, x, y, z);
+        Coord src = new Coord(world, pos);
         HashSet<Coord> found = new HashSet();
         for (int i = 0; i < data.coords.length; i += 3) {
             int ix = data.coords[i + 0];

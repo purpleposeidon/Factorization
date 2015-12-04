@@ -116,7 +116,7 @@ public class RenderDimensionSliceEntity extends Render implements IFzdsShenaniga
                         //We could allocate lists per WR instead?
                         //NORELEASE: w.loadedTileEntityList might be wrong? Might be inefficient?
                         //It creates a list... maybe we should use that instead?
-                        renderers[i] = new WorldRenderer(corner.w, corner.w.loadedTileEntityList, x, y, z, getRenderList() + i*wr_display_list_size);
+                        renderers[i] = new WorldRenderer(corner.w, corner.w.loadedTileEntityList, pos, getRenderList() + i*wr_display_list_size);
                         renderers[i].posXClip = x - corner.x;
                         renderers[i].posYClip = y - corner.y;
                         renderers[i].posZClip = z - corner.z;
@@ -434,7 +434,7 @@ public class RenderDimensionSliceEntity extends Render implements IFzdsShenaniga
             }
             glPushMatrix();
             try {
-                GL11.glTranslated(x, y, z);
+                GL11.glTranslated(pos);
                 Quaternion rotation = dse.getRotation();
                 if (!rotation.isZero() || !dse.prevTickRotation.isZero()) {
                     Quaternion rot = dse.prevTickRotation.slerp(rotation, partialTicks);

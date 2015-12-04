@@ -127,7 +127,7 @@ public class TileEntityWrathLamp extends TileEntityCommon {
                     continue;
                 }
                 TileEntityWrathLamp lamp = (TileEntityWrathLamp) o;
-                if (lamp.lightsBlock(x, y, z)) {
+                if (lamp.lightsBlock(pos)) {
                     // NOTE: It's possible for two lamps to overlap eachother...
                     return lamp;
                 }
@@ -147,7 +147,7 @@ public class TileEntityWrathLamp extends TileEntityCommon {
     }
 
     private boolean lightsBlock(BlockPos pos) {
-        if (!inArea(x, y, z)) {
+        if (!inArea(pos)) {
             return false;
         }
         int depth = beamDepths[getDepthIndex(x, z)];
@@ -412,7 +412,7 @@ public class TileEntityWrathLamp extends TileEntityCommon {
                 for (int x = (int) (posX - r); x <= posX + r; x++) {
                     for (int z = (int) (posZ - r); z <= posZ + r; z++) {
                         for (int y = (int) posY; y >= posY - maxDepth; y--) {
-                            worldObj.func_147451_t(x, y, z);
+                            worldObj.func_147451_t(pos);
                         }
                     }
                 }

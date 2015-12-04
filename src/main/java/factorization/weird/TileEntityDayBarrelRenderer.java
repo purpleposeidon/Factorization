@@ -88,7 +88,7 @@ public class TileEntityDayBarrelRenderer extends TileEntitySpecialRenderer {
         }
         Core.profileStart("barrel");
         GL11.glPushMatrix();
-        GL11.glTranslated(x, y, z);
+        GL11.glTranslated(pos);
 
         if (FzConfig.render_barrel_use_displaylists && barrel.type != Type.HOPPING && barrel.should_use_display_list && barrel != FactoryType.DAYBARREL.getRepresentative()) {
             if (barrel.display_list == -1) {

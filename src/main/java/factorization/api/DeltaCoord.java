@@ -11,7 +11,7 @@ import net.minecraft.util.Vec3;
 import java.io.IOException;
 
 public class DeltaCoord implements IDataSerializable {
-    public int x, y, z;
+    public int pos;
 
     public static final DeltaCoord ZERO = new DeltaCoord();
     public DeltaCoord() {
@@ -63,7 +63,7 @@ public class DeltaCoord implements IDataSerializable {
     }
 
     private static DeltaCoord d(int x, int y, int z) {
-        return new DeltaCoord(x, y, z);
+        return new DeltaCoord(pos);
     }
 
     public static DeltaCoord directNeighbors[] = {
@@ -230,7 +230,7 @@ public class DeltaCoord implements IDataSerializable {
     }
 
     public Vec3 toVector() {
-        return new Vec3(x, y, z);
+        return new Vec3(pos);
     }
 
     public void move(EnumFacing dir) {

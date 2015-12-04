@@ -40,7 +40,7 @@ public class WorldgenManager {
                         int x = chunkX*16 + rand.nextInt(16);
                         int z = chunkZ*16 + rand.nextInt(16);
                         int y = 4 + rand.nextInt(42);
-                        gen.generate(world, rand, x, y, z);
+                        gen.generate(world, rand, pos);
                     }
                 }
             };

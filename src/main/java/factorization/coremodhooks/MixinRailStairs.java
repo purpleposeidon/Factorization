@@ -38,7 +38,7 @@ public abstract class MixinRailStairs extends BlockRailBase {
             if (i == EnumRailDirection.ASCENDING_EAST) {
                 box = new AxisAlignedBB(x + w, y, z + s, x + 1, y + h, z + 1 - s);
             } else if (i == EnumRailDirection.ASCENDING_WEST) {
-                box = new AxisAlignedBB(x, y, z + s, x + w, y + h, z + 1 - s);
+                box = new AxisAlignedBB(pos + s, x + w, y + h, z + 1 - s);
             } else if (i == EnumRailDirection.ASCENDING_NORTH) {
                 box = new AxisAlignedBB(x + s, y, z, x + 1 - s, y + h, z + w);
             } else if (i == EnumRailDirection.ASCENDING_SOUTH) {

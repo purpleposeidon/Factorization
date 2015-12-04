@@ -140,38 +140,38 @@ public enum GooRenderer {
             int x = data.coords[i + 0];
             int y = data.coords[i + 1];
             int z = data.coords[i + 2];
-            if (player.getDistanceSq(x, y, z) > render_dist_sq) continue;
+            if (player.getDistanceSq(pos) > render_dist_sq) continue;
             if (!rendered_something) {
                 tess.startDrawingQuads();
                 tess.disableColor();
                 rendered_something = true;
             }
-            Block b = player.worldObj.getBlock(x, y, z);
+            Block b = player.worldObj.getBlock(pos);
             Material mat = b.getMaterial();
-            int md = player.worldObj.getBlockMetadata(x, y, z);
+            int md = player.worldObj.getBlockMetadata(pos);
             if (useShaders()) {
                 if (mat.blocksMovement() && !b.hasTileEntity(md)) {
-                    rb.renderBlockByRenderType(b, x, y, z);
+                    rb.renderBlockByRenderType(b, pos);
                 } else {
                     b.setBlockBoundsBasedOnState(player.world, pos);
                     block.setBlockBounds((float)b.getBlockBoundsMinX(), (float)b.getBlockBoundsMinY(), (float)b.getBlockBoundsMinZ(), (float)b.getBlockBoundsMaxX(), (float)b.getBlockBoundsMaxY(), (float)b.getBlockBoundsMaxZ()); // Hello, Notch! 
                     block.useTexture(BlockIcons.utiligoo$invasion);
-                    block.render(rb, x, y, z);
+                    block.render(rb, pos);
                 }
             } else {
                 if (mat.blocksMovement() && !b.hasTileEntity(md)) {
-                    rb.renderBlockUsingTexture(b, x, y, z, BlockIcons.utiligoo$invasion);
+                    rb.renderBlockUsingTexture(b, pos, BlockIcons.utiligoo$invasion);
                 } else if (b.getRenderType() == 2 /* torches */) {
                     // Torches stupidly don't support setBlockBoundsBasedOnState. #blamenotch
                     float d = 0.25F;
                     block.setBlockBoundsOffset(d, d, d);
                     block.useTexture(BlockIcons.utiligoo$invasion);
-                    block.render(rb, x, y, z);
+                    block.render(rb, pos);
                 } else {
                     b.setBlockBoundsBasedOnState(player.world, pos);
                     block.setBlockBounds((float)b.getBlockBoundsMinX(), (float)b.getBlockBoundsMinY(), (float)b.getBlockBoundsMinZ(), (float)b.getBlockBoundsMaxX(), (float)b.getBlockBoundsMaxY(), (float)b.getBlockBoundsMaxZ()); // Hello, Notch! 
                     block.useTexture(BlockIcons.utiligoo$invasion);
-                    block.render(rb, x, y, z);
+                    block.render(rb, pos);
                 }
             }
         }

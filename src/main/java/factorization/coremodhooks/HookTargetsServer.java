@@ -20,7 +20,7 @@ public class HookTargetsServer {
         if (world.isRemote) {
             return;
         }
-        Coord c = new Coord(world, x, y, z);
+        Coord c = new Coord(world, pos);
         //if (c.isAir()) return;
         c.setAir();
         int i = 18;

@@ -18,7 +18,7 @@ import java.util.List;
 public class MethodSplices {
     // Block.onBlockDestroyedByExplosion
     public void func_180652_a(World world, BlockPos pos, Explosion explosion) {
-        HookTargetsServer.diamondExploded(this, world, x, y, z);
+        HookTargetsServer.diamondExploded(this, world, pos);
     }
     
     // Block.canDropFromExplosion

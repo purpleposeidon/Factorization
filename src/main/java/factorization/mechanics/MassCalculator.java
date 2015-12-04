@@ -26,7 +26,7 @@ class MassCalculator implements ICoordFunction {
             double x = tag.getDouble(comKey + ".x");
             double y = tag.getDouble(comKey + ".y");
             double z = tag.getDouble(comKey + ".z");
-            return new Vec3(x, y, z);
+            return new Vec3(pos);
         }
         MassCalculator mc = new MassCalculator(idc);
         return mc.com;

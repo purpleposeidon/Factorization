@@ -91,10 +91,10 @@ public class FactorizationClientProxy extends FactorizationProxy {
             return new GuiPocketTable(new ContainerPocket(player));
         }
         if (ID == FactoryType.ARTIFACTFORGEGUI.gui) {
-            return new GuiArtifactForge(new ContainerForge(new Coord(world, x, y, z), player));
+            return new GuiArtifactForge(new ContainerForge(new Coord(world, pos), player));
         }
         
-        TileEntity te = world.getTileEntity(new BlockPos(x, y, z));
+        TileEntity te = world.getTileEntity(new BlockPos(pos));
         if (!(te instanceof TileEntityFactorization)) {
             return null;
         }

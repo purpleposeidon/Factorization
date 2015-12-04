@@ -192,7 +192,7 @@ public class TileEntityExtension extends TileEntityCommon implements IFurnaceHea
         HeatConverters.addConverter(new HeatConverters.IHeatConverter() {
             @Override
             public IFurnaceHeatable convert(World w, BlockPos pos) {
-                TileEntity te = w.getTileEntity(x, y, z);
+                TileEntity te = w.getTileEntity(pos);
                 if (te instanceof TileEntityExtension) {
                     TileEntityExtension ex = (TileEntityExtension) te;
                     TileEntityCommon parent = ex.getParent();

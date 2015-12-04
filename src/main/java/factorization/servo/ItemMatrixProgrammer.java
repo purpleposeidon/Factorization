@@ -49,7 +49,7 @@ public class ItemMatrixProgrammer extends ItemFactorization {
     
     @Override
     public boolean onItemUseFirst(ItemStack stack, EntityPlayer player, World world, BlockPos pos, int side, float hitX, float hitY, float hitZ) {
-        Coord c = new Coord(world, x, y, z);
+        Coord c = new Coord(world, pos);
         TileEntityNote noteBlock = c.getTE(TileEntityNote.class);
         if (noteBlock != null) {
             if (world.isRemote) return false;
@@ -66,7 +66,7 @@ public class ItemMatrixProgrammer extends ItemFactorization {
                 noteBlock.markDirty();
             }
             if (noteBlock.note != orig_note) {
-                noteBlock.triggerNote(world, x, y, z);
+                noteBlock.triggerNote(world, pos);
             }
             new Notice(noteBlock, "noteblock.pitch." + noteBlock.note).withStyle(Style.EXACTPOSITION).send(player);
             return true;

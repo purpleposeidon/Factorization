@@ -87,11 +87,11 @@ public class BlockMatcher extends Block {
 
     @Override
     public int getComparatorInputOverride(World world, BlockPos pos, int side) {
-        int md = world.getBlockMetadata(x, y, z);
+        int md = world.getBlockMetadata(pos);
         EnumFacing axis = getAxis(md);
         EnumFacing mojangSide = SpaceUtil.demojangSide(side);
         if (axis == mojangSide || axis == mojangSide.getOpposite()) return 0;
-        byte match = match(world, x, y, z, axis);
+        byte match = match(world, pos, axis);
         if (match == 0) return 0;
         return (match * 5) - 4;
     }
@@ -99,13 +99,13 @@ public class BlockMatcher extends Block {
     @Override
     public void onNeighborBlockChange(World world, BlockPos pos, Block block) {
         if (block == this) return;
-        int md = world.getBlockMetadata(x, y, z);
+        int md = world.getBlockMetadata(pos);
         byte state = getState(md);
         if (state == STATE_FIRING) return;
         EnumFacing axis = getAxis(md);
-        byte match = match(world, x, y, z, axis);
+        byte match = match(world, pos, axis);
         byte next_state = match >= 3 ? STATE_FIRING : STATE_READY;
-        world.func_147453_f(x, y, z, this); // 'update comparators'; don't do this when firing as it might cause a loop?
+        world.func_147453_f(pos, this); // 'update comparators'; don't do this when firing as it might cause a loop?
         if (state == STATE_MATCHED && next_state == STATE_FIRING) {
             return;
         }
@@ -113,8 +113,8 @@ public class BlockMatcher extends Block {
         final int next_md = makeMd(axis, next_state);
         if (md == next_md) return;
         //println("neighbor changed", block.getLocalizedName(), state, "-->", next_state);
-        world.setBlockMetadataWithNotify(x, y, z, next_md, notify);
-        world.scheduleBlockUpdate(x, y, z, this, 4);
+        world.setBlockMetadataWithNotify(pos, next_md, notify);
+        world.scheduleBlockUpdate(pos, this, 4);
     }
 
     @Override
@@ -124,7 +124,7 @@ public class BlockMatcher extends Block {
 
     @Override
     public boolean canConnectRedstone(IBlockAccess world, BlockPos pos, int side) {
-        int md = world.getBlockMetadata(x, y, z);
+        int md = world.getBlockMetadata(pos);
         EnumFacing axis = getAxis(md);
         // Great job, forge! This is some right ol' stupid BS!
         if (axis == EnumFacing.DOWN) {
@@ -139,34 +139,34 @@ public class BlockMatcher extends Block {
 
     @Override
     public boolean isSideSolid(IBlockAccess world, BlockPos pos, EnumFacing side) {
-        int md = world.getBlockMetadata(x, y, z);
+        int md = world.getBlockMetadata(pos);
         EnumFacing axis = getAxis(md);
         return axis != side && axis != side.getOpposite(); // Look how much less stupid this is! :D
     }
 
     @Override
     public int isProvidingWeakPower(IBlockAccess world, BlockPos pos, int side) {
-        int md = world.getBlockMetadata(x, y, z);
+        int md = world.getBlockMetadata(pos);
         byte state = getState(md);
         if (state != STATE_FIRING) return 0;
         EnumFacing axis = getAxis(md);
         EnumFacing dir = SpaceUtil.getOrientation(side);
         if (axis == dir || axis == dir.getOpposite()) return 0;
-        byte match = match(world, x, y, z, axis);
+        byte match = match(world, pos, axis);
         if (match >= 3) return 0xF;
         return 0;
     }
 
     @Override
     public void updateTick(World world, BlockPos pos, Random random) {
-        int md = world.getBlockMetadata(x, y, z);
+        int md = world.getBlockMetadata(pos);
         EnumFacing axis = getAxis(md);
-        byte match = match(world, x, y, z, axis);
+        byte match = match(world, pos, axis);
         byte nextState = match >= 3 ? STATE_MATCHED : STATE_READY;
         int notify = Coord.UPDATE | Coord.NOTIFY_NEIGHBORS;
         int nextMd = makeMd(getAxis(md), nextState);
         //println("update tick", state, "-->", nextState);
-        world.setBlockMetadataWithNotify(x, y, z, nextMd, notify);
+        world.setBlockMetadataWithNotify(pos, nextMd, notify);
     }
 
     @Override
@@ -176,11 +176,11 @@ public class BlockMatcher extends Block {
 
     @Override
     public void onBlockAdded(World world, BlockPos pos) {
-        int md = world.getBlockMetadata(x, y, z);
+        int md = world.getBlockMetadata(pos);
         byte state = getState(md);
         if (state == STATE_READY) return;
         EnumFacing axis = getAxis(md);
-        world.setBlockMetadataWithNotify(x, y, z, makeMd(axis, STATE_READY), 0);
+        world.setBlockMetadataWithNotify(pos, makeMd(axis, STATE_READY), 0);
     }
 
     @Override

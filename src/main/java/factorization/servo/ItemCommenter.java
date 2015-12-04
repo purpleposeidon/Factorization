@@ -21,7 +21,7 @@ public class ItemCommenter extends ItemFactorization {
         if (player == null) {
             return false;
         }
-        Coord at = new Coord(world, x, y, z);
+        Coord at = new Coord(world, pos);
         TileEntityServoRail rail = at.getTE(TileEntityServoRail.class);
         if (rail == null) {
             return false;

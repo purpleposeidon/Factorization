@@ -228,7 +228,7 @@ public class SocketScissors extends TileEntitySocketBase implements ICaptureDrop
     private boolean removeBlock(EntityPlayer thisPlayerMP, Block block, int md, BlockPos pos) {
         if (block == null) return false;
         block.onBlockHarvested(world, pos, md, thisPlayerMP);
-        if (block.removedByPlayer(worldObj, thisPlayerMP, x, y, z, false)) {
+        if (block.removedByPlayer(worldObj, thisPlayerMP, pos, false)) {
             block.onBlockDestroyedByPlayer(world, pos, md);
             return true;
         }
@@ -236,15 +236,15 @@ public class SocketScissors extends TileEntitySocketBase implements ICaptureDrop
     }
 
     public static boolean canCutBlock(EntityPlayer player, World world, Block block, BlockPos pos) {
-        int md = world.getBlockMetadata(x, y, z);
+        int md = world.getBlockMetadata(pos);
         Material mat = block.getMaterial();
-        if (block.getBlockHardness(world, x, y, z) == 0 && mat != Material.circuits && mat != Material.fire && mat != Material.air) {
+        if (block.getBlockHardness(world, pos) == 0 && mat != Material.circuits && mat != Material.fire && mat != Material.air) {
             return true;
         }
-        // if (!block.canSilkHarvest(world, player, x, y, z, md)) return false; -- useless; vanilla things return values that don't work for us
+        // if (!block.canSilkHarvest(world, player, pos, md)) return false; -- useless; vanilla things return values that don't work for us
         // if (block instanceof IShearable) return true;
         if (block instanceof BlockPortal) return true;
-        if (block.getBlockHardness(world, x, y, z) == 0 && mat != Material.circuits && mat != Material.fire && mat != Material.air) {
+        if (block.getBlockHardness(world, pos) == 0 && mat != Material.circuits && mat != Material.fire && mat != Material.air) {
             return true;
         }
         if (mat == Material.leaves || mat == Material.cactus || mat == Material.plants || mat == Material.cloth || mat == Material.carpet) {

@@ -55,7 +55,7 @@ public class NotifyNetwork {
     @SideOnly(Side.CLIENT)
     void handleNotify(DataInput input, EntityPlayer me) throws IOException {
         Object target = null;
-        int x, y, z;
+        int pos;
         switch (input.readByte()) {
         case COORD:
             x = input.readInt();
@@ -75,7 +75,7 @@ public class NotifyNetwork {
             x = input.readInt();
             y = input.readInt();
             z = input.readInt();
-            target = me.worldObj.getTileEntity(x, y, z);
+            target = me.worldObj.getTileEntity(pos);
             if (target == null) {
                 target = new SimpleCoord(me.world, pos);
             }

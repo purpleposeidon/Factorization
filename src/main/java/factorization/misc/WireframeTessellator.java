@@ -31,19 +31,19 @@ public class WireframeTessellator extends Tessellator {
     @Override
     public void addVertex(double x, double y, double z) {
         if (drawMode != GL11.GL_QUADS || faker) {
-            super.addVertex(x, y, z);
+            super.addVertex(pos);
             return;
         }
         int vert = verts % 4;
         verts++;
-        super.addVertex(x, y, z);
+        super.addVertex(pos);
 
         if (vert == 0) {
             startX = x;
             startY = y;
             startZ = z;
         } else {
-            super.addVertex(x, y, z);
+            super.addVertex(pos);
             if (vert == 3) {
                 super.addVertex(startX, startY, startZ);
             }

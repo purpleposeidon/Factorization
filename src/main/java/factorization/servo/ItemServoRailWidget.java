@@ -62,7 +62,7 @@ public class ItemServoRailWidget extends ItemFactorization {
         if (sc == null) {
             return false;
         }
-        Coord here = new Coord(world, x, y, z);
+        Coord here = new Coord(world, pos);
         TileEntityServoRail rail = here.getTE(TileEntityServoRail.class);
         if (rail == null) {
             sc.onItemUse(here, player);
@@ -81,7 +81,7 @@ public class ItemServoRailWidget extends ItemFactorization {
                 }
             }
         }
-        return super.onItemUse(is, player, world, x, y, z, side, vx, vy, vz);
+        return super.onItemUse(is, player, world, pos, side, vx, vy, vz);
     }
     
     @Override
