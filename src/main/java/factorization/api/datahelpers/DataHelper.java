@@ -205,22 +205,22 @@ for t in all_types:
     }
 
     public AxisAlignedBB putBox(AxisAlignedBB box) throws IOException {
-        box.minX = asSameShare(name + ".minX").putDouble(box.minX);
-        box.maxX = asSameShare(name + ".maxX").putDouble(box.maxX);
-        box.minY = asSameShare(name + ".minY").putDouble(box.minY);
-        box.maxY = asSameShare(name + ".maxY").putDouble(box.maxY);
-        box.minZ = asSameShare(name + ".minZ").putDouble(box.minZ);
-        box.maxZ = asSameShare(name + ".maxZ").putDouble(box.maxZ);
-        return box;
+        double boxminX = asSameShare(name + ".minX").putDouble(box.minX);
+        double boxmaxX = asSameShare(name + ".maxX").putDouble(box.maxX);
+        double boxminY = asSameShare(name + ".minY").putDouble(box.minY);
+        double boxmaxY = asSameShare(name + ".maxY").putDouble(box.maxY);
+        double boxminZ = asSameShare(name + ".minZ").putDouble(box.minZ);
+        double boxmaxZ = asSameShare(name + ".maxZ").putDouble(box.maxZ);
+        return new AxisAlignedBB(boxminX, boxminY, boxminZ, boxmaxX, boxmaxY, boxmaxZ);
     }
 
     public Vec3 putVec3(Vec3 val) throws IOException {
         String prefix = name;
-        val.xCoord = asSameShare(prefix + ".x").putDouble(val.xCoord);
-        val.yCoord = asSameShare(prefix + ".y").putDouble(val.yCoord);
-        val.zCoord = asSameShare(prefix + ".z").putDouble(val.zCoord);
+        double valxCoord = asSameShare(prefix + ".x").putDouble(val.xCoord);
+        double valyCoord = asSameShare(prefix + ".y").putDouble(val.yCoord);
+        double valzCoord = asSameShare(prefix + ".z").putDouble(val.zCoord);
         name = prefix;
-        return val;
+        return new Vec3(valxCoord, valyCoord, valzCoord);
     }
 
     public <E extends Enum> E putEnum(E value) throws IOException {

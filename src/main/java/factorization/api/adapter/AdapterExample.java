@@ -8,6 +8,7 @@ import net.minecraft.init.Items;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.BlockPos;
 import net.minecraft.world.World;
 
 @SuppressWarnings("unused")
@@ -15,7 +16,7 @@ class AdapterExample {
     interface ISparkly {
         InterfaceAdapter<Block, ISparkly> adapter = InterfaceAdapter.get(ISparkly.class);
 
-        int getSparklePower(World w, int x, int y, int z);
+        int getSparklePower(World w, BlockPos pos);
     }
 
     class BlockVampire extends Block implements ISparkly {
@@ -24,7 +25,7 @@ class AdapterExample {
         }
 
         @Override
-        public int getSparklePower(World w, int x, int y, int z) {
+        public int getSparklePower(World w, BlockPos pos) {
             return Integer.MAX_VALUE;
         }
     }
@@ -32,8 +33,8 @@ class AdapterExample {
     void init() {
         ISparkly.adapter.register(Block.class, new ISparkly() {
             @Override
-            public int getSparklePower(World w, int x, int y, int z) {
-                Block b = w.getBlock(x, y, z);
+            public int getSparklePower(World w, BlockPos pos) {
+                Block b = w.getBlockState(pos).getBlock();
                 if (b == Blocks.diamond_block) return 100;
                 if (b == Blocks.coal_block) return -10;
                 return 0;
@@ -41,8 +42,8 @@ class AdapterExample {
         });
         final ISparkly sparkly_inventory = new ISparkly() {
             @Override
-            public int getSparklePower(World w, int x, int y, int z) {
-                TileEntity te = w.getTileEntity(x, y, z);
+            public int getSparklePower(World w, BlockPos pos) {
+                TileEntity te = w.getTileEntity(pos);
                 if (te instanceof IInventory) {
                     IInventory inv = (IInventory) te;
                     ItemStack first = inv.getStackInSlot(0);
@@ -70,11 +71,11 @@ class AdapterExample {
         });
     }
 
-    public static void printSparkliness(World w, int x, int y, int z) {
-        ISparkly sparkly = ISparkly.adapter.cast(w.getBlock(x, y, z));
+    public static void printSparkliness(World w, BlockPos pos) {
+        ISparkly sparkly = ISparkly.adapter.cast(w.getBlockState(pos).getBlock());
         int sparklePower = 0;
         if (sparkly != null) {
-            sparklePower = sparkly.getSparklePower(w, x, y, z);
+            sparklePower = sparkly.getSparklePower(w, pos);
         }
         System.out.println("The sparkle power is " + sparklePower);
     }
