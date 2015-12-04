@@ -1,6 +1,6 @@
 package factorization.shared;
 
-import cpw.mods.fml.common.network.internal.FMLNetworkHandler;
+import net.minecraftforge.fml.common.network.internal.FMLNetworkHandler;
 import factorization.api.IEntityMessage;
 import io.netty.buffer.ByteBuf;
 
@@ -11,8 +11,8 @@ import net.minecraft.entity.Entity;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.Packet;
 import net.minecraft.world.World;
-import cpw.mods.fml.common.registry.IEntityAdditionalSpawnData;
-import cpw.mods.fml.relauncher.Side;
+import net.minecraftforge.fml.common.registry.IEntityAdditionalSpawnData;
+import net.minecraftforge.fml.relauncher.Side;
 import factorization.api.datahelpers.DataHelper;
 import factorization.api.datahelpers.DataInByteBuf;
 import factorization.api.datahelpers.DataInNBT;

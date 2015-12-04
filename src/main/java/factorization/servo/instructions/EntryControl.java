@@ -7,7 +7,7 @@ import net.minecraft.init.Blocks;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.IIcon;
-import net.minecraftforge.common.util.ForgeDirection;
+import net.minecraft.util.EnumFacing;
 import factorization.api.Coord;
 import factorization.api.datahelpers.DataHelper;
 import factorization.api.datahelpers.IDataSerializable;
@@ -26,7 +26,7 @@ public class EntryControl extends Instruction {
     }
     
     @Override
-    public boolean onClick(EntityPlayer player, Coord block, ForgeDirection side) {
+    public boolean onClick(EntityPlayer player, Coord block, EnumFacing side) {
         if (!playerHasProgrammer(player)) {
             return false;
         }
@@ -56,7 +56,7 @@ public class EntryControl extends Instruction {
     public void motorHit(ServoMotor motor) { }
 
     @Override
-    public IIcon getIcon(ForgeDirection side) {
+    public IIcon getIcon(EnumFacing side) {
         return blocking ? BlockIcons.servo$entry_forbid : BlockIcons.servo$entry_require;
     }
 

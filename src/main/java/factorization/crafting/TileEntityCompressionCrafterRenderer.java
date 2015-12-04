@@ -11,12 +11,12 @@ import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.world.World;
-import net.minecraftforge.common.util.ForgeDirection;
+import net.minecraft.util.EnumFacing;
 
 import org.lwjgl.opengl.GL11;
 
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 import factorization.api.Coord;
 import factorization.api.FzOrientation;
 import factorization.api.Quaternion;
@@ -72,7 +72,7 @@ public class TileEntityCompressionCrafterRenderer extends TileEntitySpecialRende
         float d = -1F/256F;
         d = 0;
         block.setBlockBounds(0 - d, 0.5F - 1F/256F, 0 - d, 1 + d, 1F, 1 + d);
-        ForgeDirection facing = cc.getFacing();
+        EnumFacing facing = cc.getFacing();
         FzOrientation fo = FzOrientation.fromDirection(facing);
         Quaternion q = Quaternion.fromOrientation(fo);
         GL11.glPushMatrix();
@@ -83,7 +83,7 @@ public class TileEntityCompressionCrafterRenderer extends TileEntitySpecialRende
         block.rotateCenter(q);
         
         Tessellator.instance.startDrawingQuads();
-        Tessellator.instance.setBrightness(block.getMixedBrightnessForBlock(cc.getWorldObj(), cc.xCoord, cc.yCoord, cc.zCoord));
+        Tessellator.instance.setBrightness(block.getMixedBrightnessForBlock(cc.getWorld(), cc.xCoord, cc.yCoord, cc.zCoord));
         GL11.glDisable(GL11.GL_LIGHTING);
         block.renderForTileEntity();
         Tessellator.instance.draw();
@@ -104,11 +104,11 @@ public class TileEntityCompressionCrafterRenderer extends TileEntitySpecialRende
             float cy = (up.y + lo.y + 1)/2F;
             float cz = (up.z + lo.z + 1)/2F;
             float sx, sy, sz;
-            ForgeDirection fd = cc.craftingAxis;
+            EnumFacing fd = cc.craftingAxis;
             sx = sy = sz = 1 - p;
-            if (fd.offsetX != 0) sx = 1 + perc*extraAxialSquish;
-            if (fd.offsetY != 0) sy = 1 + perc*extraAxialSquish;
-            if (fd.offsetZ != 0) sz = 1 + perc*extraAxialSquish;
+            if (fd.getDirectionVec().getX() != 0) sx = 1 + perc*extraAxialSquish;
+            if (fd.getDirectionVec().getY() != 0) sy = 1 + perc*extraAxialSquish;
+            if (fd.getDirectionVec().getZ() != 0) sz = 1 + perc*extraAxialSquish;
             
             //Unfortunately, the transformed origin is equal to the world's origin.
             //So it scales towards the origin instead of the center of the compression area.
@@ -122,9 +122,9 @@ public class TileEntityCompressionCrafterRenderer extends TileEntitySpecialRende
             
             sx = sy = sz = 1;
             float s = 17F/16F;
-            if (fd.offsetX != 0) sx = s;
-            if (fd.offsetY != 0) sy = s;
-            if (fd.offsetZ != 0) sz = s;
+            if (fd.getDirectionVec().getX() != 0) sx = s;
+            if (fd.getDirectionVec().getY() != 0) sy = s;
+            if (fd.getDirectionVec().getZ() != 0) sz = s;
             GL11.glScalef(sx, sy, sz);
             GL11.glTranslatef(lo.x - cc.xCoord, lo.y - cc.yCoord, lo.z - cc.zCoord);
             sx -= 1;
@@ -206,7 +206,7 @@ public class TileEntityCompressionCrafterRenderer extends TileEntitySpecialRende
                         if (b == null) {
                             if (renderPass == 3) {
                                 if (contentSize == null) {
-                                    contentSize = AxisAlignedBB.getBoundingBox(x, y, z, x + 1, y + 1, z + 1);
+                                    contentSize = new AxisAlignedBB(x, y, z, x + 1, y + 1, z + 1);
                                 } else {
                                     contentSize.minX = Math.min(contentSize.minX, x);
                                     contentSize.maxX = Math.max(contentSize.maxX, x + 1);

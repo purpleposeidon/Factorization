@@ -13,9 +13,9 @@ import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.IIcon;
 import net.minecraft.util.MovingObjectPosition;
 import net.minecraft.util.Vec3;
-import net.minecraftforge.common.util.ForgeDirection;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
+import net.minecraft.util.EnumFacing;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 import factorization.api.Charge;
 import factorization.api.Coord;
 import factorization.api.IChargeConductor;
@@ -41,7 +41,7 @@ public class TileEntityWire extends TileEntityCommon implements IChargeConductor
         return BlockClass.Wire;
     }
     @Override
-    public boolean activate(EntityPlayer entityplayer, ForgeDirection side) {
+    public boolean activate(EntityPlayer entityplayer, EnumFacing side) {
         return false;
     }
 
@@ -111,7 +111,7 @@ public class TileEntityWire extends TileEntityCommon implements IChargeConductor
         TileEntityWire parent = supporter.getTE(TileEntityWire.class);
         if (parent != null) {
             if (parent.is_directly_supported()) {
-                int opposite = ForgeDirection.getOrientation(side).getOpposite().ordinal();
+                int opposite = SpaceUtil.getOrientation(side).getOpposite().ordinal();
                 if (parent.supporting_side == side || parent.supporting_side == opposite) {
                     return false;
                 }
@@ -149,7 +149,7 @@ public class TileEntityWire extends TileEntityCommon implements IChargeConductor
             }
             complexity += new WireConnections(w).getComplexity();
         }
-        TileEntityWire below = getCoord().add(ForgeDirection.getOrientation(supporting_side)).getTE(TileEntityWire.class);
+        TileEntityWire below = getCoord().add(SpaceUtil.getOrientation(supporting_side)).getTE(TileEntityWire.class);
         if (below != null && below.supporting_side == supporting_side) {
             complexity += 16;
         }
@@ -236,7 +236,7 @@ public class TileEntityWire extends TileEntityCommon implements IChargeConductor
     
     @Override
     @SideOnly(Side.CLIENT)
-    public IIcon getIcon(ForgeDirection dir) {
+    public IIcon getIcon(EnumFacing dir) {
         return BlockIcons.wire;
     }
 }

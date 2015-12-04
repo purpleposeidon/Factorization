@@ -233,7 +233,7 @@ public class MechanicsController implements IDCController {
         if (!anyMotion) return;
         /*if (anyMotion) {
             // See EntityLivingBase.moveEntityWithHeading
-            //push(idc, MassCalculator.getComCoord(idc), Vec3.createVectorHelper(0, GRAVITY, 0));
+            //push(idc, MassCalculator.getComCoord(idc), new Vec3(0, GRAVITY, 0));
         }
         if (decay_time > 0) {
             decay_time--;

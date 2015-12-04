@@ -1,6 +1,6 @@
 package factorization.coremod;
 
-import cpw.mods.fml.common.eventhandler.EventBus;
+import net.minecraftforge.fml.common.eventhandler.EventBus;
 import factorization.coremodhooks.HookTargetsClient;
 import factorization.coremodhooks.HookTargetsServer;
 import net.minecraft.command.IEntitySelector;

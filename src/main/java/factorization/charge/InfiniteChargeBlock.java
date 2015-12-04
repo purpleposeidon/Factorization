@@ -3,7 +3,7 @@ package factorization.charge;
 import factorization.api.datahelpers.DataHelper;
 import net.minecraft.init.Blocks;
 import net.minecraft.util.IIcon;
-import net.minecraftforge.common.util.ForgeDirection;
+import net.minecraft.util.EnumFacing;
 import factorization.api.Charge;
 import factorization.api.IChargeConductor;
 import factorization.common.BlockIcons;
@@ -50,8 +50,8 @@ public class InfiniteChargeBlock extends TileEntityCommon implements IChargeCond
     }
     
     @Override
-    public IIcon getIcon(ForgeDirection dir) {
-        if (dir.offsetY != 0) return BlockIcons.battery_top;
+    public IIcon getIcon(EnumFacing dir) {
+        if (dir.getDirectionVec().getY() != 0) return BlockIcons.battery_top;
         return Blocks.bedrock.getIcon(0, 0);
     }
 }

@@ -11,10 +11,10 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.IIcon;
 import net.minecraft.util.Vec3;
-import net.minecraftforge.common.util.ForgeDirection;
-import cpw.mods.fml.common.network.internal.FMLProxyPacket;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
+import net.minecraft.util.EnumFacing;
+import net.minecraftforge.fml.common.network.internal.FMLProxyPacket;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 import factorization.api.Charge;
 import factorization.api.Coord;
 import factorization.api.IChargeConductor;
@@ -97,9 +97,9 @@ public class TileEntityLeydenJar extends TileEntityCommon implements IChargeCond
     public void updateSparks(ChargeSparks the_sparks) {
         double level = getLevel()*4/5;
         if (level > rand.nextDouble()) {
-            Vec3 src = Vec3.createVectorHelper(0.5, randomizeDirection(0)/2 + 0.2, 0.5);
-            ForgeDirection fo = ForgeDirection.getOrientation(2 + rand.nextInt(4));
-            Vec3 dest = Vec3.createVectorHelper(randomizeDirection(fo.offsetX), randomizeDirection(fo.offsetY), randomizeDirection(fo.offsetZ));
+            Vec3 src = new Vec3(0.5, randomizeDirection(0)/2 + 0.2, 0.5);
+            EnumFacing fo = SpaceUtil.getOrientation(2 + rand.nextInt(4));
+            Vec3 dest = new Vec3(randomizeDirection(fo.getDirectionVec().getX()), randomizeDirection(fo.getDirectionVec().getY()), randomizeDirection(fo.getDirectionVec().getZ()));
             the_sparks.spark(src, dest, 12, 1, 3, 2.0, 8.0, /*0xF0FF00*/ /*0xEEDB02*/ 0xEEE59D);
         }
         the_sparks.update();
@@ -187,7 +187,7 @@ public class TileEntityLeydenJar extends TileEntityCommon implements IChargeCond
     
     @Override
     @SideOnly(Side.CLIENT)
-    public IIcon getIcon(ForgeDirection dir) {
+    public IIcon getIcon(EnumFacing dir) {
         return BlockIcons.leyden.bottom;
     }
 
@@ -211,7 +211,7 @@ public class TileEntityLeydenJar extends TileEntityCommon implements IChargeCond
     }
     
     @Override
-    public int getComparatorValue(ForgeDirection side) {
+    public int getComparatorValue(EnumFacing side) {
         return (int) (getLevel()*0xF);
     }
 }

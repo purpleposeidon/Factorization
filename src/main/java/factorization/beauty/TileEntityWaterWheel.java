@@ -1,7 +1,7 @@
 package factorization.beauty;
 
-import cpw.mods.fml.common.FMLCommonHandler;
-import cpw.mods.fml.relauncher.Side;
+import net.minecraftforge.fml.common.FMLCommonHandler;
+import net.minecraftforge.fml.relauncher.Side;
 import factorization.api.*;
 import factorization.api.datahelpers.DataHelper;
 import factorization.api.datahelpers.Share;
@@ -31,12 +31,12 @@ import net.minecraft.world.World;
 import net.minecraft.world.biome.BiomeGenBase;
 import net.minecraft.world.biome.BiomeGenOcean;
 import net.minecraft.world.biome.BiomeGenRiver;
-import net.minecraftforge.common.util.ForgeDirection;
+import net.minecraft.util.EnumFacing;
 
 import java.io.IOException;
 
 public class TileEntityWaterWheel extends TileEntityCommon implements IRotationalEnergySource, IMeterInfo {
-    ForgeDirection wheelDirection = ForgeDirection.UP;
+    EnumFacing wheelDirection = EnumFacing.UP;
     double power_per_tick, power_this_tick, target_velocity, velocity;
     double water_strength = 0;
     boolean rs_power = false;
@@ -60,18 +60,18 @@ public class TileEntityWaterWheel extends TileEntityCommon implements IRotationa
     }
 
     @Override
-    public boolean canConnect(ForgeDirection direction) {
+    public boolean canConnect(EnumFacing direction) {
         return direction == this.wheelDirection.getOpposite();
     }
 
     @Override
-    public double availableEnergy(ForgeDirection direction) {
+    public double availableEnergy(EnumFacing direction) {
         if (direction != wheelDirection.getOpposite()) return 0;
         return power_this_tick;
     }
 
     @Override
-    public double takeEnergy(ForgeDirection direction, double maxPower) {
+    public double takeEnergy(EnumFacing direction, double maxPower) {
         if (direction != wheelDirection.getOpposite()) return 0;
         if (maxPower > power_this_tick) {
             maxPower = power_this_tick;
@@ -81,7 +81,7 @@ public class TileEntityWaterWheel extends TileEntityCommon implements IRotationa
     }
 
     @Override
-    public double getVelocity(ForgeDirection direction) {
+    public double getVelocity(EnumFacing direction) {
         if (direction != wheelDirection.getOpposite()) return 0;
         // Except I had to reverse it! Silliness!
         int sign = 1; //SpaceUtil.sign(wheelDirection);
@@ -105,9 +105,9 @@ public class TileEntityWaterWheel extends TileEntityCommon implements IRotationa
     @Override
     public void onPlacedBy(EntityPlayer player, ItemStack is, int side, float hitX, float hitY, float hitZ) {
         super.onPlacedBy(player, is, side, hitX, hitY, hitZ);
-        wheelDirection = ForgeDirection.getOrientation(side);
-        if (wheelDirection.offsetY != 0) {
-            wheelDirection = ForgeDirection.getOrientation(SpaceUtil.determineFlatOrientation(player)).getOpposite();
+        wheelDirection = SpaceUtil.getOrientation(side);
+        if (wheelDirection.getDirectionVec().getY() != 0) {
+            wheelDirection = SpaceUtil.getOrientation(SpaceUtil.determineFlatOrientation(player)).getOpposite();
         }
     }
 
@@ -200,11 +200,11 @@ public class TileEntityWaterWheel extends TileEntityCommon implements IRotationa
                 DeltaCapability.VIOLENT_COLLISIONS,
                 DeltaCapability.DRAG);
         idc.setRotationalCenterOffset(offset.toVector().addVector(0.5, 0.5, 0.5));
-        final ForgeDirection normal = wheelDirection.getOpposite();
+        final EnumFacing normal = wheelDirection.getOpposite();
         Coord at = new Coord(this).add(wheelDirection);
         at.setAsEntityLocation(idc);
-        if (normal.offsetY == 0) {
-            //Vec3 up = SpaceUtil.fromDirection(ForgeDirection.UP);
+        if (normal.getDirectionVec().getY() == 0) {
+            //Vec3 up = SpaceUtil.fromDirection(EnumFacing.UP);
             //Vec3 vnorm = SpaceUtil.fromDirection(normal);
             //Vec3 axis = up.crossProduct(vnorm);
             //Quaternion rot = Quaternion.getRotationQuaternionRadians(-Math.PI / 2, axis);
@@ -212,10 +212,10 @@ public class TileEntityWaterWheel extends TileEntityCommon implements IRotationa
             idc.posY += 0.5;
         } else {
             double a = .5;
-            idc.posX += wheelDirection.offsetX * a;
-            idc.posY += wheelDirection.offsetY * a;
-            idc.posZ += wheelDirection.offsetZ * a;
-            if (normal.offsetY == 1) {
+            idc.posX += wheelDirection.getDirectionVec().getX() * a;
+            idc.posY += wheelDirection.getDirectionVec().getY() * a;
+            idc.posZ += wheelDirection.getDirectionVec().getZ() * a;
+            if (normal.getDirectionVec().getY() == 1) {
                 idc.posY += 1;
             }
         }
@@ -341,12 +341,12 @@ public class TileEntityWaterWheel extends TileEntityCommon implements IRotationa
         final int sea_max = worldObj.provider.getAverageGroundLevel() + sea_level_range_max;
         final Vec3 water_torque = SpaceUtil.newVec();
         final Vec3 centerOfMass = idc.getCenter().toMiddleVector();
-        ForgeDirection a = this.wheelDirection;
+        EnumFacing a = this.wheelDirection;
         if (SpaceUtil.sign(a) == -1) a = a.getOpposite();
         final DeltaCoord fwd = new DeltaCoord(wheelDirection).incrScale(3);
         final Vec3 mask = SpaceUtil.fromDirection(a);
         final Vec3 antiMask = SpaceUtil.fromDirection(a.getOpposite());
-        SpaceUtil.incrAdd(antiMask, Vec3.createVectorHelper(1, 1, 1));
+        SpaceUtil.incrAdd(antiMask, new Vec3(1, 1, 1));
 
         ICoordFunction measure = new ICoordFunction() {
             boolean waterOkay(Coord here, Block hereBlock) {
@@ -425,7 +425,7 @@ public class TileEntityWaterWheel extends TileEntityCommon implements IRotationa
     }
 
     @Override
-    public IIcon getIcon(ForgeDirection dir) {
+    public IIcon getIcon(EnumFacing dir) {
         return BlockIcons.beauty$water_side;
     }
 }

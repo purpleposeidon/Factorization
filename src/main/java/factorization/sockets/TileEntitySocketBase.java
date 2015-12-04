@@ -27,12 +27,12 @@ import net.minecraft.util.IIcon;
 import net.minecraft.util.MovingObjectPosition;
 import net.minecraft.util.Vec3;
 import net.minecraft.world.World;
-import net.minecraftforge.common.util.ForgeDirection;
+import net.minecraft.util.EnumFacing;
 
 import org.lwjgl.opengl.GL11;
 
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 import factorization.api.Coord;
 import factorization.api.FzOrientation;
 import factorization.api.IChargeConductor;
@@ -52,7 +52,7 @@ public abstract class TileEntitySocketBase extends TileEntityCommon implements I
      * 		These vars need to be set: worldObj, [xyz]Coord, facing
      * 		Some things might call this's ISocketHolder methods rather than the passed in ISocketHolder's methods
      */
-    public ForgeDirection facing = ForgeDirection.UP;
+    public EnumFacing facing = EnumFacing.UP;
     protected ItemStack[] parts = new ItemStack[3];
 
     @Override
@@ -63,7 +63,7 @@ public abstract class TileEntitySocketBase extends TileEntityCommon implements I
     @Override
     public void onPlacedBy(EntityPlayer player, ItemStack is, int side, float hitX, float hitY, float hitZ) {
         super.onPlacedBy(player, is, side, hitX, hitY, hitZ);
-        facing = ForgeDirection.getOrientation(side);
+        facing = SpaceUtil.getOrientation(side);
     }
 
     public void migrate1to2() {
@@ -103,29 +103,29 @@ public abstract class TileEntitySocketBase extends TileEntityCommon implements I
         return dh.hadError;
     }
 
-    protected AxisAlignedBB getEntityBox(ISocketHolder socket, Coord c, ForgeDirection top, double d) {
+    protected AxisAlignedBB getEntityBox(ISocketHolder socket, Coord c, EnumFacing top, double d) {
         int one = 1;
-        AxisAlignedBB ab = AxisAlignedBB.getBoundingBox(
-                c.x + top.offsetX, c.y + top.offsetY, c.z + top.offsetZ,
-                c.x + one + top.offsetX, c.y + one + top.offsetY, c.z + one + top.offsetZ);
+        AxisAlignedBB ab = new AxisAlignedBB(
+                c.x + top.getDirectionVec().getX(), c.y + top.getDirectionVec().getY(), c.z + top.getDirectionVec().getZ(),
+                c.x + one + top.getDirectionVec().getX(), c.y + one + top.getDirectionVec().getY(), c.z + one + top.getDirectionVec().getZ());
         if (d != 0) {
             ab.minX -= d;
             ab.minY -= d;
             ab.minZ -= d;
-            ab.maxX += d - d * top.offsetX;
-            ab.maxY += d - d * top.offsetY;
-            ab.maxZ += d - d * top.offsetZ;
+            ab.maxX += d - d * top.getDirectionVec().getX();
+            ab.maxY += d - d * top.getDirectionVec().getY();
+            ab.maxZ += d - d * top.getDirectionVec().getZ();
         }
         return ab;
     }
     
     @Override
-    public final ForgeDirection[] getValidRotations() {
+    public final EnumFacing[] getValidRotations() {
         return full_rotation_array;
     }
     
     @Override
-    public final boolean rotate(ForgeDirection axis) {
+    public final boolean rotate(EnumFacing axis) {
         if (getClass() != SocketEmpty.class) {
             return false;
         }
@@ -148,7 +148,7 @@ public abstract class TileEntitySocketBase extends TileEntityCommon implements I
     
     @Override
     @SideOnly(Side.CLIENT)
-    public IIcon getIcon(ForgeDirection dir) {
+    public IIcon getIcon(EnumFacing dir) {
         if (dir == facing || dir.getOpposite() == facing) {
             return BlockIcons.socket$face;
         }
@@ -157,9 +157,9 @@ public abstract class TileEntitySocketBase extends TileEntityCommon implements I
     
     protected boolean isBlockPowered() {
         if (FzConfig.sockets_ignore_front_redstone) {
-            for (ForgeDirection fd : ForgeDirection.VALID_DIRECTIONS) {
+            for (EnumFacing fd : EnumFacing.VALUES) {
                 if (fd == facing) continue;
-                if (worldObj.getIndirectPowerLevelTo(xCoord + fd.offsetX, yCoord + fd.offsetY, zCoord + fd.offsetZ, fd.ordinal()) > 0) return true;
+                if (worldObj.getIndirectPowerLevelTo(xCoord + fd.getDirectionVec().getX(), yCoord + fd.getDirectionVec().getY(), zCoord + fd.getDirectionVec().getZ(), fd.ordinal()) > 0) return true;
             }
             return false;
         } else {
@@ -241,9 +241,9 @@ public abstract class TileEntitySocketBase extends TileEntityCommon implements I
     protected EntityPlayer getFakePlayer() {
         EntityPlayer player = PlayerUtil.makePlayer(getCoord(), "socket");
         player.worldObj = worldObj;
-        player.prevPosX = player.posX = xCoord + 0.5 + facing.offsetX;
-        player.prevPosY = player.posY = yCoord + 0.5 - player.getEyeHeight() + facing.offsetY;
-        player.prevPosZ = player.posZ = zCoord + 0.5 + facing.offsetZ;
+        player.prevPosX = player.posX = xCoord + 0.5 + facing.getDirectionVec().getX();
+        player.prevPosY = player.posY = yCoord + 0.5 - player.getEyeHeight() + facing.getDirectionVec().getY();
+        player.prevPosZ = player.posZ = zCoord + 0.5 + facing.getDirectionVec().getZ();
         for (int i = 0; i < player.inventory.mainInventory.length; i++) {
             player.inventory.mainInventory[i] = null;
         }
@@ -258,7 +258,7 @@ public abstract class TileEntitySocketBase extends TileEntityCommon implements I
     
     protected IInventory getBackingInventory(ISocketHolder socket) {
         if (socket == this) {
-            TileEntity te = worldObj.getTileEntity(xCoord - facing.offsetX,yCoord - facing.offsetY,zCoord - facing.offsetZ);
+            TileEntity te = worldObj.getTileEntity(xCoord - facing.getDirectionVec().getX(),yCoord - facing.getDirectionVec().getY(),zCoord - facing.getDirectionVec().getZ());
             if (te instanceof IInventory) {
                 return (IInventory) te;
             }
@@ -340,12 +340,12 @@ public abstract class TileEntitySocketBase extends TileEntityCommon implements I
     public void uninstall() { }
     
     @Override
-    public boolean activate(EntityPlayer player, ForgeDirection side) {
+    public boolean activate(EntityPlayer player, EnumFacing side) {
         ItemStack held = player.getHeldItem();
         if (held != null && held.getItem() == Core.registry.logicMatrixProgrammer) {
             if (!getFactoryType().hasGui) {
                 if (getClass() == SocketEmpty.class) {
-                    facing = FzUtil.shiftEnum(facing, ForgeDirection.VALID_DIRECTIONS, 1);
+                    facing = FzUtil.shiftEnum(facing, EnumFacing.VALUES, 1);
                     if (worldObj.isRemote) {
                         new Coord(this).redraw();
                     }

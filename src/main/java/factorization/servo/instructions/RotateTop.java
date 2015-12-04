@@ -7,7 +7,7 @@ import factorization.servo.stepper.StepperEngine;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.IIcon;
-import net.minecraftforge.common.util.ForgeDirection;
+import net.minecraft.util.EnumFacing;
 import factorization.api.Coord;
 import factorization.api.FzOrientation;
 import factorization.api.datahelpers.DataHelper;
@@ -20,21 +20,21 @@ import factorization.servo.ServoMotor;
 import factorization.shared.Core;
 
 public class RotateTop extends Instruction {
-    ForgeDirection top = ForgeDirection.UP;
+    EnumFacing top = EnumFacing.UP;
     
     @Override
-    public IIcon getIcon(ForgeDirection side) {
-        if (side == ForgeDirection.UNKNOWN) {
+    public IIcon getIcon(EnumFacing side) {
+        if (side == null) {
             return BlockIcons.servo$set_facing.side_W;
         }
         return BlockIcons.servo$set_facing.get(top.getOpposite(), side);
     }
     
     @Override
-    public boolean onClick(EntityPlayer player, Coord block, ForgeDirection side) {
+    public boolean onClick(EntityPlayer player, Coord block, EnumFacing side) {
         if (playerHasProgrammer(player)) {
             int i = top.ordinal();
-            top = ForgeDirection.getOrientation((i + 1) % 6);
+            top = SpaceUtil.getOrientation((i + 1) % 6);
             return true;
         }
         return false;

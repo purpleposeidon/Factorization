@@ -6,7 +6,7 @@ import net.minecraft.block.BlockRedstoneWire;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.IIcon;
-import net.minecraftforge.common.util.ForgeDirection;
+import net.minecraft.util.EnumFacing;
 import factorization.api.Coord;
 import factorization.api.FzOrientation;
 import factorization.api.datahelpers.DataHelper;
@@ -43,7 +43,7 @@ public class ReadRedstone extends Instruction {
     }
 
     @Override
-    public IIcon getIcon(ForgeDirection side) {
+    public IIcon getIcon(EnumFacing side) {
         return BlockIcons.servo$read_redstone;
     }
 

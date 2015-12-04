@@ -2,7 +2,7 @@ package factorization.sockets;
 
 import net.minecraft.client.renderer.RenderBlocks;
 import net.minecraft.client.renderer.Tessellator;
-import net.minecraftforge.common.util.ForgeDirection;
+import net.minecraft.util.EnumFacing;
 
 import org.lwjgl.opengl.GL11;
 
@@ -22,7 +22,7 @@ public class BlockRenderSocketBase extends FactorizationBlockRender {
 
     @Override
     public boolean render(RenderBlocks rb) {
-        ForgeDirection dir = ForgeDirection.EAST;
+        EnumFacing dir = EnumFacing.EAST;
         TileEntitySocketBase socket;
         BlockRenderHelper block = BlockRenderHelper.instance;
         block.setBlockBounds(0, 0.75F, 0, 1, 1, 1);

@@ -17,7 +17,7 @@ import factorization.util.ItemUtil;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.IIcon;
-import net.minecraftforge.common.util.ForgeDirection;
+import net.minecraft.util.EnumFacing;
 
 import java.io.IOException;
 
@@ -37,7 +37,7 @@ public class TileEntityCrystallizer extends TileEntityFactorization implements I
     IVexatiousCrafting<TileEntityCrystallizer> active_recipe;
     
     @Override
-    public IIcon getIcon(ForgeDirection dir) {
+    public IIcon getIcon(EnumFacing dir) {
         switch (dir) {
             case UP: return BlockIcons.crystallizer.top;
             case DOWN: return BlockIcons.crystallizer.bottom;
@@ -96,8 +96,8 @@ public class TileEntityCrystallizer extends TileEntityFactorization implements I
     
     @Override
     public int[] getAccessibleSlotsFromSide(int s) {
-        ForgeDirection side = ForgeDirection.getOrientation(s);
-        if (side == ForgeDirection.DOWN) {
+        EnumFacing side = SpaceUtil.getOrientation(s);
+        if (side == EnumFacing.DOWN) {
             return OUTPUT_s;
         }
         return INPUTS_s;

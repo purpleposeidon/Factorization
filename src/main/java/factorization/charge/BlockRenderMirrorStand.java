@@ -8,7 +8,7 @@ import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.init.Blocks;
 import net.minecraft.util.IIcon;
 import net.minecraft.util.Vec3;
-import net.minecraftforge.common.util.ForgeDirection;
+import net.minecraft.util.EnumFacing;
 import factorization.api.Coord;
 import factorization.api.Quaternion;
 import factorization.common.BlockIcons;
@@ -62,7 +62,7 @@ public class BlockRenderMirrorStand extends FactorizationBlockRender {
             TileEntityMirror mirror = (TileEntityMirror) te;
             if (mirror != null && mirror.target_rotation >= 0) {
                 block.translate(-0.5F, 0F, 0F);
-                Quaternion trans = Quaternion.getRotationQuaternionRadians(Math.toRadians(mirror.target_rotation - 90), ForgeDirection.UP);
+                Quaternion trans = Quaternion.getRotationQuaternionRadians(Math.toRadians(mirror.target_rotation - 90), EnumFacing.UP);
                 trans.incrMultiply(mirrorTilt);
                 block.rotate(trans);
                 block.translate(0.5F, -0.20F, 0.5F);
@@ -94,13 +94,13 @@ public class BlockRenderMirrorStand extends FactorizationBlockRender {
         // *could* have a customly animated texture that updates to match the light level, similar to vanilla lighting...
         // And it's not like the whole world'd need to update; just a few chunks.
         float poses[] = new float[] { -6F/16F, 6F/16F };
-        Quaternion trans = Quaternion.getRotationQuaternionRadians(Math.toRadians(mirror.target_rotation - 90), ForgeDirection.UP);
+        Quaternion trans = Quaternion.getRotationQuaternionRadians(Math.toRadians(mirror.target_rotation - 90), EnumFacing.UP);
         trans.incrMultiply(mirrorTilt);
         Vec3[] points = new Vec3[4];
         int i = 0;
         for (int sx = 0; sx < 2; sx++) {
             for (int sz = 0; sz < 2; sz++) {
-                Vec3 vec = Vec3.createVectorHelper(poses[sx], 0F, poses[sz]);
+                Vec3 vec = new Vec3(poses[sx], 0F, poses[sz]);
                 trans.applyRotation(vec);
                 vec.xCoord += x + 0.5F;
                 vec.yCoord += y + 0.5F;
@@ -108,7 +108,7 @@ public class BlockRenderMirrorStand extends FactorizationBlockRender {
                 points[i++] = vec;
             }
         }
-        Vec3 src = Vec3.createVectorHelper(x + 0.5, y + 0.5, z + 0.5);
+        Vec3 src = new Vec3(x + 0.5, y + 0.5, z + 0.5);
         Vec3 middle = mirror.reflection_target.toMiddleVector();
         Vec3 dif = SpaceUtil.subtract(middle, src);
         float N = 1.125F;

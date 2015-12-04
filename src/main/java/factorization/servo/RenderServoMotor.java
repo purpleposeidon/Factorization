@@ -26,7 +26,7 @@ import net.minecraft.util.IIcon;
 import net.minecraft.util.MovingObjectPosition;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.Vec3;
-import net.minecraftforge.common.util.ForgeDirection;
+import net.minecraft.util.EnumFacing;
 
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL12;
@@ -89,7 +89,7 @@ public class RenderServoMotor extends RenderEntity {
             GL11.glColor4f(gray, gray, gray, 0.8F);
             GL11.glLineWidth(1.5F);
             float d = 1F/2F, h = 0.25F;
-            AxisAlignedBB ab = AxisAlignedBB.getBoundingBox(-d, -h, -d, d, h, d);
+            AxisAlignedBB ab = new AxisAlignedBB(-d, -h, -d, d, h, d);
             drawOutlinedBoundingBox(ab);
             ab.offset(ab.minX, ab.minY, ab.minZ);
             GL11.glPopAttrib();
@@ -166,16 +166,16 @@ public class RenderServoMotor extends RenderEntity {
             FzOrientation o = orientation;
             GL11.glColor3f(1, 0, 0);
             GL11.glVertex3d(0, 0, 0);
-            GL11.glVertex3d(o.facing.offsetX, o.facing.offsetY, o.facing.offsetZ);
-            GL11.glVertex3d(o.facing.offsetX + o.top.offsetX, o.facing.offsetY + o.top.offsetY, o.facing.offsetZ + o.top.offsetZ);
+            GL11.glVertex3d(o.facing.getDirectionVec().getX(), o.facing.getDirectionVec().getY(), o.facing.getDirectionVec().getZ());
+            GL11.glVertex3d(o.facing.getDirectionVec().getX() + o.top.getDirectionVec().getX(), o.facing.getDirectionVec().getY() + o.top.getDirectionVec().getY(), o.facing.getDirectionVec().getZ() + o.top.getDirectionVec().getZ());
             GL11.glEnd();
             GL11.glLineWidth(2);
             GL11.glBegin(GL11.GL_LINE_STRIP);
             o = prevOrientation;
             GL11.glColor3f(0, 0, 1);
             GL11.glVertex3d(0, 0, 0);
-            GL11.glVertex3d(o.facing.offsetX, o.facing.offsetY, o.facing.offsetZ);
-            GL11.glVertex3d(o.facing.offsetX + o.top.offsetX, o.facing.offsetY + o.top.offsetY, o.facing.offsetZ + o.top.offsetZ);
+            GL11.glVertex3d(o.facing.getDirectionVec().getX(), o.facing.getDirectionVec().getY(), o.facing.getDirectionVec().getZ());
+            GL11.glVertex3d(o.facing.getDirectionVec().getX() + o.top.getDirectionVec().getX(), o.facing.getDirectionVec().getY() + o.top.getDirectionVec().getY(), o.facing.getDirectionVec().getZ() + o.top.getDirectionVec().getZ());
             GL11.glEnd();
         }
 
@@ -211,7 +211,7 @@ public class RenderServoMotor extends RenderEntity {
     
     void renderSocketAttachment(ServoMotor motor, TileEntitySocketBase socket, float partial) {
         socket.xCoord = socket.yCoord = socket.zCoord = 0;
-        socket.facing = ForgeDirection.UP;
+        socket.facing = EnumFacing.UP;
         socket.renderInServo(motor, partial);
     }
 

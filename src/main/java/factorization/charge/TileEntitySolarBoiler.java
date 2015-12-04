@@ -9,7 +9,7 @@ import io.netty.buffer.ByteBuf;
 import net.minecraft.init.Blocks;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.IIcon;
-import net.minecraftforge.common.util.ForgeDirection;
+import net.minecraft.util.EnumFacing;
 import net.minecraftforge.fluids.Fluid;
 import net.minecraftforge.fluids.FluidRegistry;
 import net.minecraftforge.fluids.FluidStack;
@@ -54,7 +54,7 @@ public class TileEntitySolarBoiler extends TileEntityCommon implements IReflecti
     }
     
     @Override
-    public IIcon getIcon(ForgeDirection dir) {
+    public IIcon getIcon(EnumFacing dir) {
         switch (dir) {
         case UP: return BlockIcons.boiler_top;
         default: return BlockIcons.boiler_side;
@@ -76,15 +76,15 @@ public class TileEntitySolarBoiler extends TileEntityCommon implements IReflecti
         given_heat = data.as(Share.VISIBLE_TRANSIENT, "givenHeat").putShort(given_heat);
     }
     
-    private FluidTank getTank(ForgeDirection from) {
-        if (from == ForgeDirection.UP) {
+    private FluidTank getTank(EnumFacing from) {
+        if (from == EnumFacing.UP) {
             return steamTank;
         }
         return waterTank;
     }
     
     @Override
-    public int fill(ForgeDirection from, FluidStack resource, boolean doFill) {
+    public int fill(EnumFacing from, FluidStack resource, boolean doFill) {
         if (resource.isFluidEqual(water_stack)) {
             return waterTank.fill(resource, doFill);
         } else if (resource.isFluidEqual(steam_stack)) {
@@ -95,26 +95,26 @@ public class TileEntitySolarBoiler extends TileEntityCommon implements IReflecti
     }
 
     @Override
-    public FluidStack drain(ForgeDirection from, int maxDrain, boolean doDrain) {
+    public FluidStack drain(EnumFacing from, int maxDrain, boolean doDrain) {
         return getTank(from).drain(maxDrain, doDrain);
     }
     
     @Override
-    public boolean canDrain(ForgeDirection from, Fluid fluid) {
+    public boolean canDrain(EnumFacing from, Fluid fluid) {
         return false;
     }
     
     @Override
-    public boolean canFill(ForgeDirection from, Fluid fluid) {
-        if (from == ForgeDirection.UP) {
+    public boolean canFill(EnumFacing from, Fluid fluid) {
+        if (from == EnumFacing.UP) {
             return false;
         }
         return fluid == null || fluid == water_stack.getFluid();
     }
     
     @Override
-    public FluidStack drain(ForgeDirection from, FluidStack resource, boolean doDrain) {
-        if (from != ForgeDirection.UP) return null; 
+    public FluidStack drain(EnumFacing from, FluidStack resource, boolean doDrain) {
+        if (from != EnumFacing.UP) return null; 
         FluidTank tank = getTank(from);
         if (resource == null || tank.getFluid() != resource) {
             return null;
@@ -123,7 +123,7 @@ public class TileEntitySolarBoiler extends TileEntityCommon implements IReflecti
     }
     
     @Override
-    public FluidTankInfo[] getTankInfo(ForgeDirection from) {
+    public FluidTankInfo[] getTankInfo(EnumFacing from) {
         return new FluidTankInfo[] {getTank(from).getInfo()};
     }
 
@@ -191,7 +191,7 @@ public class TileEntitySolarBoiler extends TileEntityCommon implements IReflecti
         if (aboveTank != null) {
             FluidStack sending_steam = steam.copy();
             sending_steam.amount = Math.min(sending_steam.amount, 1000);
-            steam.amount -= aboveTank.fill(ForgeDirection.DOWN, steam.copy(), true);
+            steam.amount -= aboveTank.fill(EnumFacing.DOWN, steam.copy(), true);
             steam.amount = Math.max(0, steam.amount);
         }
         if (water.amount < 1000) {
@@ -207,9 +207,9 @@ public class TileEntitySolarBoiler extends TileEntityCommon implements IReflecti
                     water.amount = Math.min(water.amount, waterTank.getCapacity());
                 }
             } else if (tc != null) {
-                ForgeDirection dir = ForgeDirection.UP;
+                EnumFacing dir = EnumFacing.UP;
                 if (below.getTE(TileEntitySolarBoiler.class) != null) {
-                    dir = ForgeDirection.DOWN;
+                    dir = EnumFacing.DOWN;
                 }
                 int free = Math.max(0, waterTank.getCapacity() - water.amount);
                 free = Math.min(1000/10, free);

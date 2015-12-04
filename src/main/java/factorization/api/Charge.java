@@ -127,7 +127,7 @@ public class Charge implements IDataSerializable {
      */
     public void update() {
         TileEntity te = (TileEntity) conductor;
-        World w = te.getWorldObj();
+        World w = te.getWorld();
         if (w.isRemote) {
             return;
         }

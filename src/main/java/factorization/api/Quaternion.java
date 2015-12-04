@@ -9,14 +9,14 @@ import java.io.IOException;
 
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.Vec3;
-import net.minecraftforge.common.util.ForgeDirection;
+import net.minecraft.util.EnumFacing;
 
 import org.lwjgl.opengl.GL11;
 
 import com.google.common.io.ByteArrayDataOutput;
 
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 import factorization.api.datahelpers.DataHelper;
 import factorization.api.datahelpers.IDataSerializable;
 
@@ -168,8 +168,8 @@ public class Quaternion implements IDataSerializable {
         update(other.w, other.x, other.y, other.z);
     }
     
-    public void update(ForgeDirection dir) {
-        update(w, dir.offsetX, dir.offsetY, dir.offsetZ);
+    public void update(EnumFacing dir) {
+        update(w, dir.getDirectionVec().getX(), dir.getDirectionVec().getY(), dir.getDirectionVec().getZ());
     }
     
     public void update(Vec3 v) {
@@ -183,7 +183,7 @@ public class Quaternion implements IDataSerializable {
     }
     
     public Vec3 toVector() {
-        return Vec3.createVectorHelper(x, y, z);
+        return new Vec3(x, y, z);
     }
     
     /**
@@ -226,10 +226,10 @@ public class Quaternion implements IDataSerializable {
         return new Quaternion(Math.cos(halfAngle), axis.xCoord*sin, axis.yCoord*sin, axis.zCoord*sin);
     }
     
-    public static Quaternion getRotationQuaternionRadians(double angle, ForgeDirection axis) {
+    public static Quaternion getRotationQuaternionRadians(double angle, EnumFacing axis) {
         double halfAngle = angle/2;
         double sin = Math.sin(halfAngle);
-        return new Quaternion(Math.cos(halfAngle), axis.offsetX*sin, axis.offsetY*sin, axis.offsetZ*sin);
+        return new Quaternion(Math.cos(halfAngle), axis.getDirectionVec().getX()*sin, axis.getDirectionVec().getY()*sin, axis.getDirectionVec().getZ()*sin);
     }
     
     public static Quaternion getRotationQuaternionRadians(double angle, double ax, double ay, double az) {
@@ -256,34 +256,34 @@ public class Quaternion implements IDataSerializable {
         int rotation = orient.getRotation();
         switch (orient.facing) {
         case UP: {
-            q1 = Quaternion.getRotationQuaternionRadians(0*quart, ForgeDirection.WEST);
+            q1 = Quaternion.getRotationQuaternionRadians(0*quart, EnumFacing.WEST);
             rotation = 5 - rotation;
             break;
         }
         case DOWN: {
-            q1 = Quaternion.getRotationQuaternionRadians(2*quart, ForgeDirection.WEST);
+            q1 = Quaternion.getRotationQuaternionRadians(2*quart, EnumFacing.WEST);
             rotation = 3 - rotation;
             break;
         }
         case NORTH: {
-            q1 = Quaternion.getRotationQuaternionRadians(1*quart, ForgeDirection.WEST);
+            q1 = Quaternion.getRotationQuaternionRadians(1*quart, EnumFacing.WEST);
             rotation = 5 - rotation;
             break;
         }
         case SOUTH: {
-            q1 = Quaternion.getRotationQuaternionRadians(-1*quart, ForgeDirection.WEST);
+            q1 = Quaternion.getRotationQuaternionRadians(-1*quart, EnumFacing.WEST);
             rotation = 3 - rotation;
             break;
         }
         case EAST: {
-            q1 = Quaternion.getRotationQuaternionRadians(1*quart, ForgeDirection.NORTH);
+            q1 = Quaternion.getRotationQuaternionRadians(1*quart, EnumFacing.NORTH);
             //rotation = 3 - rotation;
-            rotation += Math.abs(orient.top.offsetZ)*2;
+            rotation += Math.abs(orient.top.getDirectionVec().getZ())*2;
             break;
         }
         case WEST: {
-            q1 = Quaternion.getRotationQuaternionRadians(-1*quart, ForgeDirection.NORTH);
-            rotation += Math.abs(orient.top.offsetY)*2;
+            q1 = Quaternion.getRotationQuaternionRadians(-1*quart, EnumFacing.NORTH);
+            rotation += Math.abs(orient.top.getDirectionVec().getY())*2;
             break;
         }
         default: return quat_cache[ord] = new Quaternion(); //Won't happen
@@ -532,7 +532,7 @@ public class Quaternion implements IDataSerializable {
         incrConjugate();
     }
     
-    private static Vec3 uvCache = Vec3.createVectorHelper(0, 0, 0);
+    private static Vec3 uvCache = new Vec3(0, 0, 0);
     public void applyRotation(VectorUV vec) {
         uvCache.xCoord = vec.x;
         uvCache.yCoord = vec.y;

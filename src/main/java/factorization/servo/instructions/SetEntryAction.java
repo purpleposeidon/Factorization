@@ -6,7 +6,7 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.IIcon;
-import net.minecraftforge.common.util.ForgeDirection;
+import net.minecraft.util.EnumFacing;
 import factorization.api.Coord;
 import factorization.api.datahelpers.DataHelper;
 import factorization.api.datahelpers.IDataSerializable;
@@ -49,7 +49,7 @@ public class SetEntryAction extends Instruction {
     }
 
     @Override
-    public IIcon getIcon(ForgeDirection side) {
+    public IIcon getIcon(EnumFacing side) {
         switch (mode) {
         default:
         case ENTRY_EXECUTE: return BlockIcons.servo$entry_execute;
@@ -65,7 +65,7 @@ public class SetEntryAction extends Instruction {
     }
     
     @Override
-    public boolean onClick(EntityPlayer player, Coord block, ForgeDirection side) {
+    public boolean onClick(EntityPlayer player, Coord block, EnumFacing side) {
         if (!playerHasProgrammer(player)) {
             return false;
         }

@@ -26,7 +26,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.IIcon;
 import net.minecraft.world.chunk.Chunk;
-import net.minecraftforge.common.util.ForgeDirection;
+import net.minecraft.util.EnumFacing;
 
 import java.io.IOException;
 import java.util.HashSet;
@@ -187,13 +187,13 @@ public class TileEntitySapTap extends TileEntityCommon implements ISidedInventor
     }
 
     @Override
-    public boolean activate(EntityPlayer player, ForgeDirection side) {
+    public boolean activate(EntityPlayer player, EnumFacing side) {
         scanTree(player);
         return super.activate(player, side);
     }
 
     @Override
-    public IIcon getIcon(ForgeDirection dir) {
+    public IIcon getIcon(EnumFacing dir) {
         Block bup = worldObj == null ? Blocks.planks : worldObj.getBlock(xCoord, yCoord + 1, zCoord);
         int md;
         if (worldObj != null && bup.getMaterial() == Material.wood && bup instanceof BlockLog) {
@@ -213,7 +213,7 @@ public class TileEntitySapTap extends TileEntityCommon implements ISidedInventor
     @Override
     public boolean canPlaceAgainst(final EntityPlayer player, Coord c, int side) {
         final Coord at = getCoord();
-        if (!isLog(at.add(ForgeDirection.UP))) {
+        if (!isLog(at.add(EnumFacing.UP))) {
             if (!worldObj.isRemote) {
                 new Notice(at, "factorization.factoryBlock.SAP_TAP.belowlog").sendTo(player);
             }
@@ -236,7 +236,7 @@ public class TileEntitySapTap extends TileEntityCommon implements ISidedInventor
 
     @Override
     public int[] getAccessibleSlotsFromSide(int side) {
-        if (side == ForgeDirection.DOWN.ordinal()) return new int[] {0};
+        if (side == EnumFacing.DOWN.ordinal()) return new int[] {0};
         return new int[0];
     }
 

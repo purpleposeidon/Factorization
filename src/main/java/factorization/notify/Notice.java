@@ -69,7 +69,7 @@ public class Notice {
         } else if (where instanceof Entity) {
             world = ((Entity) where).worldObj;
         } else if (where instanceof TileEntity) {
-            world = ((TileEntity) where).getWorldObj();
+            world = ((TileEntity) where).getWorld();
         }
     }
     

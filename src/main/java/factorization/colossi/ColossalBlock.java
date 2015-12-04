@@ -28,9 +28,9 @@ import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import net.minecraftforge.common.ChestGenHooks;
 import net.minecraftforge.common.util.FakePlayer;
-import net.minecraftforge.common.util.ForgeDirection;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
+import net.minecraft.util.EnumFacing;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 import factorization.api.Coord;
 import factorization.common.BlockIcons;
 import factorization.fzds.DeltaChunk;
@@ -45,9 +45,9 @@ public class ColossalBlock extends Block {
 
     static Material collosal_material = new Material(MapColor.purpleColor);
 
-    static final int UP = ForgeDirection.UP.ordinal();
-    static final int DOWN = ForgeDirection.DOWN.ordinal();
-    static final int EAST = ForgeDirection.EAST.ordinal();
+    static final int UP = EnumFacing.UP.ordinal();
+    static final int DOWN = EnumFacing.DOWN.ordinal();
+    static final int EAST = EnumFacing.EAST.ordinal();
 
     public ColossalBlock() {
         super(collosal_material);
@@ -116,8 +116,8 @@ public class ColossalBlock extends Block {
             return 6; // 10
         }
         if (md == MD_MASK) {
-            for (ForgeDirection dir : ForgeDirection.VALID_DIRECTIONS) {
-                if (isSupportive(world, x + dir.offsetX, y + dir.offsetY, z + dir.offsetZ)) {
+            for (EnumFacing dir : EnumFacing.VALUES) {
+                if (isSupportive(world, x + dir.getDirectionVec().getX(), y + dir.getDirectionVec().getY(), z + dir.getDirectionVec().getZ())) {
                     return super.getBlockHardness(world, x, y, z);
                 }
             }
@@ -174,7 +174,7 @@ public class ColossalBlock extends Block {
         }
         if (md == MD_BODY_CRACKED || md == MD_MASK_CRACKED) {
             Coord me = new Coord(world, x, y, z);
-            Coord back = me.add(ForgeDirection.WEST);
+            Coord back = me.add(EnumFacing.WEST);
             if (back.getBlock() == this && back.getMd() == MD_CORE) {
                 TransferLib.move(back, me, true, true);
                 back.setIdMd(this, MD_BODY, true);
@@ -274,7 +274,7 @@ public class ColossalBlock extends Block {
     }
 
     private void placePoster(ItemStack held, EntityPlayer player, Coord at) {
-        ItemSpawnPoster.PosterPlacer placer = new ItemSpawnPoster.PosterPlacer(new ItemStack(Core.registry.spawnPoster), player, at.w, at.x, at.y, at.z, ForgeDirection.EAST.ordinal());
+        ItemSpawnPoster.PosterPlacer placer = new ItemSpawnPoster.PosterPlacer(new ItemStack(Core.registry.spawnPoster), player, at.w, at.x, at.y, at.z, EnumFacing.EAST.ordinal());
         placer.invoke();
         final EntityPoster poster = placer.result;
         poster.locked = true;

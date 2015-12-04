@@ -32,14 +32,14 @@ import net.minecraft.util.MovingObjectPosition;
 import net.minecraft.util.StatCollector;
 import net.minecraft.util.Vec3;
 import net.minecraft.world.World;
-import net.minecraftforge.common.util.ForgeDirection;
+import net.minecraft.util.EnumFacing;
 import net.minecraftforge.event.world.WorldEvent;
 
 import org.lwjgl.opengl.GL11;
 
-import cpw.mods.fml.common.eventhandler.SubscribeEvent;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 import factorization.api.Charge;
 import factorization.api.Coord;
 import factorization.api.FzOrientation;
@@ -121,7 +121,7 @@ public class SocketLacerator extends TileEntitySocketBase implements IChargeCond
     }
     
     @Override
-    public boolean activate(EntityPlayer player, ForgeDirection side) {
+    public boolean activate(EntityPlayer player, EnumFacing side) {
         if (worldObj.isRemote) {
             return false;
         }
@@ -379,7 +379,7 @@ public class SocketLacerator extends TileEntitySocketBase implements IChargeCond
                 progress++;
                 if (socket == this && worldObj.rand.nextInt(4) == 0) {
                     // Torsion!?
-                    TileEntity partner = mopWorld.getTileEntity(mop.blockX + facing.offsetX, mop.blockY + facing.offsetY, mop.blockZ + facing.offsetZ);
+                    TileEntity partner = mopWorld.getTileEntity(mop.blockX + facing.getDirectionVec().getX(), mop.blockY + facing.getDirectionVec().getY(), mop.blockZ + facing.getDirectionVec().getZ());
                     if (partner instanceof SocketLacerator) {
                         SocketLacerator pardner = (SocketLacerator) partner;
                         if (pardner.workCheck()) {
@@ -534,15 +534,15 @@ public class SocketLacerator extends TileEntitySocketBase implements IChargeCond
         if (particleTweaker == null) {
             particleTweaker = new ParticleWarper(worldObj, mc.renderEngine);
         }
-        px = xCoord + facing.offsetX;
-        py = yCoord + facing.offsetY;
-        pz = zCoord + facing.offsetZ;
+        px = xCoord + facing.getDirectionVec().getX();
+        py = yCoord + facing.getDirectionVec().getY();
+        pz = zCoord + facing.getDirectionVec().getZ();
         
-        ForgeDirection op = facing.getOpposite();
+        EnumFacing op = facing.getOpposite();
         
-        facex = px + 0.5 + 0.5*op.offsetX;
-        facey = py + 0.5 + 0.5*op.offsetY;
-        facez = pz + 0.5 + 0.5*op.offsetZ;
+        facex = px + 0.5 + 0.5*op.getDirectionVec().getX();
+        facey = py + 0.5 + 0.5*op.getDirectionVec().getY();
+        facez = pz + 0.5 + 0.5*op.getDirectionVec().getZ();
         
         Block b = worldObj.getBlock(px, py, pz);
         if (b == null) {
@@ -572,8 +572,8 @@ public class SocketLacerator extends TileEntitySocketBase implements IChargeCond
             if (particle == null || origER == null || me == null) {
                 return;
             }
-            ForgeDirection fd = me.facing;
-            if (fd.offsetY != 0) {
+            EnumFacing fd = me.facing;
+            if (fd.getDirectionVec().getY() != 0) {
                 origER.addEffect(particle);
                 return;
             }
@@ -584,25 +584,25 @@ public class SocketLacerator extends TileEntitySocketBase implements IChargeCond
             double dist = 4.0/16.0;
             
             
-            Vec3 dir = Vec3.createVectorHelper(0, dist, 0);
+            Vec3 dir = new Vec3(0, dist, 0);
             
             
-            if (fd.offsetX != 0) {
+            if (fd.getDirectionVec().getX() != 0) {
                 dir.rotateAroundX(theta);
-            } else if (fd.offsetY != 0) {
+            } else if (fd.getDirectionVec().getY() != 0) {
                 dir.rotateAroundY(theta);
-            } else if (fd.offsetZ != 0) {
+            } else if (fd.getDirectionVec().getZ() != 0) {
                 dir.rotateAroundZ(theta);
             }
             particle.posX += dir.xCoord;
             particle.posY += dir.yCoord;
             particle.posZ += dir.zCoord;
             theta = (float) (Math.PI/2);
-            if (fd.offsetX != 0) {
+            if (fd.getDirectionVec().getX() != 0) {
                 dir.rotateAroundX(theta);
-            } else if (fd.offsetY != 0) {
+            } else if (fd.getDirectionVec().getY() != 0) {
                 dir.rotateAroundY(theta);
-            } else if (fd.offsetZ != 0) {
+            } else if (fd.getDirectionVec().getZ() != 0) {
                 dir.rotateAroundZ(theta);
             }
             float speed = 0.8F*me.speed/max_speed;

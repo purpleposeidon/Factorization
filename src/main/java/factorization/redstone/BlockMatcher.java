@@ -10,7 +10,7 @@ import net.minecraft.client.renderer.texture.IIconRegister;
 import net.minecraft.util.IIcon;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
-import net.minecraftforge.common.util.ForgeDirection;
+import net.minecraft.util.EnumFacing;
 
 import java.util.Random;
 
@@ -24,22 +24,22 @@ public class BlockMatcher extends Block {
 
     static final byte STATE_READY = 0, STATE_FIRING = 4, STATE_MATCHED = 8;
 
-    int makeMd(ForgeDirection axis, byte state) {
+    int makeMd(EnumFacing axis, byte state) {
         if (SpaceUtil.sign(axis) == 1) axis = axis.getOpposite();
         int md = 0;
-        if (axis == ForgeDirection.DOWN) md = 0;
-        if (axis == ForgeDirection.NORTH) md = 1;
-        if (axis == ForgeDirection.WEST) md = 2;
+        if (axis == EnumFacing.DOWN) md = 0;
+        if (axis == EnumFacing.NORTH) md = 1;
+        if (axis == EnumFacing.WEST) md = 2;
         md |= state;
         return md;
     }
 
-    ForgeDirection getAxis(int md) {
+    EnumFacing getAxis(int md) {
         switch (md & 0x3) {
             default:
-            case 0: return ForgeDirection.DOWN;
-            case 1: return ForgeDirection.NORTH;
-            case 2: return ForgeDirection.WEST;
+            case 0: return EnumFacing.DOWN;
+            case 1: return EnumFacing.NORTH;
+            case 2: return EnumFacing.WEST;
         }
     }
 
@@ -47,7 +47,7 @@ public class BlockMatcher extends Block {
         return (byte) (md & 0xC);
     }
 
-    byte match(IBlockAccess world, int x, int y, int z, ForgeDirection axis) {
+    byte match(IBlockAccess world, int x, int y, int z, EnumFacing axis) {
         // 0: Not at all similar
         // 1: Same solidity
         // 2: Same material
@@ -56,15 +56,15 @@ public class BlockMatcher extends Block {
         // NORELEASE TODO: Barrels. Not just 'are the items identical', but 'is this item the same as that block'.
         // This stuff may be easier in 1.8.
         @SuppressWarnings("UnnecessaryLocalVariable")
-        ForgeDirection dir1 = axis;
-        ForgeDirection dir2 = axis.getOpposite();
-        Block front = world.getBlock(x + dir1.offsetX, y + dir1.offsetY, z + dir1.offsetZ);
-        int frontMd = world.getBlockMetadata(x + dir1.offsetX, y + dir1.offsetY, z + dir1.offsetZ);
-        boolean frontAir = world.isAirBlock(x + dir1.offsetX, y + dir1.offsetY, z + dir1.offsetZ);
+        EnumFacing dir1 = axis;
+        EnumFacing dir2 = axis.getOpposite();
+        Block front = world.getBlock(x + dir1.getDirectionVec().getX(), y + dir1.getDirectionVec().getY(), z + dir1.getDirectionVec().getZ());
+        int frontMd = world.getBlockMetadata(x + dir1.getDirectionVec().getX(), y + dir1.getDirectionVec().getY(), z + dir1.getDirectionVec().getZ());
+        boolean frontAir = world.isAirBlock(x + dir1.getDirectionVec().getX(), y + dir1.getDirectionVec().getY(), z + dir1.getDirectionVec().getZ());
 
-        Block back = world.getBlock(x + dir2.offsetX, y + dir2.offsetY, z + dir2.offsetZ);
-        int backMd = world.getBlockMetadata(x + dir2.offsetX, y + dir2.offsetY, z + dir2.offsetZ);
-        boolean backAir = world.isAirBlock(x + dir2.offsetX, y + dir2.offsetY, z + dir2.offsetZ);
+        Block back = world.getBlock(x + dir2.getDirectionVec().getX(), y + dir2.getDirectionVec().getY(), z + dir2.getDirectionVec().getZ());
+        int backMd = world.getBlockMetadata(x + dir2.getDirectionVec().getX(), y + dir2.getDirectionVec().getY(), z + dir2.getDirectionVec().getZ());
+        boolean backAir = world.isAirBlock(x + dir2.getDirectionVec().getX(), y + dir2.getDirectionVec().getY(), z + dir2.getDirectionVec().getZ());
         if (frontAir || backAir) return 0;
         if (front == back) {
             if (frontMd == backMd) {
@@ -89,8 +89,8 @@ public class BlockMatcher extends Block {
     @Override
     public int getComparatorInputOverride(World world, int x, int y, int z, int side) {
         int md = world.getBlockMetadata(x, y, z);
-        ForgeDirection axis = getAxis(md);
-        ForgeDirection mojangSide = SpaceUtil.demojangSide(side);
+        EnumFacing axis = getAxis(md);
+        EnumFacing mojangSide = SpaceUtil.demojangSide(side);
         if (axis == mojangSide || axis == mojangSide.getOpposite()) return 0;
         byte match = match(world, x, y, z, axis);
         if (match == 0) return 0;
@@ -103,7 +103,7 @@ public class BlockMatcher extends Block {
         int md = world.getBlockMetadata(x, y, z);
         byte state = getState(md);
         if (state == STATE_FIRING) return;
-        ForgeDirection axis = getAxis(md);
+        EnumFacing axis = getAxis(md);
         byte match = match(world, x, y, z, axis);
         byte next_state = match >= 3 ? STATE_FIRING : STATE_READY;
         world.func_147453_f(x, y, z, this); // 'update comparators'; don't do this when firing as it might cause a loop?
@@ -126,22 +126,22 @@ public class BlockMatcher extends Block {
     @Override
     public boolean canConnectRedstone(IBlockAccess world, int x, int y, int z, int side) {
         int md = world.getBlockMetadata(x, y, z);
-        ForgeDirection axis = getAxis(md);
+        EnumFacing axis = getAxis(md);
         // Great job, forge! This is some right ol' stupid BS!
-        if (axis == ForgeDirection.DOWN) {
+        if (axis == EnumFacing.DOWN) {
             return side != -1 && side != -2 && side != 4;
-        } else if (axis == ForgeDirection.NORTH) {
+        } else if (axis == EnumFacing.NORTH) {
             return side != 0 && side != 2;
-        } else if (axis == ForgeDirection.WEST) {
+        } else if (axis == EnumFacing.WEST) {
             return side != 1 && side != 3;
         }
         return false;
     }
 
     @Override
-    public boolean isSideSolid(IBlockAccess world, int x, int y, int z, ForgeDirection side) {
+    public boolean isSideSolid(IBlockAccess world, int x, int y, int z, EnumFacing side) {
         int md = world.getBlockMetadata(x, y, z);
-        ForgeDirection axis = getAxis(md);
+        EnumFacing axis = getAxis(md);
         return axis != side && axis != side.getOpposite(); // Look how much less stupid this is! :D
     }
 
@@ -150,8 +150,8 @@ public class BlockMatcher extends Block {
         int md = world.getBlockMetadata(x, y, z);
         byte state = getState(md);
         if (state != STATE_FIRING) return 0;
-        ForgeDirection axis = getAxis(md);
-        ForgeDirection dir = ForgeDirection.getOrientation(side);
+        EnumFacing axis = getAxis(md);
+        EnumFacing dir = SpaceUtil.getOrientation(side);
         if (axis == dir || axis == dir.getOpposite()) return 0;
         byte match = match(world, x, y, z, axis);
         if (match >= 3) return 0xF;
@@ -161,7 +161,7 @@ public class BlockMatcher extends Block {
     @Override
     public void updateTick(World world, int x, int y, int z, Random random) {
         int md = world.getBlockMetadata(x, y, z);
-        ForgeDirection axis = getAxis(md);
+        EnumFacing axis = getAxis(md);
         byte match = match(world, x, y, z, axis);
         byte nextState = match >= 3 ? STATE_MATCHED : STATE_READY;
         int notify = Coord.UPDATE | Coord.NOTIFY_NEIGHBORS;
@@ -172,7 +172,7 @@ public class BlockMatcher extends Block {
 
     @Override
     public int onBlockPlaced(World w, int x, int y, int z, int side, float hitX, float hitY, float hitZ, int itemMetadata) {
-        return makeMd(ForgeDirection.getOrientation(side), STATE_READY);
+        return makeMd(SpaceUtil.getOrientation(side), STATE_READY);
     }
 
     @Override
@@ -180,7 +180,7 @@ public class BlockMatcher extends Block {
         int md = world.getBlockMetadata(x, y, z);
         byte state = getState(md);
         if (state == STATE_READY) return;
-        ForgeDirection axis = getAxis(md);
+        EnumFacing axis = getAxis(md);
         world.setBlockMetadataWithNotify(x, y, z, makeMd(axis, STATE_READY), 0);
     }
 
@@ -191,8 +191,8 @@ public class BlockMatcher extends Block {
 
     @Override
     public IIcon getIcon(int side, int md) {
-        ForgeDirection dir = ForgeDirection.getOrientation(side);
-        ForgeDirection axis = getAxis(md);
+        EnumFacing dir = SpaceUtil.getOrientation(side);
+        EnumFacing axis = getAxis(md);
         if (axis == dir || axis == dir.getOpposite()) return BlockIcons.redstone$matcher_face;
         return BlockIcons.redstone$matcher_side;
     }

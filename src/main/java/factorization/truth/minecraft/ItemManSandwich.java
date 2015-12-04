@@ -1,8 +1,8 @@
 package factorization.truth.minecraft;
 
-import cpw.mods.fml.common.eventhandler.SubscribeEvent;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 import factorization.shared.Core;
 import factorization.truth.api.DocReg;
 import factorization.truth.api.IManwich;
@@ -114,7 +114,7 @@ public class ItemManSandwich extends ItemFood implements IManwich {
     }
 
     @SubscribeEvent
-    public void syncLoginManwhich(cpw.mods.fml.common.gameevent.PlayerEvent.PlayerLoggedInEvent event) {
+    public void syncLoginManwhich(net.minecraftforge.fml.common.gameevent.PlayerEvent.PlayerLoggedInEvent event) {
         syncStat(event.player);
     }
 

@@ -17,9 +17,9 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.IIcon;
 import net.minecraft.world.EnumSkyBlock;
 import net.minecraft.world.World;
-import net.minecraftforge.common.util.ForgeDirection;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
+import net.minecraft.util.EnumFacing;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 import factorization.api.Coord;
 import factorization.api.DeltaCoord;
 import factorization.api.IReflectionTarget;
@@ -76,7 +76,7 @@ public class TileEntityMirror extends TileEntityCommon {
     }
 
     @Override
-    public boolean activate(EntityPlayer entityplayer, ForgeDirection side) {
+    public boolean activate(EntityPlayer entityplayer, EnumFacing side) {
         neighborChanged();
         return false;
     }
@@ -367,7 +367,7 @@ public class TileEntityMirror extends TileEntityCommon {
     
     @Override
     @SideOnly(Side.CLIENT)
-    public IIcon getIcon(ForgeDirection dir) {
+    public IIcon getIcon(EnumFacing dir) {
         return BlockIcons.mirror_front;
     }
     
@@ -396,7 +396,7 @@ public class TileEntityMirror extends TileEntityCommon {
         byte ret = 1;
         for (Coord c : getCoord().getNeighborsAdjacent()) {
             if (c.isAir() || !c.isSolid()) continue;
-            ItemStack is = c.getPickBlock(ForgeDirection.DOWN);
+            ItemStack is = c.getPickBlock(EnumFacing.DOWN);
             for (ItemStack ag : getSilver()) {
                 if (ItemUtil.wildcardSimilar(ag, is)) {
                     ret += 2;

@@ -1,7 +1,7 @@
 package factorization.mechanics;
 
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 import factorization.api.Coord;
 import factorization.api.DeltaCoord;
 import factorization.api.FzOrientation;
@@ -28,7 +28,7 @@ import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.*;
 import net.minecraft.world.World;
-import net.minecraftforge.common.util.ForgeDirection;
+import net.minecraft.util.EnumFacing;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL12;
 
@@ -67,7 +67,7 @@ public class TileEntityHinge extends TileEntityCommon implements IDCController {
 
     @Override
     public boolean isBlockSolidOnSide(int side) {
-        return ForgeDirection.getOrientation(side) == facing.facing.getOpposite();
+        return SpaceUtil.getOrientation(side) == facing.facing.getOpposite();
     }
 
     @Override
@@ -267,9 +267,9 @@ public class TileEntityHinge extends TileEntityCommon implements IDCController {
 
         incrComponentMultiply(torque, rotationAxis);
 
-        Quaternion qx = Quaternion.getRotationQuaternionRadians(torque.xCoord, ForgeDirection.EAST);
-        Quaternion qy = Quaternion.getRotationQuaternionRadians(torque.yCoord, ForgeDirection.UP);
-        Quaternion qz = Quaternion.getRotationQuaternionRadians(torque.zCoord, ForgeDirection.SOUTH);
+        Quaternion qx = Quaternion.getRotationQuaternionRadians(torque.xCoord, EnumFacing.EAST);
+        Quaternion qy = Quaternion.getRotationQuaternionRadians(torque.yCoord, EnumFacing.UP);
+        Quaternion qz = Quaternion.getRotationQuaternionRadians(torque.zCoord, EnumFacing.SOUTH);
 
         Quaternion dOmega = qx.multiply(qy).multiply(qz);
 
@@ -505,15 +505,15 @@ public class TileEntityHinge extends TileEntityCommon implements IDCController {
         if (idcRef.trackingEntity()) {
             IDeltaChunk idc = getIdc();
             if (idc != null) {
-                ForgeDirection face = facing.facing, top = facing.top;
+                EnumFacing face = facing.facing, top = facing.top;
                 float faced = 0.5F, topd = 0.0F;
 
                 if (sign(facing.top) == +1) topd = 1;
                 if (sign(facing.facing) == -1) faced *= -1;
 
-                float dx = face.offsetX * faced + top.offsetX * topd;
-                float dy = face.offsetY * faced + top.offsetY * topd;
-                float dz = face.offsetZ * faced + top.offsetZ * topd;
+                float dx = face.getDirectionVec().getX() * faced + top.getDirectionVec().getX() * topd;
+                float dy = face.getDirectionVec().getY() * faced + top.getDirectionVec().getY() * topd;
+                float dz = face.getDirectionVec().getZ() * faced + top.getDirectionVec().getZ() * topd;
 
                 GL11.glTranslatef(dx, dy, dz);
                 idc.getRotation().glRotate();
@@ -539,25 +539,25 @@ public class TileEntityHinge extends TileEntityCommon implements IDCController {
 
     private void setupHingeRotation2() {
         // Well, it's better than my 125 line first try. I bet Player could do better tho.
-        final ForgeDirection face = facing.facing;
-        final ForgeDirection top = facing.top;
+        final EnumFacing face = facing.facing;
+        final EnumFacing top = facing.top;
         final int fsign = face.ordinal() % 2 == 0 ? -1 : +1;
         final int tsign = top.ordinal() % 2 == 0 ? -1 : +1;
         float dx = 0, dy = 0, dz = 0;
         if (tsign == +1) {
-            ForgeDirection v = top;
-            dx += v.offsetX; dy += v.offsetY; dz += v.offsetZ;
+            EnumFacing v = top;
+            dx += v.getDirectionVec().getX(); dy += v.getDirectionVec().getY(); dz += v.getDirectionVec().getZ();
         }
         if (fsign == +1) {
-            ForgeDirection v = facing.rotateOnFace(1).top;
-            dx += v.offsetX; dy += v.offsetY; dz += v.offsetZ;
+            EnumFacing v = facing.rotateOnFace(1).top;
+            dx += v.getDirectionVec().getX(); dy += v.getDirectionVec().getY(); dz += v.getDirectionVec().getZ();
         }
         GL11.glTranslatef(dx, dy, dz);
         Quaternion.fromOrientation(facing).glRotate();
         boolean left = false;
-        if (face.offsetX != 0) left = top == ForgeDirection.NORTH || top == ForgeDirection.UP;
-        if (face.offsetY != 0) left = top == ForgeDirection.WEST || top == ForgeDirection.SOUTH;
-        if (face.offsetZ != 0) left = top == ForgeDirection.DOWN || top == ForgeDirection.EAST;
+        if (face.getDirectionVec().getX() != 0) left = top == EnumFacing.NORTH || top == EnumFacing.UP;
+        if (face.getDirectionVec().getY() != 0) left = top == EnumFacing.WEST || top == EnumFacing.SOUTH;
+        if (face.getDirectionVec().getZ() != 0) left = top == EnumFacing.DOWN || top == EnumFacing.EAST;
 
         float dleft = 0.5F;
         if (left) {
@@ -569,14 +569,14 @@ public class TileEntityHinge extends TileEntityCommon implements IDCController {
     @Override
     public AxisAlignedBB getRenderBoundingBox() {
         int a = -2, b = +3;
-        return AxisAlignedBB.getBoundingBox(xCoord + a, yCoord + a, zCoord + a, xCoord + b, yCoord + b, zCoord + b);
+        return new AxisAlignedBB(xCoord + a, yCoord + a, zCoord + a, xCoord + b, yCoord + b, zCoord + b);
     }
 
     private transient byte comparator_cache = 0;
     private transient boolean executing_order = false;
 
     @Override
-    public int getComparatorValue(ForgeDirection side) {
+    public int getComparatorValue(EnumFacing side) {
         return comparator_cache;
     }
 
@@ -600,7 +600,7 @@ public class TileEntityHinge extends TileEntityCommon implements IDCController {
     }
 
     @Override
-    public IIcon getIcon(ForgeDirection dir) {
+    public IIcon getIcon(EnumFacing dir) {
         return Blocks.iron_block.getIcon(0, 0);
     }
 }

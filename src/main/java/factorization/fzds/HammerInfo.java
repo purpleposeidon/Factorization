@@ -1,8 +1,8 @@
 package factorization.fzds;
 
-import cpw.mods.fml.common.Mod.EventHandler;
-import cpw.mods.fml.common.gameevent.TickEvent.Phase;
-import cpw.mods.fml.common.gameevent.TickEvent.ServerTickEvent;
+import net.minecraftforge.fml.common.Mod.EventHandler;
+import net.minecraftforge.fml.common.gameevent.TickEvent.Phase;
+import net.minecraftforge.fml.common.gameevent.TickEvent.ServerTickEvent;
 import factorization.api.Coord;
 import factorization.api.DeltaCoord;
 import factorization.shared.Core;

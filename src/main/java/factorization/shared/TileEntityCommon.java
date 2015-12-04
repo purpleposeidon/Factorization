@@ -1,9 +1,9 @@
 package factorization.shared;
 
-import cpw.mods.fml.common.event.FMLModIdMappingEvent;
-import cpw.mods.fml.common.network.internal.FMLProxyPacket;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
+import net.minecraftforge.fml.common.event.FMLModIdMappingEvent;
+import net.minecraftforge.fml.common.network.internal.FMLProxyPacket;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 import factorization.api.*;
 import factorization.api.datahelpers.DataHelper;
 import factorization.api.datahelpers.DataInNBT;
@@ -32,7 +32,7 @@ import net.minecraft.util.IIcon;
 import net.minecraft.util.MovingObjectPosition;
 import net.minecraft.util.Vec3;
 import net.minecraftforge.common.util.Constants;
-import net.minecraftforge.common.util.ForgeDirection;
+import net.minecraft.util.EnumFacing;
 
 import java.io.ByteArrayOutputStream;
 import java.io.DataInput;
@@ -258,7 +258,7 @@ public abstract class TileEntityCommon extends TileEntity implements ICoord, IFa
         b.setBlockBounds(0, 0, 0, 1, 1, 1);
     }
 
-    public boolean activate(EntityPlayer entityplayer, ForgeDirection side) {
+    public boolean activate(EntityPlayer entityplayer, EnumFacing side) {
         FactoryType type = getFactoryType();
 
         if (type.hasGui) {
@@ -284,21 +284,21 @@ public abstract class TileEntityCommon extends TileEntity implements ICoord, IFa
     }
 
     /** Looks like we're doing "face towards this axis" */
-    public boolean rotate(ForgeDirection axis) {
+    public boolean rotate(EnumFacing axis) {
         return false;
     }
 
-    public static final ForgeDirection[] empty_rotation_array = new ForgeDirection[0];
-    public static final ForgeDirection[] flat_rotation_array = new ForgeDirection[] {
-            ForgeDirection.NORTH, ForgeDirection.SOUTH, ForgeDirection.WEST, ForgeDirection.EAST
+    public static final EnumFacing[] empty_rotation_array = new EnumFacing[0];
+    public static final EnumFacing[] flat_rotation_array = new EnumFacing[] {
+            EnumFacing.NORTH, EnumFacing.SOUTH, EnumFacing.WEST, EnumFacing.EAST
     };
-    public static final ForgeDirection[] full_rotation_array = new ForgeDirection[6];
+    public static final EnumFacing[] full_rotation_array = new EnumFacing[6];
     static {
         for (int i = 0; i < 6; i++) {
-            full_rotation_array[i] = ForgeDirection.getOrientation(i);
+            full_rotation_array[i] = SpaceUtil.getOrientation(i);
         }
     }
-    public ForgeDirection[] getValidRotations() {
+    public EnumFacing[] getValidRotations() {
         return empty_rotation_array;
     }
 
@@ -307,7 +307,7 @@ public abstract class TileEntityCommon extends TileEntity implements ICoord, IFa
         return 0;
     }
 
-    public int getComparatorValue(ForgeDirection side) {
+    public int getComparatorValue(EnumFacing side) {
         if (this instanceof IInventory) {
             return Container.calcRedstoneFromInventory((IInventory) this);
         }
@@ -326,10 +326,10 @@ public abstract class TileEntityCommon extends TileEntity implements ICoord, IFa
     /** Called when there's a comparatory-inventory-ish update */
     public void onNeighborTileChanged(int tilex, int tiley, int tilez) {}
 
-    public boolean recolourBlock(ForgeDirection side, FzColor fzColor) { return false; }
+    public boolean recolourBlock(EnumFacing side, FzColor fzColor) { return false; }
 
     @SideOnly(Side.CLIENT)
-    public IIcon getIcon(ForgeDirection dir) {
+    public IIcon getIcon(EnumFacing dir) {
         return BlockIcons.error;
     }
 

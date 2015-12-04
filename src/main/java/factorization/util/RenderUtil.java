@@ -1,11 +1,11 @@
 package factorization.util;
 
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 import factorization.shared.Core;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.RenderBlocks;
-import net.minecraftforge.common.util.ForgeDirection;
+import net.minecraft.util.EnumFacing;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.util.glu.GLU;
 
@@ -25,7 +25,7 @@ public final class RenderUtil {
     }
 
     @SideOnly(Side.CLIENT)
-    public static void rotateForDirection(ForgeDirection dir) {
+    public static void rotateForDirection(EnumFacing dir) {
         switch (dir) {
         case WEST:
             break;

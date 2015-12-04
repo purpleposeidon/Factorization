@@ -29,7 +29,7 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.IIcon;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.client.MinecraftForgeClient;
-import net.minecraftforge.common.util.ForgeDirection;
+import net.minecraft.util.EnumFacing;
 import org.lwjgl.opengl.GL11;
 
 import static net.minecraftforge.client.IItemRenderer.ItemRenderType.INVENTORY;
@@ -38,14 +38,14 @@ public class TileEntityDayBarrelRenderer extends TileEntitySpecialRenderer {
 
     void doDraw(TileEntityDayBarrel barrel, ItemStack is) {
         FzOrientation bo = barrel.orientation;
-        ForgeDirection face = bo.facing;
+        EnumFacing face = bo.facing;
         if (SpaceUtil.sign(face) == 1) {
-            GL11.glTranslated(face.offsetX, face.offsetY, face.offsetZ);
+            GL11.glTranslated(face.getDirectionVec().getX(), face.getDirectionVec().getY(), face.getDirectionVec().getZ());
         }
         GL11.glTranslated(
-                0.5*(1 - Math.abs(face.offsetX)), 
-                0.5*(1 - Math.abs(face.offsetY)), 
-                0.5*(1 - Math.abs(face.offsetZ))
+                0.5*(1 - Math.abs(face.getDirectionVec().getX())), 
+                0.5*(1 - Math.abs(face.getDirectionVec().getY())), 
+                0.5*(1 - Math.abs(face.getDirectionVec().getZ()))
                 );
         
         Quaternion quat = Quaternion.fromOrientation(bo.getSwapped());
@@ -53,7 +53,7 @@ public class TileEntityDayBarrelRenderer extends TileEntitySpecialRenderer {
         GL11.glRotatef(90, 0, 1, 0);
         GL11.glTranslated(0.25, 0.25 - 1.0/16.0, -1.0/128.0);
         if (barrel.type == Type.HOPPING) {
-            double time = barrel.getWorldObj().getTotalWorldTime();
+            double time = barrel.getWorld().getTotalWorldTime();
             if (Math.sin(time/20) > 0) {
                 double delta = Math.max(0, Math.sin(time/2)/16);
                 GL11.glTranslated(0, delta, 0);

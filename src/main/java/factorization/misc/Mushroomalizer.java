@@ -6,11 +6,11 @@ import net.minecraft.block.Block;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraftforge.common.util.ForgeDirection;
+import net.minecraft.util.EnumFacing;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
-import cpw.mods.fml.common.eventhandler.SubscribeEvent;
-import cpw.mods.fml.common.gameevent.TickEvent.Phase;
-import cpw.mods.fml.common.gameevent.TickEvent.ServerTickEvent;
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.fml.common.gameevent.TickEvent.Phase;
+import net.minecraftforge.fml.common.gameevent.TickEvent.ServerTickEvent;
 import factorization.api.Coord;
 
 public class Mushroomalizer {
@@ -37,10 +37,10 @@ public class Mushroomalizer {
     public void tickEnd(ServerTickEvent tick) {
         if (tick.phase != Phase.END) return;
         if (shroomQueue.isEmpty()) return;
-        ForgeDirection[] HORIZONTALS = new ForgeDirection[] { ForgeDirection.NORTH, ForgeDirection.SOUTH, ForgeDirection.EAST, ForgeDirection.WEST };
+        EnumFacing[] HORIZONTALS = new EnumFacing[] { EnumFacing.NORTH, EnumFacing.SOUTH, EnumFacing.EAST, EnumFacing.WEST };
         for (PlayerInteractEvent event : shroomQueue) {
             if (event.isCanceled()) continue;
-            Coord at = new Coord(event.entityPlayer.worldObj, event.x, event.y, event.z).add(ForgeDirection.getOrientation(event.face));
+            Coord at = new Coord(event.entityPlayer.worldObj, event.x, event.y, event.z).add(SpaceUtil.getOrientation(event.face));
             if (event.entityPlayer.isSneaking()) {
                 // Stalk
                 if (event.face > 1) {
@@ -53,7 +53,7 @@ public class Mushroomalizer {
             Block shroom = at.getBlock();
             int flag = 0;
             for (int i = 0; i < HORIZONTALS.length; i++) {
-                ForgeDirection fd = HORIZONTALS[i];
+                EnumFacing fd = HORIZONTALS[i];
                 if (at.add(fd).getBlock() == shroom) {
                     flag |= 1 << i;
                 }
@@ -63,7 +63,7 @@ public class Mushroomalizer {
             if (flag == 0) md = 14;
             if (flag == 15) {
                 md = 0;
-                if (at.add(ForgeDirection.UP).getBlock() != shroom) {
+                if (at.add(EnumFacing.UP).getBlock() != shroom) {
                     md = 9;
                 }
             }

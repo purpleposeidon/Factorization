@@ -4,7 +4,7 @@ import factorization.api.Coord;
 import factorization.util.SpaceUtil;
 import net.minecraft.block.Block;
 import net.minecraft.util.Vec3;
-import net.minecraftforge.common.util.ForgeDirection;
+import net.minecraft.util.EnumFacing;
 import factorization.api.Quaternion;
 import factorization.colossi.ColossusController.BodySide;
 import factorization.colossi.ColossusController.LimbType;
@@ -47,7 +47,7 @@ public enum WalkState implements IStateMachine<WalkState> {
                         limb.target(new Quaternion(), 1 * controller.getSpeedScale());
                     } else {
                         double arm_angle = arms_angle * (limb.side == BodySide.LEFT ? +1 : -1);
-                        Quaternion ar = Quaternion.getRotationQuaternionRadians(arm_angle, ForgeDirection.EAST);
+                        Quaternion ar = Quaternion.getRotationQuaternionRadians(arm_angle, EnumFacing.EAST);
                         limb.target(ar, 1 * controller.getSpeedScale());
                     }
                     limb.creak();
@@ -90,10 +90,10 @@ public enum WalkState implements IStateMachine<WalkState> {
                 }
                 nextRotation *= limb.lastTurnDirection;
                 
-                Quaternion nr = Quaternion.getRotationQuaternionRadians(nextRotation, ForgeDirection.DOWN);
+                Quaternion nr = Quaternion.getRotationQuaternionRadians(nextRotation, EnumFacing.DOWN);
                 if (limb.lastTurnDirection == controller.turningDirection) {
                     // Lift a leg up a tiny bit
-                    nr.incrMultiply(Quaternion.getRotationQuaternionRadians(Math.toRadians(2), ForgeDirection.SOUTH));
+                    nr.incrMultiply(Quaternion.getRotationQuaternionRadians(Math.toRadians(2), EnumFacing.SOUTH));
                 }
                 limb.setTargetRotation(nr, (int) (nextRotationTime * controller.getSpeedScale()), interp);
                 limb.creak();
@@ -110,7 +110,7 @@ public enum WalkState implements IStateMachine<WalkState> {
             Vec3 me = SpaceUtil.fromEntPos(body);
             Vec3 delta = me.subtract(target);
             double angle = Math.atan2(delta.xCoord, delta.zCoord) - Math.PI / 2;
-            Quaternion target_rotation = Quaternion.getRotationQuaternionRadians(angle, ForgeDirection.UP);
+            Quaternion target_rotation = Quaternion.getRotationQuaternionRadians(angle, EnumFacing.UP);
             Quaternion current_rotation = body.getRotation();
             int size = controller.leg_size + 1;
             double rotation_distance = (((Math.toDegrees(target_rotation.getAngleBetween(current_rotation)) % 360) + 360) % 360) / 360;
@@ -168,7 +168,7 @@ public enum WalkState implements IStateMachine<WalkState> {
         
         private final double max_leg_swing_degrees = 22.5;
         private final double max_leg_swing_radians = Math.toRadians(max_leg_swing_degrees);
-        private final Quaternion arm_hang = Quaternion.getRotationQuaternionRadians(Math.toRadians(5), ForgeDirection.EAST);
+        private final Quaternion arm_hang = Quaternion.getRotationQuaternionRadians(Math.toRadians(5), EnumFacing.EAST);
         private final int SPEED = 2;
         private final double MAX_WALK_SPEED = SPEED / 20.0;
         
@@ -203,7 +203,7 @@ public enum WalkState implements IStateMachine<WalkState> {
                 if (controller.walked == 0) {
                     p = 0;
                 }
-                Quaternion nextRotation = Quaternion.getRotationQuaternionRadians(max_leg_swing_radians * p, ForgeDirection.NORTH);
+                Quaternion nextRotation = Quaternion.getRotationQuaternionRadians(max_leg_swing_radians * p, EnumFacing.NORTH);
                 if (limb.type == LimbType.ARM) {
                     if (limb.side == BodySide.LEFT) {
                         nextRotation.incrMultiply(arm_hang);

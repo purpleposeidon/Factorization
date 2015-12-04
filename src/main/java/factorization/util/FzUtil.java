@@ -1,10 +1,10 @@
 package factorization.util;
 
 import com.google.common.collect.Multimap;
-import cpw.mods.fml.common.Loader;
-import cpw.mods.fml.common.event.FMLPreInitializationEvent;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
+import net.minecraftforge.fml.common.Loader;
+import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 import factorization.api.Coord;
 import factorization.shared.Core;
 import factorization.weird.TileEntityDayBarrel;

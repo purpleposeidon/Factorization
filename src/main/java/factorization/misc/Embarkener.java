@@ -11,12 +11,12 @@ import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.common.util.ForgeDirection;
+import net.minecraft.util.EnumFacing;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
-import cpw.mods.fml.common.FMLCommonHandler;
-import cpw.mods.fml.common.eventhandler.SubscribeEvent;
-import cpw.mods.fml.common.gameevent.TickEvent.Phase;
-import cpw.mods.fml.common.gameevent.TickEvent.ServerTickEvent;
+import net.minecraftforge.fml.common.FMLCommonHandler;
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.fml.common.gameevent.TickEvent.Phase;
+import net.minecraftforge.fml.common.gameevent.TickEvent.ServerTickEvent;
 import factorization.api.Coord;
 import factorization.common.FzConfig;
 import factorization.shared.Core;
@@ -90,7 +90,7 @@ public class Embarkener {
         Block theBlock = Block.getBlockFromItem(is.getItem());
         if (!isWoodish(theBlock)) return;
         Coord target = new Coord(event.entityPlayer.worldObj, event.x, event.y, event.z);
-        target.adjust(ForgeDirection.getOrientation(event.face));
+        target.adjust(SpaceUtil.getOrientation(event.face));
         if (!target.isReplacable()) return;
         embarkenQueue.add(new EmbarkenEvent(target, is.stackSize, is, event.entityPlayer, (BlockLog) theBlock));
     }

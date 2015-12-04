@@ -8,7 +8,7 @@ import net.minecraft.world.World;
 public class DefaultWindModel implements IWindModel {
     @Override
     public Vec3 getWindPower(World w, int x, int y, int z, IWindmill mill) {
-        return Vec3.createVectorHelper(-1, 0, 0);
+        return new Vec3(-1, 0, 0);
     }
 
     @Override

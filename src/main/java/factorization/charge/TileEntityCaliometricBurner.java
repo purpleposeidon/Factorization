@@ -18,9 +18,9 @@ import net.minecraft.item.ItemFood;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.IIcon;
-import net.minecraftforge.common.util.ForgeDirection;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
+import net.minecraft.util.EnumFacing;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 import factorization.api.Coord;
 import factorization.api.datahelpers.DataHelper;
 import factorization.api.datahelpers.DataInNBT;
@@ -129,7 +129,7 @@ public class TileEntityCaliometricBurner extends TileEntityFactorization {
     private static final int[] nomslots = new int[] {0}, emptySlots = new int[] {};
     @Override
     public int[] getAccessibleSlotsFromSide(int side) {
-        if (ForgeDirection.getOrientation(side).offsetY != 0) {
+        if (SpaceUtil.getOrientation(side).getDirectionVec().getY() != 0) {
             return emptySlots; //Food goes in through the teeth
         }
         return nomslots;
@@ -137,8 +137,8 @@ public class TileEntityCaliometricBurner extends TileEntityFactorization {
     
     @Override
     @SideOnly(Side.CLIENT)
-    public IIcon getIcon(ForgeDirection dir) {
-        if (dir.offsetY != 0) {
+    public IIcon getIcon(EnumFacing dir) {
+        if (dir.getDirectionVec().getY() != 0) {
             return BlockIcons.caliometric_top;
         }
         return BlockIcons.caliometric_side;
@@ -210,7 +210,7 @@ public class TileEntityCaliometricBurner extends TileEntityFactorization {
     }
     
     @Override
-    public boolean activate(EntityPlayer entityplayer, ForgeDirection side) {
+    public boolean activate(EntityPlayer entityplayer, EnumFacing side) {
         if (worldObj.isRemote) {
             return true;
         }
@@ -219,7 +219,7 @@ public class TileEntityCaliometricBurner extends TileEntityFactorization {
             info(entityplayer);
             return false;
         }
-        is = InvUtil.openInventory(this, ForgeDirection.NORTH).push(is);
+        is = InvUtil.openInventory(this, EnumFacing.NORTH).push(is);
         entityplayer.setCurrentItemOrArmor(0, is);
         info(entityplayer);
         markDirty();

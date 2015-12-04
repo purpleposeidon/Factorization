@@ -16,7 +16,7 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.DamageSource;
 import net.minecraft.world.World;
-import net.minecraftforge.common.util.ForgeDirection;
+import net.minecraft.util.EnumFacing;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -93,16 +93,16 @@ public class EntityGrabController extends EntityFz implements IDCController {
     public static void drop(final IDeltaChunk idc) {
         final Coord min = idc.getCorner();
         final Coord max = idc.getFarCorner();
-        ForgeDirection up = ForgeDirection.UP;
-        ForgeDirection south = ForgeDirection.SOUTH;
-        ForgeDirection east = ForgeDirection.EAST;
+        EnumFacing up = EnumFacing.UP;
+        EnumFacing south = EnumFacing.SOUTH;
+        EnumFacing east = EnumFacing.EAST;
         final Coord realStart = idc.shadow2realCoord(min);
         DeltaCoord range = max.difference(min);
 
         // Rotate our axiis
         final Quaternion rot = idc.getRotation();
-        ArrayList<ForgeDirection> known = new ArrayList<ForgeDirection>();
-        Collections.addAll(known, ForgeDirection.VALID_DIRECTIONS);
+        ArrayList<EnumFacing> known = new ArrayList<EnumFacing>();
+        Collections.addAll(known, EnumFacing.VALUES);
         up = SpaceUtil.rotateDirectionAndExclude(up, rot, known);
         south = SpaceUtil.rotateDirectionAndExclude(south, rot, known);
         east = SpaceUtil.rotateDirectionAndExclude(east, rot, known);

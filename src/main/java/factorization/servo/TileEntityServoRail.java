@@ -1,9 +1,9 @@
 package factorization.servo;
 
-import cpw.mods.fml.common.FMLCommonHandler;
-import cpw.mods.fml.common.network.ByteBufUtils;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
+import net.minecraftforge.fml.common.FMLCommonHandler;
+import net.minecraftforge.fml.common.network.ByteBufUtils;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 import factorization.api.Charge;
 import factorization.api.Coord;
 import factorization.api.FzColor;
@@ -30,7 +30,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.*;
-import net.minecraftforge.common.util.ForgeDirection;
+import net.minecraft.util.EnumFacing;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.IOException;
@@ -94,8 +94,8 @@ public class TileEntityServoRail extends TileEntityCommon implements IChargeCond
         }
     }
     
-    boolean has(ForgeDirection dir) {
-        TileEntity te = worldObj.getTileEntity(xCoord + dir.offsetX, yCoord + dir.offsetY, zCoord + dir.offsetZ);
+    boolean has(EnumFacing dir) {
+        TileEntity te = worldObj.getTileEntity(xCoord + dir.getDirectionVec().getX(), yCoord + dir.getDirectionVec().getY(), zCoord + dir.getDirectionVec().getZ());
         if (te instanceof TileEntityServoRail) {
             return true;
         }
@@ -105,7 +105,7 @@ public class TileEntityServoRail extends TileEntityCommon implements IChargeCond
     public boolean fillSideInfo(boolean[] sides) {
         boolean any = false;
         for (int i = 0; i < 6; i++) {
-            boolean flag = has(ForgeDirection.getOrientation(i));
+            boolean flag = has(SpaceUtil.getOrientation(i));
             sides[i] = flag;
             any |= flag;
         }
@@ -211,7 +211,7 @@ public class TileEntityServoRail extends TileEntityCommon implements IChargeCond
     
     @Override
     @SideOnly(Side.CLIENT)
-    public IIcon getIcon(ForgeDirection dir) {
+    public IIcon getIcon(EnumFacing dir) {
         return BlockIcons.servo$rail;
     }
     
@@ -252,7 +252,7 @@ public class TileEntityServoRail extends TileEntityCommon implements IChargeCond
     }
     
     @Override
-    public boolean activate(EntityPlayer entityplayer, ForgeDirection side) {
+    public boolean activate(EntityPlayer entityplayer, EnumFacing side) {
         final Coord here = getCoord();
         if (worldObj.isRemote) {
             return false;
@@ -345,7 +345,7 @@ public class TileEntityServoRail extends TileEntityCommon implements IChargeCond
     }
     
     @Override
-    public boolean recolourBlock(ForgeDirection side, FzColor fzColor) {
+    public boolean recolourBlock(EnumFacing side, FzColor fzColor) {
         if (fzColor != color) {
             color = fzColor;
             getCoord().markBlockForUpdate();

@@ -12,7 +12,7 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.Vec3;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.FakePlayer;
-import net.minecraftforge.common.util.ForgeDirection;
+import net.minecraft.util.EnumFacing;
 import factorization.api.Coord;
 import factorization.api.DeltaCoord;
 import factorization.api.Quaternion;
@@ -50,7 +50,7 @@ public class ItemTwistedBlock extends ItemBlockProxy {
             NBTTagCompound tag = idc.getEntityData();
             if (!tag.getBoolean("isTwistedBlockIDC")) return false;
             if (idc.hasOrderedRotation()) return false;
-            ForgeDirection orig = ForgeDirection.getOrientation(tag.getInteger("placedSide"));
+            EnumFacing orig = SpaceUtil.getOrientation(tag.getInteger("placedSide"));
             int turns = tag.getInteger("turns");
             int d = player.isSneaking() ? -1 : 1;
             turns += d;
@@ -89,7 +89,7 @@ public class ItemTwistedBlock extends ItemBlockProxy {
         }) {
             idc.permit(allowed);
         }
-        ForgeDirection axis = ForgeDirection.getOrientation(side);
+        EnumFacing axis = SpaceUtil.getOrientation(side);
         double amount = Math.toRadians(45);
         idc.getCenter().setIdMd(darkIron, darkIronMd, true);
         idc.posX = at.x + 0.5;
@@ -102,7 +102,7 @@ public class ItemTwistedBlock extends ItemBlockProxy {
 
         Quaternion rotation = Quaternion.getRotationQuaternionRadians(amount, axis);
         idc.orderTargetRotation(rotation, 40, Interpolation.SMOOTH);
-        at.add(ForgeDirection.getOrientation(side)).spawnItem(Core.registry.dark_iron_sprocket.copy());
+        at.add(SpaceUtil.getOrientation(side)).spawnItem(Core.registry.dark_iron_sprocket.copy());
 
         return true;
     }

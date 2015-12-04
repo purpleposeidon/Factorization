@@ -1,6 +1,6 @@
 package factorization.api.wind;
 
-import net.minecraftforge.common.util.ForgeDirection;
+import net.minecraft.util.EnumFacing;
 
 public interface IWindmill {
     /**
@@ -11,5 +11,5 @@ public interface IWindmill {
     /**
      * @return The axis the windmill's sails rotate around
      */
-    ForgeDirection getDirection();
+    EnumFacing getDirection();
 }

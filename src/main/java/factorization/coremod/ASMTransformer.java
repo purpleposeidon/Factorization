@@ -1,6 +1,6 @@
 package factorization.coremod;
 
-import cpw.mods.fml.relauncher.FMLRelaunchLog;
+import net.minecraftforge.fml.relauncher.FMLRelaunchLog;
 import factorization.fzds.HammerEnabled;
 import net.minecraft.launchwrapper.IClassTransformer;
 import net.minecraft.launchwrapper.Launch;
@@ -99,7 +99,7 @@ public class ASMTransformer implements IClassTransformer {
             if (transformedName.equals("net.minecraft.client.multiplayer.WorldClient") && HammerEnabled.ENABLED) {
                 return applyTransform(basicClass,
                         new AbstractAsmMethodTransform.MutateCall(name, transformedName, "<init>", "<init>")
-                                .setOwner("cpw.mods.fml.common.eventhandler.EventBus")
+                                .setOwner("net.minecraftforge.fml.common.eventhandler.EventBus")
                                 .setName("post", "post", "post")
                                 .setDescr("(Lcpw/mods/fml/common/eventhandler/Event;)Z", "(Lcpw/mods/fml/common/eventhandler/Event;)Z")
                 );

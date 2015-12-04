@@ -1,8 +1,8 @@
 package factorization.fzds.network;
 
 import com.mojang.authlib.GameProfile;
-import cpw.mods.fml.common.network.handshake.NetworkDispatcher;
-import cpw.mods.fml.relauncher.Side;
+import net.minecraftforge.fml.common.network.handshake.NetworkDispatcher;
+import net.minecraftforge.fml.relauncher.Side;
 import factorization.api.Coord;
 import factorization.api.DeltaCoord;
 import factorization.api.ICoordFunction;
@@ -62,7 +62,7 @@ public class PacketProxyingPlayer extends EntityPlayerMP implements
     void preinitWrapping() {
         playerNetServerHandler = new NetHandlerPlayServer(mcServer, networkManager, this);
         playerNetServerHandler.netManager.channel().attr(NetworkDispatcher.FML_DISPATCHER).set(new NetworkDispatcher(this.networkManager));
-        //Compare cpw.mods.fml.common.network.FMLOutboundHandler.OutboundTarget.PLAYER.{...}.selectNetworks(Object, ChannelHandlerContext, FMLProxyPacket)
+        //Compare net.minecraftforge.fml.common.network.FMLOutboundHandler.OutboundTarget.PLAYER.{...}.selectNetworks(Object, ChannelHandlerContext, FMLProxyPacket)
         playerNetServerHandler.netManager.setConnectionState(EnumConnectionState.PLAY);
         /* (misc notes here)
          * We don't need to touch NetworkDispatcher; we need a NetworkManager.

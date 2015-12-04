@@ -1,6 +1,6 @@
 package factorization.artifact;
 
-import cpw.mods.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import factorization.common.ItemIcons;
 import factorization.shared.Core;
 import factorization.shared.ItemCraftingComponent;
@@ -19,7 +19,7 @@ import net.minecraft.stats.StatisticsFile;
 import net.minecraft.util.IIcon;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.FakePlayer;
-import net.minecraftforge.common.util.ForgeDirection;
+import net.minecraft.util.EnumFacing;
 import net.minecraftforge.event.AnvilUpdateEvent;
 import net.minecraftforge.event.entity.player.AnvilRepairEvent;
 
@@ -118,7 +118,7 @@ public class ItemPotency extends ItemCraftingComponent {
         if (left.stackSize > 1) {
             int free = left.stackSize - 1;
             ItemStack toGive = left.splitStack(free);
-            ItemUtil.giveItem(event.entityPlayer, null, toGive, ForgeDirection.UNKNOWN);
+            ItemUtil.giveItem(event.entityPlayer, null, toGive, null);
         }
 
         if (event.entityPlayer.worldObj.isRemote) return;

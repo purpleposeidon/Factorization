@@ -1,8 +1,8 @@
 package factorization.common;
 
-import cpw.mods.fml.client.IModGuiFactory;
-import cpw.mods.fml.client.config.GuiConfig;
-import cpw.mods.fml.client.config.IConfigElement;
+import net.minecraftforge.fml.client.IModGuiFactory;
+import net.minecraftforge.fml.client.config.GuiConfig;
+import net.minecraftforge.fml.client.config.IConfigElement;
 import factorization.shared.Core;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiScreen;

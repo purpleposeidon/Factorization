@@ -7,7 +7,7 @@ import factorization.api.datahelpers.Share;
 import factorization.fzds.interfaces.IDeltaChunk;
 import factorization.fzds.interfaces.Interpolation;
 import factorization.servo.MotionHandler;
-import net.minecraftforge.common.util.ForgeDirection;
+import net.minecraft.util.EnumFacing;
 
 import java.io.IOException;
 
@@ -41,7 +41,7 @@ public class StepperMotionHandler extends MotionHandler {
     }
 
     @Override
-    public void changeOrientation(ForgeDirection dir) {
+    public void changeOrientation(EnumFacing dir) {
         FzOrientation orig = orientation;
         super.changeOrientation(dir);
         if (orientation == orig) return;

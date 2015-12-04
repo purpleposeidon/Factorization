@@ -1,9 +1,9 @@
 package factorization.fzds.network;
 
 import com.google.common.collect.BiMap;
-import cpw.mods.fml.common.network.handshake.NetworkDispatcher;
-import cpw.mods.fml.common.network.internal.FMLProxyPacket;
-import cpw.mods.fml.relauncher.Side;
+import net.minecraftforge.fml.common.network.handshake.NetworkDispatcher;
+import net.minecraftforge.fml.common.network.internal.FMLProxyPacket;
+import net.minecraftforge.fml.relauncher.Side;
 import factorization.fzds.Hammer;
 import factorization.shared.Core;
 import net.minecraft.client.Minecraft;

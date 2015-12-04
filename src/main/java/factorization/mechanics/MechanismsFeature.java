@@ -1,7 +1,7 @@
 package factorization.mechanics;
 
-import cpw.mods.fml.common.FMLCommonHandler;
-import cpw.mods.fml.relauncher.Side;
+import net.minecraftforge.fml.common.FMLCommonHandler;
+import net.minecraftforge.fml.relauncher.Side;
 import factorization.fzds.DeltaChunk;
 import factorization.shared.Core;
 

@@ -7,7 +7,7 @@ import factorization.util.DataUtil;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompressedStreamTools;
 import net.minecraft.nbt.NBTTagCompound;
-import cpw.mods.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.Side;
 
 public class DataOutPacket extends DataHelper {
     private final DataOutput dos;

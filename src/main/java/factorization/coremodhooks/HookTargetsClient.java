@@ -1,6 +1,6 @@
 package factorization.coremodhooks;
 
-import cpw.mods.fml.common.eventhandler.EventBus;
+import net.minecraftforge.fml.common.eventhandler.EventBus;
 import factorization.util.SpaceUtil;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
@@ -66,7 +66,7 @@ public class HookTargetsClient {
             box.moveEntity(dx * meh, dy * meh, dz * meh);
         }
         
-        Vec3 hit = Vec3.createVectorHelper(box.posX, box.posY, box.posZ);
+        Vec3 hit = new Vec3(box.posX, box.posY, box.posZ);
         
         {
             box.boundingBox.minX = box.posX - d;

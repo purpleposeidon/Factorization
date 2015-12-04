@@ -9,7 +9,7 @@ import org.lwjgl.opengl.GL11;
 import net.minecraft.client.renderer.RenderBlocks;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.util.IIcon;
-import net.minecraftforge.common.util.ForgeDirection;
+import net.minecraft.util.EnumFacing;
 import factorization.api.Quaternion;
 import factorization.common.BlockIcons;
 import factorization.common.FactoryType;
@@ -57,7 +57,7 @@ public class BlockRenderDayBarrel extends FactorizationBlockRender {
         } else {
             if (pass == 0) {
                 for (int i = 0; i < 6; i++) {
-                    block.setTexture(i, barrel.getIcon(ForgeDirection.getOrientation(i)));
+                    block.setTexture(i, barrel.getIcon(SpaceUtil.getOrientation(i)));
                 }
             } else {
                 BlockIcons.BarrelTextureset set;

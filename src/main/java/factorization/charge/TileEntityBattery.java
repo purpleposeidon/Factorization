@@ -11,7 +11,7 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.IIcon;
-import net.minecraftforge.common.util.ForgeDirection;
+import net.minecraft.util.EnumFacing;
 import factorization.api.Charge;
 import factorization.api.IChargeConductor;
 import factorization.common.BlockIcons;
@@ -34,7 +34,7 @@ public class TileEntityBattery extends TileEntityCommon implements IChargeConduc
     }
     
     @Override
-    public IIcon getIcon(ForgeDirection dir) {
+    public IIcon getIcon(EnumFacing dir) {
         switch (dir) {
         case UP: return BlockIcons.battery_top;
         case DOWN: return BlockIcons.battery_bottom;
@@ -142,7 +142,7 @@ public class TileEntityBattery extends TileEntityCommon implements IChargeConduc
     }
     
     @Override
-    public int getComparatorValue(ForgeDirection side) {
+    public int getComparatorValue(EnumFacing side) {
         return (int) (getFullness()*0xF);
     }
 }

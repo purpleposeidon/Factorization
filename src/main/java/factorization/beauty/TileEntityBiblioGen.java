@@ -19,7 +19,7 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.IIcon;
-import net.minecraftforge.common.util.ForgeDirection;
+import net.minecraft.util.EnumFacing;
 
 import java.io.IOException;
 
@@ -60,7 +60,7 @@ public class TileEntityBiblioGen extends TileEntityCommon implements IRotational
     }
 
     @Override
-    public boolean activate(EntityPlayer entityplayer, ForgeDirection side) {
+    public boolean activate(EntityPlayer entityplayer, EnumFacing side) {
         if (entityplayer.isSneaking()) {
             bookCount = -1;
             return true;
@@ -77,7 +77,7 @@ public class TileEntityBiblioGen extends TileEntityCommon implements IRotational
     public void updateEntity() {
         if (worldObj.isRemote) {
             prev_angle = angle;
-            angle += getVelocity(ForgeDirection.DOWN);
+            angle += getVelocity(EnumFacing.DOWN);
         }
         long now = worldObj.getTotalWorldTime() + hashCode();
         if (bookCount == -1 || now % 2000 == 0) {
@@ -92,19 +92,19 @@ public class TileEntityBiblioGen extends TileEntityCommon implements IRotational
     }
 
     @Override
-    public boolean canConnect(ForgeDirection direction) {
-        return direction == ForgeDirection.DOWN;
+    public boolean canConnect(EnumFacing direction) {
+        return direction == EnumFacing.DOWN;
     }
 
     @Override
-    public double availableEnergy(ForgeDirection direction) {
-        if (direction != ForgeDirection.DOWN) return 0;
+    public double availableEnergy(EnumFacing direction) {
+        if (direction != EnumFacing.DOWN) return 0;
         return availablePower;
     }
 
     @Override
-    public double takeEnergy(ForgeDirection direction, double maxPower) {
-        if (direction != ForgeDirection.DOWN) return 0;
+    public double takeEnergy(EnumFacing direction, double maxPower) {
+        if (direction != EnumFacing.DOWN) return 0;
         return availablePower;
     }
 
@@ -114,8 +114,8 @@ public class TileEntityBiblioGen extends TileEntityCommon implements IRotational
     }
 
     @Override
-    public double getVelocity(ForgeDirection direction) {
-        if (direction != ForgeDirection.DOWN) return 0;
+    public double getVelocity(EnumFacing direction) {
+        if (direction != EnumFacing.DOWN) return 0;
         double v = bookCount * POWER_PER_BOOK;
         if (v > MAX_SPEED) v = MAX_SPEED;
         return v;
@@ -156,7 +156,7 @@ public class TileEntityBiblioGen extends TileEntityCommon implements IRotational
     }
 
     @Override
-    public IIcon getIcon(ForgeDirection dir) {
+    public IIcon getIcon(EnumFacing dir) {
         return Blocks.enchanting_table.getIcon(0, 0);
     }
 }

@@ -1,7 +1,7 @@
 package factorization.util;
 
 import com.mojang.authlib.GameProfile;
-import cpw.mods.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import factorization.api.Coord;
 import factorization.shared.Core;
 import io.netty.channel.ChannelHandler;
@@ -32,7 +32,7 @@ import net.minecraft.util.Vec3;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;
 import net.minecraftforge.common.util.FakePlayer;
-import net.minecraftforge.common.util.ForgeDirection;
+import net.minecraft.util.EnumFacing;
 import net.minecraftforge.event.world.WorldEvent;
 
 import java.util.Arrays;
@@ -205,7 +205,7 @@ public final class PlayerUtil {
     }
 
     public static MovingObjectPosition rayTrace(EntityPlayer player, double dist, float partial) {
-        Vec3 pos = Vec3.createVectorHelper(player.posX, player.posY + (player.getEyeHeight() - player.getDefaultEyeHeight()), player.posZ);
+        Vec3 pos = new Vec3(player.posX, player.posY + (player.getEyeHeight() - player.getDefaultEyeHeight()), player.posZ);
         Vec3 look = player.getLook(partial);
         Vec3 ray = pos.addVector(look.xCoord * dist, look.yCoord * dist, look.zCoord * dist);
         return player.worldObj.func_147447_a(pos, ray, false, false, true);

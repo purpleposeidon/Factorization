@@ -7,7 +7,7 @@ import factorization.util.SpaceUtil;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.Vec3;
 import net.minecraft.world.World;
-import net.minecraftforge.common.util.ForgeDirection;
+import net.minecraft.util.EnumFacing;
 
 import java.util.List;
 
@@ -268,24 +268,24 @@ public abstract class IDeltaChunk extends EntityFz {
 
     /**
      * Helper method.
-     * @param dir ForgeDirection in shadow space
+     * @param dir EnumFacing in shadow space
      * @return dir with rotation applied. Slight possibility for it to be the UNKNOWN direction.
      */
-    public ForgeDirection shadow2real(ForgeDirection dir) {
+    public EnumFacing shadow2real(EnumFacing dir) {
         Vec3 v = SpaceUtil.fromDirection(dir);
         getRotation().applyRotation(v);
-        return SpaceUtil.round(v, ForgeDirection.UNKNOWN);
+        return SpaceUtil.round(v, null);
     }
 
     /**
      * Helper method.
-     * @param dir ForgeDirection in real space
+     * @param dir EnumFacing in real space
      * @return dir with reverse-rotation applied. Slight possibility for it to be the UNKNOWN direction.
      */
-    public ForgeDirection real2shadow(ForgeDirection dir) {
+    public EnumFacing real2shadow(EnumFacing dir) {
         Vec3 v = SpaceUtil.fromDirection(dir);
         getRotation().applyReverseRotation(v);
-        return SpaceUtil.round(v, ForgeDirection.UNKNOWN);
+        return SpaceUtil.round(v, null);
     }
     
     /**

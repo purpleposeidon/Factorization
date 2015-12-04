@@ -6,7 +6,7 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.IIcon;
-import net.minecraftforge.common.util.ForgeDirection;
+import net.minecraft.util.EnumFacing;
 import factorization.api.Coord;
 import factorization.api.datahelpers.DataHelper;
 import factorization.api.datahelpers.IDataSerializable;
@@ -36,12 +36,12 @@ public class RedstonePulse extends Instruction {
     }
 
     @Override
-    public IIcon getIcon(ForgeDirection side) {
+    public IIcon getIcon(EnumFacing side) {
         return BlockIcons.servo$pulse;
     }
 
     @Override
-    public boolean onClick(EntityPlayer player, Coord block, ForgeDirection side) {
+    public boolean onClick(EntityPlayer player, Coord block, EnumFacing side) {
         return false;
     }
 

@@ -21,7 +21,7 @@ import net.minecraft.util.MovingObjectPosition;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;
 import net.minecraft.world.gen.NoiseGeneratorOctaves;
-import net.minecraftforge.common.util.ForgeDirection;
+import net.minecraft.util.EnumFacing;
 
 import java.util.HashSet;
 
@@ -64,7 +64,7 @@ public class EntityLeafBomb extends EntityThrowable {
 
         Coord center = Coord.fromMop(worldObj, mop);
         if (mop.typeOfHit == MovingObjectPosition.MovingObjectType.BLOCK) {
-            center.adjust(ForgeDirection.getOrientation(mop.sideHit));
+            center.adjust(SpaceUtil.getOrientation(mop.sideHit));
         }
         shooter = PlayerUtil.makePlayer(center, "LeafBomb");
         int id = DataUtil.getId(stack);

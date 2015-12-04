@@ -1,11 +1,11 @@
 package factorization.weird;
 
-import cpw.mods.fml.common.eventhandler.SubscribeEvent;
-import cpw.mods.fml.common.gameevent.TickEvent;
-import cpw.mods.fml.common.gameevent.TickEvent.ClientTickEvent;
-import cpw.mods.fml.common.network.internal.FMLProxyPacket;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.fml.common.gameevent.TickEvent;
+import net.minecraftforge.fml.common.gameevent.TickEvent.ClientTickEvent;
+import net.minecraftforge.fml.common.network.internal.FMLProxyPacket;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 import factorization.api.Coord;
 import factorization.api.FzOrientation;
 import factorization.api.datahelpers.DataHelper;
@@ -43,7 +43,7 @@ import net.minecraftforge.client.IItemRenderer;
 import net.minecraftforge.client.event.RenderWorldLastEvent;
 import net.minecraftforge.common.ForgeHooks;
 import net.minecraftforge.common.util.FakePlayer;
-import net.minecraftforge.common.util.ForgeDirection;
+import net.minecraft.util.EnumFacing;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.minecraftforge.event.world.ChunkEvent;
 import org.lwjgl.opengl.GL11;
@@ -264,19 +264,19 @@ public class TileEntityDayBarrel extends TileEntityFactorization implements ISor
         return ItemUtil.couldMerge(item, is);
     }
     
-    boolean isTop(ForgeDirection d) {
+    boolean isTop(EnumFacing d) {
         return d == orientation.top;
     }
     
-    boolean isTopOrBack(ForgeDirection d) {
+    boolean isTopOrBack(EnumFacing d) {
         return d == orientation.top || d == orientation.facing.getOpposite();
     }
     
-    boolean isBottom(ForgeDirection d) {
+    boolean isBottom(EnumFacing d) {
         return d == orientation.top.getOpposite();
     }
     
-    boolean isBack(ForgeDirection d) {
+    boolean isBack(EnumFacing d) {
         return d == orientation.facing.getOpposite();
     }
     
@@ -550,7 +550,7 @@ public class TileEntityDayBarrel extends TileEntityFactorization implements ISor
     
     @Override
     public boolean canExtractItem(int slot, ItemStack itemstack, int side) {
-        ForgeDirection d = ForgeDirection.getOrientation(side);
+        EnumFacing d = SpaceUtil.getOrientation(side);
         return isTop(d.getOpposite());
     }
 
@@ -558,7 +558,7 @@ public class TileEntityDayBarrel extends TileEntityFactorization implements ISor
     private static final int[] top_slot = new int[] {0}, bottom_slot = new int[] {1}, no_slots = new int[] {};
     @Override
     public int[] getAccessibleSlotsFromSide(int i) {
-        ForgeDirection d = ForgeDirection.getOrientation(i);
+        EnumFacing d = SpaceUtil.getOrientation(i);
         if (isTopOrBack(d)) {
             return top_slot;
         }
@@ -578,7 +578,7 @@ public class TileEntityDayBarrel extends TileEntityFactorization implements ISor
     //* Double:						Add all but 1 item
 
     @Override
-    public boolean activate(EntityPlayer entityplayer, ForgeDirection side) {
+    public boolean activate(EntityPlayer entityplayer, EnumFacing side) {
         // right click: put an item in
         if (entityplayer.worldObj.isRemote) {
             return true;
@@ -709,17 +709,17 @@ public class TileEntityDayBarrel extends TileEntityFactorization implements ISor
         if (distance <= 0) {
             return false;
         }
-        ForgeDirection dir = ForgeDirection.getOrientation(last_hit_side).getOpposite();
-        if (dir == ForgeDirection.UNKNOWN) {
+        EnumFacing dir = SpaceUtil.getOrientation(last_hit_side).getOpposite();
+        if (dir == null) {
             return false;
         }
         Coord src = getCoord();
         Coord next = src;
         FzOrientation newOrientation = orientation;
-        boolean doRotation = dir.offsetY == 0;
-        ForgeDirection rotationAxis = ForgeDirection.UNKNOWN;
+        boolean doRotation = dir.getDirectionVec().getY() == 0;
+        EnumFacing rotationAxis = null;
         if (doRotation) {
-            rotationAxis = dir.getRotation(ForgeDirection.UP);
+            rotationAxis = dir.getRotation(EnumFacing.UP);
         }
         if (player.isSneaking() && distance > 1) {
             distance = 1;
@@ -735,13 +735,13 @@ public class TileEntityDayBarrel extends TileEntityFactorization implements ISor
             if (!peek.blockExists()) {
                 break;
             }
-            Coord below = peek.add(ForgeDirection.DOWN);
+            Coord below = peek.add(EnumFacing.DOWN);
             int rotateCount = 1;
             if (!peek.isReplacable()) {
                 if (!isStairish(peek)) {
                     break;
                 }
-                Coord above = peek.add(ForgeDirection.UP);
+                Coord above = peek.add(EnumFacing.UP);
                 if (!above.isAir() /* Not going to replace snow in this case */) {
                     break;
                 }
@@ -760,15 +760,15 @@ public class TileEntityDayBarrel extends TileEntityFactorization implements ISor
             }
             //When we roll a barrel, the side we punch should face up
             for (int r = rotateCount; r > 0; r--) {
-                ForgeDirection nTop = newOrientation.top.getRotation(rotationAxis);
-                ForgeDirection nFace = newOrientation.facing.getRotation(rotationAxis);
+                EnumFacing nTop = newOrientation.top.getRotation(rotationAxis);
+                EnumFacing nFace = newOrientation.facing.getRotation(rotationAxis);
                 newOrientation = FzOrientation.fromDirection(nFace).pointTopTo(nTop);
             }
         }
         if (src.equals(next)) {
             return false;
         }
-        if (!doRotation && orientation.top == ForgeDirection.UP && dir == ForgeDirection.UP) {
+        if (!doRotation && orientation.top == EnumFacing.UP && dir == EnumFacing.UP) {
             spillage = 0;
         }
         if (doubleRolls % 2 == 1) {
@@ -822,7 +822,7 @@ public class TileEntityDayBarrel extends TileEntityFactorization implements ISor
         if (to_remove > 1 && to_remove == getItemCount()) {
             to_remove--;
         }
-        Entity ent = ItemUtil.giveItem(entityplayer, new Coord(this), makeStack(to_remove), ForgeDirection.getOrientation(last_hit_side));
+        Entity ent = ItemUtil.giveItem(entityplayer, new Coord(this), makeStack(to_remove), SpaceUtil.getOrientation(last_hit_side));
         if (ent != null && ent.isDead && !(entityplayer instanceof FakePlayer)) {
             ItemStack newHeld = entityplayer.getHeldItem();
             if (newHeld != origHeldItem) {
@@ -869,7 +869,7 @@ public class TileEntityDayBarrel extends TileEntityFactorization implements ISor
     //Misc junk
     
     @Override
-    public int getComparatorValue(ForgeDirection side) {
+    public int getComparatorValue(EnumFacing side) {
         int count = getItemCount();
         if (count == 0) {
             return 0;
@@ -884,8 +884,8 @@ public class TileEntityDayBarrel extends TileEntityFactorization implements ISor
     
     @Override
     @SideOnly(Side.CLIENT)
-    public IIcon getIcon(ForgeDirection dir) {
-        if (dir.offsetY != 0) {
+    public IIcon getIcon(EnumFacing dir) {
+        if (dir.getDirectionVec().getY() != 0) {
             Block ws = DataUtil.getBlock(woodSlab);
             if (ws != null) {
                 return ws.getIcon(0, woodSlab.getItemDamage());
@@ -912,7 +912,7 @@ public class TileEntityDayBarrel extends TileEntityFactorization implements ISor
             int to_drop;
             to_drop = Math.min(item.getMaxStackSize(), count);
             count -= to_drop;
-            ItemUtil.giveItem(null, new Coord(this), makeStack(to_drop), ForgeDirection.UNKNOWN);
+            ItemUtil.giveItem(null, new Coord(this), makeStack(to_drop), null);
             if (count <= 0) {
                 break;
             }
@@ -1027,8 +1027,8 @@ public class TileEntityDayBarrel extends TileEntityFactorization implements ISor
     }
     
     @Override
-    public boolean rotate(ForgeDirection axis) {
-        if (axis == ForgeDirection.UNKNOWN) {
+    public boolean rotate(EnumFacing axis) {
+        if (axis == null) {
             return false;
         }
         if (axis == orientation.facing || axis.getOpposite() == orientation.facing) {
@@ -1157,7 +1157,7 @@ public class TileEntityDayBarrel extends TileEntityFactorization implements ISor
         if (mop == null || mop.hitVec == null || mop.typeOfHit != MovingObjectPosition.MovingObjectType.BLOCK) return;
         Vec3 vec = mop.hitVec;
         FzOrientation orientation = SpaceUtil.getOrientation(player, mop.sideHit, (float) (vec.xCoord - mop.blockX), (float) (vec.yCoord - mop.blockY), (float) (vec.zCoord - mop.blockZ));
-        if (orientation.top.offsetY == 1) {
+        if (orientation.top.getDirectionVec().getY() == 1) {
             /*
              * The purpose of this is two-fold:
              * 		- It renders at the wrong spot when pointing upwards on a vertical face
@@ -1173,8 +1173,8 @@ public class TileEntityDayBarrel extends TileEntityFactorization implements ISor
             double cz = camera.lastTickPosZ + (camera.posZ - camera.lastTickPosZ) * (double) event.partialTicks;
             GL11.glTranslated(-cx, -cy, -cz);
         }
-        ForgeDirection fd = ForgeDirection.getOrientation(mop.sideHit);
-        GL11.glTranslatef(mop.blockX + fd.offsetX, mop.blockY + fd.offsetY, mop.blockZ + fd.offsetZ);
+        EnumFacing fd = SpaceUtil.getOrientation(mop.sideHit);
+        GL11.glTranslatef(mop.blockX + fd.getDirectionVec().getX(), mop.blockY + fd.getDirectionVec().getY(), mop.blockZ + fd.getDirectionVec().getZ());
         GL11.glColor4f(0.0F, 0.0F, 0.0F, 0.4F);
         GL11.glDisable(GL11.GL_ALPHA_TEST);
         GL11.glDisable(GL11.GL_TEXTURE_2D);
@@ -1182,35 +1182,35 @@ public class TileEntityDayBarrel extends TileEntityFactorization implements ISor
         GL11.glLineWidth(2.0F);
         
         {
-            ForgeDirection face = orientation.facing;
+            EnumFacing face = orientation.facing;
             if (SpaceUtil.sign(face) == 1) {
-                GL11.glTranslated(face.offsetX, face.offsetY, face.offsetZ);
+                GL11.glTranslated(face.getDirectionVec().getX(), face.getDirectionVec().getY(), face.getDirectionVec().getZ());
             }
             float d = -2F;
-            GL11.glTranslatef(d*fd.offsetX, d*fd.offsetY, d*fd.offsetZ);
+            GL11.glTranslatef(d*fd.getDirectionVec().getX(), d*fd.getDirectionVec().getY(), d*fd.getDirectionVec().getZ());
             GL11.glTranslated(
-                    0.5*(1 - Math.abs(face.offsetX)), 
-                    0.5*(1 - Math.abs(face.offsetY)), 
-                    0.5*(1 - Math.abs(face.offsetZ))
+                    0.5*(1 - Math.abs(face.getDirectionVec().getX())), 
+                    0.5*(1 - Math.abs(face.getDirectionVec().getY())), 
+                    0.5*(1 - Math.abs(face.getDirectionVec().getZ()))
                     );
             
             GL11.glBegin(GL11.GL_LINE_LOOP);
-            float mid_x = orientation.facing.offsetX;
-            float mid_y = orientation.facing.offsetY;
-            float mid_z = orientation.facing.offsetZ;
+            float mid_x = orientation.facing.getDirectionVec().getX();
+            float mid_y = orientation.facing.getDirectionVec().getY();
+            float mid_z = orientation.facing.getDirectionVec().getZ();
             
-            float top_x = mid_x + orientation.top.offsetX/2F;
-            float top_y = mid_y + orientation.top.offsetY/2F;
-            float top_z = mid_z + orientation.top.offsetZ/2F;
+            float top_x = mid_x + orientation.top.getDirectionVec().getX()/2F;
+            float top_y = mid_y + orientation.top.getDirectionVec().getY()/2F;
+            float top_z = mid_z + orientation.top.getDirectionVec().getZ()/2F;
             
-            float bot_x = mid_x - orientation.top.offsetX/2F;
-            float bot_y = mid_y - orientation.top.offsetY/2F;
-            float bot_z = mid_z - orientation.top.offsetZ/2F;
+            float bot_x = mid_x - orientation.top.getDirectionVec().getX()/2F;
+            float bot_y = mid_y - orientation.top.getDirectionVec().getY()/2F;
+            float bot_z = mid_z - orientation.top.getDirectionVec().getZ()/2F;
             
-            ForgeDirection r = orientation.facing.getRotation(orientation.top);
-            float right_x = r.offsetX/2F;
-            float right_y = r.offsetY/2F;
-            float right_z = r.offsetZ/2F;
+            EnumFacing r = orientation.facing.getRotation(orientation.top);
+            float right_x = r.getDirectionVec().getX()/2F;
+            float right_y = r.getDirectionVec().getY()/2F;
+            float right_z = r.getDirectionVec().getZ()/2F;
             
             
             //GL11.glVertex3f(mid_x, mid_y, mid_z);

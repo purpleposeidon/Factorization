@@ -19,12 +19,12 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.IIcon;
 import net.minecraft.util.MathHelper;
-import net.minecraftforge.common.util.ForgeDirection;
-import cpw.mods.fml.common.event.FMLModIdMappingEvent;
-import cpw.mods.fml.common.registry.GameRegistry;
-import cpw.mods.fml.common.registry.GameRegistry.UniqueIdentifier;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
+import net.minecraft.util.EnumFacing;
+import net.minecraftforge.fml.common.event.FMLModIdMappingEvent;
+import net.minecraftforge.fml.common.registry.GameRegistry;
+import net.minecraftforge.fml.common.registry.GameRegistry.UniqueIdentifier;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 import factorization.api.Coord;
 import factorization.common.BlockIcons;
 import factorization.common.FactoryType;
@@ -80,8 +80,8 @@ public class TileEntityParaSieve extends TileEntityFactorization implements ISid
         }
     }
     
-    public ForgeDirection getFacing() {
-        return ForgeDirection.getOrientation(facing_direction).getOpposite();
+    public EnumFacing getFacing() {
+        return SpaceUtil.getOrientation(facing_direction).getOpposite();
     }
 
     static Coord hereCache = new Coord(null, 0, 0, 0);
@@ -205,12 +205,12 @@ public class TileEntityParaSieve extends TileEntityFactorization implements ISid
         stack_recursion.set(Math.max(0, sr - 1));
     }
     
-    AxisAlignedBB target_area = AxisAlignedBB.getBoundingBox(0, 0, 0, 0, 0, 0);
+    AxisAlignedBB target_area = new AxisAlignedBB(0, 0, 0, 0, 0, 0);
     AxisAlignedBB getTargetArea() {
-        final ForgeDirection f = getFacing();
-        target_area.minX = xCoord + f.offsetX;
-        target_area.minY = yCoord + f.offsetY;
-        target_area.minZ = zCoord + f.offsetZ;
+        final EnumFacing f = getFacing();
+        target_area.minX = xCoord + f.getDirectionVec().getX();
+        target_area.minY = yCoord + f.getDirectionVec().getY();
+        target_area.minZ = zCoord + f.getDirectionVec().getZ();
         target_area.maxX = target_area.minX + 1;
         target_area.maxY = target_area.minY + 1;
         target_area.maxZ = target_area.minZ + 1;
@@ -226,8 +226,8 @@ public class TileEntityParaSieve extends TileEntityFactorization implements ISid
         if (_beginRecursion() || putting_nbt || getWorldObj() == null || getWorldObj().isRemote) {
             return null;
         }
-        ForgeDirection facing = getFacing();
-        if (facing == ForgeDirection.UNKNOWN) {
+        EnumFacing facing = getFacing();
+        if (facing == null) {
             return null;
         }
         if (cached_te != null) {
@@ -241,7 +241,7 @@ public class TileEntityParaSieve extends TileEntityFactorization implements ISid
             }
             cached_ent = null;
         }
-        TileEntity te = worldObj.getTileEntity(xCoord + facing.offsetX, yCoord + facing.offsetY, zCoord + facing.offsetZ);
+        TileEntity te = worldObj.getTileEntity(xCoord + facing.getDirectionVec().getX(), yCoord + facing.getDirectionVec().getY(), zCoord + facing.getDirectionVec().getZ());
         if (te instanceof IInventory) {
             cached_te = te;
             return InvUtil.openDoubleChest((IInventory) te, true);
@@ -401,8 +401,8 @@ public class TileEntityParaSieve extends TileEntityFactorization implements ISid
 
     @Override
     @SideOnly(Side.CLIENT)
-    public IIcon getIcon(ForgeDirection dir) {
-        ForgeDirection face = getFacing();
+    public IIcon getIcon(EnumFacing dir) {
+        EnumFacing face = getFacing();
         if (dir == face) {
             return BlockIcons.parasieve_front;
         } else if (dir == face.getOpposite()) {
@@ -413,7 +413,7 @@ public class TileEntityParaSieve extends TileEntityFactorization implements ISid
     }
     
     @Override
-    public int getComparatorValue(ForgeDirection side) {
+    public int getComparatorValue(EnumFacing side) {
         try {
             if (_beginRecursion()) {
                 return 11;
@@ -484,12 +484,12 @@ public class TileEntityParaSieve extends TileEntityFactorization implements ISid
     }
     
     @Override
-    public ForgeDirection[] getValidRotations() {
+    public EnumFacing[] getValidRotations() {
         return full_rotation_array;
     }
     
     @Override
-    public boolean rotate(ForgeDirection axis) {
+    public boolean rotate(EnumFacing axis) {
         dirtyCache();
         byte ao = (byte) axis.ordinal();
         if (ao == facing_direction) {
@@ -515,8 +515,8 @@ public class TileEntityParaSieve extends TileEntityFactorization implements ISid
     
     @Override
     public void onNeighborTileChanged(int tilex, int tiley, int tilez) {
-        ForgeDirection facing = getFacing();
-        boolean isOurs = xCoord + facing.offsetX == tilex &&  yCoord + facing.offsetY == tiley &&  zCoord + facing.offsetZ == tilez;
+        EnumFacing facing = getFacing();
+        boolean isOurs = xCoord + facing.getDirectionVec().getX() == tilex &&  yCoord + facing.getDirectionVec().getY() == tiley &&  zCoord + facing.getDirectionVec().getZ() == tilez;
         if (!isOurs) {
             return;
         }

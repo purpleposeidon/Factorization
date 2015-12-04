@@ -8,7 +8,7 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.IIcon;
-import net.minecraftforge.common.util.ForgeDirection;
+import net.minecraft.util.EnumFacing;
 import factorization.api.Coord;
 import factorization.api.datahelpers.DataHelper;
 import factorization.api.datahelpers.IDataSerializable;
@@ -18,28 +18,28 @@ import factorization.servo.Instruction;
 import factorization.servo.ServoMotor;
 
 public class SetDirection extends Instruction {
-    ForgeDirection dir = ForgeDirection.UP;
+    EnumFacing dir = EnumFacing.UP;
     
     @Override
-    public IIcon getIcon(ForgeDirection side) {
-        if (side == ForgeDirection.UNKNOWN) {
+    public IIcon getIcon(EnumFacing side) {
+        if (side == null) {
             return BlockIcons.servo$set_direction.side_W;
         }
         return BlockIcons.servo$set_direction.get(dir.getOpposite(), side);
     }
     
     @Override
-    public boolean onClick(EntityPlayer player, Coord block, ForgeDirection side) {
+    public boolean onClick(EntityPlayer player, Coord block, EnumFacing side) {
         if (playerHasProgrammer(player)) {
             int i = dir.ordinal();
-            dir = ForgeDirection.getOrientation((i + 1) % 6);
+            dir = SpaceUtil.getOrientation((i + 1) % 6);
             return true;
         }
         return false;
     }
 
     void hit(AbstractServoMachine motor) {
-        ForgeDirection d = dir.getOpposite();
+        EnumFacing d = dir.getOpposite();
         motor.setNextDirection(d);
         if (d == motor.getOrientation().facing.getOpposite()) {
             motor.changeOrientation(d);

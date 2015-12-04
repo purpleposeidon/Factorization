@@ -3,7 +3,7 @@ package factorization.crafting;
 import net.minecraft.client.renderer.RenderBlocks;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.util.IIcon;
-import net.minecraftforge.common.util.ForgeDirection;
+import net.minecraft.util.EnumFacing;
 import factorization.api.FzOrientation;
 import factorization.api.Quaternion;
 import factorization.common.BlockIcons;
@@ -24,7 +24,7 @@ public class BlockRenderCompressionCrafter extends FactorizationBlockRender {
                 side, side,
                 side, side);
         block.setBlockBoundsOffset(0, 0, 0);
-        ForgeDirection dir = ForgeDirection.WEST;
+        EnumFacing dir = EnumFacing.WEST;
         if (world_mode) {
             TileEntityCompressionCrafter cc = (TileEntityCompressionCrafter) te;
             if (cc == null) {
@@ -47,8 +47,8 @@ public class BlockRenderCompressionCrafter extends FactorizationBlockRender {
             block.begin();
             block.rotateMiddle(q);
             float d = -1F/10000F;
-            block.translate(dir.offsetX*d, dir.offsetY*d, dir.offsetZ*d);
-            block.renderRotated(Tessellator.instance, x + dir.offsetX, y + dir.offsetY , z + dir.offsetZ);
+            block.translate(dir.getDirectionVec().getX()*d, dir.getDirectionVec().getY()*d, dir.getDirectionVec().getZ()*d);
+            block.renderRotated(Tessellator.instance, x + dir.getDirectionVec().getX(), y + dir.getDirectionVec().getY() , z + dir.getDirectionVec().getZ());
             */
         } else {
             block.renderForInventory(rb);

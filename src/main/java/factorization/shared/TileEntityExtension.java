@@ -19,10 +19,10 @@ import net.minecraft.util.IIcon;
 import net.minecraft.util.MovingObjectPosition;
 import net.minecraft.util.Vec3;
 import net.minecraft.world.World;
-import net.minecraftforge.common.util.ForgeDirection;
-import cpw.mods.fml.common.network.internal.FMLProxyPacket;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
+import net.minecraft.util.EnumFacing;
+import net.minecraftforge.fml.common.network.internal.FMLProxyPacket;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 import factorization.api.DeltaCoord;
 import factorization.ceramics.TileEntityGreenware;
 import factorization.common.FactoryType;
@@ -140,7 +140,7 @@ public class TileEntityExtension extends TileEntityCommon implements IFurnaceHea
     }
     
     @Override
-    public boolean activate(EntityPlayer entityplayer, ForgeDirection side) {
+    public boolean activate(EntityPlayer entityplayer, EnumFacing side) {
         TileEntityCommon p = getParent();
         if (p != null) {
             return p.activate(entityplayer, side);
@@ -176,7 +176,7 @@ public class TileEntityExtension extends TileEntityCommon implements IFurnaceHea
     
     @Override
     @SideOnly(Side.CLIENT)
-    public IIcon getIcon(ForgeDirection dir) {
+    public IIcon getIcon(EnumFacing dir) {
         TileEntityCommon p = getParent();
         if (p == null) {
             return super.getIcon(dir);

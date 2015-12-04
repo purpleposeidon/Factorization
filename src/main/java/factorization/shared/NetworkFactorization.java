@@ -1,7 +1,7 @@
 package factorization.shared;
 
-import cpw.mods.fml.common.network.ByteBufUtils;
-import cpw.mods.fml.relauncher.Side;
+import net.minecraftforge.fml.common.network.ByteBufUtils;
+import net.minecraftforge.fml.relauncher.Side;
 import factorization.api.datahelpers.DataInByteBuf;
 import factorization.artifact.ContainerForge;
 import factorization.notify.Notice;
@@ -19,7 +19,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.world.World;
-import cpw.mods.fml.common.network.internal.FMLProxyPacket;
+import net.minecraftforge.fml.common.network.internal.FMLProxyPacket;
 import factorization.api.Coord;
 import factorization.api.DeltaCoord;
 import factorization.api.IEntityMessage;

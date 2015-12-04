@@ -6,7 +6,7 @@ import net.minecraft.block.Block;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.IIcon;
-import net.minecraftforge.common.util.ForgeDirection;
+import net.minecraft.util.EnumFacing;
 import factorization.api.datahelpers.DataHelper;
 import factorization.api.datahelpers.IDataSerializable;
 import factorization.common.BlockIcons;
@@ -33,7 +33,7 @@ public class Drop extends Instruction {
     }
 
     @Override
-    public IIcon getIcon(ForgeDirection side) {
+    public IIcon getIcon(EnumFacing side) {
         return BlockIcons.servo$drop;
     }
 

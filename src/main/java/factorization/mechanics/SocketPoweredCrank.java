@@ -1,7 +1,7 @@
 package factorization.mechanics;
 
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 import factorization.api.*;
 import factorization.api.datahelpers.DataHelper;
 import factorization.api.datahelpers.IDataSerializable;
@@ -29,7 +29,7 @@ import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.DamageSource;
 import net.minecraft.util.Vec3;
 import net.minecraft.world.World;
-import net.minecraftforge.common.util.ForgeDirection;
+import net.minecraft.util.EnumFacing;
 import org.lwjgl.opengl.GL11;
 
 import java.io.IOException;
@@ -272,7 +272,7 @@ public class SocketPoweredCrank extends TileEntitySocketBase implements IChargeC
         DimensionSliceEntity dse = (DimensionSliceEntity) idc;
         Vec3 realHookLocation = idc.shadow2real(hookLocation);
         Vec3 inst = dse.getInstantaneousRotationalVelocityAtPointInCornerSpace(realHookLocation);
-        return Vec3.createVectorHelper(
+        return new Vec3(
                 c(inst.xCoord, force.xCoord),
                 c(inst.yCoord, force.yCoord),
                 c(inst.zCoord, force.zCoord));
@@ -357,7 +357,7 @@ public class SocketPoweredCrank extends TileEntitySocketBase implements IChargeC
 
     int compareValue;
     @Override
-    public int getComparatorValue(ForgeDirection side) {
+    public int getComparatorValue(EnumFacing side) {
         return compareValue;
     }
 
@@ -432,7 +432,7 @@ public class SocketPoweredCrank extends TileEntitySocketBase implements IChargeC
     @Override
     public Vec3 getPos() {
         double d = 0.5;
-        return Vec3.createVectorHelper(xCoord + d, yCoord + d, zCoord + d);
+        return new Vec3(xCoord + d, yCoord + d, zCoord + d);
     }
 
     @Override

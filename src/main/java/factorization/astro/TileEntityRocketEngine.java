@@ -25,8 +25,8 @@ import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.IIcon;
 import net.minecraft.util.MovingObjectPosition;
 import net.minecraft.util.Vec3;
-import net.minecraftforge.common.util.ForgeDirection;
-import cpw.mods.fml.common.network.internal.FMLProxyPacket;
+import net.minecraft.util.EnumFacing;
+import net.minecraftforge.fml.common.network.internal.FMLProxyPacket;
 import factorization.api.Coord;
 import factorization.api.DeltaCoord;
 import factorization.common.BlockIcons;
@@ -53,7 +53,7 @@ public class TileEntityRocketEngine extends TileEntityCommon {
     }
     
     @Override
-    public IIcon getIcon(ForgeDirection dir) {
+    public IIcon getIcon(EnumFacing dir) {
         return lastValidationStatus ? BlockIcons.rocket_engine_valid : BlockIcons.rocket_engine_invalid;
     }
 
@@ -93,17 +93,17 @@ public class TileEntityRocketEngine extends TileEntityCommon {
     }
     
     DeltaCoord getCornerDirection(EntityPlayer player, int side) {
-        ForgeDirection dir = ForgeDirection.getOrientation(side);
+        EnumFacing dir = SpaceUtil.getOrientation(side);
         DeltaCoord dc = SpaceUtil.getFlatDiagonalFacing(player);
         if (dc.isZero()) {
             return null;
         }
-        ForgeDirection fside = ForgeDirection.getOrientation(side);
-        if (fside.offsetY == 0) {
-            dc.x *= fside.offsetX != 0 ? -1 : 1;
-            dc.z *= fside.offsetZ != 0 ? -1 : 1;
+        EnumFacing fside = SpaceUtil.getOrientation(side);
+        if (fside.getDirectionVec().getY() == 0) {
+            dc.x *= fside.getDirectionVec().getX() != 0 ? -1 : 1;
+            dc.z *= fside.getDirectionVec().getZ() != 0 ? -1 : 1;
         }
-        if (fside == ForgeDirection.DOWN) {
+        if (fside == EnumFacing.DOWN) {
             dc.y = -1;
         } else {
             dc.y = 1;
@@ -145,7 +145,7 @@ public class TileEntityRocketEngine extends TileEntityCommon {
             new Notice(c, "Obstructed").withStyle(Style.FORCE).send(player);
             return false;
         }
-        AxisAlignedBB area = AxisAlignedBB.getBoundingBox(c.x, c.y, c.z, c.x, c.y, c.z);
+        AxisAlignedBB area = new AxisAlignedBB(c.x, c.y, c.z, c.x, c.y, c.z);
         area = area.addCoord(2*dc.x, 3*dc.y, 2*dc.z);
         //double ao = 0.5;
         //area = area.offset(ao, ao, ao);
@@ -349,7 +349,7 @@ for x in range(0, len(d[0])):
         dse.posZ += 0.5;
         //TODO Use the functional method for doing this
         
-        Vec3 real = Vec3.createVectorHelper(0, 0, 0);
+        Vec3 real = new Vec3(0, 0, 0);
         Coord dest = new Coord(DeltaChunk.getServerShadowWorld(), 0, 0, 0);
         for (Coord c : solver.entireRocket) {
             c.setAsVector(real);
@@ -402,7 +402,7 @@ for x in range(0, len(d[0])):
     }
     
     @Override
-    public boolean activate(EntityPlayer entityplayer, ForgeDirection side) {
+    public boolean activate(EntityPlayer entityplayer, EnumFacing side) {
         if (worldObj.isRemote) {
             return true;
         }
@@ -565,7 +565,7 @@ for x in range(0, len(d[0])):
         }
     }
     
-    static int expandPlane(ArrayList<Coord> coordSet, ForgeDirection normal, Criteria<Coord> crit) {
+    static int expandPlane(ArrayList<Coord> coordSet, EnumFacing normal, Criteria<Coord> crit) {
         int ord = normal.ordinal();
         HashSet<Coord> toAdd = new HashSet<Coord>();
         for (Coord me : coordSet) {
@@ -666,7 +666,7 @@ for x in range(0, len(d[0])):
                 collapsePlane(heightScan, isSolid);
                 int last_size = heightScan.size();
                 while (true) {
-                    expandPlane(heightScan, ForgeDirection.UP, isSolid);
+                    expandPlane(heightScan, EnumFacing.UP, isSolid);
                     int new_size = heightScan.size();
                     if (new_size >= FzConfig.max_rocket_base_size) {
                         throw new RocketValidationException("Rocket is too wide");

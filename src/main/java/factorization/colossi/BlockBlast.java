@@ -12,7 +12,7 @@ import net.minecraft.util.Vec3;
 import net.minecraft.world.Explosion;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
-import net.minecraftforge.common.util.ForgeDirection;
+import net.minecraft.util.EnumFacing;
 
 import java.util.List;
 import java.util.Random;
@@ -67,10 +67,10 @@ public class BlockBlast extends Block {
     public void updateTick(World world, int x, int y, int z, Random rand) {
         boolean boom = world.getBlockMetadata(x, y, z) == 1;
         if (!boom) {
-            for (ForgeDirection dir : ForgeDirection.VALID_DIRECTIONS) {
-                int atX = x + dir.offsetX;
-                int atY = y + dir.offsetY;
-                int atZ = z + dir.offsetZ;
+            for (EnumFacing dir : EnumFacing.VALUES) {
+                int atX = x + dir.getDirectionVec().getX();
+                int atY = y + dir.getDirectionVec().getY();
+                int atZ = z + dir.getDirectionVec().getZ();
                 Block b = world.getBlock(atX, atY, atZ);
                 Material mat = b.getMaterial();
                 if (mat == Material.lava || mat == Material.fire || b.isBurning(world, atX, atY, atZ)) {
@@ -91,9 +91,9 @@ public class BlockBlast extends Block {
         world.playSoundEffect(explosionX, explosionY, explosionZ, "random.explode", 4.0F, (1.0F + (world.rand.nextFloat() - world.rand.nextFloat()) * 0.2F) * 0.7F);
         world.spawnParticle("largeexplode", explosionX, explosionY, explosionZ, 1.0D, 0.0D, 0.0D);
         double r = 5;
-        List list = world.getEntitiesWithinAABBExcludingEntity(null, AxisAlignedBB.getBoundingBox(explosionX - r, explosionY - r, explosionZ - r, explosionX + r, explosionY + r, explosionZ + r));
+        List list = world.getEntitiesWithinAABBExcludingEntity(null, new AxisAlignedBB(explosionX - r, explosionY - r, explosionZ - r, explosionX + r, explosionY + r, explosionZ + r));
 
-        Vec3 vec3 = Vec3.createVectorHelper(explosionX, explosionY, explosionZ);
+        Vec3 vec3 = new Vec3(explosionX, explosionY, explosionZ);
         for (Object aList : list) {
             Entity entity = (Entity) aList;
             double dist = entity.getDistance(explosionX, explosionY, explosionZ) / explosionSize;

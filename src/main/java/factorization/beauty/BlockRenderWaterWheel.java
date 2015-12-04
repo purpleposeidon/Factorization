@@ -9,12 +9,12 @@ import factorization.shared.FactorizationBlockRender;
 import net.minecraft.client.renderer.RenderBlocks;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.util.IIcon;
-import net.minecraftforge.common.util.ForgeDirection;
+import net.minecraft.util.EnumFacing;
 
 public class BlockRenderWaterWheel extends FactorizationBlockRender {
     @Override
     public boolean render(RenderBlocks rb) {
-        ForgeDirection out = ForgeDirection.WEST;
+        EnumFacing out = EnumFacing.WEST;
         if (world_mode) {
             TileEntityWaterWheel wheel = (TileEntityWaterWheel) te;
             out = wheel.wheelDirection;

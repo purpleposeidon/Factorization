@@ -1,7 +1,7 @@
 package factorization.sockets.fanturpeller;
 
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 import factorization.api.Coord;
 import factorization.api.datahelpers.DataHelper;
 import factorization.api.datahelpers.IDataSerializable;
@@ -39,7 +39,7 @@ import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.DamageSource;
 import net.minecraft.util.Vec3;
 import net.minecraft.world.World;
-import net.minecraftforge.common.util.ForgeDirection;
+import net.minecraft.util.EnumFacing;
 import org.lwjgl.opengl.GL11;
 
 import java.io.IOException;
@@ -81,8 +81,8 @@ public class BlowEntities extends SocketFanturpeller implements IEntitySelector 
         return 1 + target_speed*target_speed;
     }
     
-    private AxisAlignedBB area = AxisAlignedBB.getBoundingBox(0, 0, 0, 0, 0, 0);
-    private AxisAlignedBB death_area = AxisAlignedBB.getBoundingBox(0, 0, 0, 0, 0, 0);
+    private AxisAlignedBB area = new AxisAlignedBB(0, 0, 0, 0, 0, 0);
+    private AxisAlignedBB death_area = new AxisAlignedBB(0, 0, 0, 0, 0, 0);
     
     void addCoord(double x, double y, double z) {
         if (x < 0.0D) area.minX += x;
@@ -121,15 +121,15 @@ public class BlowEntities extends SocketFanturpeller implements IEntitySelector 
         int side_range = target_speed;
         int front_range = 3 + target_speed*target_speed;
         if (isSucking) front_range++;
-        for (ForgeDirection dir : ForgeDirection.VALID_DIRECTIONS) {
+        for (EnumFacing dir : EnumFacing.VALUES) {
             if (dir == facing) {
-                addCoord(dir.offsetX*front_range, dir.offsetY*front_range, dir.offsetZ*front_range);
+                addCoord(dir.getDirectionVec().getX()*front_range, dir.getDirectionVec().getY()*front_range, dir.getDirectionVec().getZ()*front_range);
             } else if (dir.getOpposite() != facing) {
-                addCoord(dir.offsetX*side_range, dir.offsetY*side_range, dir.offsetZ*side_range);
+                addCoord(dir.getDirectionVec().getX()*side_range, dir.getDirectionVec().getY()*side_range, dir.getDirectionVec().getZ()*side_range);
             }
         }
         double s = 0.025;
-        ForgeDirection dir = isSucking ? facing.getOpposite() : facing;
+        EnumFacing dir = isSucking ? facing.getOpposite() : facing;
         found_player = false;
         iterateEntities(front_range, s, dir, area, death_area, worldObj);
         if (worldObj == DeltaChunk.getWorld(worldObj)) {
@@ -148,19 +148,19 @@ public class BlowEntities extends SocketFanturpeller implements IEntitySelector 
                     return;
                 }
             }
-            ForgeDirection d = facing;
+            EnumFacing d = facing;
             float ds = isSucking ? 3 : 0;
             for (int i = 0; i < count; i++) {
-                double x = pick(area.minX, area.maxX) + d.offsetX*ds;
-                double y = pick(area.minY, area.maxY) + d.offsetY*ds;
-                double z = pick(area.minZ, area.maxZ) + d.offsetZ*ds;
+                double x = pick(area.minX, area.maxX) + d.getDirectionVec().getX()*ds;
+                double y = pick(area.minY, area.maxY) + d.getDirectionVec().getY()*ds;
+                double z = pick(area.minZ, area.maxZ) + d.getDirectionVec().getZ()*ds;
                 //Good ones: explode, cloud, smoke, snowshovel
-                worldObj.spawnParticle("cloud", x, y, z, facing.offsetX*s, facing.offsetY*s, facing.offsetZ*s);
+                worldObj.spawnParticle("cloud", x, y, z, facing.getDirectionVec().getX()*s, facing.getDirectionVec().getY()*s, facing.getDirectionVec().getZ()*s);
             }
         }
     }
 
-    private void iterateFzdsEntities(int front_range, double s, ForgeDirection dir, IDeltaChunk idc) {
+    private void iterateFzdsEntities(int front_range, double s, EnumFacing dir, IDeltaChunk idc) {
         iterateEntities(front_range, s, idc.shadow2real(dir), idc.shadow2real(area), idc.shadow2real(death_area), idc.worldObj);
         if (!worldObj.isRemote && Core.dev_environ && idc.getController() instanceof MechanicsController) {
             Vec3 force = SpaceUtil.fromDirection(dir);
@@ -171,9 +171,9 @@ public class BlowEntities extends SocketFanturpeller implements IEntitySelector 
         }
     }
 
-    private void iterateEntities(int front_range, double s, ForgeDirection dir, AxisAlignedBB box, AxisAlignedBB deathBox, World w) {
+    private void iterateEntities(int front_range, double s, EnumFacing dir, AxisAlignedBB box, AxisAlignedBB deathBox, World w) {
         //AabbDebugger.addBox(box);
-        boolean rising = dir.offsetY == (isSucking ? -1 : +1);
+        boolean rising = dir.getDirectionVec().getY() == (isSucking ? -1 : +1);
         for (Entity ent : (Iterable<Entity>)w.getEntitiesWithinAABBExcludingEntity(null, box, this)) {
             if (rising) {
                 waftEntity(ent);
@@ -196,24 +196,24 @@ public class BlowEntities extends SocketFanturpeller implements IEntitySelector 
         return min + d * worldObj.rand.nextDouble();
     }
     
-    void suckEntity(Entity ent, int front_range, ForgeDirection dir, double s) {
+    void suckEntity(Entity ent, int front_range, EnumFacing dir, double s) {
         double ms = s;
         double distSq = ent.getDistanceSq(xCoord + 0.5, yCoord + 0.5, zCoord + 0.5);
         ms /= distSq/(front_range*10);
         if (ms > 0.15) ms = 0.15;
-        double dx = ms*dir.offsetX;
-        double dy = ms*dir.offsetY;
-        double dz = ms*dir.offsetZ;
-        if (isSucking || dir == ForgeDirection.UP) {
-            if (dir.offsetX == 0) {
+        double dx = ms*dir.getDirectionVec().getX();
+        double dy = ms*dir.getDirectionVec().getY();
+        double dz = ms*dir.getDirectionVec().getZ();
+        if (isSucking || dir == EnumFacing.UP) {
+            if (dir.getDirectionVec().getX() == 0) {
                 double diff = ent.posX - xCoord - 0.5;
                 dx -= diff*ms;
             }
-            if (dir.offsetY == 0) {
+            if (dir.getDirectionVec().getY() == 0) {
                 double diff = ent.posY - yCoord - 0.5;
                 dy -= diff*ms;
             }
-            if (dir.offsetZ == 0) {
+            if (dir.getDirectionVec().getZ() == 0) {
                 double diff = ent.posZ - zCoord - 0.5;
                 dz -= diff*ms;
             }
@@ -334,7 +334,7 @@ public class BlowEntities extends SocketFanturpeller implements IEntitySelector 
     }
     
     @Override
-    public boolean activate(EntityPlayer player, ForgeDirection side) {
+    public boolean activate(EntityPlayer player, EnumFacing side) {
         if (!buffer.isEmpty()) {
             new Notice(this, "Buffered output").send(player);
             return false;

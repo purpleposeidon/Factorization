@@ -1,14 +1,14 @@
 package factorization.common;
 
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 import factorization.shared.FactorizationTextureLoader.Directory;
 import factorization.shared.FactorizationTextureLoader.IIconGroup;
 import factorization.shared.FactorizationTextureLoader.Ignore;
 import factorization.shared.TileEntityFactorization;
 import net.minecraft.client.renderer.RenderBlocks;
 import net.minecraft.util.IIcon;
-import net.minecraftforge.common.util.ForgeDirection;
+import net.minecraft.util.EnumFacing;
 
 public class BlockIcons {
     public static IIcon uv_test,
@@ -131,7 +131,7 @@ public class BlockIcons {
     
     public static class ActivatingMachineIIcon extends IIconGroup {
         public IIcon top, bottom, side, side_on;
-        public IIcon get(TileEntityFactorization tef, ForgeDirection dir) {
+        public IIcon get(TileEntityFactorization tef, EnumFacing dir) {
             switch (dir) {
             case UP: return top;
             case DOWN: return bottom;
@@ -143,7 +143,7 @@ public class BlockIcons {
     public static class SimpleMachine extends IIconGroup {
         public IIcon face, side, top, bottom;
         
-        public IIcon get(TileEntityFactorization tef, ForgeDirection dir) {
+        public IIcon get(TileEntityFactorization tef, EnumFacing dir) {
             switch (dir) {
             case UP: return top;
             case DOWN: return bottom;
@@ -237,36 +237,36 @@ public class BlockIcons {
             };
         }
         
-        public IIcon get(ForgeDirection arrow_direction, ForgeDirection face) {
+        public IIcon get(EnumFacing arrow_direction, EnumFacing face) {
             if (arrow_direction == face) {
                 return front;
             }
             if (arrow_direction.getOpposite() == face) {
                 return back;
             }
-            if (arrow_direction == ForgeDirection.UP) {
+            if (arrow_direction == EnumFacing.UP) {
                 return side_N;
             }
-            if (arrow_direction == ForgeDirection.DOWN) {
+            if (arrow_direction == EnumFacing.DOWN) {
                 return side_S;
             }
-            if (face.offsetY != 0) {
-                if (arrow_direction == ForgeDirection.WEST) return side_W;
-                if (arrow_direction == ForgeDirection.EAST) return side_E;
-                if (arrow_direction == ForgeDirection.NORTH) return side_N;
-                if (arrow_direction == ForgeDirection.SOUTH) return side_S;
+            if (face.getDirectionVec().getY() != 0) {
+                if (arrow_direction == EnumFacing.WEST) return side_W;
+                if (arrow_direction == EnumFacing.EAST) return side_E;
+                if (arrow_direction == EnumFacing.NORTH) return side_N;
+                if (arrow_direction == EnumFacing.SOUTH) return side_S;
             }
-            if (face == ForgeDirection.WEST) {;
-                return arrow_direction.offsetZ == 1 ? side_E : side_W;
+            if (face == EnumFacing.WEST) {;
+                return arrow_direction.getDirectionVec().getZ() == 1 ? side_E : side_W;
             }
-            if (face == ForgeDirection.EAST) {;
-                return arrow_direction.offsetZ == -1 ? side_E : side_W;
+            if (face == EnumFacing.EAST) {;
+                return arrow_direction.getDirectionVec().getZ() == -1 ? side_E : side_W;
             }
-            if (face == ForgeDirection.NORTH) {
-                return arrow_direction.offsetX == -1 ? side_E : side_W;
+            if (face == EnumFacing.NORTH) {
+                return arrow_direction.getDirectionVec().getX() == -1 ? side_E : side_W;
             }
-            if (face == ForgeDirection.SOUTH) {
-                return arrow_direction.offsetX == 1 ? side_E : side_W;
+            if (face == EnumFacing.SOUTH) {
+                return arrow_direction.getDirectionVec().getX() == 1 ? side_E : side_W;
             }
             return uv_test;
         }

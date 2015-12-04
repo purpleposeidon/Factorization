@@ -12,7 +12,7 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.IIcon;
 import net.minecraft.world.IBlockAccess;
 import net.minecraftforge.client.IItemRenderer.ItemRenderType;
-import net.minecraftforge.common.util.ForgeDirection;
+import net.minecraft.util.EnumFacing;
 
 import org.lwjgl.opengl.GL11;
 
@@ -89,7 +89,7 @@ abstract public class FactorizationBlockRender implements ICoord {
             }
             return null;
         }
-        if (te != null && te.getWorldObj() != null) {
+        if (te != null && te.getWorld() != null) {
             return new Coord(te);
         }
         return new Coord(Minecraft.getMinecraft().theWorld, x, y, z);
@@ -218,21 +218,21 @@ abstract public class FactorizationBlockRender implements ICoord {
     static private RenderBlocks rb = new RenderBlocks();
 
     
-    static private ForgeDirection getFaceDirection(VectorUV[] vecs, VectorUV center) {
+    static private EnumFacing getFaceDirection(VectorUV[] vecs, VectorUV center) {
         VectorUV here = vecs[0].add(vecs[2]);
         here.scale(0.5F);
         here = here.add(center);
         double x = Math.abs(here.x), y = Math.abs(here.y), z = Math.abs(here.z);
         if (x >= y && x >= z) {
-            return here.x >= 0 ? ForgeDirection.WEST : ForgeDirection.EAST;
+            return here.x >= 0 ? EnumFacing.WEST : EnumFacing.EAST;
         }
         if (y >= x && y >= z) {
-            return here.y >= 0 ? ForgeDirection.UP : ForgeDirection.DOWN;
+            return here.y >= 0 ? EnumFacing.UP : EnumFacing.DOWN;
         }
         if (z >= x && z >= y) {
-            return here.z >= 0 ? ForgeDirection.SOUTH : ForgeDirection.NORTH;
+            return here.z >= 0 ? EnumFacing.SOUTH : EnumFacing.NORTH;
         }
-        return ForgeDirection.UP;
+        return EnumFacing.UP;
     }
     
     static float[] directionLighting = new float[] {0.5F, 1F, 0.8F, 0.8F, 0.6F, 0.6F};

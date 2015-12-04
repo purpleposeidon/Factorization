@@ -1,7 +1,7 @@
 package factorization.fzds.network;
 
 import com.google.common.collect.BiMap;
-import cpw.mods.fml.common.network.internal.FMLProxyPacket;
+import net.minecraftforge.fml.common.network.internal.FMLProxyPacket;
 import factorization.fzds.interfaces.IFzdsShenanigans;
 import factorization.shared.Core;
 import net.minecraft.network.EnumConnectionState;

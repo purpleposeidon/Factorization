@@ -1,8 +1,8 @@
 package factorization.shared;
 
 import net.minecraft.tileentity.TileEntity;
-import cpw.mods.fml.common.FMLCommonHandler;
-import cpw.mods.fml.relauncher.Side;
+import net.minecraftforge.fml.common.FMLCommonHandler;
+import net.minecraftforge.fml.relauncher.Side;
 import factorization.api.Coord;
 import factorization.shared.NetworkFactorization.MessageType;
 

@@ -31,7 +31,7 @@ import net.minecraft.item.crafting.CraftingManager;
 import net.minecraft.item.crafting.IRecipe;
 import net.minecraft.item.crafting.ShapelessRecipes;
 import net.minecraft.util.IIcon;
-import net.minecraftforge.common.util.ForgeDirection;
+import net.minecraft.util.EnumFacing;
 import net.minecraftforge.oredict.OreDictionary;
 import net.minecraftforge.oredict.ShapelessOreRecipe;
 
@@ -50,7 +50,7 @@ public class TileEntityMixer extends TileEntityFactorization implements
     Charge charge = new Charge(this);
     
     @Override
-    public IIcon getIcon(ForgeDirection dir) {
+    public IIcon getIcon(EnumFacing dir) {
         switch (dir) {
         case UP: return BlockIcons.mixer.top;
         case DOWN: return BlockIcons.mixer.bottom;
@@ -131,8 +131,8 @@ public class TileEntityMixer extends TileEntityFactorization implements
 
     @Override
     public int[] getAccessibleSlotsFromSide(int s) {
-        ForgeDirection side = ForgeDirection.getOrientation(s);
-        if (side == ForgeDirection.DOWN) {
+        EnumFacing side = SpaceUtil.getOrientation(s);
+        if (side == EnumFacing.DOWN) {
             return OUT_s;
         }
         return IN_s;
@@ -326,7 +326,7 @@ public class TileEntityMixer extends TileEntityFactorization implements
         public void onCraftingComplete(TileEntityMixer machine) {
             InventoryCrafting craft = CraftUtil.makeCraftingGrid();
             int craft_slot = 0;
-            FzInv inv = InvUtil.openInventory(machine, ForgeDirection.UP);
+            FzInv inv = InvUtil.openInventory(machine, EnumFacing.UP);
             ArrayList recipeInputs = new ArrayList();
             for (Object o : this.inputs) {
                 if (o instanceof ItemStack) {
@@ -602,7 +602,7 @@ public class TileEntityMixer extends TileEntityFactorization implements
     boolean dumpBuffer() {
         if (outputBuffer.size() > 0) {
             ItemStack toAdd = outputBuffer.get(0);
-            FzInv out = InvUtil.openInventory(this, ForgeDirection.DOWN);
+            FzInv out = InvUtil.openInventory(this, EnumFacing.DOWN);
             out.setInsertForce(true);
             Iterator<ItemStack> it = outputBuffer.iterator();
             while (it.hasNext()) {

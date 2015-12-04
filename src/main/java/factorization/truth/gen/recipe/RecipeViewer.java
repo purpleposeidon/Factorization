@@ -1,6 +1,6 @@
 package factorization.truth.gen.recipe;
 
-import cpw.mods.fml.common.event.FMLInterModComms.IMCMessage;
+import net.minecraftforge.fml.common.event.FMLInterModComms.IMCMessage;
 import factorization.shared.Core;
 import factorization.truth.DocumentationModule;
 import factorization.truth.api.*;

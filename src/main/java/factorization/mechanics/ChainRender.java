@@ -1,6 +1,6 @@
 package factorization.mechanics;
 
-import cpw.mods.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import factorization.shared.Core;
 import factorization.algos.FastBag;
 import factorization.util.SpaceUtil;

@@ -17,7 +17,7 @@ import net.minecraft.util.MathHelper;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;
 import net.minecraft.world.chunk.Chunk;
-import cpw.mods.fml.common.network.internal.FMLProxyPacket;
+import net.minecraftforge.fml.common.network.internal.FMLProxyPacket;
 
 public class FzNetDispatch {
     
@@ -87,7 +87,7 @@ public class FzNetDispatch {
     }
     
     public static void addPacketFrom(Packet packet, TileEntity ent) {
-        World w = ent.getWorldObj();
+        World w = ent.getWorld();
         addPacketFrom(packet, w.getChunkFromBlockCoords(ent.xCoord, ent.zCoord));
     }
     

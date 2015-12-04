@@ -9,7 +9,7 @@ import net.minecraft.item.Item;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.IIcon;
-import net.minecraftforge.common.util.ForgeDirection;
+import net.minecraft.util.EnumFacing;
 import factorization.api.Coord;
 import factorization.api.FzOrientation;
 import factorization.api.datahelpers.DataHelper;
@@ -30,7 +30,7 @@ public class Spin extends Instruction {
     }
     
     @Override
-    public boolean onClick(EntityPlayer player, Coord block, ForgeDirection side) {
+    public boolean onClick(EntityPlayer player, Coord block, EnumFacing side) {
         if (player.worldObj.isRemote) {
             return true;
         }
@@ -47,7 +47,7 @@ public class Spin extends Instruction {
     }
 
     void hit(AbstractServoMachine motor) {
-        ForgeDirection newTop = motor.getOrientation().top;
+        EnumFacing newTop = motor.getOrientation().top;
         for (int i = cc ? 3 : 1; i > 0; i--) {
             newTop = newTop.getRotation(motor.getOrientation().facing);
         }
@@ -68,7 +68,7 @@ public class Spin extends Instruction {
     }
 
     @Override
-    public IIcon getIcon(ForgeDirection side) {
+    public IIcon getIcon(EnumFacing side) {
         return cc ? BlockIcons.servo$spin_cc : BlockIcons.servo$spin_ccc;
     }
 

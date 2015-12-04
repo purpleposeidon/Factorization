@@ -1,6 +1,6 @@
 package factorization.common;
 
-import cpw.mods.fml.common.registry.GameRegistry;
+import net.minecraftforge.fml.common.registry.GameRegistry;
 import factorization.artifact.TileEntityLegendarium;
 import factorization.astro.TileEntityRocketEngine;
 import factorization.beauty.*;

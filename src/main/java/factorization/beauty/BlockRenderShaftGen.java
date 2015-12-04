@@ -9,14 +9,14 @@ import factorization.shared.FactorizationBlockRender;
 import net.minecraft.client.renderer.RenderBlocks;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.util.IIcon;
-import net.minecraftforge.common.util.ForgeDirection;
+import net.minecraft.util.EnumFacing;
 
 public class BlockRenderShaftGen extends FactorizationBlockRender {
     @Override
     public boolean render(RenderBlocks rb) {
         BlockRenderHelper block = BlockRenderHelper.instance;
         boolean on = true;
-        ForgeDirection shaft = ForgeDirection.UP;
+        EnumFacing shaft = EnumFacing.UP;
         if (world_mode) {
             Tessellator.instance.setBrightness(block.getMixedBrightnessForBlock(w, x, y, z));
             TileEntityShaftGen gen = (TileEntityShaftGen) te;

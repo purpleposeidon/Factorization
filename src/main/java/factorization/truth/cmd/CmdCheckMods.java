@@ -1,6 +1,6 @@
 package factorization.truth.cmd;
 
-import cpw.mods.fml.common.Loader;
+import net.minecraftforge.fml.common.Loader;
 import factorization.truth.api.AgnosticCommand;
 import factorization.truth.api.ITokenizer;
 import factorization.truth.api.ITypesetter;

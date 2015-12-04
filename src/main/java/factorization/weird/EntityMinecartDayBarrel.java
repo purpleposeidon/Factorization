@@ -14,7 +14,7 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.DamageSource;
 import net.minecraft.util.MathHelper;
 import net.minecraft.world.World;
-import net.minecraftforge.common.util.ForgeDirection;
+import net.minecraft.util.EnumFacing;
 
 import java.io.IOException;
 
@@ -70,7 +70,7 @@ public class EntityMinecartDayBarrel extends EntityMinecart implements IInventor
         barrel.setWorldObj(worldObj);
         barrel.xCoord = barrel.yCoord = barrel.zCoord = 0;
         barrel.validate();
-        barrel.orientation = FzOrientation.fromDirection(ForgeDirection.WEST).pointTopTo(ForgeDirection.UP);
+        barrel.orientation = FzOrientation.fromDirection(EnumFacing.WEST).pointTopTo(EnumFacing.UP);
         barrel.notice_target = this;
     }
 
@@ -199,7 +199,7 @@ public class EntityMinecartDayBarrel extends EntityMinecart implements IInventor
             return true;
         }
 
-        boolean result = barrel.activate(player, ForgeDirection.UNKNOWN);
+        boolean result = barrel.activate(player, null);
         updateDataWatcher(false);
         return result;
     }

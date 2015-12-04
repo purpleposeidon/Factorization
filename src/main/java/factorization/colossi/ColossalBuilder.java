@@ -12,7 +12,7 @@ import net.minecraft.block.BlockFalling;
 import net.minecraft.init.Blocks;
 import net.minecraft.world.biome.BiomeGenBase;
 import net.minecraft.world.gen.NoiseGeneratorOctaves;
-import net.minecraftforge.common.util.ForgeDirection;
+import net.minecraft.util.EnumFacing;
 import factorization.api.Coord;
 import factorization.api.DeltaCoord;
 import factorization.api.ICoordFunction;
@@ -196,8 +196,8 @@ public class ColossalBuilder {
         arm_end.adjust(armDelta);
         fill(arm_start, arm_end, ARM);
         
-        paintMask(ForgeDirection.UP);
-        paintMask(ForgeDirection.DOWN);
+        paintMask(EnumFacing.UP);
+        paintMask(EnumFacing.DOWN);
         
         Coord standard_eyeball = start.add(leg_size + body_front_padding + 1, leg_height + 1 + body_height + (face_height / 2), 1 + leg_size + leg_spread / 2);
         fill(standard_eyeball, standard_eyeball, EYE);
@@ -207,14 +207,14 @@ public class ColossalBuilder {
         drawer.applyBiomeDecorations();
         
         Coord heart_crack = start.add(leg_size + body_front_padding, leg_height + 1 + ((body_height + 1) / 2), leg_size + ((1 + leg_spread) / 2));
-        Coord hc_front = heart_crack.add(ForgeDirection.EAST);
+        Coord hc_front = heart_crack.add(EnumFacing.EAST);
         if (MASK.matches(hc_front) || EYE.matches(hc_front)) {
-            heart_crack.adjust(ForgeDirection.EAST);
+            heart_crack.adjust(EnumFacing.EAST);
             fill(heart_crack, heart_crack, MASK_CRACK);
         } else {
             fill(heart_crack, heart_crack, BODY_CRACK);
         }
-        Coord heart = heart_crack.add(ForgeDirection.WEST);
+        Coord heart = heart_crack.add(EnumFacing.WEST);
         fill(heart, heart, HEART);
         TileEntityColossalHeart heartTe = new TileEntityColossalHeart();
         heartTe.loadInfoFromBuilder(this);
@@ -250,12 +250,12 @@ public class ColossalBuilder {
         return leg_height + 1 + body_height + face_height + 4;
     }
     
-    void paintMask(ForgeDirection dir) {
+    void paintMask(EnumFacing dir) {
         MaskTemplate mask = MaskLoader.pickMask(rand, dir, face_width + 1, face_width + 1);
         if (mask == null) return;
         int mask_start = ((leg_spread + leg_size * 2) - face_width + 1) / 2;
         Coord mask_anchor = start.add(body_front_padding + leg_size + 1, leg_height + 1 + body_height - 1, mask_start);
-        if (dir == ForgeDirection.DOWN) {
+        if (dir == EnumFacing.DOWN) {
             mask_anchor = mask_anchor.add(0, face_height, 0);
         }
         Brush maskBrush = new Brush(MASK, BrushMask.ALL, rand);

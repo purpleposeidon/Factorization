@@ -7,7 +7,7 @@ import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.world.World;
-import net.minecraftforge.common.util.ForgeDirection;
+import net.minecraft.util.EnumFacing;
 
 public class ItemGargantuanBlock extends ItemBlock {
 
@@ -18,8 +18,8 @@ public class ItemGargantuanBlock extends ItemBlock {
     
     @Override
     public boolean placeBlockAt(ItemStack stack, EntityPlayer player, World world, int x, int y, int z, int side, float hitX, float hitY, float hitZ, int metadata) {
-        ForgeDirection dir = ForgeDirection.getOrientation(side);
-        if (dir == ForgeDirection.UNKNOWN) return false;
+        EnumFacing dir = SpaceUtil.getOrientation(side);
+        if (dir == null) return false;
         Coord me = new Coord(world, x, y, z);
         Coord mate = me.add(dir);
         if (!mate.isReplacable()) return false;

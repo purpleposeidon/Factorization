@@ -1,7 +1,7 @@
 package factorization.beauty;
 
-import cpw.mods.fml.common.FMLCommonHandler;
-import cpw.mods.fml.relauncher.Side;
+import net.minecraftforge.fml.common.FMLCommonHandler;
+import net.minecraftforge.fml.relauncher.Side;
 import factorization.api.*;
 import factorization.api.datahelpers.DataHelper;
 import factorization.api.datahelpers.Share;
@@ -29,12 +29,12 @@ import net.minecraft.util.DamageSource;
 import net.minecraft.util.IIcon;
 import net.minecraft.util.Vec3;
 import net.minecraft.world.World;
-import net.minecraftforge.common.util.ForgeDirection;
+import net.minecraft.util.EnumFacing;
 
 import java.io.IOException;
 
 public class TileEntityWindMill extends TileEntityCommon implements IRotationalEnergySource, IDCController, IWindmill, IMeterInfo {
-    ForgeDirection sailDirection = ForgeDirection.UP;
+    EnumFacing sailDirection = EnumFacing.UP;
     boolean dirty = true;
     double power_per_tick, power_this_tick, target_velocity, velocity;
     double wind_strength = 0, efficiency = 0;
@@ -62,18 +62,18 @@ public class TileEntityWindMill extends TileEntityCommon implements IRotationalE
     }
 
     @Override
-    public boolean canConnect(ForgeDirection direction) {
+    public boolean canConnect(EnumFacing direction) {
         return direction == this.sailDirection.getOpposite();
     }
 
     @Override
-    public double availableEnergy(ForgeDirection direction) {
+    public double availableEnergy(EnumFacing direction) {
         if (direction != sailDirection.getOpposite()) return 0;
         return power_this_tick;
     }
 
     @Override
-    public double takeEnergy(ForgeDirection direction, double maxPower) {
+    public double takeEnergy(EnumFacing direction, double maxPower) {
         if (direction != sailDirection.getOpposite()) return 0;
         if (maxPower > power_this_tick) {
             maxPower = power_this_tick;
@@ -83,7 +83,7 @@ public class TileEntityWindMill extends TileEntityCommon implements IRotationalE
     }
 
     @Override
-    public double getVelocity(ForgeDirection direction) {
+    public double getVelocity(EnumFacing direction) {
         if (direction != sailDirection.getOpposite()) return 0;
         return velocity;
     }
@@ -103,7 +103,7 @@ public class TileEntityWindMill extends TileEntityCommon implements IRotationalE
     @Override
     public void onPlacedBy(EntityPlayer player, ItemStack is, int side, float hitX, float hitY, float hitZ) {
         super.onPlacedBy(player, is, side, hitX, hitY, hitZ);
-        sailDirection = ForgeDirection.getOrientation(side);
+        sailDirection = SpaceUtil.getOrientation(side);
     }
 
     @Override
@@ -210,11 +210,11 @@ public class TileEntityWindMill extends TileEntityCommon implements IRotationalE
                 DeltaCapability.VIOLENT_COLLISIONS,
                 DeltaCapability.DRAG);
         idc.setRotationalCenterOffset(offset.toVector().addVector(0.5, 0.5, 0.5));
-        final ForgeDirection normal = sailDirection.getOpposite();
+        final EnumFacing normal = sailDirection.getOpposite();
         Coord at = new Coord(this).add(sailDirection);
         at.setAsEntityLocation(idc);
-        if (normal.offsetY == 0) {
-            Vec3 up = SpaceUtil.fromDirection(ForgeDirection.UP);
+        if (normal.getDirectionVec().getY() == 0) {
+            Vec3 up = SpaceUtil.fromDirection(EnumFacing.UP);
             Vec3 vnorm = SpaceUtil.fromDirection(normal);
             Vec3 axis = up.crossProduct(vnorm);
             Quaternion rot = Quaternion.getRotationQuaternionRadians(-Math.PI / 2, axis);
@@ -222,10 +222,10 @@ public class TileEntityWindMill extends TileEntityCommon implements IRotationalE
             idc.posY += 0.5;
         } else {
             double a = .5;
-            idc.posX += sailDirection.offsetX * a;
-            idc.posY += sailDirection.offsetY * a;
-            idc.posZ += sailDirection.offsetZ * a;
-            if (normal.offsetY == 1) {
+            idc.posX += sailDirection.getDirectionVec().getX() * a;
+            idc.posY += sailDirection.getDirectionVec().getY() * a;
+            idc.posZ += sailDirection.getDirectionVec().getZ() * a;
+            if (normal.getDirectionVec().getY() == 1) {
                 idc.posY += 1;
             }
         }
@@ -307,7 +307,7 @@ public class TileEntityWindMill extends TileEntityCommon implements IRotationalE
         double max_score = 1;
         double new_radius = 0;
         while (ys-- > 0) {
-            Symmetry symmetry = new Symmetry(center, MAX_RADIUS, ForgeDirection.UP);
+            Symmetry symmetry = new Symmetry(center, MAX_RADIUS, EnumFacing.UP);
             symmetry.calculate();
             score += symmetry.score;
             asymetry += symmetry.asymetry;
@@ -355,7 +355,7 @@ public class TileEntityWindMill extends TileEntityCommon implements IRotationalE
     }
 
     @Override
-    public ForgeDirection getDirection() {
+    public EnumFacing getDirection() {
         return sailDirection;
     }
 
@@ -394,7 +394,7 @@ public class TileEntityWindMill extends TileEntityCommon implements IRotationalE
     }
 
     @Override
-    public IIcon getIcon(ForgeDirection dir) {
+    public IIcon getIcon(EnumFacing dir) {
         return BlockIcons.beauty$wind_side;
     }
 

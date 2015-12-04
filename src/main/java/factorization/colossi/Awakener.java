@@ -19,7 +19,7 @@ import net.minecraft.block.material.Material;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.Vec3;
-import net.minecraftforge.common.util.ForgeDirection;
+import net.minecraft.util.EnumFacing;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -197,7 +197,7 @@ public class Awakener {
             SetAndInfo sai = new SetAndInfo(arm, arm_length, arm_size, joint, LimbType.ARM, getSide(arm));
             limbInfo.add(sai);
         }
-        Vec3 leg_sum = Vec3.createVectorHelper(0, 0, 0);
+        Vec3 leg_sum = new Vec3(0, 0, 0);
         for (Set<Coord> leg: legs) {
             Vec3 joint = calculateJointPosition(leg, leg_size, leg_length, LimbType.LEG);
             SetAndInfo sai = new SetAndInfo(leg, leg_length, leg_size, joint, LimbType.LEG, getSide(leg));
@@ -290,7 +290,7 @@ public class Awakener {
         msg("Activated with %s parts", part_size);
         LimbInfo[] info = parts.toArray(new LimbInfo[part_size]);
         int body_size = max.z - min.z;
-        ColossusController controller = new ColossusController(heartTE.getWorldObj(), info, arm_size, arm_length, leg_size, leg_length, body_size);
+        ColossusController controller = new ColossusController(heartTE.getWorld(), info, arm_size, arm_length, leg_size, leg_length, body_size);
         new Coord(heartTE).setAsEntityLocation(controller);
         FzUtil.spawn(controller);
         
@@ -332,8 +332,8 @@ public class Awakener {
                 corner.z = c.z;
             }
         }
-        if (corner == null) return Vec3.createVectorHelper(0, 0, 0);
-        corner = corner.add(ForgeDirection.UP); // Make the Y axis start at the top
+        if (corner == null) return new Vec3(0, 0, 0);
+        corner = corner.add(EnumFacing.UP); // Make the Y axis start at the top
         Vec3 ret = corner.createVector();
         ret.xCoord += size/2.0;
         ret.zCoord += size/2.0;

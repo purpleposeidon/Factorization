@@ -9,7 +9,7 @@ import factorization.shared.*;
 import factorization.util.NumUtil;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.util.IIcon;
-import net.minecraftforge.common.util.ForgeDirection;
+import net.minecraft.util.EnumFacing;
 import net.minecraftforge.fluids.Fluid;
 import net.minecraftforge.fluids.FluidRegistry;
 import net.minecraftforge.fluids.FluidStack;
@@ -34,7 +34,7 @@ public class TileEntitySteamTurbine extends TileEntityCommon implements IFluidHa
     }
     
     @Override
-    public IIcon getIcon(ForgeDirection dir) {
+    public IIcon getIcon(EnumFacing dir) {
         switch (dir) {
         case UP: return BlockIcons.turbine_top;
         case DOWN: return BlockIcons.turbine_bottom;
@@ -55,35 +55,35 @@ public class TileEntitySteamTurbine extends TileEntityCommon implements IFluidHa
     }
 
     @Override
-    public int fill(ForgeDirection from, FluidStack resource, boolean doFill) {
+    public int fill(EnumFacing from, FluidStack resource, boolean doFill) {
         return steamTank.fill(resource, doFill);
     }
     
     @Override
-    public FluidStack drain(ForgeDirection from, FluidStack resource, boolean doDrain) {
+    public FluidStack drain(EnumFacing from, FluidStack resource, boolean doDrain) {
         return null;
     }
     
     @Override
-    public FluidStack drain(ForgeDirection from, int maxDrain, boolean doDrain) {
+    public FluidStack drain(EnumFacing from, int maxDrain, boolean doDrain) {
         return steamTank.drain(maxDrain, doDrain);
     }
     
     @Override
-    public boolean canFill(ForgeDirection from, Fluid fluid) {
-        if (from == ForgeDirection.UP) {
+    public boolean canFill(EnumFacing from, Fluid fluid) {
+        if (from == EnumFacing.UP) {
             return false;
         }
         return fluid == null || fluid.getID() == TileEntitySolarBoiler.steam.getID();
     }
     
     @Override
-    public boolean canDrain(ForgeDirection from, Fluid fluid) {
+    public boolean canDrain(EnumFacing from, Fluid fluid) {
         return false;
     }
     
     @Override
-    public FluidTankInfo[] getTankInfo(ForgeDirection from) {
+    public FluidTankInfo[] getTankInfo(EnumFacing from) {
         return new FluidTankInfo[] {steamTank.getInfo()};
     }
 

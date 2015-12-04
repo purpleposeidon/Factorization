@@ -17,7 +17,7 @@ import net.minecraft.util.IIcon;
 import net.minecraft.util.MovingObjectPosition;
 import net.minecraft.util.StatCollector;
 import net.minecraft.world.World;
-import net.minecraftforge.common.util.ForgeDirection;
+import net.minecraft.util.EnumFacing;
 import factorization.api.Coord;
 import factorization.api.Quaternion;
 import factorization.ceramics.TileEntityGreenware.ClayLump;
@@ -306,8 +306,8 @@ public class ItemSculptingTool extends ItemFactorization {
         if (reverse) {
             delta *= -1;
         }
-        ForgeDirection direction = ForgeDirection.getOrientation(side);
-        cube.quat.incrMultiply(Quaternion.getRotationQuaternionRadians(delta, direction.offsetX, direction.offsetY, direction.offsetZ));
+        EnumFacing direction = SpaceUtil.getOrientation(side);
+        cube.quat.incrMultiply(Quaternion.getRotationQuaternionRadians(delta, direction.getDirectionVec().getX(), direction.getDirectionVec().getY(), direction.getDirectionVec().getZ()));
     }
     
     void rotate_global(ClayLump cube, boolean reverse, int side, int strength) {
@@ -315,22 +315,22 @@ public class ItemSculptingTool extends ItemFactorization {
         if (reverse) {
             delta *= -1;
         }
-        ForgeDirection direction = ForgeDirection.getOrientation(side);
-        Quaternion global = Quaternion.getRotationQuaternionRadians(delta, direction.offsetX, direction.offsetY, direction.offsetZ);
+        EnumFacing direction = SpaceUtil.getOrientation(side);
+        Quaternion global = Quaternion.getRotationQuaternionRadians(delta, direction.getDirectionVec().getX(), direction.getDirectionVec().getY(), direction.getDirectionVec().getZ());
         global.incrMultiply(cube.quat);
         cube.quat = global;
     }
     
     void move(ClayLump cube, boolean reverse, int side, int strength) {
         //shift origin 0.5, and corner by 0.5.
-        ForgeDirection dir = ForgeDirection.getOrientation(side);
+        EnumFacing dir = SpaceUtil.getOrientation(side);
         stretch(cube, reverse, dir.ordinal(), strength);
         stretch(cube, !reverse, dir.getOpposite().ordinal(), strength);
     }
     
     void stretch(ClayLump cube, boolean reverse, int side, int strength) {
         //shift origin 0.5, and corner by 0.5.
-        ForgeDirection dir = ForgeDirection.getOrientation(side);
+        EnumFacing dir = SpaceUtil.getOrientation(side);
         int delta = reverse ? -strength : strength;
         switch (dir) {
         case SOUTH:

@@ -1,6 +1,6 @@
 package factorization.beauty;
 
-import cpw.mods.fml.common.registry.GameRegistry;
+import net.minecraftforge.fml.common.registry.GameRegistry;
 import factorization.algos.ReservoirSampler;
 import factorization.shared.Core;
 import factorization.shared.ItemFactorization;

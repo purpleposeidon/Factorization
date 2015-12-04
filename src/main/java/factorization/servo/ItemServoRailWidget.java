@@ -1,7 +1,7 @@
 package factorization.servo;
 
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 import factorization.api.Coord;
 import factorization.common.BlockIcons;
 import factorization.shared.Core;
@@ -15,7 +15,7 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.IIcon;
 import net.minecraft.world.World;
-import net.minecraftforge.common.util.ForgeDirection;
+import net.minecraft.util.EnumFacing;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -132,7 +132,7 @@ public class ItemServoRailWidget extends ItemFactorization {
             ServoComponent sc = get(stack);
             IIcon ret = null;
             if (sc instanceof Decorator) {
-                ret = ((Decorator) sc).getIcon(ForgeDirection.UNKNOWN);
+                ret = ((Decorator) sc).getIcon(null);
             }
             if (ret == null) {
                 ret = BlockIcons.uv_test;

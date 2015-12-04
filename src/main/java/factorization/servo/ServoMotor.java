@@ -1,9 +1,9 @@
 package factorization.servo;
 
-import cpw.mods.fml.common.network.internal.FMLNetworkHandler;
-import cpw.mods.fml.common.network.internal.FMLProxyPacket;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
+import net.minecraftforge.fml.common.network.internal.FMLNetworkHandler;
+import net.minecraftforge.fml.common.network.internal.FMLProxyPacket;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 import factorization.api.*;
 import factorization.api.datahelpers.*;
 import factorization.common.FactoryType;
@@ -30,7 +30,7 @@ import net.minecraft.network.Packet;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.*;
 import net.minecraft.world.World;
-import net.minecraftforge.common.util.ForgeDirection;
+import net.minecraft.util.EnumFacing;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -422,13 +422,13 @@ public class ServoMotor extends AbstractServoMachine implements IInventory, ISoc
     ArrayList<MovingObjectPosition> rayTrace() {
         ret.clear();
         final Coord c = getCurrentPos();
-        final ForgeDirection top = motionHandler.orientation.top;
-        final ForgeDirection face = motionHandler.orientation.facing;
-        final ForgeDirection right = face.getRotation(top);
+        final EnumFacing top = motionHandler.orientation.top;
+        final EnumFacing face = motionHandler.orientation.facing;
+        final EnumFacing right = face.getRotation(top);
         
-        AxisAlignedBB ab = AxisAlignedBB.getBoundingBox(
-                c.x + top.offsetX, c.y + top.offsetY, c.z + top.offsetZ,  
-                c.x + 1 + top.offsetX, c.y + 1 + top.offsetY, c.z + 1 + top.offsetZ);
+        AxisAlignedBB ab = new AxisAlignedBB(
+                c.x + top.getDirectionVec().getX(), c.y + top.getDirectionVec().getY(), c.z + top.getDirectionVec().getZ(),  
+                c.x + 1 + top.getDirectionVec().getX(), c.y + 1 + top.getDirectionVec().getY(), c.z + 1 + top.getDirectionVec().getZ());
         for (Entity entity : (Iterable<Entity>)worldObj.getEntitiesWithinAABBExcludingEntity(this, ab)) {
             if (!entity.canBeCollidedWith()) {
                 continue;
@@ -452,8 +452,8 @@ public class ServoMotor extends AbstractServoMachine implements IInventory, ISoc
         return ret;
     }
     
-    private static final Vec3 nullVec = Vec3.createVectorHelper(0, 0, 0);
-    void mopBlock(ArrayList<MovingObjectPosition> list, Coord target, ForgeDirection side) {
+    private static final Vec3 nullVec = new Vec3(0, 0, 0);
+    void mopBlock(ArrayList<MovingObjectPosition> list, Coord target, EnumFacing side) {
         if (target.isAir()) {
             return;
         }

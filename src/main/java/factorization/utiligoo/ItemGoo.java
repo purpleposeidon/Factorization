@@ -7,7 +7,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Random;
 
-import cpw.mods.fml.common.network.ByteBufUtils;
+import net.minecraftforge.fml.common.network.ByteBufUtils;
 import factorization.shared.*;
 import factorization.util.InvUtil;
 import factorization.util.ItemUtil;
@@ -30,15 +30,15 @@ import net.minecraft.util.IIcon;
 import net.minecraft.util.MovingObjectPosition;
 import net.minecraft.util.MovingObjectPosition.MovingObjectType;
 import net.minecraft.world.World;
-import net.minecraftforge.common.util.ForgeDirection;
+import net.minecraft.util.EnumFacing;
 import net.minecraftforge.event.world.BlockEvent.BreakEvent;
 
 import org.apache.commons.lang3.ArrayUtils;
 
-import cpw.mods.fml.common.eventhandler.SubscribeEvent;
-import cpw.mods.fml.common.network.internal.FMLProxyPacket;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.fml.common.network.internal.FMLProxyPacket;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 import factorization.api.Coord;
 import factorization.common.Command;
 import factorization.common.ItemIcons;
@@ -69,12 +69,12 @@ public class ItemGoo extends ItemFactorization {
         if (data != null && data.checkWorld(player, new Coord(world, x, y, z))) return false;
         if (player.isSneaking()) {
             if (data == null) return false;
-            ForgeDirection fd = ForgeDirection.getOrientation(side);
+            EnumFacing fd = SpaceUtil.getOrientation(side);
             ArrayList<Integer> toRemove = new ArrayList();
             for (int i = 0; i < data.coords.length; i += 3) {
-                data.coords[i + 0] = data.coords[i + 0] + fd.offsetX;
-                int goo_y = data.coords[i + 1] = data.coords[i + 1] + fd.offsetY;
-                data.coords[i + 2] = data.coords[i + 2] + fd.offsetZ;
+                data.coords[i + 0] = data.coords[i + 0] + fd.getDirectionVec().getX();
+                int goo_y = data.coords[i + 1] = data.coords[i + 1] + fd.getDirectionVec().getY();
+                data.coords[i + 2] = data.coords[i + 2] + fd.getDirectionVec().getZ();
                 if (goo_y < 0 || goo_y > 0xFF) {
                     toRemove.add(i + 0);
                     toRemove.add(i + 1);
@@ -105,7 +105,7 @@ public class ItemGoo extends ItemFactorization {
             int iy = data.coords[i + 1];
             int iz = data.coords[i + 2];
             if (x == ix && y == iy && z == iz) {
-                expandSelection(is, data, player, world, x, y, z, ForgeDirection.getOrientation(side));
+                expandSelection(is, data, player, world, x, y, z, SpaceUtil.getOrientation(side));
                 return true;
             }
         }
@@ -206,7 +206,7 @@ public class ItemGoo extends ItemFactorization {
         } else if (held.getItem() == this) {
             int n = player.isSneaking() ? 1 : 2;
             for (int i = 0; i < n; i++) {
-                expandSelection(gooItem, data, player, player.worldObj, mop.blockX, mop.blockY, mop.blockZ, ForgeDirection.getOrientation(mop.sideHit));
+                expandSelection(gooItem, data, player, player.worldObj, mop.blockX, mop.blockY, mop.blockZ, SpaceUtil.getOrientation(mop.sideHit));
             }
         } else if (held.getItem() instanceof ItemBlock) {
             replaceBlocks(gooItem, data, player.worldObj, player, mop, held);
@@ -230,19 +230,19 @@ public class ItemGoo extends ItemFactorization {
         return ItemUtil.identical(ais, b.getBrokenBlock());
     }
     
-    private void expandSelection(ItemStack is, GooData data, EntityPlayer player, World world, int x, int y, int z, ForgeDirection dir) {
+    private void expandSelection(ItemStack is, GooData data, EntityPlayer player, World world, int x, int y, int z, EnumFacing dir) {
         Coord src = new Coord(world, x, y, z);
         HashSet<Coord> found = new HashSet();
         for (int i = 0; i < data.coords.length; i += 3) {
             int ix = data.coords[i + 0];
             int iy = data.coords[i + 1];
             int iz = data.coords[i + 2];
-            if (check(dir.offsetX, ix, x) && check(dir.offsetY, iy, y) && check(dir.offsetZ, iz, z)) {
+            if (check(dir.getDirectionVec().getX(), ix, x) && check(dir.getDirectionVec().getY(), iy, y) && check(dir.getDirectionVec().getZ(), iz, z)) {
                 Coord at = new Coord(world, ix, iy, iz);
                 Coord adj = at.add(dir);
                 if (adj.isSolid() || adj.isSolidOnSide(dir.getOpposite())) continue;
                 if (!similarBlocks(src, at)) continue;
-                for (ForgeDirection fd : ForgeDirection.VALID_DIRECTIONS) {
+                for (EnumFacing fd : EnumFacing.VALUES) {
                     if (fd == dir || fd == dir.getOpposite()) continue;
                     Coord n = at.add(fd);
                     if (similarBlocks(at, n)) {

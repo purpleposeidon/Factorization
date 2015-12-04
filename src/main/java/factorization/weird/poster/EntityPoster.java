@@ -1,7 +1,7 @@
 package factorization.weird.poster;
 
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 import factorization.api.Coord;
 import factorization.api.Quaternion;
 import factorization.api.datahelpers.DataHelper;
@@ -26,7 +26,7 @@ import net.minecraft.util.MovingObjectPosition;
 import net.minecraft.util.Vec3;
 import net.minecraft.world.World;
 import net.minecraftforge.client.IItemRenderer;
-import net.minecraftforge.common.util.ForgeDirection;
+import net.minecraft.util.EnumFacing;
 
 import java.io.IOException;
 
@@ -40,7 +40,7 @@ public class EntityPoster extends EntityFz implements ISortableRenderer<EntityPo
     double base_scale = 1.0;
     public short spin_normal = 0, spin_vertical = 0, spin_tilt = 0;
     byte delta_scale = 0;
-    ForgeDirection norm = ForgeDirection.NORTH, top = ForgeDirection.UP, tilt = ForgeDirection.EAST;
+    EnumFacing norm = EnumFacing.NORTH, top = EnumFacing.UP, tilt = EnumFacing.EAST;
 
     public EntityPoster(World w) {
         super(w);
@@ -51,7 +51,7 @@ public class EntityPoster extends EntityFz implements ISortableRenderer<EntityPo
     void updateSize() {
         Vec3 here = SpaceUtil.fromEntPos(this);
         SpaceUtil.setAABB(this.boundingBox, here, here);
-        for (ForgeDirection dir : ForgeDirection.VALID_DIRECTIONS) {
+        for (EnumFacing dir : EnumFacing.VALUES) {
             if (dir == norm) continue;
             float s = (float) scale;
             if (dir == norm.getOpposite()) {
@@ -92,7 +92,7 @@ public class EntityPoster extends EntityFz implements ISortableRenderer<EntityPo
         return super.isInRangeToRender3d(p_145770_1_, p_145770_3_, p_145770_5_);
     }
 
-    public void setBase(double baseScale, Quaternion baseRotation, ForgeDirection norm, ForgeDirection top, AxisAlignedBB bounds) {
+    public void setBase(double baseScale, Quaternion baseRotation, EnumFacing norm, EnumFacing top, AxisAlignedBB bounds) {
         this.scale = this.base_scale = baseScale;
         this.base_rotation = baseRotation;
         this.rot = new Quaternion(base_rotation);
@@ -215,7 +215,7 @@ public class EntityPoster extends EntityFz implements ISortableRenderer<EntityPo
         final boolean hasPoster = held.getItem() == Core.registry.spawnPoster;
         final boolean hasLmp = held.getItem() == Core.registry.logicMatrixProgrammer;
         if (hasPoster || hasLmp) {
-            ForgeDirection clickDir = ForgeDirection.getOrientation(SpaceUtil.determineOrientation(player));
+            EnumFacing clickDir = SpaceUtil.getOrientation(SpaceUtil.determineOrientation(player));
             if (hasPoster) {
                 if (clickDir == norm || clickDir == norm.getOpposite()) {
                     spin_normal -= d;
@@ -249,7 +249,7 @@ public class EntityPoster extends EntityFz implements ISortableRenderer<EntityPo
 
         if (!worldObj.blockExists(x, 0, z)) return 0;
         double d = -0.5;
-        if (ForgeDirection.UP == top) {
+        if (EnumFacing.UP == top) {
             d = +0;
         }
         return worldObj.getLightBrightnessForSkyBlocks(x, MathHelper.floor_double(posY + d), z, 0);

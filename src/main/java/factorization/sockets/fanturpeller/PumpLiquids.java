@@ -22,7 +22,7 @@ import net.minecraft.init.Items;
 import net.minecraft.item.ItemBucket;
 import net.minecraft.item.ItemStack;
 import net.minecraft.world.World;
-import net.minecraftforge.common.util.ForgeDirection;
+import net.minecraft.util.EnumFacing;
 import net.minecraftforge.fluids.BlockFluidFinite;
 import net.minecraftforge.fluids.Fluid;
 import net.minecraftforge.fluids.FluidContainerRegistry;
@@ -35,8 +35,8 @@ import net.minecraftforge.fluids.IFluidHandler;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL12;
 
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 import factorization.api.Coord;
 import factorization.api.FzOrientation;
 import factorization.api.Quaternion;
@@ -74,33 +74,33 @@ public class PumpLiquids extends SocketFanturpeller implements IFluidHandler {
     }
 
     @Override
-    public int fill(ForgeDirection from, FluidStack resource, boolean doFill) {
+    public int fill(EnumFacing from, FluidStack resource, boolean doFill) {
         if (from != facing.getOpposite()) return 0;
         return buffer.fill(resource, doFill);
     }
 
     @Override
-    public FluidStack drain(ForgeDirection from, FluidStack resource, boolean doDrain) {
+    public FluidStack drain(EnumFacing from, FluidStack resource, boolean doDrain) {
         return null;
     }
 
     @Override
-    public FluidStack drain(ForgeDirection from, int maxDrain, boolean doDrain) {
+    public FluidStack drain(EnumFacing from, int maxDrain, boolean doDrain) {
         return null;
     }
 
     @Override
-    public boolean canFill(ForgeDirection from, Fluid fluid) {
+    public boolean canFill(EnumFacing from, Fluid fluid) {
         return from == facing.getOpposite();
     }
 
     @Override
-    public boolean canDrain(ForgeDirection from, Fluid fluid) {
+    public boolean canDrain(EnumFacing from, Fluid fluid) {
         return false;
     }
     
     @Override
-    public FluidTankInfo[] getTankInfo(ForgeDirection from) {
+    public FluidTankInfo[] getTankInfo(EnumFacing from) {
         if (from == facing.getOpposite()) {
             return new FluidTankInfo[] { new FluidTankInfo(buffer), new FluidTankInfo(auxBuffer) };
         }
@@ -128,10 +128,10 @@ public class PumpLiquids extends SocketFanturpeller implements IFluidHandler {
             this.parent = parent;
         }
         
-        PumpCoord(PumpCoord parent, ForgeDirection d) {
-            this.x = parent.x + d.offsetX;
-            this.y = parent.y + d.offsetY;
-            this.z = parent.z + d.offsetZ;
+        PumpCoord(PumpCoord parent, EnumFacing d) {
+            this.x = parent.x + d.getDirectionVec().getX();
+            this.y = parent.y + d.getDirectionVec().getY();
+            this.z = parent.z + d.getDirectionVec().getZ();
             this.pathDistance = (short) (parent.pathDistance + 1);
             this.parent = parent;
         }
@@ -162,8 +162,8 @@ public class PumpLiquids extends SocketFanturpeller implements IFluidHandler {
     
     static final class FoundFluidHandler {
         final IFluidHandler te;
-        final ForgeDirection dir;
-        public FoundFluidHandler(IFluidHandler te, ForgeDirection dir) {
+        final EnumFacing dir;
+        public FoundFluidHandler(IFluidHandler te, EnumFacing dir) {
             this.te = te;
             this.dir = dir.getOpposite();
         }
@@ -245,8 +245,8 @@ public class PumpLiquids extends SocketFanturpeller implements IFluidHandler {
                 if (!orig_is_liquid) {
                     continue; //...oops!
                 }
-                for (ForgeDirection dir : ForgeDirection.VALID_DIRECTIONS) {
-                    if (!isSucking && pc.y + dir.offsetY >= maxHeight) continue;
+                for (EnumFacing dir : EnumFacing.VALUES) {
+                    if (!isSucking && pc.y + dir.getDirectionVec().getY() >= maxHeight) continue;
                     PumpCoord at = new PumpCoord(pc, dir);
                     probe.set(worldObj, at.x, at.y, at.z);
                     if (visited.contains(at) || !probe.blockExists()) continue;
@@ -507,7 +507,7 @@ public class PumpLiquids extends SocketFanturpeller implements IFluidHandler {
     }
 
     transient PumpAction sourceAction, destinationAction;
-    transient ForgeDirection sourceDirection, destinationDirection;
+    transient EnumFacing sourceDirection, destinationDirection;
     
     @Override
     public FactoryType getFactoryType() {
@@ -701,7 +701,7 @@ public class PumpLiquids extends SocketFanturpeller implements IFluidHandler {
     }
     
     @Override
-    public boolean activate(EntityPlayer player, ForgeDirection side) {
+    public boolean activate(EntityPlayer player, EnumFacing side) {
         ItemStack is = ItemUtil.normalize(player.getHeldItem());
         if (is != null && is.getItem() instanceof IFluidContainerItem && buffer.getFluidAmount() > 0) {
             ItemStack use = is;

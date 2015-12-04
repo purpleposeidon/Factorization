@@ -9,7 +9,7 @@ import net.minecraft.client.renderer.RenderBlocks;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.texture.IIconRegister;
 import net.minecraft.util.IIcon;
-import net.minecraftforge.common.util.ForgeDirection;
+import net.minecraft.util.EnumFacing;
 import factorization.api.FzColor;
 import factorization.common.BlockIcons;
 import factorization.common.FactoryType;
@@ -91,11 +91,11 @@ public class BlockRenderServoRail extends FactorizationBlockRender {
         
         block.useTexture(null);
         
-        for (ForgeDirection fd : ForgeDirection.VALID_DIRECTIONS) {
+        for (EnumFacing fd : EnumFacing.VALUES) {
             int i = fd.ordinal();
             block.setTexture(i, icon);
             boolean any = false;
-            for (ForgeDirection other : ForgeDirection.VALID_DIRECTIONS) {
+            for (EnumFacing other : EnumFacing.VALUES) {
                 if (fd == other || fd == other.getOpposite()) {
                     continue;
                 }

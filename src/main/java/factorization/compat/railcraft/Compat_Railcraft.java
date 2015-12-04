@@ -1,7 +1,7 @@
 package factorization.compat.railcraft;
 
-import cpw.mods.fml.common.event.FMLInitializationEvent;
-import cpw.mods.fml.common.event.FMLInterModComms;
+import net.minecraftforge.fml.common.event.FMLInitializationEvent;
+import net.minecraftforge.fml.common.event.FMLInterModComms;
 import factorization.compat.CompatBase;
 import factorization.shared.Core;
 import factorization.truth.DocumentationModule;

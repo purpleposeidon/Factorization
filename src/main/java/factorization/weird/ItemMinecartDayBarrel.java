@@ -1,7 +1,7 @@
 package factorization.weird;
 
 import com.mojang.authlib.GameProfile;
-import cpw.mods.fml.common.Optional;
+import net.minecraftforge.fml.common.Optional;
 import factorization.common.FactoryType;
 import factorization.shared.Core;
 import factorization.shared.ItemFactorization;

@@ -2,7 +2,7 @@ package factorization.servo;
 
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
-import net.minecraftforge.common.util.ForgeDirection;
+import net.minecraft.util.EnumFacing;
 import factorization.api.Coord;
 import factorization.common.FzConfig;
 import factorization.shared.Core;
@@ -10,7 +10,7 @@ import factorization.shared.Core;
 
 public abstract class Instruction extends Decorator {
     @Override
-    public boolean onClick(EntityPlayer player, Coord block, ForgeDirection side) {
+    public boolean onClick(EntityPlayer player, Coord block, EnumFacing side) {
         // FIXME: This is lame. Put in a method for cycling through state...
         return false;
     }

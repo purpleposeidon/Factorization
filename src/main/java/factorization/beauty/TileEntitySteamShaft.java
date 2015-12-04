@@ -1,7 +1,7 @@
 package factorization.beauty;
 
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 import factorization.api.IMeterInfo;
 import factorization.api.IRotationalEnergySource;
 import factorization.api.Quaternion;
@@ -21,7 +21,7 @@ import io.netty.buffer.ByteBuf;
 import net.minecraft.client.Minecraft;
 import net.minecraft.util.IIcon;
 import net.minecraft.util.Vec3;
-import net.minecraftforge.common.util.ForgeDirection;
+import net.minecraft.util.EnumFacing;
 import net.minecraftforge.fluids.*;
 
 import java.io.IOException;
@@ -66,7 +66,7 @@ public class TileEntitySteamShaft extends TileEntityCommon implements IFluidHand
 
 
     @Override
-    public IIcon getIcon(ForgeDirection dir) {
+    public IIcon getIcon(EnumFacing dir) {
         switch (dir) {
             case UP: return BlockIcons.turbine_top;
             case DOWN: return BlockIcons.turbine_bottom;
@@ -77,8 +77,8 @@ public class TileEntitySteamShaft extends TileEntityCommon implements IFluidHand
     boolean dry = true;
 
     @Override
-    public int fill(ForgeDirection from, FluidStack resource, boolean doFill) {
-        if (from == ForgeDirection.DOWN) {
+    public int fill(EnumFacing from, FluidStack resource, boolean doFill) {
+        if (from == EnumFacing.DOWN) {
             if (doFill && resource.amount > 0) dry = false;
             return steamTank.fill(resource, doFill);
         }
@@ -86,30 +86,30 @@ public class TileEntitySteamShaft extends TileEntityCommon implements IFluidHand
     }
 
     @Override
-    public FluidStack drain(ForgeDirection from, FluidStack resource, boolean doDrain) {
+    public FluidStack drain(EnumFacing from, FluidStack resource, boolean doDrain) {
         return null;
     }
 
     @Override
-    public FluidStack drain(ForgeDirection from, int maxDrain, boolean doDrain) {
+    public FluidStack drain(EnumFacing from, int maxDrain, boolean doDrain) {
         return null;
     }
 
     @Override
-    public boolean canFill(ForgeDirection from, Fluid fluid) {
-        if (from == ForgeDirection.DOWN && fluid != null) {
+    public boolean canFill(EnumFacing from, Fluid fluid) {
+        if (from == EnumFacing.DOWN && fluid != null) {
             return fluid.getID() == TileEntitySolarBoiler.steam.getID();
         }
         return false;
     }
 
     @Override
-    public boolean canDrain(ForgeDirection from, Fluid fluid) {
+    public boolean canDrain(EnumFacing from, Fluid fluid) {
         return false;
     }
 
     @Override
-    public FluidTankInfo[] getTankInfo(ForgeDirection from) {
+    public FluidTankInfo[] getTankInfo(EnumFacing from) {
         return new FluidTankInfo[] { steamTank.getInfo() };
     }
 
@@ -118,7 +118,7 @@ public class TileEntitySteamShaft extends TileEntityCommon implements IFluidHand
         if (worldObj.isRemote) {
             prev_angle = angle;
             if (velocity != 0) {
-                angle += getVelocity(ForgeDirection.UP);
+                angle += getVelocity(EnumFacing.UP);
                 emitParticles();
             }
             return;
@@ -174,20 +174,20 @@ public class TileEntitySteamShaft extends TileEntityCommon implements IFluidHand
         int particleLevel = Minecraft.getMinecraft().gameSettings.particleSetting;
         if (particleLevel >= 2) return;
         double r = 7.0 / 16.0;
-        double v = getVelocity(ForgeDirection.UP) * r;
+        double v = getVelocity(EnumFacing.UP) * r;
         double bottom = -3.0 / 16.0;
         double left = -4.0 / 16.0;
         double scootch_x = 3.0 / 16.0;
         double scootch_y = 3.0 / 16.0;
-        Quaternion rot = Quaternion.getRotationQuaternionRadians(angle, ForgeDirection.UP);
+        Quaternion rot = Quaternion.getRotationQuaternionRadians(angle, EnumFacing.UP);
         double motFuzz = v / 20;
         Random rng = worldObj.rand;
         double threshold = velocity / (particleLevel == 1 ? 1 : 4);
         for (int side = 0; side < 4; side++) {
             for (int y = 0; y < 3; y++) {
                 if (rng.nextFloat() > threshold) continue;
-                Vec3 pos = Vec3.createVectorHelper(left + scootch_x * y, bottom + scootch_y * y, r);
-                Vec3 mot = Vec3.createVectorHelper(-v + rng.nextGaussian() * motFuzz * 3, rng.nextGaussian() * motFuzz, rng.nextGaussian() * motFuzz + r * 0.125);
+                Vec3 pos = new Vec3(left + scootch_x * y, bottom + scootch_y * y, r);
+                Vec3 mot = new Vec3(-v + rng.nextGaussian() * motFuzz * 3, rng.nextGaussian() * motFuzz, rng.nextGaussian() * motFuzz + r * 0.125);
                 rot.applyRotation(pos);
                 rot.applyRotation(mot);
 
@@ -195,7 +195,7 @@ public class TileEntitySteamShaft extends TileEntityCommon implements IFluidHand
                 SpaceUtil.toEntVel(steam, mot);
                 Minecraft.getMinecraft().effectRenderer.addEffect(steam);
             }
-            rot.incrMultiply(Quaternion.getRotationQuaternionRadians(Math.PI / 2, ForgeDirection.UP));
+            rot.incrMultiply(Quaternion.getRotationQuaternionRadians(Math.PI / 2, EnumFacing.UP));
         }
     }
 
@@ -221,18 +221,18 @@ public class TileEntitySteamShaft extends TileEntityCommon implements IFluidHand
     }
 
     @Override
-    public boolean canConnect(ForgeDirection direction) {
-        return direction == ForgeDirection.UP;
+    public boolean canConnect(EnumFacing direction) {
+        return direction == EnumFacing.UP;
     }
 
     @Override
-    public double availableEnergy(ForgeDirection direction) {
-        if (direction == ForgeDirection.UP) return drawable_velocity;
+    public double availableEnergy(EnumFacing direction) {
+        if (direction == EnumFacing.UP) return drawable_velocity;
         return 0;
     }
 
     @Override
-    public double takeEnergy(ForgeDirection direction, double maxPower) {
+    public double takeEnergy(EnumFacing direction, double maxPower) {
         double d = Math.min(drawable_velocity, maxPower);
         drawable_velocity -= d;
         velocity -= d * DRAW_EFFICIENCY;
@@ -240,8 +240,8 @@ public class TileEntitySteamShaft extends TileEntityCommon implements IFluidHand
     }
 
     @Override
-    public double getVelocity(ForgeDirection direction) {
-        if (direction == ForgeDirection.UP) {
+    public double getVelocity(EnumFacing direction) {
+        if (direction == EnumFacing.UP) {
             if (velocity > MAX_SPEED) return MAX_SPEED;
             if (velocity < -MAX_SPEED) return -MAX_SPEED;
             return velocity;
@@ -256,7 +256,7 @@ public class TileEntitySteamShaft extends TileEntityCommon implements IFluidHand
 
     @Override
     public String getInfo() {
-        return FzUtil.toRpm(getVelocity(ForgeDirection.UP))
+        return FzUtil.toRpm(getVelocity(EnumFacing.UP))
                 + "\nPower: " + (int) (velocity * 10)
                 + "\nSteam: " + steamTank.getFluidAmount() + "mB"
                 + (!Core.dev_environ ? "" :

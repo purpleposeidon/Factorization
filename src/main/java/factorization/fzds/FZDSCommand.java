@@ -27,7 +27,7 @@ import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;
 import net.minecraft.world.biome.BiomeGenBase;
 import net.minecraftforge.common.DimensionManager;
-import net.minecraftforge.common.util.ForgeDirection;
+import net.minecraft.util.EnumFacing;
 
 import com.google.common.base.Splitter;
 import com.google.common.base.Strings;
@@ -524,7 +524,7 @@ public class FZDSCommand extends CommandBase {
                 Vec3 newOffset = null;
                 try {
                     String[] vecArg = args[0].split(",");
-                    newOffset = Vec3.createVectorHelper(
+                    newOffset = new Vec3(
                             Double.parseDouble(vecArg[0]),
                             Double.parseDouble(vecArg[1]),
                             Double.parseDouble(vecArg[2]));
@@ -777,17 +777,17 @@ public class FZDSCommand extends CommandBase {
                     return;
                 }
                 double theta = Math.toRadians(Double.parseDouble(args[0]));
-                ForgeDirection dir;
+                EnumFacing dir;
                 try {
                     if (args.length == 2) {
-                        dir = ForgeDirection.valueOf(args[1].toUpperCase(Locale.ROOT));
+                        dir = EnumFacing.valueOf(args[1].toUpperCase(Locale.ROOT));
                     } else {
-                        dir = ForgeDirection.UP;
+                        dir = EnumFacing.UP;
                     }
                 } catch (IllegalArgumentException e) {
                     String msg = "Direction must be:";
-                    for (ForgeDirection d : ForgeDirection.values()) {
-                        if (d == ForgeDirection.UNKNOWN) {
+                    for (EnumFacing d : EnumFacing.values()) {
+                        if (d == null) {
                             continue;
                         }
                         msg += " " + d;
@@ -1020,7 +1020,7 @@ public class FZDSCommand extends CommandBase {
         add(new SubCommand("orbitme") {
             @Override
             void call(String[] args) {
-                Vec3 p = Vec3.createVectorHelper(player.posX, player.posY, player.posZ);
+                Vec3 p = new Vec3(player.posX, player.posY, player.posZ);
                 selected.changeRotationCenter(p);
             }
         }, Requires.SLICE_SELECTED, Requires.PLAYER);
@@ -1076,10 +1076,10 @@ public class FZDSCommand extends CommandBase {
                     return;
                 }
                 double angle = Math.PI * selected.worldObj.rand.nextDouble();
-                ForgeDirection up = ForgeDirection.UP;
+                EnumFacing up = EnumFacing.UP;
                 int time = 30;
                 if (selected.getParent() == null) {
-                    up = ForgeDirection.NORTH;
+                    up = EnumFacing.NORTH;
                     time = 300;
                 }
                 Quaternion quat = Quaternion.getRotationQuaternionRadians(angle, up);

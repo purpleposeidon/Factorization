@@ -11,9 +11,9 @@ import net.minecraft.world.World;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraftforge.common.DimensionManager;
 import net.minecraftforge.common.util.FakePlayer;
-import net.minecraftforge.common.util.ForgeDirection;
-import cpw.mods.fml.common.FMLCommonHandler;
-import cpw.mods.fml.relauncher.Side;
+import net.minecraft.util.EnumFacing;
+import net.minecraftforge.fml.common.FMLCommonHandler;
+import net.minecraftforge.fml.relauncher.Side;
 import factorization.api.Coord;
 import factorization.api.DeltaCoord;
 import factorization.fzds.interfaces.IDeltaChunk;
@@ -133,7 +133,7 @@ public class DeltaChunk {
         return closest;
     }
     
-    private static Vec3 buffer = Vec3.createVectorHelper(0, 0, 0);
+    private static Vec3 buffer = new Vec3(0, 0, 0);
     
     public static Vec3 shadow2nearestReal(Entity player, double x, double y, double z) {
         //The JVM sometimes segfaults in this function.
@@ -228,9 +228,9 @@ public class DeltaChunk {
     static void outsetChunks(Collection<Chunk> chunks) {
         ArrayList<Chunk> edges = new ArrayList();
         for (Chunk chunk : chunks) {
-            for (ForgeDirection fd : ForgeDirection.VALID_DIRECTIONS) {
-                if (fd.offsetY != 0) continue;
-                edges.add(chunk.worldObj.getChunkFromChunkCoords(chunk.xPosition + fd.offsetX, chunk.zPosition + fd.offsetZ));
+            for (EnumFacing fd : EnumFacing.VALUES) {
+                if (fd.getDirectionVec().getY() != 0) continue;
+                edges.add(chunk.worldObj.getChunkFromChunkCoords(chunk.xPosition + fd.getDirectionVec().getX(), chunk.zPosition + fd.getDirectionVec().getZ()));
             }
         }
         chunks.addAll(edges);
@@ -243,8 +243,8 @@ public class DeltaChunk {
     public static void paste(IDeltaChunk selected, boolean overwriteDestination) {
         Coord a = new Coord(DeltaChunk.getServerShadowWorld(), 0, 0, 0);
         Coord b = a.copy();
-        Vec3 vShadowMin = Vec3.createVectorHelper(0, 0, 0);
-        Vec3 vShadowMax = Vec3.createVectorHelper(0, 0, 0);
+        Vec3 vShadowMin = new Vec3(0, 0, 0);
+        Vec3 vShadowMax = new Vec3(0, 0, 0);
         selected.getCorner().setAsVector(vShadowMin);
         selected.getFarCorner().setAsVector(vShadowMax);
         a.set(vShadowMin);
@@ -285,8 +285,8 @@ public class DeltaChunk {
     public static void clear(IDeltaChunk selected) {
         Coord a = new Coord(DeltaChunk.getServerShadowWorld(), 0, 0, 0);
         Coord b = a.copy();
-        Vec3 vShadowMin = Vec3.createVectorHelper(0, 0, 0);
-        Vec3 vShadowMax = Vec3.createVectorHelper(0, 0, 0);
+        Vec3 vShadowMin = new Vec3(0, 0, 0);
+        Vec3 vShadowMax = new Vec3(0, 0, 0);
         selected.getCorner().setAsVector(vShadowMin);
         selected.getFarCorner().setAsVector(vShadowMax);
         a.set(vShadowMin);

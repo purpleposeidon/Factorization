@@ -9,7 +9,7 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.MathHelper;
 import net.minecraft.util.Vec3;
-import net.minecraftforge.common.util.ForgeDirection;
+import net.minecraft.util.EnumFacing;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -26,7 +26,7 @@ public final class SpaceUtil {
     public static final byte GET_POINT_MIN = 0x0;
     public static final byte GET_POINT_MAX = 0x7;
 
-    private static ThreadLocal<ArrayList<ForgeDirection>> direction_cache = new ThreadLocal<ArrayList<ForgeDirection>>();
+    private static ThreadLocal<ArrayList<EnumFacing>> direction_cache = new ThreadLocal<ArrayList<EnumFacing>>();
 
     public static int determineOrientation(EntityPlayer player) {
         if (player.rotationPitch > 75) {
@@ -52,16 +52,16 @@ public final class SpaceUtil {
     }
 
     public static byte getOpposite(int dir) {
-        return (byte) ForgeDirection.getOrientation(dir).getOpposite().ordinal();
+        return (byte) SpaceUtil.getOrientation(dir).getOpposite().ordinal();
     }
 
 
     public static Vec3 copy(Vec3 a) {
-        return Vec3.createVectorHelper(a.xCoord, a.yCoord, a.zCoord);
+        return new Vec3(a.xCoord, a.yCoord, a.zCoord);
     }
 
     public static AxisAlignedBB copy(AxisAlignedBB box) {
-        return AxisAlignedBB.getBoundingBox(box.minX, box.minY, box.minZ, box.maxX, box.maxY, box.maxZ);
+        return new AxisAlignedBB(box.minX, box.minY, box.minZ, box.maxX, box.maxY, box.maxZ);
     }
 
     public static void copyTo(AxisAlignedBB dst, AxisAlignedBB src) {
@@ -73,16 +73,12 @@ public final class SpaceUtil {
         dst.maxZ = src.maxZ;
     }
 
-    public static Vec3 newVec() {
-        return Vec3.createVectorHelper(0, 0, 0);
-    }
-
     public static Vec3 fromEntPos(Entity ent) {
-        return Vec3.createVectorHelper(ent.posX, ent.posY, ent.posZ);
+        return new Vec3(ent.posX, ent.posY, ent.posZ);
     }
 
     public static Vec3 fromEntVel(Entity ent) {
-        return Vec3.createVectorHelper(ent.motionX, ent.motionY, ent.motionZ);
+        return new Vec3(ent.motionX, ent.motionY, ent.motionZ);
     }
 
     public static void toEntVel(Entity ent, Vec3 vec) {
@@ -95,9 +91,9 @@ public final class SpaceUtil {
         // This is all iChun's fault. :/
         // Uh...
         if (ent.worldObj.isRemote) {
-            return Vec3.createVectorHelper(ent.posX, ent.posY + (ent.getEyeHeight() - ent.getDefaultEyeHeight()), ent.posZ);
+            return new Vec3(ent.posX, ent.posY + (ent.getEyeHeight() - ent.getDefaultEyeHeight()), ent.posZ);
         } else {
-            return Vec3.createVectorHelper(ent.posX, ent.posY + ent.getEyeHeight(), ent.posZ);
+            return new Vec3(ent.posX, ent.posY + ent.getEyeHeight(), ent.posZ);
         }
     }
 
@@ -121,11 +117,11 @@ public final class SpaceUtil {
     }
 
     public static Vec3 getMax(AxisAlignedBB aabb) {
-        return Vec3.createVectorHelper(aabb.maxX, aabb.maxY, aabb.maxZ);
+        return new Vec3(aabb.maxX, aabb.maxY, aabb.maxZ);
     }
 
     public static Vec3 getMin(AxisAlignedBB aabb) {
-        return Vec3.createVectorHelper(aabb.minX, aabb.minY, aabb.minZ);
+        return new Vec3(aabb.minX, aabb.minY, aabb.minZ);
     }
 
     public static void getMax(AxisAlignedBB box, Vec3 target) {
@@ -170,16 +166,16 @@ public final class SpaceUtil {
     }
 
     public static AxisAlignedBB newBox() {
-        return AxisAlignedBB.getBoundingBox(0, 0, 0, 0, 0, 0);
+        return new AxisAlignedBB(0, 0, 0, 0, 0, 0);
     }
 
     @Deprecated() // Use newVec() instead
     public static Vec3 newVec3() {
-        return Vec3.createVectorHelper(0, 0, 0);
+        return new Vec3(0, 0, 0);
     }
 
-    public static Vec3 fromDirection(ForgeDirection dir) {
-        return Vec3.createVectorHelper(dir.offsetX, dir.offsetY, dir.offsetZ);
+    public static Vec3 fromDirection(EnumFacing dir) {
+        return new Vec3(dir.getDirectionVec().getX(), dir.getDirectionVec().getY(), dir.getDirectionVec().getZ());
     }
 
     public static void sort(Vec3 min, Vec3 max) {
@@ -220,18 +216,18 @@ public final class SpaceUtil {
      * @param face The side of the box that will remain untouched; the opposite face will be brought to it
      * @return A new box, with a volume of 0. Returns null if face is invalid.
      */
-    public static AxisAlignedBB flatten(AxisAlignedBB box, ForgeDirection face) {
+    public static AxisAlignedBB flatten(AxisAlignedBB box, EnumFacing face) {
         Vec3 min = getMin(box), max = getMax(box);
         Vec3 mv = sign(face) == +1 ? min : max;
         Vec3 base = mv == min ? max : min;
         assert mv != base;
-        if (face.offsetX != 0) {
+        if (face.getDirectionVec().getX() != 0) {
             mv.xCoord = base.xCoord;
         }
-        if (face.offsetY != 0) {
+        if (face.getDirectionVec().getY() != 0) {
             mv.yCoord = base.yCoord;
         }
-        if (face.offsetZ != 0) {
+        if (face.getDirectionVec().getZ() != 0) {
             mv.zCoord = base.zCoord;
         }
         return createAABB(min, max);
@@ -245,7 +241,7 @@ public final class SpaceUtil {
     }
 
     public static Vec3 averageVec(Vec3 a, Vec3 b) {
-        return Vec3.createVectorHelper((a.xCoord + b.xCoord) / 2, (a.yCoord + b.yCoord) / 2, (a.zCoord + b.zCoord) / 2);
+        return new Vec3((a.xCoord + b.xCoord) / 2, (a.yCoord + b.yCoord) / 2, (a.zCoord + b.zCoord) / 2);
     }
 
     public static void assignVecFrom(Vec3 dest, Vec3 orig) {
@@ -262,7 +258,7 @@ public final class SpaceUtil {
     }
 
     public static Vec3 add(Vec3 a, Vec3 b) {
-        Vec3 ret = Vec3.createVectorHelper(a.xCoord, a.yCoord, a.zCoord);
+        Vec3 ret = new Vec3(a.xCoord, a.yCoord, a.zCoord);
         incrAdd(ret, b);
         return ret;
     }
@@ -331,11 +327,11 @@ public final class SpaceUtil {
         double maxX = Math.max(min.xCoord, max.xCoord);
         double maxY = Math.max(min.yCoord, max.yCoord);
         double maxZ = Math.max(min.zCoord, max.zCoord);
-        return AxisAlignedBB.getBoundingBox(minX, minY, minZ, maxX, maxY, maxZ);
+        return new AxisAlignedBB(minX, minY, minZ, maxX, maxY, maxZ);
     }
 
     public static AxisAlignedBB createAABB(Coord min, Coord max) {
-        return AxisAlignedBB.getBoundingBox(min.x, min.y, min.z,
+        return new AxisAlignedBB(min.x, min.y, min.z,
                 max.x, max.y, max.z);
     }
 
@@ -364,24 +360,24 @@ public final class SpaceUtil {
 
     public static Vec3[] getCorners(AxisAlignedBB box) {
         return new Vec3[]{
-                Vec3.createVectorHelper(box.minX, box.minY, box.minZ),
-                Vec3.createVectorHelper(box.minX, box.maxY, box.minZ),
-                Vec3.createVectorHelper(box.maxX, box.maxY, box.minZ),
-                Vec3.createVectorHelper(box.maxX, box.minY, box.minZ),
+                new Vec3(box.minX, box.minY, box.minZ),
+                new Vec3(box.minX, box.maxY, box.minZ),
+                new Vec3(box.maxX, box.maxY, box.minZ),
+                new Vec3(box.maxX, box.minY, box.minZ),
 
-                Vec3.createVectorHelper(box.minX, box.minY, box.maxZ),
-                Vec3.createVectorHelper(box.minX, box.maxY, box.maxZ),
-                Vec3.createVectorHelper(box.maxX, box.maxY, box.maxZ),
-                Vec3.createVectorHelper(box.maxX, box.minY, box.maxZ)
+                new Vec3(box.minX, box.minY, box.maxZ),
+                new Vec3(box.minX, box.maxY, box.maxZ),
+                new Vec3(box.maxX, box.maxY, box.maxZ),
+                new Vec3(box.maxX, box.minY, box.maxZ)
         };
     }
 
-    public static ArrayList<ForgeDirection> getRandomDirections(Random rand) {
-        ArrayList<ForgeDirection> ret = direction_cache.get();
+    public static ArrayList<EnumFacing> getRandomDirections(Random rand) {
+        ArrayList<EnumFacing> ret = direction_cache.get();
         if (ret == null) {
             ret = new ArrayList(6);
             for (int i = 0; i < 6; i++) {
-                ret.add(ForgeDirection.getOrientation(i));
+                ret.add(SpaceUtil.getOrientation(i));
             }
             direction_cache.set(ret);
         }
@@ -389,14 +385,14 @@ public final class SpaceUtil {
         return ret;
     }
 
-    public static int getAxis(ForgeDirection fd) {
-        if (fd.offsetX != 0) {
+    public static int getAxis(EnumFacing fd) {
+        if (fd.getDirectionVec().getX() != 0) {
             return 1;
         }
-        if (fd.offsetY != 0) {
+        if (fd.getDirectionVec().getY() != 0) {
             return 2;
         }
-        if (fd.offsetZ != 0) {
+        if (fd.getDirectionVec().getZ() != 0) {
             return 3;
         }
         return 0;
@@ -420,11 +416,17 @@ public final class SpaceUtil {
         return lineVec.crossProduct(nPoint).lengthVector() / mag;
     }
 
+    public static EnumFacing getOrientation(int ordinal) {
+        if (ordinal < 0) return null;
+        if (ordinal >= 6) return null;
+        return EnumFacing.VALUES[ordinal];
+    }
+
     public static FzOrientation getOrientation(EntityPlayer player, int side, float hitX, float hitY, float hitZ) {
-        ForgeDirection facing = ForgeDirection.getOrientation(side);
+        EnumFacing facing = SpaceUtil.getOrientation(side);
         double u = 0.5, v = 0.5; //We pick the axiis based on which side gets clicked
         switch (facing) {
-            case UNKNOWN:
+            case null:
             case DOWN:
                 u = 1 - hitX;
                 v = hitZ;
@@ -464,15 +466,15 @@ public final class SpaceUtil {
         if (SpaceUtil.determineOrientation(player) >= 2 /* player isn't looking straight down */
                 && side < 2 /* and the side is the bottom */) {
             side = SpaceUtil.determineOrientation(player);
-            fo = FzOrientation.fromDirection(ForgeDirection.getOrientation(side).getOpposite());
-            FzOrientation perfect = fo.pointTopTo(ForgeDirection.UP);
+            fo = FzOrientation.fromDirection(SpaceUtil.getOrientation(side).getOpposite());
+            FzOrientation perfect = fo.pointTopTo(EnumFacing.UP);
             if (perfect != FzOrientation.UNKNOWN) {
                 fo = perfect;
             }
         }
         double dist = Math.max(Math.abs(u), Math.abs(v));
         if (dist < 0.33) {
-            FzOrientation perfect = fo.pointTopTo(ForgeDirection.UP);
+            FzOrientation perfect = fo.pointTopTo(EnumFacing.UP);
             if (perfect != FzOrientation.UNKNOWN) {
                 fo = perfect;
             }
@@ -480,24 +482,24 @@ public final class SpaceUtil {
         return fo;
     }
 
-    public static int sign(ForgeDirection dir) {
-        return dir.offsetX + dir.offsetY + dir.offsetZ;
+    public static int sign(EnumFacing dir) {
+        return dir.getDirectionVec().getX() + dir.getDirectionVec().getY() + dir.getDirectionVec().getZ();
     }
 
     public static double sum(Vec3 vec) {
         return vec.xCoord + vec.yCoord + vec.zCoord;
     }
 
-    public static ForgeDirection round(Vec3 vec, ForgeDirection not) {
-        if (isZero(vec)) return ForgeDirection.UNKNOWN;
+    public static EnumFacing round(Vec3 vec, EnumFacing not) {
+        if (isZero(vec)) return null;
         Vec3 work = newVec();
         double bestAngle = Double.POSITIVE_INFINITY;
-        ForgeDirection closest = ForgeDirection.UNKNOWN;
-        for (ForgeDirection dir : ForgeDirection.VALID_DIRECTIONS) {
+        EnumFacing closest = null;
+        for (EnumFacing dir : EnumFacing.VALUES) {
             if (dir == not) continue;
-            work.xCoord = dir.offsetX;
-            work.yCoord = dir.offsetY;
-            work.zCoord = dir.offsetZ;
+            work.xCoord = dir.getDirectionVec().getX();
+            work.yCoord = dir.getDirectionVec().getY();
+            work.zCoord = dir.getDirectionVec().getZ();
             double dot = getAngle(vec, work);
             if (dot < bestAngle) {
                 bestAngle = dot;
@@ -568,15 +570,15 @@ public final class SpaceUtil {
         return SpaceUtil.createAABB(at.add(-R, -R, -R), at.add(+R, +R, +R));
     }
 
-    public static ForgeDirection demojangSide(int side) {
+    public static EnumFacing demojangSide(int side) {
         switch (side) {
-            case 0: return ForgeDirection.SOUTH;
-            case 1: return ForgeDirection.WEST;
-            case 2: return ForgeDirection.NORTH;
-            case 3: return ForgeDirection.EAST;
+            case 0: return EnumFacing.SOUTH;
+            case 1: return EnumFacing.WEST;
+            case 2: return EnumFacing.NORTH;
+            case 3: return EnumFacing.EAST;
             default:
-            case 4: return ForgeDirection.UP; // Making this up
-            case 5: return ForgeDirection.DOWN; // And this one
+            case 4: return EnumFacing.UP; // Making this up
+            case 5: return EnumFacing.DOWN; // And this one
         }
     }
 
@@ -587,12 +589,12 @@ public final class SpaceUtil {
      * @param allow The directions that may be used.
      * @return A novel direction
      */
-    public static ForgeDirection rotateDirection(ForgeDirection dir, Quaternion rot, Iterable<ForgeDirection> allow) {
+    public static EnumFacing rotateDirection(EnumFacing dir, Quaternion rot, Iterable<EnumFacing> allow) {
         Vec3 v = fromDirection(dir);
         rot.applyRotation(v);
-        ForgeDirection best = ForgeDirection.UNKNOWN;
+        EnumFacing best = null;
         double bestDot = Double.POSITIVE_INFINITY;
-        for (ForgeDirection fd : allow) {
+        for (EnumFacing fd : allow) {
             Vec3 f = fromDirection(fd);
             rot.applyRotation(f);
             double dot = v.dotProduct(f);
@@ -604,8 +606,8 @@ public final class SpaceUtil {
         return best;
     }
 
-    public static ForgeDirection rotateDirectionAndExclude(ForgeDirection dir, Quaternion rot, Collection<ForgeDirection> allow) {
-        ForgeDirection ret = rotateDirection(dir, rot, allow);
+    public static EnumFacing rotateDirectionAndExclude(EnumFacing dir, Quaternion rot, Collection<EnumFacing> allow) {
+        EnumFacing ret = rotateDirection(dir, rot, allow);
         allow.remove(ret);
         allow.remove(ret.getOpposite());
         return ret;

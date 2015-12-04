@@ -31,13 +31,13 @@ public class MixinRailStairs extends BlockRailBase {
             BlockRailBase me = this;
             int i = me.getBasicRailMetadata(world, null, x, y, z);
             if (i == 0x2) { // Ascend East
-                box = AxisAlignedBB.getBoundingBox(x + w, y, z + s, x + 1, y + h, z + 1 - s);
+                box = new AxisAlignedBB(x + w, y, z + s, x + 1, y + h, z + 1 - s);
             } else if (i == 0x3) { // Ascend West
-                box = AxisAlignedBB.getBoundingBox(x, y, z + s, x + w, y + h, z + 1 - s);
+                box = new AxisAlignedBB(x, y, z + s, x + w, y + h, z + 1 - s);
             } else if (i == 0x4) { // Ascend North
-                box = AxisAlignedBB.getBoundingBox(x + s, y, z, x + 1 - s, y + h, z + w);
+                box = new AxisAlignedBB(x + s, y, z, x + 1 - s, y + h, z + w);
             } else if (i == 0x5) { // Ascend South
-                box = AxisAlignedBB.getBoundingBox(x + s, y, z + w, x + 1 - s, y + h, z + 1);
+                box = new AxisAlignedBB(x + s, y, z + w, x + 1 - s, y + h, z + 1);
             }
             if (box != null && queryBox.intersectsWith(box)) {
                 boxList.add(box);

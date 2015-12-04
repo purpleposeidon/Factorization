@@ -2,19 +2,20 @@ package factorization.api;
 
 import com.google.common.io.ByteArrayDataInput;
 import com.google.common.io.ByteArrayDataOutput;
-import cpw.mods.fml.common.network.internal.FMLProxyPacket;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
 import factorization.api.datahelpers.DataHelper;
 import factorization.api.datahelpers.IDataSerializable;
 import factorization.notify.ISaneCoord;
-import factorization.shared.*;
+import factorization.shared.BlockHelper;
+import factorization.shared.Core;
+import factorization.shared.FzNetDispatch;
 import factorization.shared.NetworkFactorization.MessageType;
+import factorization.shared.TileEntityCommon;
 import factorization.util.FzUtil;
 import factorization.util.ItemUtil;
 import factorization.util.SpaceUtil;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.block.Block;
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
@@ -27,19 +28,18 @@ import net.minecraft.network.Packet;
 import net.minecraft.network.play.server.S21PacketChunkData;
 import net.minecraft.server.management.PlayerManager;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.AxisAlignedBB;
-import net.minecraft.util.ChunkCoordinates;
-import net.minecraft.util.MovingObjectPosition;
-import net.minecraft.util.Vec3;
+import net.minecraft.util.*;
 import net.minecraft.world.EnumSkyBlock;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;
 import net.minecraft.world.biome.BiomeGenBase;
 import net.minecraft.world.chunk.Chunk;
-import net.minecraftforge.common.util.ForgeDirection;
 import net.minecraftforge.fluids.Fluid;
 import net.minecraftforge.fluids.FluidRegistry;
 import net.minecraftforge.fluids.IFluidBlock;
+import net.minecraftforge.fml.common.network.internal.FMLProxyPacket;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -50,6 +50,7 @@ import java.util.Random;
 // Note: The rules for holding on to references to Coord are the same as for holding on to World.
 // Don't keep references to them outside of things that are in worlds to avoid mem-leaks; or be careful about it.
 public final class Coord implements IDataSerializable, ISaneCoord, Comparable<Coord> {
+    // NORELEASE: Inline things that create BlockPos.
     public World w;
     public int x, y, z;
     private static final Random rand = new Random();
@@ -64,12 +65,16 @@ public final class Coord implements IDataSerializable, ISaneCoord, Comparable<Co
         this.z = z;
     }
 
+    public Coord(World w, BlockPos pos) {
+        this(w, pos.getX(), pos.getY(), pos.getZ());
+    }
+
     public Coord(TileEntity te) {
-        this(te.getWorldObj(), te.xCoord, te.yCoord, te.zCoord);
+        this(te.getWorld(), te.getPos());
     }
 
     public Coord(Entity ent) {
-        this(ent.worldObj, Math.floor(ent.posX), ent.posY + ent.yOffset, Math.floor(ent.posZ));
+        this(ent.worldObj, Math.floor(ent.posX), ent.posY + ent.getYOffset(), Math.floor(ent.posZ));
     }
 
     public Coord(World w, double x, double y, double z) {
@@ -83,16 +88,16 @@ public final class Coord implements IDataSerializable, ISaneCoord, Comparable<Co
 
     @Deprecated
     public Coord(World w, MovingObjectPosition mop) {
-        this(w, mop.blockX, mop.blockY, mop.blockZ);
+        this(w, mop.getBlockPos());
     }
 
     public static Coord fromMop(World world, MovingObjectPosition mop) {
         if (mop.typeOfHit == MovingObjectPosition.MovingObjectType.ENTITY && mop.entityHit != null) return new Coord(mop.entityHit);
-        return new Coord(world, mop.blockX, mop.blockY, mop.blockZ);
+        return new Coord(world, mop.getBlockPos());
     }
     
     public Coord(Chunk chunk) {
-        this(chunk.worldObj, chunk.xPosition * 16, 0, chunk.zPosition * 16);
+        this(chunk.getWorld(), chunk.xPosition * 16, 0, chunk.zPosition * 16);
     }
     
     @Override public World w() { return w; }
@@ -180,10 +185,6 @@ public final class Coord implements IDataSerializable, ISaneCoord, Comparable<Co
         this.z = z;
     }
     
-    public void set(ChunkCoordinates cc) {
-        set(w, cc.posX, cc.posY, cc.posZ);
-    }
-    
     public void set(Coord c) {
         set(c.w, c.x, c.y, c.z);
     }
@@ -197,7 +198,18 @@ public final class Coord implements IDataSerializable, ISaneCoord, Comparable<Co
     }
     
     public void set(TileEntity te) {
-        set(te.getWorldObj(), te.xCoord, te.yCoord, te.zCoord);
+        set(te.getWorld(), te.getPos());
+    }
+
+    public void set(World w, BlockPos pos) {
+        w = w;
+        set(pos);
+    }
+
+    public void set(BlockPos pos) {
+        x = pos.getX();
+        y = pos.getY();
+        z = pos.getZ();
     }
 
     @Override
@@ -237,11 +249,11 @@ public final class Coord implements IDataSerializable, ISaneCoord, Comparable<Co
     }
     
     public Vec3 createVector() {
-        return Vec3.createVectorHelper(x, y, z);
+        return new Vec3(x, y, z);
     }
     
-    public MovingObjectPosition createMop(ForgeDirection side, Vec3 hitVec) {
-        return new MovingObjectPosition(x, y, z, side.ordinal(), hitVec);
+    public MovingObjectPosition createMop(EnumFacing side, Vec3 hitVec) {
+        return new MovingObjectPosition(hitVec, side, toBlockPos());
     }
 
     /** @return boolean for a checkerboard pattern */
@@ -428,8 +440,8 @@ public final class Coord implements IDataSerializable, ISaneCoord, Comparable<Co
         return add(d.x, d.y, d.z);
     }
     
-    public Coord add(ForgeDirection d) {
-        return add(d.offsetX, d.offsetY, d.offsetZ);
+    public Coord add(EnumFacing d) {
+        return add(d.getDirectionVec().getX(), d.getDirectionVec().getY(), d.getDirectionVec().getZ());
     }
 
     public Coord add(int x, int y, int z) {
@@ -445,7 +457,7 @@ public final class Coord implements IDataSerializable, ISaneCoord, Comparable<Co
     }
     
     public Vec3 centerVec(Coord o) {
-        return Vec3.createVectorHelper((x + o.x)/2.0, (y + o.y)/2.0, (z + o.z)/2.0);
+        return new Vec3((x + o.x)/2.0, (y + o.y)/2.0, (z + o.z)/2.0);
     }
     
     /**
@@ -483,10 +495,10 @@ public final class Coord implements IDataSerializable, ISaneCoord, Comparable<Co
         return this;
     }
     
-    public Coord adjust(ForgeDirection dc) {
-        x += dc.offsetX;
-        y += dc.offsetY;
-        z += dc.offsetZ;
+    public Coord adjust(EnumFacing dc) {
+        x += dc.getDirectionVec().getX();
+        y += dc.getDirectionVec().getY();
+        z += dc.getDirectionVec().getZ();
         return this;
     }
     
@@ -502,12 +514,12 @@ public final class Coord implements IDataSerializable, ISaneCoord, Comparable<Co
     public void markBlockForUpdate() {
         //this will re-send block values & TE description to the client, which will also do a redraw()
         //...is what it used to do. Now you have to use syncAndDraw()?
-        w.markBlockForUpdate(x, y, z);
+        w.markBlockForUpdate(toBlockPos());
     }
 
     public void redraw() {
         if (w.isRemote) {
-            w.markBlockForUpdate(x, y, z);
+            w.markBlockForUpdate(toBlockPos());
         }
     }
     
@@ -532,43 +544,41 @@ public final class Coord implements IDataSerializable, ISaneCoord, Comparable<Co
     }
     
     public void notifyNeighbors() {
-        w.notifyBlocksOfNeighborChange(x, y, z, getBlock());
+        BlockPos bp = toBlockPos();
+        IBlockState bs = w.getBlockState(bp);
+        w.notifyBlockOfStateChange(bp, bs.getBlock());
     }
 
     public void updateLight() {
-        w.func_147451_t(x, y, z); //w.updateAllLightTypes(x, y, z);
+        w.checkLight(toBlockPos());
     }
     
     public void updateBlockLight() {
-        w.updateLightByType(EnumSkyBlock.Block, x, y, z);
+        w.checkLightFor(EnumSkyBlock.BLOCK, toBlockPos());
     }
-    
-    public int getCombinedLight() {
-        return w.getBlockLightValue(x, y, z); 
-    }
-    
+
     public int getLightLevelBlock() {
-        return w.getSavedLightValue(EnumSkyBlock.Block, x, y, z);
+        return w.getLight(toBlockPos());
     }
     
     public int getLightLevelSky() {
-        return w.getSavedLightValue(EnumSkyBlock.Sky, x, y, z);
+        return w.getLightFor(EnumSkyBlock.SKY, toBlockPos());
     }
     
     public void setLightLevelBlock(int light) {
-        getChunk().setLightValue(EnumSkyBlock.Block, x & 0xF, y & 0xF, z & 0xF, light);
+        getChunk().setLightFor(EnumSkyBlock.BLOCK, toBlockPos(), light);
     }
     
     public void setLightLevelSky(int light) {
-        getChunk().setLightValue(EnumSkyBlock.Sky, x & 0xF, y & 0xF, z & 0xF, light);
+        getChunk().setLightFor(EnumSkyBlock.SKY, toBlockPos(), light);
     }
 
     public void setTE(TileEntity te) {
-        w.setTileEntity(x, y, z, te);
+        w.setTileEntity(toBlockPos(), te);
     }
     
     public void rmTE() {
-        w.removeTileEntity(x, y, z);
+        w.removeTileEntity(toBlockPos());
     }
 
     public TileEntity getTE() {
@@ -578,17 +588,17 @@ public final class Coord implements IDataSerializable, ISaneCoord, Comparable<Co
         if (!blockExists()) {
             return null;
         }
-        return w.getTileEntity(x, y, z);
+        return w.getTileEntity(toBlockPos());
         // Could check blockHasTE() first. Might only be needed for TE-scanning, which is often better done w/ hashmap iteration instead
     }
 
     public TileEntity forceGetTE() {
         if (w == null) return null;
-        return w.getTileEntity(x, y, z);
+        return w.getTileEntity(toBlockPos());
     }
 
     public boolean blockHasTE() {
-        return getBlock().hasTileEntity(getMd());
+        return getBlock().hasTileEntity(getState());
     }
 
     @SuppressWarnings("unchecked")
@@ -601,11 +611,11 @@ public final class Coord implements IDataSerializable, ISaneCoord, Comparable<Co
     }
     
     public Chunk getChunk() {
-        return w.getChunkFromBlockCoords(x, z);
+        return w.getChunkFromBlockCoords(toBlockPos());
     }
     
     public BiomeGenBase getBiome() {
-        return w.getBiomeGenForCoords(x, z);
+        return w.getBiomeGenForCoords(toBlockPos());
     }
 
     public void setBiome(BiomeGenBase biome) {
@@ -619,9 +629,9 @@ public final class Coord implements IDataSerializable, ISaneCoord, Comparable<Co
     public void resyncChunksFull() {
         if (w.isRemote) return;
         Chunk chunk = getChunk();
-        final WorldServer world = (WorldServer) chunk.worldObj;
+        final WorldServer world = (WorldServer) chunk.getWorld();
         final PlayerManager pm = world.getPlayerManager();
-        PlayerManager.PlayerInstance watcher = pm.getOrCreateChunkWatcher(chunk.xPosition, chunk.zPosition, false);
+        PlayerManager.PlayerInstance watcher = pm.getPlayerInstance(chunk.xPosition, chunk.zPosition, false);
         if (watcher == null) return;
         ArrayList<EntityPlayerMP> players = new ArrayList<EntityPlayerMP>();
         players.addAll(watcher.playersWatchingChunk);
@@ -635,24 +645,26 @@ public final class Coord implements IDataSerializable, ISaneCoord, Comparable<Co
         FzNetDispatch.addPacketFrom(packet, chunk);
     }
 
+    public IBlockState getState() {
+        return w.getBlockState(toBlockPos());
+    }
+
     public Block getBlock() {
-        return getId();
+        return getState().getBlock();
     }
 
-    public Block getId() {
-        return w.getBlock(x, y, z);
-    }
-
+    @Deprecated
     public int getMd() {
-        return w.getBlockMetadata(x, y, z);
+        IBlockState bs = getState();
+        return bs.getBlock().getMetaFromState(bs);
     }
     
     public int getRawId() {
-        return Block.getIdFromBlock(w.getBlock(x, y, z));
+        return Block.getIdFromBlock(getBlock());
     }
 
     public boolean isAir() {
-        return w.isAirBlock(x, y, z);
+        return w.isAirBlock(toBlockPos());
     }
 
     public boolean isSolid() {
@@ -660,7 +672,7 @@ public final class Coord implements IDataSerializable, ISaneCoord, Comparable<Co
         if (b == null) {
             return false;
         }
-        return b.isNormalCube(w, x, y, z);
+        return b.isNormalCube(w, toBlockPos());
     }
     
     public float getHardness() {
@@ -668,7 +680,7 @@ public final class Coord implements IDataSerializable, ISaneCoord, Comparable<Co
         if (b == null) {
             return 0;
         }
-        return b.getBlockHardness(w, x, y, z);
+        return b.getBlockHardness(w, toBlockPos());
     }
 
     public boolean isBedrock() {
@@ -677,43 +689,36 @@ public final class Coord implements IDataSerializable, ISaneCoord, Comparable<Co
 
     /** Let's try to use Orientation */
     public boolean isSolidOnSide(int side) {
-        return w.isSideSolid(x, y, z, ForgeDirection.getOrientation(side));
+        return w.isSideSolid(toBlockPos(), SpaceUtil.getOrientation(side));
     }
     
-    public boolean isSolidOnSide(ForgeDirection side) {
-        return w.isSideSolid(x, y, z, side);
+    public boolean isSolidOnSide(EnumFacing side) {
+        return w.isSideSolid(toBlockPos(), side);
     }
     
     public boolean isBlockBurning() {
         Block b = getBlock();
-        if (b == null) {
-            return false;
-        }
-        return b == Blocks.fire || b.isBurning(w, x, y, z);
+        if (b == null) return false;
+        return b == Blocks.fire || b.isBurning(w, toBlockPos());
     }
 
     public boolean blockExists() {
-        if (w == null) {
-            return false;
-        }
-        return w.blockExists(x, y, z);
+        return w != null && w.isBlockLoaded(toBlockPos());
     }
 
     public boolean isReplacable() {
         Block b = getBlock();
-        if (b == null) {
-            return true;
-        }
-        return b.isReplaceable(w, x, y, z);
+        if (b == null) return true;
+        return b.isReplaceable(w, toBlockPos());
     }
 
     @Deprecated // Inaccurate, ignores transparent blocks
     public boolean isTop() {
-        return w.getHeightValue(x, z) == y;
+        return w.getHeight(toBlockPos()).getY() == y;
     }
     
     public int getColumnHeight() {
-        return w.getHeightValue(x, z);
+        return w.getHeight(toBlockPos()).getY();
     }
 
     public boolean canBeSeenThrough() {
@@ -743,44 +748,59 @@ public final class Coord implements IDataSerializable, ISaneCoord, Comparable<Co
     }
 
     public boolean is(Block b) {
-        return getId() == b;
+        return getBlock() == b;
+        //NORELEASE ? return b.getDefaultState().equals(getBlock().getDefaultState());
     }
 
+    public boolean is(IBlockState state) {
+        return state.equals(getState());
+    }
+
+    @Deprecated
     public boolean is(Block b, int md) {
-        return getId() == b && getMd() == md;
+        return getBlock() == b && getMd() == md;
     }
     
     public static final int NOTIFY_NEIGHBORS = 1, UPDATE = 2, ONLY_UPDATE_SERVERSIDE = 4; //TODO, this'll end up in Forge probably
-    
-    public boolean setId(Block block, boolean notify) {
+
+    public boolean set(IBlockState state, boolean notify) {
         int notifyFlag = notify ? NOTIFY_NEIGHBORS | UPDATE : 0;
-        return w.setBlock(x, y, z, block, 0, notifyFlag);
+        return w.setBlockState(toBlockPos(), state, notifyFlag);
     }
 
-    public boolean setMd(int md, boolean notify) {
-        int notifyFlag = notify ? NOTIFY_NEIGHBORS | UPDATE : 0;
-        return w.setBlockMetadataWithNotify(x, y, z, md, notifyFlag);
+    @Deprecated // Use IBlockState
+    public boolean setId(Block block, boolean notify) {
+        return set(block.getDefaultState(), notify);
     }
-    
+
+    @Deprecated // Use IBlockState
+    public boolean setMd(int md, boolean notify) {
+        IBlockState bs = getBlock().getStateFromMeta(md);
+        return set(bs, notify);
+    }
+
+    @Deprecated // Use IBlockState
     public boolean setIdMd(Block block, int md, boolean notify) {
-        int notifyFlag = notify ? NOTIFY_NEIGHBORS | UPDATE : 0;
-        return w.setBlock(x, y, z, block, md, notifyFlag);
+        IBlockState bs = block.getStateFromMeta(md);
+        return set(bs, notify);
     }
     
     public void setAir() {
-        w.setBlockToAir(x, y, z);
+        w.setBlockToAir(toBlockPos());
     }
 
+    @Deprecated
     public boolean setId(Block id) {
         return setId(id, true);
     }
 
+    @Deprecated
     public boolean setMd(int md) {
         return setMd(md, true);
     }
     
     public void notifyBlockChange() {
-        w.notifyBlockChange(x, y, z, getId());
+        w.notifyBlockOfStateChange(toBlockPos(), getBlock()); // NORELEASE: Check that this does what I expect. There's also another call of this in this file.
     }
 
     public void writeToNBT(String prefix, NBTTagCompound tag) {
@@ -828,8 +848,13 @@ public final class Coord implements IDataSerializable, ISaneCoord, Comparable<Co
     }
 
     public void mark() {
+        // Variant of spawnParticle(); for debugging.
         World use_world = w;
-        use_world.spawnParticle("reddust", x + 0.5, y + 0.5, z + 0.5, 0, 0, 0);
+        use_world.spawnParticle(EnumParticleTypes.REDSTONE, x + 0.5, y + 0.5, z + 0.5, 0, 0, 0);
+    }
+
+    public void spawnParticle(EnumParticleTypes particle) {
+        w.spawnParticle(particle, x + 0.5, y + 0.5, z + 0.5, 0, 0, 0);
     }
     
     public boolean remote() {
@@ -855,20 +880,16 @@ public final class Coord implements IDataSerializable, ISaneCoord, Comparable<Co
     }
     
     public AxisAlignedBB getCollisionBoundingBoxFromPool() {
-        Block b = getBlock();
-        if (b == null) {
-            return null;
-        }
-        return b.getCollisionBoundingBoxFromPool(w, x, y, z);
+        BlockPos pos = toBlockPos();
+        IBlockState bs = w.getBlockState(pos);
+        return bs.getBlock().getCollisionBoundingBox(w, pos, bs);
     }
     
     @SideOnly(Side.CLIENT)
     public AxisAlignedBB getSelectedBoundingBoxFromPool() {
-        Block b = getBlock();
-        if (b == null) {
-            return null;
-        }
-        return b.getSelectedBoundingBoxFromPool(w, x, y, z);
+        BlockPos pos = toBlockPos();
+        IBlockState bs = w.getBlockState(pos);
+        return bs.getBlock().getSelectedBoundingBox(w, pos);
     }
 
     public AxisAlignedBB getBlockBounds() {
@@ -879,16 +900,21 @@ public final class Coord implements IDataSerializable, ISaneCoord, Comparable<Co
         double maxY = block.getBlockBoundsMaxY();
         double minZ = block.getBlockBoundsMinZ();
         double maxZ = block.getBlockBoundsMaxZ();
-        return AxisAlignedBB.getBoundingBox(x + minX, y + minY, z + minZ, x + maxX, y + maxY, z + maxZ);
+        return new AxisAlignedBB(x + minX, y + minY, z + minZ, x + maxX, y + maxY, z + maxZ);
     }
     
     public static AxisAlignedBB aabbFromRange(Coord min, Coord max) {
         Coord.sort(min, max);
-        return AxisAlignedBB.getBoundingBox(min.x, min.y, min.z, max.x, max.y, max.z);
+        return new AxisAlignedBB(min.x, min.y, min.z, max.x, max.y, max.z);
     }
-    
+
+    public void scheduleUpdate(int delay, int priority) {
+        w.scheduleBlockUpdate(toBlockPos(), getBlock(), delay, priority);
+    }
+
+    @Deprecated
     public void scheduleUpdate(int delay) {
-        w.scheduleBlockUpdate(x, y, z, getId(), delay);
+        scheduleUpdate(delay, 0);
     }
     
     public void setAsEntityLocation(Entity ent) {
@@ -904,30 +930,22 @@ public final class Coord implements IDataSerializable, ISaneCoord, Comparable<Co
     }
     
     public void setAsTileEntityLocation(TileEntity te) {
-        te.setWorldObj(w);
-        te.xCoord = x;
-        te.yCoord = y;
-        te.zCoord = z;
-    }
-    
-    public void setAsVector(Vec3 vec) {
-        vec.xCoord = x;
-        vec.yCoord = y;
-        vec.zCoord = z;
+        if (te.getWorld() != w) {
+            te.setWorldObj(w);
+        }
+        te.setPos(toBlockPos());
     }
 
     public Vec3 toVector() {
-        Vec3 vec = SpaceUtil.newVec();
-        setAsVector(vec);
-        return vec;
+        return new Vec3(x, y, z);
     }
 
     public Vec3 toMiddleVector() {
-        Vec3 vec = toVector();
-        vec.xCoord += 0.5;
-        vec.yCoord += 0.5;
-        vec.zCoord += 0.5;
-        return vec;
+        return new Vec3(x + 0.5, y + 0.5, z + 0.5);
+    }
+
+    public BlockPos toBlockPos() {
+        return new BlockPos(x, y, z);
     }
     
     public static void sort(Coord lower, Coord upper) {
@@ -942,23 +960,25 @@ public final class Coord implements IDataSerializable, ISaneCoord, Comparable<Co
     }
     
     public void moveToTopBlock() {
-        for (int dx = -1; dx <= 1; dx++) {
-            for (int dz = -1; dz <= 1; dz++) {
-                y = Math.max(y,  w.getTopSolidOrLiquidBlock(x + dx, z + dz));
+        int r = 1;
+        for (int dx = -r; dx <= r; dx++) {
+            for (int dz = -r; dz <= r; dz++) {
+                BlockPos top = w.getTopSolidOrLiquidBlock(toBlockPos());
+                y = Math.max(y, top.getY());
             }
         }
     }
     
     public boolean isPowered() {
-        return w.getBlockPowerInput(x, y, z) > 0;
+        return w.isBlockPowered(toBlockPos());
     }
     
     public boolean isWeaklyPowered() {
-        return w.isBlockIndirectlyGettingPowered(x, y, z);
+        return w.isBlockIndirectlyGettingPowered(toBlockPos()) > 0;
     }
 
-    public int getPowerInput() {
-        return w.getBlockPowerInput(x, y, z);
+    public int getPowerInput(EnumFacing face) {
+        return w.getRedstonePower(toBlockPos(), face);
     }
     
     public static void iterateCube(Coord a, Coord b, ICoordFunction func) {
@@ -1050,24 +1070,21 @@ public final class Coord implements IDataSerializable, ISaneCoord, Comparable<Co
         return x == other.x || y == other.y || z == other.z;
     }
     
-    public int getComparatorOverride(ForgeDirection side) {
+    public int getComparatorOverride(EnumFacing side) {
         Block b = getBlock();
         if (b == null || !b.hasComparatorInputOverride()) {
             return 0;
         }
-        return b.getComparatorInputOverride(w, x, y, z, side.ordinal());
+        return b.getComparatorInputOverride(w, toBlockPos());
     }
     
-    private static Vec3 nullVec = Vec3.createVectorHelper(0, 0, 0);
+    private static Vec3 nullVec = new Vec3(0, 0, 0);
     private static boolean spam = false;
-    public ItemStack getPickBlock(ForgeDirection dir) {
+    public ItemStack getPickBlock(EnumFacing dir, EntityPlayer player) {
         Block b = getBlock();
-        if (b == null) {
-            return null;
-        }
         MovingObjectPosition mop = createMop(dir, nullVec);
         try {
-            return b.getPickBlock(mop, w, x, y, z);
+            return b.getPickBlock(mop, w, toBlockPos(), player);
         } catch (NoSuchMethodError t) {
             if (!spam) {
                 /*Core.logWarning("Blocks.getPickBlock is unusable on the server." +
@@ -1083,26 +1100,19 @@ public final class Coord implements IDataSerializable, ISaneCoord, Comparable<Co
         }
     }
     
-    public ItemStack getPickBlock(MovingObjectPosition mop) {
+    public ItemStack getPickBlock(MovingObjectPosition mop, EntityPlayer player) {
         Block b = getBlock();
-        if (b == null) {
-            return null;
-        }
-        return b.getPickBlock(mop, w, x, y, z);
+        return b.getPickBlock(mop, w, toBlockPos(), player);
     }
     
     public ItemStack getBrokenBlock() {
         Block b = getBlock();
-        if (b == null) {
-            return null;
-        }
-        ArrayList<ItemStack> dropped = b.getDrops(w, x, y, z, getMd(), 0);
+        List<ItemStack> dropped = b.getDrops(w, toBlockPos(), getState(), 0);
         if (dropped == null || dropped.isEmpty()) {
             return null;
         }
         ItemStack main = dropped.remove(0);
-        for (int i = 0; i < dropped.size(); i++) {
-            ItemStack other = dropped.get(i);
+        for (ItemStack other : dropped) {
             if (!ItemUtil.couldMerge(main, other)) {
                 return null;
             }
@@ -1126,21 +1136,22 @@ public final class Coord implements IDataSerializable, ISaneCoord, Comparable<Co
     }
 
     public int getDimensionID() {
-        return w.provider.dimensionId;
+        return w.provider.getDimensionId();
     }
 
     public void breakBlock() {
         Block b = getBlock();
         int md = getMd();
-        b.dropBlockAsItem(w, x, y, z, md, 0 /* fortune */);
+        b.dropBlockAsItem(w, toBlockPos(), getState(), 0 /* fortune */);
     }
 
     public boolean isAt(TileEntity te) {
-        return x == te.xCoord && y == te.yCoord && z == te.zCoord && w == te.getWorldObj();
+        BlockPos bp = te.getPos();
+        return bp.getX() == x && bp.getY() == y && bp.getZ() == z && te.getWorld() == w;
     }
 
     public boolean isNormalCube() {
-        return w.getBlock(x, y, z).isNormalCube(w, x, y, z);
+        return getBlock().isNormalCube(w, toBlockPos());
     }
 
     public boolean isInvalid() {

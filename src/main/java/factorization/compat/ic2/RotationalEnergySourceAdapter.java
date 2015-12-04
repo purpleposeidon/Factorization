@@ -4,7 +4,7 @@ import factorization.api.IRotationalEnergySource;
 import factorization.api.adapter.Adapter;
 import ic2.api.energy.tile.IKineticSource;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraftforge.common.util.ForgeDirection;
+import net.minecraft.util.EnumFacing;
 
 public class RotationalEnergySourceAdapter implements Adapter<TileEntity, IRotationalEnergySource> {
     @Override
@@ -36,24 +36,24 @@ public class RotationalEnergySourceAdapter implements Adapter<TileEntity, IRotat
         }
 
         @Override
-        public boolean canConnect(ForgeDirection direction) {
+        public boolean canConnect(EnumFacing direction) {
             return true;
         }
 
         @Override
-        public double availableEnergy(ForgeDirection direction) {
+        public double availableEnergy(EnumFacing direction) {
             return base.maxrequestkineticenergyTick(direction) / IC2_FZ_RATIO;
         }
 
         @Override
-        public double takeEnergy(ForgeDirection direction, double maxPower) {
+        public double takeEnergy(EnumFacing direction, double maxPower) {
             final int avail = base.requestkineticenergy(direction, (int) (maxPower * IC2_FZ_RATIO));
             last_velocity = avail;
             return avail / IC2_FZ_RATIO;
         }
 
         @Override
-        public double getVelocity(ForgeDirection direction) {
+        public double getVelocity(EnumFacing direction) {
             double v = last_velocity * IC2_ANGULAR_VELOCITY_RATIO;
             if (v > MAX_SPEED) v = MAX_SPEED;
             if (v < -MAX_SPEED) v = -MAX_SPEED;

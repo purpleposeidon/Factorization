@@ -112,15 +112,15 @@ class ClientMessage {
             final double x = interp(e.prevPosX, e.posX, partial) + w / 2;
             final double y = interp(e.prevPosY, e.posY, partial) + eye_height;
             final double z = interp(e.prevPosZ, e.posZ, partial) + w / 2;
-            return Vec3.createVectorHelper(x, y, z);
+            return new Vec3(x, y, z);
         }
         if (locus instanceof TileEntity) {
             TileEntity te = ((TileEntity) locus);
-            return Vec3.createVectorHelper(te.xCoord, te.yCoord, te.zCoord);
+            return new Vec3(te.xCoord, te.yCoord, te.zCoord);
         }
         if (locus instanceof ISaneCoord) {
             ISaneCoord c = (ISaneCoord) locus;
-            return Vec3.createVectorHelper(c.x(), c.y(), c.z());
+            return new Vec3(c.x(), c.y(), c.z());
         }
         return null;
     }
@@ -143,7 +143,7 @@ class ClientMessage {
         }
         if (locus instanceof TileEntity) {
             TileEntity te = (TileEntity) locus;
-            return new SimpleCoord(te.getWorldObj(), te.xCoord, te.yCoord, te.zCoord);
+            return new SimpleCoord(te.getWorld(), te.xCoord, te.yCoord, te.zCoord);
         }
         return null;
     }

@@ -1,7 +1,7 @@
 package factorization.truth.minecraft;
 
-import cpw.mods.fml.common.eventhandler.SubscribeEvent;
-import cpw.mods.fml.common.gameevent.PlayerEvent.PlayerLoggedInEvent;
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.fml.common.gameevent.PlayerEvent.PlayerLoggedInEvent;
 import factorization.api.Coord;
 import factorization.api.ICoordFunction;
 import factorization.common.FzConfig;

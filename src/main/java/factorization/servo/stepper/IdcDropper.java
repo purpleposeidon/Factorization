@@ -3,15 +3,15 @@ package factorization.servo.stepper;
 import factorization.api.Coord;
 import factorization.api.DeltaCoord;
 import factorization.fzds.TransferLib;
-import net.minecraftforge.common.util.ForgeDirection;
+import net.minecraft.util.EnumFacing;
 
 public class IdcDropper {
-    final ForgeDirection ax, ay, az;
+    final EnumFacing ax, ay, az;
     final Coord src, dst;
     final DeltaCoord range;
     final boolean breakSrcElseDest;
 
-    public IdcDropper(ForgeDirection up, ForgeDirection south, ForgeDirection east, Coord src, Coord dst, DeltaCoord range, boolean breakSrcElseDest) {
+    public IdcDropper(EnumFacing up, EnumFacing south, EnumFacing east, Coord src, Coord dst, DeltaCoord range, boolean breakSrcElseDest) {
         this.ax = east;
         this.ay = up;
         this.az = south;
@@ -22,10 +22,10 @@ public class IdcDropper {
         if (range.isSubmissive()) throw new IllegalArgumentException("range must be positive");
     }
 
-    static void add(Coord ret, Coord src, ForgeDirection a1, int n1, ForgeDirection a2, int n2, ForgeDirection a3, int n3) {
-        ret.x = src.x + a1.offsetX * n1 + a2.offsetX * n2 + a3.offsetX * n3;
-        ret.y = src.y + a1.offsetY * n1 + a2.offsetY * n2 + a3.offsetY * n3;
-        ret.z = src.z + a1.offsetZ * n1 + a2.offsetZ * n2 + a3.offsetZ * n3;
+    static void add(Coord ret, Coord src, EnumFacing a1, int n1, EnumFacing a2, int n2, EnumFacing a3, int n3) {
+        ret.x = src.x + a1.getDirectionVec().getX() * n1 + a2.getDirectionVec().getX() * n2 + a3.getDirectionVec().getX() * n3;
+        ret.y = src.y + a1.getDirectionVec().getY() * n1 + a2.getDirectionVec().getY() * n2 + a3.getDirectionVec().getY() * n3;
+        ret.z = src.z + a1.getDirectionVec().getZ() * n1 + a2.getDirectionVec().getZ() * n2 + a3.getDirectionVec().getZ() * n3;
     }
 
     int fails = 0;

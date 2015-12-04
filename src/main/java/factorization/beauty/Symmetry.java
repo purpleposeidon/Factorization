@@ -5,25 +5,25 @@ import factorization.api.DeltaCoord;
 import factorization.util.SpaceUtil;
 import net.minecraft.block.*;
 import net.minecraft.block.material.Material;
-import net.minecraftforge.common.util.ForgeDirection;
+import net.minecraft.util.EnumFacing;
 
 public class Symmetry {
     final Coord center;
     final int max_radius;
-    ForgeDirection normal, right, up;
+    EnumFacing normal, right, up;
 
     public int score = 0, asymetry = 0;
     public int max_score;
     public double measured_radius = 1;
 
-    public Symmetry(Coord center, int max_radius, ForgeDirection normal) {
+    public Symmetry(Coord center, int max_radius, EnumFacing normal) {
         this.center = center;
         this.max_radius = max_radius;
         this.normal = normal;
         score += scoreBlock(center);
         int normAxis = SpaceUtil.getAxis(normal);
         int upAxis = -1;
-        for (ForgeDirection dir : ForgeDirection.VALID_DIRECTIONS) {
+        for (EnumFacing dir : EnumFacing.VALUES) {
             final int axis = SpaceUtil.getAxis(dir);
             if (upAxis == -1 && axis != normAxis) {
                 upAxis = axis;
@@ -41,11 +41,11 @@ public class Symmetry {
         // The region is split into 4 quadrants, and rotational symmetry is checked in each point simultaneously.
         // The iteration is shaped like:
         // for each point moving right { for each point moving up }
-        ForgeDirection[] rights = new ForgeDirection[4];
-        ForgeDirection[] ups = new ForgeDirection[4];
+        EnumFacing[] rights = new EnumFacing[4];
+        EnumFacing[] ups = new EnumFacing[4];
         DeltaCoord[] dRight = new DeltaCoord[4];
         DeltaCoord[] dUp = new DeltaCoord[4];
-        ForgeDirection _R = right, _U = up;
+        EnumFacing _R = right, _U = up;
         for (int i = 0; i < 4; i++) {
             rights[i] = _R;
             ups[i] = _U;
@@ -87,7 +87,7 @@ public class Symmetry {
         }
     }
 
-    void move(DeltaCoord[] deltas, ForgeDirection[] dirs) {
+    void move(DeltaCoord[] deltas, EnumFacing[] dirs) {
         for (int i = 0; i < 4; i++) {
             deltas[i].move(dirs[i]);
         }

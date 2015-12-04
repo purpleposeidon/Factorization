@@ -39,7 +39,7 @@ public class BlockUpdateDebugger implements IWorldAccess {
             return;
         }
         double l = -0.25, h = +1.25;
-        AabbDebugger.addBox(AxisAlignedBB.getBoundingBox(minX + l, minY + l, minZ + l, maxX + h, maxY + h, maxZ + h));
+        AabbDebugger.addBox(new AxisAlignedBB(minX + l, minY + l, minZ + l, maxX + h, maxY + h, maxZ + h));
     }
 
     @Override public void playSound(String p_72704_1_, double p_72704_2_, double p_72704_4_, double p_72704_6_, float p_72704_8_, float p_72704_9_) { }

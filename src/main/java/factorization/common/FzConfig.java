@@ -1,8 +1,8 @@
 package factorization.common;
 
-import cpw.mods.fml.common.FMLCommonHandler;
-import cpw.mods.fml.common.Loader;
-import cpw.mods.fml.common.registry.EntityRegistry;
+import net.minecraftforge.fml.common.FMLCommonHandler;
+import net.minecraftforge.fml.common.Loader;
+import net.minecraftforge.fml.common.registry.EntityRegistry;
 import factorization.fzds.DeltaChunk;
 import factorization.shared.Core;
 import factorization.shared.Graylist;

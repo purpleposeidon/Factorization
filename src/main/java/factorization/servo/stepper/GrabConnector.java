@@ -6,7 +6,7 @@ import factorization.shared.BlockClass;
 import factorization.shared.Core;
 import net.minecraft.block.Block;
 import net.minecraft.init.Blocks;
-import net.minecraftforge.common.util.ForgeDirection;
+import net.minecraft.util.EnumFacing;
 
 import java.util.Collection;
 import java.util.HashSet;
@@ -42,7 +42,7 @@ public class GrabConnector {
             Blocks.flowing_lava
     };
 
-    Coord glueCheck(Coord at, ForgeDirection dir) {
+    Coord glueCheck(Coord at, EnumFacing dir) {
         // Temporary. Counts as glued if it's the primary block, or two identical not-worldgen blocks
         Coord neighbor = at.add(dir);
         Block neighborBlock = neighbor.getBlock();
@@ -57,7 +57,7 @@ public class GrabConnector {
     public Collection<Coord> fill() {
         while (!frontier.isEmpty()) {
             Coord at = frontier.removeAny();
-            for (ForgeDirection dir : ForgeDirection.VALID_DIRECTIONS) {
+            for (EnumFacing dir : EnumFacing.VALUES) {
                 Coord next = glueCheck(at, dir);
                 if (next == null) continue;
                 if (found.add(next)) {

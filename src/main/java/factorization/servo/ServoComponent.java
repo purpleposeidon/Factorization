@@ -2,8 +2,8 @@ package factorization.servo;
 
 import com.google.common.collect.BiMap;
 import com.google.common.collect.ImmutableBiMap;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 import factorization.api.Coord;
 import factorization.api.datahelpers.*;
 import factorization.servo.instructions.*;
@@ -15,7 +15,7 @@ import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraftforge.common.util.ForgeDirection;
+import net.minecraft.util.EnumFacing;
 
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -185,7 +185,7 @@ public abstract class ServoComponent implements IDataSerializable {
     }
     
     //return True if the item should be consumed by a survival-mode player
-    public abstract boolean onClick(EntityPlayer player, Coord block, ForgeDirection side);
+    public abstract boolean onClick(EntityPlayer player, Coord block, EnumFacing side);
     public abstract boolean onClick(EntityPlayer player, ServoMotor motor);
     
     /**

@@ -35,9 +35,9 @@ import net.minecraftforge.event.world.WorldEvent;
 
 import org.lwjgl.opengl.GL11;
 
-import cpw.mods.fml.common.eventhandler.SubscribeEvent;
-import cpw.mods.fml.common.gameevent.TickEvent.Phase;
-import cpw.mods.fml.common.gameevent.TickEvent.RenderTickEvent;
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.fml.common.gameevent.TickEvent.Phase;
+import net.minecraftforge.fml.common.gameevent.TickEvent.RenderTickEvent;
 import factorization.aabbdebug.AabbDebugger;
 import factorization.api.Coord;
 import factorization.api.Quaternion;
@@ -62,7 +62,7 @@ public class RenderDimensionSliceEntity extends Render implements IFzdsShenaniga
     @Override
     protected ResourceLocation getEntityTexture(Entity entity) { return null; }
 
-    Vec3 shadowEyeVec = Vec3.createVectorHelper(0, 0, 0);
+    Vec3 shadowEyeVec = new Vec3(0, 0, 0);
     EntityLivingBase shadowEye = new EntityLivingBase(null) {
         @Override protected void entityInit() { }
         @Override public void readEntityFromNBT(NBTTagCompound var1) { }

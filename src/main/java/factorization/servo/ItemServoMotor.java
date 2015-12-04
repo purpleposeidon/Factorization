@@ -9,7 +9,7 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.Vec3;
 import net.minecraft.world.World;
-import net.minecraftforge.common.util.ForgeDirection;
+import net.minecraft.util.EnumFacing;
 import factorization.api.Coord;
 import factorization.api.FzOrientation;
 import factorization.shared.Core;
@@ -48,14 +48,14 @@ public class ItemServoMotor extends ItemCraftingComponent {
         motor.posZ = c.z;
         //c.setAsEntityLocation(motor);
         //w.spawnEntityInWorld(motor);
-        ForgeDirection top = ForgeDirection.getOrientation(side);
+        EnumFacing top = SpaceUtil.getOrientation(side);
         
         ArrayList<FzOrientation> valid = new ArrayList();
         motor.motionHandler.beforeSpawn();
         
-        ForgeDirection playerAngle = ForgeDirection.getOrientation(SpaceUtil.determineOrientation(player));
+        EnumFacing playerAngle = SpaceUtil.getOrientation(SpaceUtil.determineOrientation(player));
         
-        for (ForgeDirection fd : ForgeDirection.VALID_DIRECTIONS) {
+        for (EnumFacing fd : EnumFacing.VALUES) {
             if (top == fd || top.getOpposite() == fd) {
                 continue;
             }
@@ -71,12 +71,12 @@ public class ItemServoMotor extends ItemCraftingComponent {
                 }
             }
         }
-        final Vec3 vP = Vec3.createVectorHelper(hitX, hitY, hitZ).normalize();
+        final Vec3 vP = new Vec3(hitX, hitY, hitZ).normalize();
         Collections.sort(valid, new Comparator<FzOrientation>() {
             @Override
             public int compare(FzOrientation a, FzOrientation b) {
-                double dpA = vP.dotProduct(Vec3.createVectorHelper(a.facing.offsetX, a.facing.offsetY, a.facing.offsetZ));
-                double dpB = vP.dotProduct(Vec3.createVectorHelper(b.facing.offsetX, b.facing.offsetY, b.facing.offsetZ));
+                double dpA = vP.dotProduct(new Vec3(a.facing.getDirectionVec().getX(), a.facing.getDirectionVec().getY(), a.facing.getDirectionVec().getZ()));
+                double dpB = vP.dotProduct(new Vec3(b.facing.getDirectionVec().getX(), b.facing.getDirectionVec().getY(), b.facing.getDirectionVec().getZ()));
                 double theta_a = Math.acos(dpA);
                 double theta_b = Math.acos(dpB);
                 if (theta_a > theta_b) {

@@ -11,9 +11,9 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.IIcon;
 import net.minecraft.world.World;
-import net.minecraftforge.common.util.ForgeDirection;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
+import net.minecraft.util.EnumFacing;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 import factorization.common.BlockIcons;
 
 public class BlockDarkIronOre extends Block {
@@ -44,8 +44,8 @@ public class BlockDarkIronOre extends Block {
         if (world.getTileEntity(x, y, z) != null) {
             return;
         }
-        for (ForgeDirection dir : ForgeDirection.VALID_DIRECTIONS) {
-            if (world.isBlockNormalCubeDefault(x + dir.offsetX, y + dir.offsetY, z + dir.offsetZ, true)) {
+        for (EnumFacing dir : EnumFacing.VALUES) {
+            if (world.isBlockNormalCubeDefault(x + dir.getDirectionVec().getX(), y + dir.getDirectionVec().getY(), z + dir.getDirectionVec().getZ(), true)) {
                 continue;
             }
             TileEntity te = new Glint();

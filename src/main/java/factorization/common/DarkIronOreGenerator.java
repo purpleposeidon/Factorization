@@ -1,6 +1,6 @@
 package factorization.common;
 
-import cpw.mods.fml.common.IWorldGenerator;
+import net.minecraftforge.fml.common.IWorldGenerator;
 import factorization.api.Coord;
 import factorization.api.ICoordFunction;
 import factorization.shared.Core;

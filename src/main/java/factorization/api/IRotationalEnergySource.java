@@ -2,7 +2,7 @@ package factorization.api;
 
 import factorization.api.adapter.InterfaceAdapter;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraftforge.common.util.ForgeDirection;
+import net.minecraft.util.EnumFacing;
 
 /**
  * Modeled after IC2ex's {@link ic2.api.energy.tile.IKineticSource}.
@@ -17,14 +17,14 @@ public interface IRotationalEnergySource {
      *                  <code>availableEnergy(DOWN)</code>.
      * @return true if a connection in that direction can be made.
      */
-    boolean canConnect(ForgeDirection direction);
+    boolean canConnect(EnumFacing direction);
 
     /**
      * @param direction {@see IRotationalEnergySource#canConnect}
      * @return how much power is still available for use this tick. The units are those of torque * angular speed
      * This value should always be positive, even if the velocity is negative.
      */
-    double availableEnergy(ForgeDirection direction);
+    double availableEnergy(EnumFacing direction);
 
     /**
      * Takes the power that is available for this tick.
@@ -32,7 +32,7 @@ public interface IRotationalEnergySource {
      * @param maxPower The maximum amount of power to deplete. This value must be positive.
      * @return The amount of power that was actually used, limited by actual availability.
      */
-    double takeEnergy(ForgeDirection direction, double maxPower);
+    double takeEnergy(EnumFacing direction, double maxPower);
 
     /**
      * @param direction {@see IRotationalEnergySource#canConnect}
@@ -41,7 +41,7 @@ public interface IRotationalEnergySource {
      *
      * This value should be kept synchronized with the client, but need not be exact.
      */
-    double getVelocity(ForgeDirection direction);
+    double getVelocity(EnumFacing direction);
 
     /**
      * Speeds higher than this are going to render badly due to FPS limits. If the speed would go above this,

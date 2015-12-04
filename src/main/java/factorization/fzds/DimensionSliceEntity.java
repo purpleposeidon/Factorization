@@ -1,7 +1,7 @@
 package factorization.fzds;
 
-import cpw.mods.fml.common.network.NetworkRegistry;
-import cpw.mods.fml.common.network.internal.FMLProxyPacket;
+import net.minecraftforge.fml.common.network.NetworkRegistry;
+import net.minecraftforge.fml.common.network.internal.FMLProxyPacket;
 import factorization.aabbdebug.AabbDebugger;
 import factorization.algos.TortoiseAndHare;
 import factorization.api.Coord;
@@ -51,10 +51,10 @@ public class DimensionSliceEntity extends IDeltaChunk implements IFzdsEntryContr
     
     private Coord cornerMin = Coord.ZERO.copy();
     private Coord cornerMax = Coord.ZERO.copy();
-    private Vec3 centerOffset = Vec3.createVectorHelper(0, 0, 0);
+    private Vec3 centerOffset = new Vec3(0, 0, 0);
     
     private final EntityReference<DimensionSliceEntity> parent; // init in constructor ._.
-    private Vec3 parentShadowOrigin = Vec3.createVectorHelper(0, 0, 0);
+    private Vec3 parentShadowOrigin = new Vec3(0, 0, 0);
     private transient final ArrayList<IDeltaChunk> children = new ArrayList<IDeltaChunk>(0);
     
     private long capabilities = DeltaCapability.of(DeltaCapability.MOVE, DeltaCapability.COLLIDE, DeltaCapability.DRAG, DeltaCapability.REMOVE_ITEM_ENTITIES);
@@ -109,7 +109,7 @@ public class DimensionSliceEntity extends IDeltaChunk implements IFzdsEntryContr
         this.cornerMin = lowerCorner;
         this.cornerMax = upperCorner;
         DeltaCoord dc = upperCorner.difference(lowerCorner);
-        centerOffset = Vec3.createVectorHelper(
+        centerOffset = new Vec3(
                 dc.x/2,
                 dc.y/2,
                 dc.z/2);
@@ -118,7 +118,7 @@ public class DimensionSliceEntity extends IDeltaChunk implements IFzdsEntryContr
     @Override
     public final Vec3 real2shadow(final Vec3 realVector) {
         // rotate⁻¹(real - DSE) + centerOffset + corner = shadow
-        Vec3 buffer = Vec3.createVectorHelper(0, 0, 0);
+        Vec3 buffer = new Vec3(0, 0, 0);
         real2shadow(realVector, buffer);
         return buffer;
     }
@@ -139,7 +139,7 @@ public class DimensionSliceEntity extends IDeltaChunk implements IFzdsEntryContr
     @Override
     public final Vec3 shadow2real(final Vec3 shadowVector) {
         // rotate(shadow - corner - centerOffset) + DSE = real
-        Vec3 buffer = Vec3.createVectorHelper(0, 0, 0);
+        Vec3 buffer = new Vec3(0, 0, 0);
         buffer.xCoord = shadowVector.xCoord - cornerMin.x - centerOffset.xCoord;
         buffer.yCoord = shadowVector.yCoord - cornerMin.y - centerOffset.yCoord;
         buffer.zCoord = shadowVector.zCoord - cornerMin.z - centerOffset.zCoord;
@@ -159,7 +159,7 @@ public class DimensionSliceEntity extends IDeltaChunk implements IFzdsEntryContr
         return SpaceUtil.createAABB(shadow2real(min), shadow2real(max));
     }
 
-    private Vec3 workVec = Vec3.createVectorHelper(0, 0, 0);
+    private Vec3 workVec = new Vec3(0, 0, 0);
     
     @Override
     public void shadow2real(Coord c) {
@@ -264,11 +264,11 @@ public class DimensionSliceEntity extends IDeltaChunk implements IFzdsEntryContr
     }
     
     private AxisAlignedBB makeAABB() {
-        return AxisAlignedBB.getBoundingBox(0, 0, 0, 0, 0, 0);
+        return new AxisAlignedBB(0, 0, 0, 0, 0, 0);
     }
     
     private AxisAlignedBB offsetAABB(AxisAlignedBB orig, double dx, double dy, double dz) {
-        return AxisAlignedBB.getBoundingBox(
+        return new AxisAlignedBB(
                 orig.minX + dx, orig.minY + dy, orig.minZ + dz,
                 orig.maxX + dx, orig.maxY + dy, orig.maxZ + dz);
     }
@@ -461,7 +461,7 @@ public class DimensionSliceEntity extends IDeltaChunk implements IFzdsEntryContr
                         continue;
                     }
                     if (start == null) {
-                        start = AxisAlignedBB.getBoundingBox(x, y, z, x + 1, y + 1, z + 1);
+                        start = new AxisAlignedBB(x, y, z, x + 1, y + 1, z + 1);
                     } else {
                         start.minX = Math.min(start.minX, x);
                         start.minY = Math.min(start.minY, y);
@@ -623,7 +623,7 @@ public class DimensionSliceEntity extends IDeltaChunk implements IFzdsEntryContr
             updateUniversalCollisions();
         }
         if (children.isEmpty()) return;
-        Vec3 childAt = Vec3.createVectorHelper(0, 0, 0);
+        Vec3 childAt = new Vec3(0, 0, 0);
         for (Iterator<IDeltaChunk> iterator = children.iterator(); iterator.hasNext();) {
             DimensionSliceEntity child = (DimensionSliceEntity) iterator.next();
             if (child.isDead) {
@@ -807,7 +807,7 @@ public class DimensionSliceEntity extends IDeltaChunk implements IFzdsEntryContr
             here = next;
             rot.incrMultiply(here.getRotationalVelocity());
         }
-        Vec3 linear = Vec3.createVectorHelper(here.motionX, here.motionY, here.motionZ);
+        Vec3 linear = new Vec3(here.motionX, here.motionY, here.motionZ);
         return calcInstantVelocityAtRealPoint(realPos, linear, rot);
     }
     
@@ -936,7 +936,7 @@ public class DimensionSliceEntity extends IDeltaChunk implements IFzdsEntryContr
         if (!worldObj.isRemote) controller.beforeUpdate(this);
         if (!parent.trackingEntity()) {
             Core.profileStart("updateMotion");
-            updateMotion(Vec3.createVectorHelper(0, 0, 0), new Quaternion());
+            updateMotion(new Vec3(0, 0, 0), new Quaternion());
             Core.profileEnd();
         } else if (!parent.entityFound()) {
             IDeltaChunk p = parent.getEntity();

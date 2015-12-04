@@ -10,7 +10,7 @@ import factorization.util.CraftUtil;
 import factorization.util.ItemUtil;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.IIcon;
-import net.minecraftforge.common.util.ForgeDirection;
+import net.minecraft.util.EnumFacing;
 
 public class TileEntityPackager extends TileEntityStamper {
     @Override
@@ -24,7 +24,7 @@ public class TileEntityPackager extends TileEntityStamper {
     }
     
     @Override
-    public IIcon getIcon(ForgeDirection dir) {
+    public IIcon getIcon(EnumFacing dir) {
         return BlockIcons.packager.get(this, dir);
     }
     

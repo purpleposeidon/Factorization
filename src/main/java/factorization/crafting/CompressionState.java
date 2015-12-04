@@ -13,7 +13,7 @@ import factorization.util.ItemUtil;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraftforge.common.util.ForgeDirection;
+import net.minecraft.util.EnumFacing;
 import factorization.api.Coord;
 import factorization.notify.Notice;
 import factorization.notify.Style;
@@ -25,9 +25,9 @@ public class CompressionState {
     static int MAX_CRAFT = 32;
     
     TileEntityCompressionCrafter start, root, otherEdge;
-    ForgeDirection up, right, otherEdgeRight;
+    EnumFacing up, right, otherEdgeRight;
     CellInfo[] cells = new CellInfo[9];
-    HashSet<TileEntityCompressionCrafter> foundWalls = new HashSet(3*4);
+    HashSet<TileEntityCompressionCrafter> foundWalls = new HashSet<TileEntityCompressionCrafter>(3*4);
     int height, width;
     EntityPlayer player;
     
@@ -36,7 +36,7 @@ public class CompressionState {
     //Clears the fields
     void reset() {
         start = root = otherEdge = null;
-        up = right = ForgeDirection.UNKNOWN;
+        up = right = null;
         foundWalls.clear();
         height = width = -1;
         Arrays.fill(cells, null);
@@ -79,7 +79,7 @@ public class CompressionState {
         start = cc;
         up = cc.getFacing();
         
-        if (up == ForgeDirection.UNKNOWN) {
+        if (up == null) {
             error(cc, "Broken direction");
             return false;
         }
@@ -89,7 +89,7 @@ public class CompressionState {
             return false;
         }
         right = getRightDirection();
-        if (right == ForgeDirection.UNKNOWN) {
+        if (right == null) {
             error(root, "No friendly compressors");
             return false;
         }
@@ -123,12 +123,12 @@ public class CompressionState {
         return true;
     }
     
-    private static ForgeDirection[] forgeDirections = new ForgeDirection[] { ForgeDirection.DOWN, ForgeDirection.NORTH, ForgeDirection.WEST };
+    private static EnumFacing[] forgeDirections = new EnumFacing[] { EnumFacing.DOWN, EnumFacing.NORTH, EnumFacing.WEST };
     private static TileEntityCompressionCrafter findEdgeRoot(TileEntityCompressionCrafter at) {
-        final ForgeDirection cd = at.getFacing();
+        final EnumFacing cd = at.getFacing();
         TileEntityCompressionCrafter first = at;
         for (int directionIndex = 0; directionIndex < forgeDirections.length; directionIndex++) {
-            ForgeDirection d = forgeDirections[directionIndex];
+            EnumFacing d = forgeDirections[directionIndex];
             if (d == cd || d.getOpposite() == cd) {
                 continue;
             }
@@ -149,12 +149,12 @@ public class CompressionState {
     }
     
 
-    private ForgeDirection getRightDirection() {
+    private EnumFacing getRightDirection() {
         //"The right chest is obviously the right one" -- etho, badly quoted.
         Coord here = root.getCoord();
-        ForgeDirection[] validDirections = ForgeDirection.VALID_DIRECTIONS;
+        EnumFacing[] validDirections = EnumFacing.VALUES;
         for (int i = 0; i < validDirections.length; i++) {
-            ForgeDirection dir = validDirections[i];
+            EnumFacing dir = validDirections[i];
             if (dir == up || dir == up.getOpposite()) {
                 continue;
             }
@@ -163,13 +163,13 @@ public class CompressionState {
                 return dir;
             } else if (cc != null) {
                 error(cc, "Inconsistent direction");
-                return ForgeDirection.UNKNOWN;
+                return null;
             }
         }
         //Could be 1xn.
         Coord front = here.add(up);
         for (int i = 0; i < validDirections.length; i++) {
-            ForgeDirection dir = validDirections[i];
+            EnumFacing dir = validDirections[i];
             if (dir == up || dir == up.getOpposite()) {
                 continue;
             }
@@ -178,7 +178,7 @@ public class CompressionState {
                 return dir;
             }
         }
-        return ForgeDirection.UNKNOWN;
+        return null;
     }
     
     private int pickSize() {
@@ -204,13 +204,13 @@ public class CompressionState {
     private void showExample() {
         Notice.clear(player);
         int width = pickSize(), height = pickSize();
-        ForgeDirection r = ForgeDirection.WEST;
-        if (up.offsetX*r.offsetX != 0) {
-            r = ForgeDirection.NORTH;
+        EnumFacing r = EnumFacing.WEST;
+        if (up.getDirectionVec().getX()*r.getDirectionVec().getX() != 0) {
+            r = EnumFacing.NORTH;
         }
         Coord c = root.getCoord();
         Coord d = c.copy();
-        for (int _ = 0; _ < height + 1; _++) d.adjust(up);
+        for (int i = 0; i < height + 1; i++) d.adjust(up);
         for (int x = 0; x < width; x++) {
             mark(c);
             c.adjust(r);
@@ -222,7 +222,7 @@ public class CompressionState {
         hypoRoot.adjust(r.getOpposite());
         c = hypoRoot;
         d = c.copy();
-        for (int _ = 0; _ < width + 1; _++) d.adjust(r);
+        for (int i = 0; i < width + 1; i++) d.adjust(r);
         for (int x = 0; x < height; x++) {
             mark(c);
             c.adjust(up);
@@ -261,10 +261,10 @@ public class CompressionState {
     private void getCells() {
         Coord corner = root.getCoord();
         corner.adjust(up);
-        ForgeDirection out = right.getRotation(up);
+        EnumFacing out = right.getRotation(up);
         for (int dx = 0; dx < width; dx++) {
             for (int dy = 0; dy < height; dy++) {
-                Coord c = corner.add(dx*right.offsetX + dy*up.offsetX, dx*right.offsetY + dy*up.offsetY, dx*right.offsetZ + dy*up.offsetZ);
+                Coord c = corner.add(dx*right.getDirectionVec().getX() + dy*up.getDirectionVec().getX(), dx*right.getDirectionVec().getY() + dy*up.getDirectionVec().getY(), dx*right.getDirectionVec().getZ() + dy*up.getDirectionVec().getZ());
                 cells[cellIndex(dx, dy)] = new CellInfo(c, out);
             }
         }
@@ -279,7 +279,7 @@ public class CompressionState {
         ItemStack[] items = new ItemStack[length];
         boolean airBlock = true;
         
-        public CellInfo(Coord cell, ForgeDirection top) {
+        public CellInfo(Coord cell, EnumFacing top) {
             this.cell = cell;
             if (cell.isAir() || cell.getHardness() < 0) {
                 airBlock = true;
@@ -381,7 +381,7 @@ public class CompressionState {
     
     
     int pair_height = 0;
-    int checkPairs(HashSet<TileEntityCompressionCrafter> walls, TileEntityCompressionCrafter local_root, final ForgeDirection up, final ForgeDirection right) {
+    int checkPairs(HashSet<TileEntityCompressionCrafter> walls, TileEntityCompressionCrafter local_root, final EnumFacing up, final EnumFacing right) {
         int distance = getPairDistance(walls, local_root);
         if (distance <= 0) {
             return -1;
@@ -411,7 +411,7 @@ public class CompressionState {
     }
 
     int getPairDistance(HashSet<TileEntityCompressionCrafter> walls, TileEntityCompressionCrafter start) {
-        final ForgeDirection cd = start.getFacing();
+        final EnumFacing cd = start.getFacing();
         if (!start.buffer.isEmpty()) {
             error(start, "Buffered output");
             return -1;
@@ -592,7 +592,7 @@ public class CompressionState {
             maxY = Math.max(c.y, maxY);
             maxZ = Math.max(c.z, maxZ);
         }
-        ForgeDirection axis = right.getRotation(up);
+        EnumFacing axis = right.getRotation(up);
         start.broadcastMessage(null, MessageType.CompressionCrafterBounds, minX, minY, minZ, maxX, maxY, maxZ, (byte) axis.ordinal());
     }
     

@@ -11,7 +11,7 @@ import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.init.Blocks;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.IIcon;
-import net.minecraftforge.common.util.ForgeDirection;
+import net.minecraft.util.EnumFacing;
 
 import org.lwjgl.opengl.GL11;
 
@@ -168,9 +168,9 @@ public class BlockRenderGreenware extends FactorizationBlockRender {
                             block.useTexture(it.getIcon(useIIcon, rc.icon_md));
                         }
                         int color = 0xFFFFFF; 
-                        if (greenware.getWorldObj() != null) {
+                        if (greenware.getWorld() != null) {
                             try {
-                                color = it.colorMultiplier(greenware.getWorldObj(), greenware.xCoord, greenware.yCoord, greenware.zCoord);
+                                color = it.colorMultiplier(greenware.getWorld(), greenware.xCoord, greenware.yCoord, greenware.zCoord);
                             } catch (Throwable t) {
                                 if (!spammed) {
                                     spammed = true;
@@ -209,7 +209,7 @@ public class BlockRenderGreenware extends FactorizationBlockRender {
             rc.toBlockBounds(block);
             block.beginWithMirroredUVs();
             block.rotateMiddle(rc.quat);
-            if (greenware.front != ForgeDirection.UNKNOWN && greenware.rotation > 0) {
+            if (greenware.front != null && greenware.rotation > 0) {
                 block.rotateCenter(greenware.rotation_quat);
             }
             float o = (float) ((offset + rci)*d);

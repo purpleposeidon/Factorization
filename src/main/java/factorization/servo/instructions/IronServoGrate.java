@@ -3,7 +3,7 @@ package factorization.servo.instructions;
 import net.minecraft.block.Block;
 import net.minecraft.init.Blocks;
 import net.minecraft.util.IIcon;
-import net.minecraftforge.common.util.ForgeDirection;
+import net.minecraft.util.EnumFacing;
 import factorization.shared.Core;
 
 public class IronServoGrate extends WoodenServoGrate {
@@ -13,7 +13,7 @@ public class IronServoGrate extends WoodenServoGrate {
     }
     
     @Override
-    public IIcon getIcon(ForgeDirection side) {
+    public IIcon getIcon(EnumFacing side) {
         return Blocks.iron_bars.getBlockTextureFromSide(2);
     }
     

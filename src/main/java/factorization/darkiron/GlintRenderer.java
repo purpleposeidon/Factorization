@@ -10,7 +10,7 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.Vec3;
 import net.minecraft.world.World;
-import net.minecraftforge.common.util.ForgeDirection;
+import net.minecraft.util.EnumFacing;
 
 import org.lwjgl.opengl.GL11;
 
@@ -22,7 +22,7 @@ import factorization.shared.Core;
 public class GlintRenderer extends TileEntitySpecialRenderer {
     
     Minecraft mc = Minecraft.getMinecraft();
-    Vec3 sideVec = Vec3.createVectorHelper(0, 0, 0);
+    Vec3 sideVec = new Vec3(0, 0, 0);
 
     @Override
     public void renderTileEntityAt(TileEntity tileEntity, double dx, double dy, double dz, float partial) {
@@ -35,7 +35,7 @@ public class GlintRenderer extends TileEntitySpecialRenderer {
             distPacity = 0.8;
         }
         BlockDarkIronOre.Glint te = (Glint) tileEntity;
-        te.lastRenderedTick = te.getWorldObj().getTotalWorldTime();
+        te.lastRenderedTick = te.getWorld().getTotalWorldTime();
         OpenGlHelper.setLightmapTextureCoords(OpenGlHelper.lightmapTexUnit, 0, 0xF0);
         bindTexture(Core.blockAtlas);
         GL11.glPushMatrix();
@@ -53,13 +53,13 @@ public class GlintRenderer extends TileEntitySpecialRenderer {
         
         Vec3 lookVec = player.getLook(partial).normalize();
         
-        World w = te.getWorldObj();
+        World w = te.getWorld();
         
         tess.startDrawingQuads();
-        for (ForgeDirection dir : ForgeDirection.VALID_DIRECTIONS) {
-            sideVec.xCoord = dir.offsetX;
-            sideVec.yCoord = dir.offsetY;
-            sideVec.zCoord = dir.offsetZ;
+        for (EnumFacing dir : EnumFacing.VALUES) {
+            sideVec.xCoord = dir.getDirectionVec().getX();
+            sideVec.yCoord = dir.getDirectionVec().getY();
+            sideVec.zCoord = dir.getDirectionVec().getZ();
             //lookVec .dot. sideVec = cos(angle)
             double theta = Math.acos(lookVec.dotProduct(sideVec));
             float opacity = (float) (theta/(2*Math.PI));
@@ -70,7 +70,7 @@ public class GlintRenderer extends TileEntitySpecialRenderer {
             float r = NumUtil.uninterp((float) minTheta, (float) maxTheta, (float) theta);
             opacity *= r;
             
-            int light = w.getBlockLightValue(te.xCoord + dir.offsetX, te.yCoord + dir.offsetY, te.zCoord + dir.offsetZ);
+            int light = w.getBlockLightValue(te.xCoord + dir.getDirectionVec().getX(), te.yCoord + dir.getDirectionVec().getY(), te.zCoord + dir.getDirectionVec().getZ());
             opacity += (light/16F)*0.2F;
             opacity = Math.min(opacity, 0.35F);
             

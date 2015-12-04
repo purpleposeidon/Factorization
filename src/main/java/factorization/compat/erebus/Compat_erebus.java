@@ -1,8 +1,8 @@
 package factorization.compat.erebus;
 
-import cpw.mods.fml.common.event.FMLInitializationEvent;
-import cpw.mods.fml.common.event.FMLInterModComms;
-import cpw.mods.fml.relauncher.ReflectionHelper;
+import net.minecraftforge.fml.common.event.FMLInitializationEvent;
+import net.minecraftforge.fml.common.event.FMLInterModComms;
+import net.minecraftforge.fml.relauncher.ReflectionHelper;
 import factorization.compat.CompatBase;
 import factorization.shared.Core;
 import factorization.truth.DocumentationModule;

@@ -1,7 +1,7 @@
 package factorization.sockets;
 
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 import factorization.api.Coord;
 import factorization.api.FzOrientation;
 import factorization.api.Quaternion;
@@ -29,7 +29,7 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.Vec3;
-import net.minecraftforge.common.util.ForgeDirection;
+import net.minecraft.util.EnumFacing;
 import org.lwjgl.opengl.GL11;
 
 import java.io.IOException;
@@ -127,7 +127,7 @@ public class SocketShifter extends TileEntitySocketBase {
         }
         
         FzInv localInv, foreignInv;
-        ForgeDirection back = facing.getOpposite();
+        EnumFacing back = facing.getOpposite();
         if (socket != this) {
             // meaning we're on a Servo
             localInv = InvUtil.openInventory((IInventory) socket, facing);
@@ -275,12 +275,12 @@ public class SocketShifter extends TileEntitySocketBase {
         cooldown = (byte) (mode == ShifterMode.MODE_STREAM ? 8 : 1);
     }
 
-    private FzInv openForeignInv(ISocketHolder socket, Coord coord, ForgeDirection back) {
+    private FzInv openForeignInv(ISocketHolder socket, Coord coord, EnumFacing back) {
         coord.adjust(facing);
         FzInv foreignInv = InvUtil.openInventory(coord.getTE(IInventory.class), back);
         coord.adjust(back);
         if (foreignInv != null) return foreignInv;
-        final ForgeDirection top = facing;
+        final EnumFacing top = facing;
 
         for (Entity entity : (Iterable<EntityItem>)worldObj.getEntitiesWithinAABB(IInventory.class, getEntityBox(socket, coord, top, 0))) {
             foreignInv = InvUtil.openInventory(entity, false);
@@ -293,7 +293,7 @@ public class SocketShifter extends TileEntitySocketBase {
         if (worldObj != DeltaChunk.getServerShadowWorld()) return null;
         Coord target = coord.add(facing);
         for (IDeltaChunk idc : DeltaChunk.getSlicesContainingPoint(target)) {
-            final ForgeDirection realBack = idc.shadow2real(back);
+            final EnumFacing realBack = idc.shadow2real(back);
 
             Vec3 v = SpaceUtil.newVec();
             target.setAsVector(v);
@@ -353,8 +353,8 @@ public class SocketShifter extends TileEntitySocketBase {
     
     public void probe(ServoMotor motor) {
         Coord at = motor.getCurrentPos();
-        ForgeDirection fd = motor.getOrientation().top;
-        final ForgeDirection fdOp = fd.getOpposite();
+        EnumFacing fd = motor.getOrientation().top;
+        final EnumFacing fdOp = fd.getOpposite();
         at.adjust(fd);
         FzInv target = InvUtil.openInventory(at.getTE(IInventory.class), fdOp);
         at.adjust(fdOp);
@@ -439,7 +439,7 @@ public class SocketShifter extends TileEntitySocketBase {
     }
     
     @Override
-    public boolean activate(EntityPlayer player, ForgeDirection side) {
+    public boolean activate(EntityPlayer player, EnumFacing side) {
         if (super.activate(player, side)) return true;
         if (worldObj.isRemote) return true;
         if (getCoord().add(facing.getOpposite()).getTE(IInventory.class) == null) {

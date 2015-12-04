@@ -17,9 +17,9 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.IIcon;
-import net.minecraftforge.common.util.ForgeDirection;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
+import net.minecraft.util.EnumFacing;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 import factorization.api.Coord;
 import factorization.common.BlockIcons;
 import factorization.common.FactoryType;
@@ -50,14 +50,14 @@ public class TileEntityCompressionCrafter extends TileEntityCommon {
     }
     
     byte progress = 0;
-    byte b_facing = (byte) ForgeDirection.UP.ordinal();
+    byte b_facing = (byte) EnumFacing.UP.ordinal();
     boolean isCrafterRoot = false;
     boolean powered = false;
     public Coord upperCorner, lowerCorner;
-    public ForgeDirection craftingAxis = ForgeDirection.UP;
+    public EnumFacing craftingAxis = EnumFacing.UP;
     
-    public ForgeDirection getFacing() {
-        return ForgeDirection.getOrientation(b_facing);
+    public EnumFacing getFacing() {
+        return SpaceUtil.getOrientation(b_facing);
     }
     
     public float getProgressPerc() {
@@ -85,8 +85,8 @@ public class TileEntityCompressionCrafter extends TileEntityCommon {
     
     @Override
     @SideOnly(Side.CLIENT)
-    public IIcon getIcon(ForgeDirection dir) {
-        ForgeDirection f = getFacing();
+    public IIcon getIcon(EnumFacing dir) {
+        EnumFacing f = getFacing();
         if (dir == f) {
             return BlockIcons.compactFace;
         } else if (dir == f.getOpposite()) {
@@ -104,7 +104,7 @@ public class TileEntityCompressionCrafter extends TileEntityCommon {
     @Override
     public void updateEntity() {
         if (progress != 0 && progress++ == 20) {
-            if (!worldObj.isRemote && getFacing() != ForgeDirection.UNKNOWN && isCrafterRoot) {
+            if (!worldObj.isRemote && getFacing() != null && isCrafterRoot) {
                 getStateHelper().craft(false, this);
                 isCrafterRoot = false;
                 boolean signal = worldObj.isBlockIndirectlyGettingPowered(xCoord, yCoord, zCoord);
@@ -142,13 +142,13 @@ public class TileEntityCompressionCrafter extends TileEntityCommon {
         FzInv[] ret = new FzInv[6*5];
         int i = 0;
         Coord me = getCoord();
-        final ForgeDirection facing = getFacing();
-        final ForgeDirection behind = facing.getOpposite();
-        for (ForgeDirection fd : ForgeDirection.VALID_DIRECTIONS) {
+        final EnumFacing facing = getFacing();
+        final EnumFacing behind = facing.getOpposite();
+        for (EnumFacing fd : EnumFacing.VALUES) {
             if (fd == facing) {
                 continue;
             }
-            ForgeDirection back = fd.getOpposite();
+            EnumFacing back = fd.getOpposite();
             Coord sc = me.add(fd);
             IInventory inv = sc.getTE(IInventory.class);
             if (inv != null) {
@@ -158,11 +158,11 @@ public class TileEntityCompressionCrafter extends TileEntityCommon {
                 if (neighbor == null) continue;
                 if (neighbor.getFacing() != facing) continue;
                 //recursiveish search
-                for (ForgeDirection nfd : ForgeDirection.VALID_DIRECTIONS) {
+                for (EnumFacing nfd : EnumFacing.VALUES) {
                     if (nfd == facing) continue;
                     if (nfd == back) continue;
                     Coord sd = sc.add(nfd);
-                    ForgeDirection newBack = nfd.getOpposite();
+                    EnumFacing newBack = nfd.getOpposite();
                     IInventory newInv = sd.getTE(IInventory.class);
                     if (newInv != null) ret[i++] = InvUtil.openInventory(newInv, newBack);
                 }
@@ -203,7 +203,7 @@ public class TileEntityCompressionCrafter extends TileEntityCommon {
         if (messageType == MessageType.CompressionCrafterBounds) {
             upperCorner = new Coord(worldObj, input.readInt(), input.readInt(), input.readInt());
             lowerCorner = new Coord(worldObj, input.readInt(), input.readInt(), input.readInt());
-            craftingAxis = ForgeDirection.getOrientation(input.readByte());
+            craftingAxis = SpaceUtil.getOrientation(input.readByte());
             Coord.sort(lowerCorner, upperCorner);
             if (lowerCorner.distanceSq(upperCorner) > 25) {
                 Core.logWarning("Server wanted us to render a large area!?");
@@ -222,8 +222,8 @@ public class TileEntityCompressionCrafter extends TileEntityCommon {
         powered = true;
     }
     
-    TileEntityCompressionCrafter look(ForgeDirection d) {
-        TileEntity te = worldObj.getTileEntity(xCoord + d.offsetX, yCoord + d.offsetY, zCoord + d.offsetZ);
+    TileEntityCompressionCrafter look(EnumFacing d) {
+        TileEntity te = worldObj.getTileEntity(xCoord + d.getDirectionVec().getX(), yCoord + d.getDirectionVec().getY(), zCoord + d.getDirectionVec().getZ());
         if (te instanceof TileEntityCompressionCrafter) {
             return (TileEntityCompressionCrafter) te;
         }
@@ -231,7 +231,7 @@ public class TileEntityCompressionCrafter extends TileEntityCommon {
     }
     
     @Override
-    public boolean rotate(ForgeDirection axis) {
+    public boolean rotate(EnumFacing axis) {
         byte new_b = (byte) axis.ordinal();
         if (new_b == b_facing) {
             return false;
@@ -250,7 +250,7 @@ public class TileEntityCompressionCrafter extends TileEntityCommon {
     }
     
     @Override
-    public boolean activate(EntityPlayer entityplayer, ForgeDirection side) {
+    public boolean activate(EntityPlayer entityplayer, EnumFacing side) {
         if (worldObj.isRemote) {
             return false;
         }

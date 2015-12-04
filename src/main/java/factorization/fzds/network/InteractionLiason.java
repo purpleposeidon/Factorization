@@ -1,6 +1,6 @@
 package factorization.fzds.network;
 
-import cpw.mods.fml.common.network.handshake.NetworkDispatcher;
+import net.minecraftforge.fml.common.network.handshake.NetworkDispatcher;
 import factorization.fzds.ShadowPlayerAligner;
 import factorization.fzds.interfaces.IDeltaChunk;
 import factorization.fzds.interfaces.IFzdsShenanigans;
@@ -47,7 +47,7 @@ public class InteractionLiason extends EntityPlayerMP implements IFzdsShenanigan
         networkManager = new CustomChannelNetworkManager(proxiedChannel, false);
         this.playerNetServerHandler = new NetHandlerPlayServer(MinecraftServer.getServer(), networkManager, this);
         playerNetServerHandler.netManager.channel().attr(NetworkDispatcher.FML_DISPATCHER).set(new NetworkDispatcher(networkManager));
-        //Compare cpw.mods.fml.common.network.FMLOutboundHandler.OutboundTarget.PLAYER.{...}.selectNetworks(Object, ChannelHandlerContext, FMLProxyPacket)
+        //Compare net.minecraftforge.fml.common.network.FMLOutboundHandler.OutboundTarget.PLAYER.{...}.selectNetworks(Object, ChannelHandlerContext, FMLProxyPacket)
         playerNetServerHandler.netManager.setConnectionState(EnumConnectionState.PLAY);
     }
 

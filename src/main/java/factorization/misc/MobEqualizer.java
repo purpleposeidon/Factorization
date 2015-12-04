@@ -1,7 +1,7 @@
 package factorization.misc;
 
-import cpw.mods.fml.common.eventhandler.EventPriority;
-import cpw.mods.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.fml.common.eventhandler.EventPriority;
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import factorization.util.FzUtil;
 import net.minecraft.entity.IRangedAttackMob;
 import net.minecraft.entity.monster.EntityMob;

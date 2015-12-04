@@ -1,7 +1,7 @@
 package factorization.mechanics;
 
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 import factorization.shared.Core;
 import factorization.util.NumUtil;
 import factorization.util.SpaceUtil;
@@ -53,9 +53,9 @@ public class ChainLink {
                      AxisAlignedBB workBox, Vec3 workStart, Vec3 workEnd) {
         Vec3 forward = SpaceUtil.subtract(workStart, workEnd);
         double length = forward.lengthVector();
-        Vec3 side1 = forward.crossProduct(Vec3.createVectorHelper(1, 0, 1));
+        Vec3 side1 = forward.crossProduct(new Vec3(1, 0, 1));
         if (SpaceUtil.isZero(side1)) {
-            side1 = forward.crossProduct(Vec3.createVectorHelper(-1, 0, -1));
+            side1 = forward.crossProduct(new Vec3(-1, 0, -1));
         }
         side1 = side1.normalize();
         Vec3 side2 = forward.crossProduct(side1).normalize();

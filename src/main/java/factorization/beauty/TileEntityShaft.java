@@ -1,7 +1,7 @@
 package factorization.beauty;
 
-import cpw.mods.fml.common.FMLCommonHandler;
-import cpw.mods.fml.relauncher.Side;
+import net.minecraftforge.fml.common.FMLCommonHandler;
+import net.minecraftforge.fml.relauncher.Side;
 import factorization.api.Coord;
 import factorization.api.IRotationalEnergySource;
 import factorization.api.datahelpers.DataHelper;
@@ -23,17 +23,17 @@ import net.minecraft.util.IIcon;
 import net.minecraft.util.MovingObjectPosition;
 import net.minecraft.util.Vec3;
 import net.minecraft.world.World;
-import net.minecraftforge.common.util.ForgeDirection;
+import net.minecraft.util.EnumFacing;
 
 import java.io.IOException;
 import java.util.ArrayList;
 
 public class TileEntityShaft extends TileEntityCommon implements IRotationalEnergySource {
-    ForgeDirection axis = ForgeDirection.UP;
+    EnumFacing axis = EnumFacing.UP;
     IRotationalEnergySource _src = null;
     Coord srcPos = null;
     double angle = 0, prev_angle = 0;
-    ForgeDirection srcConnection = ForgeDirection.UNKNOWN;
+    EnumFacing srcConnection = null;
     boolean useCustomVelocity = false;
     double customVelocity = 0;
     byte velocitySign = 1;
@@ -136,7 +136,7 @@ public class TileEntityShaft extends TileEntityCommon implements IRotationalEner
         Coord at = getCoord();
         IRotationalEnergySource found = find(at.copy(), axis.getOpposite());
         byte p = 1;
-        if (axis.offsetX != 0) p = -1;
+        if (axis.getDirectionVec().getX() != 0) p = -1;
         if (found != null) {
             velocitySign = p;
             return found;
@@ -145,7 +145,7 @@ public class TileEntityShaft extends TileEntityCommon implements IRotationalEner
         return find(at, axis);
     }
 
-    private IRotationalEnergySource find(Coord at, ForgeDirection dir) {
+    private IRotationalEnergySource find(Coord at, EnumFacing dir) {
         while (true) {
             at.adjust(dir);
             if (at.isAir()) return null;
@@ -165,26 +165,26 @@ public class TileEntityShaft extends TileEntityCommon implements IRotationalEner
     }
 
     @Override
-    public boolean canConnect(ForgeDirection direction) {
+    public boolean canConnect(EnumFacing direction) {
         return direction == axis || direction == axis.getOpposite();
     }
 
     @Override
-    public double availableEnergy(ForgeDirection direction) {
+    public double availableEnergy(EnumFacing direction) {
         IRotationalEnergySource src = getSrc();
         if (src == null) return 0;
         return src.availableEnergy(direction);
     }
 
     @Override
-    public double takeEnergy(ForgeDirection direction, double maxPower) {
+    public double takeEnergy(EnumFacing direction, double maxPower) {
         IRotationalEnergySource src = getSrc();
         if (src == null) return 0;
         return src.takeEnergy(direction, maxPower);
     }
 
     @Override
-    public double getVelocity(ForgeDirection direction) {
+    public double getVelocity(EnumFacing direction) {
         IRotationalEnergySource src = getSrc();
         if (src == null) return 0;
         return src.getVelocity(direction) * velocitySign;
@@ -197,12 +197,12 @@ public class TileEntityShaft extends TileEntityCommon implements IRotationalEner
 
     @Override
     public void setBlockBounds(Block b) {
-        ForgeDirection dir = axis;
+        EnumFacing dir = axis;
         float l = 0.5F - 2F / 16F;
         float h = 1 - l;
-        if (dir == ForgeDirection.SOUTH) {
+        if (dir == EnumFacing.SOUTH) {
             b.setBlockBounds(l, l, 0, h, h, 1);
-        } else if (dir == ForgeDirection.EAST) {
+        } else if (dir == EnumFacing.EAST) {
             b.setBlockBounds(0, l, l, 1, h, h);
         } else { // UP
             b.setBlockBounds(l, 0, l, h, 1, h);
@@ -211,15 +211,15 @@ public class TileEntityShaft extends TileEntityCommon implements IRotationalEner
 
     @Override
     public AxisAlignedBB getCollisionBoundingBoxFromPool() {
-        ForgeDirection dir = axis;
+        EnumFacing dir = axis;
         float l = 0.5F - 2F / 16F;
         float h = 1 - l;
-        if (dir == ForgeDirection.SOUTH) {
-            return AxisAlignedBB.getBoundingBox(xCoord + l, yCoord + l, zCoord + 0, xCoord + h, yCoord + h, zCoord + 1);
-        } else if (dir == ForgeDirection.EAST) {
-            return AxisAlignedBB.getBoundingBox(xCoord + 0, yCoord + l, zCoord + l, xCoord + 1, yCoord + h, zCoord + h);
+        if (dir == EnumFacing.SOUTH) {
+            return new AxisAlignedBB(xCoord + l, yCoord + l, zCoord + 0, xCoord + h, yCoord + h, zCoord + 1);
+        } else if (dir == EnumFacing.EAST) {
+            return new AxisAlignedBB(xCoord + 0, yCoord + l, zCoord + l, xCoord + 1, yCoord + h, zCoord + h);
         } else { // UP
-            return AxisAlignedBB.getBoundingBox(xCoord + l, yCoord + 0, zCoord + l, xCoord + h, yCoord + 1, zCoord + h);
+            return new AxisAlignedBB(xCoord + l, yCoord + 0, zCoord + l, xCoord + h, yCoord + 1, zCoord + h);
         }
     }
 
@@ -257,7 +257,7 @@ public class TileEntityShaft extends TileEntityCommon implements IRotationalEner
         }
     }
 
-    void invalidateLine(Coord at, ForgeDirection dir) {
+    void invalidateLine(Coord at, EnumFacing dir) {
         while (true) {
             at.adjust(dir);
             TileEntityShaft shaft = at.getTE(TileEntityShaft.class);
@@ -271,16 +271,16 @@ public class TileEntityShaft extends TileEntityCommon implements IRotationalEner
         }
     }
 
-    public static ForgeDirection normalizeDirection(ForgeDirection dir) {
+    public static EnumFacing normalizeDirection(EnumFacing dir) {
         return SpaceUtil.sign(dir) == -1 ? dir.getOpposite() : dir;
     }
 
-    public void setAxis(ForgeDirection axis) {
+    public void setAxis(EnumFacing axis) {
         this.axis = normalizeDirection(axis);
     }
 
     private boolean isUnconnected() {
-        ForgeDirection back = axis.getOpposite();
+        EnumFacing back = axis.getOpposite();
         boolean a = IRotationalEnergySource.adapter.cast(getCoord().add(axis).getTE()) == null;
         boolean b = IRotationalEnergySource.adapter.cast(getCoord().add(back).getTE()) == null;
         return a && b;
@@ -295,14 +295,14 @@ public class TileEntityShaft extends TileEntityCommon implements IRotationalEner
     }
 
     private void joinAdjacent(EntityPlayer player, int side) {
-        ForgeDirection defaultDirection = ForgeDirection.getOrientation(side);
+        EnumFacing defaultDirection = SpaceUtil.getOrientation(side);
 
         Coord at = getCoord();
         ArrayList<Coord> lockedNeighbors = new ArrayList<Coord>();
         ArrayList<Coord> freeNeighbors = new ArrayList<Coord>();
-        ForgeDirection lockedDirection = ForgeDirection.UNKNOWN, free_direction = ForgeDirection.UNKNOWN;
+        EnumFacing lockedDirection = null, free_direction = null;
         TileEntityShaft free_neighbor = null;
-        for (ForgeDirection neighborDirection : ForgeDirection.VALID_DIRECTIONS) {
+        for (EnumFacing neighborDirection : EnumFacing.VALUES) {
             Coord neighbor = at.add(neighborDirection);
             TileEntityShaft tes = at.getTE(TileEntityShaft.class);
             if (tes != null) {
@@ -371,7 +371,7 @@ public class TileEntityShaft extends TileEntityCommon implements IRotationalEner
     }
 
     @Override
-    public boolean rotate(ForgeDirection axis) {
+    public boolean rotate(EnumFacing axis) {
         axis = normalizeDirection(axis);
         if (axis == this.axis) return false;
         invalidateConnections();
@@ -380,7 +380,7 @@ public class TileEntityShaft extends TileEntityCommon implements IRotationalEner
     }
 
     @Override
-    public IIcon getIcon(ForgeDirection dir) {
+    public IIcon getIcon(EnumFacing dir) {
         return BlockIcons.beauty$shaft;
     }
 }

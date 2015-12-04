@@ -7,7 +7,7 @@ import factorization.api.DeltaCoord;
 import factorization.util.SpaceUtil;
 import net.minecraft.util.Vec3;
 import net.minecraft.world.chunk.Chunk;
-import net.minecraftforge.common.util.ForgeDirection;
+import net.minecraft.util.EnumFacing;
 import factorization.api.Coord;
 import factorization.api.FzColor;
 import factorization.api.FzOrientation;
@@ -21,7 +21,7 @@ public class MotionHandler {
     Coord pos_prev, pos_next;
     public float pos_progress;
     public FzOrientation prevOrientation = FzOrientation.UNKNOWN, orientation = FzOrientation.UNKNOWN;
-    public ForgeDirection nextDirection = ForgeDirection.UNKNOWN, lastDirection = ForgeDirection.UNKNOWN;
+    public EnumFacing nextDirection = null, lastDirection = null;
     byte speed_b;
     byte target_speed_index = 2;
     static final byte max_speed_b = 127;
@@ -137,7 +137,7 @@ public class MotionHandler {
         return (sr.priority >= 0 || desperate) && !color.conflictsWith(sr.color);
     }
 
-    boolean validDirection(ForgeDirection dir, boolean desperate) {
+    boolean validDirection(EnumFacing dir, boolean desperate) {
         Coord at = motor.getCurrentPos();
         at.adjust(dir);
         try {
@@ -147,8 +147,8 @@ public class MotionHandler {
         }
     }
 
-    public boolean testDirection(ForgeDirection d, boolean desperate) {
-        if (d == ForgeDirection.UNKNOWN) {
+    public boolean testDirection(EnumFacing d, boolean desperate) {
+        if (d == null) {
             return false;
         }
         return validDirection(d, desperate);
@@ -161,9 +161,9 @@ public class MotionHandler {
         return ret;
     }
     
-    public void changeOrientation(ForgeDirection dir) {
-        ForgeDirection orig_direction = orientation.facing;
-        ForgeDirection orig_top = orientation.top;
+    public void changeOrientation(EnumFacing dir) {
+        EnumFacing orig_direction = orientation.facing;
+        EnumFacing orig_top = orientation.top;
         FzOrientation start = FzOrientation.fromDirection(dir);
         FzOrientation perfect = start.pointTopTo(orig_top);
         if (perfect == FzOrientation.UNKNOWN) {
@@ -181,18 +181,18 @@ public class MotionHandler {
         orientation = perfect;
         lastDirection = orig_direction;
         if (orientation.facing == nextDirection) {
-            nextDirection = ForgeDirection.UNKNOWN;
+            nextDirection = null;
         }
     }
 
     boolean pickNextOrientation_impl() {
-        ArrayList<ForgeDirection> dirs = SpaceUtil.getRandomDirections(motor.worldObj.rand);
+        ArrayList<EnumFacing> dirs = SpaceUtil.getRandomDirections(motor.worldObj.rand);
         int available_nonbackwards_directions = 0;
         Coord look = pos_next.copy();
         int all_count = 0;
         //noinspection ForLoopReplaceableByForEach
         for (int i = 0; i < dirs.size(); i++) {
-            ForgeDirection fd = dirs.get(i);
+            EnumFacing fd = dirs.get(i);
             look.set(pos_next);
             look.adjust(fd);
             TileEntityServoRail sr = look.getTE(TileEntityServoRail.class);
@@ -220,8 +220,8 @@ public class MotionHandler {
         }
         
         final boolean desperate = available_nonbackwards_directions < 1;
-        final ForgeDirection direction = orientation.facing;
-        final ForgeDirection opposite = direction.getOpposite();
+        final EnumFacing direction = orientation.facing;
+        final EnumFacing opposite = direction.getOpposite();
         
         if (nextDirection != opposite && testDirection(nextDirection, desperate)) {
             // We can go the way we were told to go next
@@ -237,7 +237,7 @@ public class MotionHandler {
             changeOrientation(lastDirection);
             return true;
         }
-        final ForgeDirection top = orientation.top;
+        final EnumFacing top = orientation.top;
         if (testDirection(top, desperate) /* top being opposite won't be an issue because of Geometry */ ) {
             // We'll turn upwards.
             changeOrientation(top);
@@ -247,7 +247,7 @@ public class MotionHandler {
         // We'll pick a random direction; we're re-using the list from before, should be fine.
         // Going backwards is our last resort.
         for (int i = 0; i < 6; i++) {
-            ForgeDirection d = dirs.get(i);
+            EnumFacing d = dirs.get(i);
             if (d == nextDirection || d == direction || d == opposite || d == lastDirection || d == top) {
                 continue;
             }

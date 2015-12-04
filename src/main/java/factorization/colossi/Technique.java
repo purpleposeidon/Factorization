@@ -1,6 +1,6 @@
 package factorization.colossi;
 
-import cpw.mods.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.Side;
 import factorization.algos.ReservoirSampler;
 import factorization.api.Coord;
 import factorization.api.DeltaCoord;
@@ -32,7 +32,7 @@ import net.minecraft.potion.Potion;
 import net.minecraft.potion.PotionEffect;
 import net.minecraft.util.Vec3;
 import net.minecraft.world.WorldServer;
-import net.minecraftforge.common.util.ForgeDirection;
+import net.minecraft.util.EnumFacing;
 
 import java.util.*;
 
@@ -68,7 +68,7 @@ public enum Technique implements IStateMachine<Technique> {
                     controller.body.setRotationalVelocity(new Quaternion());
                     Quaternion bodyRot = controller.body.getRotation();
                     double yRot = bodyRot.toRotationVector().yCoord;
-                    Quaternion straightRot = Quaternion.getRotationQuaternionRadians(yRot, ForgeDirection.UP);
+                    Quaternion straightRot = Quaternion.getRotationQuaternionRadians(yRot, EnumFacing.UP);
                     if (err > Math.PI / 160) {
                         controller.bodyLimbInfo.target(straightRot, 1 * controller.getSpeedScale());
                     } else {
@@ -135,7 +135,7 @@ public enum Technique implements IStateMachine<Technique> {
 
             Quaternion bodyRot = controller.body.getRotation();
             double yRot = bodyRot.toRotationVector().yCoord;
-            Quaternion straightRot = Quaternion.getRotationQuaternionRadians(yRot, ForgeDirection.UP);
+            Quaternion straightRot = Quaternion.getRotationQuaternionRadians(yRot, EnumFacing.UP);
             controller.bodyLimbInfo.target(straightRot, 1 * controller.getSpeedScale());
             int time = controller.bodyLimbInfo.idc.getEntity().getRemainingRotationTime();
 
@@ -153,7 +153,7 @@ public enum Technique implements IStateMachine<Technique> {
             
             /*
             Quaternion bodyRot = controller.body.getRotation();
-            Quaternion up = Quaternion.getRotationQuaternionRadians(0, ForgeDirection.UP);
+            Quaternion up = Quaternion.getRotationQuaternionRadians(0, EnumFacing.UP);
             double tiltAngle = bodyRot.dotProduct(up);
             Vec3 right = bodyRot.cross(up).toVector().normalize();
             Quaternion correction = Quaternion.getRotationQuaternionRadians(tiltAngle, right);
@@ -184,7 +184,7 @@ public enum Technique implements IStateMachine<Technique> {
             // Bend over slightly
             double slight_bend = Math.PI / 8;
             Random rand = controller.worldObj.rand;
-            ForgeDirection dir = rand.nextBoolean() ? ForgeDirection.NORTH : ForgeDirection.SOUTH;
+            EnumFacing dir = rand.nextBoolean() ? EnumFacing.NORTH : EnumFacing.SOUTH;
             Quaternion bend = Quaternion.getRotationQuaternionRadians(slight_bend, dir);
             Quaternion rot = controller.body.getRotation().multiply(bend);
             controller.bodyLimbInfo.target(rot, controller.getSpeedScale());
@@ -226,9 +226,9 @@ public enum Technique implements IStateMachine<Technique> {
             double cross = NumUtil.interp(MIN_CROSS, MAX_CROSS, rand.nextDouble());
             double twist = Math.PI / 2 * rand.nextDouble();
             if (arm.side == BodySide.LEFT) cross = -cross;
-            Quaternion rot = Quaternion.getRotationQuaternionRadians(cross, ForgeDirection.UP);
-            rot.incrMultiply(Quaternion.getRotationQuaternionRadians(raise, ForgeDirection.SOUTH));
-            rot.incrMultiply(Quaternion.getRotationQuaternionRadians(twist, ForgeDirection.UP));
+            Quaternion rot = Quaternion.getRotationQuaternionRadians(cross, EnumFacing.UP);
+            rot.incrMultiply(Quaternion.getRotationQuaternionRadians(raise, EnumFacing.SOUTH));
+            rot.incrMultiply(Quaternion.getRotationQuaternionRadians(twist, EnumFacing.UP));
             arm.target(rot, controller.getSpeedScale());
         }
     },
@@ -244,7 +244,7 @@ public enum Technique implements IStateMachine<Technique> {
             STAND_STILL.onEnterState(controller, prevState);
             for (LimbInfo limb : controller.limbs) {
                 if (limb.type != LimbType.ARM) continue;
-                final Quaternion rot = Quaternion.getRotationQuaternionRadians(Math.PI, ForgeDirection.WEST);
+                final Quaternion rot = Quaternion.getRotationQuaternionRadians(Math.PI, EnumFacing.WEST);
                 if (limb.side == BodySide.LEFT) rot.incrConjugate();
                 limb.target(rot, controller.getStrikeSpeedScale());
             }
@@ -310,8 +310,8 @@ public enum Technique implements IStateMachine<Technique> {
                 public void handle(Coord here) {
                     if (here.getBlock() != Core.registry.colossal_block) return;
                     if (here.getMd() != ColossalBlock.MD_MASK) return;
-                    if (!here.add(ForgeDirection.UP).isAir()) return;
-                    if (here.add(ForgeDirection.EAST).isAir()) return;
+                    if (!here.add(EnumFacing.UP).isAir()) return;
+                    if (here.add(EnumFacing.EAST).isAir()) return;
                     sampler.give(here.copy());
                 }
             });
@@ -362,7 +362,7 @@ public enum Technique implements IStateMachine<Technique> {
         boolean isExposedSkin(Coord cell) {
             if (cell.getBlock() != Core.registry.colossal_block) return false;
             if (cell.getMd() != ColossalBlock.MD_BODY) return false;
-            for (ForgeDirection dir : ForgeDirection.VALID_DIRECTIONS) {
+            for (EnumFacing dir : EnumFacing.VALUES) {
                 Coord n = cell.add(dir);
                 if (n.isAir() || n.isReplacable()) return true;
             }
@@ -414,7 +414,7 @@ public enum Technique implements IStateMachine<Technique> {
             // (And the legs bend -90° since they're rooted to the body)
             // And hopefully we're bipedal! It'd do something hilarious & derpy if quadrapedal or polypedal.
             double bowAngle = Math.toRadians(70);
-            Quaternion bow = Quaternion.getRotationQuaternionRadians(bowAngle, ForgeDirection.NORTH);
+            Quaternion bow = Quaternion.getRotationQuaternionRadians(bowAngle, EnumFacing.NORTH);
             Quaternion bodyBend = controller.body.getRotation().multiply(bow);
             controller.bodyLimbInfo.target(bodyBend, bow_power, bendInterp);
             int bodyBendTime;
@@ -423,7 +423,7 @@ public enum Technique implements IStateMachine<Technique> {
             } else {
                 bodyBendTime = 60; // Hmph! Make something up. Shouldn't happen.
             }
-            //Quaternion legBend = Quaternion.getRotationQuaternionRadians(-bowAngle * 1.5, ForgeDirection.NORTH);
+            //Quaternion legBend = Quaternion.getRotationQuaternionRadians(-bowAngle * 1.5, EnumFacing.NORTH);
             Quaternion bodyBack = bodyBend.conjugate();
             Quaternion legBend = bodyBack.slerp(bodyBack.multiply(bodyBack), 0.5);
             for (LimbInfo limb : controller.limbs) {
@@ -434,8 +434,8 @@ public enum Technique implements IStateMachine<Technique> {
                 } else if (limb.type == LimbType.ARM) {
                     double armFlap = Math.toRadians(limb.side == BodySide.RIGHT ? -25 : 25);
                     double armHang = Math.toRadians(-90 - 45);
-                    Quaternion flap = Quaternion.getRotationQuaternionRadians(armFlap, ForgeDirection.EAST);
-                    Quaternion hang = Quaternion.getRotationQuaternionRadians(armHang, ForgeDirection.NORTH);
+                    Quaternion flap = Quaternion.getRotationQuaternionRadians(armFlap, EnumFacing.EAST);
+                    Quaternion hang = Quaternion.getRotationQuaternionRadians(armHang, EnumFacing.NORTH);
                     idc.orderTargetRotation(flap.multiply(hang).multiply(bow), bodyBendTime /* Don't be influenced by the speed */, Interpolation.SMOOTH);
                 }
             }
@@ -502,7 +502,7 @@ public enum Technique implements IStateMachine<Technique> {
             if (prevState != INITIAL_UNBOW) playNoise(controller);
             Quaternion bodyRot = controller.body.getRotation();
             double yRot = bodyRot.toRotationVector().yCoord;
-            Quaternion straightRot = Quaternion.getRotationQuaternionRadians(-yRot, ForgeDirection.UP);
+            Quaternion straightRot = Quaternion.getRotationQuaternionRadians(-yRot, EnumFacing.UP);
             if (bodyRot.dotProduct(straightRot) < 0) {
                 // Sometimes seems to go the long way 'round; this should make it short
                 straightRot.incrConjugate();
@@ -581,7 +581,7 @@ public enum Technique implements IStateMachine<Technique> {
         public void onEnterState(ColossusController controller, Technique prevState) {
             double v = controller.leg_length / (double) SIT_FALL_TIME;
             controller.body.setVelocity(0, -v * controller.getSpeedScale(), 0);
-            Quaternion legBend = Quaternion.getRotationQuaternionRadians(Math.PI / 2, ForgeDirection.SOUTH);
+            Quaternion legBend = Quaternion.getRotationQuaternionRadians(Math.PI / 2, EnumFacing.SOUTH);
             for (LimbInfo limb : controller.limbs) {
                 if (limb.type == LimbType.LEG) {
                     limb.setTargetRotation(legBend, (int) (SIT_FALL_TIME * controller.getSpeedScale()), Interpolation.SMOOTH);
@@ -772,7 +772,7 @@ public enum Technique implements IStateMachine<Technique> {
                 // that changes DOWN to the normalized direction.
                 // The cross product of the two gives the axis of rotation,
                 // and the dot product can be converted to the angle
-                Vec3 src = Vec3.createVectorHelper(0, -1, 0);
+                Vec3 src = new Vec3(0, -1, 0);
                 Vec3 dst = li2player.normalize();
                 Vec3 axis = src.crossProduct(dst);
                 double angle = SpaceUtil.getAngle(src, dst);
@@ -870,7 +870,7 @@ public enum Technique implements IStateMachine<Technique> {
                 idc.setRotationalVelocity(new Quaternion());
                 idc.permit(DeltaCapability.VIOLENT_COLLISIONS);
             }
-            Quaternion fallAxis = Quaternion.getRotationQuaternionRadians(Math.PI / 2, ForgeDirection.SOUTH);
+            Quaternion fallAxis = Quaternion.getRotationQuaternionRadians(Math.PI / 2, EnumFacing.SOUTH);
             Quaternion rotation = controller.body.getRotation();
             fallAxis = rotation.multiply(fallAxis);
             controller.body.orderTargetRotation(fallAxis, (int) (20 * 2.5 /* 2.5 seconds for the fall sound to hit */), Interpolation.SQUARE);
@@ -1064,7 +1064,7 @@ public enum Technique implements IStateMachine<Technique> {
                 if (limb.type == LimbType.BODY) {
                     Quaternion bodyRot = controller.body.getRotation();
                     double yRot = bodyRot.toRotationVector().yCoord;
-                    Quaternion straightRot = Quaternion.getRotationQuaternionRadians(-yRot, ForgeDirection.UP);
+                    Quaternion straightRot = Quaternion.getRotationQuaternionRadians(-yRot, EnumFacing.UP);
                     if (bodyRot.dotProduct(straightRot) < 0) {
                         // Sometimes seems to go the long way 'round; this should make it short
                         straightRot.incrConjugate();
@@ -1074,7 +1074,7 @@ public enum Technique implements IStateMachine<Technique> {
                 }
                 int angleDeg = limb.type == LimbType.ARM ? 90 + 45 : 45;
                 if (limb.side == BodySide.RIGHT) angleDeg = -angleDeg;
-                Quaternion target = Quaternion.getRotationQuaternionRadians(Math.toRadians(angleDeg), ForgeDirection.EAST);
+                Quaternion target = Quaternion.getRotationQuaternionRadians(Math.toRadians(angleDeg), EnumFacing.EAST);
                 idc.orderTargetRotation(target, target_time, Interpolation.INV_CUBIC);
             }
 
@@ -1218,7 +1218,7 @@ public enum Technique implements IStateMachine<Technique> {
         if (li.type != LimbType.ARM) return;
         // Swing arms towards side
         double d = turnDirection == BodySide.RIGHT ? -1 : +1;
-        Quaternion rot = Quaternion.getRotationQuaternionRadians(Math.PI / 2, ForgeDirection.SOUTH);
+        Quaternion rot = Quaternion.getRotationQuaternionRadians(Math.PI / 2, EnumFacing.SOUTH);
         double turn;
         // But the arm that's crossing the body can't, anatomically speaking, go all the way
         if (li.side == turnDirection) {
@@ -1227,7 +1227,7 @@ public enum Technique implements IStateMachine<Technique> {
             turn = +45;
         }
         turn = Math.toRadians(turn) * d;
-        rot = Quaternion.getRotationQuaternionRadians(turn, ForgeDirection.UP).multiply(rot);
+        rot = Quaternion.getRotationQuaternionRadians(turn, EnumFacing.UP).multiply(rot);
         li.target(rot, 1 * controller.getSpeedScale(), Interpolation.SMOOTH);
     }
     

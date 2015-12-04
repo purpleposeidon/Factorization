@@ -17,7 +17,7 @@ import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntityChest;
 import net.minecraft.world.World;
-import net.minecraftforge.common.util.ForgeDirection;
+import net.minecraft.util.EnumFacing;
 
 import java.util.List;
 
@@ -27,7 +27,7 @@ import java.util.List;
 public final class InvUtil {
 
     public static void givePlayerItem(EntityPlayer player, ItemStack is) {
-        FzInv inv = openInventory(player.inventory, ForgeDirection.UP);
+        FzInv inv = openInventory(player.inventory, EnumFacing.UP);
         ItemStack drop = inv.push(is);
         if (drop != null) {
             player.dropPlayerItemWithRandomChoice(drop, false);
@@ -109,11 +109,11 @@ public final class InvUtil {
         return ItemUtil.normalize(clickStack);
     }
 
-    public static FzInv openInventory(IInventory orig_inv, ForgeDirection side) {
+    public static FzInv openInventory(IInventory orig_inv, EnumFacing side) {
         return openInventory(orig_inv, side.ordinal(), true);
     }
 
-    public static FzInv openInventory(IInventory orig_inv, ForgeDirection side, boolean openBothChests) {
+    public static FzInv openInventory(IInventory orig_inv, EnumFacing side, boolean openBothChests) {
         return openInventory(orig_inv, side.ordinal(), openBothChests);
     }
 
@@ -133,11 +133,11 @@ public final class InvUtil {
         }
         if (orig_inv instanceof net.minecraft.inventory.ISidedInventory) {
             final net.minecraft.inventory.ISidedInventory inv = (net.minecraft.inventory.ISidedInventory) orig_inv;
-            int[] _ = inv.getAccessibleSlotsFromSide(side);
-            if (_ == null) {
-                _ = new int[0];
+            int[] invSlots = inv.getAccessibleSlotsFromSide(side);
+            if (invSlots == null) {
+                invSlots = new int[0];
             }
-            final int[] slotMap = _;
+            final int[] slotMap = invSlots;
             return new FzInv(inv) {
                 @Override
                 int slotIndex(int i) {
@@ -174,11 +174,11 @@ public final class InvUtil {
             return null;
         }
         if (ent instanceof IInventory) {
-            return openInventory((IInventory) ent, ForgeDirection.UP);
+            return openInventory((IInventory) ent, EnumFacing.UP);
         }
         if (ent instanceof EntityPlayer) {
             InventoryPlayer ip = ((EntityPlayer)ent).inventory;
-            return openInventory(ip, ForgeDirection.UP).slice(0, ip.mainInventory.length);
+            return openInventory(ip, EnumFacing.UP).slice(0, ip.mainInventory.length);
         }
         return null;
     }
@@ -210,7 +210,7 @@ public final class InvUtil {
      */
     public static IInventory openDoubleChest(TileEntityChest chest, boolean openBothSides) {
         IInventory origChest = chest;
-        World world = chest.getWorldObj();
+        World world = chest.getWorld();
         int i = chest.xCoord, j = chest.yCoord, k = chest.zCoord;
         Block cb = chest.getBlockType();
         if (cb == null) {

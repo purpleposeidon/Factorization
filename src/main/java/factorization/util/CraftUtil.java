@@ -168,7 +168,7 @@ public final class CraftUtil {
 
         InventoryCrafting craft = getCrafter(slots);
 
-        IRecipe recipe = findMatchingRecipe(craft, where == null ? null : where.getWorldObj());
+        IRecipe recipe = findMatchingRecipe(craft, where == null ? null : where.getWorld());
         ItemStack result = null;
         if (recipe != null) {
             result = recipe.getCraftingResult(craft);

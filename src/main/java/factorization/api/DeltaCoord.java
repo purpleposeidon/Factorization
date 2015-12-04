@@ -6,7 +6,7 @@ import factorization.api.datahelpers.IDataSerializable;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.Vec3;
-import net.minecraftforge.common.util.ForgeDirection;
+import net.minecraft.util.EnumFacing;
 
 import java.io.IOException;
 
@@ -30,8 +30,8 @@ public class DeltaCoord implements IDataSerializable {
         this.z = orig.z;
     }
 
-    public DeltaCoord(ForgeDirection dir) {
-        this(dir.offsetX, dir.offsetY, dir.offsetZ);
+    public DeltaCoord(EnumFacing dir) {
+        this(dir.getDirectionVec().getX(), dir.getDirectionVec().getY(), dir.getDirectionVec().getZ());
     }
 
     public DeltaCoord add(DeltaCoord o) {
@@ -95,15 +95,15 @@ public class DeltaCoord implements IDataSerializable {
         return Math.atan2(z, -x);
     }
     
-    public ForgeDirection getDirection() {
-        ForgeDirection[] values = ForgeDirection.VALID_DIRECTIONS;
+    public EnumFacing getDirection() {
+        EnumFacing[] values = EnumFacing.VALUES;
         for (int i = 0; i < values.length; i++) {
-            ForgeDirection d = values[i];
-            if (d.offsetX == x && d.offsetY == y && d.offsetZ == z) {
+            EnumFacing d = values[i];
+            if (d.getDirectionVec().getX() == x && d.getDirectionVec().getY() == y && d.getDirectionVec().getZ() == z) {
                 return d;
             }
         }
-        return ForgeDirection.UNKNOWN;
+        return null;
     }
 
     public int getFaceSide() {
@@ -230,12 +230,12 @@ public class DeltaCoord implements IDataSerializable {
     }
 
     public Vec3 toVector() {
-        return Vec3.createVectorHelper(x, y, z);
+        return new Vec3(x, y, z);
     }
 
-    public void move(ForgeDirection dir) {
-        x += dir.offsetX;
-        y += dir.offsetY;
-        z += dir.offsetZ;
+    public void move(EnumFacing dir) {
+        x += dir.getDirectionVec().getX();
+        y += dir.getDirectionVec().getY();
+        z += dir.getDirectionVec().getZ();
     }
 }

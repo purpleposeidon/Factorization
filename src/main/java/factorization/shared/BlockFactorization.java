@@ -1,8 +1,8 @@
 package factorization.shared;
 
-import cpw.mods.fml.common.network.internal.FMLProxyPacket;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
+import net.minecraftforge.fml.common.network.internal.FMLProxyPacket;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 import factorization.algos.ReservoirSampler;
 import factorization.api.Coord;
 import factorization.api.FzColor;
@@ -27,7 +27,7 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.*;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
-import net.minecraftforge.common.util.ForgeDirection;
+import net.minecraft.util.EnumFacing;
 
 import java.util.*;
 
@@ -80,7 +80,7 @@ public class BlockFactorization extends BlockContainer {
     }
     
     @Override
-    public boolean isSideSolid(IBlockAccess world, int x, int y, int z, ForgeDirection side) {
+    public boolean isSideSolid(IBlockAccess world, int x, int y, int z, EnumFacing side) {
         return isBlockSolid(world, x, y, z, side.ordinal());
     }
     
@@ -111,7 +111,7 @@ public class BlockFactorization extends BlockContainer {
         }
 
         if (t != null) {
-            return t.activate(player, ForgeDirection.getOrientation(side));
+            return t.activate(player, SpaceUtil.getOrientation(side));
         }
         if (w.isRemote) {
             if (here.getTE() == null) {
@@ -154,7 +154,7 @@ public class BlockFactorization extends BlockContainer {
         TileEntity te = w.getTileEntity(x, y, z);
         if (te instanceof TileEntityCommon) {
             TileEntityCommon tec = (TileEntityCommon) te;
-            return tec.getIcon(ForgeDirection.getOrientation(side));
+            return tec.getIcon(SpaceUtil.getOrientation(side));
         }
         return BlockIcons.error;
     }
@@ -179,7 +179,7 @@ public class BlockFactorization extends BlockContainer {
         if (rep == null) {
             return BlockIcons.error;
         }
-        return rep.getIcon(ForgeDirection.getOrientation(side));
+        return rep.getIcon(SpaceUtil.getOrientation(side));
     }
     
     @Override
@@ -375,7 +375,7 @@ public class BlockFactorization extends BlockContainer {
     }
 
     @Override
-    public int getFlammability(IBlockAccess world, int x, int y, int z, ForgeDirection face) {
+    public int getFlammability(IBlockAccess world, int x, int y, int z, EnumFacing face) {
         int md = world.getBlockMetadata(x, y, z);
         if (BlockClass.Barrel.md == md) {
             TileEntity te = world.getTileEntity(x, y, z);
@@ -387,7 +387,7 @@ public class BlockFactorization extends BlockContainer {
     }
     
     @Override
-    public boolean isFlammable(IBlockAccess world, int x, int y, int z, ForgeDirection face) {
+    public boolean isFlammable(IBlockAccess world, int x, int y, int z, EnumFacing face) {
         //Not really. But this keeps fire rendering.
         return getFlammability(world, x, y, z, face) > 0;
     }
@@ -554,7 +554,7 @@ public class BlockFactorization extends BlockContainer {
     public boolean addHitEffects(World worldObj, MovingObjectPosition target, EffectRenderer effectRenderer) {
         Coord here = new Coord(worldObj, target.blockX, target.blockY, target.blockZ);
         TileEntityCommon tec = here.getTE(TileEntityCommon.class);
-        tempParticleIIcon = (tec == null) ? BlockIcons.default_icon : tec.getIcon(ForgeDirection.getOrientation(target.sideHit));
+        tempParticleIIcon = (tec == null) ? BlockIcons.default_icon : tec.getIcon(SpaceUtil.getOrientation(target.sideHit));
         return false;
     }
     
@@ -566,7 +566,7 @@ public class BlockFactorization extends BlockContainer {
             return false;
         }
         TileEntityCommon tec = (TileEntityCommon) te;
-        IIcon theIIcon =  tec.getIcon(ForgeDirection.DOWN);
+        IIcon theIIcon =  tec.getIcon(EnumFacing.DOWN);
         
         //copied & modified from EffectRenderer.addDestroyEffects
         byte range = 4;
@@ -588,7 +588,7 @@ public class BlockFactorization extends BlockContainer {
     }
     
     @Override
-    public boolean rotateBlock(World worldObj, int x, int y, int z, ForgeDirection axis) {
+    public boolean rotateBlock(World worldObj, int x, int y, int z, EnumFacing axis) {
         final Coord at = new Coord(worldObj, x, y, z);
         TileEntityCommon tec = at.getTE(TileEntityCommon.class);
         if (tec == null) {
@@ -602,7 +602,7 @@ public class BlockFactorization extends BlockContainer {
     }
     
     @Override
-    public ForgeDirection[] getValidRotations(World worldObj, int x, int y, int z) {
+    public EnumFacing[] getValidRotations(World worldObj, int x, int y, int z) {
         TileEntityCommon tec = new Coord(worldObj, x, y, z).getTE(TileEntityCommon.class);
         if (tec == null) {
             return TileEntityCommon.empty_rotation_array;
@@ -621,7 +621,7 @@ public class BlockFactorization extends BlockContainer {
         if (tec == null) {
             return 0;
         }
-        return tec.getComparatorValue(ForgeDirection.getOrientation(side));
+        return tec.getComparatorValue(SpaceUtil.getOrientation(side));
     }
     
     @Override
@@ -642,7 +642,7 @@ public class BlockFactorization extends BlockContainer {
     }
     
     @Override
-    public boolean recolourBlock(World world, int x, int y, int z, ForgeDirection side, int colour) {
+    public boolean recolourBlock(World world, int x, int y, int z, EnumFacing side, int colour) {
         TileEntity te = world.getTileEntity(x, y, z);
         if (te instanceof TileEntityCommon) {
             return ((TileEntityCommon) te).recolourBlock(side, FzColor.fromVanillaColorIndex(colour));

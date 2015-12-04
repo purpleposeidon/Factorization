@@ -5,16 +5,16 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Map;
 
-import cpw.mods.fml.relauncher.IFMLLoadingPlugin;
-import cpw.mods.fml.relauncher.IFMLLoadingPlugin.DependsOn;
-import cpw.mods.fml.relauncher.IFMLLoadingPlugin.MCVersion;
-import cpw.mods.fml.relauncher.IFMLLoadingPlugin.SortingIndex;
-import cpw.mods.fml.relauncher.IFMLLoadingPlugin.TransformerExclusions;
+import net.minecraftforge.fml.relauncher.IFMLLoadingPlugin;
+import net.minecraftforge.fml.relauncher.IFMLLoadingPlugin.DependsOn;
+import net.minecraftforge.fml.relauncher.IFMLLoadingPlugin.MCVersion;
+import net.minecraftforge.fml.relauncher.IFMLLoadingPlugin.SortingIndex;
+import net.minecraftforge.fml.relauncher.IFMLLoadingPlugin.TransformerExclusions;
 
 @SortingIndex(1)
 @MCVersion("1.7.10") // NORELEASE: Check that this matches our MC version! (Or just automate it...)
 @TransformerExclusions("factorization.coremod.")
-@DependsOn("cpw.mods.fml.common.asm.transformers.DeobfuscationTransformer")
+@DependsOn("net.minecraftforge.fml.common.asm.transformers.DeobfuscationTransformer")
 public class LoadingPlugin implements IFMLLoadingPlugin {
     public static boolean pluginInvoked = false;
     public static boolean deobfuscatedEnvironment = true;

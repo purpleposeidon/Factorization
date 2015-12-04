@@ -13,7 +13,7 @@ import factorization.util.ItemUtil;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.IIcon;
-import net.minecraftforge.common.util.ForgeDirection;
+import net.minecraft.util.EnumFacing;
 import factorization.common.BlockIcons;
 import factorization.common.FactoryType;
 
@@ -30,7 +30,7 @@ public class TileEntityStamper extends TileEntityFactorization {
     }
     
     @Override
-    public IIcon getIcon(ForgeDirection dir) {
+    public IIcon getIcon(EnumFacing dir) {
         return BlockIcons.stamper.get(this, dir);
     }
 
@@ -42,7 +42,7 @@ public class TileEntityStamper extends TileEntityFactorization {
     static int[] OUTPUT_sides = {0}, INPUT_sides = {1};
     @Override
     public int[] getAccessibleSlotsFromSide(int s) {
-        switch (ForgeDirection.getOrientation(s)) {
+        switch (SpaceUtil.getOrientation(s)) {
         case DOWN: return INPUT_sides;
         default: return OUTPUT_sides;
         }

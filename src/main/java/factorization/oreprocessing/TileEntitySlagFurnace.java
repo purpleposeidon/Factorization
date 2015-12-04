@@ -21,7 +21,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntityFurnace;
 import net.minecraft.util.IIcon;
 import net.minecraft.world.World;
-import net.minecraftforge.common.util.ForgeDirection;
+import net.minecraft.util.EnumFacing;
 import factorization.common.BlockIcons;
 import factorization.common.FactoryType;
 import factorization.shared.NetworkFactorization.MessageType;
@@ -46,7 +46,7 @@ public class TileEntitySlagFurnace extends TileEntityFactorization implements IF
     }
 
     @Override
-    public IIcon getIcon(ForgeDirection dir) {
+    public IIcon getIcon(EnumFacing dir) {
         if (draw_active > 0 && facing_direction == dir.ordinal()) {
             return BlockIcons.machine$slag_furnace_face_on;
         }
@@ -73,7 +73,7 @@ public class TileEntitySlagFurnace extends TileEntityFactorization implements IF
     
     @Override
     public int[] getAccessibleSlotsFromSide(int s) {
-        ForgeDirection side = ForgeDirection.getOrientation(s);
+        EnumFacing side = SpaceUtil.getOrientation(s);
         switch (side) {
         case DOWN: return OUTPUT_s;
         case UP: return INPUT_s;
@@ -362,8 +362,8 @@ public class TileEntitySlagFurnace extends TileEntityFactorization implements IF
     }
     
     @Override
-    public boolean rotate(ForgeDirection axis) {
-        if (axis.offsetY != 0) {
+    public boolean rotate(EnumFacing axis) {
+        if (axis.getDirectionVec().getY() != 0) {
             return false;
         }
         byte newd = (byte) axis.ordinal();

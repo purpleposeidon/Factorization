@@ -7,8 +7,8 @@ import net.minecraft.util.Vec3;
 
 import org.lwjgl.opengl.GL11;
 
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 import factorization.shared.Core;
 
 public class ChargeSparks {
@@ -124,7 +124,7 @@ public class ChargeSparks {
     private static int segments_drawn, end_segment;
     private static SparkInfo current_spark;
     
-    private static Vec3 work = Vec3.createVectorHelper(0, 0, 0), work2 = Vec3.createVectorHelper(0, 0, 0), delta = Vec3.createVectorHelper(0, 0, 0);
+    private static Vec3 work = new Vec3(0, 0, 0), work2 = new Vec3(0, 0, 0), delta = new Vec3(0, 0, 0);
     
     void drawSpark(Vec3 start, Vec3 end, int depth) {
         if (segments_drawn > end_segment) {

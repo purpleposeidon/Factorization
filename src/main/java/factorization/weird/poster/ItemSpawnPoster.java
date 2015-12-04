@@ -13,7 +13,7 @@ import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.MovingObjectPosition;
 import net.minecraft.util.Vec3;
 import net.minecraft.world.World;
-import net.minecraftforge.common.util.ForgeDirection;
+import net.minecraft.util.EnumFacing;
 
 import java.util.ArrayList;
 
@@ -41,7 +41,7 @@ public class ItemSpawnPoster extends ItemFactorization {
         private int z;
         private int side;
 
-        final ForgeDirection dir;
+        final EnumFacing dir;
 
         final Coord at;
         AxisAlignedBB blockBox = null;
@@ -51,7 +51,7 @@ public class ItemSpawnPoster extends ItemFactorization {
         double bestWidth;
         AxisAlignedBB bounds, plane;
         Quaternion rot;
-        ForgeDirection top;
+        EnumFacing top;
 
         public PosterPlacer(ItemStack is, EntityPlayer player, World w, int x, int y, int z, int side) {
             this.is = is;
@@ -62,7 +62,7 @@ public class ItemSpawnPoster extends ItemFactorization {
             this.z = z;
             this.side = side;
             this.at = new Coord(w, x, y, z);
-            this.dir = ForgeDirection.getOrientation(side);
+            this.dir = SpaceUtil.getOrientation(side);
         }
 
         boolean is() {
@@ -89,14 +89,14 @@ public class ItemSpawnPoster extends ItemFactorization {
         private void determineOrientation() {
             // Determine rotations & orientations
             double rotationAngle = 0;
-            if (dir.offsetY == 0) {
-                top = ForgeDirection.UP;
-                if (dir == ForgeDirection.WEST) rotationAngle = 1;
-                if (dir == ForgeDirection.SOUTH) rotationAngle = 2;
-                if (dir == ForgeDirection.EAST) rotationAngle = 3;
+            if (dir.getDirectionVec().getY() == 0) {
+                top = EnumFacing.UP;
+                if (dir == EnumFacing.WEST) rotationAngle = 1;
+                if (dir == EnumFacing.SOUTH) rotationAngle = 2;
+                if (dir == EnumFacing.EAST) rotationAngle = 3;
             } else {
-                top = ForgeDirection.WEST;
-                rotationAngle = -dir.offsetY;
+                top = EnumFacing.WEST;
+                rotationAngle = -dir.getDirectionVec().getY();
             }
             rot = Quaternion.getRotationQuaternionRadians(rotationAngle * Math.PI / 2, top);
         }
@@ -106,7 +106,7 @@ public class ItemSpawnPoster extends ItemFactorization {
             plane = SpaceUtil.flatten(blockBox, dir);
 
             final double pix = 1.0 / 16.0;
-            bounds = plane.addCoord(dir.offsetX * pix, dir.offsetY * pix, dir.offsetZ * pix);
+            bounds = plane.addCoord(dir.getDirectionVec().getX() * pix, dir.getDirectionVec().getY() * pix, dir.getDirectionVec().getZ() * pix);
 
             for (Object ent : w.getEntitiesWithinAABB(EntityPoster.class, bounds)) {
                 if (ent instanceof EntityPoster) {

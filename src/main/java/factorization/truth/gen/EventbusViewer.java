@@ -1,12 +1,12 @@
 package factorization.truth.gen;
 
 import com.google.common.base.Splitter;
-import cpw.mods.fml.common.FMLCommonHandler;
-import cpw.mods.fml.common.eventhandler.EventBus;
-import cpw.mods.fml.common.eventhandler.EventPriority;
-import cpw.mods.fml.common.eventhandler.IEventListener;
-import cpw.mods.fml.common.eventhandler.SubscribeEvent;
-import cpw.mods.fml.relauncher.ReflectionHelper;
+import net.minecraftforge.fml.common.FMLCommonHandler;
+import net.minecraftforge.fml.common.eventhandler.EventBus;
+import net.minecraftforge.fml.common.eventhandler.EventPriority;
+import net.minecraftforge.fml.common.eventhandler.IEventListener;
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.fml.relauncher.ReflectionHelper;
 import factorization.truth.api.IDocGenerator;
 import factorization.truth.api.ITypesetter;
 import factorization.truth.api.TruthError;
@@ -80,7 +80,7 @@ public class EventbusViewer implements IDocGenerator {
                 if (a.priority() == EventPriority.NORMAL && !a.receiveCanceled()) {
                     out.write("@SubscribeEvent\\nl");
                 } else {
-                    out.write(a.toString().replace("cpw.mods.fml.common.eventhandler.", "") + "\\nl");
+                    out.write(a.toString().replace("net.minecraftforge.fml.common.eventhandler.", "") + "\\nl");
                 }
                 final String handlerName = m.getDeclaringClass().getCanonicalName();
                 outSplit(out, handlerName + "." + m.getName(), null);

@@ -18,7 +18,7 @@ import net.minecraft.util.IIcon;
 import net.minecraft.util.Vec3;
 import net.minecraft.world.World;
 import net.minecraftforge.common.DimensionManager;
-import net.minecraftforge.common.util.ForgeDirection;
+import net.minecraft.util.EnumFacing;
 
 import java.util.Arrays;
 import java.util.List;
@@ -39,7 +39,7 @@ public class ItemDarkIronChain extends ItemFactorization {
             new Notice(at, "item.factorization:darkIronChain.clear").sendTo(player);
             return true;
         }
-        ForgeDirection dir = ForgeDirection.getOrientation(side);
+        EnumFacing dir = SpaceUtil.getOrientation(side);
         if (world == DeltaChunk.getServerShadowWorld()) {
             for (IDeltaChunk idc : DeltaChunk.getSlicesContainingPoint(at)) {
                 if (!acceptableIDC(idc)) continue;
@@ -89,7 +89,7 @@ public class ItemDarkIronChain extends ItemFactorization {
         return true;
     }
 
-    void setPos(ItemStack is, String name, Coord at, ForgeDirection side) {
+    void setPos(ItemStack is, String name, Coord at, EnumFacing side) {
         NBTTagCompound tag = ItemUtil.getTag(is);
         tag.setInteger(name + ":w", FzUtil.getWorldDimension(at.w));
         tag.setInteger(name + ":x", at.x);
@@ -123,12 +123,12 @@ public class ItemDarkIronChain extends ItemFactorization {
         return new Coord(w, x, y, z);
     }
 
-    ForgeDirection loadSide(ItemStack is, String name) {
-        if (!is.hasTagCompound()) return ForgeDirection.UNKNOWN;
+    EnumFacing loadSide(ItemStack is, String name) {
+        if (!is.hasTagCompound()) return null;
         NBTTagCompound tag = ItemUtil.getTag(is);
-        if (!tag.hasKey(name + ":s")) return ForgeDirection.UNKNOWN;
+        if (!tag.hasKey(name + ":s")) return null;
         byte b = tag.getByte(name + ":s");
-        return ForgeDirection.getOrientation(b);
+        return SpaceUtil.getOrientation(b);
     }
 
     boolean bothSet(ItemStack is) {
@@ -165,7 +165,7 @@ public class ItemDarkIronChain extends ItemFactorization {
         }
         double d = 0.5;
         final Vec3 anchorPoint = shadow.createVector().addVector(d, d, d);
-        ForgeDirection dir = loadSide(is, "shadow");
+        EnumFacing dir = loadSide(is, "shadow");
         Vec3 dv = SpaceUtil.scale(SpaceUtil.fromDirection(dir), 0.5);
         SpaceUtil.incrAdd(anchorPoint, dv);
 

@@ -1,6 +1,6 @@
 package factorization.truth.gen.recipe;
 
-import cpw.mods.fml.relauncher.ReflectionHelper;
+import net.minecraftforge.fml.relauncher.ReflectionHelper;
 import factorization.api.adapter.Adapter;
 import factorization.api.adapter.GenericAdapter;
 import factorization.truth.api.IObjectWriter;

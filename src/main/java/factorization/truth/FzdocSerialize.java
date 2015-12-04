@@ -16,7 +16,7 @@ import net.minecraft.init.Blocks;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.ChatComponentText;
-import net.minecraftforge.common.util.ForgeDirection;
+import net.minecraft.util.EnumFacing;
 
 import java.util.List;
 
@@ -58,7 +58,7 @@ final class FzdocSerialize implements ICommand {
     public void processCommand(ICommandSender icommandsender, String[] astring) {
         if (!(icommandsender instanceof EntityPlayer)) return;
         EntityPlayer player = (EntityPlayer) icommandsender;
-        Coord peak = new Coord(player).add(ForgeDirection.DOWN);
+        Coord peak = new Coord(player).add(EnumFacing.DOWN);
         Block gold = Blocks.gold_block;
         if (!peak.is(gold)) {
             msg(player, "Not on a gold block");
@@ -67,13 +67,13 @@ final class FzdocSerialize implements ICommand {
         int ySize = 0;
         Coord at = peak.copy();
         while (at.is(gold)) {
-            at.adjust(ForgeDirection.DOWN);
+            at.adjust(EnumFacing.DOWN);
             ySize--;
         }
-        at.adjust(ForgeDirection.UP);
+        at.adjust(EnumFacing.UP);
         Coord bottom = at.copy();
-        int xSize = measure(bottom, ForgeDirection.EAST, ForgeDirection.WEST, gold);
-        int zSize = measure(bottom, ForgeDirection.SOUTH, ForgeDirection.NORTH, gold);
+        int xSize = measure(bottom, EnumFacing.EAST, EnumFacing.WEST, gold);
+        int zSize = measure(bottom, EnumFacing.SOUTH, EnumFacing.NORTH, gold);
         
         if (xSize*ySize*zSize == 0) {
             msg(player, "Invalid dimensions");
@@ -145,9 +145,9 @@ final class FzdocSerialize implements ICommand {
         player.addChatMessage(new ChatComponentText(msg));
     }
 
-    int measure(Coord bottom, ForgeDirection east, ForgeDirection west, Block gold) {
+    int measure(Coord bottom, EnumFacing east, EnumFacing west, Block gold) {
         Coord at = bottom.copy();
-        ForgeDirection d = bottom.add(east).is(gold) ? east : west;
+        EnumFacing d = bottom.add(east).is(gold) ? east : west;
         int size = 0;
         while (at.is(gold)) {
             at.adjust(d);

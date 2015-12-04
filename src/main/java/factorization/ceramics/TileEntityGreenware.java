@@ -1,9 +1,9 @@
 package factorization.ceramics;
 
-import cpw.mods.fml.common.FMLCommonHandler;
-import cpw.mods.fml.common.eventhandler.SubscribeEvent;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
+import net.minecraftforge.fml.common.FMLCommonHandler;
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 import factorization.api.Coord;
 import factorization.api.IFurnaceHeatable;
 import factorization.api.Quaternion;
@@ -39,7 +39,7 @@ import net.minecraft.util.MovingObjectPosition;
 import net.minecraft.util.Vec3;
 import net.minecraftforge.client.event.DrawBlockHighlightEvent;
 import net.minecraftforge.common.util.Constants;
-import net.minecraftforge.common.util.ForgeDirection;
+import net.minecraft.util.EnumFacing;
 import org.lwjgl.opengl.GL11;
 
 import java.io.DataInput;
@@ -50,9 +50,9 @@ import java.util.List;
 
 public class TileEntityGreenware extends TileEntityCommon implements IFurnaceHeatable {
     public static int MAX_PARTS = 32;
-    ForgeDirection front = ForgeDirection.UNKNOWN;
+    EnumFacing front = null;
     byte rotation = 0;
-    Quaternion rotation_quat = Quaternion.getRotationQuaternionRadians(0, ForgeDirection.UP);
+    Quaternion rotation_quat = Quaternion.getRotationQuaternionRadians(0, EnumFacing.UP);
     
     @Override
     public FactoryType getFactoryType() {
@@ -378,7 +378,7 @@ public class TileEntityGreenware extends TileEntityCommon implements IFurnaceHea
 
     public void setRotation(byte newRotation) {
         rotation = newRotation;
-        rotation_quat = Quaternion.getRotationQuaternionRadians(Math.PI*newRotation/2, ForgeDirection.UP);
+        rotation_quat = Quaternion.getRotationQuaternionRadians(Math.PI*newRotation/2, EnumFacing.UP);
     }
 
     @Override
@@ -395,24 +395,24 @@ public class TileEntityGreenware extends TileEntityCommon implements IFurnaceHea
         } else {
             addLump();
         }
-        ForgeDirection placement = ForgeDirection.getOrientation(SpaceUtil.determineFlatOrientation(player));
+        EnumFacing placement = SpaceUtil.getOrientation(SpaceUtil.determineFlatOrientation(player));
         if (tag == null || !tag.hasKey("front")) {
             front = placement;
             setRotation((byte) 0);
-        } else if (placement.offsetY == 0 && placement != ForgeDirection.UNKNOWN) {
-            front = ForgeDirection.getOrientation(tag.getByte("front"));
-            if (front == ForgeDirection.UNKNOWN || front.offsetY != 0) {
+        } else if (placement.getDirectionVec().getY() == 0 && placement != null) {
+            front = SpaceUtil.getOrientation(tag.getByte("front"));
+            if (front == null || front.getDirectionVec().getY() != 0) {
                 setRotation((byte) 0);
                 front = placement;
             } else {
-                ForgeDirection f = placement;
+                EnumFacing f = placement;
                 byte r = 0;
                 for (byte i = 0; i < 4; i++) {
                     if (f == front) {
                         r = i;
                         break;
                     }
-                    f = f.getRotation(ForgeDirection.UP);
+                    f = f.getRotation(EnumFacing.UP);
                 }
                 setRotation(r);
             }
@@ -479,7 +479,7 @@ public class TileEntityGreenware extends TileEntityCommon implements IFurnaceHea
     Item woolItem = Item.getItemFromBlock(Blocks.wool);
     
     @Override
-    public boolean activate(EntityPlayer player, ForgeDirection side) {
+    public boolean activate(EntityPlayer player, EnumFacing side) {
         ClayState state = getState();
         if (state == ClayState.WET) {
             touch();
@@ -560,18 +560,18 @@ public class TileEntityGreenware extends TileEntityCommon implements IFurnaceHea
 
     ClayLump extrudeLump(ClayLump against, int side) {
         ClayLump lump = against.copy();
-        ForgeDirection dir = ForgeDirection.getOrientation(side);
+        EnumFacing dir = SpaceUtil.getOrientation(side);
         BlockRenderHelper b = Core.registry.serverTraceHelper;
         against.toBlockBounds(b);
         int wX = lump.maxX - lump.minX;
         int wY = lump.maxY - lump.minY;
         int wZ = lump.maxZ - lump.minZ;
-        lump.maxX += wX * dir.offsetX;
-        lump.maxY += wY * dir.offsetY;
-        lump.maxZ += wZ * dir.offsetZ;
-        lump.minX += wX * dir.offsetX;
-        lump.minY += wY * dir.offsetY;
-        lump.minZ += wZ * dir.offsetZ;
+        lump.maxX += wX * dir.getDirectionVec().getX();
+        lump.maxY += wY * dir.getDirectionVec().getY();
+        lump.maxZ += wZ * dir.getDirectionVec().getZ();
+        lump.minX += wX * dir.getDirectionVec().getX();
+        lump.minY += wY * dir.getDirectionVec().getY();
+        lump.minZ += wZ * dir.getDirectionVec().getZ();
         return lump;
     }
 
@@ -611,7 +611,7 @@ public class TileEntityGreenware extends TileEntityCommon implements IFurnaceHea
         for (int dx = -1; dx <= 1; dx++) {
             for (int dy = -1; dy <= 1; dy++) {
                 for (int dz = -1; dz <= 1; dz++) {
-                    AxisAlignedBB ab = AxisAlignedBB.getBoundingBox(xCoord + dx, yCoord + dy, zCoord + dz, xCoord + dx + 1, yCoord + dy + 1, zCoord + dz + 1);
+                    AxisAlignedBB ab = new AxisAlignedBB(xCoord + dx, yCoord + dy, zCoord + dz, xCoord + dx + 1, yCoord + dy + 1, zCoord + dz + 1);
                     Coord c = getCoord();
                     c.x += dx;
                     c.y += dy;
@@ -705,7 +705,7 @@ public class TileEntityGreenware extends TileEntityCommon implements IFurnaceHea
         switch (messageType) {
         case SculptDescription:
             readStateChange(input);
-            front = ForgeDirection.getOrientation(input.readByte());
+            front = SpaceUtil.getOrientation(input.readByte());
             setRotation(input.readByte());
             parts.clear();
             ArrayList<Object> args = new ArrayList();
@@ -761,7 +761,7 @@ public class TileEntityGreenware extends TileEntityCommon implements IFurnaceHea
         getCoord().redraw();
     }
 
-    private static final Vec3 zeroVec = Vec3.createVectorHelper(0, 0, 0);
+    private static final Vec3 zeroVec = new Vec3(0, 0, 0);
 
     @Override
     protected boolean removedByPlayer(EntityPlayer player, boolean willHarvest) {
@@ -830,8 +830,8 @@ public class TileEntityGreenware extends TileEntityCommon implements IFurnaceHea
                 } else {
                     Vec3 s = shortest.hitVec;
                     Vec3 m = mop.hitVec;
-                    s = Vec3.createVectorHelper(s.xCoord, s.yCoord, s.zCoord);
-                    m = Vec3.createVectorHelper(m.xCoord, m.yCoord, m.zCoord);
+                    s = new Vec3(s.xCoord, s.yCoord, s.zCoord);
+                    m = new Vec3(m.xCoord, m.yCoord, m.zCoord);
                     offsetVector(startVec, s);
                     offsetVector(startVec, m);
                     if (m.lengthVector() < s.lengthVector()) {
@@ -926,7 +926,7 @@ public class TileEntityGreenware extends TileEntityCommon implements IFurnaceHea
 
     @Override
     public AxisAlignedBB getRenderBoundingBox() {
-        AxisAlignedBB bb = AxisAlignedBB.getBoundingBox(xCoord - 2, yCoord - 2, zCoord - 2, xCoord + 2, yCoord + 2, zCoord + 2);
+        AxisAlignedBB bb = new AxisAlignedBB(xCoord - 2, yCoord - 2, zCoord - 2, xCoord + 2, yCoord + 2, zCoord + 2);
         return bb;
     }
 
@@ -970,7 +970,7 @@ public class TileEntityGreenware extends TileEntityCommon implements IFurnaceHea
 
     @Override
     @SideOnly(Side.CLIENT)
-    public IIcon getIcon(ForgeDirection dir) {
+    public IIcon getIcon(EnumFacing dir) {
         if (parts.size() == 0) {
             return Blocks.clay.getBlockTextureFromSide(0);
         }

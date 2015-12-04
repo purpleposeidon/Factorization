@@ -1,7 +1,7 @@
 package factorization.shared;
 
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 import factorization.api.Coord;
 import factorization.api.FzOrientation;
 import factorization.api.Quaternion;
@@ -14,7 +14,7 @@ import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.util.IIcon;
 import net.minecraft.util.Vec3;
 import net.minecraft.world.IBlockAccess;
-import net.minecraftforge.common.util.ForgeDirection;
+import net.minecraft.util.EnumFacing;
 
 public class BlockRenderHelper extends Block {
     //This class is used to make it easy (and very thread-safe) to render cubes of various sizes. It's a fake block.
@@ -319,13 +319,13 @@ public class BlockRenderHelper extends Block {
 
 
     public void simpleCull(FzOrientation fzo, IBlockAccess w, int x, int y, int z) {
-        for (ForgeDirection dir : ForgeDirection.VALID_DIRECTIONS) {
+        for (EnumFacing dir : EnumFacing.VALUES) {
             /*Quaternion quat = Quaternion.fromOrientation(fzo);
             Vec3 v = SpaceUtil.fromDirection(dir);
             quat.applyRotation(v);
-            ForgeDirection turned = SpaceUtil.round(v, ForgeDirection.UNKNOWN);*/
-            ForgeDirection turned = fzo.applyRotation(dir);
-            Block b = w.getBlock(x + turned.offsetX, y + turned.offsetY, z + turned.offsetZ);
+            EnumFacing turned = SpaceUtil.round(v, null);*/
+            EnumFacing turned = fzo.applyRotation(dir);
+            Block b = w.getBlock(x + turned.getDirectionVec().getX(), y + turned.getDirectionVec().getY(), z + turned.getDirectionVec().getZ());
             boolean cull = b.isOpaqueCube();
             if (!cull) continue;
             int ordinal = dir.ordinal();
@@ -387,7 +387,7 @@ public class BlockRenderHelper extends Block {
         renderRotated(tess, c.x, c.y, c.z);
     }
     
-    static Vec3 midCache = Vec3.createVectorHelper(0, 0, 0);
+    static Vec3 midCache = new Vec3(0, 0, 0);
     public Vec3 getBoundsMiddle() {
         midCache.xCoord = (minX + maxX)/2;
         midCache.yCoord = (minY + maxY)/2;
@@ -638,18 +638,18 @@ public class BlockRenderHelper extends Block {
         currentFace[i].z = Z == 0 ? minZ : maxZ;
     }
     
-    static private ForgeDirection getDirectionFromVector(VectorUV here) {
+    static private EnumFacing getDirectionFromVector(VectorUV here) {
         double x = Math.abs(here.x), y = Math.abs(here.y), z = Math.abs(here.z);
         if (x >= y && x >= z) {
-            return here.x >= 0 ? ForgeDirection.WEST : ForgeDirection.EAST;
+            return here.x >= 0 ? EnumFacing.WEST : EnumFacing.EAST;
         }
         if (y >= x && y >= z) {
-            return here.y >= 0 ? ForgeDirection.UP : ForgeDirection.DOWN;
+            return here.y >= 0 ? EnumFacing.UP : EnumFacing.DOWN;
         }
         if (z >= x && z >= y) {
-            return here.z >= 0 ? ForgeDirection.SOUTH : ForgeDirection.NORTH;
+            return here.z >= 0 ? EnumFacing.SOUTH : EnumFacing.NORTH;
         }
-        return ForgeDirection.UP;
+        return EnumFacing.UP;
     }
     
     private static final float[] directionLighting = new float[] {0.5F, 1F, 0.8F, 0.8F, 0.6F, 0.6F};
@@ -659,7 +659,7 @@ public class BlockRenderHelper extends Block {
         normal_uv.x = normal.x;
         normal_uv.y = normal.y;
         normal_uv.z = normal.z;
-        ForgeDirection dir = getDirectionFromVector(normal_uv);
+        EnumFacing dir = getDirectionFromVector(normal_uv);
         return directionLighting[dir.ordinal()];
     }
     

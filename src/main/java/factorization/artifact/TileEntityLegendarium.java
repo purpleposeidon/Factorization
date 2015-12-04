@@ -31,7 +31,7 @@ import net.minecraft.world.World;
 import net.minecraft.world.WorldSavedData;
 import net.minecraft.world.chunk.IChunkProvider;
 import net.minecraftforge.common.util.FakePlayer;
-import net.minecraftforge.common.util.ForgeDirection;
+import net.minecraft.util.EnumFacing;
 
 import java.io.IOException;
 import java.util.*;
@@ -111,7 +111,7 @@ public class TileEntityLegendarium extends TileEntityCommon {
     }
 
     @Override
-    public boolean activate(EntityPlayer player, ForgeDirection side) {
+    public boolean activate(EntityPlayer player, EnumFacing side) {
         // Store an item
         if (worldObj.isRemote) return true;
         if (isDroid(player)) return false;
@@ -183,7 +183,7 @@ public class TileEntityLegendarium extends TileEntityCommon {
             return;
         }
         final ItemStack artifact = queue.remove(0);
-        ItemUtil.giveItem(player, new Coord(this), artifact, ForgeDirection.UNKNOWN);
+        ItemUtil.giveItem(player, new Coord(this), artifact, null);
         markDirty();
         //sound("remove");
         populatePosters();
@@ -295,8 +295,8 @@ public class TileEntityLegendarium extends TileEntityCommon {
     }
 
     @Override
-    public IIcon getIcon(ForgeDirection dir) {
-        if (dir.offsetY == 0) return BlockIcons.artifact$legendarium_side;
+    public IIcon getIcon(EnumFacing dir) {
+        if (dir.getDirectionVec().getY() == 0) return BlockIcons.artifact$legendarium_side;
         return BlockIcons.artifact$legendarium_top;
     }
 

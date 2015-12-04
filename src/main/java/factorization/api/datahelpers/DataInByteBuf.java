@@ -1,7 +1,7 @@
 package factorization.api.datahelpers;
 
-import cpw.mods.fml.common.network.ByteBufUtils;
-import cpw.mods.fml.relauncher.Side;
+import net.minecraftforge.fml.common.network.ByteBufUtils;
+import net.minecraftforge.fml.relauncher.Side;
 import factorization.util.DataUtil;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.item.ItemStack;

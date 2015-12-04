@@ -6,9 +6,9 @@ import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.IIcon;
-import net.minecraftforge.common.util.ForgeDirection;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
+import net.minecraft.util.EnumFacing;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 import factorization.api.Coord;
 import factorization.common.BlockIcons;
 import factorization.shared.BlockRenderHelper;
@@ -98,7 +98,7 @@ public abstract class Decorator extends ServoComponent {
         float d = getSize();
         block.setBlockBoundsOffset(d, d, d);
         for (int i = 0; i < 6; i++) {
-            ForgeDirection face = ForgeDirection.getOrientation(i);
+            EnumFacing face = SpaceUtil.getOrientation(i);
             IIcon icon = getIcon(face);
             if (icon == null) {
                 icon = BlockIcons.uv_test;
@@ -118,7 +118,7 @@ public abstract class Decorator extends ServoComponent {
         }
     }
     
-    public abstract IIcon getIcon(ForgeDirection side);
+    public abstract IIcon getIcon(EnumFacing side);
     public float getSize() {
         return TileEntityServoRail.width - 1F/2048F;
         //return 6F/16F;

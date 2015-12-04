@@ -12,7 +12,7 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.IIcon;
 import net.minecraft.util.StatCollector;
 import net.minecraft.world.World;
-import net.minecraftforge.common.util.ForgeDirection;
+import net.minecraft.util.EnumFacing;
 import factorization.api.Coord;
 import factorization.astro.TileEntityRocketEngine;
 import factorization.ceramics.TileEntityGreenware;
@@ -40,7 +40,7 @@ public class ItemFactorizationBlock extends ItemBlock {
         TileEntityCommon tec = f.makeTileEntity();
         if (tec == null) return false;
         here.setAsTileEntityLocation(tec);
-        Coord placedAgainst = here.add(ForgeDirection.getOrientation(side).getOpposite());
+        Coord placedAgainst = here.add(SpaceUtil.getOrientation(side).getOpposite());
         boolean good = tec.canPlaceAgainst(player, placedAgainst, side);
         if (!good) {
             return false;

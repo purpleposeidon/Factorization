@@ -40,16 +40,16 @@ public class TileEntityGrinderRender {
         float dum = (du1 + du2)/2;
         float dvm = (dv1 + dv2)/2;
         
-        PositionTextureVertex down = new PositionTextureVertex(Vec3.createVectorHelper(near/2, point, far/-3), dum, dvm), //the pointy end
+        PositionTextureVertex down = new PositionTextureVertex(new Vec3(near/2, point, far/-3), dum, dvm), //the pointy end
                 //numpad directions
-                v6 = new PositionTextureVertex(Vec3.createVectorHelper(far, 0, 0), du2, dv2),
-                v2 = new PositionTextureVertex(Vec3.createVectorHelper(0, 0, -near), du1, dv2),
-                v4 = new PositionTextureVertex(Vec3.createVectorHelper(-far, 0, 0), du2, dv2),
-                v8 = new PositionTextureVertex(Vec3.createVectorHelper(0, 0, near), du1, dv2);
+                v6 = new PositionTextureVertex(new Vec3(far, 0, 0), du2, dv2),
+                v2 = new PositionTextureVertex(new Vec3(0, 0, -near), du1, dv2),
+                v4 = new PositionTextureVertex(new Vec3(-far, 0, 0), du2, dv2),
+                v8 = new PositionTextureVertex(new Vec3(0, 0, near), du1, dv2);
 
         TexturedQuad makeQuad(PositionTextureVertex a, PositionTextureVertex b) {
             Vec3 va = a.vector3D, vb = b.vector3D;
-            Vec3 mid = Vec3.createVectorHelper((va.xCoord + vb.xCoord) / 2, (va.yCoord + vb.yCoord) / 2, (va.zCoord + vb.zCoord) / 2);
+            Vec3 mid = new Vec3((va.xCoord + vb.xCoord) / 2, (va.yCoord + vb.yCoord) / 2, (va.zCoord + vb.zCoord) / 2);
             float tmx = (a.texturePositionX + b.texturePositionX) / 2;
             float tmy = (a.texturePositionY + b.texturePositionY) / 2;
             return new TexturedQuad(new PositionTextureVertex[] { down, a, new PositionTextureVertex(mid, tmx, tmy), b });

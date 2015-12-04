@@ -1,14 +1,14 @@
 package factorization.fzds;
 
-import cpw.mods.fml.client.registry.RenderingRegistry;
-import cpw.mods.fml.common.FMLCommonHandler;
-import cpw.mods.fml.common.eventhandler.SubscribeEvent;
-import cpw.mods.fml.common.gameevent.TickEvent;
-import cpw.mods.fml.common.gameevent.TickEvent.ClientTickEvent;
-import cpw.mods.fml.common.gameevent.TickEvent.Phase;
-import cpw.mods.fml.common.network.FMLNetworkEvent;
-import cpw.mods.fml.common.network.FMLNetworkEvent.ClientDisconnectionFromServerEvent;
-import cpw.mods.fml.relauncher.Side;
+import net.minecraftforge.fml.client.registry.RenderingRegistry;
+import net.minecraftforge.fml.common.FMLCommonHandler;
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.fml.common.gameevent.TickEvent;
+import net.minecraftforge.fml.common.gameevent.TickEvent.ClientTickEvent;
+import net.minecraftforge.fml.common.gameevent.TickEvent.Phase;
+import net.minecraftforge.fml.common.network.FMLNetworkEvent;
+import net.minecraftforge.fml.common.network.FMLNetworkEvent.ClientDisconnectionFromServerEvent;
+import net.minecraftforge.fml.relauncher.Side;
 import factorization.api.Coord;
 import factorization.api.Quaternion;
 import factorization.coremodhooks.HookTargetsClient;
@@ -326,7 +326,7 @@ public class HammerClientProxy extends HammerProxy {
         try {
             //Inspired by Minecraft.runTick()
             w.updateEntities();
-            Vec3 playerPos = Vec3.createVectorHelper(mcPlayer.posX, mcPlayer.posY, mcPlayer.posZ);
+            Vec3 playerPos = new Vec3(mcPlayer.posX, mcPlayer.posY, mcPlayer.posZ);
             for (IDeltaChunk idc : nearbyChunks) {
                 Vec3 center = idc.real2shadow(playerPos);
                 w.doVoidFogParticles((int) center.xCoord, (int) center.yCoord, (int) center.zCoord);

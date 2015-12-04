@@ -12,7 +12,7 @@ import net.minecraft.entity.Entity;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.MovingObjectPosition;
 import net.minecraft.util.Vec3;
-import net.minecraftforge.common.util.ForgeDirection;
+import net.minecraft.util.EnumFacing;
 
 public class RayTracer {
     final TileEntitySocketBase base;
@@ -79,9 +79,9 @@ public class RayTracer {
             Coord at = new Coord(base);
             Vec3 v = SpaceUtil.newVec();
             at.setAsVector(v);
-            v.xCoord += 0.5 + trueOrientation.top.offsetX;
-            v.yCoord += 0.5 + trueOrientation.top.offsetY;
-            v.zCoord += 0.5 + trueOrientation.top.offsetZ;
+            v.xCoord += 0.5 + trueOrientation.top.getDirectionVec().getX();
+            v.yCoord += 0.5 + trueOrientation.top.getDirectionVec().getY();
+            v.zCoord += 0.5 + trueOrientation.top.getDirectionVec().getZ();
             v = idc.shadow2real(v);
             idc.shadow2real(at);
             AxisAlignedBB box = SpaceUtil.createAABB(v, v);
@@ -129,8 +129,8 @@ public class RayTracer {
         Vec3 faceVec = SpaceUtil.fromDirection(trueOrientation.facing);
         rot.applyRotation(topVec);
         rot.applyRotation(faceVec);
-        ForgeDirection top = SpaceUtil.round(topVec, ForgeDirection.UNKNOWN);
-        ForgeDirection facing = SpaceUtil.round(faceVec, top);
+        EnumFacing top = SpaceUtil.round(topVec, null);
+        EnumFacing facing = SpaceUtil.round(faceVec, top);
         FzOrientation to = FzOrientation.fromDirection(top);
         if (to == FzOrientation.UNKNOWN) {
             return FzOrientation.fromDirection(facing);
@@ -144,9 +144,9 @@ public class RayTracer {
 
 
     boolean runPass(FzOrientation orientation, Coord coord, IDeltaChunk idc) {
-        final ForgeDirection top = orientation.top;
-        final ForgeDirection face = orientation.facing;
-        final ForgeDirection right = face.getRotation(top);
+        final EnumFacing top = orientation.top;
+        final EnumFacing face = orientation.facing;
+        final EnumFacing right = face.getRotation(top);
 
         if (checkEnts) {
             if (entBox == null) {
@@ -180,14 +180,14 @@ public class RayTracer {
         return false;
     }
 
-    boolean mopBlock(Coord target, ForgeDirection side) {
+    boolean mopBlock(Coord target, EnumFacing side) {
         if (base != socket && target.getTE(TileEntityServoRail.class) != null) return false;
         boolean isThis = base == socket && target.isAt(base);
-        Vec3 hitVec = Vec3.createVectorHelper(base.xCoord + side.offsetX, base.yCoord + side.offsetY, base.zCoord + side.offsetZ);
+        Vec3 hitVec = new Vec3(base.xCoord + side.getDirectionVec().getX(), base.yCoord + side.getDirectionVec().getY(), base.zCoord + side.getDirectionVec().getZ());
         return base.handleRay(socket, target.createMop(side, hitVec), target.w, isThis, powered);
     }
 
-    Iterable<Entity> getEntities(Coord coord, ForgeDirection top, IDeltaChunk idc) {
+    Iterable<Entity> getEntities(Coord coord, EnumFacing top, IDeltaChunk idc) {
         if (idc == null) {
             Entity ent = null;
             if (socket instanceof Entity) {

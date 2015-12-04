@@ -15,14 +15,14 @@ import io.netty.buffer.ByteBuf;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.IIcon;
-import net.minecraftforge.common.util.ForgeDirection;
+import net.minecraft.util.EnumFacing;
 
 import java.io.IOException;
 
 public class TileEntityShaftGen extends TileEntityCommon implements IChargeConductor {
     final Charge charge = new Charge(this);
     double rotor_angle;
-    ForgeDirection shaft_direction = ForgeDirection.DOWN;
+    EnumFacing shaft_direction = EnumFacing.DOWN;
     IRotationalEnergySource shaft;
     transient double last_power;
     public static double MAX_POWER = 1024, CHARGE_PER_POWER = 180 * 4;
@@ -47,27 +47,27 @@ public class TileEntityShaftGen extends TileEntityCommon implements IChargeCondu
     @Override
     public void onPlacedBy(EntityPlayer player, ItemStack is, int side, float hitX, float hitY, float hitZ) {
         super.onPlacedBy(player, is, side, hitX, hitY, hitZ);
-        shaft_direction = ForgeDirection.getOrientation(side);
+        shaft_direction = SpaceUtil.getOrientation(side);
         if (player.isSneaking()) {
             shaft_direction = shaft_direction.getOpposite();
             return;
         }
         Coord at = getCoord();
-        ForgeDirection use = ForgeDirection.UNKNOWN;
-        for (ForgeDirection dir : ForgeDirection.VALID_DIRECTIONS) {
+        EnumFacing use = null;
+        for (EnumFacing dir : EnumFacing.VALUES) {
             IRotationalEnergySource res = IRotationalEnergySource.adapter.cast(at.add(dir).getTE());
             if (res == null) continue;
             if (res.canConnect(dir.getOpposite())) {
-                if (use != ForgeDirection.UNKNOWN) return;
+                if (use != null) return;
                 use = dir;
             }
         }
-        if (use == ForgeDirection.UNKNOWN) return;
+        if (use == null) return;
         shaft_direction = use;
     }
 
     @Override
-    public boolean rotate(ForgeDirection axis) {
+    public boolean rotate(EnumFacing axis) {
         if (axis == shaft_direction) return false;
         shaft_direction = axis;
         return true;
@@ -121,7 +121,7 @@ public class TileEntityShaftGen extends TileEntityCommon implements IChargeCondu
             }
             return;
         }
-        ForgeDirection shaftOutputDirection = shaft_direction.getOpposite();
+        EnumFacing shaftOutputDirection = shaft_direction.getOpposite();
         double avail = shaft.availableEnergy(shaftOutputDirection);
         double usable = Math.min(MAX_POWER, avail);
         last_power = shaft.takeEnergy(shaftOutputDirection, usable);
@@ -146,7 +146,7 @@ public class TileEntityShaftGen extends TileEntityCommon implements IChargeCondu
     }
 
     @Override
-    public IIcon getIcon(ForgeDirection dir) {
+    public IIcon getIcon(EnumFacing dir) {
         return BlockIcons.beauty$shaft_gen_side;
     }
 }

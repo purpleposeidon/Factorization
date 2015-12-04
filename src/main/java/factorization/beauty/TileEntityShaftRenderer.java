@@ -24,9 +24,9 @@ public class TileEntityShaftRenderer extends TileEntitySpecialRenderer {
         GL11.glPushMatrix();
         GL11.glTranslated(dx + 0.5, dy + 0.5, dz + 0.5);
         TileEntityShaft shaft = (TileEntityShaft) te;
-        if (shaft.axis.offsetX == 1) {
+        if (shaft.axis.getDirectionVec().getX() == 1) {
             GL11.glRotatef(90, 0, 0, 1);
-        } else if (shaft.axis.offsetZ == 1) {
+        } else if (shaft.axis.getDirectionVec().getZ() == 1) {
             GL11.glRotatef(90, 1, 0, 0);
         }
         double angle = Math.toDegrees(NumUtil.interp(shaft.prev_angle, shaft.angle, partial));

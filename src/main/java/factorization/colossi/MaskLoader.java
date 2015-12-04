@@ -10,7 +10,7 @@ import java.util.Random;
 import net.minecraft.crash.CrashReport;
 import net.minecraft.crash.CrashReportCategory;
 import net.minecraft.util.ReportedException;
-import net.minecraftforge.common.util.ForgeDirection;
+import net.minecraft.util.EnumFacing;
 
 import com.google.common.base.Joiner;
 
@@ -23,7 +23,7 @@ public class MaskLoader {
         mask_templates.add(mask);
     }
     
-    public static MaskTemplate pickMask(Random rand, ForgeDirection anchor_direction, int min_size, int max_size) {
+    public static MaskTemplate pickMask(Random rand, EnumFacing anchor_direction, int min_size, int max_size) {
         ArrayList<MaskTemplate> valid = new ArrayList();
         int total_weight = 0;
         for (MaskTemplate mask : mask_templates) {

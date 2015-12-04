@@ -1,7 +1,7 @@
 package factorization.artifact;
 
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 import factorization.common.BlockIcons;
 import factorization.common.FactoryType;
 import factorization.shared.Core;

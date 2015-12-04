@@ -12,7 +12,7 @@ import net.minecraft.nbt.NBTTagList;
 import net.minecraft.nbt.NBTTagString;
 import net.minecraft.util.Vec3;
 import net.minecraft.world.World;
-import net.minecraftforge.common.util.ForgeDirection;
+import net.minecraft.util.EnumFacing;
 import net.minecraftforge.oredict.OreDictionary;
 
 import java.util.ArrayList;
@@ -260,7 +260,7 @@ public final class ItemUtil {
         displayTag.setTag("Lore", loreList);
     }
 
-    public static Entity giveItem(EntityPlayer player, Coord at, ItemStack stack, ForgeDirection side) {
+    public static Entity giveItem(EntityPlayer player, Coord at, ItemStack stack, EnumFacing side) {
         if (null == ItemUtil.normalize(stack)) return null;
         if (at == null) at = new Coord(player);
         if (at.w.isRemote) return null;
@@ -278,19 +278,19 @@ public final class ItemUtil {
         }
 
         Vec3 dir;
-        if (side == ForgeDirection.UNKNOWN && player == null) {
+        if (side == null && player == null) {
             if (at.isAir()) {
                 return ent;
             }
-            side = ForgeDirection.UP; // Last ditch attempt at picking a direction if all else fails
-            for (ForgeDirection fd : ForgeDirection.VALID_DIRECTIONS) {
+            side = EnumFacing.UP; // Last ditch attempt at picking a direction if all else fails
+            for (EnumFacing fd : EnumFacing.VALUES) {
                 if (at.add(fd).isAir()) {
                     side = fd;
                     break;
                 }
             }
         }
-        if (side == ForgeDirection.UNKNOWN && player != null) {
+        if (side == null && player != null) {
             Vec3 me = at.toVector();
             Vec3 you = SpaceUtil.fromEntPos(player);
             dir = SpaceUtil.incrSubtract(you, me);

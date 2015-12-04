@@ -1,7 +1,7 @@
 package factorization.fzds;
 
 import net.minecraft.util.Vec3;
-import net.minecraftforge.common.util.ForgeDirection;
+import net.minecraft.util.EnumFacing;
 
 class Range {
     double lower, upper;
@@ -18,7 +18,7 @@ class Range {
         return !(upper < other.lower || other.upper < lower);
     }
     
-    void include(Vec3 point, ForgeDirection axis) {
+    void include(Vec3 point, EnumFacing axis) {
         switch (axis) {
         case EAST:
         case WEST:

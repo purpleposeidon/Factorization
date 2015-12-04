@@ -4,8 +4,8 @@ import java.io.DataInput;
 import java.io.IOException;
 import java.util.ArrayList;
 
-import cpw.mods.fml.common.FMLCommonHandler;
-import cpw.mods.fml.relauncher.Side;
+import net.minecraftforge.fml.common.FMLCommonHandler;
+import net.minecraftforge.fml.relauncher.Side;
 
 import io.netty.buffer.ByteBuf;
 import net.minecraft.entity.Entity;
@@ -100,7 +100,7 @@ public enum Sound {
     }
 
     public void playAt(TileEntity ent) {
-        playAt(ent.getWorldObj(), ent.xCoord, ent.yCoord, ent.zCoord);
+        playAt(ent.getWorld(), ent.xCoord, ent.yCoord, ent.zCoord);
     }
 
     public void play() {

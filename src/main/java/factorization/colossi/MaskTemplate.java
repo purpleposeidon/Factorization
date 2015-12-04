@@ -1,12 +1,12 @@
 package factorization.colossi;
 
-import net.minecraftforge.common.util.ForgeDirection;
+import net.minecraft.util.EnumFacing;
 import factorization.api.Coord;
 
 public class MaskTemplate {
     int width;
     String[] template;
-    ForgeDirection anchor = ForgeDirection.UNKNOWN;
+    EnumFacing anchor = null;
     int anchor_points = 0;
     int anchor_x, anchor_y;
     
@@ -25,13 +25,13 @@ public class MaskTemplate {
             }
             for (int i = 0; i < width; i++) {
                 char c = s.charAt(i);
-                ForgeDirection fd = toAnchor(c);
-                if (fd == ForgeDirection.UNKNOWN) {
+                EnumFacing fd = toAnchor(c);
+                if (fd == null) {
                     if (c == MASK || c == EYE || c == AIR) continue;
                     throw new IllegalArgumentException("Invalid template character: '" + c + "'");
                 } else {
                     if (anchor != fd) {
-                        if (anchor != ForgeDirection.UNKNOWN) {
+                        if (anchor != null) {
                             throw new IllegalArgumentException("Mixed anchor types");							
                         }
                         anchor = fd;
@@ -44,14 +44,14 @@ public class MaskTemplate {
         }
     }
     
-    ForgeDirection toAnchor(char c) {
+    EnumFacing toAnchor(char c) {
         switch (c) {
         case 'V':
-        case 'v': return ForgeDirection.DOWN;
-        case '^': return ForgeDirection.UP;
-        case '<': return ForgeDirection.NORTH;
-        case '>': return ForgeDirection.SOUTH;
-        default: return ForgeDirection.UNKNOWN;
+        case 'v': return EnumFacing.DOWN;
+        case '^': return EnumFacing.UP;
+        case '<': return EnumFacing.NORTH;
+        case '>': return EnumFacing.SOUTH;
+        default: return null;
         } 
     }
     

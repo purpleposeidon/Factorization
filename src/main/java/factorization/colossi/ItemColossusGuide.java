@@ -12,7 +12,7 @@ import net.minecraft.util.ChatComponentTranslation;
 import net.minecraft.util.IChatComponent;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.FakePlayer;
-import net.minecraftforge.common.util.ForgeDirection;
+import net.minecraft.util.EnumFacing;
 import factorization.api.Coord;
 import factorization.api.DeltaCoord;
 import factorization.notify.Notice;
@@ -67,7 +67,7 @@ public class ItemColossusGuide extends ItemFactorization {
             player.addChatComponentMessage(new ChatComponentTranslation("colossus.is.creativeFound", nearby.size()));
         } else {
             Coord at = nearby.get(0);
-            at.adjust(ForgeDirection.EAST); // The heart is positioned behind a cracked block
+            at.adjust(EnumFacing.EAST); // The heart is positioned behind a cracked block
             DeltaCoord dc = at.difference(playerPos);
             IChatComponent msg;
             if (dc.x == 0 && dc.z == 0) {

@@ -24,7 +24,7 @@ import net.minecraftforge.client.event.RenderWorldLastEvent;
 
 import org.lwjgl.opengl.GL11;
 
-import cpw.mods.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
 public class RenderMessages extends RenderMessagesProxy {
     static ArrayList<ClientMessage> messages = new ArrayList();

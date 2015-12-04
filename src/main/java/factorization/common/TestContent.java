@@ -35,7 +35,7 @@ public class TestContent {
 
             @Override
             public void onCraftingComplete(TileEntityCrystallizer machine) {
-                EntityTNTPrimed tnt = new EntityTNTPrimed(machine.getWorldObj());
+                EntityTNTPrimed tnt = new EntityTNTPrimed(machine.getWorld());
                 machine.getCoord().setAsEntityLocation(tnt);
                 tnt.worldObj.spawnEntityInWorld(tnt);
             }

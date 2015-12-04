@@ -2,7 +2,7 @@ package factorization.api.datahelpers;
 
 import java.io.DataOutput;
 
-import cpw.mods.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.Side;
 import io.netty.buffer.ByteBuf;
 
 public class DataOutByteBufEdited extends DataOutByteBuf {
