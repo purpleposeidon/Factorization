@@ -1,9 +1,9 @@
 package factorization.fzds;
 
 import net.minecraft.util.ChunkCoordinates;
+import net.minecraft.world.WorldProvider;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.chunk.IChunkProvider;
-import net.minecraft.world.WorldProvider;
 
 public class HammerWorldProvider extends WorldProvider {
     HammerChunkProvider chunkProvider = null;

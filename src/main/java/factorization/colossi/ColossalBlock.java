@@ -1,13 +1,15 @@
 package factorization.colossi;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
-import java.util.UUID;
-
+import factorization.api.Coord;
 import factorization.citizen.EntityCitizen;
+import factorization.common.BlockIcons;
+import factorization.fzds.DeltaChunk;
+import factorization.fzds.TransferLib;
+import factorization.fzds.interfaces.IDeltaChunk;
+import factorization.oreprocessing.ItemOreProcessing;
 import factorization.servo.ItemMatrixProgrammer;
-import factorization.util.FzUtil;
+import factorization.shared.Core;
+import factorization.shared.Core.TabType;
 import factorization.util.PlayerUtil;
 import factorization.weird.poster.EntityPoster;
 import factorization.weird.poster.ItemSpawnPoster;
@@ -21,24 +23,20 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.EnumFacing;
 import net.minecraft.util.IIcon;
 import net.minecraft.util.MovingObjectPosition;
 import net.minecraft.util.WeightedRandomChestContent;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import net.minecraftforge.common.ChestGenHooks;
-import net.minecraftforge.common.util.FakePlayer;
-import net.minecraft.util.EnumFacing;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
-import factorization.api.Coord;
-import factorization.common.BlockIcons;
-import factorization.fzds.DeltaChunk;
-import factorization.fzds.TransferLib;
-import factorization.fzds.interfaces.IDeltaChunk;
-import factorization.oreprocessing.ItemOreProcessing;
-import factorization.shared.Core;
-import factorization.shared.Core.TabType;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
+import java.util.UUID;
 
 public class ColossalBlock extends Block {
     static final byte MD_MASK = 0, MD_BODY = 4, MD_BODY_CRACKED = 1, MD_ARM = 2, MD_LEG = 3, MD_EYE = 5, MD_CORE = 6, MD_EYE_OPEN = 7, MD_BODY_COVERED = 8, MD_MASK_CRACKED = 9;

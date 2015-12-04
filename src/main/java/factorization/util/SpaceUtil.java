@@ -1,15 +1,9 @@
 package factorization.util;
 
-import factorization.api.Coord;
-import factorization.api.DeltaCoord;
-import factorization.api.FzOrientation;
-import factorization.api.Quaternion;
+import factorization.api.*;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.util.AxisAlignedBB;
-import net.minecraft.util.MathHelper;
-import net.minecraft.util.Vec3;
-import net.minecraft.util.EnumFacing;
+import net.minecraft.util.*;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -55,6 +49,9 @@ public final class SpaceUtil {
         return (byte) SpaceUtil.getOrientation(dir).getOpposite().ordinal();
     }
 
+    public static Vec3 newvec() {
+        return new Vec3(0, 0, 0);
+    }
 
     public static Vec3 copy(Vec3 a) {
         return new Vec3(a.xCoord, a.yCoord, a.zCoord);
@@ -62,15 +59,6 @@ public final class SpaceUtil {
 
     public static AxisAlignedBB copy(AxisAlignedBB box) {
         return new AxisAlignedBB(box.minX, box.minY, box.minZ, box.maxX, box.maxY, box.maxZ);
-    }
-
-    public static void copyTo(AxisAlignedBB dst, AxisAlignedBB src) {
-        dst.minX = src.minX;
-        dst.maxX = src.maxX;
-        dst.minY = src.minY;
-        dst.maxY = src.maxY;
-        dst.minZ = src.minZ;
-        dst.maxZ = src.maxZ;
     }
 
     public static Vec3 fromEntPos(Entity ent) {
@@ -103,17 +91,11 @@ public final class SpaceUtil {
         ent.posZ = pos.zCoord;
     }
 
-    public static Vec3 set(Vec3 dest, Vec3 orig) {
-        dest.xCoord = orig.xCoord;
-        dest.yCoord = orig.yCoord;
-        dest.zCoord = orig.zCoord;
-        return dest;
-    }
-
-    public static void setMin(AxisAlignedBB aabb, Vec3 v) {
-        aabb.minX = v.xCoord;
-        aabb.minY = v.yCoord;
-        aabb.minZ = v.zCoord;
+    public static AxisAlignedBB setMin(AxisAlignedBB aabb, Vec3 v) {
+        return new AxisAlignedBB(
+                v.xCoord, v.yCoord, v.zCoord,
+                aabb.maxX, aabb.maxY, aabb.maxZ
+        );
     }
 
     public static Vec3 getMax(AxisAlignedBB aabb) {
@@ -124,76 +106,37 @@ public final class SpaceUtil {
         return new Vec3(aabb.minX, aabb.minY, aabb.minZ);
     }
 
-    public static void getMax(AxisAlignedBB box, Vec3 target) {
-        target.xCoord = box.maxX;
-        target.yCoord = box.maxY;
-        target.zCoord = box.maxZ;
-    }
-
-    public static void getMin(AxisAlignedBB box, Vec3 target) {
-        target.xCoord = box.minX;
-        target.yCoord = box.minY;
-        target.zCoord = box.minZ;
-    }
-
-    public static void setMax(AxisAlignedBB aabb, Vec3 v) {
-        aabb.maxX = v.xCoord;
-        aabb.maxY = v.yCoord;
-        aabb.maxZ = v.zCoord;
-    }
-
-    public static void setMiddle(AxisAlignedBB ab, Vec3 v) {
-        v.xCoord = (ab.minX + ab.maxX)/2;
-        v.yCoord = (ab.minY + ab.maxY)/2;
-        v.zCoord = (ab.minZ + ab.maxZ)/2;
+    public static AxisAlignedBB setMax(AxisAlignedBB aabb, Vec3 v) {
+        return new AxisAlignedBB(
+                aabb.minX, aabb.minY, aabb.minZ,
+                v.xCoord, v.yCoord, v.zCoord
+        );
     }
 
     public static Vec3 getMiddle(AxisAlignedBB ab) {
-        Vec3 ret = newVec();
-        ret.xCoord = (ab.minX + ab.maxX) / 2;
-        ret.yCoord = (ab.minY + ab.maxY) / 2;
-        ret.zCoord = (ab.minZ + ab.maxZ) / 2;
-        return ret;
+        return new Vec3(
+                (ab.minX + ab.maxX) / 2,
+                (ab.minY + ab.maxY) / 2,
+                (ab.minZ + ab.maxZ) / 2
+        );
     }
 
-    public static void incrContract(AxisAlignedBB box, double dx, double dy, double dz) {
-        box.minX += dx;
-        box.minY += dy;
-        box.minZ += dz;
-        box.maxX -= dx;
-        box.maxY -= dy;
-        box.maxZ -= dz;
-    }
-
-    public static AxisAlignedBB newBox() {
-        return new AxisAlignedBB(0, 0, 0, 0, 0, 0);
-    }
-
-    @Deprecated() // Use newVec() instead
-    public static Vec3 newVec3() {
-        return new Vec3(0, 0, 0);
+    public static AxisAlignedBB incrContract(AxisAlignedBB box, double dx, double dy, double dz) {
+        return box.contract(dx, dy, dz);
     }
 
     public static Vec3 fromDirection(EnumFacing dir) {
         return new Vec3(dir.getDirectionVec().getX(), dir.getDirectionVec().getY(), dir.getDirectionVec().getZ());
     }
 
-    public static void sort(Vec3 min, Vec3 max) {
-        if (min.xCoord > max.xCoord) {
-            double big = min.xCoord;
-            min.xCoord = max.xCoord;
-            max.xCoord = big;
-        }
-        if (min.yCoord > max.yCoord) {
-            double big = min.yCoord;
-            min.yCoord = max.yCoord;
-            max.yCoord = big;
-        }
-        if (min.zCoord > max.zCoord) {
-            double big = min.zCoord;
-            min.zCoord = max.zCoord;
-            max.zCoord = big;
-        }
+    public static SortedPair<Vec3> sort(Vec3 left, Vec3 right) {
+        double minX = Math.min(left.xCoord, right.xCoord);
+        double maxX = Math.max(left.xCoord, right.xCoord);
+        double minY = Math.min(left.yCoord, right.yCoord);
+        double maxY = Math.max(left.yCoord, right.yCoord);
+        double minZ = Math.min(left.zCoord, right.zCoord);
+        double maxZ = Math.max(left.zCoord, right.zCoord);
+        return new SortedPair<>(new Vec3(minX, minY, minZ), new Vec3(maxX, maxY, maxZ));
     }
 
     /**
@@ -202,13 +145,15 @@ public final class SpaceUtil {
      * So if the value is 0b000, then target is the minimum point,
      * and 0b111 the target is the maximum.
      */
-    public static void getPoint(AxisAlignedBB box, byte pointFlags, Vec3 target) {
+    public static Vec3 getVertex(AxisAlignedBB box, byte pointFlags) {
         boolean xSide = (pointFlags & 1) == 1;
         boolean ySide = (pointFlags & 2) == 2;
         boolean zSide = (pointFlags & 4) == 4;
-        target.xCoord = xSide ? box.minX : box.maxX;
-        target.yCoord = ySide ? box.minY : box.maxY;
-        target.zCoord = zSide ? box.minZ : box.maxZ;
+        return new Vec3(
+                xSide ? box.minX : box.maxX,
+                ySide ? box.minY : box.maxY,
+                zSide ? box.minZ : box.maxZ
+        );
     }
 
     /**
@@ -244,39 +189,6 @@ public final class SpaceUtil {
         return new Vec3((a.xCoord + b.xCoord) / 2, (a.yCoord + b.yCoord) / 2, (a.zCoord + b.zCoord) / 2);
     }
 
-    public static void assignVecFrom(Vec3 dest, Vec3 orig) {
-        dest.xCoord = orig.xCoord;
-        dest.yCoord = orig.yCoord;
-        dest.zCoord = orig.zCoord;
-    }
-
-    public static Vec3 incrAdd(Vec3 base, Vec3 add) {
-        base.xCoord += add.xCoord;
-        base.yCoord += add.yCoord;
-        base.zCoord += add.zCoord;
-        return base;
-    }
-
-    public static Vec3 add(Vec3 a, Vec3 b) {
-        Vec3 ret = new Vec3(a.xCoord, a.yCoord, a.zCoord);
-        incrAdd(ret, b);
-        return ret;
-    }
-
-    public static Vec3 incrSubtract(Vec3 base, Vec3 sub) {
-        base.xCoord -= sub.xCoord;
-        base.yCoord -= sub.yCoord;
-        base.zCoord -= sub.zCoord;
-        return base;
-    }
-
-    public static Vec3 subtract(Vec3 a, Vec3 b) {
-        Vec3 ret = copy(a);
-        incrSubtract(ret, b);
-        return ret;
-    }
-
-
 
     public static double getAngle(Vec3 a, Vec3 b) {
         double dot = a.dotProduct(b);
@@ -287,37 +199,18 @@ public final class SpaceUtil {
         return Math.acos(div);
     }
 
-    public static void setAABB(AxisAlignedBB target, Vec3 min, Vec3 max) {
-        target.minX = min.xCoord;
-        target.minY = min.yCoord;
-        target.minZ = min.zCoord;
-        target.maxX = max.xCoord;
-        target.maxY = max.yCoord;
-        target.maxZ = max.zCoord;
-    }
-
-    public static Vec3 incrScale(Vec3 base, double s) {
-        base.xCoord *= s;
-        base.yCoord *= s;
-        base.zCoord *= s;
-        return base;
+    public static AxisAlignedBB setAABB(AxisAlignedBB target, Vec3 min, Vec3 max) {
+        return new AxisAlignedBB(
+                min.xCoord, min.yCoord, min.zCoord,
+                max.xCoord, max.yCoord, max.zCoord);
     }
 
     public static Vec3 scale(Vec3 base, double s) {
-        Vec3 ret = copy(base);
-        incrScale(ret, s);
-        return ret;
+        return new Vec3(base.xCoord * s, base.yCoord * s, base.zCoord * s);
     }
 
     public static Vec3 componentMultiply(Vec3 a, Vec3 b) {
-        return incrComponentMultiply(copy(a), b);
-    }
-
-    public static Vec3 incrComponentMultiply(Vec3 base, Vec3 scale) {
-        base.xCoord *= scale.xCoord;
-        base.yCoord *= scale.yCoord;
-        base.zCoord *= scale.zCoord;
-        return base;
+        return new Vec3(a.xCoord + b.yCoord, a.yCoord + b.yCoord, a.zCoord + b.yCoord);
     }
 
     public static AxisAlignedBB createAABB(Vec3 min, Vec3 max) {
@@ -335,27 +228,15 @@ public final class SpaceUtil {
                 max.x, max.y, max.z);
     }
 
-    public static void updateAABB(AxisAlignedBB box, Vec3 min, Vec3 max) {
-        box.minX = min.xCoord;
-        box.minY = min.yCoord;
-        box.minZ = min.zCoord;
-
-        box.maxX = max.xCoord;
-        box.maxY = max.yCoord;
-        box.maxZ = max.zCoord;
-    }
-
-    public static void assignBoxFrom(AxisAlignedBB dest, AxisAlignedBB orig) {
-        dest.setBB(orig);
-    }
-
-    public static void incrAddCoord(AxisAlignedBB box, Vec3 vec) {
-        if (vec.xCoord < box.minX) box.minX = vec.xCoord;
+    public static AxisAlignedBB addCoord(AxisAlignedBB box, Vec3 vec) {
+        return box.addCoord(vec.xCoord, vec.yCoord, vec.zCoord);
+        // NORELEASE: Is the above right? Should be equivalent to this:
+        /*if (vec.xCoord < box.minX) box.minX = vec.xCoord;
         if (box.maxX < vec.xCoord) box.maxX = vec.xCoord;
         if (vec.yCoord < box.minY) box.minY = vec.yCoord;
         if (box.maxY < vec.yCoord) box.maxY = vec.yCoord;
         if (vec.zCoord < box.minZ) box.minZ = vec.zCoord;
-        if (box.maxZ < vec.zCoord) box.maxZ = vec.zCoord;
+        if (box.maxZ < vec.zCoord) box.maxZ = vec.zCoord;*/
     }
 
     public static Vec3[] getCorners(AxisAlignedBB box) {
@@ -425,8 +306,10 @@ public final class SpaceUtil {
     public static FzOrientation getOrientation(EntityPlayer player, int side, float hitX, float hitY, float hitZ) {
         EnumFacing facing = SpaceUtil.getOrientation(side);
         double u = 0.5, v = 0.5; //We pick the axiis based on which side gets clicked
+        if (facing == null) facing = EnumFacing.DOWN;
+        assert facing != null;
         switch (facing) {
-            case null:
+            default:
             case DOWN:
                 u = 1 - hitX;
                 v = hitZ;
@@ -466,16 +349,19 @@ public final class SpaceUtil {
         if (SpaceUtil.determineOrientation(player) >= 2 /* player isn't looking straight down */
                 && side < 2 /* and the side is the bottom */) {
             side = SpaceUtil.determineOrientation(player);
-            fo = FzOrientation.fromDirection(SpaceUtil.getOrientation(side).getOpposite());
-            FzOrientation perfect = fo.pointTopTo(EnumFacing.UP);
-            if (perfect != FzOrientation.UNKNOWN) {
-                fo = perfect;
+            EnumFacing orientation = SpaceUtil.getOrientation(side);
+            fo = orientation == null ? null : FzOrientation.fromDirection(orientation.getOpposite());
+            if (fo != null) {
+                FzOrientation perfect = fo.pointTopTo(EnumFacing.UP);
+                if (perfect != null) {
+                    fo = perfect;
+                }
             }
         }
         double dist = Math.max(Math.abs(u), Math.abs(v));
         if (dist < 0.33) {
             FzOrientation perfect = fo.pointTopTo(EnumFacing.UP);
-            if (perfect != FzOrientation.UNKNOWN) {
+            if (perfect != null) {
                 fo = perfect;
             }
         }
@@ -492,15 +378,13 @@ public final class SpaceUtil {
 
     public static EnumFacing round(Vec3 vec, EnumFacing not) {
         if (isZero(vec)) return null;
-        Vec3 work = newVec();
+        Vec3i work = null;
         double bestAngle = Double.POSITIVE_INFINITY;
         EnumFacing closest = null;
         for (EnumFacing dir : EnumFacing.VALUES) {
             if (dir == not) continue;
-            work.xCoord = dir.getDirectionVec().getX();
-            work.yCoord = dir.getDirectionVec().getY();
-            work.zCoord = dir.getDirectionVec().getZ();
-            double dot = getAngle(vec, work);
+            work = dir.getDirectionVec();
+            double dot = getAngle(vec, new Vec3(work));
             if (dot < bestAngle) {
                 bestAngle = dot;
                 closest = dir;
@@ -509,43 +393,60 @@ public final class SpaceUtil {
         return closest;
     }
 
-    public static void incrFloor(Vec3 v) {
-        v.xCoord = Math.floor(v.xCoord);
-        v.yCoord = Math.floor(v.yCoord);
-        v.zCoord = Math.floor(v.zCoord);
-    }
-
-    public static Vec3 floor(Vec3 v) {
-        Vec3 ret = copy(v);
-        incrFloor(ret);
-        return ret;
+    public static Vec3 floor(Vec3 vec) {
+        return new Vec3(
+                Math.floor(vec.xCoord),
+                Math.floor(vec.yCoord),
+                Math.floor(vec.zCoord));
     }
 
     public static Vec3 normalize(Vec3 v) {
         // Vanilla's threshold is too low for my purposes.
         double length = v.lengthVector();
-        if (length == 0) return newVec();
+        if (length == 0) return newvec();
         double inv = 1.0 / length;
-        if (Double.isNaN(inv) || Double.isInfinite(inv)) return newVec();
+        if (Double.isNaN(inv) || Double.isInfinite(inv)) return newvec();
         return scale(v, inv);
     }
 
-    public static void include(AxisAlignedBB box, Coord at) {
-        if (at.x < box.minX) box.minX = at.x;
-        if (at.x + 1 > box.maxX) box.maxX = at.x + 1;
-        if (at.y < box.minY) box.minY = at.y;
-        if (at.y + 1 > box.maxY) box.maxY = at.y + 1;
-        if (at.z < box.minZ) box.minZ = at.z;
-        if (at.z + 1 > box.maxZ) box.maxZ = at.z + 1;
+    public static AxisAlignedBB include(AxisAlignedBB box, Coord at) {
+        double minX = box.minX;
+        double maxX = box.maxX;
+        double minY = box.minY;
+        double maxY = box.maxY;
+        double minZ = box.minZ;
+        double maxZ = box.maxZ;
+
+        if (at.x < minX) minX = at.x;
+        if (at.x + 1 > maxX) maxX = at.x + 1;
+        if (at.y < minY) minY = at.y;
+        if (at.y + 1 > maxY) maxY = at.y + 1;
+        if (at.z < minZ) minZ = at.z;
+        if (at.z + 1 > maxZ) maxZ = at.z + 1;
+
+        return new AxisAlignedBB(
+                minX, minY, minZ,
+                maxX, maxY, maxZ);
     }
 
-    public static void include(AxisAlignedBB box, Vec3 at) {
-        if (at.xCoord < box.minX) box.minX = at.xCoord;
-        if (at.xCoord > box.maxX) box.maxX = at.xCoord;
-        if (at.yCoord < box.minY) box.minY = at.yCoord;
-        if (at.yCoord > box.maxY) box.maxY = at.yCoord;
-        if (at.zCoord < box.minZ) box.minZ = at.zCoord;
-        if (at.zCoord > box.maxZ) box.maxZ = at.zCoord;
+    public static AxisAlignedBB include(AxisAlignedBB box, Vec3 at) {
+        double minX = box.minX;
+        double maxX = box.maxX;
+        double minY = box.minY;
+        double maxY = box.maxY;
+        double minZ = box.minZ;
+        double maxZ = box.maxZ;
+
+        if (at.xCoord < minX) minX = at.xCoord;
+        if (at.xCoord > maxX) maxX = at.xCoord;
+        if (at.yCoord < minY) minY = at.yCoord;
+        if (at.yCoord > maxY) maxY = at.yCoord;
+        if (at.zCoord < minZ) minZ = at.zCoord;
+        if (at.zCoord > maxZ) maxZ = at.zCoord;
+
+        return new AxisAlignedBB(
+                minX, minY, minZ,
+                maxX, maxY, maxZ);
     }
 
     public static boolean contains(AxisAlignedBB box, Coord at) {

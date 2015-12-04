@@ -1,20 +1,18 @@
 package factorization.utiligoo;
 
-import java.io.File;
-import java.util.ArrayList;
-import java.util.WeakHashMap;
-
+import factorization.api.Coord;
+import factorization.notify.Notice;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldSavedData;
-
 import org.apache.commons.lang3.ArrayUtils;
 
-import factorization.api.Coord;
-import factorization.notify.Notice;
+import java.io.File;
+import java.util.ArrayList;
+import java.util.WeakHashMap;
 
 public class GooData extends WorldSavedData {
     public GooData(String dataName) {

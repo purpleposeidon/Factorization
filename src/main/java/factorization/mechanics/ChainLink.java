@@ -1,7 +1,5 @@
 package factorization.mechanics;
 
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
 import factorization.shared.Core;
 import factorization.util.NumUtil;
 import factorization.util.SpaceUtil;
@@ -11,6 +9,8 @@ import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.culling.ICamera;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.Vec3;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 public class ChainLink {
     private Vec3 start, end, prevStart, prevEnd;

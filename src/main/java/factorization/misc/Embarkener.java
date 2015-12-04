@@ -1,7 +1,7 @@
 package factorization.misc;
 
-import java.util.ArrayList;
-
+import factorization.api.Coord;
+import factorization.shared.Core;
 import factorization.util.PlayerUtil;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockLog;
@@ -10,16 +10,12 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
-import net.minecraftforge.common.MinecraftForge;
-import net.minecraft.util.EnumFacing;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
-import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent.Phase;
 import net.minecraftforge.fml.common.gameevent.TickEvent.ServerTickEvent;
-import factorization.api.Coord;
-import factorization.common.FzConfig;
-import factorization.shared.Core;
+
+import java.util.ArrayList;
 
 public class Embarkener {
     public Embarkener() {

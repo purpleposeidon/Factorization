@@ -1,15 +1,13 @@
 package factorization.api.datahelpers;
 
-import java.io.IOException;
-import java.util.ArrayList;
-
 import factorization.shared.Core;
-
-import factorization.util.DataUtil;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraftforge.common.util.Constants;
+
+import java.io.IOException;
+import java.util.ArrayList;
 
 public class DataInNBT extends DataHelperNBT {	
     public DataInNBT(NBTTagCompound theTag) {

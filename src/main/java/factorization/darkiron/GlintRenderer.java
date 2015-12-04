@@ -1,5 +1,9 @@
 package factorization.darkiron;
 
+import factorization.common.BlockIcons;
+import factorization.darkiron.BlockDarkIronOre.Glint;
+import factorization.shared.BlockRenderHelper;
+import factorization.shared.Core;
 import factorization.util.NumUtil;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.OpenGlHelper;
@@ -8,16 +12,10 @@ import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.EnumFacing;
 import net.minecraft.util.Vec3;
 import net.minecraft.world.World;
-import net.minecraft.util.EnumFacing;
-
 import org.lwjgl.opengl.GL11;
-
-import factorization.common.BlockIcons;
-import factorization.darkiron.BlockDarkIronOre.Glint;
-import factorization.shared.BlockRenderHelper;
-import factorization.shared.Core;
 
 public class GlintRenderer extends TileEntitySpecialRenderer {
     
@@ -70,7 +68,7 @@ public class GlintRenderer extends TileEntitySpecialRenderer {
             float r = NumUtil.uninterp((float) minTheta, (float) maxTheta, (float) theta);
             opacity *= r;
             
-            int light = w.getBlockLightValue(te.pos.getX() + dir.getDirectionVec().getX(), te.pos.getY() + dir.getDirectionVec().getY(), te.pos.getZ() + dir.getDirectionVec().getZ());
+            int light = w.getBlockLightValue(te.getPos().getX() + dir.getDirectionVec().getX(), te.getPos().getY() + dir.getDirectionVec().getY(), te.getPos().getZ() + dir.getDirectionVec().getZ());
             opacity += (light/16F)*0.2F;
             opacity = Math.min(opacity, 0.35F);
             

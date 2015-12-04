@@ -2,7 +2,6 @@ package factorization.charge;
 
 import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
 import net.minecraft.tileentity.TileEntity;
-
 import org.lwjgl.opengl.GL11;
 
 

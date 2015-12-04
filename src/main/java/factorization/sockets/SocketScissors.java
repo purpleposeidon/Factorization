@@ -1,7 +1,5 @@
 package factorization.sockets;
 
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
 import factorization.api.Coord;
 import factorization.api.FzOrientation;
 import factorization.api.Quaternion;
@@ -13,8 +11,11 @@ import factorization.common.FactoryType;
 import factorization.common.ItemIcons;
 import factorization.notify.Notice;
 import factorization.servo.ServoMotor;
-import factorization.shared.*;
+import factorization.shared.Core;
+import factorization.shared.DropCaptureHandler;
+import factorization.shared.ICaptureDrops;
 import factorization.shared.NetworkFactorization.MessageType;
+import factorization.shared.ObjectModel;
 import factorization.util.InvUtil;
 import factorization.util.ItemUtil;
 import factorization.util.PlayerUtil;
@@ -32,7 +33,8 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.*;
 import net.minecraft.world.World;
 import net.minecraftforge.common.IShearable;
-import net.minecraft.util.EnumFacing;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 import org.lwjgl.opengl.GL11;
 
 import java.io.IOException;

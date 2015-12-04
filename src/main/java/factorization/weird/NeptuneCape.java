@@ -1,5 +1,6 @@
 package factorization.weird;
 
+import factorization.shared.Core;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.AbstractClientPlayer;
 import net.minecraft.client.model.ModelBase;
@@ -11,11 +12,8 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.client.event.RenderPlayerEvent;
 import net.minecraftforge.client.event.TextureStitchEvent;
-
-import org.lwjgl.opengl.GL11;
-
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
-import factorization.shared.Core;
+import org.lwjgl.opengl.GL11;
 
 public class NeptuneCape {
     {

@@ -1,17 +1,16 @@
 package factorization.shared;
 
-import java.util.ArrayList;
-
-import net.minecraftforge.fml.common.FMLCommonHandler;
-import net.minecraftforge.fml.relauncher.Side;
-
+import factorization.api.Coord;
+import factorization.shared.NetworkFactorization.MessageType;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.world.World;
-import factorization.api.Coord;
-import factorization.shared.NetworkFactorization.MessageType;
+import net.minecraftforge.fml.common.FMLCommonHandler;
+import net.minecraftforge.fml.relauncher.Side;
+
+import java.util.ArrayList;
 
 public enum Sound {
     // it might be kinda cool to have this be configable?
@@ -98,7 +97,7 @@ public enum Sound {
     }
 
     public void playAt(TileEntity ent) {
-        playAt(ent.getWorld(), ent.pos.getX(), ent.pos.getY(), ent.pos.getZ());
+        playAt(ent.getWorld(), ent.getPos().getX(), ent.getPos().getY(), ent.getPos().getZ());
     }
 
     public void play() {

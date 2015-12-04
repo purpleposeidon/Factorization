@@ -1,8 +1,5 @@
 package factorization.notify;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-
 import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
@@ -21,10 +18,11 @@ import net.minecraft.util.Vec3;
 import net.minecraft.world.World;
 import net.minecraftforge.client.ClientCommandHandler;
 import net.minecraftforge.client.event.RenderWorldLastEvent;
-
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import org.lwjgl.opengl.GL11;
 
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import java.util.ArrayList;
+import java.util.Iterator;
 
 public class RenderMessages extends RenderMessagesProxy {
     static ArrayList<ClientMessage> messages = new ArrayList();

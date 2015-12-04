@@ -1,10 +1,10 @@
 package factorization.fzds;
 
+import factorization.api.Coord;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.Vec3;
 import net.minecraft.world.Teleporter;
 import net.minecraft.world.WorldServer;
-import factorization.api.Coord;
 
 class DSTeleporter extends Teleporter {
     Coord destination;

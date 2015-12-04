@@ -27,7 +27,7 @@ class DefaultHeatConverter implements HeatConverters.IHeatConverter {
             // copy of private function for TileEntityFurnace.canSmelt. Lame. AT it?
             final ItemStack inputItem = furnace.getStackInSlot(0);
             if (inputItem == null) return false;
-            ItemStack smeltOutput = FurnaceRecipes.smelting().getSmeltingResult(inputItem);
+            ItemStack smeltOutput = FurnaceRecipes.instance().getSmeltingResult(inputItem);
             if (smeltOutput == null) return false;
             final ItemStack outputSlot = furnace.getStackInSlot(2);
             if (outputSlot == null) return true;
@@ -43,7 +43,7 @@ class DefaultHeatConverter implements HeatConverters.IHeatConverter {
             if (furnace.furnaceBurnTime < topBurnTime) {
                 furnace.furnaceBurnTime += 1;
                 if (needStart) {
-                    BlockFurnace.updateFurnaceBlockState(furnace.furnaceBurnTime > 0, furnace.getWorld(), furnace.pos.getX(), furnace.pos.getY(), furnace.pos.getZ());
+                    BlockFurnace.updateFurnaceBlockState(furnace.furnaceBurnTime > 0, furnace.getWorld(), furnace.getPos().getX(), furnace.getPos().getY(), furnace.getPos().getZ());
                 }
             } else {
                 furnace.furnaceCookTime += 1;

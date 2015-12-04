@@ -1,22 +1,22 @@
 package factorization.oreprocessing;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
+import factorization.api.IActOnCraft;
+import factorization.shared.Core;
+import factorization.shared.Core.TabType;
+import factorization.shared.ItemFactorization;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraftforge.oredict.OreDictionary;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.relauncher.Side;
-import factorization.api.IActOnCraft;
-import factorization.shared.Core;
-import factorization.shared.Core.TabType;
-import factorization.shared.ItemFactorization;
+import net.minecraftforge.oredict.OreDictionary;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 public class ItemOreProcessing extends ItemFactorization implements IActOnCraft {
     public static ArrayList<String> OD_ores = new ArrayList(), OD_ingots = new ArrayList();

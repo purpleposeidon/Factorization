@@ -1,15 +1,13 @@
 package factorization.charge;
 
+import factorization.common.BlockIcons;
+import factorization.shared.BlockRenderHelper;
+import factorization.shared.Core;
 import net.minecraft.client.renderer.RenderBlocks;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
 import net.minecraft.tileentity.TileEntity;
-
 import org.lwjgl.opengl.GL11;
-
-import factorization.common.BlockIcons;
-import factorization.shared.BlockRenderHelper;
-import factorization.shared.Core;
 
 public class TileEntityHeaterRenderer extends TileEntitySpecialRenderer {
     static RenderBlocks rb = new RenderBlocks();

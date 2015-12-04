@@ -116,7 +116,7 @@ class ClientMessage {
         }
         if (locus instanceof TileEntity) {
             TileEntity te = ((TileEntity) locus);
-            return new Vec3(te.pos.getX(), te.pos.getY(), te.pos.getZ());
+            return new Vec3(te.getPos().getX(), te.getPos().getY(), te.getPos().getZ());
         }
         if (locus instanceof ISaneCoord) {
             ISaneCoord c = (ISaneCoord) locus;
@@ -143,7 +143,7 @@ class ClientMessage {
         }
         if (locus instanceof TileEntity) {
             TileEntity te = (TileEntity) locus;
-            return new SimpleCoord(te.getWorld(), te.pos.getX(), te.pos.getY(), te.pos.getZ());
+            return new SimpleCoord(te.getWorld(), te.getPos().getX(), te.getPos().getY(), te.getPos().getZ());
         }
         return null;
     }

@@ -1,12 +1,12 @@
 package factorization.servo;
 
-import java.io.IOException;
-
 import factorization.api.Coord;
 import factorization.api.datahelpers.DataHelper;
 import factorization.api.datahelpers.Share;
 import factorization.notify.Notice;
 import factorization.servo.instructions.IntegerValue;
+
+import java.io.IOException;
 
 public class Executioner {
     private transient final ServoMotor motor;

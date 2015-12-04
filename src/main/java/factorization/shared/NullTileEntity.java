@@ -1,10 +1,10 @@
 package factorization.shared;
 
+import factorization.api.Coord;
+import factorization.shared.NetworkFactorization.MessageType;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.relauncher.Side;
-import factorization.api.Coord;
-import factorization.shared.NetworkFactorization.MessageType;
 
 public class NullTileEntity extends TileEntity {
     int description_request_delay = 5;

@@ -1,7 +1,6 @@
 package factorization.fzds.network;
 
 import com.google.common.collect.BiMap;
-import net.minecraftforge.fml.common.network.internal.FMLProxyPacket;
 import factorization.fzds.interfaces.IFzdsShenanigans;
 import factorization.shared.Core;
 import net.minecraft.network.EnumConnectionState;
@@ -9,6 +8,7 @@ import net.minecraft.network.Packet;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.network.play.client.C17PacketCustomPayload;
 import net.minecraft.network.play.server.S3FPacketCustomPayload;
+import net.minecraftforge.fml.common.network.internal.FMLProxyPacket;
 
 import java.io.IOException;
 

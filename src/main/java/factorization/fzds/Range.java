@@ -1,7 +1,7 @@
 package factorization.fzds;
 
-import net.minecraft.util.Vec3;
 import net.minecraft.util.EnumFacing;
+import net.minecraft.util.Vec3;
 
 class Range {
     double lower, upper;

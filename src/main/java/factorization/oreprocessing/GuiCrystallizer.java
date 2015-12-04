@@ -1,11 +1,10 @@
 package factorization.oreprocessing;
 
-import factorization.util.NumUtil;
-import org.lwjgl.opengl.GL11;
-
 import factorization.common.ContainerFactorization;
 import factorization.shared.Core;
 import factorization.shared.FactorizationGui;
+import factorization.util.NumUtil;
+import org.lwjgl.opengl.GL11;
 
 public class GuiCrystallizer extends FactorizationGui {
     TileEntityCrystallizer crys;

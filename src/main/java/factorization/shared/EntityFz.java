@@ -1,11 +1,8 @@
 package factorization.shared;
 
-import net.minecraftforge.fml.common.network.internal.FMLNetworkHandler;
 import factorization.api.IEntityMessage;
+import factorization.api.datahelpers.*;
 import io.netty.buffer.ByteBuf;
-
-import java.io.IOException;
-
 import io.netty.buffer.Unpooled;
 import net.minecraft.entity.Entity;
 import net.minecraft.nbt.NBTTagCompound;
@@ -13,11 +10,8 @@ import net.minecraft.network.Packet;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.common.registry.IEntityAdditionalSpawnData;
 import net.minecraftforge.fml.relauncher.Side;
-import factorization.api.datahelpers.DataHelper;
-import factorization.api.datahelpers.DataInByteBuf;
-import factorization.api.datahelpers.DataInNBT;
-import factorization.api.datahelpers.DataOutByteBuf;
-import factorization.api.datahelpers.DataOutNBT;
+
+import java.io.IOException;
 
 public abstract class EntityFz extends Entity implements IEntityAdditionalSpawnData, IEntityMessage {
 

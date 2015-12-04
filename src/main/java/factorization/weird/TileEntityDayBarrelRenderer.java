@@ -26,10 +26,10 @@ import net.minecraft.entity.item.EntityItem;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.EnumFacing;
 import net.minecraft.util.IIcon;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.client.MinecraftForgeClient;
-import net.minecraft.util.EnumFacing;
 import org.lwjgl.opengl.GL11;
 
 import static net.minecraftforge.client.IItemRenderer.ItemRenderType.INVENTORY;

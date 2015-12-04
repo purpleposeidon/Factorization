@@ -1,12 +1,5 @@
 package factorization.servo.instructions;
 
-import java.io.IOException;
-
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.init.Blocks;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.IIcon;
-import net.minecraft.util.EnumFacing;
 import factorization.api.Coord;
 import factorization.api.datahelpers.DataHelper;
 import factorization.api.datahelpers.IDataSerializable;
@@ -15,6 +8,13 @@ import factorization.servo.CpuBlocking;
 import factorization.servo.Instruction;
 import factorization.servo.ServoMotor;
 import factorization.shared.TileEntityCommon;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.init.Blocks;
+import net.minecraft.item.ItemStack;
+import net.minecraft.util.EnumFacing;
+import net.minecraft.util.IIcon;
+
+import java.io.IOException;
 
 public class RedstonePulse extends Instruction {
 

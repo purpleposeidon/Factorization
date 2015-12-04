@@ -1,13 +1,13 @@
 package factorization.oreprocessing;
 
-import java.util.ArrayList;
-
-import factorization.shared.*;
+import factorization.shared.Core;
 import factorization.util.ItemUtil;
 import net.minecraft.block.Block;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.oredict.OreDictionary;
+
+import java.util.ArrayList;
 
 public class TileEntityGrinder {
     // This is now just a recipe-holder class...

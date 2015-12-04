@@ -100,7 +100,7 @@ public class FigurePage extends AbstractPage {
         TileEntityRendererDispatcher ter = TileEntityRendererDispatcher.instance;
         ter.staticPlayerX = ter.staticPlayerY = ter.staticPlayerZ = 0;
         for (TileEntity te : figure.tileEntities) {
-            ter.renderTileEntityAt(te, te.pos.getX(), te.pos.getY(), te.pos.getZ(), 0);
+            ter.renderTileEntityAt(te, te.getPos().getX(), te.getPos().getY(), te.getPos().getZ(), 0);
         }
         GL11.glPopAttrib();
         GL11.glPushAttrib(GL11.GL_ALL_ATTRIB_BITS);

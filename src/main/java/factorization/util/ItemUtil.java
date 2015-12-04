@@ -10,14 +10,13 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.nbt.NBTTagString;
+import net.minecraft.util.EnumFacing;
 import net.minecraft.util.Vec3;
 import net.minecraft.world.World;
-import net.minecraft.util.EnumFacing;
 import net.minecraftforge.oredict.OreDictionary;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.regex.Pattern;
 
 /**
  * Operations on ItemStack.
@@ -65,10 +64,7 @@ public final class ItemUtil {
     }
 
     public static boolean sameItemTags(ItemStack a, ItemStack b) {
-        if (a.stackTagCompound == null || b.stackTagCompound == null) {
-            return a.stackTagCompound == b.stackTagCompound;
-        }
-        return a.stackTagCompound.equals(b.stackTagCompound);
+        return ItemUtil.sameItemTags(a, b);
     }
 
     /**
@@ -115,7 +111,7 @@ public final class ItemUtil {
 
     public static boolean oreDictionarySimilar(Object template, ItemStack stranger) {
         if (template instanceof String) {
-            ArrayList<ItemStack> ores = OreDictionary.getOres((String) template);
+            List<ItemStack> ores = OreDictionary.getOres((String) template);
             for (int i = 0; i < ores.size(); i++) {
                 if (wildcardSimilar(ores.get(i), stranger)) {
                     return true;

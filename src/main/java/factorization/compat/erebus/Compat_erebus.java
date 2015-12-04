@@ -1,11 +1,11 @@
 package factorization.compat.erebus;
 
-import net.minecraftforge.fml.common.event.FMLInitializationEvent;
-import net.minecraftforge.fml.common.event.FMLInterModComms;
-import net.minecraftforge.fml.relauncher.ReflectionHelper;
 import factorization.compat.CompatBase;
 import factorization.shared.Core;
 import factorization.truth.DocumentationModule;
+import net.minecraftforge.fml.common.event.FMLInitializationEvent;
+import net.minecraftforge.fml.common.event.FMLInterModComms;
+import net.minecraftforge.fml.relauncher.ReflectionHelper;
 
 public class Compat_erebus extends CompatBase {
     public static Iterable<Object> compost_recipes, offering_altar_recipes, smoothie_recipes;

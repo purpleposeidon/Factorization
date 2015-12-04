@@ -1,7 +1,6 @@
 package factorization.fzds;
 
-import java.util.List;
-
+import factorization.api.Coord;
 import net.minecraft.block.Block;
 import net.minecraft.init.Blocks;
 import net.minecraft.nbt.NBTTagCompound;
@@ -11,7 +10,8 @@ import net.minecraft.world.EnumSkyBlock;
 import net.minecraft.world.NextTickListEntry;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.chunk.storage.ExtendedBlockStorage;
-import factorization.api.Coord;
+
+import java.util.List;
 
 public class TransferLib {
     public static int default_set_method = 0;

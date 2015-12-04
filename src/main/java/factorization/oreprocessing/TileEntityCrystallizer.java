@@ -16,8 +16,8 @@ import factorization.util.DataUtil;
 import factorization.util.ItemUtil;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.IIcon;
 import net.minecraft.util.EnumFacing;
+import net.minecraft.util.IIcon;
 
 import java.io.IOException;
 

@@ -1,11 +1,8 @@
 package factorization.compat.ic2;
 
 
-import net.minecraftforge.fml.common.event.FMLInitializationEvent;
-import net.minecraftforge.fml.common.event.FMLInterModComms;
 import factorization.api.IRotationalEnergySource;
 import factorization.compat.CompatBase;
-import factorization.shared.Core;
 import factorization.truth.DocumentationModule;
 import factorization.truth.api.IObjectWriter;
 import factorization.truth.word.ItemWord;
@@ -14,13 +11,12 @@ import ic2.core.AdvRecipe;
 import ic2.core.AdvShapelessRecipe;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.nbt.NBTTagList;
-import net.minecraft.nbt.NBTTagString;
+import net.minecraftforge.fml.common.event.FMLInitializationEvent;
+import net.minecraftforge.fml.common.event.FMLInterModComms;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 public class Compat_IC2 extends CompatBase {

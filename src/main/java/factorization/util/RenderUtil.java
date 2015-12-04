@@ -1,29 +1,15 @@
 package factorization.util;
 
+import factorization.shared.Core;
+import net.minecraft.util.EnumFacing;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
-import factorization.shared.Core;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.RenderBlocks;
-import net.minecraft.util.EnumFacing;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.util.glu.GLU;
 
 import static org.lwjgl.opengl.GL11.glGetError;
 
 public final class RenderUtil {
-    @SideOnly(Side.CLIENT)
-    private static RenderBlocks rb;
-
-    @SideOnly(Side.CLIENT)
-    public static RenderBlocks getRB() {
-        if (rb == null) {
-            rb = new RenderBlocks();
-        }
-        rb.blockAccess = Minecraft.getMinecraft().theWorld;
-        return rb;
-    }
-
     @SideOnly(Side.CLIENT)
     public static void rotateForDirection(EnumFacing dir) {
         switch (dir) {
@@ -44,7 +30,7 @@ public final class RenderUtil {
         case DOWN:
             GL11.glRotatef(90, 0, 0, 1);
             break;
-        case UNKNOWN: break;
+        default: break;
         }
     }
 

@@ -1,8 +1,9 @@
 package factorization.common;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-
+import factorization.oreprocessing.TileEntityCrystallizer;
+import factorization.oreprocessing.TileEntitySlagFurnace;
+import factorization.redstone.TileEntityParaSieve;
+import factorization.shared.TileEntityFactorization;
 import factorization.util.InvUtil;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
@@ -13,10 +14,9 @@ import net.minecraft.inventory.SlotFurnace;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntityFurnace;
-import factorization.oreprocessing.TileEntityCrystallizer;
-import factorization.oreprocessing.TileEntitySlagFurnace;
-import factorization.redstone.TileEntityParaSieve;
-import factorization.shared.TileEntityFactorization;
+
+import java.util.ArrayList;
+import java.util.Arrays;
 
 public class ContainerFactorization extends Container {
     public TileEntityFactorization factory;

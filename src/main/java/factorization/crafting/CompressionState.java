@@ -1,25 +1,21 @@
 package factorization.crafting;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-
-import factorization.shared.*;
+import factorization.api.Coord;
+import factorization.notify.Notice;
+import factorization.notify.Style;
+import factorization.shared.Core;
+import factorization.shared.NetworkFactorization.MessageType;
 import factorization.util.CraftUtil;
 import factorization.util.InvUtil;
+import factorization.util.InvUtil.FzInv;
 import factorization.util.ItemUtil;
+import factorization.weird.TileEntityDayBarrel;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumFacing;
-import factorization.api.Coord;
-import factorization.notify.Notice;
-import factorization.notify.Style;
-import factorization.util.InvUtil.FzInv;
-import factorization.shared.NetworkFactorization.MessageType;
-import factorization.weird.TileEntityDayBarrel;
+
+import java.util.*;
 
 public class CompressionState {
     static int MAX_CRAFT = 32;

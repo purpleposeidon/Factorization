@@ -1,14 +1,13 @@
 package factorization.common;
 
-import net.minecraftforge.fml.common.FMLCommonHandler;
-import net.minecraftforge.fml.common.Loader;
-import net.minecraftforge.fml.common.registry.EntityRegistry;
 import factorization.fzds.DeltaChunk;
 import factorization.shared.Core;
 import factorization.shared.Graylist;
 import net.minecraft.block.Block;
 import net.minecraftforge.common.config.Configuration;
 import net.minecraftforge.common.config.Property;
+import net.minecraftforge.fml.common.Loader;
+import net.minecraftforge.fml.common.registry.EntityRegistry;
 
 import java.io.File;
 import java.util.ArrayList;

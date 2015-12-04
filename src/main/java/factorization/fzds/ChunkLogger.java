@@ -1,7 +1,7 @@
 package factorization.fzds;
 
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.event.world.ChunkEvent;
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
 public class ChunkLogger {
     @SubscribeEvent

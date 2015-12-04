@@ -3,7 +3,6 @@ package factorization.truth.cmd;
 import factorization.truth.ClientTypesetter;
 import factorization.truth.WordPage;
 import factorization.truth.api.*;
-import factorization.truth.word.Word;
 
 import java.util.ArrayList;
 

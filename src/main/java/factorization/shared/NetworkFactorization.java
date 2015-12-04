@@ -1,17 +1,15 @@
 package factorization.shared;
 
-import net.minecraftforge.fml.common.network.ByteBufUtils;
-import net.minecraftforge.fml.relauncher.Side;
+import factorization.api.*;
 import factorization.api.datahelpers.DataInByteBuf;
 import factorization.artifact.ContainerForge;
+import factorization.common.Command;
+import factorization.common.FactoryType;
 import factorization.notify.Notice;
 import factorization.util.DataUtil;
+import factorization.utiligoo.ItemGoo;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
-
-import java.io.IOException;
-import java.util.Random;
-
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
@@ -19,15 +17,12 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.world.World;
+import net.minecraftforge.fml.common.network.ByteBufUtils;
 import net.minecraftforge.fml.common.network.internal.FMLProxyPacket;
-import factorization.api.Coord;
-import factorization.api.DeltaCoord;
-import factorization.api.IEntityMessage;
-import factorization.api.Quaternion;
-import factorization.api.VectorUV;
-import factorization.common.Command;
-import factorization.common.FactoryType;
-import factorization.utiligoo.ItemGoo;
+import net.minecraftforge.fml.relauncher.Side;
+
+import java.io.IOException;
+import java.util.Random;
 
 public class NetworkFactorization {
     public static final ItemStack EMPTY_ITEMSTACK = new ItemStack(Blocks.air);

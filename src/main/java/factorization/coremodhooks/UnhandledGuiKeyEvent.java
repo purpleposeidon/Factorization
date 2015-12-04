@@ -1,8 +1,8 @@
 package factorization.coremodhooks;
 
-import net.minecraftforge.fml.common.eventhandler.Event;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraftforge.fml.common.eventhandler.Event;
 
 public class UnhandledGuiKeyEvent extends Event {
     public final char chr;

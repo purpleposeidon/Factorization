@@ -1,12 +1,5 @@
 package factorization.servo.instructions;
 
-import java.io.IOException;
-
-import factorization.servo.stepper.StepperEngine;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.IIcon;
-import net.minecraft.util.EnumFacing;
 import factorization.api.Coord;
 import factorization.api.datahelpers.DataHelper;
 import factorization.api.datahelpers.IDataSerializable;
@@ -15,7 +8,14 @@ import factorization.common.BlockIcons;
 import factorization.servo.CpuBlocking;
 import factorization.servo.Instruction;
 import factorization.servo.ServoMotor;
+import factorization.servo.stepper.StepperEngine;
 import factorization.shared.Core;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.item.ItemStack;
+import net.minecraft.util.EnumFacing;
+import net.minecraft.util.IIcon;
+
+import java.io.IOException;
 
 public class SocketCtrl extends Instruction {
     static final byte MODE_PULSE = 0, MODE_POWER = 1, MODE_UNPOWER = 2;

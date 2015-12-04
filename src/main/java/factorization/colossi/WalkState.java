@@ -1,15 +1,15 @@
 package factorization.colossi;
 
 import factorization.api.Coord;
-import factorization.util.SpaceUtil;
-import net.minecraft.block.Block;
-import net.minecraft.util.Vec3;
-import net.minecraft.util.EnumFacing;
 import factorization.api.Quaternion;
 import factorization.colossi.ColossusController.BodySide;
 import factorization.colossi.ColossusController.LimbType;
 import factorization.fzds.interfaces.IDeltaChunk;
 import factorization.fzds.interfaces.Interpolation;
+import factorization.util.SpaceUtil;
+import net.minecraft.block.Block;
+import net.minecraft.util.EnumFacing;
+import net.minecraft.util.Vec3;
 
 public enum WalkState implements IStateMachine<WalkState> {
     IDLE {

@@ -2,7 +2,10 @@ package factorization.util;
 
 import factorization.api.Coord;
 import net.minecraft.block.Block;
+import net.minecraft.block.BlockLiquid;
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.init.Blocks;
+import net.minecraft.util.BlockPos;
 import net.minecraft.world.World;
 import net.minecraftforge.fluids.*;
 
@@ -12,12 +15,15 @@ public class FluidUtil {
         if (what == null || what.amount < 0) {
             return;
         }
-        FluidEvent.fireEvent(new FluidEvent.FluidSpilledEvent(what, where.w, where.x, where.y, where.z));
+        FluidEvent.fireEvent(new FluidEvent.FluidSpilledEvent(what, where.w, where.toBlockPos()));
     }
 
-    public static FluidStack drainSpecificBlockFluid(World worldObj, int x, int y, int z, boolean doDrain, Fluid targetFluid) {
-        Block b = worldObj.getBlock(x, y, z);
-        if (!(b instanceof IFluidBlock)) {
+    public static FluidStack drainSpecificBlockFluid(World worldObj, BlockPos pos, boolean doDrain, Fluid targetFluid) {
+        IBlockState bs = worldObj.getBlockState(pos);
+        Block b = bs.getBlock();
+        Integer fluidLevel = bs.getValue(BlockLiquid.LEVEL);
+        if (fluidLevel != null) {
+            if (fluidLevel != 0) return null;
             Fluid vanilla;
             if (b == Blocks.water || b == Blocks.flowing_water) {
                 vanilla = FluidRegistry.WATER;
@@ -26,21 +32,18 @@ public class FluidUtil {
             } else {
                 return null;
             }
-            if (worldObj.getBlockMetadata(x, y, z) != 0) {
-                return null;
-            }
             if (doDrain) {
-                worldObj.setBlockToAir(x, y, z);
+                worldObj.setBlockToAir(pos);
             }
             return new FluidStack(vanilla, FluidContainerRegistry.BUCKET_VOLUME);
         }
         IFluidBlock block = (IFluidBlock) b;
-        if (!block.canDrain(world, pos)) return null;
-        FluidStack fs = block.drain(world, pos, false);
+        if (!block.canDrain(worldObj, pos)) return null;
+        FluidStack fs = block.drain(worldObj, pos, false);
         if (fs == null) return null;
         if (fs.getFluid() != targetFluid) return null;
         if (doDrain) {
-            fs = block.drain(world, pos, true);
+            fs = block.drain(worldObj, pos, true);
         }
         if (fs == null || fs.amount <= 0) return null;
         return fs;

@@ -1,12 +1,11 @@
 package factorization.fzds;
 
-import java.util.HashMap;
-import java.util.Map;
-
-import org.apache.commons.lang3.ArrayUtils;
-
 import factorization.api.Coord;
 import factorization.fzds.interfaces.IDeltaChunk;
+import org.apache.commons.lang3.ArrayUtils;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Map<Chunk, IDeltaChunk[]>

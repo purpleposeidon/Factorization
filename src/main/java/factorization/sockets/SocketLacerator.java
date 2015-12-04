@@ -1,15 +1,28 @@
 package factorization.sockets;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Iterator;
-
+import factorization.api.*;
+import factorization.api.datahelpers.DataHelper;
+import factorization.api.datahelpers.IDataSerializable;
+import factorization.api.datahelpers.Share;
+import factorization.common.BlockIcons;
+import factorization.common.FactoryType;
 import factorization.common.FzConfig;
-import factorization.shared.*;
+import factorization.notify.Notice;
+import factorization.oreprocessing.TileEntityGrinder;
+import factorization.oreprocessing.TileEntityGrinder.GrinderRecipe;
+import factorization.oreprocessing.TileEntityGrinderRender;
+import factorization.servo.RenderServoMotor;
+import factorization.servo.ServoMotor;
+import factorization.shared.BlockFactorization;
+import factorization.shared.Core;
+import factorization.shared.DropCaptureHandler;
+import factorization.shared.ICaptureDrops;
+import factorization.shared.NetworkFactorization.MessageType;
 import factorization.util.InvUtil;
 import factorization.util.ItemUtil;
 import factorization.util.NumUtil;
 import factorization.util.PlayerUtil;
+import factorization.weird.TileEntityDayBarrel;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
@@ -24,40 +37,17 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.ChatComponentTranslation;
-import net.minecraft.util.DamageSource;
-import net.minecraft.util.IChatComponent;
-import net.minecraft.util.IIcon;
-import net.minecraft.util.MovingObjectPosition;
-import net.minecraft.util.StatCollector;
-import net.minecraft.util.Vec3;
+import net.minecraft.util.*;
 import net.minecraft.world.World;
-import net.minecraft.util.EnumFacing;
 import net.minecraftforge.event.world.WorldEvent;
-
-import org.lwjgl.opengl.GL11;
-
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
-import factorization.api.Charge;
-import factorization.api.Coord;
-import factorization.api.FzOrientation;
-import factorization.api.IChargeConductor;
-import factorization.api.Quaternion;
-import factorization.api.datahelpers.DataHelper;
-import factorization.api.datahelpers.IDataSerializable;
-import factorization.api.datahelpers.Share;
-import factorization.common.BlockIcons;
-import factorization.common.FactoryType;
-import factorization.notify.Notice;
-import factorization.oreprocessing.TileEntityGrinder;
-import factorization.oreprocessing.TileEntityGrinder.GrinderRecipe;
-import factorization.oreprocessing.TileEntityGrinderRender;
-import factorization.servo.RenderServoMotor;
-import factorization.servo.ServoMotor;
-import factorization.shared.NetworkFactorization.MessageType;
-import factorization.weird.TileEntityDayBarrel;
+import org.lwjgl.opengl.GL11;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Iterator;
 
 public class SocketLacerator extends TileEntitySocketBase implements IChargeConductor, ICaptureDrops {
     Charge charge = new Charge(this);

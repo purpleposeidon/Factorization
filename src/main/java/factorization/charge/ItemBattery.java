@@ -1,10 +1,9 @@
 package factorization.charge;
 
-import java.util.List;
-
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
-
+import factorization.api.IActOnCraft;
+import factorization.shared.Core;
+import factorization.shared.Core.TabType;
+import factorization.shared.ItemBlockProxy;
 import factorization.util.ItemUtil;
 import net.minecraft.client.renderer.texture.IIconRegister;
 import net.minecraft.entity.player.EntityPlayer;
@@ -13,10 +12,10 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.StatCollector;
 import net.minecraft.world.World;
-import factorization.api.IActOnCraft;
-import factorization.shared.Core;
-import factorization.shared.ItemBlockProxy;
-import factorization.shared.Core.TabType;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
+
+import java.util.List;
 
 public class ItemBattery extends ItemBlockProxy implements IActOnCraft {
     //3 States: Empty. Enough for 1 magnet. Enough for 2 magnets.

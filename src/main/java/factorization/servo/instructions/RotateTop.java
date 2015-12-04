@@ -1,23 +1,23 @@
 package factorization.servo.instructions;
 
-import java.io.IOException;
-
-import factorization.servo.AbstractServoMachine;
-import factorization.servo.stepper.StepperEngine;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.IIcon;
-import net.minecraft.util.EnumFacing;
 import factorization.api.Coord;
 import factorization.api.FzOrientation;
 import factorization.api.datahelpers.DataHelper;
 import factorization.api.datahelpers.IDataSerializable;
 import factorization.api.datahelpers.Share;
 import factorization.common.BlockIcons;
+import factorization.servo.AbstractServoMachine;
 import factorization.servo.CpuBlocking;
 import factorization.servo.Instruction;
 import factorization.servo.ServoMotor;
+import factorization.servo.stepper.StepperEngine;
 import factorization.shared.Core;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.item.ItemStack;
+import net.minecraft.util.EnumFacing;
+import net.minecraft.util.IIcon;
+
+import java.io.IOException;
 
 public class RotateTop extends Instruction {
     EnumFacing top = EnumFacing.UP;

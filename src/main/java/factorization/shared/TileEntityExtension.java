@@ -1,30 +1,26 @@
 package factorization.shared;
 
-import java.io.IOException;
-import java.util.List;
-
+import factorization.api.DeltaCoord;
 import factorization.api.HeatConverters;
 import factorization.api.IFurnaceHeatable;
 import factorization.api.datahelpers.DataHelper;
 import factorization.api.datahelpers.Share;
+import factorization.ceramics.TileEntityGreenware;
+import factorization.common.FactoryType;
+import factorization.shared.NetworkFactorization.MessageType;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.block.Block;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.AxisAlignedBB;
-import net.minecraft.util.IIcon;
-import net.minecraft.util.MovingObjectPosition;
-import net.minecraft.util.Vec3;
+import net.minecraft.util.*;
 import net.minecraft.world.World;
-import net.minecraft.util.EnumFacing;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
-import factorization.api.DeltaCoord;
-import factorization.ceramics.TileEntityGreenware;
-import factorization.common.FactoryType;
-import factorization.shared.NetworkFactorization.MessageType;
+
+import java.io.IOException;
+import java.util.List;
 
 public class TileEntityExtension extends TileEntityCommon implements IFurnaceHeatable {
     private TileEntityCommon _parent = null;

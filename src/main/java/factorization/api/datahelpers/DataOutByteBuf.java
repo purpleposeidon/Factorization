@@ -2,13 +2,12 @@ package factorization.api.datahelpers;
 
 import factorization.util.DataUtil;
 import io.netty.buffer.ByteBuf;
-
-import java.io.IOException;
-
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraftforge.fml.common.network.ByteBufUtils;
 import net.minecraftforge.fml.relauncher.Side;
+
+import java.io.IOException;
 
 public class DataOutByteBuf extends DataHelper {
     private final ByteBuf dos;

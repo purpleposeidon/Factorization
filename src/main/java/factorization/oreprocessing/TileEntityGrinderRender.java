@@ -1,29 +1,18 @@
 package factorization.oreprocessing;
 
-import static org.lwjgl.opengl.GL11.GL_BLEND;
-import static org.lwjgl.opengl.GL11.GL_LIGHTING;
-import static org.lwjgl.opengl.GL11.glDisable;
-import static org.lwjgl.opengl.GL11.glEnable;
-import static org.lwjgl.opengl.GL11.glPopMatrix;
-import static org.lwjgl.opengl.GL11.glPushMatrix;
-import static org.lwjgl.opengl.GL11.glRotatef;
-import static org.lwjgl.opengl.GL11.glTranslatef;
-import net.minecraft.block.Block;
-import net.minecraft.init.Blocks;
+import factorization.shared.BlockRenderHelper;
+import factorization.shared.Core;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.model.PositionTextureVertex;
 import net.minecraft.client.model.TexturedQuad;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.texture.TextureManager;
-import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
-import net.minecraft.tileentity.TileEntity;
+import net.minecraft.init.Blocks;
 import net.minecraft.util.IIcon;
 import net.minecraft.util.Vec3;
-
 import org.lwjgl.opengl.GL11;
 
-import factorization.shared.BlockRenderHelper;
-import factorization.shared.Core;
+import static org.lwjgl.opengl.GL11.*;
 
 public class TileEntityGrinderRender {
     public static class DiamondModel {

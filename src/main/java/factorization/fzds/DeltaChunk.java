@@ -1,23 +1,22 @@
 package factorization.fzds;
 
-import java.util.*;
-
+import factorization.api.Coord;
+import factorization.api.DeltaCoord;
+import factorization.fzds.interfaces.IDeltaChunk;
 import factorization.fzds.network.InteractionLiason;
 import factorization.fzds.network.PacketProxyingPlayer;
+import gnu.trove.set.hash.THashSet;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.util.EnumFacing;
 import net.minecraft.util.Vec3;
 import net.minecraft.world.World;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraftforge.common.DimensionManager;
-import net.minecraftforge.common.util.FakePlayer;
-import net.minecraft.util.EnumFacing;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.relauncher.Side;
-import factorization.api.Coord;
-import factorization.api.DeltaCoord;
-import factorization.fzds.interfaces.IDeltaChunk;
-import gnu.trove.set.hash.THashSet;
+
+import java.util.*;
 
 public class DeltaChunk {
     public static boolean enabled() {

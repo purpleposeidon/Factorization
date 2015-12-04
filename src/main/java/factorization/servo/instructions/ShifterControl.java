@@ -1,24 +1,25 @@
 package factorization.servo.instructions;
 
-import java.io.IOException;
-
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.init.Blocks;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.IIcon;
-import net.minecraft.util.EnumFacing;
 import factorization.api.Coord;
 import factorization.api.datahelpers.DataHelper;
 import factorization.api.datahelpers.IDataSerializable;
 import factorization.api.datahelpers.Share;
 import factorization.common.BlockIcons;
-import factorization.common.FactoryType;
 import factorization.servo.Instruction;
 import factorization.servo.ServoMotor;
 import factorization.servo.ServoStack;
 import factorization.sockets.SocketShifter;
 import factorization.sockets.TileEntitySocketBase;
-import static factorization.servo.instructions.ShifterControl.ShifterModes.*;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.init.Blocks;
+import net.minecraft.item.ItemStack;
+import net.minecraft.util.EnumFacing;
+import net.minecraft.util.IIcon;
+
+import java.io.IOException;
+
+import static factorization.servo.instructions.ShifterControl.ShifterModes.EXPORT_MODE;
+import static factorization.servo.instructions.ShifterControl.ShifterModes.TRANSFER_LIMIT;
 
 public class ShifterControl extends Instruction {
     static enum ShifterModes {

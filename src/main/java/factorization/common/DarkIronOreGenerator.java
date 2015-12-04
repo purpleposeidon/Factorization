@@ -1,6 +1,5 @@
 package factorization.common;
 
-import net.minecraftforge.fml.common.IWorldGenerator;
 import factorization.api.Coord;
 import factorization.api.ICoordFunction;
 import factorization.shared.Core;
@@ -11,6 +10,7 @@ import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.world.World;
 import net.minecraft.world.chunk.IChunkProvider;
 import net.minecraft.world.gen.NoiseGeneratorOctaves;
+import net.minecraftforge.fml.common.IWorldGenerator;
 
 import java.util.Random;
 

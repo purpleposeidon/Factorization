@@ -1,22 +1,20 @@
 package factorization.colossi;
 
-import java.util.ArrayList;
-
+import factorization.api.Coord;
 import factorization.util.SpaceUtil;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.client.renderer.IconFlipped;
 import net.minecraft.client.renderer.texture.IIconRegister;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.EnumFacing;
 import net.minecraft.util.IIcon;
 import net.minecraft.world.World;
-import net.minecraft.util.EnumFacing;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
-import factorization.api.Coord;
-import factorization.common.BlockIcons;
+
+import java.util.ArrayList;
 
 public class GargantuanBlock extends Block {
 

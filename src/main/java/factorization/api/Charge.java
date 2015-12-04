@@ -1,13 +1,13 @@
 package factorization.api;
 
-import java.io.IOException;
-
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.world.World;
 import factorization.api.datahelpers.DataHelper;
 import factorization.api.datahelpers.IDataSerializable;
 import factorization.api.datahelpers.Share;
+import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.tileentity.TileEntity;
+import net.minecraft.world.World;
+
+import java.io.IOException;
 
 public class Charge implements IDataSerializable {
     ConductorSet conductorSet = null;
@@ -135,7 +135,7 @@ public class Charge implements IDataSerializable {
         if (isConductorSetLeader) {
             conductorSet.update();
         }
-        int seed = ((te.pos.getX() << 4 + te.pos.getZ()) << 8) + te.pos.getY();
+        int seed = ((te.getPos().getX() << 4 + te.getPos().getZ()) << 8) + te.getPos().getY();
         //Does the time part really need to be here?
         if (justCreated || (w.getTotalWorldTime() + seed) % 600 == 0) {
             justCreated = false;

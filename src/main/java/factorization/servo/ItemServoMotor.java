@@ -1,20 +1,20 @@
 package factorization.servo;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-
-import factorization.util.SpaceUtil;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.Vec3;
-import net.minecraft.world.World;
-import net.minecraft.util.EnumFacing;
 import factorization.api.Coord;
 import factorization.api.FzOrientation;
 import factorization.shared.Core;
 import factorization.shared.Core.TabType;
 import factorization.shared.ItemCraftingComponent;
+import factorization.util.SpaceUtil;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.item.ItemStack;
+import net.minecraft.util.EnumFacing;
+import net.minecraft.util.Vec3;
+import net.minecraft.world.World;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 
 public class ItemServoMotor extends ItemCraftingComponent {
 

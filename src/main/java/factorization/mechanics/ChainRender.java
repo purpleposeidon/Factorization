@@ -1,8 +1,7 @@
 package factorization.mechanics;
 
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
-import factorization.shared.Core;
 import factorization.algos.FastBag;
+import factorization.shared.Core;
 import factorization.util.SpaceUtil;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.WorldClient;
@@ -17,6 +16,7 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.Vec3;
 import net.minecraftforge.client.event.RenderWorldLastEvent;
 import net.minecraftforge.event.world.WorldEvent;
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import org.lwjgl.opengl.GL11;
 
 import java.lang.ref.WeakReference;

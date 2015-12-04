@@ -1,38 +1,8 @@
 package factorization.fzds;
 
-import java.lang.ref.WeakReference;
-import java.util.*;
-import java.util.Map.Entry;
-
-import factorization.util.LangUtil;
-import factorization.util.PlayerUtil;
-import factorization.util.SpaceUtil;
-import net.minecraft.client.Minecraft;
-import net.minecraft.command.CommandBase;
-import net.minecraft.command.CommandException;
-import net.minecraft.command.ICommandSender;
-import net.minecraft.command.SyntaxErrorException;
-import net.minecraft.command.WrongUsageException;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.player.EntityPlayerMP;
-import net.minecraft.init.Blocks;
-import net.minecraft.server.MinecraftServer;
-import net.minecraft.server.management.ServerConfigurationManager;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.tileentity.TileEntityCommandBlock;
-import net.minecraft.util.ChunkCoordinates;
-import net.minecraft.util.EnumChatFormatting;
-import net.minecraft.util.Vec3;
-import net.minecraft.world.World;
-import net.minecraft.world.WorldServer;
-import net.minecraft.world.biome.BiomeGenBase;
-import net.minecraftforge.common.DimensionManager;
-import net.minecraft.util.EnumFacing;
-
 import com.google.common.base.Splitter;
 import com.google.common.base.Strings;
 import com.google.common.collect.Iterables;
-
 import factorization.api.Coord;
 import factorization.api.DeltaCoord;
 import factorization.api.ICoordFunction;
@@ -44,6 +14,30 @@ import factorization.fzds.interfaces.IDeltaChunk;
 import factorization.fzds.interfaces.Interpolation;
 import factorization.notify.Notice;
 import factorization.shared.Core;
+import factorization.util.LangUtil;
+import factorization.util.PlayerUtil;
+import factorization.util.SpaceUtil;
+import net.minecraft.client.Minecraft;
+import net.minecraft.command.*;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.init.Blocks;
+import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.management.ServerConfigurationManager;
+import net.minecraft.tileentity.TileEntity;
+import net.minecraft.tileentity.TileEntityCommandBlock;
+import net.minecraft.util.ChunkCoordinates;
+import net.minecraft.util.EnumChatFormatting;
+import net.minecraft.util.EnumFacing;
+import net.minecraft.util.Vec3;
+import net.minecraft.world.World;
+import net.minecraft.world.WorldServer;
+import net.minecraft.world.biome.BiomeGenBase;
+import net.minecraftforge.common.DimensionManager;
+
+import java.lang.ref.WeakReference;
+import java.util.*;
+import java.util.Map.Entry;
 
 public class FZDSCommand extends CommandBase {
     //private static DimensionSliceEntity currentWE = null;

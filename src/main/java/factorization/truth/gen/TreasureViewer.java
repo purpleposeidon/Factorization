@@ -1,11 +1,11 @@
 package factorization.truth.gen;
 
-import net.minecraftforge.fml.relauncher.ReflectionHelper;
 import factorization.truth.api.IDocGenerator;
 import factorization.truth.api.ITypesetter;
 import factorization.truth.api.TruthError;
 import net.minecraft.util.WeightedRandomChestContent;
 import net.minecraftforge.common.ChestGenHooks;
+import net.minecraftforge.fml.relauncher.ReflectionHelper;
 
 import java.util.ArrayList;
 import java.util.Collections;

@@ -1,9 +1,6 @@
 package factorization.fzds.network;
 
 import com.google.common.collect.BiMap;
-import net.minecraftforge.fml.common.network.handshake.NetworkDispatcher;
-import net.minecraftforge.fml.common.network.internal.FMLProxyPacket;
-import net.minecraftforge.fml.relauncher.Side;
 import factorization.fzds.Hammer;
 import factorization.shared.Core;
 import net.minecraft.client.Minecraft;
@@ -12,6 +9,9 @@ import net.minecraft.network.INetHandler;
 import net.minecraft.network.Packet;
 import net.minecraft.network.play.server.S21PacketChunkData;
 import net.minecraft.network.play.server.S26PacketMapChunkBulk;
+import net.minecraftforge.fml.common.network.handshake.NetworkDispatcher;
+import net.minecraftforge.fml.common.network.internal.FMLProxyPacket;
+import net.minecraftforge.fml.relauncher.Side;
 
 public class WrappedPacketFromServer extends WrappedPacket {
     public WrappedPacketFromServer(Packet towrap) {

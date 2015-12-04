@@ -1,6 +1,5 @@
 package factorization.coremodhooks;
 
-import net.minecraftforge.fml.common.eventhandler.EventBus;
 import factorization.util.SpaceUtil;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
@@ -12,6 +11,7 @@ import net.minecraft.world.World;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.world.WorldEvent;
+import net.minecraftforge.fml.common.eventhandler.EventBus;
 
 public class HookTargetsClient {
     public static void keyTyped(char chr, int keysym) {

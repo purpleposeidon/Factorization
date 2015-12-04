@@ -1,15 +1,13 @@
 package factorization.charge;
 
-import java.util.Random;
-
+import factorization.shared.Core;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.util.Vec3;
-
-import org.lwjgl.opengl.GL11;
-
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
-import factorization.shared.Core;
+import org.lwjgl.opengl.GL11;
+
+import java.util.Random;
 
 public class ChargeSparks {
     public long last_update = -1; //haxx to prevent updating while paused

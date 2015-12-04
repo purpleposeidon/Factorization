@@ -1,7 +1,6 @@
 package factorization.shared;
 
-import java.util.List;
-
+import factorization.shared.Core.TabType;
 import factorization.util.DataUtil;
 import net.minecraft.block.Block;
 import net.minecraft.creativetab.CreativeTabs;
@@ -13,7 +12,8 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
-import factorization.shared.Core.TabType;
+
+import java.util.List;
 
 public class ItemBlockProxy extends ItemFactorization {
     //TODO: Why doesn't this just extend ItemBlock?

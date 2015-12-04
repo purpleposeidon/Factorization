@@ -1,11 +1,9 @@
 package factorization.ceramics;
 
+import factorization.shared.Core;
 import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
 import net.minecraft.tileentity.TileEntity;
-
 import org.lwjgl.opengl.GL11;
-
-import factorization.shared.Core;
 
 
 public class TileEntityGreenwareRender extends TileEntitySpecialRenderer {

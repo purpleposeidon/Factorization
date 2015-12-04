@@ -26,12 +26,12 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.tileentity.TileEntitySign;
 import net.minecraft.util.AxisAlignedBB;
+import net.minecraft.util.EnumFacing;
 import net.minecraft.util.IIcon;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldSavedData;
 import net.minecraft.world.chunk.IChunkProvider;
 import net.minecraftforge.common.util.FakePlayer;
-import net.minecraft.util.EnumFacing;
 
 import java.io.IOException;
 import java.util.*;

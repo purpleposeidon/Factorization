@@ -1,15 +1,5 @@
 package factorization.servo.instructions;
 
-import java.io.IOException;
-
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockCactus;
-import net.minecraft.block.BlockReed;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.init.Items;
-import net.minecraft.util.IIcon;
-import net.minecraftforge.common.IPlantable;
-import net.minecraft.util.EnumFacing;
 import factorization.api.Coord;
 import factorization.api.FzColor;
 import factorization.api.datahelpers.DataHelper;
@@ -20,6 +10,16 @@ import factorization.notify.Notice;
 import factorization.servo.Decorator;
 import factorization.servo.ServoMotor;
 import factorization.shared.Core;
+import net.minecraft.block.Block;
+import net.minecraft.block.BlockCactus;
+import net.minecraft.block.BlockReed;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.init.Items;
+import net.minecraft.util.EnumFacing;
+import net.minecraft.util.IIcon;
+import net.minecraftforge.common.IPlantable;
+
+import java.io.IOException;
 
 public class ScanColor extends Decorator {
     @Override

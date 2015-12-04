@@ -1,14 +1,12 @@
 package factorization.servo;
 
+import factorization.shared.NetworkFactorization.MessageType;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.gui.GuiTextField;
 import net.minecraft.client.resources.I18n;
-
 import org.lwjgl.input.Keyboard;
-
-import factorization.shared.NetworkFactorization.MessageType;
 
 public class GuiCommentEditor extends GuiScreen {
     GuiTextField rem;

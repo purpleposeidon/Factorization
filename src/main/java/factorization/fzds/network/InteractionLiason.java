@@ -1,6 +1,5 @@
 package factorization.fzds.network;
 
-import net.minecraftforge.fml.common.network.handshake.NetworkDispatcher;
 import factorization.fzds.ShadowPlayerAligner;
 import factorization.fzds.interfaces.IDeltaChunk;
 import factorization.fzds.interfaces.IFzdsShenanigans;
@@ -16,6 +15,7 @@ import net.minecraft.network.NetworkManager;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.management.ItemInWorldManager;
 import net.minecraft.world.WorldServer;
+import net.minecraftforge.fml.common.network.handshake.NetworkDispatcher;
 
 import java.lang.ref.WeakReference;
 import java.util.Iterator;

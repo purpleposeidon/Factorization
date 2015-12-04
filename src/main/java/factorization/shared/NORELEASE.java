@@ -1,11 +1,11 @@
 package factorization.shared;
 
+import com.google.common.base.Joiner;
+
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.PrintStream;
-
-import com.google.common.base.Joiner;
 
 /**
  * Provides facilities for ensuring that dev-time debug cruft does not escape into the wild.

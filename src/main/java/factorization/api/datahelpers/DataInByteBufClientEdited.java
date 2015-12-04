@@ -1,9 +1,7 @@
 package factorization.api.datahelpers;
 
-import java.io.DataInput;
-
-import net.minecraftforge.fml.relauncher.Side;
 import io.netty.buffer.ByteBuf;
+import net.minecraftforge.fml.relauncher.Side;
 
 public class DataInByteBufClientEdited extends DataInByteBuf {
 

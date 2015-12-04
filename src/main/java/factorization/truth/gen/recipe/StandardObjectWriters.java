@@ -1,6 +1,5 @@
 package factorization.truth.gen.recipe;
 
-import net.minecraftforge.fml.relauncher.ReflectionHelper;
 import factorization.api.adapter.Adapter;
 import factorization.api.adapter.GenericAdapter;
 import factorization.truth.api.IObjectWriter;
@@ -16,6 +15,7 @@ import net.minecraft.item.crafting.ShapelessRecipes;
 import net.minecraft.nbt.NBTBase;
 import net.minecraftforge.fluids.Fluid;
 import net.minecraftforge.fluids.FluidStack;
+import net.minecraftforge.fml.relauncher.ReflectionHelper;
 import net.minecraftforge.oredict.OreDictionary;
 import net.minecraftforge.oredict.ShapedOreRecipe;
 import net.minecraftforge.oredict.ShapelessOreRecipe;

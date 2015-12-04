@@ -1,11 +1,11 @@
 package factorization.truth.gen;
 
-import net.minecraftforge.fml.common.Loader;
-import net.minecraftforge.fml.common.ModContainer;
-import net.minecraftforge.fml.common.versioning.ArtifactVersion;
 import factorization.truth.api.IDocGenerator;
 import factorization.truth.api.ITypesetter;
 import factorization.truth.api.TruthError;
+import net.minecraftforge.fml.common.Loader;
+import net.minecraftforge.fml.common.ModContainer;
+import net.minecraftforge.fml.common.versioning.ArtifactVersion;
 
 public class ModDependViewer implements IDocGenerator {
     @Override

@@ -1,8 +1,17 @@
 package factorization.sockets.fanturpeller;
 
-import java.io.IOException;
-
-import factorization.shared.*;
+import factorization.api.*;
+import factorization.api.datahelpers.DataHelper;
+import factorization.api.datahelpers.IDataSerializable;
+import factorization.api.datahelpers.Share;
+import factorization.common.BlockIcons;
+import factorization.common.FactoryType;
+import factorization.servo.RenderServoMotor;
+import factorization.servo.ServoMotor;
+import factorization.shared.Core;
+import factorization.shared.NetworkFactorization.MessageType;
+import factorization.sockets.ISocketHolder;
+import factorization.sockets.TileEntitySocketBase;
 import factorization.util.NumUtil;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.block.Block;
@@ -15,26 +24,11 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.IIcon;
 import net.minecraftforge.fluids.IFluidBlock;
 import net.minecraftforge.fluids.IFluidHandler;
-
-import org.lwjgl.opengl.GL11;
-
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
-import factorization.api.Charge;
-import factorization.api.Coord;
-import factorization.api.FzOrientation;
-import factorization.api.IChargeConductor;
-import factorization.api.Quaternion;
-import factorization.api.datahelpers.DataHelper;
-import factorization.api.datahelpers.IDataSerializable;
-import factorization.api.datahelpers.Share;
-import factorization.common.BlockIcons;
-import factorization.common.FactoryType;
-import factorization.servo.RenderServoMotor;
-import factorization.servo.ServoMotor;
-import factorization.shared.NetworkFactorization.MessageType;
-import factorization.sockets.ISocketHolder;
-import factorization.sockets.TileEntitySocketBase;
+import org.lwjgl.opengl.GL11;
+
+import java.io.IOException;
 
 public abstract class SocketFanturpeller extends TileEntitySocketBase implements IChargeConductor {
     Charge charge = new Charge(this);

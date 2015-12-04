@@ -1,6 +1,6 @@
 package factorization.oreprocessing;
 
-import static org.lwjgl.opengl.GL11.*;
+import factorization.shared.Core;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.texture.TextureManager;
@@ -10,10 +10,9 @@ import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.IIcon;
-
 import org.lwjgl.opengl.GL11;
 
-import factorization.shared.Core;
+import static org.lwjgl.opengl.GL11.*;
 
 public class TileEntityCrystallizerRender extends TileEntitySpecialRenderer {
 

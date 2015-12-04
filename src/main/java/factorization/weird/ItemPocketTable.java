@@ -1,12 +1,11 @@
 package factorization.weird;
 
-import java.util.List;
-
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
 import factorization.common.*;
 import factorization.coremodhooks.UnhandledGuiKeyEvent;
+import factorization.shared.Core;
+import factorization.shared.Core.TabType;
+import factorization.shared.FactorizationTextureLoader;
+import factorization.shared.ItemFactorization;
 import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.client.renderer.texture.IIconRegister;
 import net.minecraft.entity.player.EntityPlayer;
@@ -15,10 +14,11 @@ import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.StatCollector;
 import net.minecraft.world.World;
-import factorization.shared.Core;
-import factorization.shared.Core.TabType;
-import factorization.shared.FactorizationTextureLoader;
-import factorization.shared.ItemFactorization;
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
+
+import java.util.List;
 
 public class ItemPocketTable extends ItemFactorization {
     

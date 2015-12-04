@@ -1,7 +1,5 @@
 package factorization.beauty;
 
-import net.minecraftforge.fml.common.FMLCommonHandler;
-import net.minecraftforge.fml.relauncher.Side;
 import factorization.api.*;
 import factorization.api.datahelpers.DataHelper;
 import factorization.api.datahelpers.Share;
@@ -11,7 +9,10 @@ import factorization.fzds.DeltaChunk;
 import factorization.fzds.TransferLib;
 import factorization.fzds.interfaces.DeltaCapability;
 import factorization.fzds.interfaces.IDeltaChunk;
-import factorization.shared.*;
+import factorization.shared.BlockClass;
+import factorization.shared.EntityReference;
+import factorization.shared.NetworkFactorization;
+import factorization.shared.TileEntityCommon;
 import factorization.util.FzUtil;
 import factorization.util.NumUtil;
 import factorization.util.PlayerUtil;
@@ -25,13 +26,15 @@ import net.minecraft.block.material.Material;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.EnumFacing;
 import net.minecraft.util.IIcon;
 import net.minecraft.util.Vec3;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.BiomeGenBase;
 import net.minecraft.world.biome.BiomeGenOcean;
 import net.minecraft.world.biome.BiomeGenRiver;
-import net.minecraft.util.EnumFacing;
+import net.minecraftforge.fml.common.FMLCommonHandler;
+import net.minecraftforge.fml.relauncher.Side;
 
 import java.io.IOException;
 

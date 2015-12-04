@@ -1,6 +1,5 @@
 package factorization.coremod;
 
-import net.minecraftforge.fml.common.eventhandler.EventBus;
 import factorization.coremodhooks.HookTargetsClient;
 import factorization.coremodhooks.HookTargetsServer;
 import net.minecraft.command.IEntitySelector;
@@ -12,6 +11,7 @@ import net.minecraft.util.Vec3;
 import net.minecraft.world.Explosion;
 import net.minecraft.world.World;
 import net.minecraftforge.event.world.WorldEvent;
+import net.minecraftforge.fml.common.eventhandler.EventBus;
 
 import java.util.List;
 

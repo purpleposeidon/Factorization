@@ -3,12 +3,6 @@ package factorization.notify;
 import factorization.util.DataUtil;
 import io.netty.buffer.ByteBufInputStream;
 import io.netty.buffer.Unpooled;
-
-import java.io.ByteArrayOutputStream;
-import java.io.DataInput;
-import java.io.DataOutputStream;
-import java.io.IOException;
-
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
@@ -28,6 +22,11 @@ import net.minecraftforge.fml.common.network.NetworkRegistry.TargetPoint;
 import net.minecraftforge.fml.common.network.internal.FMLProxyPacket;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+
+import java.io.ByteArrayOutputStream;
+import java.io.DataInput;
+import java.io.DataOutputStream;
+import java.io.IOException;
 
 public class NotifyNetwork {
     static final String channelName = "fzNotify";
@@ -160,9 +159,9 @@ public class NotifyNetwork {
             } else if (where instanceof TileEntity) {
                 output.writeByte(TILEENTITY);
                 TileEntity te = (TileEntity) where;
-                output.writeInt(te.pos.getX());
-                output.writeInt(te.pos.getY());
-                output.writeInt(te.pos.getZ());
+                output.writeInt(te.getPos().getX());
+                output.writeInt(te.getPos().getY());
+                output.writeInt(te.getPos().getZ());
             } else {
                 return null;
             }

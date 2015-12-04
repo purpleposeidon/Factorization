@@ -1,7 +1,5 @@
 package factorization.misc;
 
-import java.util.List;
-
 public class MiscProxy {
     void initializeClient() { }
     

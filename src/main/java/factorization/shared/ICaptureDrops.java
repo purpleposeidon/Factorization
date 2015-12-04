@@ -1,9 +1,8 @@
 package factorization.shared;
 
-import java.util.ArrayList;
-
 import net.minecraft.item.ItemStack;
-import net.minecraft.world.World;
+
+import java.util.ArrayList;
 
 public interface ICaptureDrops {
     public boolean captureDrops(ArrayList<ItemStack> stacks);

@@ -1,7 +1,7 @@
 package factorization.colossi;
 
-import net.minecraft.util.EnumFacing;
 import factorization.api.Coord;
+import net.minecraft.util.EnumFacing;
 
 public class MaskTemplate {
     int width;

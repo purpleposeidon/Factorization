@@ -1,10 +1,10 @@
 package factorization.api;
 
+import net.minecraft.nbt.NBTTagCompound;
+
 import java.io.DataInput;
 import java.io.IOException;
 import java.util.ArrayList;
-
-import net.minecraft.nbt.NBTTagCompound;
 
 public class VectorUV {
     public double x, y, z, u, v;

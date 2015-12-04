@@ -1,7 +1,5 @@
 package factorization.truth.api;
 
-import factorization.truth.word.Word;
-
 import java.util.List;
 
 public interface IClientTypesetter extends ITypesetter {

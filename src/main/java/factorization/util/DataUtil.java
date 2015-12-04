@@ -1,6 +1,5 @@
 package factorization.util;
 
-import net.minecraftforge.fml.common.network.ByteBufUtils;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.block.Block;
 import net.minecraft.item.Item;
@@ -9,13 +8,17 @@ import net.minecraft.nbt.CompressedStreamTools;
 import net.minecraft.nbt.NBTSizeTracker;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.StringUtils;
 import net.minecraftforge.common.util.Constants;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.FluidTank;
+import net.minecraftforge.fml.common.network.ByteBufUtils;
+import net.minecraftforge.fml.common.registry.GameData;
 
 import java.io.DataInput;
 import java.io.IOException;
+import java.io.InputStream;
 
 public final class DataUtil {
     public static final ItemStack NULL_ITEM = new ItemStack((Item) null, 0, 0); // Forge may throw a huge hissy fit over this at some point.
@@ -37,7 +40,7 @@ public final class DataUtil {
     }
 
     static public NBTTagCompound readTag(DataInput input, NBTSizeTracker tracker) throws IOException {
-        return CompressedStreamTools.func_152456_a(input, tracker);
+        return CompressedStreamTools.read(input, tracker);
     }
 
     static public ItemStack readStack(DataInput input, NBTSizeTracker tracker) throws IOException {
@@ -48,12 +51,18 @@ public final class DataUtil {
         return is;
     }
 
+    public static int MAX_TAG_SIZE = 20 * 1024; // NORELEASE: JVM option?
+
+    public static NBTSizeTracker newTracker() {
+        return new NBTSizeTracker(MAX_TAG_SIZE);
+    }
+
     public static NBTTagCompound readTag(DataInput input) throws IOException {
-        return readTag(input, NBTSizeTracker.field_152451_a);
+        return readTag(input, newTracker());
     }
 
     public static ItemStack readStack(DataInput input) throws IOException {
-        return readStack(input, NBTSizeTracker.field_152451_a);
+        return readStack(input, newTracker());
     }
 
     static public NBTTagCompound readTag(ByteBuf input) throws IOException {
@@ -138,7 +147,7 @@ public final class DataUtil {
     }
 
     public static String getName(Item it) {
-        return Item.itemRegistry.getNameForObject(it);
+        return GameData.getItemRegistry().getNameForObject(it).toString();
     }
 
     public static String getName(ItemStack is) {
@@ -146,15 +155,15 @@ public final class DataUtil {
     }
 
     public static String getName(Block b) {
-        return Block.blockRegistry.getNameForObject(b);
+        return GameData.getBlockRegistry().getNameForObject(b).toString();
     }
 
     public static Block getBlockFromName(String blockName) {
-        return (Block) Block.blockRegistry.getObject(blockName);
+        return Block.blockRegistry.getObject(new ResourceLocation(blockName));
     }
 
     public static Item getItemFromName(String itemName) {
-        return (Item) Item.itemRegistry.getObject(itemName);
+        return Item.itemRegistry.getObject(new ResourceLocation(itemName));
     }
 
 }

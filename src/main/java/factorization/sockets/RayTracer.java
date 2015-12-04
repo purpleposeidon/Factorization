@@ -10,9 +10,9 @@ import factorization.servo.TileEntityServoRail;
 import factorization.util.SpaceUtil;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.AxisAlignedBB;
+import net.minecraft.util.EnumFacing;
 import net.minecraft.util.MovingObjectPosition;
 import net.minecraft.util.Vec3;
-import net.minecraft.util.EnumFacing;
 
 public class RayTracer {
     final TileEntitySocketBase base;
@@ -183,7 +183,7 @@ public class RayTracer {
     boolean mopBlock(Coord target, EnumFacing side) {
         if (base != socket && target.getTE(TileEntityServoRail.class) != null) return false;
         boolean isThis = base == socket && target.isAt(base);
-        Vec3 hitVec = new Vec3(base.pos.getX() + side.getDirectionVec().getX(), base.pos.getY() + side.getDirectionVec().getY(), base.pos.getZ() + side.getDirectionVec().getZ());
+        Vec3 hitVec = new Vec3(base.getPos().getX() + side.getDirectionVec().getX(), base.getPos().getY() + side.getDirectionVec().getY(), base.getPos().getZ() + side.getDirectionVec().getZ());
         return base.handleRay(socket, target.createMop(side, hitVec), target.w, isThis, powered);
     }
 

@@ -1,8 +1,5 @@
 package factorization.fzds;
 
-import net.minecraftforge.fml.common.Mod.EventHandler;
-import net.minecraftforge.fml.common.gameevent.TickEvent.Phase;
-import net.minecraftforge.fml.common.gameevent.TickEvent.ServerTickEvent;
 import factorization.api.Coord;
 import factorization.api.DeltaCoord;
 import factorization.shared.Core;
@@ -11,6 +8,9 @@ import net.minecraft.world.WorldServer;
 import net.minecraftforge.common.config.ConfigCategory;
 import net.minecraftforge.common.config.Configuration;
 import net.minecraftforge.common.config.Property;
+import net.minecraftforge.fml.common.Mod.EventHandler;
+import net.minecraftforge.fml.common.gameevent.TickEvent.Phase;
+import net.minecraftforge.fml.common.gameevent.TickEvent.ServerTickEvent;
 
 import java.io.File;
 import java.util.HashMap;

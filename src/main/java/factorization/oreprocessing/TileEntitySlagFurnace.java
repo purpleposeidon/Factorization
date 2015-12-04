@@ -1,15 +1,16 @@
 package factorization.oreprocessing;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Random;
-
 import factorization.api.IFurnaceHeatable;
 import factorization.api.crafting.CraftingManagerGeneric;
 import factorization.api.crafting.IVexatiousCrafting;
 import factorization.api.datahelpers.DataHelper;
 import factorization.api.datahelpers.Share;
-import factorization.shared.*;
+import factorization.common.BlockIcons;
+import factorization.common.FactoryType;
+import factorization.shared.BlockClass;
+import factorization.shared.Core;
+import factorization.shared.NetworkFactorization.MessageType;
+import factorization.shared.TileEntityFactorization;
 import factorization.util.DataUtil;
 import factorization.util.ItemUtil;
 import factorization.util.SpaceUtil;
@@ -19,12 +20,13 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntityFurnace;
+import net.minecraft.util.EnumFacing;
 import net.minecraft.util.IIcon;
 import net.minecraft.world.World;
-import net.minecraft.util.EnumFacing;
-import factorization.common.BlockIcons;
-import factorization.common.FactoryType;
-import factorization.shared.NetworkFactorization.MessageType;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Random;
 
 public class TileEntitySlagFurnace extends TileEntityFactorization implements IFurnaceHeatable {
     ItemStack inv[] = new ItemStack[4];

@@ -1,10 +1,10 @@
 package factorization.truth.cmd;
 
-import net.minecraftforge.fml.common.Loader;
 import factorization.truth.api.AgnosticCommand;
 import factorization.truth.api.ITokenizer;
 import factorization.truth.api.ITypesetter;
 import factorization.truth.api.TruthError;
+import net.minecraftforge.fml.common.Loader;
 
 public class CmdCheckMods extends AgnosticCommand {
     @Override

@@ -1,10 +1,14 @@
 package factorization.ceramics;
 
-import java.util.ArrayList;
-import java.util.List;
-
+import factorization.api.Coord;
+import factorization.ceramics.TileEntityGreenware.ClayLump;
+import factorization.ceramics.TileEntityGreenware.ClayState;
+import factorization.common.BlockIcons;
 import factorization.common.ItemIcons;
-import factorization.shared.*;
+import factorization.notify.Notice;
+import factorization.shared.Core;
+import factorization.shared.Core.TabType;
+import factorization.shared.ItemFactorization;
 import factorization.util.DataUtil;
 import factorization.util.ItemUtil;
 import factorization.util.LangUtil;
@@ -20,12 +24,9 @@ import net.minecraft.util.MovingObjectPosition;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
-import factorization.api.Coord;
-import factorization.ceramics.TileEntityGreenware.ClayLump;
-import factorization.ceramics.TileEntityGreenware.ClayState;
-import factorization.common.BlockIcons;
-import factorization.notify.Notice;
-import factorization.shared.Core.TabType;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class ItemGlazeBucket extends ItemFactorization {
     public static final int MAX_CHARGES = 64;

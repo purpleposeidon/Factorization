@@ -1,18 +1,5 @@
 package factorization.twistedblock;
 
-import java.util.List;
-
-import net.minecraft.block.Block;
-import net.minecraft.client.renderer.texture.IIconRegister;
-import net.minecraft.creativetab.CreativeTabs;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.util.Vec3;
-import net.minecraft.world.World;
-import net.minecraftforge.common.util.FakePlayer;
-import net.minecraft.util.EnumFacing;
 import factorization.api.Coord;
 import factorization.api.DeltaCoord;
 import factorization.api.Quaternion;
@@ -24,6 +11,19 @@ import factorization.fzds.interfaces.Interpolation;
 import factorization.shared.Core;
 import factorization.shared.Core.TabType;
 import factorization.shared.ItemBlockProxy;
+import net.minecraft.block.Block;
+import net.minecraft.client.renderer.texture.IIconRegister;
+import net.minecraft.creativetab.CreativeTabs;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.util.EnumFacing;
+import net.minecraft.util.Vec3;
+import net.minecraft.world.World;
+import net.minecraftforge.common.util.FakePlayer;
+
+import java.util.List;
 
 public class ItemTwistedBlock extends ItemBlockProxy {
     static final Block darkIron = Core.registry.resource_block;

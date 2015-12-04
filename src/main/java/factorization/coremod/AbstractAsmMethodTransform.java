@@ -2,7 +2,6 @@ package factorization.coremod;
 
 import net.minecraftforge.fml.common.asm.transformers.deobf.FMLDeobfuscatingRemapper;
 import org.objectweb.asm.Opcodes;
-import org.objectweb.asm.tree.*;
 
 abstract class AbstractAsmMethodTransform {
     protected final String obfClassName;

@@ -1,11 +1,10 @@
 package factorization.sockets;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
-
+import factorization.api.Coord;
 import factorization.api.datahelpers.*;
+import factorization.shared.Core;
+import factorization.shared.FzNetDispatch;
+import factorization.shared.NetworkFactorization.MessageType;
 import factorization.util.LangUtil;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
@@ -17,13 +16,12 @@ import net.minecraft.client.renderer.texture.TextureManager;
 import net.minecraft.entity.Entity;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.IIcon;
-
 import org.lwjgl.input.Keyboard;
 
-import factorization.api.Coord;
-import factorization.shared.Core;
-import factorization.shared.FzNetDispatch;
-import factorization.shared.NetworkFactorization.MessageType;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 public class GuiDataConfig extends GuiScreen {
     IDataSerializable ids;

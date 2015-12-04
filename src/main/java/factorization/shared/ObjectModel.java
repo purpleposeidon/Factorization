@@ -1,8 +1,5 @@
 package factorization.shared;
 
-import java.io.IOException;
-import java.io.InputStream;
-
 import factorization.api.Quaternion;
 import factorization.util.SpaceUtil;
 import net.minecraft.block.Block;
@@ -16,10 +13,11 @@ import net.minecraft.util.Vec3;
 import net.minecraftforge.client.event.TextureStitchEvent;
 import net.minecraftforge.client.model.ModelFormatException;
 import net.minecraftforge.client.model.obj.WavefrontObject;
-
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import org.lwjgl.opengl.GL11;
 
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import java.io.IOException;
+import java.io.InputStream;
 
 public class ObjectModel {
     private final ResourceLocation modelLocation;

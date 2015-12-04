@@ -1,13 +1,12 @@
 package factorization.common;
 
+import factorization.shared.Core;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.settings.KeyBinding;
 import net.minecraftforge.fml.client.registry.ClientRegistry;
-import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent.ClientTickEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent.Phase;
-import factorization.shared.Core;
 
 public class FactorizationKeyHandler {
     public static final KeyBinding pocket_key = new KeyBinding("PcktCrft Open (FZ)", org.lwjgl.input.Keyboard.KEY_C, "key.categories.item");

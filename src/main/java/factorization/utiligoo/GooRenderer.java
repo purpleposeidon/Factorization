@@ -1,5 +1,8 @@
 package factorization.utiligoo;
 
+import factorization.common.BlockIcons;
+import factorization.shared.BlockRenderHelper;
+import factorization.shared.Core;
 import factorization.util.RenderUtil;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
@@ -12,15 +15,10 @@ import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.client.event.RenderWorldLastEvent;
-
-import org.lwjgl.opengl.GL11;
-
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
-import factorization.common.BlockIcons;
-import factorization.shared.BlockRenderHelper;
-import factorization.shared.Core;
+import org.lwjgl.opengl.GL11;
 
 public enum GooRenderer {
     INSTANCE;

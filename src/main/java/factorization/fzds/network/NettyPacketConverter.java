@@ -1,10 +1,10 @@
 package factorization.fzds.network;
 
-import net.minecraftforge.fml.common.network.FMLEmbeddedChannel;
-import net.minecraftforge.fml.relauncher.Side;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import net.minecraft.network.Packet;
+import net.minecraftforge.fml.common.network.FMLEmbeddedChannel;
+import net.minecraftforge.fml.relauncher.Side;
 
 public class NettyPacketConverter extends FMLEmbeddedChannel {
 

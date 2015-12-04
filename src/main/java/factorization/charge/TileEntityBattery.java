@@ -1,22 +1,24 @@
 package factorization.charge;
 
-import java.io.IOException;
-
+import factorization.api.Charge;
+import factorization.api.IChargeConductor;
 import factorization.api.datahelpers.DataHelper;
 import factorization.api.datahelpers.Share;
-import factorization.shared.*;
+import factorization.common.BlockIcons;
+import factorization.common.FactoryType;
+import factorization.shared.BlockClass;
+import factorization.shared.Core;
+import factorization.shared.NetworkFactorization.MessageType;
+import factorization.shared.TileEntityCommon;
 import factorization.util.ItemUtil;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.util.IIcon;
 import net.minecraft.util.EnumFacing;
-import factorization.api.Charge;
-import factorization.api.IChargeConductor;
-import factorization.common.BlockIcons;
-import factorization.common.FactoryType;
-import factorization.shared.NetworkFactorization.MessageType;
+import net.minecraft.util.IIcon;
+
+import java.io.IOException;
 
 public class TileEntityBattery extends TileEntityCommon implements IChargeConductor {
     Charge charge = new Charge(this);

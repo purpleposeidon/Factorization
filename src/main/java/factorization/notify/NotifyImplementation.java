@@ -1,9 +1,5 @@
 package factorization.notify;
 
-import java.util.ArrayList;
-import java.util.EnumSet;
-import java.util.Iterator;
-
 import factorization.util.FzUtil;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
@@ -26,6 +22,10 @@ import net.minecraftforge.fml.common.gameevent.TickEvent.ServerTickEvent;
 import net.minecraftforge.fml.common.network.NetworkRegistry.TargetPoint;
 import net.minecraftforge.fml.common.network.internal.FMLProxyPacket;
 import net.minecraftforge.fml.relauncher.Side;
+
+import java.util.ArrayList;
+import java.util.EnumSet;
+import java.util.Iterator;
 
 @Mod(
         modid = NotifyImplementation.modId,
@@ -90,9 +90,9 @@ public class NotifyImplementation {
                 } else if (where instanceof TileEntity) {
                     TileEntity te = (TileEntity) where;
                     world = te.getWorld();
-                    x = te.pos.getX();
-                    y = te.pos.getY();
-                    z = te.pos.getZ();
+                    x = te.getPos().getX();
+                    y = te.getPos().getY();
+                    z = te.getPos().getZ();
                 } else if (where instanceof Entity) {
                     Entity ent = (Entity) where;
                     world = ent.worldObj;

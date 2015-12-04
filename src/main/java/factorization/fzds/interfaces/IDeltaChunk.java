@@ -5,9 +5,9 @@ import factorization.api.Quaternion;
 import factorization.shared.EntityFz;
 import factorization.util.SpaceUtil;
 import net.minecraft.util.AxisAlignedBB;
+import net.minecraft.util.EnumFacing;
 import net.minecraft.util.Vec3;
 import net.minecraft.world.World;
-import net.minecraft.util.EnumFacing;
 
 import java.util.List;
 

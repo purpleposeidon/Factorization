@@ -1,6 +1,5 @@
 package factorization.truth.gen.recipe;
 
-import net.minecraftforge.fml.common.event.FMLInterModComms.IMCMessage;
 import factorization.shared.Core;
 import factorization.truth.DocumentationModule;
 import factorization.truth.api.*;
@@ -12,6 +11,7 @@ import net.minecraft.item.crafting.CraftingManager;
 import net.minecraft.item.crafting.FurnaceRecipes;
 import net.minecraft.item.crafting.IRecipe;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraftforge.fml.common.event.FMLInterModComms.IMCMessage;
 import net.minecraftforge.oredict.OreDictionary;
 
 import java.lang.reflect.Field;

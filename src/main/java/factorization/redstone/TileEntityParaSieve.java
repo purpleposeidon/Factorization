@@ -1,13 +1,15 @@
 package factorization.redstone;
 
-import java.io.IOException;
-import java.util.Arrays;
-import java.util.HashMap;
-
+import factorization.api.Coord;
 import factorization.api.datahelpers.DataHelper;
-import factorization.shared.*;
+import factorization.common.BlockIcons;
+import factorization.common.FactoryType;
+import factorization.shared.BlockClass;
+import factorization.shared.Core;
+import factorization.shared.TileEntityFactorization;
 import factorization.util.DataUtil;
 import factorization.util.InvUtil;
+import factorization.util.InvUtil.FzInv;
 import factorization.util.ItemUtil;
 import net.minecraft.entity.Entity;
 import net.minecraft.inventory.IInventory;
@@ -16,18 +18,18 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.AxisAlignedBB;
+import net.minecraft.util.EnumFacing;
 import net.minecraft.util.IIcon;
 import net.minecraft.util.MathHelper;
-import net.minecraft.util.EnumFacing;
 import net.minecraftforge.fml.common.event.FMLModIdMappingEvent;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.fml.common.registry.GameRegistry.UniqueIdentifier;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
-import factorization.api.Coord;
-import factorization.common.BlockIcons;
-import factorization.common.FactoryType;
-import factorization.util.InvUtil.FzInv;
+
+import java.io.IOException;
+import java.util.Arrays;
+import java.util.HashMap;
 
 public class TileEntityParaSieve extends TileEntityFactorization implements ISidedInventory {
     public ItemStack[] filters = new ItemStack[8];

@@ -1,23 +1,18 @@
 package factorization.colossi;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashSet;
-import java.util.Random;
-
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockFalling;
-import net.minecraft.init.Blocks;
-import net.minecraft.world.biome.BiomeGenBase;
-import net.minecraft.world.gen.NoiseGeneratorOctaves;
-import net.minecraft.util.EnumFacing;
 import factorization.api.Coord;
 import factorization.api.DeltaCoord;
 import factorization.api.ICoordFunction;
 import factorization.colossi.Brush.BrushMask;
 import factorization.shared.Core;
+import net.minecraft.block.Block;
+import net.minecraft.block.BlockFalling;
+import net.minecraft.init.Blocks;
+import net.minecraft.util.EnumFacing;
+import net.minecraft.world.biome.BiomeGenBase;
+import net.minecraft.world.gen.NoiseGeneratorOctaves;
+
+import java.util.*;
 
 public class ColossalBuilder {
     final int seed;

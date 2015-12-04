@@ -5,15 +5,14 @@ import factorization.api.Quaternion;
 import factorization.shared.Core;
 import factorization.shared.ItemFactorization;
 import factorization.util.ItemUtil;
-import factorization.util.PlayerUtil;
 import factorization.util.SpaceUtil;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.AxisAlignedBB;
+import net.minecraft.util.EnumFacing;
 import net.minecraft.util.MovingObjectPosition;
 import net.minecraft.util.Vec3;
 import net.minecraft.world.World;
-import net.minecraft.util.EnumFacing;
 
 import java.util.ArrayList;
 

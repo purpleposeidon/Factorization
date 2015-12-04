@@ -1,7 +1,6 @@
 package factorization.truth.word;
 
 import factorization.truth.DocViewer;
-import factorization.truth.api.IHtmlTypesetter;
 import factorization.truth.api.IWord;
 import net.minecraft.client.gui.FontRenderer;
 

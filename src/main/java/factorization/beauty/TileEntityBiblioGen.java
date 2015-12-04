@@ -6,20 +6,18 @@ import factorization.api.IMeterInfo;
 import factorization.api.IRotationalEnergySource;
 import factorization.api.datahelpers.DataHelper;
 import factorization.api.datahelpers.Share;
-import factorization.common.BlockIcons;
 import factorization.common.FactoryType;
 import factorization.notify.Notice;
 import factorization.notify.Style;
 import factorization.shared.BlockClass;
 import factorization.shared.BlockFactorization;
-import factorization.shared.Core;
 import factorization.shared.TileEntityCommon;
 import net.minecraft.block.Block;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.IIcon;
 import net.minecraft.util.EnumFacing;
+import net.minecraft.util.IIcon;
 
 import java.io.IOException;
 

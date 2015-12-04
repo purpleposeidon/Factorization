@@ -1,10 +1,9 @@
 package factorization.servo.instructions;
 
-import net.minecraft.block.Block;
-import net.minecraft.init.Blocks;
-import net.minecraft.util.IIcon;
-import net.minecraft.util.EnumFacing;
 import factorization.shared.Core;
+import net.minecraft.init.Blocks;
+import net.minecraft.util.EnumFacing;
+import net.minecraft.util.IIcon;
 
 public class IronServoGrate extends WoodenServoGrate {
     @Override

@@ -1,15 +1,15 @@
 package factorization.charge;
 
-import factorization.api.datahelpers.DataHelper;
-import net.minecraft.init.Blocks;
-import net.minecraft.util.IIcon;
-import net.minecraft.util.EnumFacing;
 import factorization.api.Charge;
 import factorization.api.IChargeConductor;
+import factorization.api.datahelpers.DataHelper;
 import factorization.common.BlockIcons;
 import factorization.common.FactoryType;
 import factorization.shared.BlockClass;
 import factorization.shared.TileEntityCommon;
+import net.minecraft.init.Blocks;
+import net.minecraft.util.EnumFacing;
+import net.minecraft.util.IIcon;
 
 import java.io.IOException;
 

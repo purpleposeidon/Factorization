@@ -1,18 +1,18 @@
 package factorization.weird;
 
-import java.util.List;
-
+import factorization.common.FactoryType;
+import factorization.shared.Core;
+import factorization.shared.Core.TabType;
+import factorization.shared.ItemBlockProxy;
 import factorization.util.LangUtil;
+import factorization.weird.TileEntityDayBarrel.Type;
 import net.minecraft.client.renderer.texture.IIconRegister;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
-import factorization.common.FactoryType;
-import factorization.shared.Core;
-import factorization.shared.Core.TabType;
-import factorization.shared.ItemBlockProxy;
-import factorization.weird.TileEntityDayBarrel.Type;
+
+import java.util.List;
 
 public class ItemDayBarrel extends ItemBlockProxy {
 

@@ -1,10 +1,9 @@
 package factorization.oreprocessing;
 
-import org.lwjgl.opengl.GL11;
-
 import factorization.common.ContainerFactorization;
 import factorization.shared.Core;
 import factorization.shared.FactorizationGui;
+import org.lwjgl.opengl.GL11;
 
 public class GuiSlag extends FactorizationGui {
     TileEntitySlagFurnace furnace;

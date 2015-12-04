@@ -1,16 +1,16 @@
 package factorization.colossi;
 
-import java.io.IOException;
-import java.util.UUID;
-
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.ChatComponentText;
 import factorization.api.datahelpers.DataHelper;
 import factorization.api.datahelpers.DataInNBT;
 import factorization.api.datahelpers.DataOutNBT;
 import factorization.api.datahelpers.Share;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.ChatComponentText;
+
+import java.io.IOException;
+import java.util.UUID;
 
 public class TileEntityColossalHeart extends TileEntity {
     public static final UUID noController = UUID.fromString("00000000-0000-0000-0000-000000000000");

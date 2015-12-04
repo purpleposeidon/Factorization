@@ -1,15 +1,8 @@
 package factorization.coremod;
 
-import java.util.ListIterator;
+import org.objectweb.asm.tree.*;
 
-import org.objectweb.asm.tree.AbstractInsnNode;
-import org.objectweb.asm.tree.AnnotationNode;
-import org.objectweb.asm.tree.ClassNode;
-import org.objectweb.asm.tree.FieldInsnNode;
-import org.objectweb.asm.tree.FieldNode;
-import org.objectweb.asm.tree.InsnNode;
-import org.objectweb.asm.tree.LocalVariableNode;
-import org.objectweb.asm.tree.MethodNode;
+import java.util.ListIterator;
 
 public abstract class AbstractAsmClassTransform {
     public abstract void apply(ClassNode cn);

@@ -1,32 +1,28 @@
 package factorization.ceramics;
 
-import java.io.IOException;
-import java.util.List;
-
+import factorization.api.Coord;
+import factorization.api.Quaternion;
 import factorization.api.datahelpers.DataInNBT;
-import factorization.shared.*;
+import factorization.ceramics.TileEntityGreenware.ClayLump;
+import factorization.ceramics.TileEntityGreenware.ClayState;
+import factorization.common.ItemIcons;
+import factorization.notify.Notice;
+import factorization.shared.Core;
+import factorization.shared.Core.TabType;
+import factorization.shared.ItemFactorization;
 import factorization.util.InvUtil;
+import factorization.util.InvUtil.FzInv;
 import factorization.util.ItemUtil;
 import net.minecraft.client.renderer.texture.IIconRegister;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.util.EnumChatFormatting;
-import net.minecraft.util.IIcon;
-import net.minecraft.util.MovingObjectPosition;
-import net.minecraft.util.StatCollector;
+import net.minecraft.util.*;
 import net.minecraft.world.World;
-import net.minecraft.util.EnumFacing;
-import factorization.api.Coord;
-import factorization.api.Quaternion;
-import factorization.ceramics.TileEntityGreenware.ClayLump;
-import factorization.ceramics.TileEntityGreenware.ClayState;
-import factorization.common.FactoryType;
-import factorization.common.ItemIcons;
-import factorization.notify.Notice;
-import factorization.shared.Core.TabType;
-import factorization.util.InvUtil.FzInv;
+
+import java.io.IOException;
+import java.util.List;
 
 public class ItemSculptingTool extends ItemFactorization {
 

@@ -32,10 +32,10 @@ public final class NumUtil {
         return oldValue * (1 - partial) + newValue * partial;
     }
 
-    public static void interp(Vec3 oldVal, Vec3 newVal, float partial, Vec3 dest) {
-        dest.xCoord = interp(oldVal.xCoord, newVal.xCoord, partial);
-        dest.yCoord = interp(oldVal.yCoord, newVal.yCoord, partial);
-        dest.zCoord = interp(oldVal.zCoord, newVal.zCoord, partial);
+    public static Vec3 interp(Vec3 oldVal, Vec3 newVal, float partial) {
+        return new Vec3(interp(oldVal.xCoord, newVal.xCoord, partial),
+                interp(oldVal.yCoord, newVal.yCoord, partial),
+                interp(oldVal.zCoord, newVal.zCoord, partial));
     }
 
     public static float uninterp(float lowValue, float highValue, float currentValue) {

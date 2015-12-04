@@ -1,11 +1,11 @@
 package factorization.servo;
 
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.EnumFacing;
 import factorization.api.Coord;
 import factorization.common.FzConfig;
 import factorization.shared.Core;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.item.ItemStack;
+import net.minecraft.util.EnumFacing;
 
 
 public abstract class Instruction extends Decorator {

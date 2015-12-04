@@ -8,14 +8,13 @@ import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.init.Blocks;
-import net.minecraft.inventory.Container;
-import net.minecraft.inventory.IInventory;
-import net.minecraft.inventory.InventoryLargeChest;
-import net.minecraft.inventory.Slot;
+import net.minecraft.inventory.*;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntityChest;
-import net.minecraft.world.World;
+import net.minecraft.util.BlockPos;
 import net.minecraft.util.EnumFacing;
+import net.minecraft.world.ILockableContainer;
+import net.minecraft.world.World;
 
 import java.util.List;
 
@@ -107,19 +106,11 @@ public final class InvUtil {
         return ItemUtil.normalize(clickStack);
     }
 
-    public static FzInv openInventory(IInventory orig_inv, EnumFacing side) {
-        return openInventory(orig_inv, side.ordinal(), true);
-    }
-
-    public static FzInv openInventory(IInventory orig_inv, EnumFacing side, boolean openBothChests) {
-        return openInventory(orig_inv, side.ordinal(), openBothChests);
-    }
-
-    public static FzInv openInventory(IInventory orig_inv, final int side) {
+    public static FzInv openInventory(IInventory orig_inv, final EnumFacing side) {
         return openInventory(orig_inv, side, true);
     }
 
-    public static FzInv openInventory(IInventory orig_inv, final int side, boolean openBothChests) {
+    public static FzInv openInventory(IInventory orig_inv, final EnumFacing side, boolean openBothChests) {
         if (orig_inv == null) {
             return null;
         }
@@ -129,9 +120,9 @@ public final class InvUtil {
                 return null;
             }
         }
-        if (orig_inv instanceof net.minecraft.inventory.ISidedInventory) {
+        if (orig_inv instanceof ISidedInventory) {
             final net.minecraft.inventory.ISidedInventory inv = (net.minecraft.inventory.ISidedInventory) orig_inv;
-            int[] invSlots = inv.getAccessibleSlotsFromSide(side);
+            int[] invSlots = inv.getSlotsForFace(side);
             if (invSlots == null) {
                 invSlots = new int[0];
             }
@@ -182,11 +173,11 @@ public final class InvUtil {
     }
 
     public static boolean canAccessSlot(IInventory inv, int slot) {
-        if (inv instanceof net.minecraft.inventory.ISidedInventory) {
-            net.minecraft.inventory.ISidedInventory isi = (net.minecraft.inventory.ISidedInventory) inv;
+        if (inv instanceof ISidedInventory) {
+            ISidedInventory isi = (ISidedInventory) inv;
             //O(n). Ugh.
-            for (int i = 0; i < 6; i++) {
-                int[] slots = isi.getAccessibleSlotsFromSide(i);
+            for (EnumFacing face : EnumFacing.VALUES) {
+                int[] slots = isi.getSlotsForFace(face);
                 for (int j = 0; j < slots.length; j++) {
                     if (slots[j] == slot) {
                         return true;
@@ -207,34 +198,32 @@ public final class InvUtil {
      * @return
      */
     public static IInventory openDoubleChest(TileEntityChest chest, boolean openBothSides) {
-        IInventory origChest = chest;
+        ILockableContainer origChest = chest;
         World world = chest.getWorld();
-        int i = chest.pos.getX(), j = chest.pos.getY(), k = chest.pos.getZ();
+        int i = chest.getPos().getX(), j = chest.getPos().getY(), k = chest.getPos().getZ();
         Block cb = chest.getBlockType();
         if (cb == null) {
             return null;
         }
-        Block chestBlock = Blocks.chest;
-        if (world.getBlock(i - 1, j, k) == chestBlock) {
-            return new InventoryLargeChest(origChest.getInventoryName(), (TileEntityChest) world.getTileEntity(i - 1, j, k), origChest);
-        }
-        if (world.getBlock(i, j, k - 1) == chestBlock) {
-            return new InventoryLargeChest(origChest.getInventoryName(), (TileEntityChest) world.getTileEntity(i, j, k - 1), origChest);
-        }
-        // If we're the lower chest, skip ourselves
-        if (world.getBlock(i + 1, j, k) == chestBlock) {
-            if (openBothSides) {
-                return new InventoryLargeChest(origChest.getInventoryName(), origChest, (TileEntityChest) world.getTileEntity(i + 1, j, k));
+        Block chestBlock = chest.getBlockType();
+        for (EnumFacing face : new EnumFacing[] { EnumFacing.NORTH, EnumFacing.WEST }) {
+            // Upper chest
+            BlockPos peek = chest.getPos().offset(face);
+            if (world.getBlockState(peek).getBlock() == chestBlock) {
+                return new InventoryLargeChest("doublechest", (ILockableContainer) world.getTileEntity(peek), origChest);
             }
-            return null;
         }
-        if (world.getBlock(i, j, k + 1) == chestBlock) {
-            if (openBothSides) {
-                return new InventoryLargeChest(origChest.getInventoryName(), origChest, (TileEntityChest) world.getTileEntity(i, j, k + 1));
+        for (EnumFacing face : new EnumFacing[] { EnumFacing.SOUTH, EnumFacing.EAST }) {
+            // If we're the lower chest, perhaps skip ourselves
+            BlockPos peek = chest.getPos().offset(face);
+            if (world.getBlockState(peek).getBlock() == chestBlock) {
+                if (openBothSides) {
+                    return new InventoryLargeChest("doublechest", origChest, (ILockableContainer) world.getTileEntity(peek));
+                }
+                return null;
             }
-            return null;
-        }
 
+        }
         return chest;
     }
 
@@ -677,54 +666,5 @@ public final class InvUtil {
         public int size() {
             return length;
         }
-    }
-
-    public static class Container2IInventory implements IInventory {
-        Container cont;
-        public Container2IInventory(Container cont) {
-            this.cont = cont;
-        }
-        @Override
-        public int getSizeInventory() {
-            return cont.getInventory().size();
-        }
-
-        @Override
-        public ItemStack getStackInSlot(int i) {
-            return cont.getSlot(i).getStack();
-        }
-        @Override
-        public ItemStack decrStackSize(int i, int j) {
-            return cont.getSlot(i).decrStackSize(j);
-        }
-        @Override
-        public ItemStack getStackInSlotOnClosing(int i) {
-            return null;
-        }
-        @Override
-        public void setInventorySlotContents(int i, ItemStack itemstack) {
-            cont.putStackInSlot(i, itemstack);
-        }
-
-        @Override
-        public boolean isItemValidForSlot(int i, ItemStack itemstack) {
-            return cont.getSlot(i).isItemValid(itemstack);
-        }
-
-        @Override
-        public String getInventoryName() { return "Container2IInventory wrapper"; }
-
-        @Override
-        public boolean hasCustomInventoryName() { return false; }
-        @Override
-        public int getInventoryStackLimit() { return 64; }
-        @Override
-        public void markDirty() { }
-        @Override
-        public boolean isUseableByPlayer(EntityPlayer entityplayer) { return false; }
-        @Override
-        public void openInventory() { }
-        @Override
-        public void closeInventory() { }
     }
 }

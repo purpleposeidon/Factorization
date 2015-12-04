@@ -1,22 +1,20 @@
 package factorization.oreprocessing;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-
+import factorization.oreprocessing.ItemOreProcessing.OreType;
+import factorization.shared.Core;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.FurnaceRecipes;
-import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fluids.FluidContainerRegistry;
 import net.minecraftforge.fluids.FluidContainerRegistry.FluidContainerData;
 import net.minecraftforge.fluids.FluidStack;
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.oredict.OreDictionary;
 import net.minecraftforge.oredict.OreDictionary.OreRegisterEvent;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
-import factorization.oreprocessing.ItemOreProcessing.OreType;
-import factorization.shared.Core;
+
+import java.util.HashMap;
+import java.util.Iterator;
 
 public class FactorizationOreProcessingHandler {
     private static final String waterBucket = "fz.waterBucketLike";

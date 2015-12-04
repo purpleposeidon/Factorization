@@ -1,10 +1,14 @@
 package factorization.servo;
 
-import net.minecraftforge.fml.common.eventhandler.EventPriority;
-import net.minecraftforge.fml.common.gameevent.PlayerEvent;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import factorization.api.Coord;
+import factorization.api.FzColor;
 import factorization.common.ItemIcons;
+import factorization.notify.Notice;
+import factorization.notify.Style;
+import factorization.shared.Core;
+import factorization.shared.Core.TabType;
+import factorization.shared.ItemFactorization;
+import factorization.util.FzUtil;
 import factorization.util.PlayerUtil;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityClientPlayerMP;
@@ -23,16 +27,12 @@ import net.minecraft.util.IIcon;
 import net.minecraft.world.World;
 import net.minecraftforge.common.ForgeHooks;
 import net.minecraftforge.event.entity.player.EntityInteractEvent;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
-import factorization.api.Coord;
-import factorization.api.FzColor;
-import factorization.notify.Notice;
-import factorization.notify.Style;
-import factorization.shared.Core;
-import factorization.shared.Core.TabType;
-import factorization.util.FzUtil;
-import factorization.shared.ItemFactorization;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
+import net.minecraftforge.fml.common.eventhandler.EventPriority;
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.fml.common.gameevent.PlayerEvent;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 public class ItemMatrixProgrammer extends ItemFactorization {
     public ItemMatrixProgrammer() {

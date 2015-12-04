@@ -1,14 +1,5 @@
 package factorization.sockets;
 
-import java.io.IOException;
-
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
-
-import net.minecraft.client.renderer.Tessellator;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.IIcon;
-
 import factorization.api.FzOrientation;
 import factorization.api.Quaternion;
 import factorization.api.datahelpers.DataHelper;
@@ -18,6 +9,13 @@ import factorization.common.FactoryType;
 import factorization.servo.ServoMotor;
 import factorization.shared.BlockRenderHelper;
 import factorization.shared.Core;
+import net.minecraft.client.renderer.Tessellator;
+import net.minecraft.item.ItemStack;
+import net.minecraft.util.IIcon;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
+
+import java.io.IOException;
 
 public class SocketBareMotor extends TileEntitySocketBase {
 

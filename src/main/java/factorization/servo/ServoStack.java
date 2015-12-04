@@ -1,16 +1,16 @@
 package factorization.servo;
 
+import factorization.api.FzColor;
+import factorization.api.datahelpers.DataHelper;
+import factorization.api.datahelpers.IDataSerializable;
+import factorization.api.datahelpers.UnionEnumeration;
+import factorization.servo.instructions.GenericPlaceholder;
+import factorization.shared.Core;
+
 import java.io.IOException;
 import java.util.ArrayDeque;
 import java.util.Collection;
 import java.util.Iterator;
-
-import factorization.api.datahelpers.*;
-import factorization.servo.instructions.GenericPlaceholder;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
-import factorization.api.FzColor;
-import factorization.shared.Core;
 
 public class ServoStack implements IDataSerializable, Iterable {
     private ArrayDeque<Object> contents = new ArrayDeque<Object>();

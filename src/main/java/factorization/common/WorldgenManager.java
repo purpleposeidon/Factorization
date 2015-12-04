@@ -1,25 +1,19 @@
 package factorization.common;
 
-import java.util.ArrayList;
-import java.util.Random;
-
-import net.minecraft.block.Block;
-import net.minecraft.crash.CrashReport;
-import net.minecraft.crash.CrashReportCategory;
-import net.minecraft.init.Blocks;
+import factorization.colossi.WorldGenColossus;
+import factorization.shared.Core;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.util.ReportedException;
 import net.minecraft.world.World;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.chunk.IChunkProvider;
-import net.minecraft.world.gen.NoiseGeneratorOctaves;
 import net.minecraft.world.gen.feature.WorldGenMinable;
 import net.minecraftforge.event.world.ChunkDataEvent;
 import net.minecraftforge.fml.common.IWorldGenerator;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.registry.GameRegistry;
-import factorization.colossi.WorldGenColossus;
-import factorization.shared.Core;
+
+import java.util.ArrayList;
+import java.util.Random;
 
 public class WorldgenManager {
     {

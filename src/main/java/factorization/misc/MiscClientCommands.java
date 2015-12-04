@@ -1,9 +1,6 @@
 package factorization.misc;
 
 import com.google.common.base.Joiner;
-import net.minecraftforge.fml.client.GuiModList;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
 import factorization.aabbdebug.AabbDebugger;
 import factorization.api.Coord;
 import factorization.common.FzConfig;
@@ -33,6 +30,9 @@ import net.minecraft.util.StringUtils;
 import net.minecraft.world.IWorldAccess;
 import net.minecraft.world.World;
 import net.minecraft.world.chunk.Chunk;
+import net.minecraftforge.fml.client.GuiModList;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL12;

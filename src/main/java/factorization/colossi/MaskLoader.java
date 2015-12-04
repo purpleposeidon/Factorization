@@ -1,20 +1,18 @@
 package factorization.colossi;
 
+import com.google.common.base.Joiner;
+import factorization.shared.Core;
+import net.minecraft.crash.CrashReport;
+import net.minecraft.crash.CrashReportCategory;
+import net.minecraft.util.EnumFacing;
+import net.minecraft.util.ReportedException;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Random;
-
-import net.minecraft.crash.CrashReport;
-import net.minecraft.crash.CrashReportCategory;
-import net.minecraft.util.ReportedException;
-import net.minecraft.util.EnumFacing;
-
-import com.google.common.base.Joiner;
-
-import factorization.shared.Core;
 
 public class MaskLoader {
     public static ArrayList<MaskTemplate> mask_templates = new ArrayList();

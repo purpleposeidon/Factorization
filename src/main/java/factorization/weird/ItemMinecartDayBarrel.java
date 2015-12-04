@@ -1,7 +1,6 @@
 package factorization.weird;
 
 import com.mojang.authlib.GameProfile;
-import net.minecraftforge.fml.common.Optional;
 import factorization.common.FactoryType;
 import factorization.shared.Core;
 import factorization.shared.ItemFactorization;
@@ -22,6 +21,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.world.World;
+import net.minecraftforge.fml.common.Optional;
 
 import java.util.List;
 

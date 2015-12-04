@@ -1,7 +1,6 @@
 package factorization.notify;
 
-import java.util.EnumSet;
-
+import com.google.common.base.Joiner;
 import net.minecraft.command.CommandBase;
 import net.minecraft.command.ICommand;
 import net.minecraft.command.ICommandSender;
@@ -10,7 +9,7 @@ import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 
-import com.google.common.base.Joiner;
+import java.util.EnumSet;
 
 public class MutterCommand extends CommandBase {
 

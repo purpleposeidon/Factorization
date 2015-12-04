@@ -1,9 +1,8 @@
 package factorization.colossi;
 
-import net.minecraft.client.Minecraft;
+import factorization.shared.EmptyRender;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.boss.BossStatus;
-import factorization.shared.EmptyRender;
 
 public class ColossusControllerRenderer extends EmptyRender {
     @Override

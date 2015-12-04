@@ -1,6 +1,5 @@
 package factorization.weird;
 
-import net.minecraftforge.fml.common.registry.GameRegistry;
 import factorization.shared.Core;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
@@ -8,6 +7,7 @@ import net.minecraft.inventory.InventoryCrafting;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.ShapedRecipes;
 import net.minecraft.world.World;
+import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.oredict.OreDictionary;
 import net.minecraftforge.oredict.RecipeSorter;
 

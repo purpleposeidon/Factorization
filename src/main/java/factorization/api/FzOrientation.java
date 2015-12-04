@@ -1,8 +1,8 @@
 package factorization.api;
 
 import factorization.util.SpaceUtil;
-import net.minecraft.util.Vec3;
 import net.minecraft.util.EnumFacing;
+import net.minecraft.util.Vec3;
 import org.omg.CORBA.UNKNOWN;
 
 public enum FzOrientation {
@@ -210,7 +210,7 @@ public enum FzOrientation {
             }
             fzo = fzo.nextFaceRotation;
         }
-        return UNKNOWN;
+        return null;
     }
     
     public int getRotation() {

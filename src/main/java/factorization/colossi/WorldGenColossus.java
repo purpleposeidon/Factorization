@@ -1,18 +1,10 @@
 package factorization.colossi;
 
-import static net.minecraftforge.common.BiomeDictionary.Type.*;
-import static net.minecraftforge.event.terraingen.PopulateChunkEvent.Populate.EventType.*;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.Random;
-
+import factorization.api.Coord;
+import factorization.common.FzConfig;
 import factorization.fzds.DeltaChunk;
+import factorization.shared.Core;
 import factorization.util.NumUtil;
-import gnu.trove.impl.hash.TIntByteHash;
-import gnu.trove.impl.hash.TIntHash;
-import gnu.trove.list.array.TIntArrayList;
 import gnu.trove.map.hash.TIntByteHashMap;
 import net.minecraft.block.material.Material;
 import net.minecraft.tileentity.TileEntity;
@@ -30,13 +22,18 @@ import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.terraingen.DecorateBiomeEvent.Decorate;
 import net.minecraftforge.event.terraingen.InitNoiseGensEvent;
 import net.minecraftforge.event.terraingen.PopulateChunkEvent;
+import net.minecraftforge.event.terraingen.PopulateChunkEvent.Populate.EventType;
 import net.minecraftforge.fml.common.IWorldGenerator;
 import net.minecraftforge.fml.common.eventhandler.Event.Result;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
-import factorization.api.Coord;
-import factorization.common.FzConfig;
-import factorization.shared.Core;
-import net.minecraftforge.event.terraingen.PopulateChunkEvent.Populate.EventType;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Random;
+
+import static net.minecraftforge.common.BiomeDictionary.Type.*;
+import static net.minecraftforge.event.terraingen.PopulateChunkEvent.Populate.EventType.*;
 
 public class WorldGenColossus implements IWorldGenerator {
     {

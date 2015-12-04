@@ -1,7 +1,9 @@
 package factorization.misc;
 
 import com.google.common.base.Strings;
-
+import factorization.api.Coord;
+import factorization.shared.Core;
+import factorization.shared.NetworkFactorization.MessageType;
 import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.entity.ai.EntityAIBase;
@@ -13,9 +15,6 @@ import net.minecraftforge.event.entity.player.EntityInteractEvent;
 import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.network.internal.FMLProxyPacket;
-import factorization.api.Coord;
-import factorization.shared.Core;
-import factorization.shared.NetworkFactorization.MessageType;
 
 public class BuffNametags {
     @SubscribeEvent(priority = EventPriority.LOW)

@@ -1,19 +1,19 @@
 package factorization.darkiron;
 
-import java.util.Random;
-
+import factorization.common.BlockIcons;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.AxisAlignedBB;
+import net.minecraft.util.EnumFacing;
 import net.minecraft.util.IIcon;
 import net.minecraft.world.World;
-import net.minecraft.util.EnumFacing;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
-import factorization.common.BlockIcons;
+
+import java.util.Random;
 
 public class BlockDarkIronOre extends Block {
     public BlockDarkIronOre() {

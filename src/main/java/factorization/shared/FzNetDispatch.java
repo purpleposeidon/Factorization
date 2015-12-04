@@ -4,9 +4,6 @@ import factorization.api.Coord;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufOutputStream;
 import io.netty.buffer.Unpooled;
-
-import java.io.ByteArrayOutputStream;
-
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
@@ -18,6 +15,8 @@ import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraftforge.fml.common.network.internal.FMLProxyPacket;
+
+import java.io.ByteArrayOutputStream;
 
 public class FzNetDispatch {
     
@@ -88,7 +87,7 @@ public class FzNetDispatch {
     
     public static void addPacketFrom(Packet packet, TileEntity ent) {
         World w = ent.getWorld();
-        addPacketFrom(packet, w.getChunkFromBlockCoords(ent.pos.getX(), ent.pos.getZ()));
+        addPacketFrom(packet, w.getChunkFromBlockCoords(ent.getPos().getX(), ent.getPos().getZ()));
     }
     
     public static void addPacketFrom(Packet packet, Coord c) {

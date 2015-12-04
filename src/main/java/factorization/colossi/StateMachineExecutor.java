@@ -3,7 +3,6 @@ package factorization.colossi;
 import factorization.api.datahelpers.DataHelper;
 import factorization.api.datahelpers.IDataSerializable;
 import factorization.api.datahelpers.Share;
-import factorization.shared.Core;
 
 import java.io.IOException;
 

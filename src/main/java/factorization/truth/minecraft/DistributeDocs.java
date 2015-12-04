@@ -1,7 +1,5 @@
 package factorization.truth.minecraft;
 
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
-import net.minecraftforge.fml.common.gameevent.PlayerEvent.PlayerLoggedInEvent;
 import factorization.api.Coord;
 import factorization.api.ICoordFunction;
 import factorization.common.FzConfig;
@@ -19,6 +17,8 @@ import net.minecraft.util.ChatComponentTranslation;
 import net.minecraft.world.WorldSettings;
 import net.minecraftforge.common.util.FakePlayer;
 import net.minecraftforge.event.world.BlockEvent;
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.fml.common.gameevent.PlayerEvent.PlayerLoggedInEvent;
 
 import java.util.HashSet;
 

@@ -1,24 +1,24 @@
 package factorization.colossi;
 
-import java.util.ArrayList;
-
+import factorization.api.Coord;
+import factorization.api.DeltaCoord;
 import factorization.common.FzConfig;
+import factorization.notify.Notice;
+import factorization.shared.Core;
+import factorization.shared.Core.TabType;
+import factorization.shared.ItemFactorization;
 import factorization.util.PlayerUtil;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.ChatComponentText;
 import net.minecraft.util.ChatComponentTranslation;
+import net.minecraft.util.EnumFacing;
 import net.minecraft.util.IChatComponent;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.FakePlayer;
-import net.minecraft.util.EnumFacing;
-import factorization.api.Coord;
-import factorization.api.DeltaCoord;
-import factorization.notify.Notice;
-import factorization.shared.Core;
-import factorization.shared.Core.TabType;
-import factorization.shared.ItemFactorization;
+
+import java.util.ArrayList;
 
 public class ItemColossusGuide extends ItemFactorization {
 

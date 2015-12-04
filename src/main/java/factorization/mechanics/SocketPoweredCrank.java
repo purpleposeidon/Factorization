@@ -1,7 +1,5 @@
 package factorization.mechanics;
 
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
 import factorization.api.*;
 import factorization.api.datahelpers.DataHelper;
 import factorization.api.datahelpers.IDataSerializable;
@@ -26,9 +24,11 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.DamageSource;
+import net.minecraft.util.EnumFacing;
 import net.minecraft.util.Vec3;
 import net.minecraft.world.World;
-import net.minecraft.util.EnumFacing;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 import org.lwjgl.opengl.GL11;
 
 import java.io.IOException;
@@ -261,7 +261,7 @@ public class SocketPoweredCrank extends TileEntitySocketBase implements IChargeC
 
     private Vec3 getForce(IDeltaChunk idc, ISocketHolder socket, double targetSpeed) {
         Vec3 realHookLocation = idc.shadow2real(hookLocation);
-        Vec3 selfPos = socket.getPos();
+        Vec3 selfPos = socket.getServoPos();
         Vec3 chainVec = SpaceUtil.subtract(realHookLocation, selfPos).normalize();
         SpaceUtil.incrScale(chainVec, -targetSpeed);
         return chainVec;
@@ -381,7 +381,7 @@ public class SocketPoweredCrank extends TileEntitySocketBase implements IChargeC
         IDeltaChunk idc = hookedIdc.getEntity();
         if (idc == null) return;
         Vec3 realHookLocation = idc.shadow2real(hookLocation);
-        Vec3 selfPos = socket.getPos();
+        Vec3 selfPos = socket.getServoPos();
         Vec3 chainVec = SpaceUtil.subtract(realHookLocation, selfPos);
         Vec3 point = SpaceUtil.fromDirection(facing);
         Vec3 right = SpaceUtil.scale(point.crossProduct(chainVec).normalize(), sprocketRadius);
@@ -429,7 +429,7 @@ public class SocketPoweredCrank extends TileEntitySocketBase implements IChargeC
     }
 
     @Override
-    public Vec3 getPos() {
+    public Vec3 getServoPos() {
         double d = 0.5;
         return new Vec3(pos.getX() + d, pos.getY() + d, pos.getZ() + d);
     }

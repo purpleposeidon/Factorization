@@ -1,9 +1,8 @@
 package factorization.misc;
 
-import java.text.DateFormat;
-import java.util.*;
-
+import factorization.api.Coord;
 import factorization.api.ICoordFunction;
+import factorization.common.FzConfig;
 import factorization.util.FzUtil;
 import factorization.util.ItemUtil;
 import factorization.util.PlayerUtil;
@@ -18,14 +17,15 @@ import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.*;
 import net.minecraft.world.World;
+import net.minecraft.world.chunk.Chunk;
 import net.minecraftforge.fml.client.registry.ClientRegistry;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent.ClientTickEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent.Phase;
-import factorization.api.Coord;
-import factorization.common.FzConfig;
-import net.minecraft.world.chunk.Chunk;
+
+import java.text.DateFormat;
+import java.util.*;
 
 public class MiscClientTickHandler {
     private final Minecraft mc = Minecraft.getMinecraft();

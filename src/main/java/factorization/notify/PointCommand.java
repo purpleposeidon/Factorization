@@ -1,8 +1,7 @@
 package factorization.notify;
 
-import java.io.IOException;
-import java.util.List;
-
+import com.google.common.base.Joiner;
+import factorization.api.Coord;
 import net.minecraft.client.Minecraft;
 import net.minecraft.command.CommandBase;
 import net.minecraft.command.ICommandSender;
@@ -14,9 +13,8 @@ import net.minecraft.util.MovingObjectPosition;
 import net.minecraft.util.MovingObjectPosition.MovingObjectType;
 import net.minecraft.util.Vec3;
 
-import com.google.common.base.Joiner;
-
-import factorization.api.Coord;
+import java.io.IOException;
+import java.util.List;
 
 public class PointCommand extends CommandBase {
 

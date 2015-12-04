@@ -1,7 +1,5 @@
 package factorization.notify;
 
-import java.util.EnumSet;
-
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Items;
@@ -11,6 +9,8 @@ import net.minecraft.util.ChatComponentTranslation;
 import net.minecraft.util.IChatComponent;
 import net.minecraft.util.Vec3;
 import net.minecraft.world.World;
+
+import java.util.EnumSet;
 
 public class Notice {
     final Object where;

@@ -1,7 +1,6 @@
 package factorization.coremodhooks;
 
 import net.minecraft.entity.Entity;
-import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.world.World;
 
 public abstract class MixinEntityKinematicsTracker extends Entity implements IKinematicTracker {

@@ -1,13 +1,12 @@
 package factorization.api.datahelpers;
 
-import java.io.DataInput;
-import java.io.IOException;
-
 import factorization.util.DataUtil;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.CompressedStreamTools;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraftforge.fml.relauncher.Side;
+
+import java.io.DataInput;
+import java.io.IOException;
 
 public class DataInPacket extends DataHelper {
     private final DataInput dis;

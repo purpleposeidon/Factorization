@@ -2,8 +2,6 @@ package factorization.util;
 
 import factorization.api.Coord;
 import factorization.shared.Core;
-import factorization.util.ItemUtil;
-import factorization.util.PlayerUtil;
 import net.minecraft.block.Block;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.*;
@@ -21,78 +19,9 @@ import java.util.*;
 public final class CraftUtil {
     private static final ItemStack[] slots3x3 = new ItemStack[9];
     public static boolean craft_succeeded = false;
-    public static ArrayList<ItemStack> emptyArrayList = new ArrayList(0);
-    static ArrayList<IRecipe> recipeCache = new ArrayList();
+    public static ArrayList<ItemStack> emptyArrayList = new ArrayList<ItemStack>(0);
+    static ArrayList<IRecipe> recipeCache = new ArrayList<IRecipe>();
     private static int cache_fear = 10;
-    private static IRecipe stupid_hacky_vanilla_item_repair_recipe = new IRecipe() {
-        ItemStack firstItem, secondItem, result;
-
-        void update(IInventory par1InventoryCrafting) {
-            //This is copied from CraftingManager.findMatchingRecipe; with a few tweaks
-            firstItem = secondItem = result = null;
-            int i = 0;
-            int j;
-
-            for (j = 0; j < par1InventoryCrafting.getSizeInventory(); ++j)
-            {
-                ItemStack itemstack2 = par1InventoryCrafting.getStackInSlot(j);
-
-                if (itemstack2 != null)
-                {
-                    if (i == 0)
-                    {
-                        firstItem = itemstack2;
-                    }
-
-                    if (i == 1)
-                    {
-                        secondItem = itemstack2;
-                    }
-
-                    ++i;
-                }
-            }
-
-            if (i == 2 && firstItem.getItem() == secondItem.getItem() && firstItem.stackSize == 1 && secondItem.stackSize == 1 && firstItem.getItem().isRepairable())
-            {
-                Item item = firstItem.getItem();
-                int j1 = item.getMaxDamage() - firstItem.getItemDamageForDisplay();
-                int k = item.getMaxDamage() - secondItem.getItemDamageForDisplay();
-                int l = j1 + k + item.getMaxDamage() * 5 / 100;
-                int i1 = item.getMaxDamage() - l;
-
-                if (i1 < 0)
-                {
-                    i1 = 0;
-                }
-
-                result = new ItemStack(firstItem.getItem(), 1, i1);
-            }
-        }
-
-        @Override
-        public boolean matches(InventoryCrafting inventorycrafting, World world) {
-            update(inventorycrafting);
-            return result != null;
-        }
-
-        @Override
-        public ItemStack getCraftingResult(InventoryCrafting inventorycrafting) {
-            update(inventorycrafting);
-            return result;
-        }
-
-        @Override
-        public int getRecipeSize() {
-            return 2;
-        }
-
-        @Override
-        public ItemStack getRecipeOutput() {
-            return null;
-        }
-
-    };
 
     public static InventoryCrafting makeCraftingGrid() {
         return new InventoryCrafting(new Container() {
@@ -223,7 +152,6 @@ public final class CraftUtil {
                 recipeCache.clear();
                 recipeCache.ensureCapacity(craftingManagerRecipes.size());
                 recipeCache.addAll(craftingManagerRecipes);
-                recipeCache.add(stupid_hacky_vanilla_item_repair_recipe);
             }
             for (int i = 0; i < recipeCache.size(); i++) {
                 IRecipe recipe = recipeCache.get(i);
@@ -267,92 +195,5 @@ public final class CraftUtil {
             }
             return null;
         }
-    }
-
-    //Recipe creation
-    public static IRecipe createShapedRecipe(ItemStack result, Object... args) {
-        String var3 = "";
-        int var4 = 0;
-        int var5 = 0;
-        int var6 = 0;
-
-        if (args[var4] instanceof String[]) {
-            String[] var7 = (String[]) ((String[]) args[var4++]);
-
-            for (int var8 = 0; var8 < var7.length; ++var8) {
-                String var9 = var7[var8];
-                ++var6;
-                var5 = var9.length();
-                var3 = var3 + var9;
-            }
-        } else {
-            while (args[var4] instanceof String) {
-                String var11 = (String) args[var4++];
-                ++var6;
-                var5 = var11.length();
-                var3 = var3 + var11;
-            }
-        }
-
-        HashMap var12;
-
-        for (var12 = new HashMap(); var4 < args.length; var4 += 2) {
-            Character var13 = (Character) args[var4];
-            ItemStack var14 = null;
-
-            if (args[var4 + 1] instanceof Item) {
-                var14 = new ItemStack((Item) args[var4 + 1]);
-            } else if (args[var4 + 1] instanceof Block) {
-                var14 = new ItemStack((Block) args[var4 + 1], 1, -1);
-            } else if (args[var4 + 1] instanceof ItemStack) {
-                var14 = (ItemStack) args[var4 + 1];
-            }
-
-            var12.put(var13, var14);
-        }
-
-        ItemStack[] var15 = new ItemStack[var5 * var6];
-
-        for (int var16 = 0; var16 < var5 * var6; ++var16) {
-            char var10 = var3.charAt(var16);
-
-            if (var12.containsKey(Character.valueOf(var10))) {
-                var15[var16] = ((ItemStack) var12.get(Character.valueOf(var10))).copy();
-            } else {
-                var15[var16] = null;
-            }
-        }
-
-        return new ShapedRecipes(var5, var6, var15, result);
-    }
-
-    public static IRecipe createShapelessRecipe(ItemStack result, Object... args) {
-        ArrayList var3 = new ArrayList();
-        int var5 = args.length;
-
-        for (int var6 = 0; var6 < var5; ++var6)
-        {
-            Object var7 = args[var6];
-
-            if (var7 instanceof ItemStack)
-            {
-                var3.add(((ItemStack) var7).copy());
-            }
-            else if (var7 instanceof Item)
-            {
-                var3.add(new ItemStack((Item) var7));
-            }
-            else
-            {
-                if (!(var7 instanceof Block))
-                {
-                    throw new RuntimeException("Invalid shapeless recipy!");
-                }
-
-                var3.add(new ItemStack((Block) var7));
-            }
-        }
-
-        return new ShapelessRecipes(result, var3);
     }
 }

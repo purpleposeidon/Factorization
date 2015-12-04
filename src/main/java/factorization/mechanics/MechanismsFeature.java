@@ -1,9 +1,9 @@
 package factorization.mechanics;
 
-import net.minecraftforge.fml.common.FMLCommonHandler;
-import net.minecraftforge.fml.relauncher.Side;
 import factorization.fzds.DeltaChunk;
 import factorization.shared.Core;
+import net.minecraftforge.fml.common.FMLCommonHandler;
+import net.minecraftforge.fml.relauncher.Side;
 
 public class MechanismsFeature {
     static int deltachunk_channel;

@@ -1,10 +1,9 @@
 package factorization.misc;
 
-import java.util.Random;
-
-import net.minecraft.client.Minecraft;
 import factorization.common.FzConfig;
 import factorization.shared.Core;
+
+import java.util.Random;
 
 public class LagssieWatchDog implements Runnable {
     static int ticks = 0;

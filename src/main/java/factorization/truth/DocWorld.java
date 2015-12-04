@@ -1,7 +1,5 @@
 package factorization.truth;
 
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
 import factorization.api.Coord;
 import factorization.api.DeltaCoord;
 import factorization.shared.Core;
@@ -19,6 +17,8 @@ import net.minecraft.world.EnumSkyBlock;
 import net.minecraft.world.WorldSettings;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraftforge.common.util.Constants;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 import java.util.ArrayList;
 
@@ -126,7 +126,7 @@ public class DocWorld extends WorldClient {
     @Override
     public TileEntity getTileEntity(int x, int y, int z) {
         for (TileEntity te : tileEntities) {
-            if (te.pos.getX() == x && te.pos.getY() == y && te.pos.getZ() == z) {
+            if (te.getPos().getX() == x && te.getPos().getY() == y && te.getPos().getZ() == z) {
                 return te;
             }
         }
@@ -160,9 +160,9 @@ public class DocWorld extends WorldClient {
         
         if (te == null) return;
         TileEntity clone = DataUtil.cloneTileEntity(te);
-        clone.pos.getX() = dc.x;
-        clone.pos.getY() = dc.y;
-        clone.pos.getZ() = dc.z;
+        clone.getPos().getX() = dc.x;
+        clone.getPos().getY() = dc.y;
+        clone.getPos().getZ() = dc.z;
         tileEntities.add(clone);
     }
     

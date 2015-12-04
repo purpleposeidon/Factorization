@@ -1,10 +1,10 @@
 package factorization.colossi;
 
-import java.util.Random;
-
 import factorization.api.Coord;
 import factorization.api.DeltaCoord;
 import factorization.util.NumUtil;
+
+import java.util.Random;
 
 public class Brush {
     public static enum BrushMask {

@@ -1,11 +1,11 @@
 package factorization.fzds;
 
+import factorization.fzds.interfaces.IDeltaChunk;
+import factorization.fzds.interfaces.IFzdsEntryControl;
 import net.minecraft.entity.Entity;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.world.World;
-import factorization.fzds.interfaces.IDeltaChunk;
-import factorization.fzds.interfaces.IFzdsEntryControl;
 
 class UniversalCollider extends Entity implements IFzdsEntryControl {
     private final DimensionSliceEntity dimensionSliceEntity;

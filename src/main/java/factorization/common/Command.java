@@ -1,12 +1,12 @@
 package factorization.common;
 
-import java.util.HashMap;
-
 import factorization.misc.ItemMover;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.entity.player.EntityPlayerMP;
 import factorization.shared.Core;
 import factorization.weird.ContainerPocket;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.EntityPlayerMP;
+
+import java.util.HashMap;
 
 public enum Command {
     craftClear(2, true), craftSwirl(3, true), craftBalance(4, true), craftOpen(5, true), craftFill(11, true),

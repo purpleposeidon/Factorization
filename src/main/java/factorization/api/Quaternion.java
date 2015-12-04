@@ -1,24 +1,20 @@
 package factorization.api;
 
+import com.google.common.io.ByteArrayDataOutput;
+import factorization.api.datahelpers.DataHelper;
+import factorization.api.datahelpers.IDataSerializable;
 import factorization.util.SpaceUtil;
 import io.netty.buffer.ByteBuf;
+import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.util.EnumFacing;
+import net.minecraft.util.Vec3;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
+import org.lwjgl.opengl.GL11;
 
 import java.io.DataInput;
 import java.io.DataOutputStream;
 import java.io.IOException;
-
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.util.Vec3;
-import net.minecraft.util.EnumFacing;
-
-import org.lwjgl.opengl.GL11;
-
-import com.google.common.io.ByteArrayDataOutput;
-
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
-import factorization.api.datahelpers.DataHelper;
-import factorization.api.datahelpers.IDataSerializable;
 
 public class Quaternion implements IDataSerializable {
     public double w, x, y, z;

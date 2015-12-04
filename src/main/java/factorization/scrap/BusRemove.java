@@ -2,15 +2,18 @@ package factorization.scrap;
 
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
+import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.common.eventhandler.*;
 import net.minecraftforge.fml.relauncher.ReflectionHelper;
-import net.minecraftforge.common.MinecraftForge;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
-import java.util.*;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+import java.util.Scanner;
 
 @Help({"Deregisters an event handler from the EventBusses",
         "BusRemove EventClassname EventHandlerClassname"})

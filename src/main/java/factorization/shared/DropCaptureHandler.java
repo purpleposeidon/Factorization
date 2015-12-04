@@ -1,9 +1,5 @@
 package factorization.shared;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Iterator;
-
 import factorization.api.Coord;
 import factorization.util.ItemUtil;
 import net.minecraft.entity.item.EntityItem;
@@ -13,6 +9,10 @@ import net.minecraftforge.event.entity.living.LivingDropsEvent;
 import net.minecraftforge.event.world.BlockEvent;
 import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Iterator;
 
 public enum DropCaptureHandler {
     CATCHER;

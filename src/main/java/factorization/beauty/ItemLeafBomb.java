@@ -1,6 +1,5 @@
 package factorization.beauty;
 
-import net.minecraftforge.fml.common.registry.GameRegistry;
 import factorization.algos.ReservoirSampler;
 import factorization.shared.Core;
 import factorization.shared.ItemFactorization;
@@ -16,6 +15,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.world.World;
+import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.oredict.OreDictionary;
 
 import java.util.ArrayList;

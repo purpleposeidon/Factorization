@@ -1,8 +1,8 @@
 package factorization.sockets;
 
-import java.util.ArrayList;
-import java.util.List;
-
+import factorization.common.FactoryType;
+import factorization.shared.Core.TabType;
+import factorization.shared.ItemFactorization;
 import factorization.util.LangUtil;
 import net.minecraft.client.renderer.texture.IIconRegister;
 import net.minecraft.creativetab.CreativeTabs;
@@ -13,9 +13,9 @@ import net.minecraft.util.IIcon;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
-import factorization.common.FactoryType;
-import factorization.shared.Core.TabType;
-import factorization.shared.ItemFactorization;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Deprecated
 public class ItemSocketPart extends ItemFactorization {

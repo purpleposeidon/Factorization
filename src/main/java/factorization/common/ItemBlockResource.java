@@ -1,12 +1,12 @@
 package factorization.common;
 
-import java.util.List;
-
+import factorization.shared.Core;
 import net.minecraft.block.Block;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
-import factorization.shared.Core;
+
+import java.util.List;
 
 public class ItemBlockResource extends ItemBlock {
     public ItemBlockResource(Block block) {

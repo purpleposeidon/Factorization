@@ -1,15 +1,13 @@
 package factorization.weird;
 
+import factorization.common.FactoryType;
+import factorization.shared.TileEntityCommon;
 import net.minecraft.client.renderer.RenderBlocks;
 import net.minecraft.client.renderer.tileentity.TileEntityRendererDispatcher;
 import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.client.IItemRenderer;
-
 import org.lwjgl.opengl.GL11;
-
-import factorization.common.FactoryType;
-import factorization.shared.TileEntityCommon;
 
 public class DayBarrelItemRenderer implements IItemRenderer {
     BlockRenderDayBarrel render_barrel;

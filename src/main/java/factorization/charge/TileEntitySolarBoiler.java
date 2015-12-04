@@ -1,27 +1,22 @@
 package factorization.charge;
 
-import factorization.api.datahelpers.DataHelper;
-import factorization.api.datahelpers.Share;
-import factorization.shared.*;
-import factorization.util.DataUtil;
-import factorization.util.FluidUtil;
-import io.netty.buffer.ByteBuf;
-import net.minecraft.init.Blocks;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.util.IIcon;
-import net.minecraft.util.EnumFacing;
-import net.minecraftforge.fluids.Fluid;
-import net.minecraftforge.fluids.FluidRegistry;
-import net.minecraftforge.fluids.FluidStack;
-import net.minecraftforge.fluids.FluidTank;
-import net.minecraftforge.fluids.FluidTankInfo;
-import net.minecraftforge.fluids.IFluidHandler;
 import factorization.api.Coord;
 import factorization.api.IMeterInfo;
 import factorization.api.IReflectionTarget;
+import factorization.api.datahelpers.DataHelper;
+import factorization.api.datahelpers.Share;
 import factorization.common.BlockIcons;
 import factorization.common.FactoryType;
 import factorization.common.FzConfig;
+import factorization.shared.BlockClass;
+import factorization.shared.NetworkFactorization;
+import factorization.shared.TileEntityCommon;
+import factorization.util.FluidUtil;
+import io.netty.buffer.ByteBuf;
+import net.minecraft.init.Blocks;
+import net.minecraft.util.EnumFacing;
+import net.minecraft.util.IIcon;
+import net.minecraftforge.fluids.*;
 
 import java.io.IOException;
 

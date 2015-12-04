@@ -1,10 +1,8 @@
 package factorization.sockets;
 
-import org.lwjgl.opengl.GL11;
-
-
 import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
 import net.minecraft.tileentity.TileEntity;
+import org.lwjgl.opengl.GL11;
 
 public class TileEntitySocketRenderer extends TileEntitySpecialRenderer {
     @Override

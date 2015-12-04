@@ -11,8 +11,11 @@ import factorization.servo.RenderServoMotor;
 import factorization.servo.ServoMotor;
 import factorization.shared.*;
 import factorization.shared.NetworkFactorization.MessageType;
-import factorization.util.*;
+import factorization.util.FzUtil;
+import factorization.util.InvUtil;
 import factorization.util.InvUtil.FzInv;
+import factorization.util.ItemUtil;
+import factorization.util.PlayerUtil;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import net.minecraft.client.Minecraft;
@@ -263,7 +266,7 @@ public abstract class TileEntitySocketBase extends TileEntityCommon implements I
     }
 
     @Override
-    public Vec3 getPos() {
+    public Vec3 getServoPos() {
         return getCoord().createVector();
     }
 

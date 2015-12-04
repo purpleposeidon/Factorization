@@ -1,18 +1,18 @@
 package factorization.servo;
 
+import factorization.api.Coord;
+import factorization.common.BlockIcons;
 import factorization.servo.stepper.StepperEngine;
+import factorization.shared.BlockRenderHelper;
+import factorization.shared.Core;
 import net.minecraft.client.renderer.RenderBlocks;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.IIcon;
 import net.minecraft.util.EnumFacing;
+import net.minecraft.util.IIcon;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
-import factorization.api.Coord;
-import factorization.common.BlockIcons;
-import factorization.shared.BlockRenderHelper;
-import factorization.shared.Core;
 
 
 public abstract class Decorator extends ServoComponent {

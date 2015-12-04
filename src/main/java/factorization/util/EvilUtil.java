@@ -45,28 +45,28 @@ public class EvilUtil {
 
     public static void forceSpawn(TileEntity te, Entity ent) {
         ent.worldObj.spawnEntityInWorld(ent);
-        ent.worldObj.playAuxSFX(2004, te.pos.getX(), te.pos.getY(), te.pos.getZ(), 0);
+        ent.worldObj.playAuxSFX(2004, te.getPos(), 0);
         if (ent instanceof EntityLiving) {
             ((EntityLiving) ent).spawnExplosionParticle();
         }
     }
 
     public static void positionEntity(TileEntity te, Random random, int range, Entity ent) {
-        double x = te.pos.getX() + randNear(random, range);
-        double y = te.pos.getY() + randNear(random, range);
-        double z = te.pos.getZ() + randNear(random, range);
+        double x = te.getPos().getX() + randNear(random, range);
+        double y = te.getPos().getY() + randNear(random, range);
+        double z = te.getPos().getZ() + randNear(random, range);
         ent.setLocationAndAngles(x, y, z, random.nextFloat() * 360.0F, 0.0F);
     }
 
     public static void givePotion(EntityLiving ent, Potion potion, int level, boolean ambient) {
-        ent.addPotionEffect(new PotionEffect(potion.getId(), Short.MAX_VALUE, level, ambient));
+        ent.addPotionEffect(new PotionEffect(potion.getId(), Short.MAX_VALUE, level, ambient, ambient));
     }
 
     public static EntityPlayer getClosestPlayer(Coord at, double maxRange) {
         maxRange *= maxRange;
         double bestDist = Double.POSITIVE_INFINITY;
         EntityPlayer best = null;
-        for (EntityPlayer player : (Iterable<EntityPlayer>) at.w.playerEntities) {
+        for (EntityPlayer player : at.w.playerEntities) {
             if (PlayerUtil.isPlayerCreative(player)) continue;
             double dist = player.getDistanceSq(at.x + 0.5, at.y + 0.5, at.z + 0.5);
             if (dist > maxRange) continue;

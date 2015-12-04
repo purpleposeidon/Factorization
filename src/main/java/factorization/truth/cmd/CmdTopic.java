@@ -4,7 +4,6 @@ import factorization.truth.api.AgnosticCommand;
 import factorization.truth.api.ITokenizer;
 import factorization.truth.api.ITypesetter;
 import factorization.truth.api.TruthError;
-import factorization.truth.export.IndexDocumentation;
 import factorization.truth.export.IndexerTypesetter;
 
 public class CmdTopic extends AgnosticCommand {

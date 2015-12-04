@@ -1,14 +1,12 @@
 package factorization.fzds;
 
-import static org.lwjgl.opengl.GL11.*;
-
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
+import factorization.aabbdebug.AabbDebugger;
+import factorization.api.Coord;
+import factorization.api.Quaternion;
+import factorization.common.FzConfig;
+import factorization.fzds.interfaces.DeltaCapability;
+import factorization.fzds.interfaces.IFzdsShenanigans;
+import factorization.shared.Core;
 import factorization.util.NumUtil;
 import factorization.util.RenderUtil;
 import net.minecraft.block.Block;
@@ -32,19 +30,14 @@ import net.minecraft.world.ChunkPosition;
 import net.minecraft.world.World;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraftforge.event.world.WorldEvent;
-
-import org.lwjgl.opengl.GL11;
-
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent.Phase;
 import net.minecraftforge.fml.common.gameevent.TickEvent.RenderTickEvent;
-import factorization.aabbdebug.AabbDebugger;
-import factorization.api.Coord;
-import factorization.api.Quaternion;
-import factorization.common.FzConfig;
-import factorization.fzds.interfaces.DeltaCapability;
-import factorization.fzds.interfaces.IFzdsShenanigans;
-import factorization.shared.Core;
+import org.lwjgl.opengl.GL11;
+
+import java.util.*;
+
+import static org.lwjgl.opengl.GL11.*;
 
 
 public class RenderDimensionSliceEntity extends Render implements IFzdsShenanigans {

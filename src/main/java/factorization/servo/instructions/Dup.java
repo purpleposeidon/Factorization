@@ -1,19 +1,17 @@
 package factorization.servo.instructions;
 
-import java.io.IOException;
-
-import net.minecraft.item.Item;
-import net.minecraft.init.Items;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.IIcon;
-import net.minecraft.util.EnumFacing;
 import factorization.api.datahelpers.DataHelper;
 import factorization.api.datahelpers.IDataSerializable;
 import factorization.common.BlockIcons;
-import factorization.servo.Executioner;
 import factorization.servo.Instruction;
 import factorization.servo.ServoMotor;
 import factorization.servo.ServoStack;
+import net.minecraft.init.Items;
+import net.minecraft.item.ItemStack;
+import net.minecraft.util.EnumFacing;
+import net.minecraft.util.IIcon;
+
+import java.io.IOException;
 
 public class Dup extends Instruction {
     @Override

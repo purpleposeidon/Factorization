@@ -5,7 +5,6 @@ import factorization.truth.api.IWord;
 import factorization.truth.api.TruthError;
 import factorization.truth.gen.recipe.RecipeViewer;
 import factorization.truth.minecraft.GuiButtonNextPage;
-import factorization.truth.word.Word;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.GuiButton;

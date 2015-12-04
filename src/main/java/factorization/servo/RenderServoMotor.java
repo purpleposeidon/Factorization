@@ -1,11 +1,15 @@
 package factorization.servo;
 
-import java.util.Iterator;
-
+import factorization.api.FzColor;
+import factorization.api.FzOrientation;
+import factorization.api.Quaternion;
+import factorization.common.BlockIcons;
 import factorization.fzds.DeltaChunk;
 import factorization.fzds.Hammer;
 import factorization.fzds.HammerEnabled;
-import factorization.shared.*;
+import factorization.shared.Core;
+import factorization.shared.ObjectModel;
+import factorization.sockets.TileEntitySocketBase;
 import factorization.util.NumUtil;
 import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
@@ -21,19 +25,13 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.AxisAlignedBB;
-import net.minecraft.util.IIcon;
+import net.minecraft.util.EnumFacing;
 import net.minecraft.util.MovingObjectPosition;
 import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.EnumFacing;
-
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL12;
 
-import factorization.api.FzColor;
-import factorization.api.FzOrientation;
-import factorization.api.Quaternion;
-import factorization.common.BlockIcons;
-import factorization.sockets.TileEntitySocketBase;
+import java.util.Iterator;
 
 public class RenderServoMotor extends RenderEntity {
     ObjectModel sprocket = new ObjectModel(Core.getResource("models/servo/sprocket.obj"));
@@ -208,7 +206,7 @@ public class RenderServoMotor extends RenderEntity {
     }
     
     void renderSocketAttachment(ServoMotor motor, TileEntitySocketBase socket, float partial) {
-        socket.pos.getX() = socket.pos.getY() = socket.pos.getZ() = 0;
+        socket.getPos().getX() = socket.getPos().getY() = socket.getPos().getZ() = 0;
         socket.facing = EnumFacing.UP;
         socket.renderInServo(motor, partial);
     }

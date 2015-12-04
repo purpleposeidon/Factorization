@@ -1,14 +1,13 @@
 package factorization.shared;
 
-import java.util.List;
-
+import factorization.shared.Core.TabType;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
-import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
-import factorization.shared.Core.TabType;
+
+import java.util.List;
 
 public class ItemFactorization extends Item {
     private int spriteNumber = 1;

@@ -1,10 +1,8 @@
 package factorization.artifact;
 
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import factorization.common.ItemIcons;
 import factorization.shared.Core;
 import factorization.shared.ItemCraftingComponent;
-import factorization.util.EvilUtil;
 import factorization.util.ItemUtil;
 import factorization.util.PlayerUtil;
 import net.minecraft.entity.Entity;
@@ -19,9 +17,9 @@ import net.minecraft.stats.StatisticsFile;
 import net.minecraft.util.IIcon;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.FakePlayer;
-import net.minecraft.util.EnumFacing;
 import net.minecraftforge.event.AnvilUpdateEvent;
 import net.minecraftforge.event.entity.player.AnvilRepairEvent;
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
 public class ItemPotency extends ItemCraftingComponent {
     public ItemPotency() {

@@ -1,5 +1,7 @@
 package factorization.colossi;
 
+import factorization.api.Coord;
+import factorization.shared.Core;
 import net.minecraft.command.CommandBase;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.init.Blocks;
@@ -7,8 +9,6 @@ import net.minecraft.tileentity.TileEntityCommandBlock;
 import net.minecraft.tileentity.TileEntitySign;
 import net.minecraft.util.ChatComponentText;
 import net.minecraft.util.ChunkCoordinates;
-import factorization.api.Coord;
-import factorization.shared.Core;
 
 public class BuildColossusCommand extends CommandBase {
     @Override

@@ -1,12 +1,9 @@
 package factorization.servo;
 
-import java.io.IOException;
-
-import factorization.api.datahelpers.DataHelper;
 import factorization.api.datahelpers.MergedDataHelper;
 import factorization.api.datahelpers.Share;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.Vec3;
+
+import java.io.IOException;
 
 public class LoggerDataHelper extends MergedDataHelper {
     ServoMotor motor;

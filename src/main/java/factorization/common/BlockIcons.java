@@ -1,14 +1,14 @@
 package factorization.common;
 
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
 import factorization.shared.FactorizationTextureLoader.Directory;
 import factorization.shared.FactorizationTextureLoader.IIconGroup;
 import factorization.shared.FactorizationTextureLoader.Ignore;
 import factorization.shared.TileEntityFactorization;
 import net.minecraft.client.renderer.RenderBlocks;
-import net.minecraft.util.IIcon;
 import net.minecraft.util.EnumFacing;
+import net.minecraft.util.IIcon;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 public class BlockIcons {
     public static IIcon uv_test,

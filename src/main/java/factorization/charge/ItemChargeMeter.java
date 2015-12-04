@@ -1,10 +1,5 @@
 package factorization.charge;
 
-import factorization.util.PlayerUtil;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.item.ItemStack;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.world.World;
 import factorization.api.Charge;
 import factorization.api.Charge.ChargeDensityReading;
 import factorization.api.Coord;
@@ -15,6 +10,11 @@ import factorization.notify.NoticeUpdater;
 import factorization.shared.Core;
 import factorization.shared.Core.TabType;
 import factorization.shared.ItemFactorization;
+import factorization.util.PlayerUtil;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.item.ItemStack;
+import net.minecraft.tileentity.TileEntity;
+import net.minecraft.world.World;
 
 public class ItemChargeMeter extends ItemFactorization {
 

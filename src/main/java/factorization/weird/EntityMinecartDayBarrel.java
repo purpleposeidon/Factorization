@@ -12,9 +12,9 @@ import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.DamageSource;
+import net.minecraft.util.EnumFacing;
 import net.minecraft.util.MathHelper;
 import net.minecraft.world.World;
-import net.minecraft.util.EnumFacing;
 
 import java.io.IOException;
 
@@ -68,7 +68,7 @@ public class EntityMinecartDayBarrel extends EntityMinecart implements IInventor
         if (barrel != null) return;
         barrel = new TileEntityDayBarrel();
         barrel.setWorldObj(worldObj);
-        barrel.pos.getX() = barrel.pos.getY() = barrel.pos.getZ() = 0;
+        barrel.getPos().getX() = barrel.getPos().getY() = barrel.getPos().getZ() = 0;
         barrel.validate();
         barrel.orientation = FzOrientation.fromDirection(EnumFacing.WEST).pointTopTo(EnumFacing.UP);
         barrel.notice_target = this;
@@ -157,9 +157,9 @@ public class EntityMinecartDayBarrel extends EntityMinecart implements IInventor
         }
 
         if (!worldObj.isRemote) {
-            barrel.pos.getX() = MathHelper.floor_double(posX);
-            barrel.pos.getY() = MathHelper.floor_double(posY);
-            barrel.pos.getZ() = MathHelper.floor_double(posZ);
+            barrel.getPos().getX() = MathHelper.floor_double(posX);
+            barrel.getPos().getY() = MathHelper.floor_double(posY);
+            barrel.getPos().getZ() = MathHelper.floor_double(posZ);
             if (activatorRailTicks > 0) activatorRailTicks--;
 
             if (barrel.canUpdate() && activatorRailTicks <= 0 && worldObj.getTotalWorldTime() % barrel.getLogicSpeed() == 0) {

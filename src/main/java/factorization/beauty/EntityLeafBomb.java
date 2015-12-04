@@ -21,7 +21,6 @@ import net.minecraft.util.MovingObjectPosition;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;
 import net.minecraft.world.gen.NoiseGeneratorOctaves;
-import net.minecraft.util.EnumFacing;
 
 import java.util.HashSet;
 

@@ -1,55 +1,16 @@
 package factorization.shared;
 
-import static factorization.shared.BlockHelper.BlockStyle.BED;
-import static factorization.shared.BlockHelper.BlockStyle.CAKE;
-import static factorization.shared.BlockHelper.BlockStyle.CLONE_MD;
-import static factorization.shared.BlockHelper.BlockStyle.CROP;
-import static factorization.shared.BlockHelper.BlockStyle.DOOR;
-import static factorization.shared.BlockHelper.BlockStyle.NOTHING;
-import static factorization.shared.BlockHelper.BlockStyle.PISTON_EXTENSION;
-import static factorization.shared.BlockHelper.BlockStyle.REDSTONE_ORE;
-import static factorization.shared.BlockHelper.BlockStyle.SLAB;
-import static factorization.shared.BlockHelper.BlockStyle.STEM;
-import static factorization.shared.BlockHelper.BlockStyle.USE_GET_BLOCK_DROPPED;
-import static factorization.shared.BlockHelper.BlockStyle.USE_GET_DAMAGE_VALUE;
-import static factorization.shared.BlockHelper.BlockStyle.USE_ID_DROPPED;
-
-import java.util.ArrayList;
-
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockBed;
-import net.minecraft.block.BlockBrewingStand;
-import net.minecraft.block.BlockCauldron;
-import net.minecraft.block.BlockCocoa;
-import net.minecraft.block.BlockCrops;
-import net.minecraft.block.BlockDoor;
-import net.minecraft.block.BlockEndPortal;
-import net.minecraft.block.BlockFarmland;
-import net.minecraft.block.BlockFlowerPot;
-import net.minecraft.block.BlockFurnace;
-import net.minecraft.block.BlockHugeMushroom;
-import net.minecraft.block.BlockMobSpawner;
-import net.minecraft.block.BlockNetherWart;
-import net.minecraft.block.BlockOre;
-import net.minecraft.block.BlockPistonMoving;
-import net.minecraft.block.BlockPortal;
-import net.minecraft.block.BlockRedstoneComparator;
-import net.minecraft.block.BlockRedstoneLight;
-import net.minecraft.block.BlockRedstoneRepeater;
-import net.minecraft.block.BlockRedstoneTorch;
-import net.minecraft.block.BlockRedstoneWire;
-import net.minecraft.block.BlockReed;
-import net.minecraft.block.BlockSign;
-import net.minecraft.block.BlockSilverfish;
-import net.minecraft.block.BlockSkull;
-import net.minecraft.block.BlockSlab;
-import net.minecraft.block.BlockTripWire;
+import net.minecraft.block.*;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.MovingObjectPosition;
 import net.minecraft.world.World;
+
+import java.util.ArrayList;
+
+import static factorization.shared.BlockHelper.BlockStyle.*;
 
 public class BlockHelper
 {

@@ -1,8 +1,8 @@
 package factorization.shared;
 
+import net.minecraft.client.renderer.entity.Render;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.ResourceLocation;
-import net.minecraft.client.renderer.entity.Render;
 
 public class EmptyRender extends Render {
 

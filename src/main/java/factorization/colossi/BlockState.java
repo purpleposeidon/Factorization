@@ -1,7 +1,7 @@
 package factorization.colossi;
 
-import net.minecraft.block.Block;
 import factorization.api.Coord;
+import net.minecraft.block.Block;
 
 public class BlockState {
     public final Block block;

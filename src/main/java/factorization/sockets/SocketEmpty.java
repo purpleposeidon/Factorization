@@ -1,12 +1,11 @@
 package factorization.sockets;
 
-import java.io.IOException;
-
-import net.minecraft.item.ItemStack;
-
 import factorization.api.datahelpers.DataHelper;
 import factorization.api.datahelpers.IDataSerializable;
 import factorization.common.FactoryType;
+import net.minecraft.item.ItemStack;
+
+import java.io.IOException;
 
 public class SocketEmpty extends TileEntitySocketBase {
     @Override

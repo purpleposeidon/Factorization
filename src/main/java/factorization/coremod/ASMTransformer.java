@@ -1,14 +1,13 @@
 package factorization.coremod;
 
-import net.minecraftforge.fml.relauncher.FMLRelaunchLog;
 import factorization.fzds.HammerEnabled;
 import net.minecraft.launchwrapper.IClassTransformer;
 import net.minecraft.launchwrapper.Launch;
 import net.minecraft.launchwrapper.LaunchClassLoader;
+import net.minecraftforge.fml.relauncher.FMLRelaunchLog;
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.ClassWriter;
 import org.objectweb.asm.Opcodes;
-import org.objectweb.asm.tree.*;
 import org.objectweb.asm.util.TraceClassVisitor;
 
 import java.io.File;

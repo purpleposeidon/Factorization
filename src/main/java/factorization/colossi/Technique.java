@@ -1,6 +1,5 @@
 package factorization.colossi;
 
-import net.minecraftforge.fml.relauncher.Side;
 import factorization.algos.ReservoirSampler;
 import factorization.api.Coord;
 import factorization.api.DeltaCoord;
@@ -22,17 +21,14 @@ import net.minecraft.entity.item.EntityFallingBlock;
 import net.minecraft.entity.item.EntityFireworkRocket;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.monster.EntityCreeper;
-import net.minecraft.entity.monster.EntityZombie;
-import net.minecraft.entity.passive.EntityChicken;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.potion.Potion;
 import net.minecraft.potion.PotionEffect;
+import net.minecraft.util.EnumFacing;
 import net.minecraft.util.Vec3;
 import net.minecraft.world.WorldServer;
-import net.minecraft.util.EnumFacing;
 
 import java.util.*;
 

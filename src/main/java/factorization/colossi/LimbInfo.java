@@ -1,8 +1,5 @@
 package factorization.colossi;
 
-import java.io.IOException;
-
-import net.minecraft.world.World;
 import factorization.api.Quaternion;
 import factorization.api.datahelpers.DataHelper;
 import factorization.api.datahelpers.Share;
@@ -12,6 +9,9 @@ import factorization.fzds.interfaces.DeltaCapability;
 import factorization.fzds.interfaces.IDeltaChunk;
 import factorization.fzds.interfaces.Interpolation;
 import factorization.shared.EntityReference;
+import net.minecraft.world.World;
+
+import java.io.IOException;
 
 class LimbInfo {
     LimbType type = LimbType.UNKNOWN_LIMB_TYPE;

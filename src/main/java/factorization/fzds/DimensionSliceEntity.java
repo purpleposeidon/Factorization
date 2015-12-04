@@ -1,7 +1,5 @@
 package factorization.fzds;
 
-import net.minecraftforge.fml.common.network.NetworkRegistry;
-import net.minecraftforge.fml.common.network.internal.FMLProxyPacket;
 import factorization.aabbdebug.AabbDebugger;
 import factorization.algos.TortoiseAndHare;
 import factorization.api.Coord;
@@ -38,6 +36,8 @@ import net.minecraft.util.Vec3;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;
 import net.minecraft.world.chunk.Chunk;
+import net.minecraftforge.fml.common.network.NetworkRegistry;
+import net.minecraftforge.fml.common.network.internal.FMLProxyPacket;
 import org.apache.commons.lang3.ArrayUtils;
 
 import java.io.IOException;

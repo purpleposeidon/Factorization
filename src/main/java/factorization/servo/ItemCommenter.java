@@ -1,12 +1,12 @@
 package factorization.servo;
 
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.item.ItemStack;
-import net.minecraft.world.World;
 import factorization.api.Coord;
 import factorization.shared.Core.TabType;
 import factorization.shared.ItemFactorization;
 import factorization.shared.NetworkFactorization.MessageType;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.item.ItemStack;
+import net.minecraft.world.World;
 
 public class ItemCommenter extends ItemFactorization {
 

@@ -1,35 +1,35 @@
 package factorization.charge;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-
+import factorization.api.Coord;
+import factorization.api.DeltaCoord;
+import factorization.api.IReflectionTarget;
 import factorization.api.datahelpers.DataHelper;
 import factorization.api.datahelpers.Share;
+import factorization.common.BlockIcons;
+import factorization.common.FactoryType;
 import factorization.common.FzConfig;
+import factorization.shared.BlockClass;
 import factorization.shared.BlockFactorization;
+import factorization.shared.Core;
+import factorization.shared.NetworkFactorization.MessageType;
+import factorization.shared.TileEntityCommon;
 import factorization.util.DataUtil;
 import factorization.util.ItemUtil;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.block.Block;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.EnumFacing;
 import net.minecraft.util.IIcon;
 import net.minecraft.world.EnumSkyBlock;
 import net.minecraft.world.World;
-import net.minecraft.util.EnumFacing;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
-import factorization.api.Coord;
-import factorization.api.DeltaCoord;
-import factorization.api.IReflectionTarget;
-import factorization.common.BlockIcons;
-import factorization.common.FactoryType;
-import factorization.shared.BlockClass;
-import factorization.shared.Core;
-import factorization.shared.NetworkFactorization.MessageType;
-import factorization.shared.TileEntityCommon;
 import net.minecraftforge.oredict.OreDictionary;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
 
 public class TileEntityMirror extends TileEntityCommon {
     public Coord reflection_target = null;

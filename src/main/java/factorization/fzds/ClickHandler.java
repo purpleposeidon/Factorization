@@ -1,6 +1,9 @@
 package factorization.fzds;
 
+import factorization.api.Coord;
+import factorization.fzds.interfaces.DeltaCapability;
 import factorization.fzds.network.HammerNet;
+import factorization.fzds.network.HammerNet.HammerNetType;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.client.Minecraft;
@@ -19,9 +22,6 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent.ClientTickEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent.Phase;
 import net.minecraftforge.fml.common.network.internal.FMLProxyPacket;
-import factorization.api.Coord;
-import factorization.fzds.network.HammerNet.HammerNetType;
-import factorization.fzds.interfaces.DeltaCapability;
 
 public class ClickHandler {
     //Note that these events will be triggered client-side only, as this entity is only used client-side.

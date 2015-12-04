@@ -1,35 +1,29 @@
 package factorization.charge;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-
 import com.google.common.collect.HashMultimap;
-import factorization.shared.*;
+import factorization.api.Coord;
+import factorization.api.datahelpers.DataHelper;
+import factorization.api.datahelpers.Share;
+import factorization.common.BlockIcons;
+import factorization.common.FactoryType;
+import factorization.notify.Notice;
+import factorization.shared.BlockClass;
+import factorization.shared.Sound;
+import factorization.shared.TileEntityFactorization;
 import factorization.util.DataUtil;
 import factorization.util.InvUtil;
 import factorization.util.ItemUtil;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
-import net.minecraft.init.Items;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemFood;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.util.IIcon;
 import net.minecraft.util.EnumFacing;
+import net.minecraft.util.IIcon;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
-import factorization.api.Coord;
-import factorization.api.datahelpers.DataHelper;
-import factorization.api.datahelpers.DataInNBT;
-import factorization.api.datahelpers.DataOutNBT;
-import factorization.api.datahelpers.IDataSerializable;
-import factorization.api.datahelpers.Share;
-import factorization.common.BlockIcons;
-import factorization.common.FactoryType;
-import factorization.notify.Notice;
+
+import java.io.IOException;
 
 public class TileEntityCaliometricBurner extends TileEntityFactorization {
     public static class FoodInfo {

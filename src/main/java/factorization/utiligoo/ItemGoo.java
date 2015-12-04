@@ -1,15 +1,18 @@
 package factorization.utiligoo;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Random;
-
-import net.minecraftforge.fml.common.network.ByteBufUtils;
-import factorization.shared.*;
+import factorization.api.Coord;
+import factorization.common.Command;
+import factorization.common.ItemIcons;
+import factorization.coremodhooks.HandleAttackKeyEvent;
+import factorization.coremodhooks.HandleUseKeyEvent;
+import factorization.shared.Core;
+import factorization.shared.Core.TabType;
+import factorization.shared.DropCaptureHandler;
+import factorization.shared.ICaptureDrops;
+import factorization.shared.ItemFactorization;
+import factorization.shared.NetworkFactorization.MessageType;
 import factorization.util.InvUtil;
+import factorization.util.InvUtil.FzInv;
 import factorization.util.ItemUtil;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.block.Block;
@@ -26,27 +29,21 @@ import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.ItemTool;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.util.EnumFacing;
 import net.minecraft.util.IIcon;
 import net.minecraft.util.MovingObjectPosition;
 import net.minecraft.util.MovingObjectPosition.MovingObjectType;
 import net.minecraft.world.World;
-import net.minecraft.util.EnumFacing;
 import net.minecraftforge.event.world.BlockEvent.BreakEvent;
-
-import org.apache.commons.lang3.ArrayUtils;
-
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.fml.common.network.ByteBufUtils;
 import net.minecraftforge.fml.common.network.internal.FMLProxyPacket;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
-import factorization.api.Coord;
-import factorization.common.Command;
-import factorization.common.ItemIcons;
-import factorization.coremodhooks.HandleAttackKeyEvent;
-import factorization.coremodhooks.HandleUseKeyEvent;
-import factorization.shared.Core.TabType;
-import factorization.util.InvUtil.FzInv;
-import factorization.shared.NetworkFactorization.MessageType;
+import org.apache.commons.lang3.ArrayUtils;
+
+import java.io.IOException;
+import java.util.*;
 
 public class ItemGoo extends ItemFactorization {
     public ItemGoo(String name, TabType tabType) {

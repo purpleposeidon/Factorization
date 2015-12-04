@@ -1,25 +1,25 @@
 package factorization.util;
 
 import com.google.common.collect.Multimap;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.BlockPos;
-import net.minecraft.world.IBlockAccess;
-import net.minecraft.world.IWorldAccess;
-import net.minecraftforge.fml.common.Loader;
-import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
 import factorization.api.Coord;
 import factorization.shared.Core;
 import factorization.weird.TileEntityDayBarrel;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.SharedMonsterAttributes;
+import net.minecraft.entity.ai.attributes.AttributeModifier;
 import net.minecraft.entity.ai.attributes.BaseAttributeMap;
 import net.minecraft.entity.ai.attributes.IAttributeInstance;
 import net.minecraft.entity.ai.attributes.ServersideAttributeMap;
 import net.minecraft.item.ItemStack;
+import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.BlockPos;
+import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import net.minecraftforge.common.DimensionManager;
+import net.minecraftforge.fml.common.Loader;
+import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 import java.awt.*;
 import java.awt.datatransfer.StringSelection;
@@ -47,7 +47,7 @@ public class FzUtil {
 
 
     public static int getWorldDimension(World world) {
-        return world.provider.dimensionId;
+        return world.provider.getDimensionId();
     }
 
     public static World getWorld(int dimensionId) {
@@ -61,7 +61,7 @@ public class FzUtil {
     }
     
     public static <E> ArrayList<E> copyWithoutNull(Collection<E> orig) {
-        ArrayList<E> ret = new ArrayList();
+        ArrayList<E> ret = new ArrayList<E>();
         if (orig == null) return ret;
         for (E e : orig) {
             if (e != null) ret.add(e);
@@ -92,7 +92,7 @@ public class FzUtil {
 
     public static double rateDamage(ItemStack is) {
         if (is == null) return 0;
-        Multimap attrs = is.getItem().getAttributeModifiers(is);
+        Multimap<String, AttributeModifier> attrs = is.getItem().getAttributeModifiers(is);
         if (attrs == null) return 0;
         BaseAttributeMap test = new ServersideAttributeMap();
         test.applyAttributeModifiers(attrs);
@@ -125,6 +125,7 @@ public class FzUtil {
         }
     }
 
+    @SuppressWarnings("PointlessArithmeticExpression")
     public static UnitBase unit_time[] = new UnitBase[] {
             new UnitBase(1L * 20 * 60 * 60 * 24 * 365 * 1000 * 1000, "time.eons"),
             new UnitBase(1L * 20 * 60 * 60 * 24 * 365 * 1000, "time.millenia"),
@@ -139,6 +140,7 @@ public class FzUtil {
             new UnitBase(1L * 20, "time.seconds"),
             new UnitBase(1L, "time.ticks"),
     };
+    @SuppressWarnings("PointlessArithmeticExpression")
     public static UnitBase unit_distance_px[] = new UnitBase[] {
             new UnitBase(1L * 16 * 1000, "distance.kilometers"),
             new UnitBase(1L * 16 * 16, "distance.chunks"),

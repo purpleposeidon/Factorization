@@ -1,7 +1,12 @@
 package factorization.crafting;
 
-import java.util.Random;
-
+import factorization.api.Coord;
+import factorization.api.FzOrientation;
+import factorization.api.Quaternion;
+import factorization.common.BlockIcons;
+import factorization.common.BlockIcons.ExtendedIIcon;
+import factorization.shared.BlockRenderHelper;
+import factorization.shared.Core;
 import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.RenderBlocks;
@@ -10,20 +15,13 @@ import net.minecraft.client.renderer.tileentity.TileEntityRendererDispatcher;
 import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.AxisAlignedBB;
-import net.minecraft.world.World;
 import net.minecraft.util.EnumFacing;
-
-import org.lwjgl.opengl.GL11;
-
+import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
-import factorization.api.Coord;
-import factorization.api.FzOrientation;
-import factorization.api.Quaternion;
-import factorization.common.BlockIcons;
-import factorization.common.BlockIcons.ExtendedIIcon;
-import factorization.shared.BlockRenderHelper;
-import factorization.shared.Core;
+import org.lwjgl.opengl.GL11;
+
+import java.util.Random;
 
 public class TileEntityCompressionCrafterRenderer extends TileEntitySpecialRenderer {
     float textureOffset;
@@ -83,7 +81,7 @@ public class TileEntityCompressionCrafterRenderer extends TileEntitySpecialRende
         block.rotateCenter(q);
         
         Tessellator.instance.startDrawingQuads();
-        Tessellator.instance.setBrightness(block.getMixedBrightnessForBlock(cc.getWorld(), cc.pos.getX(), cc.pos.getY(), cc.pos.getZ()));
+        Tessellator.instance.setBrightness(block.getMixedBrightnessForBlock(cc.getWorld(), cc.getPos().getX(), cc.getPos().getY(), cc.getPos().getZ()));
         GL11.glDisable(GL11.GL_LIGHTING);
         block.renderForTileEntity();
         Tessellator.instance.draw();
@@ -91,7 +89,7 @@ public class TileEntityCompressionCrafterRenderer extends TileEntitySpecialRende
         if (cc.isPrimaryCrafter() && cc.upperCorner != null && cc.lowerCorner != null
                 && Minecraft.getMinecraft().gameSettings.fancyGraphics) {
             GL11.glPushMatrix();
-            GL11.glTranslatef(-cc.pos.getX(), -cc.pos.getY(), -cc.pos.getZ());
+            GL11.glTranslatef(-cc.getPos().getX(), -cc.getPos().getY(), -cc.getPos().getZ());
             if (perc > 0.75F) {
                 float jiggle = perc - 0.75F;
                 jiggle /= 32; //this gets us 1 pixel of jiggle room
@@ -126,7 +124,7 @@ public class TileEntityCompressionCrafterRenderer extends TileEntitySpecialRende
             if (fd.getDirectionVec().getY() != 0) sy = s;
             if (fd.getDirectionVec().getZ() != 0) sz = s;
             GL11.glScalef(sx, sy, sz);
-            GL11.glTranslatef(lo.x - cc.pos.getX(), lo.y - cc.pos.getY(), lo.z - cc.pos.getZ());
+            GL11.glTranslatef(lo.x - cc.getPos().getX(), lo.y - cc.getPos().getY(), lo.z - cc.getPos().getZ());
             sx -= 1;
             sy -= 1;
             sz -= 1;

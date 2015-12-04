@@ -18,8 +18,8 @@ import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.Vec3;
 import net.minecraft.util.EnumFacing;
+import net.minecraft.util.Vec3;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -311,7 +311,7 @@ public class Awakener {
     }
 
     BodySide getSide(Set<Coord> set) {
-        return one(set).z > heartTE.pos.getZ() ? BodySide.RIGHT : BodySide.LEFT;
+        return one(set).z > heartTE.getPos().getZ() ? BodySide.RIGHT : BodySide.LEFT;
     }
 
     Vec3 calculateJointPosition(Set<Coord> limb, int size, int length, LimbType type) {

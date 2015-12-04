@@ -1,7 +1,6 @@
 package factorization.misc;
 
-import java.util.ArrayList;
-
+import factorization.api.Coord;
 import net.minecraft.block.Block;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.Item;
@@ -11,7 +10,8 @@ import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent.Phase;
 import net.minecraftforge.fml.common.gameevent.TickEvent.ServerTickEvent;
-import factorization.api.Coord;
+
+import java.util.ArrayList;
 
 public class Mushroomalizer {
     Item red_mushroom = new ItemStack(Blocks.red_mushroom_block).getItem();

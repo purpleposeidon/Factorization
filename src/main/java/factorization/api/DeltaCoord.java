@@ -5,8 +5,8 @@ import factorization.api.datahelpers.DataHelper;
 import factorization.api.datahelpers.IDataSerializable;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.util.Vec3;
 import net.minecraft.util.EnumFacing;
+import net.minecraft.util.Vec3;
 
 import java.io.IOException;
 

@@ -1,7 +1,6 @@
 package factorization.coremodhooks;
 
 import net.minecraft.entity.Entity;
-import net.minecraft.world.World;
 import net.minecraft.world.chunk.Chunk;
 
 public class MixinExtraChunkData extends Chunk implements IExtraChunkData {

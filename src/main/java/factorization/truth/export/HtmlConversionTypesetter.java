@@ -2,15 +2,12 @@ package factorization.truth.export;
 
 import factorization.truth.AbstractTypesetter;
 import factorization.truth.api.*;
-import factorization.truth.word.ItemWord;
-import factorization.truth.word.TextWord;
 import factorization.truth.word.Word;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.IIcon;
 
 import java.io.OutputStream;
 import java.io.PrintStream;
-import java.util.ArrayList;
 import java.util.Collection;
 
 public class HtmlConversionTypesetter extends AbstractTypesetter implements IHtmlTypesetter {

@@ -1,30 +1,29 @@
 package factorization.charge;
 
-import java.io.IOException;
-import java.util.Random;
-
-import factorization.shared.*;
+import factorization.api.Charge;
+import factorization.api.Coord;
+import factorization.api.IChargeConductor;
+import factorization.api.datahelpers.DataHelper;
+import factorization.api.datahelpers.Share;
+import factorization.common.BlockIcons;
+import factorization.common.FactoryType;
+import factorization.shared.BlockClass;
+import factorization.shared.Core;
+import factorization.shared.NetworkFactorization.MessageType;
+import factorization.shared.TileEntityCommon;
 import factorization.util.ItemUtil;
 import factorization.util.NumUtil;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.util.EnumFacing;
 import net.minecraft.util.IIcon;
 import net.minecraft.util.Vec3;
-import net.minecraft.util.EnumFacing;
-import net.minecraftforge.fml.common.network.internal.FMLProxyPacket;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
-import factorization.api.Charge;
-import factorization.api.Coord;
-import factorization.api.IChargeConductor;
-import factorization.api.datahelpers.DataHelper;
-import factorization.api.datahelpers.DataInNBT;
-import factorization.api.datahelpers.DataOutNBT;
-import factorization.api.datahelpers.Share;
-import factorization.common.BlockIcons;
-import factorization.common.FactoryType;
-import factorization.shared.NetworkFactorization.MessageType;
+
+import java.io.IOException;
+import java.util.Random;
 
 public class TileEntityLeydenJar extends TileEntityCommon implements IChargeConductor {
     private Charge charge = new Charge(this);

@@ -1,13 +1,17 @@
 package factorization.crafting;
 
-import java.io.IOException;
-import java.util.ArrayList;
-
+import factorization.api.Coord;
 import factorization.api.datahelpers.DataHelper;
 import factorization.api.datahelpers.Share;
+import factorization.common.BlockIcons;
+import factorization.common.FactoryType;
 import factorization.notify.Notice;
-import factorization.shared.*;
+import factorization.shared.BlockClass;
+import factorization.shared.Core;
+import factorization.shared.NetworkFactorization.MessageType;
+import factorization.shared.TileEntityCommon;
 import factorization.util.InvUtil;
+import factorization.util.InvUtil.FzInv;
 import factorization.util.ItemUtil;
 import factorization.util.SpaceUtil;
 import io.netty.buffer.ByteBuf;
@@ -16,15 +20,13 @@ import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.AxisAlignedBB;
-import net.minecraft.util.IIcon;
 import net.minecraft.util.EnumFacing;
+import net.minecraft.util.IIcon;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
-import factorization.api.Coord;
-import factorization.common.BlockIcons;
-import factorization.common.FactoryType;
-import factorization.util.InvUtil.FzInv;
-import factorization.shared.NetworkFactorization.MessageType;
+
+import java.io.IOException;
+import java.util.ArrayList;
 
 public class TileEntityCompressionCrafter extends TileEntityCommon {
     static ThreadLocal<CompressionState> states = new ThreadLocal();

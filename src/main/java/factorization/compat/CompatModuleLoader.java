@@ -1,10 +1,10 @@
 package factorization.compat;
 
+import factorization.shared.Core;
 import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
-import factorization.shared.Core;
 
 import java.util.ArrayList;
 import java.util.Locale;

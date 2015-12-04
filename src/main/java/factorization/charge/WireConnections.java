@@ -1,19 +1,18 @@
 package factorization.charge;
 
-import java.util.ArrayList;
-
-import net.minecraft.block.Block;
-import net.minecraft.init.Blocks;
-import net.minecraft.util.MovingObjectPosition;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.Vec3;
-import net.minecraft.world.World;
 import factorization.api.Coord;
 import factorization.api.DeltaCoord;
 import factorization.api.IChargeConductor;
 import factorization.api.VectorUV;
 import factorization.common.BlockIcons;
 import factorization.shared.Core;
+import net.minecraft.block.Block;
+import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.MovingObjectPosition;
+import net.minecraft.util.Vec3;
+import net.minecraft.world.World;
+
+import java.util.ArrayList;
 
 public class WireConnections {
     TileEntityWire me;

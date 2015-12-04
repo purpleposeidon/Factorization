@@ -1,7 +1,6 @@
 package factorization.util;
 
 import com.mojang.authlib.GameProfile;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import factorization.api.Coord;
 import factorization.shared.Core;
 import io.netty.channel.ChannelHandler;
@@ -11,11 +10,10 @@ import io.netty.channel.ChannelPromise;
 import io.netty.channel.embedded.EmbeddedChannel;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.enchantment.EnchantmentHelper;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.item.ItemStack;
+import net.minecraft.network.EnumPacketDirection;
 import net.minecraft.network.NetHandlerPlayServer;
 import net.minecraft.network.NetworkManager;
 import net.minecraft.network.Packet;
@@ -25,15 +23,12 @@ import net.minecraft.potion.PotionEffect;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.management.ServerConfigurationManager;
 import net.minecraft.stats.StatisticsFile;
-import net.minecraft.util.ChunkCoordinates;
-import net.minecraft.util.MovingObjectPosition;
-import net.minecraft.util.StringUtils;
-import net.minecraft.util.Vec3;
+import net.minecraft.util.*;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;
 import net.minecraftforge.common.util.FakePlayer;
-import net.minecraft.util.EnumFacing;
 import net.minecraftforge.event.world.WorldEvent;
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -112,7 +107,7 @@ public final class PlayerUtil {
         if (player == null) return false;
         MinecraftServer server = MinecraftServer.getServer();
         if (server == null) return false;
-        return server.getConfigurationManager().func_152596_g(player.getGameProfile());
+        return server.getConfigurationManager().canSendCommands(player.getGameProfile());
     }
 
     public static boolean isCommandSenderOpped(ICommandSender player) {
@@ -130,7 +125,7 @@ public final class PlayerUtil {
         MinecraftServer server = MinecraftServer.getServer();
         if (server == null) return null;
         ServerConfigurationManager cm = server.getConfigurationManager();
-        return cm.func_152602_a(player);
+        return cm.getPlayerStatsFile(player);
     }
 
     public static int getPuntStrengthOrWeakness(EntityPlayer player) {
@@ -145,7 +140,7 @@ public final class PlayerUtil {
         if (p_wea != null) {
             strength -= p_wea.getAmplifier() + 1;
         }
-        int knockback = EnchantmentHelper.getKnockbackModifier(player, null);
+        int knockback = EnchantmentHelper.getKnockbackModifier(player);
         return strength * knockback;
     }
 
@@ -163,7 +158,7 @@ public final class PlayerUtil {
 
     private static class FakeNetManager extends NetworkManager {
         public FakeNetManager() {
-            super(false);
+            super(EnumPacketDirection.CLIENTBOUND);
             this.channel = new EmbeddedChannel(new ChannelHandler() {
                 @Override public void handlerAdded(ChannelHandlerContext ctx) throws Exception { }
                 @Override public void handlerRemoved(ChannelHandlerContext ctx) throws Exception { }
@@ -194,12 +189,12 @@ public final class PlayerUtil {
         }
 
         @Override
-        public ChunkCoordinates getPlayerCoordinates() {
-            return new ChunkCoordinates(where.x, where.y, where.z);
+        public BlockPos getPosition() {
+            return where.toBlockPos();
         }
 
         @Override
-        public boolean isEntityInvulnerable() {
+        public boolean isEntityInvulnerable(DamageSource source) {
             return true;
         }
     }
@@ -208,7 +203,7 @@ public final class PlayerUtil {
         Vec3 pos = new Vec3(player.posX, player.posY + (player.getEyeHeight() - player.getDefaultEyeHeight()), player.posZ);
         Vec3 look = player.getLook(partial);
         Vec3 ray = pos.addVector(look.xCoord * dist, look.yCoord * dist, look.zCoord * dist);
-        return player.worldObj.func_147447_a(pos, ray, false, false, true);
+        return player.worldObj.rayTraceBlocks(pos, ray, false, false, true);
     }
 
     public static ItemStack decr(EntityPlayer player, ItemStack stack) {

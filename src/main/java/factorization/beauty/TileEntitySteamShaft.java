@@ -1,7 +1,5 @@
 package factorization.beauty;
 
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
 import factorization.api.IMeterInfo;
 import factorization.api.IRotationalEnergySource;
 import factorization.api.Quaternion;
@@ -19,10 +17,12 @@ import factorization.util.NumUtil;
 import factorization.util.SpaceUtil;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.client.Minecraft;
+import net.minecraft.util.EnumFacing;
 import net.minecraft.util.IIcon;
 import net.minecraft.util.Vec3;
-import net.minecraft.util.EnumFacing;
 import net.minecraftforge.fluids.*;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 import java.io.IOException;
 import java.util.Random;

@@ -1,11 +1,11 @@
 package factorization.servo;
 
-import net.minecraftforge.fml.common.network.internal.FMLNetworkHandler;
-import net.minecraftforge.fml.common.network.internal.FMLProxyPacket;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
-import factorization.api.*;
-import factorization.api.datahelpers.*;
+import factorization.api.Coord;
+import factorization.api.FzColor;
+import factorization.api.datahelpers.DataHelper;
+import factorization.api.datahelpers.DataInByteBuf;
+import factorization.api.datahelpers.DataInByteBufClientEdited;
+import factorization.api.datahelpers.Share;
 import factorization.common.FactoryType;
 import factorization.shared.*;
 import factorization.shared.NetworkFactorization.MessageType;
@@ -28,9 +28,15 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.Packet;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.*;
-import net.minecraft.world.World;
+import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.EnumFacing;
+import net.minecraft.util.MovingObjectPosition;
+import net.minecraft.util.Vec3;
+import net.minecraft.world.World;
+import net.minecraftforge.fml.common.network.internal.FMLNetworkHandler;
+import net.minecraftforge.fml.common.network.internal.FMLProxyPacket;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -490,7 +496,7 @@ public class ServoMotor extends AbstractServoMachine implements IInventory, ISoc
     }
 
     @Override
-    public Vec3 getPos() {
+    public Vec3 getServoPos() {
         return SpaceUtil.fromEntPos(this);
     }
 
