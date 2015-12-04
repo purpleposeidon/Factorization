@@ -15,7 +15,6 @@ import factorization.fzds.interfaces.Interpolation;
 import factorization.servo.ServoMotor;
 import factorization.shared.Core;
 import factorization.shared.EntityReference;
-import factorization.shared.FactorizationBlockRender;
 import factorization.sockets.ISocketHolder;
 import factorization.sockets.SocketBareMotor;
 import factorization.sockets.TileEntitySocketBase;
@@ -432,7 +431,7 @@ public class SocketPoweredCrank extends TileEntitySocketBase implements IChargeC
     @Override
     public Vec3 getPos() {
         double d = 0.5;
-        return new Vec3(xCoord + d, yCoord + d, zCoord + d);
+        return new Vec3(pos.getX() + d, pos.getY() + d, pos.getZ() + d);
     }
 
     @Override

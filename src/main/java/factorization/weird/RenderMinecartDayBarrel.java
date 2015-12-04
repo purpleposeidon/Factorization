@@ -1,7 +1,6 @@
 package factorization.weird;
 
 import factorization.common.FactoryType;
-import factorization.shared.FactorizationBlockRender;
 import net.minecraft.block.Block;
 import net.minecraft.client.renderer.RenderBlocks;
 import net.minecraft.client.renderer.Tessellator;

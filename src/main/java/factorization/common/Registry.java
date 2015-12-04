@@ -91,7 +91,7 @@ public class Registry {
     public ItemBlockResource item_resource;
     public BlockFactorization factory_block, factory_block_barrel;
     public BlockFactorization factory_rendering_block;
-    public BlockRenderHelper blockRender = null, serverTraceHelper = null, clientTraceHelper = null;
+    public Block serverTraceHelper = null, clientTraceHelper = null;
     public BlockLightAir lightair_block;
     public BlockResource resource_block;
     public Block dark_iron_ore;

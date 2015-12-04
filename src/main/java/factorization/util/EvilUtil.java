@@ -45,16 +45,16 @@ public class EvilUtil {
 
     public static void forceSpawn(TileEntity te, Entity ent) {
         ent.worldObj.spawnEntityInWorld(ent);
-        ent.worldObj.playAuxSFX(2004, te.xCoord, te.yCoord, te.zCoord, 0);
+        ent.worldObj.playAuxSFX(2004, te.pos.getX(), te.pos.getY(), te.pos.getZ(), 0);
         if (ent instanceof EntityLiving) {
             ((EntityLiving) ent).spawnExplosionParticle();
         }
     }
 
     public static void positionEntity(TileEntity te, Random random, int range, Entity ent) {
-        double x = te.xCoord + randNear(random, range);
-        double y = te.yCoord + randNear(random, range);
-        double z = te.zCoord + randNear(random, range);
+        double x = te.pos.getX() + randNear(random, range);
+        double y = te.pos.getY() + randNear(random, range);
+        double z = te.pos.getZ() + randNear(random, range);
         ent.setLocationAndAngles(x, y, z, random.nextFloat() * 360.0F, 0.0F);
     }
 

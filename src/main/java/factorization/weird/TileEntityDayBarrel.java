@@ -141,7 +141,7 @@ public class TileEntityDayBarrel extends TileEntityFactorization implements ISor
         if (orientation == FzOrientation.UNKNOWN) {
             return;
         }
-        if (notice_target == this && worldObj.getBlockPowerInput(xCoord, yCoord, zCoord) > 0) {
+        if (notice_target == this && worldObj.getBlockPowerInput(pos.getX(), pos.getY(), pos.getZ()) > 0) {
             return;
         }
         boolean youve_changed_jim = false;
@@ -323,7 +323,7 @@ public class TileEntityDayBarrel extends TileEntityFactorization implements ISor
     }
     
     @Override
-    public void onPlacedBy(EntityPlayer player, ItemStack is, int side, float hitX, float hitY, float hitZ) {
+    public void onPlacedBy(EntityPlayer player, ItemStack is, EnumFacing side, float hitX, float hitY, float hitZ) {
         orientation = SpaceUtil.getOrientation(player, side, hitX, hitY, hitZ);
         loadFromStack(is);
         needLogic();
@@ -526,7 +526,7 @@ public class TileEntityDayBarrel extends TileEntityFactorization implements ISor
                 spammed = true;
             }
         }
-        worldObj.markTileEntityChunkModified(xCoord, yCoord, zCoord, this);
+        worldObj.markTileEntityChunkModified(pos.getX(), pos.getY(), pos.getZ(), this);
     }
 
     @Override

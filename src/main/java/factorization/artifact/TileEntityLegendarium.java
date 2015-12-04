@@ -251,7 +251,7 @@ public class TileEntityLegendarium extends TileEntityCommon {
     }
 
     @Override
-    public boolean canPlaceAgainst(EntityPlayer player, Coord c, int side) {
+    public boolean canPlaceAgainst(EntityPlayer player, Coord c, EnumFacing side) {
         if (c.w.isRemote) return true;
         LegendariumPopulation population = LegendariumPopulation.load();
         final String free = population.isFree(c.w);
@@ -263,7 +263,7 @@ public class TileEntityLegendarium extends TileEntityCommon {
     }
 
     @Override
-    public void onPlacedBy(EntityPlayer player, ItemStack is, int side, float hitX, float hitY, float hitZ) {
+    public void onPlacedBy(EntityPlayer player, ItemStack is, EnumFacing side, float hitX, float hitY, float hitZ) {
         super.onPlacedBy(player, is, side, hitX, hitY, hitZ);
         if (worldObj.isRemote) return;
         LegendariumPopulation population = LegendariumPopulation.load();
@@ -308,8 +308,8 @@ public class TileEntityLegendarium extends TileEntityCommon {
         Collections.sort(ret, new Comparator<EntityPoster>() {
             @Override
             public int compare(EntityPoster o1, EntityPoster o2) {
-                double d1 = o1.getDistanceSq(xCoord, yCoord, zCoord);
-                double d2 = o2.getDistanceSq(xCoord, yCoord, zCoord);
+                double d1 = o1.getDistanceSq(pos.getX(), pos.getY(), pos.getZ());
+                double d2 = o2.getDistanceSq(pos.getX(), pos.getY(), pos.getZ());
                 if (d1 > d2) return +1;
                 if (d1 < d2) return -1;
                 return 0;
@@ -441,7 +441,7 @@ public class TileEntityLegendarium extends TileEntityCommon {
     }
 
     void scheduleTick() {
-        worldObj.scheduleBlockUpdate(xCoord, yCoord, zCoord, new Coord(this).getBlock(), (int) getWaitTicks());
+        worldObj.scheduleBlockUpdate(pos.getX(), pos.getY(), pos.getZ(), new Coord(this).getBlock(), (int) getWaitTicks());
     }
 
     @Override

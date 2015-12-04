@@ -1,23 +1,21 @@
 package factorization.common;
 
+import factorization.api.Coord;
 import factorization.artifact.ContainerForge;
-import net.minecraft.client.renderer.texture.IIconRegister;
+import factorization.oreprocessing.ContainerCrystallizer;
+import factorization.oreprocessing.ContainerSlagFurnace;
+import factorization.shared.TileEntityFactorization;
+import factorization.weird.ContainerPocket;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.inventory.Container;
 import net.minecraft.profiler.Profiler;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.BlockPos;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.FakePlayer;
 import net.minecraftforge.fml.common.network.IGuiHandler;
-import factorization.api.Coord;
-import factorization.crafting.ContainerMixer;
-import factorization.oreprocessing.ContainerCrystallizer;
-import factorization.oreprocessing.ContainerSlagFurnace;
-import factorization.shared.BlockRenderHelper;
-import factorization.shared.TileEntityFactorization;
-import factorization.weird.ContainerPocket;
 
 public class FactorizationProxy implements IGuiHandler {
 
@@ -33,7 +31,7 @@ public class FactorizationProxy implements IGuiHandler {
             return new ContainerForge(new Coord(world, x, y, z), player);
         }
 
-        TileEntity te = world.getTileEntity(x, y, z);
+        TileEntity te = world.getTileEntity(new BlockPos(x, y, z));
         if (!(te instanceof TileEntityFactorization)) {
             return null;
         }
@@ -41,8 +39,6 @@ public class FactorizationProxy implements IGuiHandler {
         ContainerFactorization cont;
         if (ID == FactoryType.SLAGFURNACE.gui) {
             cont = new ContainerSlagFurnace(player, fac);
-        } else if (ID == FactoryType.MIXER.gui) {
-            cont = new ContainerMixer(player, fac);
         } else if (ID == FactoryType.CRYSTALLIZER.gui) {
             cont = new ContainerCrystallizer(player, fac);
         } else {
@@ -89,13 +85,7 @@ public class FactorizationProxy implements IGuiHandler {
         //XXX TODO: Figure this out.
         return true;
     }
-    
-    public void texturepackChanged(IIconRegister reg) {} // NORELEASE: There's an event now.
-    
-    public boolean BlockRenderHelper_has_texture(BlockRenderHelper block, int f) { return true; }
-    
-    public void BlockRenderHelper_clear_texture(BlockRenderHelper block) { }
-    
+
     public String getPocketCraftingTableKey() { return null; }
     
     public boolean isClientHoldingShift() { return false; }

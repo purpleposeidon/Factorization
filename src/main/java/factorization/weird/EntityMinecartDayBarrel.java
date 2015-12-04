@@ -68,7 +68,7 @@ public class EntityMinecartDayBarrel extends EntityMinecart implements IInventor
         if (barrel != null) return;
         barrel = new TileEntityDayBarrel();
         barrel.setWorldObj(worldObj);
-        barrel.xCoord = barrel.yCoord = barrel.zCoord = 0;
+        barrel.pos.getX() = barrel.pos.getY() = barrel.pos.getZ() = 0;
         barrel.validate();
         barrel.orientation = FzOrientation.fromDirection(EnumFacing.WEST).pointTopTo(EnumFacing.UP);
         barrel.notice_target = this;
@@ -157,9 +157,9 @@ public class EntityMinecartDayBarrel extends EntityMinecart implements IInventor
         }
 
         if (!worldObj.isRemote) {
-            barrel.xCoord = MathHelper.floor_double(posX);
-            barrel.yCoord = MathHelper.floor_double(posY);
-            barrel.zCoord = MathHelper.floor_double(posZ);
+            barrel.pos.getX() = MathHelper.floor_double(posX);
+            barrel.pos.getY() = MathHelper.floor_double(posY);
+            barrel.pos.getZ() = MathHelper.floor_double(posZ);
             if (activatorRailTicks > 0) activatorRailTicks--;
 
             if (barrel.canUpdate() && activatorRailTicks <= 0 && worldObj.getTotalWorldTime() % barrel.getLogicSpeed() == 0) {

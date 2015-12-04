@@ -18,7 +18,6 @@ import net.minecraftforge.fluids.IFluidHandler;
 
 import org.lwjgl.opengl.GL11;
 
-import net.minecraftforge.fml.common.network.internal.FMLProxyPacket;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import factorization.api.Charge;
@@ -228,7 +227,7 @@ public abstract class SocketFanturpeller extends TileEntitySocketBase implements
             block.setBlockBounds(d, d + yd + yoffset + 2F/16F + sd, d, 1 - d, 1 - (d + 0F/16F) + yd + yoffset, 1 - d);
             block.beginWithMirroredUVs();
             block.rotateCenter(rotation);
-            block.renderRotated(tess, xCoord, yCoord, zCoord);
+            block.renderRotated(tess, pos.getX(), pos.getY(), pos.getZ());
         }
     }
     

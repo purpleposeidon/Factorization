@@ -99,7 +99,7 @@ public class TileEntityAnthroGen extends TileEntityCommon implements IInventory,
     @Override
     public boolean handleMessageFromServer(NetworkFactorization.MessageType messageType, ByteBuf input) throws IOException {
         if (messageType == NetworkFactorization.MessageType.GeneratorParticles) {
-            worldObj.spawnParticle("flame", xCoord + 0.5, yCoord + 0.5, zCoord + 0.5, 0, 0, 0);
+            worldObj.spawnParticle("flame", pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5, 0, 0, 0);
             return true;
         }
         return super.handleMessageFromServer(messageType, input);

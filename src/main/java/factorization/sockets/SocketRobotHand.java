@@ -278,7 +278,7 @@ public class SocketRobotHand extends TileEntitySocketBase {
         if (motor != null) {
             block.translate(0, -2F/16F, 0);
         }
-        block.renderRotated(tess, xCoord, yCoord, zCoord);
+        block.renderRotated(tess, pos.getX(), pos.getY(), pos.getZ());
     }
     
     @Override

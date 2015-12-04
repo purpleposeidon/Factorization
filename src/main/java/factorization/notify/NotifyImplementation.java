@@ -15,7 +15,6 @@ import net.minecraft.world.World;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.util.FakePlayer;
 import net.minecraftforge.fml.common.FMLCommonHandler;
-import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.Mod.EventHandler;
 import net.minecraftforge.fml.common.SidedProxy;
@@ -91,9 +90,9 @@ public class NotifyImplementation {
                 } else if (where instanceof TileEntity) {
                     TileEntity te = (TileEntity) where;
                     world = te.getWorld();
-                    x = te.xCoord;
-                    y = te.yCoord;
-                    z = te.zCoord;
+                    x = te.pos.getX();
+                    y = te.pos.getY();
+                    z = te.pos.getZ();
                 } else if (where instanceof Entity) {
                     Entity ent = (Entity) where;
                     world = ent.worldObj;

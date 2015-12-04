@@ -99,7 +99,7 @@ public class SocketScissors extends TileEntitySocketBase implements ICaptureDrop
     @Override
     public void genericUpdate(ISocketHolder socket, Coord coord, boolean powered) {
         if (sound) {
-            worldObj.playSound(xCoord, yCoord, zCoord, "mob.sheep.shear", 1, 1, false);
+            worldObj.playSound(pos.getX(), pos.getY(), pos.getZ(), "mob.sheep.shear", 1, 1, false);
         }
         sound = false;
         if (worldObj.isRemote) return;

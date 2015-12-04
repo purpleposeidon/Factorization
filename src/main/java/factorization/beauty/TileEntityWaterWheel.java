@@ -103,7 +103,7 @@ public class TileEntityWaterWheel extends TileEntityCommon implements IRotationa
     }
 
     @Override
-    public void onPlacedBy(EntityPlayer player, ItemStack is, int side, float hitX, float hitY, float hitZ) {
+    public void onPlacedBy(EntityPlayer player, ItemStack is, EnumFacing side, float hitX, float hitY, float hitZ) {
         super.onPlacedBy(player, is, side, hitX, hitY, hitZ);
         wheelDirection = SpaceUtil.getOrientation(side);
         if (wheelDirection.getDirectionVec().getY() != 0) {

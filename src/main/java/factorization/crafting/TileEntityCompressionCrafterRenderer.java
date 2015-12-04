@@ -83,7 +83,7 @@ public class TileEntityCompressionCrafterRenderer extends TileEntitySpecialRende
         block.rotateCenter(q);
         
         Tessellator.instance.startDrawingQuads();
-        Tessellator.instance.setBrightness(block.getMixedBrightnessForBlock(cc.getWorld(), cc.xCoord, cc.yCoord, cc.zCoord));
+        Tessellator.instance.setBrightness(block.getMixedBrightnessForBlock(cc.getWorld(), cc.pos.getX(), cc.pos.getY(), cc.pos.getZ()));
         GL11.glDisable(GL11.GL_LIGHTING);
         block.renderForTileEntity();
         Tessellator.instance.draw();
@@ -91,7 +91,7 @@ public class TileEntityCompressionCrafterRenderer extends TileEntitySpecialRende
         if (cc.isPrimaryCrafter() && cc.upperCorner != null && cc.lowerCorner != null
                 && Minecraft.getMinecraft().gameSettings.fancyGraphics) {
             GL11.glPushMatrix();
-            GL11.glTranslatef(-cc.xCoord, -cc.yCoord, -cc.zCoord);
+            GL11.glTranslatef(-cc.pos.getX(), -cc.pos.getY(), -cc.pos.getZ());
             if (perc > 0.75F) {
                 float jiggle = perc - 0.75F;
                 jiggle /= 32; //this gets us 1 pixel of jiggle room
@@ -126,7 +126,7 @@ public class TileEntityCompressionCrafterRenderer extends TileEntitySpecialRende
             if (fd.getDirectionVec().getY() != 0) sy = s;
             if (fd.getDirectionVec().getZ() != 0) sz = s;
             GL11.glScalef(sx, sy, sz);
-            GL11.glTranslatef(lo.x - cc.xCoord, lo.y - cc.yCoord, lo.z - cc.zCoord);
+            GL11.glTranslatef(lo.x - cc.pos.getX(), lo.y - cc.pos.getY(), lo.z - cc.pos.getZ());
             sx -= 1;
             sy -= 1;
             sz -= 1;

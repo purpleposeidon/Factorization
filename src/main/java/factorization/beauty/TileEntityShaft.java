@@ -1,7 +1,5 @@
 package factorization.beauty;
 
-import net.minecraftforge.fml.common.FMLCommonHandler;
-import net.minecraftforge.fml.relauncher.Side;
 import factorization.api.Coord;
 import factorization.api.IRotationalEnergySource;
 import factorization.api.datahelpers.DataHelper;
@@ -215,11 +213,11 @@ public class TileEntityShaft extends TileEntityCommon implements IRotationalEner
         float l = 0.5F - 2F / 16F;
         float h = 1 - l;
         if (dir == EnumFacing.SOUTH) {
-            return new AxisAlignedBB(xCoord + l, yCoord + l, zCoord + 0, xCoord + h, yCoord + h, zCoord + 1);
+            return new AxisAlignedBB(pos.getX() + l, pos.getY() + l, pos.getZ() + 0, pos.getX() + h, pos.getY() + h, pos.getZ() + 1);
         } else if (dir == EnumFacing.EAST) {
-            return new AxisAlignedBB(xCoord + 0, yCoord + l, zCoord + l, xCoord + 1, yCoord + h, zCoord + h);
+            return new AxisAlignedBB(pos.getX() + 0, pos.getY() + l, pos.getZ() + l, pos.getX() + 1, pos.getY() + h, pos.getZ() + h);
         } else { // UP
-            return new AxisAlignedBB(xCoord + l, yCoord + 0, zCoord + l, xCoord + h, yCoord + 1, zCoord + h);
+            return new AxisAlignedBB(pos.getX() + l, pos.getY() + 0, pos.getZ() + l, pos.getX() + h, pos.getY() + 1, pos.getZ() + h);
         }
     }
 
@@ -228,7 +226,7 @@ public class TileEntityShaft extends TileEntityCommon implements IRotationalEner
         // TODO: This belongs... somewhere else
         BlockRenderHelper block = worldObj.isRemote ? Core.registry.clientTraceHelper : Core.registry.serverTraceHelper;
         setBlockBounds(block);
-        return block.collisionRayTrace(worldObj, xCoord, yCoord, zCoord, startVec, endVec);
+        return block.collisionRayTrace(worldObj, pos.getX(), pos.getY(), pos.getZ(), startVec, endVec);
     }
 
     @Override
@@ -288,7 +286,7 @@ public class TileEntityShaft extends TileEntityCommon implements IRotationalEner
 
 
     @Override
-    public void onPlacedBy(EntityPlayer player, ItemStack is, int side, float hitX, float hitY, float hitZ) {
+    public void onPlacedBy(EntityPlayer player, ItemStack is, EnumFacing side, float hitX, float hitY, float hitZ) {
         super.onPlacedBy(player, is, side, hitX, hitY, hitZ);
         joinAdjacent(player, side);
         invalidateConnections();

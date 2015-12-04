@@ -382,7 +382,7 @@ public class TileEntityGreenware extends TileEntityCommon implements IFurnaceHea
     }
 
     @Override
-    public void onPlacedBy(EntityPlayer player, ItemStack is, int side, float hitX, float hitY, float hitZ) {
+    public void onPlacedBy(EntityPlayer player, ItemStack is, EnumFacing side, float hitX, float hitY, float hitZ) {
         super.onPlacedBy(player, is, side, hitX, hitY, hitZ);
         NBTTagCompound tag = null;
         if (is.hasTagCompound()) {
@@ -611,13 +611,13 @@ public class TileEntityGreenware extends TileEntityCommon implements IFurnaceHea
         for (int dx = -1; dx <= 1; dx++) {
             for (int dy = -1; dy <= 1; dy++) {
                 for (int dz = -1; dz <= 1; dz++) {
-                    AxisAlignedBB ab = new AxisAlignedBB(xCoord + dx, yCoord + dy, zCoord + dz, xCoord + dx + 1, yCoord + dy + 1, zCoord + dz + 1);
+                    AxisAlignedBB ab = new AxisAlignedBB(pos.getX() + dx, pos.getY() + dy, pos.getZ() + dz, pos.getX() + dx + 1, pos.getY() + dy + 1, pos.getZ() + dz + 1);
                     Coord c = getCoord();
                     c.x += dx;
                     c.y += dy;
                     c.z += dz;
                     lump.toRotatedBlockBounds(this, block);
-                    AxisAlignedBB in = block.getCollisionBoundingBoxFromPool(worldObj, xCoord, yCoord, zCoord);
+                    AxisAlignedBB in = block.getCollisionBoundingBoxFromPool(worldObj, pos.getX(), pos.getY(), pos.getZ());
                     if (ab.intersectsWith(in)) {
                         // This block needs to be an Extension, or this
                         if (c.isAir() || c.isReplacable()) {
@@ -822,7 +822,7 @@ public class TileEntityGreenware extends TileEntityCommon implements IFurnaceHea
         for (int i = 0; i < parts.size(); i++) {
             ClayLump lump = parts.get(i);
             lump.toRotatedBlockBounds(this, block);
-            MovingObjectPosition mop = block.collisionRayTrace(worldObj, xCoord, yCoord, zCoord, startVec, endVec);
+            MovingObjectPosition mop = block.collisionRayTrace(worldObj, pos.getX(), pos.getY(), pos.getZ(), startVec, endVec);
             if (mop != null) {
                 mop.subHit = i;
                 if (shortest == null) {
@@ -926,7 +926,7 @@ public class TileEntityGreenware extends TileEntityCommon implements IFurnaceHea
 
     @Override
     public AxisAlignedBB getRenderBoundingBox() {
-        AxisAlignedBB bb = new AxisAlignedBB(xCoord - 2, yCoord - 2, zCoord - 2, xCoord + 2, yCoord + 2, zCoord + 2);
+        AxisAlignedBB bb = new AxisAlignedBB(pos.getX() - 2, pos.getY() - 2, pos.getZ() - 2, pos.getX() + 2, pos.getY() + 2, pos.getZ() + 2);
         return bb;
     }
 
@@ -943,14 +943,14 @@ public class TileEntityGreenware extends TileEntityCommon implements IFurnaceHea
         ClayState state = getState();
         if (state == ClayState.WET) {
             block.setBlockBounds(0, 0, 0, 1, 1F / 8F, 1);
-            AxisAlignedBB a = block.getCollisionBoundingBoxFromPool(worldObj, xCoord, yCoord, zCoord);
+            AxisAlignedBB a = block.getCollisionBoundingBoxFromPool(worldObj, pos.getX(), pos.getY(), pos.getZ());
             if (aabb.intersectsWith(a)) {
                 list.add(a);
             }
         }
         for (ClayLump lump : parts) {
             lump.toRotatedBlockBounds(this, block);
-            AxisAlignedBB a = block.getCollisionBoundingBoxFromPool(worldObj, xCoord, yCoord, zCoord);
+            AxisAlignedBB a = block.getCollisionBoundingBoxFromPool(worldObj, pos.getX(), pos.getY(), pos.getZ());
             if (aabb.intersectsWith(a)) {
                 list.add(a);
             }

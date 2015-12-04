@@ -5,33 +5,57 @@ import factorization.artifact.ContainerForge;
 import factorization.artifact.GuiArtifactForge;
 import factorization.artifact.RenderBrokenArtifact;
 import factorization.beauty.*;
-import factorization.charge.*;
+import factorization.ceramics.ItemRenderGlazeBucket;
+import factorization.ceramics.TileEntityGreenware;
+import factorization.ceramics.TileEntityGreenwareRender;
+import factorization.charge.TileEntityHeater;
+import factorization.charge.TileEntityHeaterRenderer;
+import factorization.charge.TileEntityLeydenJar;
+import factorization.charge.TileEntityLeydenJarRender;
 import factorization.citizen.EntityCitizen;
 import factorization.citizen.RenderCitizen;
-import factorization.mechanics.BlockRenderHinge;
+import factorization.colossi.ColossusController;
+import factorization.colossi.ColossusControllerRenderer;
+import factorization.crafting.TileEntityCompressionCrafter;
+import factorization.crafting.TileEntityCompressionCrafterRenderer;
+import factorization.darkiron.BlockDarkIronOre;
+import factorization.darkiron.GlintRenderer;
 import factorization.mechanics.SocketPoweredCrank;
 import factorization.mechanics.TileEntityHinge;
 import factorization.mechanics.TileEntityHingeRenderer;
+import factorization.oreprocessing.*;
+import factorization.redstone.GuiParasieve;
 import factorization.rendersorting.RenderSorter;
+import factorization.servo.RenderServoMotor;
+import factorization.servo.ServoMotor;
 import factorization.servo.stepper.RenderStepperEngine;
 import factorization.servo.stepper.StepperEngine;
-import factorization.shared.*;
+import factorization.shared.Core;
+import factorization.shared.EmptyRender;
+import factorization.shared.ItemRenderCapture;
+import factorization.shared.TileEntityFactorization;
+import factorization.sockets.SocketLacerator;
+import factorization.sockets.SocketScissors;
+import factorization.sockets.TileEntitySocketRenderer;
+import factorization.sockets.fanturpeller.SocketFanturpeller;
+import factorization.twistedblock.TwistedRender;
+import factorization.utiligoo.GooRenderer;
 import factorization.weird.*;
 import factorization.weird.poster.EntityPoster;
 import factorization.weird.poster.RenderPoster;
+import factorization.wrath.TileEntityWrathLamp;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.audio.ISound;
 import net.minecraft.client.audio.PositionedSoundRecord;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.renderer.entity.RenderSnowball;
-import net.minecraft.client.renderer.texture.IIconRegister;
 import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
 import net.minecraft.client.settings.GameSettings;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.item.Item;
 import net.minecraft.network.play.client.C07PacketPlayerDigging;
 import net.minecraft.profiler.Profiler;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.BlockPos;
 import net.minecraft.util.MovingObjectPosition;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
@@ -40,44 +64,6 @@ import net.minecraftforge.fml.client.registry.ClientRegistry;
 import net.minecraftforge.fml.client.registry.RenderingRegistry;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.relauncher.Side;
-import factorization.ceramics.BlockRenderGreenware;
-import factorization.ceramics.ItemRenderGlazeBucket;
-import factorization.ceramics.TileEntityGreenware;
-import factorization.ceramics.TileEntityGreenwareRender;
-import factorization.colossi.ColossusController;
-import factorization.colossi.ColossusControllerRenderer;
-import factorization.crafting.BlockRenderCompressionCrafter;
-import factorization.crafting.BlockRenderMixer;
-import factorization.crafting.ContainerMixer;
-import factorization.crafting.GuiMixer;
-import factorization.crafting.GuiStamper;
-import factorization.crafting.TileEntityCompressionCrafter;
-import factorization.crafting.TileEntityCompressionCrafterRenderer;
-import factorization.crafting.TileEntityMixer;
-import factorization.crafting.TileEntityMixerRenderer;
-import factorization.darkiron.BlockDarkIronOre;
-import factorization.darkiron.GlintRenderer;
-import factorization.oreprocessing.BlockRenderCrystallizer;
-import factorization.oreprocessing.ContainerCrystallizer;
-import factorization.oreprocessing.ContainerSlagFurnace;
-import factorization.oreprocessing.GuiCrystallizer;
-import factorization.oreprocessing.GuiSlag;
-import factorization.oreprocessing.TileEntityCrystallizer;
-import factorization.oreprocessing.TileEntityCrystallizerRender;
-import factorization.oreprocessing.TileEntityGrinderRender;
-import factorization.servo.BlockRenderServoRail;
-import factorization.redstone.GuiParasieve;
-import factorization.servo.RenderServoMotor;
-import factorization.servo.ServoMotor;
-import factorization.sockets.BlockRenderSocketBase;
-import factorization.sockets.SocketLacerator;
-import factorization.sockets.SocketScissors;
-import factorization.sockets.TileEntitySocketRenderer;
-import factorization.sockets.fanturpeller.SocketFanturpeller;
-import factorization.twistedblock.TwistedRender;
-import factorization.utiligoo.GooRenderer;
-import factorization.wrath.BlockRenderLamp;
-import factorization.wrath.TileEntityWrathLamp;
 
 public class FactorizationClientProxy extends FactorizationProxy {
     public FactorizationKeyHandler keyHandler = new FactorizationKeyHandler();
@@ -108,7 +94,7 @@ public class FactorizationClientProxy extends FactorizationProxy {
             return new GuiArtifactForge(new ContainerForge(new Coord(world, x, y, z), player));
         }
         
-        TileEntity te = world.getTileEntity(x, y, z);
+        TileEntity te = world.getTileEntity(new BlockPos(x, y, z));
         if (!(te instanceof TileEntityFactorization)) {
             return null;
         }
@@ -116,22 +102,14 @@ public class FactorizationClientProxy extends FactorizationProxy {
         ContainerFactorization cont;
         if (ID == FactoryType.SLAGFURNACE.gui) {
             cont = new ContainerSlagFurnace(player, fac);
-        } else if (ID == FactoryType.MIXER.gui) {
-            cont = new ContainerMixer(player, fac);
         } else if (ID == FactoryType.CRYSTALLIZER.gui) {
             cont = new ContainerCrystallizer(player, fac);
         } else {
             cont = new ContainerFactorization(player, fac);
         }
         GuiScreen gui = null;
-        if (ID == FactoryType.STAMPER.gui) {
-            gui = new GuiStamper(cont);
-        }
         if (ID == FactoryType.SLAGFURNACE.gui) {
             gui = new GuiSlag(cont);
-        }
-        if (ID == FactoryType.MIXER.gui && cont instanceof ContainerMixer) {
-            gui = new GuiMixer((ContainerMixer) cont);
         }
         if (ID == FactoryType.CRYSTALLIZER.gui) {
             gui = new GuiCrystallizer(cont);
@@ -180,9 +158,7 @@ public class FactorizationClientProxy extends FactorizationProxy {
         setTileEntityRendererDispatcher(TileEntityGreenware.class, new TileEntityGreenwareRender());
         if (FzConfig.renderTEs) {
             setTileEntityRendererDispatcher(TileEntityHeater.class, new TileEntityHeaterRenderer());
-            setTileEntityRendererDispatcher(TileEntityMixer.class, new TileEntityMixerRenderer());
             setTileEntityRendererDispatcher(TileEntityCrystallizer.class, new TileEntityCrystallizerRender());
-            setTileEntityRendererDispatcher(TileEntitySteamTurbine.class, new TileEntitySteamTurbineRender());
             setTileEntityRendererDispatcher(TileEntityLeydenJar.class, new TileEntityLeydenJarRender());
             setTileEntityRendererDispatcher(TileEntityCompressionCrafter.class, new TileEntityCompressionCrafterRenderer());
             setTileEntityRendererDispatcher(SocketScissors.class, new TileEntitySocketRenderer());
@@ -204,63 +180,7 @@ public class FactorizationClientProxy extends FactorizationProxy {
         RenderingRegistry.registerEntityRenderingHandler(EntityMinecartDayBarrel.class, new RenderMinecartDayBarrel());
         RenderingRegistry.registerEntityRenderingHandler(EntityLeafBomb.class, new RenderSnowball(Core.registry.leafBomb, 0));
 
-        RenderingRegistry.registerBlockHandler(new FactorizationRender());
-        RenderingRegistry.registerBlockHandler(new FactorizationRenderNonTE());
-        new BlockRenderDefault();
-        BlockRenderBattery renderBattery = new BlockRenderBattery();
-        BlockRenderDayBarrel renderBarrel = new BlockRenderDayBarrel();
-        new BlockRenderLeydenJar();
-        new BlockRenderHeater();
-        new BlockRenderLamp();
-        new BlockRenderMirrorStand();
-        new BlockRenderSteamTurbine();
-        new BlockRenderWire();
-        new BlockRenderMixer();
-        new BlockRenderCrystallizer();
-        new BlockRenderCompressionCrafter();
-        new BlockRenderGreenware().setup();
-        //new BlockRenderRocketEngine();
-        new BlockRenderServoRail();
-        new BlockRenderHinge();
-        new BlockRenderSapExtractor();
-        new BlockRenderAnthrogen();
-        new BlockRenderSteamShaft();
-        new BlockRenderSolarBoiler();
-        new BlockRenderShaftGen();
-        new BlockRenderShaft();
-        new BlockRenderBiblioGen();
-        new BlockRenderWindMill();
-        new BlockRenderWaterWheel();
-        for (FactoryType ft : new FactoryType[] {
-                FactoryType.SOCKET_EMPTY,
-                FactoryType.SOCKET_LACERATOR,
-                FactoryType.SOCKET_ROBOTHAND,
-                FactoryType.SOCKET_SHIFTER,
-                FactoryType.SOCKET_BLOWER,
-                FactoryType.SOCKET_PUMP,
-                FactoryType.SOCKET_BARE_MOTOR,
-                FactoryType.SOCKET_SCISSORS,
-                FactoryType.SOCKET_POWERED_CRANK
-        }) {
-            new BlockRenderSocketBase(ft);
-        }
-        for (FactoryType ft : new FactoryType[] {
-                FactoryType.STAMPER,
-                FactoryType.PACKAGER,
-                FactoryType.SLAGFURNACE,
-                FactoryType.PARASIEVE,
-                FactoryType.CALIOMETRIC_BURNER,
-                FactoryType.CREATIVE_CHARGE,
-                FactoryType.LEGENDARIUM
-                }) {
-            FactorizationBlockRender.setDefaultRender(ft);
-        }
-        new BlockRenderEmpty(FactoryType.EXTENDED);
-
         ItemRenderCapture capture = new ItemRenderCapture();
-        MinecraftForgeClient.registerItemRenderer(Item.getItemFromBlock(Core.registry.factory_block), capture);
-        MinecraftForgeClient.registerItemRenderer(Item.getItemFromBlock(Core.registry.factory_block_barrel), capture);
-        MinecraftForgeClient.registerItemRenderer(Core.registry.battery, new BatteryItemRender(renderBattery));
         MinecraftForgeClient.registerItemRenderer(Core.registry.glaze_bucket, new ItemRenderGlazeBucket());
         MinecraftForgeClient.registerItemRenderer(Core.registry.daybarrel, new DayBarrelItemRenderer(renderBarrel));
         MinecraftForgeClient.registerItemRenderer(Core.registry.twistedBlock, new TwistedRender());
@@ -268,26 +188,7 @@ public class FactorizationClientProxy extends FactorizationProxy {
         setTileEntityRendererDispatcher(BlockDarkIronOre.Glint.class, new GlintRenderer());
         Core.loadBus(GooRenderer.INSTANCE);
     }
-    
-    @Override
-    public void texturepackChanged(IIconRegister reg) {
-        TileEntityGrinderRender.remakeModel();
-        BlockRenderServoRail.registerColoredIcons(reg);
-    }
-    
-    @Override
-    public boolean BlockRenderHelper_has_texture(BlockRenderHelper block, int f) {
-        if (block.textures == null) {
-            return true;
-        }
-        return block.textures[f] != null;
-    }
-    
-    @Override
-    public void BlockRenderHelper_clear_texture(BlockRenderHelper block) {
-        block.textures = null;
-    }
-    
+
     @Override
     public String getPocketCraftingTableKey() {
         return GameSettings.getKeyDisplayString(FactorizationKeyHandler.pocket_key.getKeyCode());
@@ -313,6 +214,6 @@ public class FactorizationClientProxy extends FactorizationProxy {
     public void sendBlockClickPacket() {
         Minecraft mc = Minecraft.getMinecraft();
         MovingObjectPosition mop = mc.objectMouseOver;
-        new C07PacketPlayerDigging(0, mop.blockX, mop.blockY, mop.blockZ, mop.sideHit);
+        new C07PacketPlayerDigging(C07PacketPlayerDigging.Action.START_DESTROY_BLOCK /* NORELEASE: was 0, is this correct? This is for barrels. */, mop.getBlockPos(), mop.sideHit);
     }
 }

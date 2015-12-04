@@ -61,7 +61,7 @@ public class TileEntityHinge extends TileEntityCommon implements IDCController {
     }
 
     @Override
-    public void onPlacedBy(EntityPlayer player, ItemStack is, int side, float hitX, float hitY, float hitZ) {
+    public void onPlacedBy(EntityPlayer player, ItemStack is, EnumFacing side, float hitX, float hitY, float hitZ) {
         facing = getOrientation(player, side, hitX, hitY, hitZ);
     }
 
@@ -140,15 +140,15 @@ public class TileEntityHinge extends TileEntityCommon implements IDCController {
         updateComparators();
         markDirty();
         getCoord().syncTE();
-        dseOffset.xCoord = idc.posX - xCoord;
-        dseOffset.yCoord = idc.posY - yCoord;
-        dseOffset.zCoord = idc.posZ - zCoord;
+        dseOffset.xCoord = idc.posX - pos.getX();
+        dseOffset.yCoord = idc.posY - pos.getY();
+        dseOffset.zCoord = idc.posZ - pos.getZ();
     }
 
     void setProperPosition(IDeltaChunk idc) {
-        idc.posX = dseOffset.xCoord + xCoord;
-        idc.posY = dseOffset.yCoord + yCoord;
-        idc.posZ = dseOffset.zCoord + zCoord;
+        idc.posX = dseOffset.xCoord + pos.getX();
+        idc.posY = dseOffset.yCoord + pos.getY();
+        idc.posZ = dseOffset.zCoord + pos.getZ();
     }
 
     @Override
@@ -416,7 +416,7 @@ public class TileEntityHinge extends TileEntityCommon implements IDCController {
         ticks++;
         MovingObjectPosition mop = Minecraft.getMinecraft().objectMouseOver;
         if (mop == null || mop.typeOfHit != MovingObjectPosition.MovingObjectType.BLOCK) return;
-        if (mop.blockX == xCoord && mop.blockY == yCoord && mop.blockZ == zCoord) {
+        if (mop.blockX == pos.getX() && mop.blockY == pos.getY() && mop.blockZ == pos.getZ()) {
             ticks = 0;
         }
     }
@@ -569,7 +569,7 @@ public class TileEntityHinge extends TileEntityCommon implements IDCController {
     @Override
     public AxisAlignedBB getRenderBoundingBox() {
         int a = -2, b = +3;
-        return new AxisAlignedBB(xCoord + a, yCoord + a, zCoord + a, xCoord + b, yCoord + b, zCoord + b);
+        return new AxisAlignedBB(pos.getX() + a, pos.getY() + a, pos.getZ() + a, pos.getX() + b, pos.getY() + b, pos.getZ() + b);
     }
 
     private transient byte comparator_cache = 0;

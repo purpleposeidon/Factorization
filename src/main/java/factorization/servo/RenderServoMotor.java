@@ -13,7 +13,6 @@ import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.renderer.RenderBlocks;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.entity.RenderEntity;
-import net.minecraft.client.renderer.entity.RenderItem;
 import net.minecraft.client.renderer.entity.RenderManager;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLiving;
@@ -25,7 +24,6 @@ import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.IIcon;
 import net.minecraft.util.MovingObjectPosition;
 import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.Vec3;
 import net.minecraft.util.EnumFacing;
 
 import org.lwjgl.opengl.GL11;
@@ -210,7 +208,7 @@ public class RenderServoMotor extends RenderEntity {
     }
     
     void renderSocketAttachment(ServoMotor motor, TileEntitySocketBase socket, float partial) {
-        socket.xCoord = socket.yCoord = socket.zCoord = 0;
+        socket.pos.getX() = socket.pos.getY() = socket.pos.getZ() = 0;
         socket.facing = EnumFacing.UP;
         socket.renderInServo(motor, partial);
     }

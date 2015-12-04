@@ -16,6 +16,7 @@ import net.minecraft.inventory.ISidedInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
+import net.minecraft.util.EnumFacing;
 import net.minecraftforge.common.util.Constants;
 
 import java.io.IOException;
@@ -43,7 +44,7 @@ public abstract class TileEntityFactorization extends TileEntityCommon
     }
 
     @Override
-    public void onPlacedBy(EntityPlayer player, ItemStack is, int side, float hitX, float hitY, float hitZ) {
+    public void onPlacedBy(EntityPlayer player, ItemStack is, EnumFacing side, float hitX, float hitY, float hitZ) {
         super.onPlacedBy(player, is, side, hitX, hitY, hitZ);
         if (player == null) {
             return;
@@ -100,10 +101,10 @@ public abstract class TileEntityFactorization extends TileEntityCommon
 
     @Override
     public boolean isUseableByPlayer(EntityPlayer player) {
-        if (worldObj.getTileEntity(xCoord, yCoord, zCoord) != this) {
+        if (worldObj.getTileEntity(pos.getX(), pos.getY(), pos.getZ()) != this) {
             return false;
         }
-        return 8 * 8 >= player.getDistanceSq(xCoord + 0.5, yCoord + 0.5, zCoord + 0.5);
+        return 8 * 8 >= player.getDistanceSq(pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5);
     }
 
     @Override
@@ -194,7 +195,7 @@ public abstract class TileEntityFactorization extends TileEntityCommon
         if (worldObj.isRemote) {
             if (draw_active > 0) {
                 makeNoise();
-                worldObj.markBlockRangeForRenderUpdate(xCoord, yCoord, zCoord, xCoord, yCoord, zCoord);
+                worldObj.markBlockRangeForRenderUpdate(pos.getX(), pos.getY(), pos.getZ(), pos.getX(), pos.getY(), pos.getZ());
                 draw_active--;
             }
         } else {

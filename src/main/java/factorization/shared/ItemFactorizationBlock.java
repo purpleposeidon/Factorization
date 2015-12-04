@@ -1,24 +1,23 @@
 package factorization.shared;
 
-import java.util.List;
-
-import factorization.util.ItemUtil;
-import net.minecraft.block.Block;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.item.ItemBlock;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.IIcon;
-import net.minecraft.util.StatCollector;
-import net.minecraft.world.World;
-import net.minecraft.util.EnumFacing;
 import factorization.api.Coord;
-import factorization.astro.TileEntityRocketEngine;
 import factorization.ceramics.TileEntityGreenware;
 import factorization.ceramics.TileEntityGreenware.ClayState;
 import factorization.charge.TileEntityLeydenJar;
 import factorization.common.FactoryType;
+import factorization.util.ItemUtil;
+import net.minecraft.block.Block;
+import net.minecraft.block.state.IBlockState;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.item.ItemBlock;
+import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.util.BlockPos;
+import net.minecraft.util.EnumFacing;
+import net.minecraft.util.StatCollector;
+import net.minecraft.world.World;
+
+import java.util.List;
 
 public class ItemFactorizationBlock extends ItemBlock {
     public ItemFactorizationBlock(Block id) {
@@ -29,9 +28,9 @@ public class ItemFactorizationBlock extends ItemBlock {
 
     @Override
     public boolean placeBlockAt(ItemStack is, EntityPlayer player,
-            World w, int x, int y, int z, int side, float hitX, float hitY,
-            float hitZ, int md) {
-        Coord here = new Coord(w, x, y, z);
+            World w, BlockPos pos, EnumFacing side, float hitX, float hitY,
+            float hitZ, IBlockState newState) {
+        Coord here = new Coord(w, pos);
         FactoryType f = FactoryType.fromMd((byte) is.getItemDamage());
         if (f == null) {
             is.stackSize = 0;
@@ -40,12 +39,12 @@ public class ItemFactorizationBlock extends ItemBlock {
         TileEntityCommon tec = f.makeTileEntity();
         if (tec == null) return false;
         here.setAsTileEntityLocation(tec);
-        Coord placedAgainst = here.add(SpaceUtil.getOrientation(side).getOpposite());
+        Coord placedAgainst = here.add(side.getOpposite());
         boolean good = tec.canPlaceAgainst(player, placedAgainst, side);
         if (!good) {
             return false;
         }
-        if (super.placeBlockAt(is, player, w, x, y, z, side, hitX, hitY, hitZ, md)) {
+        if (super.placeBlockAt(is, player, w, pos, side, hitX, hitY, hitZ, newState)) {
             here.setAsTileEntityLocation(tec);
             tec.onPlacedBy(player, is, side, hitX, hitY, hitZ);
             tec.getBlockClass().enforce(here);
@@ -58,14 +57,8 @@ public class ItemFactorizationBlock extends ItemBlock {
     }
 
     @Override
-    public IIcon getIconFromDamage(int damage) {
-        return Core.registry.factory_block.getIcon(0, damage);
-    }
-
-    @Override
     public int getMetadata(int i) {
         return 15;
-        //return i;
     }
     
     @Override

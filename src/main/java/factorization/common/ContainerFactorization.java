@@ -13,8 +13,6 @@ import net.minecraft.inventory.SlotFurnace;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntityFurnace;
-import factorization.crafting.TileEntityMixer;
-import factorization.crafting.TileEntityStamper;
 import factorization.oreprocessing.TileEntityCrystallizer;
 import factorization.oreprocessing.TileEntitySlagFurnace;
 import factorization.redstone.TileEntityParaSieve;

@@ -20,7 +20,6 @@ import net.minecraft.block.BlockLog;
 import net.minecraft.block.material.Material;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
-import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.ISidedInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
@@ -181,7 +180,7 @@ public class TileEntitySapTap extends TileEntityCommon implements ISidedInventor
     }
 
     @Override
-    public void onPlacedBy(EntityPlayer player, ItemStack is, int side, float hitX, float hitY, float hitZ) {
+    public void onPlacedBy(EntityPlayer player, ItemStack is, EnumFacing side, float hitX, float hitY, float hitZ) {
         super.onPlacedBy(player, is, side, hitX, hitY, hitZ);
         scanTree(player);
     }
@@ -194,10 +193,10 @@ public class TileEntitySapTap extends TileEntityCommon implements ISidedInventor
 
     @Override
     public IIcon getIcon(EnumFacing dir) {
-        Block bup = worldObj == null ? Blocks.planks : worldObj.getBlock(xCoord, yCoord + 1, zCoord);
+        Block bup = worldObj == null ? Blocks.planks : worldObj.getBlock(pos.getX(), pos.getY() + 1, pos.getZ());
         int md;
         if (worldObj != null && bup.getMaterial() == Material.wood && bup instanceof BlockLog) {
-            md = worldObj.getBlockMetadata(xCoord, yCoord + 1, zCoord);
+            md = worldObj.getBlockMetadata(pos.getX(), pos.getY() + 1, pos.getZ());
         } else {
             bup = Blocks.log2;
             md = 1;
@@ -211,7 +210,7 @@ public class TileEntitySapTap extends TileEntityCommon implements ISidedInventor
     }
 
     @Override
-    public boolean canPlaceAgainst(final EntityPlayer player, Coord c, int side) {
+    public boolean canPlaceAgainst(final EntityPlayer player, Coord c, EnumFacing side) {
         final Coord at = getCoord();
         if (!isLog(at.add(EnumFacing.UP))) {
             if (!worldObj.isRemote) {

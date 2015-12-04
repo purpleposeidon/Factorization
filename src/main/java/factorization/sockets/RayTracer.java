@@ -183,7 +183,7 @@ public class RayTracer {
     boolean mopBlock(Coord target, EnumFacing side) {
         if (base != socket && target.getTE(TileEntityServoRail.class) != null) return false;
         boolean isThis = base == socket && target.isAt(base);
-        Vec3 hitVec = new Vec3(base.xCoord + side.getDirectionVec().getX(), base.yCoord + side.getDirectionVec().getY(), base.zCoord + side.getDirectionVec().getZ());
+        Vec3 hitVec = new Vec3(base.pos.getX() + side.getDirectionVec().getX(), base.pos.getY() + side.getDirectionVec().getY(), base.pos.getZ() + side.getDirectionVec().getZ());
         return base.handleRay(socket, target.createMop(side, hitVec), target.w, isThis, powered);
     }
 

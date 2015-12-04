@@ -101,7 +101,7 @@ public class TileEntityWindMill extends TileEntityCommon implements IRotationalE
     }
 
     @Override
-    public void onPlacedBy(EntityPlayer player, ItemStack is, int side, float hitX, float hitY, float hitZ) {
+    public void onPlacedBy(EntityPlayer player, ItemStack is, EnumFacing side, float hitX, float hitY, float hitZ) {
         super.onPlacedBy(player, is, side, hitX, hitY, hitZ);
         sailDirection = SpaceUtil.getOrientation(side);
     }
@@ -366,7 +366,7 @@ public class TileEntityWindMill extends TileEntityCommon implements IRotationalE
             updatePowerPerTick();
             return;
         }
-        Vec3 wind = WindModel.activeModel.getWindPower(worldObj, xCoord, yCoord, zCoord, this);
+        Vec3 wind = WindModel.activeModel.getWindPower(worldObj, pos.getX(), pos.getY(), pos.getZ(), this);
         // TODO: Dot product or something to reverse the velocity
         wind_strength = wind.lengthVector();
         updatePowerPerTick();

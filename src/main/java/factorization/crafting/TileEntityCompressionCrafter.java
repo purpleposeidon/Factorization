@@ -96,7 +96,7 @@ public class TileEntityCompressionCrafter extends TileEntityCommon {
     }
 
     @Override
-    public void onPlacedBy(EntityPlayer player, ItemStack is, int side, float hitX, float hitY, float hitZ) {
+    public void onPlacedBy(EntityPlayer player, ItemStack is, EnumFacing side, float hitX, float hitY, float hitZ) {
         super.onPlacedBy(player, is, side, hitX, hitY, hitZ);
         b_facing = SpaceUtil.getOpposite(SpaceUtil.determineOrientation(player));
     }
@@ -107,7 +107,7 @@ public class TileEntityCompressionCrafter extends TileEntityCommon {
             if (!worldObj.isRemote && getFacing() != null && isCrafterRoot) {
                 getStateHelper().craft(false, this);
                 isCrafterRoot = false;
-                boolean signal = worldObj.isBlockIndirectlyGettingPowered(xCoord, yCoord, zCoord);
+                boolean signal = worldObj.isBlockIndirectlyGettingPowered(pos.getX(), pos.getY(), pos.getZ());
                 if (!signal) {
                     powered = false;
                 }
@@ -177,7 +177,7 @@ public class TileEntityCompressionCrafter extends TileEntityCommon {
         if (worldObj.isRemote) {
             return;
         }
-        boolean signal = worldObj.isBlockIndirectlyGettingPowered(xCoord, yCoord, zCoord);
+        boolean signal = worldObj.isBlockIndirectlyGettingPowered(pos.getX(), pos.getY(), pos.getZ());
         if (signal != powered && signal && progress == 0) {
             getStateHelper().craft(true, this);
             isCrafterRoot = true;
@@ -223,7 +223,7 @@ public class TileEntityCompressionCrafter extends TileEntityCommon {
     }
     
     TileEntityCompressionCrafter look(EnumFacing d) {
-        TileEntity te = worldObj.getTileEntity(xCoord + d.getDirectionVec().getX(), yCoord + d.getDirectionVec().getY(), zCoord + d.getDirectionVec().getZ());
+        TileEntity te = worldObj.getTileEntity(pos.getX() + d.getDirectionVec().getX(), pos.getY() + d.getDirectionVec().getY(), pos.getZ() + d.getDirectionVec().getZ());
         if (te instanceof TileEntityCompressionCrafter) {
             return (TileEntityCompressionCrafter) te;
         }
@@ -268,7 +268,7 @@ public class TileEntityCompressionCrafter extends TileEntityCommon {
                     if (Math.abs(dx) + Math.abs(dy) + Math.abs(dz) == 3) {
                         continue;
                     }
-                    c.set(worldObj, xCoord + dx, yCoord + dy, zCoord + dz);
+                    c.set(worldObj, pos.getX() + dx, pos.getY() + dy, pos.getZ() + dz);
                     TileEntity te = c.getTE(TileEntityCompressionCrafter.class);
                     if (te == this) {
                         continue;

@@ -3,7 +3,6 @@ package factorization.common;
 import factorization.api.Coord;
 import factorization.api.crafting.CraftingManagerGeneric;
 import factorization.api.crafting.IVexatiousCrafting;
-import factorization.crafting.TileEntityMixer;
 import factorization.notify.Notice;
 import factorization.oreprocessing.TileEntityCrystallizer;
 import factorization.util.DataUtil;

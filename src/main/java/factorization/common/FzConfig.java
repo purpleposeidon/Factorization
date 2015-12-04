@@ -34,7 +34,6 @@ public class FzConfig {
     public static boolean renderTEs = true;
     public static boolean renderAO = true;
     public static boolean add_branding = false;
-    public static boolean debug_light_air = false;
     public static boolean dimension_slice_allow_smooth = true;
     public static boolean boilers_suck_water = true;
     public static double steam_output_adjust = 1.0;
@@ -166,7 +165,6 @@ public class FzConfig {
 
     public void readConfigSettings() {
         {
-            debug_light_air = getBoolConfig("debugLightAir", "client", debug_light_air, "Show invisible lamp-air");
             pocket_craft_anywhere = editRun().getBoolConfig("anywherePocketCraft", "client", pocket_craft_anywhere, "Lets you open the pocket crafting table from GUIs");
             render_barrel_item = editMain().getBoolConfig("renderBarrelItem", "client", render_barrel_item, null);
             render_barrel_text = editMain().getBoolConfig("renderBarrelText", "client", render_barrel_text, null);

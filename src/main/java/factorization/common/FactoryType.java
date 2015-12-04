@@ -1,15 +1,10 @@
 package factorization.common;
 
-import net.minecraftforge.fml.common.registry.GameRegistry;
 import factorization.artifact.TileEntityLegendarium;
-import factorization.astro.TileEntityRocketEngine;
 import factorization.beauty.*;
 import factorization.ceramics.TileEntityGreenware;
 import factorization.charge.*;
 import factorization.crafting.TileEntityCompressionCrafter;
-import factorization.crafting.TileEntityMixer;
-import factorization.crafting.TileEntityPackager;
-import factorization.crafting.TileEntityStamper;
 import factorization.fzds.DeltaChunk;
 import factorization.mechanics.SocketPoweredCrank;
 import factorization.mechanics.TileEntityHinge;
@@ -27,33 +22,34 @@ import factorization.sockets.fanturpeller.PumpLiquids;
 import factorization.weird.TileEntityDayBarrel;
 import factorization.wrath.TileEntityWrathLamp;
 import net.minecraft.item.ItemStack;
+import net.minecraftforge.fml.common.registry.GameRegistry;
 
 public enum FactoryType {
     //Traced here is the history of Factorization.
     //0 -- This used to be ROUTER, which is now servos
     //1 -- This used to be CUTTER, which only existed for routers
-    //2 -- This used to be MAKER, which is now
-    STAMPER(3, true, TileEntityStamper.class, "factory_stamper"), // Crafts a single item
+    //2 -- This used to be MAKER
+    //3 -- This used to be STAMPER
     //4 -- This used to be QUEUE
     //5 -- This used to be BARREL
     LAMP(6, false, TileEntityWrathLamp.class, "factory_lamp"), //spawn a bunch of AIR blocks around and below
     //7 -- this was the BlockDarkIron, which got turned into a proper block
-    PACKAGER(8, true, STAMPER.gui, TileEntityPackager.class, "factory_packager"), //crafts its input as a 3x3 or 2x2
+    //8 -- This used to be PACKAGER
     //9 -- This used to be SENTRYDEMON
     //10 -- This used to be WRATHFIRE
     SLAGFURNACE(11, true, TileEntitySlagFurnace.class, "factory_slag"), //get extra ore output
     BATTERY(12, false, TileEntityBattery.class, "factory_battery"),
     //13 -- This used to be SOLARTURBINE
-    LEADWIRE(14, false, TileEntityWire.class, "factory_solder"),
+    //14 -- This used to be LEADWIRE (factory_solder)
     HEATER(15, false, TileEntityHeater.class, "factory_heater"), //work furnaces without fuel
     MIRROR(16, false, TileEntityMirror.class, "factory_mirror"), //reflect sunlight onto IReflectionTargets
     //17 -- This used to be GRINDER
-    MIXER(18, true, TileEntityMixer.class, "factory_mixer"), //crafts its input as shapeless recipes of 2-4 ingredients
+    //18 -- THis used to be MIXER
     CRYSTALLIZER(19, true, TileEntityCrystallizer.class, "factory_crystal"), //grow metallic crystals
     //20 -- Used to be GREENWARE
-    STEAMTURBINE(21, false, TileEntitySteamTurbine.class, "factory_steamturbine"), //A generic steam turbine; works with other mods' steam
+    //21 -- Used to be STEAMTURBINE (factory_steamturbine)
     SOLARBOILER(22, false, TileEntitySolarBoiler.class, "factory_solarfurnace"), //Produces steam from sunlight
-    ROCKETENGINE(23, false, TileEntityRocketEngine.class, "factory_rocketengine"), //Is a rocket
+    //ROCKETENGINE(23, false, TileEntityRocketEngine.class, "factory_rocketengine"), //Is a rocket
     EXTENDED(24, false, TileEntityExtension.class, "factory_ext"), //Used for multipiece blocks (like beds & rocket engines)
     CERAMIC(25, false, TileEntityGreenware.class, "factory_ceramic"), //clay sculpture
     LEYDENJAR(26, false, TileEntityLeydenJar.class, "factory_leyjar"), //inefficient bulk energy storage
@@ -103,12 +99,11 @@ public enum FactoryType {
             MAX_ID = Math.max(MAX_ID, ft.md);
         }
         if (!FzConfig.enable_rocketry) {
-            ROCKETENGINE.disable();
+            //ROCKETENGINE.disable();
         }
         if (!DeltaChunk.enabled()) {
             HINGE.disable();
-            //ANCHOR.disable();
-            ROCKETENGINE.disable();
+            //ROCKETENGINE.disable();
             WIND_MILL_GEN.disable();
             WATER_WHEEL_GEN.disable();
         }
@@ -243,7 +238,7 @@ public enum FactoryType {
     }
 
     public boolean connectRedstone() {
-        return this == STAMPER || this == PACKAGER;
+        return false;
     }
     
     public ItemStack asSocketItem() {

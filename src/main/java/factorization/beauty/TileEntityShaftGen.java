@@ -45,7 +45,7 @@ public class TileEntityShaftGen extends TileEntityCommon implements IChargeCondu
     }
 
     @Override
-    public void onPlacedBy(EntityPlayer player, ItemStack is, int side, float hitX, float hitY, float hitZ) {
+    public void onPlacedBy(EntityPlayer player, ItemStack is, EnumFacing side, float hitX, float hitY, float hitZ) {
         super.onPlacedBy(player, is, side, hitX, hitY, hitZ);
         shaft_direction = SpaceUtil.getOrientation(side);
         if (player.isSneaking()) {

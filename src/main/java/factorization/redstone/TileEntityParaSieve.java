@@ -14,7 +14,6 @@ import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.ISidedInventory;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.IIcon;
@@ -208,9 +207,9 @@ public class TileEntityParaSieve extends TileEntityFactorization implements ISid
     AxisAlignedBB target_area = new AxisAlignedBB(0, 0, 0, 0, 0, 0);
     AxisAlignedBB getTargetArea() {
         final EnumFacing f = getFacing();
-        target_area.minX = xCoord + f.getDirectionVec().getX();
-        target_area.minY = yCoord + f.getDirectionVec().getY();
-        target_area.minZ = zCoord + f.getDirectionVec().getZ();
+        target_area.minX = pos.getX() + f.getDirectionVec().getX();
+        target_area.minY = pos.getY() + f.getDirectionVec().getY();
+        target_area.minZ = pos.getZ() + f.getDirectionVec().getZ();
         target_area.maxX = target_area.minX + 1;
         target_area.maxY = target_area.minY + 1;
         target_area.maxZ = target_area.minZ + 1;
@@ -241,7 +240,7 @@ public class TileEntityParaSieve extends TileEntityFactorization implements ISid
             }
             cached_ent = null;
         }
-        TileEntity te = worldObj.getTileEntity(xCoord + facing.getDirectionVec().getX(), yCoord + facing.getDirectionVec().getY(), zCoord + facing.getDirectionVec().getZ());
+        TileEntity te = worldObj.getTileEntity(pos.getX() + facing.getDirectionVec().getX(), pos.getY() + facing.getDirectionVec().getY(), pos.getZ() + facing.getDirectionVec().getZ());
         if (te instanceof IInventory) {
             cached_te = te;
             return InvUtil.openDoubleChest((IInventory) te, true);
@@ -516,7 +515,7 @@ public class TileEntityParaSieve extends TileEntityFactorization implements ISid
     @Override
     public void onNeighborTileChanged(int tilex, int tiley, int tilez) {
         EnumFacing facing = getFacing();
-        boolean isOurs = xCoord + facing.getDirectionVec().getX() == tilex &&  yCoord + facing.getDirectionVec().getY() == tiley &&  zCoord + facing.getDirectionVec().getZ() == tilez;
+        boolean isOurs = pos.getX() + facing.getDirectionVec().getX() == tilex &&  pos.getY() + facing.getDirectionVec().getY() == tiley &&  pos.getZ() + facing.getDirectionVec().getZ() == tilez;
         if (!isOurs) {
             return;
         }

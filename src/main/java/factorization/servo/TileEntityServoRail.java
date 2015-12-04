@@ -95,7 +95,7 @@ public class TileEntityServoRail extends TileEntityCommon implements IChargeCond
     }
     
     boolean has(EnumFacing dir) {
-        TileEntity te = worldObj.getTileEntity(xCoord + dir.getDirectionVec().getX(), yCoord + dir.getDirectionVec().getY(), zCoord + dir.getDirectionVec().getZ());
+        TileEntity te = worldObj.getTileEntity(pos.getX() + dir.getDirectionVec().getX(), pos.getY() + dir.getDirectionVec().getY(), pos.getZ() + dir.getDirectionVec().getZ());
         if (te instanceof TileEntityServoRail) {
             return true;
         }
@@ -126,7 +126,7 @@ public class TileEntityServoRail extends TileEntityCommon implements IChargeCond
             float low = sides[0] ? 0 : f;
             float high = sides[1] ? 1 : 1 - f;
             block.setBlockBounds(f, low, f, 1 - f, high, 1 - f);
-            AxisAlignedBB a = block.getCollisionBoundingBoxFromPool(worldObj, xCoord, yCoord, zCoord);
+            AxisAlignedBB a = block.getCollisionBoundingBoxFromPool(worldObj, pos.getX(), pos.getY(), pos.getZ());
             if (aabb == null || aabb.intersectsWith(a)) {
                 list.add(a);
             }
@@ -137,7 +137,7 @@ public class TileEntityServoRail extends TileEntityCommon implements IChargeCond
             float low = sides[2] ? 0 : f;
             float high = sides[3] ? 1 : 1 - f;
             block.setBlockBounds(f, f, low, 1 - f, 1 - f, high);
-            AxisAlignedBB a = block.getCollisionBoundingBoxFromPool(worldObj, xCoord, yCoord, zCoord);
+            AxisAlignedBB a = block.getCollisionBoundingBoxFromPool(worldObj, pos.getX(), pos.getY(), pos.getZ());
             if (aabb == null || aabb.intersectsWith(a)) {
                 list.add(a);
             }
@@ -148,14 +148,14 @@ public class TileEntityServoRail extends TileEntityCommon implements IChargeCond
             float low = sides[4] ? 0 : f;
             float high = sides[5] ? 1 : 1 - f;
             block.setBlockBounds(low, f, f, high, 1 - f, 1 - f);
-            AxisAlignedBB a = block.getCollisionBoundingBoxFromPool(worldObj, xCoord, yCoord, zCoord);
+            AxisAlignedBB a = block.getCollisionBoundingBoxFromPool(worldObj, pos.getX(), pos.getY(), pos.getZ());
             if (aabb == null || aabb.intersectsWith(a)) {
                 list.add(a);
             }
         }
         if (count == 0) {
             block.setBlockBounds(f, f, f, 1 - f, 1 - f, 1 - f);
-            AxisAlignedBB a = block.getCollisionBoundingBoxFromPool(worldObj, xCoord, yCoord, zCoord);
+            AxisAlignedBB a = block.getCollisionBoundingBoxFromPool(worldObj, pos.getX(), pos.getY(), pos.getZ());
             if (aabb == null || aabb.intersectsWith(a)) {
                 list.add(a);
             }
@@ -170,7 +170,7 @@ public class TileEntityServoRail extends TileEntityCommon implements IChargeCond
             boolean remote = (entity != null && entity.worldObj != null) ? entity.worldObj.isRemote : FMLCommonHandler.instance().getEffectiveSide() == Side.CLIENT;
             BlockRenderHelper block = remote ? Core.registry.clientTraceHelper : Core.registry.serverTraceHelper;
             block.setBlockBounds(f, f, f, 1 - f, 1 - f, 1 - f);
-            AxisAlignedBB a = block.getCollisionBoundingBoxFromPool(worldObj, xCoord, yCoord, zCoord);
+            AxisAlignedBB a = block.getCollisionBoundingBoxFromPool(worldObj, pos.getX(), pos.getY(), pos.getZ());
             if (aabb == null || aabb.intersectsWith(a)) {
                 list.add(a);
                 return true;
@@ -191,10 +191,10 @@ public class TileEntityServoRail extends TileEntityCommon implements IChargeCond
         getCollisionBoxes(null, boxes, null);
         Block b = FMLCommonHandler.instance().getEffectiveSide() == Side.SERVER ? Core.registry.serverTraceHelper : Core.registry.clientTraceHelper;
         for (AxisAlignedBB ab : boxes) {
-            ab = ab.getOffsetBoundingBox(-xCoord, -yCoord, -zCoord);
+            ab = ab.getOffsetBoundingBox(-pos.getX(), -pos.getY(), -pos.getZ());
             float d = 1F/16F;
             b.setBlockBounds((float) ab.minX - d, (float) ab.minY - d, (float) ab.minZ - d, (float) ab.maxX + d, (float) ab.maxY + d, (float) ab.maxZ + d);
-            MovingObjectPosition mop = b.collisionRayTrace(worldObj, xCoord, yCoord, zCoord, startVec, endVec);
+            MovingObjectPosition mop = b.collisionRayTrace(worldObj, pos.getX(), pos.getY(), pos.getZ(), startVec, endVec);
             if (mop != null) {
                 return mop;
             }

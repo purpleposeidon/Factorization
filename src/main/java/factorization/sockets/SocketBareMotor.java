@@ -64,7 +64,7 @@ public class SocketBareMotor extends TileEntitySocketBase {
             block.setBlockBounds(d, d + yd + yoffset + 2F/16F + sd, d, 1 - d, 1 - (d + 0F/16F) + yd + yoffset, 1 - d);
             block.beginWithMirroredUVs();
             block.rotateCenter(rotation);
-            block.renderRotated(tess, xCoord, yCoord, zCoord);
+            block.renderRotated(tess, pos.getX(), pos.getY(), pos.getZ());
         }
     }
 }

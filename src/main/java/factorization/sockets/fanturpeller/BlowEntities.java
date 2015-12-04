@@ -198,7 +198,7 @@ public class BlowEntities extends SocketFanturpeller implements IEntitySelector 
     
     void suckEntity(Entity ent, int front_range, EnumFacing dir, double s) {
         double ms = s;
-        double distSq = ent.getDistanceSq(xCoord + 0.5, yCoord + 0.5, zCoord + 0.5);
+        double distSq = ent.getDistanceSq(pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5);
         ms /= distSq/(front_range*10);
         if (ms > 0.15) ms = 0.15;
         double dx = ms*dir.getDirectionVec().getX();
@@ -206,15 +206,15 @@ public class BlowEntities extends SocketFanturpeller implements IEntitySelector 
         double dz = ms*dir.getDirectionVec().getZ();
         if (isSucking || dir == EnumFacing.UP) {
             if (dir.getDirectionVec().getX() == 0) {
-                double diff = ent.posX - xCoord - 0.5;
+                double diff = ent.posX - pos.getX() - 0.5;
                 dx -= diff*ms;
             }
             if (dir.getDirectionVec().getY() == 0) {
-                double diff = ent.posY - yCoord - 0.5;
+                double diff = ent.posY - pos.getY() - 0.5;
                 dy -= diff*ms;
             }
             if (dir.getDirectionVec().getZ() == 0) {
-                double diff = ent.posZ - zCoord - 0.5;
+                double diff = ent.posZ - pos.getZ() - 0.5;
                 dz -= diff*ms;
             }
             if (ent.motionY < dy) {

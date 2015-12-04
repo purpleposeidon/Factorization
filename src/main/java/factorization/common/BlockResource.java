@@ -1,6 +1,5 @@
 package factorization.common;
 
-import factorization.shared.BlockClass;
 import factorization.shared.Core;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
@@ -31,7 +30,7 @@ public class BlockResource extends Block {
         }
     }
 
-    IProperty<ResourceTypes> TYPE = PropertyEnum.create("type", ResourceTypes.class);
+    public static final IProperty<ResourceTypes> TYPE = PropertyEnum.create("type", ResourceTypes.class);
 
     protected BlockResource() {
         super(Material.rock);
@@ -41,7 +40,7 @@ public class BlockResource extends Block {
 
     @Override
     protected BlockState createBlockState() {
-        return getDefaultState().withProperty(TYPE, BlockClass.Machine);
+        return new BlockState(this, TYPE);
     }
 
     public void addCreativeItems(List<ItemStack> itemList) {

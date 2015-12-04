@@ -1,7 +1,5 @@
 package factorization.shared;
 
-import java.io.DataInput;
-import java.io.IOException;
 import java.util.ArrayList;
 
 import net.minecraftforge.fml.common.FMLCommonHandler;
@@ -100,7 +98,7 @@ public enum Sound {
     }
 
     public void playAt(TileEntity ent) {
-        playAt(ent.getWorld(), ent.xCoord, ent.yCoord, ent.zCoord);
+        playAt(ent.getWorld(), ent.pos.getX(), ent.pos.getY(), ent.pos.getZ());
     }
 
     public void play() {

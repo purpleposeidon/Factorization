@@ -18,9 +18,9 @@ public class WinchSound extends MovingSound {
     @Override
     public void update() {
         updateIntensity();
-        this.xPosF = source.xCoord + 0.5F;
-        this.yPosF = source.yCoord + 0.5F;
-        this.zPosF = source.zCoord + 0.5F;
+        this.xPosF = source.pos.getX() + 0.5F;
+        this.yPosF = source.pos.getY() + 0.5F;
+        this.zPosF = source.pos.getZ() + 0.5F;
     }
 
     @Override

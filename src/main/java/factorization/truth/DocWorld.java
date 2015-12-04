@@ -126,7 +126,7 @@ public class DocWorld extends WorldClient {
     @Override
     public TileEntity getTileEntity(int x, int y, int z) {
         for (TileEntity te : tileEntities) {
-            if (te.xCoord == x && te.yCoord == y && te.zCoord == z) {
+            if (te.pos.getX() == x && te.pos.getY() == y && te.pos.getZ() == z) {
                 return te;
             }
         }
@@ -160,9 +160,9 @@ public class DocWorld extends WorldClient {
         
         if (te == null) return;
         TileEntity clone = DataUtil.cloneTileEntity(te);
-        clone.xCoord = dc.x;
-        clone.yCoord = dc.y;
-        clone.zCoord = dc.z;
+        clone.pos.getX() = dc.x;
+        clone.pos.getY() = dc.y;
+        clone.pos.getZ() = dc.z;
         tileEntities.add(clone);
     }
     

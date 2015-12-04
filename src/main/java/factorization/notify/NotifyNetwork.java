@@ -160,9 +160,9 @@ public class NotifyNetwork {
             } else if (where instanceof TileEntity) {
                 output.writeByte(TILEENTITY);
                 TileEntity te = (TileEntity) where;
-                output.writeInt(te.xCoord);
-                output.writeInt(te.yCoord);
-                output.writeInt(te.zCoord);
+                output.writeInt(te.pos.getX());
+                output.writeInt(te.pos.getY());
+                output.writeInt(te.pos.getZ());
             } else {
                 return null;
             }

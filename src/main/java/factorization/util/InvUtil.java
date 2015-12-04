@@ -2,8 +2,6 @@ package factorization.util;
 
 import factorization.api.Coord;
 import factorization.shared.TileEntityCommon;
-import factorization.util.ItemUtil;
-import factorization.util.NumUtil;
 import net.minecraft.block.Block;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.item.EntityItem;
@@ -211,7 +209,7 @@ public final class InvUtil {
     public static IInventory openDoubleChest(TileEntityChest chest, boolean openBothSides) {
         IInventory origChest = chest;
         World world = chest.getWorld();
-        int i = chest.xCoord, j = chest.yCoord, k = chest.zCoord;
+        int i = chest.pos.getX(), j = chest.pos.getY(), k = chest.pos.getZ();
         Block cb = chest.getBlockType();
         if (cb == null) {
             return null;

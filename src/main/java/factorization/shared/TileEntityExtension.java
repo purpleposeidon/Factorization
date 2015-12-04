@@ -12,7 +12,6 @@ import net.minecraft.block.Block;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.IIcon;
@@ -20,7 +19,6 @@ import net.minecraft.util.MovingObjectPosition;
 import net.minecraft.util.Vec3;
 import net.minecraft.world.World;
 import net.minecraft.util.EnumFacing;
-import net.minecraftforge.fml.common.network.internal.FMLProxyPacket;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import factorization.api.DeltaCoord;
@@ -164,9 +162,9 @@ public class TileEntityExtension extends TileEntityCommon implements IFurnaceHea
             if (!(p instanceof TileEntityGreenware)) {
                 //hax
                 if (ret != null && ret.typeOfHit == MovingObjectPosition.MovingObjectType.BLOCK) {
-                    ret.blockX = xCoord;
-                    ret.blockY = yCoord;
-                    ret.blockZ = zCoord;
+                    ret.blockX = pos.getX();
+                    ret.blockY = pos.getY();
+                    ret.blockZ = pos.getZ();
                 }
             }
             return ret;

@@ -40,7 +40,7 @@ public class TileEntitySlagFurnace extends TileEntityFactorization implements IF
     }
 
     @Override
-    public void onPlacedBy(EntityPlayer player, ItemStack is, int side, float hitX, float hitY, float hitZ) {
+    public void onPlacedBy(EntityPlayer player, ItemStack is, EnumFacing side, float hitX, float hitY, float hitZ) {
         super.onPlacedBy(player, is, side, hitX, hitY, hitZ);
         facing_direction = SpaceUtil.getOpposite(SpaceUtil.determineFlatOrientation(player));
     }
@@ -381,9 +381,9 @@ public class TileEntitySlagFurnace extends TileEntityFactorization implements IF
         }
         int direction = facing_direction;
         World w = worldObj;
-        float px = xCoord + 0.5F;
-        float py = yCoord + 0.0F + rand.nextFloat() * 6.0F / 16.0F;
-        float pz = zCoord + 0.5F;
+        float px = pos.getX() + 0.5F;
+        float py = pos.getY() + 0.0F + rand.nextFloat() * 6.0F / 16.0F;
+        float pz = pos.getZ() + 0.5F;
         float d = 0.52F;
         float rng = rand.nextFloat() * 0.6F - 0.3F;
         

@@ -43,7 +43,7 @@ class DefaultHeatConverter implements HeatConverters.IHeatConverter {
             if (furnace.furnaceBurnTime < topBurnTime) {
                 furnace.furnaceBurnTime += 1;
                 if (needStart) {
-                    BlockFurnace.updateFurnaceBlockState(furnace.furnaceBurnTime > 0, furnace.getWorld(), furnace.xCoord, furnace.yCoord, furnace.zCoord);
+                    BlockFurnace.updateFurnaceBlockState(furnace.furnaceBurnTime > 0, furnace.getWorld(), furnace.pos.getX(), furnace.pos.getY(), furnace.pos.getZ());
                 }
             } else {
                 furnace.furnaceCookTime += 1;

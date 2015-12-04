@@ -1,50 +1,41 @@
 package factorization.sockets;
 
-import static org.lwjgl.opengl.GL11.*;
-
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-
-import factorization.api.datahelpers.*;
-import factorization.fzds.DeltaChunk;
-import factorization.fzds.interfaces.IDeltaChunk;
-import factorization.shared.*;
-import factorization.util.*;
-import io.netty.buffer.ByteBuf;
-import io.netty.buffer.Unpooled;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.Tessellator;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.inventory.IInventory;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.AxisAlignedBB;
-import net.minecraft.util.IIcon;
-import net.minecraft.util.MovingObjectPosition;
-import net.minecraft.util.Vec3;
-import net.minecraft.world.World;
-import net.minecraft.util.EnumFacing;
-
-import org.lwjgl.opengl.GL11;
-
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
 import factorization.api.Coord;
-import factorization.api.FzOrientation;
 import factorization.api.IChargeConductor;
-import factorization.common.BlockIcons;
+import factorization.api.datahelpers.*;
 import factorization.common.FactoryType;
 import factorization.common.FzConfig;
 import factorization.notify.Notice;
 import factorization.servo.LoggerDataHelper;
 import factorization.servo.RenderServoMotor;
 import factorization.servo.ServoMotor;
-import factorization.util.InvUtil.FzInv;
+import factorization.shared.*;
 import factorization.shared.NetworkFactorization.MessageType;
+import factorization.util.*;
+import factorization.util.InvUtil.FzInv;
+import io.netty.buffer.ByteBuf;
+import io.netty.buffer.Unpooled;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.Tessellator;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.inventory.IInventory;
+import net.minecraft.item.ItemStack;
+import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.AxisAlignedBB;
+import net.minecraft.util.EnumFacing;
+import net.minecraft.util.MovingObjectPosition;
+import net.minecraft.util.Vec3;
+import net.minecraft.world.World;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
+import org.lwjgl.opengl.GL11;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
+import static org.lwjgl.opengl.GL11.GL_LIGHTING;
 
 public abstract class TileEntitySocketBase extends TileEntityCommon implements ISocketHolder, IDataSerializable {
     /*
@@ -61,9 +52,9 @@ public abstract class TileEntitySocketBase extends TileEntityCommon implements I
     }
 
     @Override
-    public void onPlacedBy(EntityPlayer player, ItemStack is, int side, float hitX, float hitY, float hitZ) {
+    public void onPlacedBy(EntityPlayer player, ItemStack is, EnumFacing side, float hitX, float hitY, float hitZ) {
         super.onPlacedBy(player, is, side, hitX, hitY, hitZ);
-        facing = SpaceUtil.getOrientation(side);
+        facing = side;
     }
 
     public void migrate1to2() {
@@ -138,32 +129,25 @@ public abstract class TileEntitySocketBase extends TileEntityCommon implements I
     
     @Override
     public boolean isBlockSolidOnSide(EnumFacing side) {
-        return side == facing.getOpposite().ordinal();
+        return side == facing.getOpposite();
     }
     
     @Override
     public final void sendMessage(MessageType msgType, Object ...msg) {
         broadcastMessage(null, msgType, msg);
     }
-    
-    @Override
-    @SideOnly(Side.CLIENT)
-    public IIcon getIcon(EnumFacing dir) {
-        if (dir == facing || dir.getOpposite() == facing) {
-            return BlockIcons.socket$face;
-        }
-        return BlockIcons.socket$side;
-    }
-    
+
     protected boolean isBlockPowered() {
         if (FzConfig.sockets_ignore_front_redstone) {
             for (EnumFacing fd : EnumFacing.VALUES) {
                 if (fd == facing) continue;
-                if (worldObj.getIndirectPowerLevelTo(xCoord + fd.getDirectionVec().getX(), yCoord + fd.getDirectionVec().getY(), zCoord + fd.getDirectionVec().getZ(), fd.ordinal()) > 0) return true;
+                if (worldObj.getRedstonePower(pos.offset(fd), fd) > 0) {
+                    return true;
+                }
             }
             return false;
         } else {
-            return worldObj.getBlockPowerInput(xCoord, yCoord, zCoord) > 0;
+            return worldObj.getStrongPower(pos) > 0;
         }
     }
     
@@ -241,9 +225,9 @@ public abstract class TileEntitySocketBase extends TileEntityCommon implements I
     protected EntityPlayer getFakePlayer() {
         EntityPlayer player = PlayerUtil.makePlayer(getCoord(), "socket");
         player.worldObj = worldObj;
-        player.prevPosX = player.posX = xCoord + 0.5 + facing.getDirectionVec().getX();
-        player.prevPosY = player.posY = yCoord + 0.5 - player.getEyeHeight() + facing.getDirectionVec().getY();
-        player.prevPosZ = player.posZ = zCoord + 0.5 + facing.getDirectionVec().getZ();
+        player.prevPosX = player.posX = pos.getX() + 0.5 + facing.getDirectionVec().getX();
+        player.prevPosY = player.posY = pos.getY() + 0.5 - player.getEyeHeight() + facing.getDirectionVec().getY();
+        player.prevPosZ = player.posZ = pos.getZ() + 0.5 + facing.getDirectionVec().getZ();
         for (int i = 0; i < player.inventory.mainInventory.length; i++) {
             player.inventory.mainInventory[i] = null;
         }
@@ -258,7 +242,7 @@ public abstract class TileEntitySocketBase extends TileEntityCommon implements I
     
     protected IInventory getBackingInventory(ISocketHolder socket) {
         if (socket == this) {
-            TileEntity te = worldObj.getTileEntity(xCoord - facing.getDirectionVec().getX(),yCoord - facing.getDirectionVec().getY(),zCoord - facing.getDirectionVec().getZ());
+            TileEntity te = worldObj.getTileEntity(pos.getX() - facing.getDirectionVec().getX(), pos.getY() - facing.getDirectionVec().getY(), pos.getZ() - facing.getDirectionVec().getZ());
             if (te instanceof IInventory) {
                 return (IInventory) te;
             }

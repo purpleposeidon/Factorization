@@ -1,22 +1,16 @@
 package factorization.shared;
 
-import factorization.util.SpaceUtil;
-import net.minecraftforge.fml.common.event.FMLModIdMappingEvent;
-import net.minecraftforge.fml.common.network.internal.FMLProxyPacket;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
 import factorization.api.*;
 import factorization.api.datahelpers.DataHelper;
 import factorization.api.datahelpers.DataInNBT;
 import factorization.api.datahelpers.DataOutByteBuf;
 import factorization.api.datahelpers.DataOutNBT;
-import factorization.common.BlockIcons;
 import factorization.common.FactoryType;
 import factorization.migration.MigrationHelper;
 import factorization.shared.NetworkFactorization.MessageType;
 import factorization.util.ItemUtil;
+import factorization.util.SpaceUtil;
 import io.netty.buffer.ByteBuf;
-import io.netty.buffer.ByteBufAllocator;
 import io.netty.buffer.Unpooled;
 import net.minecraft.block.Block;
 import net.minecraft.entity.Entity;
@@ -29,14 +23,14 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.AxisAlignedBB;
-import net.minecraft.util.IIcon;
+import net.minecraft.util.EnumFacing;
 import net.minecraft.util.MovingObjectPosition;
 import net.minecraft.util.Vec3;
 import net.minecraftforge.common.util.Constants;
-import net.minecraft.util.EnumFacing;
+import net.minecraftforge.fml.common.event.FMLModIdMappingEvent;
+import net.minecraftforge.fml.common.network.internal.FMLProxyPacket;
+import net.minecraftforge.fml.relauncher.Side;
 
-import java.io.ByteArrayOutputStream;
-import java.io.DataInput;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -76,9 +70,9 @@ public abstract class TileEntityCommon extends TileEntity implements ICoord, IFa
         DataOutByteBuf data = new DataOutByteBuf(buf, Side.SERVER);
         try {
             MessageType.FactoryType.write(buf);
-            buf.writeInt(xCoord);
-            buf.writeInt(yCoord);
-            buf.writeInt(zCoord);
+            buf.writeInt(pos.getX());
+            buf.writeInt(pos.getY());
+            buf.writeInt(pos.getZ());
             int ftId = getFactoryType().md;
             buf.writeByte(ftId);
             putData(data);
@@ -195,18 +189,18 @@ public abstract class TileEntityCommon extends TileEntity implements ICoord, IFa
         }
     }
 
-    public boolean canPlaceAgainst(EntityPlayer player, Coord c, int side) {
+    public boolean canPlaceAgainst(EntityPlayer player, Coord c, EnumFacing side) {
         return true;
     }
 
-    public void onPlacedBy(EntityPlayer player, ItemStack is, int side, float hitX, float hitY, float hitZ) {
+    public void onPlacedBy(EntityPlayer player, ItemStack is, EnumFacing side, float hitX, float hitY, float hitZ) {
         if (is != null && is.hasTagCompound()) {
             loadFromStack(is);
         }
     }
 
     protected boolean removedByPlayer(EntityPlayer player, boolean willHarvest) {
-        return worldObj.setBlockToAir(xCoord, yCoord, zCoord);
+        return worldObj.setBlockToAir(pos);
     }
 
     public void click(EntityPlayer entityplayer) {
@@ -243,7 +237,7 @@ public abstract class TileEntityCommon extends TileEntity implements ICoord, IFa
 
     public AxisAlignedBB getCollisionBoundingBoxFromPool() {
         setBlockBounds(Core.registry.resource_block);
-        AxisAlignedBB ret = Core.registry.resource_block.getCollisionBoundingBoxFromPool(worldObj, xCoord, yCoord, zCoord);
+        AxisAlignedBB ret = Core.registry.resource_block.getCollisionBoundingBox(worldObj, pos, worldObj.getBlockState(pos));
         Core.registry.resource_block.setBlockBounds(0, 0, 0, 1, 1, 1);
         return ret;
     }
@@ -253,7 +247,7 @@ public abstract class TileEntityCommon extends TileEntity implements ICoord, IFa
     }
 
     public MovingObjectPosition collisionRayTrace(Vec3 startVec, Vec3 endVec) {
-        return Blocks.stone.collisionRayTrace(worldObj, xCoord, yCoord, zCoord, startVec, endVec);
+        return Blocks.bedrock.collisionRayTrace(worldObj, pos, startVec, endVec);
     }
 
     public void setBlockBounds(Block b) {
@@ -265,7 +259,7 @@ public abstract class TileEntityCommon extends TileEntity implements ICoord, IFa
 
         if (type.hasGui) {
             if (!entityplayer.worldObj.isRemote) {
-                entityplayer.openGui(Core.instance, type.gui, worldObj, xCoord, yCoord, zCoord);
+                entityplayer.openGui(Core.instance, type.gui, worldObj, pos.getX(), pos.getY(), pos.getZ());
             }
             return true;
         }
@@ -331,16 +325,10 @@ public abstract class TileEntityCommon extends TileEntity implements ICoord, IFa
 
     public boolean recolourBlock(EnumFacing side, FzColor fzColor) { return false; }
 
-    @SideOnly(Side.CLIENT)
-    public IIcon getIcon(EnumFacing dir) {
-        return BlockIcons.error;
-    }
-
-
 
     public void spawnDisplayTickParticles(Random rand) { }
 
     public void blockUpdateTick(Block myself) {
-        worldObj.notifyBlockChange(xCoord, yCoord, zCoord, myself);
+        worldObj.notifyBlockOfStateChange(pos, myself);
     }
 }

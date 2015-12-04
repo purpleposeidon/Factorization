@@ -515,7 +515,7 @@ public class SocketLacerator extends TileEntitySocketBase implements IChargeCond
         block.setBlockBounds(d, d + yd + yoffset + 2F/16F + sd, d, 1 - d, 1 - (d + 0F/16F) + yd + yoffset, 1 - d);
         block.beginWithMirroredUVs();
         block.rotateCenter(Quaternion.fromOrientation(FzOrientation.fromDirection(facing.getOpposite())));
-        block.renderRotated(tess, xCoord, yCoord, zCoord);
+        block.renderRotated(tess, pos.getX(), pos.getY(), pos.getZ());
     }
     
     
@@ -534,9 +534,9 @@ public class SocketLacerator extends TileEntitySocketBase implements IChargeCond
         if (particleTweaker == null) {
             particleTweaker = new ParticleWarper(worldObj, mc.renderEngine);
         }
-        px = xCoord + facing.getDirectionVec().getX();
-        py = yCoord + facing.getDirectionVec().getY();
-        pz = zCoord + facing.getDirectionVec().getZ();
+        px = pos.getX() + facing.getDirectionVec().getX();
+        py = pos.getY() + facing.getDirectionVec().getY();
+        pz = pos.getZ() + facing.getDirectionVec().getZ();
         
         EnumFacing op = facing.getOpposite();
         

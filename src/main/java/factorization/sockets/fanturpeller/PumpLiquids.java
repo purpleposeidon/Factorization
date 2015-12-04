@@ -452,7 +452,7 @@ public class PumpLiquids extends SocketFanturpeller implements IFluidHandler {
         
         @Override
         int getMaxHeight() {
-            return yCoord + 12;
+            return pos.getY() + 12;
         }
     }
     

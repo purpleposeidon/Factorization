@@ -8,7 +8,6 @@ import io.netty.buffer.ByteBuf;
 import net.minecraft.block.Block;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.IIcon;
 import net.minecraft.util.MovingObjectPosition;
@@ -104,7 +103,7 @@ public class TileEntityWire extends TileEntityCommon implements IChargeConductor
     }
 
     @Override
-    public boolean canPlaceAgainst(EntityPlayer player, Coord supporter, int side) {
+    public boolean canPlaceAgainst(EntityPlayer player, Coord supporter, EnumFacing side) {
         if (supporter.isSolidOnSide(side)) {
             return true;
         }
@@ -132,7 +131,7 @@ public class TileEntityWire extends TileEntityCommon implements IChargeConductor
     @Override
     public void neighborChanged() {
         if (!is_supported() /*&& !find_support()*/ ) {
-            Core.registry.factory_block.dropBlockAsItem(worldObj, xCoord, yCoord, zCoord, BlockClass.Wire.md, 0);
+            Core.registry.factory_block.dropBlockAsItem(worldObj, pos.getX(), pos.getY(), pos.getZ(), BlockClass.Wire.md, 0);
             Coord here = getCoord();
             here.setAir();
             here.rmTE();
@@ -158,7 +157,7 @@ public class TileEntityWire extends TileEntityCommon implements IChargeConductor
 
 
     @Override
-    public void onPlacedBy(EntityPlayer player, ItemStack is, int side, float hitX, float hitY, float hitZ) {
+    public void onPlacedBy(EntityPlayer player, ItemStack is, EnumFacing side, float hitX, float hitY, float hitZ) {
         side = new int[] { 1, 0, 3, 2, 5, 4, }[side];
         if (player.isSneaking()) {
             supporting_side = (byte) side;
@@ -201,7 +200,7 @@ public class TileEntityWire extends TileEntityCommon implements IChargeConductor
 
     @Override
     public MovingObjectPosition collisionRayTrace(Vec3 startVec, Vec3 endVec) {
-        return new WireConnections(this).collisionRayTrace(worldObj, xCoord, yCoord, zCoord, startVec, endVec);
+        return new WireConnections(this).collisionRayTrace(worldObj, pos.getX(), pos.getY(), pos.getZ(), startVec, endVec);
     }
 
     @Override

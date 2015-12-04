@@ -14,7 +14,6 @@ import net.minecraft.util.IIcon;
 import org.lwjgl.opengl.GL11;
 
 import factorization.shared.Core;
-import factorization.shared.FactorizationBlockRender;
 
 public class TileEntityCrystallizerRender extends TileEntitySpecialRenderer {
 

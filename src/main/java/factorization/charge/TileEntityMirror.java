@@ -111,9 +111,9 @@ public class TileEntityMirror extends TileEntityCommon {
     }
 
     public boolean hasSun() {
-        boolean raining = getWorldObj().isRaining() && getWorldObj().getBiomeGenForCoords(xCoord, yCoord).rainfall > 0;
+        boolean raining = getWorldObj().isRaining() && getWorldObj().getBiomeGenForCoords(pos.getX(), pos.getY()).rainfall > 0;
         if (raining) return false;
-        if (worldObj.getSavedLightValue(EnumSkyBlock.Sky, xCoord, yCoord, zCoord) < 0xF) return false;
+        if (worldObj.getSavedLightValue(EnumSkyBlock.Sky, pos.getX(), pos.getY(), pos.getZ()) < 0xF) return false;
         if (covered_by_other_mirror) return false;
         return worldObj.getSunBrightnessFactor(0) > 0.7;
     }
@@ -175,7 +175,7 @@ public class TileEntityMirror extends TileEntityCommon {
     }
 
     @Override
-    public void onPlacedBy(EntityPlayer player, ItemStack is, int side, float hitX, float hitY, float hitZ) {
+    public void onPlacedBy(EntityPlayer player, ItemStack is, EnumFacing side, float hitX, float hitY, float hitZ) {
         super.onPlacedBy(player, is, side, hitX, hitY, hitZ);
         setBelowObscured(getCoord(), true);
     }
@@ -289,9 +289,9 @@ public class TileEntityMirror extends TileEntityCommon {
         int last_dist = Integer.MAX_VALUE;
         Coord me = getCoord();
         double maxRadiusSq = 8.9*8.9;
-        for (int x = xCoord - search_distance; x <= xCoord + search_distance; x++) {
-            for (int z = zCoord - search_distance; z <= zCoord + search_distance; z++) {
-                Coord here = new Coord(worldObj, x, yCoord, z);
+        for (int x = pos.getX() - search_distance; x <= pos.getX() + search_distance; x++) {
+            for (int z = pos.getZ() - search_distance; z <= pos.getZ() + search_distance; z++) {
+                Coord here = new Coord(worldObj, x, pos.getY(), z);
                 IReflectionTarget target = here.getTE(IReflectionTarget.class); // FIXME: Iterate the chunk hash maps instead... get a nice helper function perhaps
                 if (target == null) {
                     continue;
@@ -331,7 +331,7 @@ public class TileEntityMirror extends TileEntityCommon {
     boolean myTrace(double x, double z) {
         x += 0.5;
         z += 0.5;
-        double offset_x = x - (xCoord + 0.5), offset_z = z - (zCoord + 0.5);
+        double offset_x = x - (pos.getX() + 0.5), offset_z = z - (pos.getZ() + 0.5);
         double length = Math.hypot(offset_x, offset_z);
         double dx = offset_x / length, dz = offset_z / length;
         x -= dx;
@@ -340,16 +340,16 @@ public class TileEntityMirror extends TileEntityCommon {
         for (int i = 0; i < length; i++) {
             bx = (int) Math.round(x + 0.5) - 1;
             bz = (int) Math.round(z + 0.5) - 1;
-            if (bx == xCoord && bz == zCoord) {
+            if (bx == pos.getX() && bz == pos.getZ()) {
                 return true;
             }
-            final Block b = worldObj.getBlock(bx, yCoord, bz);
+            final Block b = worldObj.getBlock(bx, pos.getY(), bz);
             boolean air_like = false;
             if (b == null) {
                 air_like = true;
             } else {
-                air_like = b.isAir(worldObj, bx, yCoord, bz);
-                air_like |= b.getCollisionBoundingBoxFromPool(worldObj, bx, yCoord, bz) == null;
+                air_like = b.isAir(worldObj, bx, pos.getY(), bz);
+                air_like |= b.getCollisionBoundingBoxFromPool(worldObj, bx, pos.getY(), bz) == null;
             }
             if (!air_like) {
                 return false;

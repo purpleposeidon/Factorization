@@ -3,7 +3,6 @@ package factorization.darkiron;
 import java.util.Random;
 
 import net.minecraft.block.Block;
-import net.minecraft.init.Blocks;
 import net.minecraft.block.material.Material;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.EntityPlayer;
@@ -83,7 +82,7 @@ public class BlockDarkIronOre extends Block {
             age++;
             EntityPlayer player = Minecraft.getMinecraft().thePlayer;
             if (lastRenderedTick + 60 < worldObj.getTotalWorldTime() && !inRange(age, age, age, player)) {
-                worldObj.removeTileEntity(xCoord, yCoord, zCoord);
+                worldObj.removeTileEntity(pos.getX(), pos.getY(), pos.getZ());
             }
         }
         
@@ -96,7 +95,7 @@ public class BlockDarkIronOre extends Block {
         @Override
         @SideOnly(Side.CLIENT)
         public AxisAlignedBB getRenderBoundingBox() {
-            return getBlockType().getCollisionBoundingBoxFromPool(worldObj, xCoord, yCoord, zCoord);
+            return getBlockType().getCollisionBoundingBoxFromPool(worldObj, pos.getX(), pos.getY(), pos.getZ());
         }
         
         @Override

@@ -88,7 +88,7 @@ public class FzNetDispatch {
     
     public static void addPacketFrom(Packet packet, TileEntity ent) {
         World w = ent.getWorld();
-        addPacketFrom(packet, w.getChunkFromBlockCoords(ent.xCoord, ent.zCoord));
+        addPacketFrom(packet, w.getChunkFromBlockCoords(ent.pos.getX(), ent.pos.getZ()));
     }
     
     public static void addPacketFrom(Packet packet, Coord c) {

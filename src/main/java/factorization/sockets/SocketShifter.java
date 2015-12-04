@@ -398,7 +398,7 @@ public class SocketShifter extends TileEntitySocketBase {
     @Override
     protected boolean isBlockPowered() {
         if (worldObj.isRemote) return false;
-        return worldObj.getStrongestIndirectPower(xCoord, yCoord, zCoord) > 0;
+        return worldObj.getStrongestIndirectPower(pos.getX(), pos.getY(), pos.getZ()) > 0;
     }
     
     @Override
@@ -419,7 +419,7 @@ public class SocketShifter extends TileEntitySocketBase {
             block.setBlockBounds(d, minY, d, 1-d, 12F/16F, 1-d);
             block.beginWithMirroredUVs();
             block.rotateCenter(Quaternion.fromOrientation(FzOrientation.fromDirection(facing.getOpposite())));
-            block.renderRotated(tess, xCoord, yCoord, zCoord);
+            block.renderRotated(tess, pos.getX(), pos.getY(), pos.getZ());
         }
     }
     

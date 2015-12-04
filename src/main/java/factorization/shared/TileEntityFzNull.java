@@ -19,16 +19,16 @@ public class TileEntityFzNull extends TileEntity {
             int origY = tag.getInteger("y");
             int origZ = tag.getInteger("z");
             Core.logSevere("fz.null TileEntity reading a " + tag.getString("id") + " TileEntity at "
-                    + xCoord + "," + yCoord + "," + zCoord + "; saved position's at "
+                    + pos.getX() + "," + pos.getY() + "," + pos.getZ() + "; saved position's at "
                     + origX + "," + origY + "," + origZ);
         }
-        tag.setInteger("x", this.xCoord);
-        tag.setInteger("y", this.yCoord);
-        tag.setInteger("z", this.zCoord);
+        tag.setInteger("x", this.pos.getX());
+        tag.setInteger("y", this.pos.getY());
+        tag.setInteger("z", this.pos.getZ());
         TileEntity replacement = TileEntity.createAndLoadEntity(tag);
         if (replacement == null) return; // Nothing can be done here.
         invalidate();
         replacement.validate();
-        worldObj.setTileEntity(xCoord, yCoord, zCoord, replacement);
+        worldObj.setTileEntity(pos.getX(), pos.getY(), pos.getZ(), replacement);
     }
 }

@@ -1,28 +1,25 @@
 package factorization.wrath;
 
-import java.io.IOException;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.PriorityQueue;
-
 import factorization.api.datahelpers.DataHelper;
+import factorization.common.FactoryType;
+import factorization.shared.BlockClass;
+import factorization.shared.Core;
+import factorization.shared.TileEntityCommon;
 import net.minecraft.block.Block;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.util.IIcon;
+import net.minecraft.util.BlockPos;
+import net.minecraft.util.EnumFacing;
 import net.minecraft.world.World;
 import net.minecraft.world.chunk.Chunk;
-import net.minecraft.util.EnumFacing;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
-import factorization.common.BlockIcons;
-import factorization.common.FactoryType;
-import factorization.shared.BlockClass;
-import factorization.shared.Core;
-import factorization.shared.TileEntityCommon;
+
+import java.io.IOException;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.PriorityQueue;
 
 public class TileEntityWrathLamp extends TileEntityCommon {
     static final int radius = 6;
@@ -31,30 +28,28 @@ public class TileEntityWrathLamp extends TileEntityCommon {
     static final int maxDepth = 24; //XXX TODO
     private short beamDepths[] = new short[(diameter + 1) * (diameter + 1)];
     private Updater updater = new Idler();
-    static boolean isUpdating = false;
+    static boolean isUpdating = false; // TODO: Bad for threads.
 
     static int update_count;
     static final int update_limit = 512;
-    static PriorityQueue<Coord> airToUpdate = new PriorityQueue(1024);
+    static PriorityQueue<LampCoord> airToUpdate = new PriorityQueue<LampCoord>(1024);
 
-    private static class Coord implements Comparable<Coord> {
-        World w;
-        int x, y, z;
+    private static class LampCoord implements Comparable<LampCoord> {
+        final World w;
+        final BlockPos pos;
 
-        Coord(World w, int x, int y, int z) {
+        LampCoord(World w, BlockPos pos) {
             this.w = w;
-            this.x = x;
-            this.y = y;
-            this.z = z;
+            this.pos = pos;
         }
 
         void check() {
-            doAirCheck(w, x, y, z);
+            doAirCheck(w, pos);
         }
 
         @Override
-        public int compareTo(Coord o) {
-            return o.y - y;
+        public int compareTo(LampCoord o) {
+            return Integer.compare(o.pos.getY(), pos.getY());
         }
     }
 
@@ -66,7 +61,7 @@ public class TileEntityWrathLamp extends TileEntityCommon {
     }
 
     @Override
-    public void onPlacedBy(EntityPlayer player, ItemStack is, int side, float hitX, float hitY, float hitZ) {
+    public void onPlacedBy(EntityPlayer player, ItemStack is, EnumFacing side, float hitX, float hitY, float hitZ) {
         super.onPlacedBy(player, is, side, hitX, hitY, hitZ);
         updater = new InitialBuild();
     }
@@ -75,7 +70,7 @@ public class TileEntityWrathLamp extends TileEntityCommon {
     static final int UPDATE_CLIENT = factorization.api.Coord.UPDATE;
     static boolean spammed_console = false;
 
-    static void doAirCheck(World w, int x, int y, int z) {
+    static void doAirCheck(World w, BlockPos pos) {
         if (w.isRemote) {
             return;
         }
@@ -87,20 +82,20 @@ public class TileEntityWrathLamp extends TileEntityCommon {
                 }
                 return;
             }
-            airToUpdate.add(new Coord(w, x, y, z));
+            airToUpdate.add(new LampCoord(w, pos));
             return;
         }
-        TileEntityWrathLamp lamp = TileEntityWrathLamp.findLightAirParent(w, x, y, z);
+        TileEntityWrathLamp lamp = TileEntityWrathLamp.findLightAirParent(w, pos);
         if (lamp == null) {
             update_count += 1;
-            w.setBlockToAir(x, y, z);
+            w.setBlockToAir(pos);
         } else {
-            lamp.activate(y);
+            lamp.activate(pos.getY());
         }
     }
 
     private int getDepthIndex(int x, int z) {
-        int dx = xCoord - x, dz = zCoord - z;
+        int dx = pos.getX() - x, dz = pos.getZ() - z;
         dx += radius;
         dz += radius;
         if (dx < 0 || dx > diameter) {
@@ -114,17 +109,16 @@ public class TileEntityWrathLamp extends TileEntityCommon {
 
     static final int deltas[] = new int[] { 0, -16, +16 };
 
-    static HashSet<Chunk> toVisit = new HashSet(9 * 5);
+    static HashSet<Chunk> toVisit = new HashSet<Chunk>(9 * 5);
 
-    static TileEntityWrathLamp findLightAirParent(World world, int x, int y, int z) {
+    static TileEntityWrathLamp findLightAirParent(World world, BlockPos pos) {
         //NOTE: This could be optimized. Probably not really worth it tho.
         toVisit.clear();
         for (int dcx : deltas) {
             for (int dcz : deltas) {
-                if (!world.blockExists(x + dcx, y, z + dcz)) {
-                    continue;
-                }
-                toVisit.add(world.getChunkFromBlockCoords(x + dcx, z + dcz));
+                BlockPos dpos = pos.add(dcx, 0, dcz);
+                if (!world.isBlockLoaded(dpos)) continue;
+                toVisit.add(world.getChunkFromBlockCoords(dpos));
             }
         }
         for (Chunk chunk : toVisit) {
@@ -143,13 +137,13 @@ public class TileEntityWrathLamp extends TileEntityCommon {
     }
 
     private boolean inArea(int x, int y, int z) {
-        if (y > yCoord) {
+        if (y > pos.getY()) {
             return false;
         }
-        if (y < yCoord - maxDepth) {
+        if (y < pos.getY() - maxDepth) {
             return false;
         }
-        return xCoord - radius <= x && x <= xCoord + radius && zCoord - radius <= z && z <= zCoord + radius;
+        return pos.getX() - radius <= x && x <= pos.getX() + radius && pos.getZ() - radius <= z && z <= pos.getZ() + radius;
     }
 
     private boolean lightsBlock(int x, int y, int z) {
@@ -177,14 +171,14 @@ public class TileEntityWrathLamp extends TileEntityCommon {
         invalidating.set(Boolean.TRUE);
         try {
             Core.profileStart("WrathLamp");
-            for (int x = xCoord - radius; x <= xCoord + radius; x++) {
-                for (int z = zCoord - radius; z <= zCoord + radius; z++) {
-                    Block id = worldObj.getBlock(x, yCoord, z);
+            for (int x = pos.getX() - radius; x <= pos.getX() + radius; x++) {
+                for (int z = pos.getZ() - radius; z <= pos.getZ() + radius; z++) {
+                    Block id = worldObj.getBlock(x, pos.getY(), z);
                     if (id == Core.registry.lightair_block) {
                         if (worldObj.isRemote) {
-                            worldObj.setBlockToAir(x, yCoord, z);
+                            worldObj.setBlockToAir(x, pos.getY(), z);
                         } else {
-                            worldObj.setBlock(x, yCoord, z, Blocks.air);
+                            worldObj.setBlock(x, pos.getY(), z, Blocks.air);
                         }
                     }
                 }
@@ -192,7 +186,7 @@ public class TileEntityWrathLamp extends TileEntityCommon {
             Core.profileEnd();
             if (worldObj.isRemote) {
                 RelightTask task = new RelightTask(worldObj);
-                task.setPosition(xCoord, yCoord, zCoord);
+                task.setPosition(pos.getX(), pos.getY(), pos.getZ());
                 worldObj.spawnEntityInWorld(task);
             }
         } finally {
@@ -216,20 +210,20 @@ public class TileEntityWrathLamp extends TileEntityCommon {
     }
 
     boolean myTrace(int x, int z) {
-        int dx = x - xCoord, dz = z - zCoord;
+        int dx = x - pos.getX(), dz = z - pos.getZ();
         float idealm = div(dz, dx);
 
         float old_dist = Float.MAX_VALUE;
         while (true) {
-            if (x == xCoord && z == zCoord) {
+            if (x == pos.getX() && z == pos.getZ()) {
                 return true;
             }
-            Block id = worldObj.getBlock(x, yCoord, z);
+            Block id = worldObj.getBlock(x, pos.getY(), z);
             if (id != null && id.isOpaqueCube() && id.getLightOpacity() != 0) {
                 return false;
             }
-            dx = x - xCoord;
-            dz = z - zCoord;
+            dx = x - pos.getX();
+            dz = z - pos.getZ();
             float m = div(dz, dx);
             int addx = (int) -Math.signum(dx), addz = (int) -Math.signum(dz);
             if (addx == 0 && addz == 0) {
@@ -261,7 +255,7 @@ public class TileEntityWrathLamp extends TileEntityCommon {
 
     @Override
     public void neighborChanged() {
-        activate(yCoord);
+        activate(pos.getY());
     }
 
     void activate(int at_height) {
@@ -289,7 +283,7 @@ public class TileEntityWrathLamp extends TileEntityCommon {
             }
             if (height == -100) {
                 if (start_height == -100) {
-                    height = yCoord;
+                    height = pos.getY();
                 }
                 else {
                     height = start_height;
@@ -298,24 +292,24 @@ public class TileEntityWrathLamp extends TileEntityCommon {
             else {
                 height -= 1;
             }
-            if (height < yCoord - maxDepth) {
+            if (height < pos.getY() - maxDepth) {
                 return next_updater;
             }
-            if (height == yCoord) {
+            if (height == pos.getY()) {
                 //we are level with the lamp.
                 //Set areas we can't reach to -1
                 Arrays.fill(beamDepths, (short) 0);
-                for (int x = xCoord - radius; x <= xCoord + radius; x++) {
-                    for (int z = zCoord - radius; z <= zCoord + radius; z++) {
-                        if (!clearTo(x, yCoord, z)) {
+                for (int x = pos.getX() - radius; x <= pos.getX() + radius; x++) {
+                    for (int z = pos.getZ() - radius; z <= pos.getZ() + radius; z++) {
+                        if (!clearTo(x, pos.getY(), z)) {
                             beamDepths[getDepthIndex(x, z)] = -1;
                         }
                     }
                 }
             }
             //NORELEASE: I've probably messed this up
-            for (int x = xCoord - radius; x <= xCoord + radius; x++) {
-                for (int z = zCoord - radius; z <= zCoord + radius; z++) {
+            for (int x = pos.getX() - radius; x <= pos.getX() + radius; x++) {
+                for (int z = pos.getZ() - radius; z <= pos.getZ() + radius; z++) {
                     // If it is air, make it LightAir™
                     // If already lightair, carry on
                     // if a (solid?) block, stop
@@ -325,7 +319,7 @@ public class TileEntityWrathLamp extends TileEntityCommon {
                     }
                     Block block = worldObj.getBlock(x, height, z);
                     Block belowBlock = worldObj.getBlock(x, height - 3, z);
-                    if (belowBlock != Core.registry.lightair_block && height != yCoord) {
+                    if (belowBlock != Core.registry.lightair_block && height != pos.getY()) {
                         beamDepths[index] = (short) height;
                         continue;
                     }
@@ -339,7 +333,7 @@ public class TileEntityWrathLamp extends TileEntityCommon {
                         chunk.func_150807_a(x & 15, height, z & 15, Core.registry.lightair_block, 0);
                         worldObj.markBlockForUpdate(x, height, z);
                     } else if (block == Core.registry.lightair_block) {
-                    } else if (x == xCoord && height == yCoord && z == zCoord) {
+                    } else if (x == pos.getX() && height == pos.getY() && z == pos.getZ()) {
                         //this is ourself. Hi, self.
                         //Don't terminate the beamDepth early.
                     } else {
@@ -370,7 +364,7 @@ public class TileEntityWrathLamp extends TileEntityCommon {
 
     class Idler extends Updater {
         boolean couldUpdate(int dx, int dz) {
-            return worldObj.isAirBlock(xCoord + dx, yCoord, zCoord + dz);
+            return worldObj.isAirBlock(pos.add(dx, 0, dz));
         }
 
         @Override
@@ -445,11 +439,5 @@ public class TileEntityWrathLamp extends TileEntityCommon {
     @Override
     public boolean isBlockSolidOnSide(EnumFacing side) {
         return false;
-    }
-    
-    @Override
-    @SideOnly(Side.CLIENT)
-    public IIcon getIcon(EnumFacing dir) {
-        return BlockIcons.dark_iron_block;
     }
 }

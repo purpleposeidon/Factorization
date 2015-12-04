@@ -124,7 +124,7 @@ public class TileEntitySteamShaft extends TileEntityCommon implements IFluidHand
             return;
         }
         double force = 0;
-        if (worldObj.getBlockPowerInput(xCoord, yCoord, zCoord) == 0) {
+        if (worldObj.getBlockPowerInput(pos.getX(), pos.getY(), pos.getZ()) == 0) {
             FluidStack steam = steamTank.getFluid();
             if (steam == null) { // Has happened on occasion
                 steamTank.setFluid(steam = FluidRegistry.getFluidStack("steam", 0));
@@ -191,7 +191,7 @@ public class TileEntitySteamShaft extends TileEntityCommon implements IFluidHand
                 rot.applyRotation(pos);
                 rot.applyRotation(mot);
 
-                EntityFXSteam steam = new EntityFXSteam(worldObj, xCoord + 0.5 + pos.xCoord, yCoord + 0.5 + pos.yCoord, zCoord + 0.5 + pos.zCoord, BlockIcons.steam);
+                EntityFXSteam steam = new EntityFXSteam(worldObj, pos.getX() + 0.5 + pos.xCoord, pos.getY() + 0.5 + pos.yCoord, pos.getZ() + 0.5 + pos.zCoord, BlockIcons.steam);
                 SpaceUtil.toEntVel(steam, mot);
                 Minecraft.getMinecraft().effectRenderer.addEffect(steam);
             }

@@ -70,7 +70,7 @@ public class GlintRenderer extends TileEntitySpecialRenderer {
             float r = NumUtil.uninterp((float) minTheta, (float) maxTheta, (float) theta);
             opacity *= r;
             
-            int light = w.getBlockLightValue(te.xCoord + dir.getDirectionVec().getX(), te.yCoord + dir.getDirectionVec().getY(), te.zCoord + dir.getDirectionVec().getZ());
+            int light = w.getBlockLightValue(te.pos.getX() + dir.getDirectionVec().getX(), te.pos.getY() + dir.getDirectionVec().getY(), te.pos.getZ() + dir.getDirectionVec().getZ());
             opacity += (light/16F)*0.2F;
             opacity = Math.min(opacity, 0.35F);
             
