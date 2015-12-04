@@ -1,6 +1,5 @@
 package factorization.truth.word;
 
-import factorization.common.BlockIcons;
 import factorization.shared.Core;
 import factorization.truth.WordPage;
 import factorization.truth.api.IHtmlTypesetter;

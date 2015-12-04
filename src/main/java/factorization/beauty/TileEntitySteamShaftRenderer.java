@@ -1,6 +1,5 @@
 package factorization.beauty;
 
-import factorization.common.BlockIcons;
 import factorization.shared.Core;
 import factorization.util.NumUtil;
 import net.minecraft.client.Minecraft;

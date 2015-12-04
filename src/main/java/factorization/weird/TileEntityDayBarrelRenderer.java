@@ -3,7 +3,6 @@ package factorization.weird;
 import factorization.api.Coord;
 import factorization.api.FzOrientation;
 import factorization.api.Quaternion;
-import factorization.common.BlockIcons;
 import factorization.common.FactoryType;
 import factorization.common.FzConfig;
 import factorization.common.ItemIcons;

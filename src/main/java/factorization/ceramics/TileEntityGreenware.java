@@ -7,7 +7,6 @@ import factorization.api.datahelpers.DataHelper;
 import factorization.api.datahelpers.DataInNBT;
 import factorization.api.datahelpers.DataOutNBT;
 import factorization.api.datahelpers.Share;
-import factorization.common.BlockIcons;
 import factorization.common.FactoryType;
 import factorization.common.FzConfig;
 import factorization.common.ResourceType;

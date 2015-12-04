@@ -1,6 +1,5 @@
 package factorization.artifact;
 
-import factorization.common.BlockIcons;
 import factorization.common.FactoryType;
 import factorization.shared.Core;
 import net.minecraft.block.Block;
@@ -21,7 +20,7 @@ import java.util.List;
 public class BlockForge extends BlockAnvil {
     public BlockForge() {
         Core.tab(this, Core.TabType.ARTIFACT);
-        setBlockName("factorization:artifactForge");
+        setUnlocalizedName("factorization:artifactForge");
         setHardness(5.0F).setResistance(2000.0F);
         setStepSound(new Block.SoundType("anvil", 1.0F, 0.125F) {
             public String getBreakSound() {
@@ -42,15 +41,6 @@ public class BlockForge extends BlockAnvil {
             player.addChatMessage(new ChatComponentTranslation("factorization.forge.wait").setChatStyle(InspirationManager.aqua));
         }
         return true;
-    }
-
-    @SideOnly(Side.CLIENT)
-    public IIcon getIcon(int side, int md) {
-        return BlockIcons.dark_iron_block;
-    }
-
-    @SideOnly(Side.CLIENT)
-    public void registerBlockIcons(IIconRegister register) {
     }
 
     @SideOnly(Side.CLIENT)

@@ -1,6 +1,5 @@
 package factorization.utiligoo;
 
-import factorization.common.BlockIcons;
 import factorization.shared.BlockRenderHelper;
 import factorization.shared.Core;
 import factorization.util.RenderUtil;

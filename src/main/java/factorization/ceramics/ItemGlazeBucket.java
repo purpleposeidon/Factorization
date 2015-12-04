@@ -3,7 +3,6 @@ package factorization.ceramics;
 import factorization.api.Coord;
 import factorization.ceramics.TileEntityGreenware.ClayLump;
 import factorization.ceramics.TileEntityGreenware.ClayState;
-import factorization.common.BlockIcons;
 import factorization.common.ItemIcons;
 import factorization.notify.Notice;
 import factorization.shared.Core;

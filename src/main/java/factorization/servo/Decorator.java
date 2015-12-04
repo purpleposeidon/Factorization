@@ -1,7 +1,6 @@
 package factorization.servo;
 
 import factorization.api.Coord;
-import factorization.common.BlockIcons;
 import factorization.servo.stepper.StepperEngine;
 import factorization.shared.BlockRenderHelper;
 import factorization.shared.Core;

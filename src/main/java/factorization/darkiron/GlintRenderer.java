@@ -1,6 +1,5 @@
 package factorization.darkiron;
 
-import factorization.common.BlockIcons;
 import factorization.darkiron.BlockDarkIronOre.Glint;
 import factorization.shared.BlockRenderHelper;
 import factorization.shared.Core;

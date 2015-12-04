@@ -1,7 +1,6 @@
 package factorization.servo;
 
 import factorization.api.Coord;
-import factorization.common.BlockIcons;
 import factorization.shared.Core;
 import factorization.shared.Core.TabType;
 import factorization.shared.ItemFactorization;

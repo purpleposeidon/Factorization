@@ -2,7 +2,6 @@ package factorization.colossi;
 
 import factorization.api.Coord;
 import factorization.citizen.EntityCitizen;
-import factorization.common.BlockIcons;
 import factorization.fzds.DeltaChunk;
 import factorization.fzds.TransferLib;
 import factorization.fzds.interfaces.IDeltaChunk;

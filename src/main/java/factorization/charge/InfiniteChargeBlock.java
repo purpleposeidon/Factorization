@@ -3,7 +3,6 @@ package factorization.charge;
 import factorization.api.Charge;
 import factorization.api.IChargeConductor;
 import factorization.api.datahelpers.DataHelper;
-import factorization.common.BlockIcons;
 import factorization.common.FactoryType;
 import factorization.shared.BlockClass;
 import factorization.shared.TileEntityCommon;

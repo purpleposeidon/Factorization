@@ -7,8 +7,9 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.RenderGlobal;
 import net.minecraft.command.ICommand;
 import net.minecraft.command.ICommandSender;
-import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.Entity;
 import net.minecraft.util.AxisAlignedBB;
+import net.minecraft.util.BlockPos;
 import net.minecraft.util.ChatComponentText;
 import net.minecraft.util.Vec3;
 import net.minecraft.world.World;
@@ -26,16 +27,11 @@ import java.util.List;
 public enum AabbDebugger {
     INSTANCE;
     
-    private AabbDebugger() {
+    AabbDebugger() {
         Core.loadBus(this);
         ClientCommandHandler.instance.registerCommand(new ICommand() {
             public int compareTo(ICommand other) {
                 return this.getCommandName().compareTo(other.getCommandName());
-            }
-
-            @Override
-            public int compareTo(Object obj) {
-                return this.compareTo((ICommand) obj);
             }
 
             @Override
@@ -49,7 +45,7 @@ public enum AabbDebugger {
             }
 
             @Override
-            public List getCommandAliases() {
+            public List<String> getCommandAliases() {
                 return null;
             }
 
@@ -69,7 +65,7 @@ public enum AabbDebugger {
             }
 
             @Override public boolean canCommandSenderUseCommand(ICommandSender p_71519_1_) { return true; }
-            @Override public List addTabCompletionOptions(ICommandSender p_71516_1_, String[] p_71516_2_) { return null; }
+            @Override public List<String> addTabCompletionOptions(ICommandSender sender, String[] args, BlockPos pos) { return null; }
             @Override public boolean isUsernameIndex(String[] p_82358_1_, int p_82358_2_) { return false; }
             
         });
@@ -89,7 +85,12 @@ public enum AabbDebugger {
     
     public static void addBox(AxisAlignedBB box) {
         if (box == null) return;
-        boxes.add(box.copy());
+        boxes.add(box);
+    }
+
+    public static void addBox(BlockPos pos) {
+        if (pos == null) return;
+        addBox(new AxisAlignedBB(pos, pos.add(1, 1, 1)));
     }
 
     public static void addBox(Coord c) {
@@ -129,7 +130,7 @@ public enum AabbDebugger {
         if (!hasBoxes()) return;
         World w = Minecraft.getMinecraft().theWorld;
         if (w == null) return;
-        EntityLivingBase eyePos = Minecraft.getMinecraft().renderViewEntity;
+        Entity eyePos = Minecraft.getMinecraft().getRenderViewEntity();
         double cx = eyePos.lastTickPosX + (eyePos.posX - eyePos.lastTickPosX) * (double) event.partialTicks;
         double cy = eyePos.lastTickPosY + (eyePos.posY - eyePos.lastTickPosY) * (double) event.partialTicks;
         double cz = eyePos.lastTickPosZ + (eyePos.posZ - eyePos.lastTickPosZ) * (double) event.partialTicks;
@@ -149,12 +150,12 @@ public enum AabbDebugger {
         GL11.glLineWidth(4);
         synchronized (boxes) {
             for (AxisAlignedBB box : boxes) {
-                RenderGlobal.drawOutlinedBoundingBox(box, 0x800000);
+                RenderGlobal.drawBoxColored(box, 0x80, 0, 0, 0xFF);
             }
         }
         synchronized (frozen) {
             for (AxisAlignedBB box : frozen) {
-                RenderGlobal.drawOutlinedBoundingBox(box, 0x4040B0);
+                RenderGlobal.drawBoxColored(box, 0x40, 0x40, 0xb0, 0xFF);
             }
         }
         GL11.glLineWidth(2);

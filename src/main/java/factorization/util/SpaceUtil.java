@@ -94,8 +94,7 @@ public final class SpaceUtil {
     public static AxisAlignedBB setMin(AxisAlignedBB aabb, Vec3 v) {
         return new AxisAlignedBB(
                 v.xCoord, v.yCoord, v.zCoord,
-                aabb.maxX, aabb.maxY, aabb.maxZ
-        );
+                aabb.maxX, aabb.maxY, aabb.maxZ);
     }
 
     public static Vec3 getMax(AxisAlignedBB aabb) {
@@ -109,16 +108,14 @@ public final class SpaceUtil {
     public static AxisAlignedBB setMax(AxisAlignedBB aabb, Vec3 v) {
         return new AxisAlignedBB(
                 aabb.minX, aabb.minY, aabb.minZ,
-                v.xCoord, v.yCoord, v.zCoord
-        );
+                v.xCoord, v.yCoord, v.zCoord);
     }
 
     public static Vec3 getMiddle(AxisAlignedBB ab) {
         return new Vec3(
                 (ab.minX + ab.maxX) / 2,
                 (ab.minY + ab.maxY) / 2,
-                (ab.minZ + ab.maxZ) / 2
-        );
+                (ab.minZ + ab.maxZ) / 2);
     }
 
     public static AxisAlignedBB incrContract(AxisAlignedBB box, double dx, double dy, double dz) {
@@ -162,7 +159,15 @@ public final class SpaceUtil {
      * @return A new box, with a volume of 0. Returns null if face is invalid.
      */
     public static AxisAlignedBB flatten(AxisAlignedBB box, EnumFacing face) {
-        Vec3 min = getMin(box), max = getMax(box);
+        byte[] lows = new byte[] { 0b000, 0b010, 0b000, 0b001, 0b000, 0b100 };
+        byte[] hghs = new byte[] { 0b101, 0b111, 0b110, 0b111, 0b011, 0b111 };
+        byte low = lows[face.ordinal()];
+        byte high = hghs[face.ordinal()];
+        assert low != high;
+        assert (~low & 0b111) != high;
+        return newBox(getVertex(box, low), getVertex(box, high));
+
+        /*Vec3 min = getMin(box), max = getMax(box);
         Vec3 mv = sign(face) == +1 ? min : max;
         Vec3 base = mv == min ? max : min;
         assert mv != base;
@@ -175,7 +180,7 @@ public final class SpaceUtil {
         if (face.getDirectionVec().getZ() != 0) {
             mv.zCoord = base.zCoord;
         }
-        return createAABB(min, max);
+        return createAABB(min, max);*/
     }
 
     public static double getDiagonalLength(AxisAlignedBB ab) {
@@ -199,7 +204,7 @@ public final class SpaceUtil {
         return Math.acos(div);
     }
 
-    public static AxisAlignedBB setAABB(AxisAlignedBB target, Vec3 min, Vec3 max) {
+    public static AxisAlignedBB newBox(Vec3 min, Vec3 max) {
         return new AxisAlignedBB(
                 min.xCoord, min.yCoord, min.zCoord,
                 max.xCoord, max.yCoord, max.zCoord);
@@ -213,7 +218,7 @@ public final class SpaceUtil {
         return new Vec3(a.xCoord + b.yCoord, a.yCoord + b.yCoord, a.zCoord + b.yCoord);
     }
 
-    public static AxisAlignedBB createAABB(Vec3 min, Vec3 max) {
+    public static AxisAlignedBB newBoxSort(Vec3 min, Vec3 max) {
         double minX = Math.min(min.xCoord, max.xCoord);
         double minY = Math.min(min.yCoord, max.yCoord);
         double minZ = Math.min(min.zCoord, max.zCoord);
@@ -512,5 +517,9 @@ public final class SpaceUtil {
         allow.remove(ret);
         allow.remove(ret.getOpposite());
         return ret;
+    }
+
+    public static Vec3 subtract(Vec3 you, Vec3 me) {
+        return you.subtract(me);
     }
 }

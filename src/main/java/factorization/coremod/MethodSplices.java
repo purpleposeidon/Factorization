@@ -1,8 +1,8 @@
 package factorization.coremod;
 
+import com.google.common.base.Predicate;
 import factorization.coremodhooks.HookTargetsClient;
 import factorization.coremodhooks.HookTargetsServer;
-import net.minecraft.command.IEntitySelector;
 import net.minecraft.entity.Entity;
 import net.minecraft.init.Blocks;
 import net.minecraft.util.AxisAlignedBB;
@@ -17,7 +17,7 @@ import java.util.List;
 
 public class MethodSplices {
     // Block.onBlockDestroyedByExplosion
-    public void func_149723_a(World world, int x, int y, int z, Explosion explosion) {
+    public void func_180652_a(World world, int x, int y, int z, Explosion explosion) {
         HookTargetsServer.diamondExploded(this, world, x, y, z);
     }
     
@@ -33,11 +33,13 @@ public class MethodSplices {
     
     // GuiContainer.keyTyped
     public void func_73869_a(char chr, int keysym) {
+        // NORELEASE: Not needed; forge is here to save the day.
         HookTargetsClient.keyTyped(chr, keysym);
     }
     
     // Minecraft.func_147116_af "attack key pressed" function (first handler), MCPBot name clickMouse
     public void func_147116_af() {
+        // NORELEASE: Maybe forge?
         if (HookTargetsClient.attackButtonPressed()) {
             return;
         }
@@ -46,6 +48,7 @@ public class MethodSplices {
     
     // Minecraft.func_147121_ag "use key pressed" function, MCPBot name rightClickMouse
     public void func_147121_ag() {
+        // NORELEASE: Maybe forge?
         if (HookTargetsClient.useButtonPressed()) {
             return;
         }
@@ -53,8 +56,8 @@ public class MethodSplices {
     }
     
     // Chunk.getEntitiesWithinAABBForEntity
-    public void func_76588_a(Entity p_76588_1_, AxisAlignedBB p_76588_2_, List p_76588_3_, IEntitySelector p_76588_4_) {
-        HookTargetsServer.addConstantColliders(this, p_76588_1_, p_76588_2_, p_76588_3_, p_76588_4_);
+    public void func_177414_a(Entity entity, AxisAlignedBB box, List<Entity> listToFill, Predicate<? super Entity> filter) {
+        HookTargetsServer.addConstantColliders(this, entity, box, listToFill, filter);
     }
     
     // EntityRenderer.orientCamera; method replacement
@@ -76,8 +79,8 @@ public class MethodSplices {
         return HookTargetsClient.abortClientLoadEvent(bus, event);
     }
 
-    public static boolean bjf$init(EventBus bus, WorldEvent.Load event) {
-        // This is me being lazy. Dealing with names is obnoxious. Hopefully we can get this gone when we port to 1.8?
+    public static boolean bdb$init(EventBus bus, WorldEvent.Load event) {
+        // This is me being lazy. Dealing with names is obnoxious. Hopefully we can get this gone when we port to 1.9?
         return HookTargetsClient.abortClientLoadEvent(bus, event);
     }
 }

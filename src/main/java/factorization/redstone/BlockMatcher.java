@@ -1,7 +1,6 @@
 package factorization.redstone;
 
 import factorization.api.Coord;
-import factorization.common.BlockIcons;
 import factorization.shared.Core;
 import factorization.util.SpaceUtil;
 import net.minecraft.block.Block;

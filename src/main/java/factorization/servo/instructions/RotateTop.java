@@ -5,7 +5,6 @@ import factorization.api.FzOrientation;
 import factorization.api.datahelpers.DataHelper;
 import factorization.api.datahelpers.IDataSerializable;
 import factorization.api.datahelpers.Share;
-import factorization.common.BlockIcons;
 import factorization.servo.AbstractServoMachine;
 import factorization.servo.CpuBlocking;
 import factorization.servo.Instruction;

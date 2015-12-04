@@ -3,7 +3,6 @@ package factorization.crafting;
 import factorization.api.Coord;
 import factorization.api.FzOrientation;
 import factorization.api.Quaternion;
-import factorization.common.BlockIcons;
 import factorization.common.BlockIcons.ExtendedIIcon;
 import factorization.shared.BlockRenderHelper;
 import factorization.shared.Core;

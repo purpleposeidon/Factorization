@@ -2,7 +2,6 @@ package factorization.servo.instructions;
 
 import factorization.api.datahelpers.DataHelper;
 import factorization.api.datahelpers.IDataSerializable;
-import factorization.common.BlockIcons;
 import factorization.servo.Instruction;
 import factorization.servo.ServoMotor;
 import factorization.servo.ServoStack;

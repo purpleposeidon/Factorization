@@ -5,7 +5,6 @@ import factorization.api.Coord;
 import factorization.api.ICoordFunction;
 import factorization.api.datahelpers.DataHelper;
 import factorization.api.datahelpers.Share;
-import factorization.common.BlockIcons;
 import factorization.common.FactoryType;
 import factorization.common.FzConfig;
 import factorization.notify.Notice;

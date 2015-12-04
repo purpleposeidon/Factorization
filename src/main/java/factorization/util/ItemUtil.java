@@ -289,13 +289,13 @@ public final class ItemUtil {
         if (side == null && player != null) {
             Vec3 me = at.toVector();
             Vec3 you = SpaceUtil.fromEntPos(player);
-            dir = SpaceUtil.incrSubtract(you, me);
+            dir = SpaceUtil.subtract(you, me);
             SpaceUtil.normalize(dir);
         } else {
             dir = SpaceUtil.fromDirection(side);
         }
         Vec3 move = SpaceUtil.scale(dir, 0.5);
-        Vec3 newSpot = SpaceUtil.incrAdd(SpaceUtil.fromEntPos(ent), move);
+        Vec3 newSpot = SpaceUtil.fromEntPos(ent).add(move);
         SpaceUtil.toEntPos(ent, newSpot);
         //SpaceUtil.scale(dir, 0.002);
         //SpaceUtil.toEntVel(ent, dir);

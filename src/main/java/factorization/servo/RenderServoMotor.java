@@ -3,7 +3,6 @@ package factorization.servo;
 import factorization.api.FzColor;
 import factorization.api.FzOrientation;
 import factorization.api.Quaternion;
-import factorization.common.BlockIcons;
 import factorization.fzds.DeltaChunk;
 import factorization.fzds.Hammer;
 import factorization.fzds.HammerEnabled;

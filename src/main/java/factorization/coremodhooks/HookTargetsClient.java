@@ -4,6 +4,7 @@ import factorization.util.SpaceUtil;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.MovingObjectPosition;
 import net.minecraft.util.MovingObjectPosition.MovingObjectType;
 import net.minecraft.util.Vec3;
@@ -29,7 +30,7 @@ public class HookTargetsClient {
     }
     
     private static boolean hasColliders(World world, Vec3 traceStart) {
-        Chunk c = world.getChunkFromBlockCoords((int) traceStart.xCoord, (int) traceStart.zCoord);
+        Chunk c = world.getChunkFromChunkCoords((int) (traceStart.xCoord) >> 4, (int) (traceStart.zCoord) >> 4);
         if (c == null) return false;
         IExtraChunkData cd = (IExtraChunkData) c;
         Entity[] colliders = cd.getConstantColliders();
@@ -40,21 +41,23 @@ public class HookTargetsClient {
     public static MovingObjectPosition boxTrace(World world, Vec3 traceStart, Vec3 traceEnd) {
         MovingObjectPosition ret = world.rayTraceBlocks(SpaceUtil.copy(traceStart), SpaceUtil.copy(traceEnd));
         if (!hasColliders(world, traceStart) && !hasColliders(world, traceEnd)) return ret;
-        
+
+        final double d = 0.2; //4.0/16.0;
         Entity box = new Entity(world) {
             @Override protected void entityInit() { }
             @Override protected void readEntityFromNBT(NBTTagCompound tag) { }
             @Override protected void writeEntityToNBT(NBTTagCompound tag) { }
+
+            @Override
+            public void setPosition(double x, double y, double z) {
+                this.posX = x;
+                this.posY = y;
+                this.posZ = z;
+                this.setEntityBoundingBox(new AxisAlignedBB(x - d, y, z - d, x + d, y + d, z + d));
+            }
         };
-        double d = 0.2; //4.0/16.0;
         box.setPosition(traceStart.xCoord, traceStart.yCoord, traceStart.zCoord);
-        box.boundingBox.minX = traceStart.xCoord - d;
-        box.boundingBox.minY = traceStart.yCoord - d;
-        box.boundingBox.minZ = traceStart.zCoord - d;
-        box.boundingBox.maxX = traceStart.xCoord + d;
-        box.boundingBox.maxY = traceStart.yCoord + d;
-        box.boundingBox.maxZ = traceStart.zCoord + d;
-        
+
         double dx = traceEnd.xCoord - traceStart.xCoord;
         double dy = traceEnd.yCoord - traceStart.yCoord;
         double dz = traceEnd.zCoord - traceStart.zCoord;
@@ -67,15 +70,7 @@ public class HookTargetsClient {
         }
         
         Vec3 hit = new Vec3(box.posX, box.posY, box.posZ);
-        
-        {
-            box.boundingBox.minX = box.posX - d;
-            box.boundingBox.minY = box.posY - d;
-            box.boundingBox.minZ = box.posZ - d;
-            box.boundingBox.maxX = box.posX + d;
-            box.boundingBox.maxY = box.posY + d;
-            box.boundingBox.maxZ = box.posZ + d;
-        }
+        box.setPosition(box.posX, box.posY, box.posZ);
         
         if (ret == null || ret.hitVec == null || ret.typeOfHit == MovingObjectType.MISS) return new MovingObjectPosition(null, hit);
         

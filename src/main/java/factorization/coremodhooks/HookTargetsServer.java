@@ -1,8 +1,8 @@
 package factorization.coremodhooks;
 
+import com.google.common.base.Predicate;
 import factorization.api.Coord;
 import factorization.shared.Core;
-import net.minecraft.command.IEntitySelector;
 import net.minecraft.enchantment.EnchantmentProtection;
 import net.minecraft.entity.Entity;
 import net.minecraft.init.Blocks;
@@ -47,12 +47,12 @@ public class HookTargetsServer {
         return r;
     }
     
-    public static void addConstantColliders(Object me, Entity collider, AxisAlignedBB box, List found, IEntitySelector filter) {
+    public static void addConstantColliders(Object me, Entity collider, AxisAlignedBB box, List<Entity> found, Predicate<? super Entity> filter) {
         Entity[] constant_colliders = ((IExtraChunkData) me).getConstantColliders();
         if (constant_colliders == null) return;
         for (Entity ent : constant_colliders) {
             if (ent == collider) continue;
-            if (filter == null || filter.isEntityApplicable(ent)) {
+            if (filter == null || filter.apply(ent)) {
                 //AxisAlignedBB ebox = ent.getBoundingBox();
                 //if (ebox == null) continue;
                 //if (!box.intersectsWith(ebox)) continue;
@@ -81,13 +81,13 @@ public class HookTargetsServer {
 
         boolean expanded = false;
 
-        Chunk c1 = world.getChunkFromBlockCoords(minX, minZ);
+        Chunk c1 = world.getChunkFromChunkCoords(minX >> 4, minZ >> 4);
         if (workableChunk(c1)) {
             expanded = true;
             box = box.expand(1, 1, 1);
             if (collides((IExtraChunkData) c1, box)) return true;
         }
-        Chunk c2 = world.getChunkFromBlockCoords(minX, maxZ);
+        Chunk c2 = world.getChunkFromChunkCoords(minX >> 4, maxZ >> 4);
         if (c2 != c1 && workableChunk(c2)) {
             if (!expanded) {
                 expanded = true;
@@ -95,7 +95,7 @@ public class HookTargetsServer {
             }
             if (collides((IExtraChunkData) c2, box)) return true;
         }
-        Chunk c3 = world.getChunkFromBlockCoords(maxX, minZ);
+        Chunk c3 = world.getChunkFromChunkCoords(maxX >> 4, minZ >> 4);
         if (c3 != c2 && c3 != c1 && workableChunk(c3)) {
             if (!expanded) {
                 expanded = true;
@@ -103,7 +103,7 @@ public class HookTargetsServer {
             }
             if (collides((IExtraChunkData) c3, box)) return true;
         }
-        Chunk c4 = world.getChunkFromBlockCoords(maxX, maxZ);
+        Chunk c4 = world.getChunkFromChunkCoords(maxX >> 4, maxZ >> 4);
         if (c4 != c3 && c4 != c2 && c4 != c1 && workableChunk(c4)) {
             if (!expanded) {
                 expanded = true;
@@ -123,7 +123,7 @@ public class HookTargetsServer {
     private static boolean collides(IExtraChunkData data, AxisAlignedBB box) {
         Entity[] colliders = data.getConstantColliders(); // This method can return null, but it will have already been checked by workableChunk
         for (Entity ent : colliders) {
-            if (ent.getBoundingBox().intersectsWith(box)) return true;
+            if (ent.getCollisionBoundingBox /* NORELEASE: Is that right? There's others. */().intersectsWith(box)) return true;
         }
         return false;
     }

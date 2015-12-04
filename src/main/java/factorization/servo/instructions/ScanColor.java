@@ -4,7 +4,6 @@ import factorization.api.Coord;
 import factorization.api.FzColor;
 import factorization.api.datahelpers.DataHelper;
 import factorization.api.datahelpers.IDataSerializable;
-import factorization.common.BlockIcons;
 import factorization.common.FactoryType;
 import factorization.notify.Notice;
 import factorization.servo.Decorator;

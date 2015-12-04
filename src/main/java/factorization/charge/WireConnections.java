@@ -4,7 +4,6 @@ import factorization.api.Coord;
 import factorization.api.DeltaCoord;
 import factorization.api.IChargeConductor;
 import factorization.api.VectorUV;
-import factorization.common.BlockIcons;
 import factorization.shared.Core;
 import net.minecraft.block.Block;
 import net.minecraft.tileentity.TileEntity;

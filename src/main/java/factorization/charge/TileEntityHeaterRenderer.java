@@ -1,6 +1,5 @@
 package factorization.charge;
 
-import factorization.common.BlockIcons;
 import factorization.shared.BlockRenderHelper;
 import factorization.shared.Core;
 import net.minecraft.client.renderer.RenderBlocks;

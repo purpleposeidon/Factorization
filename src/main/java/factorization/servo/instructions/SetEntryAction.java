@@ -3,7 +3,6 @@ package factorization.servo.instructions;
 import factorization.api.Coord;
 import factorization.api.datahelpers.DataHelper;
 import factorization.api.datahelpers.IDataSerializable;
-import factorization.common.BlockIcons;
 import factorization.servo.CpuBlocking;
 import factorization.servo.EntryAction;
 import factorization.servo.Instruction;
