@@ -252,7 +252,7 @@ public class TileEntityAnthroGen extends TileEntityCommon implements IInventory,
     }
 
     @Override
-    public boolean isBlockSolidOnSide(int side) {
+    public boolean isBlockSolidOnSide(EnumFacing side) {
         return side == 0;
     }
 }

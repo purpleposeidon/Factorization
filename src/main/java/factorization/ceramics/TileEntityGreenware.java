@@ -964,7 +964,7 @@ public class TileEntityGreenware extends TileEntityCommon implements IFurnaceHea
     }
 
     @Override
-    public boolean isBlockSolidOnSide(int side) {
+    public boolean isBlockSolidOnSide(EnumFacing side) {
         return false;
     }
 

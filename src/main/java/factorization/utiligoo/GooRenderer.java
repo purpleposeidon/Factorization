@@ -156,7 +156,7 @@ public enum GooRenderer {
                 if (mat.blocksMovement() && !b.hasTileEntity(md)) {
                     rb.renderBlockByRenderType(b, x, y, z);
                 } else {
-                    b.setBlockBoundsBasedOnState(player.worldObj, x, y, z);
+                    b.setBlockBoundsBasedOnState(player.world, pos);
                     block.setBlockBounds((float)b.getBlockBoundsMinX(), (float)b.getBlockBoundsMinY(), (float)b.getBlockBoundsMinZ(), (float)b.getBlockBoundsMaxX(), (float)b.getBlockBoundsMaxY(), (float)b.getBlockBoundsMaxZ()); // Hello, Notch! 
                     block.useTexture(BlockIcons.utiligoo$invasion);
                     block.render(rb, x, y, z);
@@ -171,7 +171,7 @@ public enum GooRenderer {
                     block.useTexture(BlockIcons.utiligoo$invasion);
                     block.render(rb, x, y, z);
                 } else {
-                    b.setBlockBoundsBasedOnState(player.worldObj, x, y, z);
+                    b.setBlockBoundsBasedOnState(player.world, pos);
                     block.setBlockBounds((float)b.getBlockBoundsMinX(), (float)b.getBlockBoundsMinY(), (float)b.getBlockBoundsMinZ(), (float)b.getBlockBoundsMaxX(), (float)b.getBlockBoundsMaxY(), (float)b.getBlockBoundsMaxZ()); // Hello, Notch! 
                     block.useTexture(BlockIcons.utiligoo$invasion);
                     block.render(rb, x, y, z);

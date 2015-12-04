@@ -2,13 +2,15 @@ package factorization.shared;
 
 import factorization.api.Coord;
 import net.minecraft.block.Block;
-import org.apache.http.impl.conn.Wire;
+import net.minecraft.util.IStringSerializable;
+
+import java.util.Locale;
 
 /**
  * This associates various block properties with metadata.
  * 
  */
-public enum BlockClass {
+public enum BlockClass implements IStringSerializable {
 
     Default(0, true, 0, 0, 1F),
     DarkIron(1, true, 0, 0, 3.25F),
@@ -28,6 +30,7 @@ public enum BlockClass {
         Wire.setAbnormal();
         Machine.setAbnormal();
         Ceramic.setAbnormal();
+        Wire.passable = true;
     }
 
     static class Md {
@@ -43,6 +46,7 @@ public enum BlockClass {
     final int lightValue;
     final float hardness; //Our default is 2
     boolean normal_cube = true;
+    boolean passable = false;
 
     BlockClass(Block block, int md, boolean normalCube, int flamability, int lightValue, float hardness) {
         if (block == null) throw new NullPointerException("BlockClass loaded too early?");
@@ -69,7 +73,9 @@ public enum BlockClass {
         return this;
     }
 
-    static BlockClass get(int md) {
+    public static BlockClass get(int md) {
+        if (md < 0) return null;
+        if (md > Md.map.length) return null;
         BlockClass ret = Md.map[md];
         if (ret == null) {
             return Md.map[0];
@@ -92,5 +98,10 @@ public enum BlockClass {
 
     boolean isNormal() {
         return normal_cube;
+    }
+
+    @Override
+    public String getName() {
+        return super.toString().toLowerCase(Locale.ROOT);
     }
 }

@@ -361,7 +361,7 @@ public class TileEntityMirror extends TileEntityCommon {
     }
 
     @Override
-    public boolean isBlockSolidOnSide(int side) {
+    public boolean isBlockSolidOnSide(EnumFacing side) {
         return false;
     }
     

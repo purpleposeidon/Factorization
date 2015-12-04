@@ -62,7 +62,7 @@ public class NotifyNetwork {
             x = input.readInt();
             y = input.readInt();
             z = input.readInt();
-            target = new SimpleCoord(me.worldObj, x, y, z);
+            target = new SimpleCoord(me.world, pos);
             break;
         case ENTITY:
             int id = input.readInt();
@@ -78,7 +78,7 @@ public class NotifyNetwork {
             z = input.readInt();
             target = me.worldObj.getTileEntity(x, y, z);
             if (target == null) {
-                target = new SimpleCoord(me.worldObj, x, y, z);
+                target = new SimpleCoord(me.world, pos);
             }
             break;
         case VEC3:

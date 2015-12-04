@@ -1,5 +1,6 @@
 package factorization.shared;
 
+import factorization.util.SpaceUtil;
 import net.minecraftforge.fml.common.event.FMLModIdMappingEvent;
 import net.minecraftforge.fml.common.network.internal.FMLProxyPacket;
 import net.minecraftforge.fml.relauncher.Side;
@@ -215,8 +216,9 @@ public abstract class TileEntityCommon extends TileEntity implements ICoord, IFa
     public void neighborChanged() {
     }
 
+    /** Called when an adjacent TE changes */
     public void neighborChanged(Block neighbor) {
-        neighborChanged();
+        neighborChanged(); // NORELEASE ???
     }
 
     private long pulseTime = -1000;
@@ -270,7 +272,7 @@ public abstract class TileEntityCommon extends TileEntity implements ICoord, IFa
         return false;
     }
 
-    public boolean isBlockSolidOnSide(int side) {
+    public boolean isBlockSolidOnSide(EnumFacing side) {
         return true;
     }
 
@@ -324,6 +326,7 @@ public abstract class TileEntityCommon extends TileEntity implements ICoord, IFa
     }
 
     /** Called when there's a comparatory-inventory-ish update */
+    @Deprecated // NORELEASE: Figure this stuff out.
     public void onNeighborTileChanged(int tilex, int tiley, int tilez) {}
 
     public boolean recolourBlock(EnumFacing side, FzColor fzColor) { return false; }

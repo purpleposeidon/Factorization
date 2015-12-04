@@ -6,6 +6,7 @@ import net.minecraft.block.BlockCarpet;
 import net.minecraft.block.BlockColored;
 import net.minecraft.block.BlockStainedGlass;
 import net.minecraft.block.BlockStainedGlassPane;
+import net.minecraft.item.EnumDyeColor;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.oredict.OreDictionary;
 
@@ -131,5 +132,15 @@ public enum FzColor {
             if (ItemUtil.oreDictionarySimilarEfficient(color.ore_entries, is)) return color;
         }
         return NO_COLOR;
+    }
+
+    public static FzColor fromVanilla(EnumDyeColor color) {
+        if (color == null) return NO_COLOR;
+        return values()[color.ordinal() + 1];
+    }
+
+    public EnumDyeColor toVanilla() {
+        if (this == NO_COLOR) return null;
+        return EnumDyeColor.values()[this.ordinal() - 1];
     }
 }

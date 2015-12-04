@@ -320,7 +320,7 @@ public class TileEntityServoRail extends TileEntityCommon implements IChargeCond
     }
     
     @Override
-    public boolean isBlockSolidOnSide(int side) {
+    public boolean isBlockSolidOnSide(EnumFacing side) {
         return false;
     }
     

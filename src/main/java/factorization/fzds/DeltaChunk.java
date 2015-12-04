@@ -137,7 +137,7 @@ public class DeltaChunk {
     
     public static Vec3 shadow2nearestReal(Entity player, double x, double y, double z) {
         //The JVM sometimes segfaults in this function.
-        IDeltaChunk closest = findClosest(player, new Coord(player.worldObj, x, y, z));
+        IDeltaChunk closest = findClosest(player, new Coord(player.world, pos));
         if (closest == null) {
             return null;
         }

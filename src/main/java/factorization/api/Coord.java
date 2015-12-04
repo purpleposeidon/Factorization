@@ -1107,7 +1107,7 @@ public final class Coord implements IDataSerializable, ISaneCoord, Comparable<Co
     
     public ItemStack getBrokenBlock() {
         Block b = getBlock();
-        List<ItemStack> dropped = b.getDrops(w, toBlockPos(), getState(), 0);
+        yList<ItemStack> dropped = b.getDrops(w, toBlockPos(), getState(), 0);
         if (dropped == null || dropped.isEmpty()) {
             return null;
         }

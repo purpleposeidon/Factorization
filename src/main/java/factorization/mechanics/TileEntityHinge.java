@@ -66,7 +66,7 @@ public class TileEntityHinge extends TileEntityCommon implements IDCController {
     }
 
     @Override
-    public boolean isBlockSolidOnSide(int side) {
+    public boolean isBlockSolidOnSide(EnumFacing side) {
         return SpaceUtil.getOrientation(side) == facing.facing.getOpposite();
     }
 

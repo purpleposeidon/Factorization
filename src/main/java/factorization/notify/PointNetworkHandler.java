@@ -52,7 +52,7 @@ public enum PointNetworkHandler {
                 int y = input.readInt();
                 int z = input.readInt();
                 String msg = buildMessage(player, input);
-                Coord at = new Coord(player.worldObj, x, y, z);
+                Coord at = new Coord(player.world, pos);
                 notice = new Notice(at, msg);
                 break;
             }

@@ -1,8 +1,5 @@
 package factorization.shared;
 
-import net.minecraftforge.fml.common.network.internal.FMLProxyPacket;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
 import factorization.algos.ReservoirSampler;
 import factorization.api.Coord;
 import factorization.api.FzColor;
@@ -11,35 +8,63 @@ import factorization.common.FactoryType;
 import factorization.common.Registry;
 import factorization.notify.Notice;
 import factorization.shared.NetworkFactorization.MessageType;
+import factorization.util.SpaceUtil;
 import factorization.weird.TileEntityDayBarrel;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockContainer;
 import net.minecraft.block.material.Material;
+import net.minecraft.block.properties.IProperty;
+import net.minecraft.block.properties.PropertyEnum;
+import net.minecraft.block.state.BlockState;
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.particle.EffectRenderer;
 import net.minecraft.client.particle.EntityDiggingFX;
-import net.minecraft.client.renderer.texture.IIconRegister;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.item.EnumDyeColor;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.*;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
-import net.minecraft.util.EnumFacing;
+import net.minecraftforge.fml.common.network.internal.FMLProxyPacket;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 import java.util.*;
 
 public class BlockFactorization extends BlockContainer {
+    IProperty<BlockClass> BLOCK_CLASS = PropertyEnum.create("class", BlockClass.class);
     public boolean fake_normal_render = false;
     public BlockFactorization(Material material) {
         super(material);
         setHardness(2.0F);
         setResistance(5);
         setLightOpacity(0);
-        canBlockGrass = true;
+        translucent = true;
         setTickRandomly(false);
+    }
+
+    @Override
+    protected BlockState createBlockState() {
+        return new BlockState(this, BLOCK_CLASS);
+    }
+
+    @Override
+    public IBlockState getStateFromMeta(int meta) {
+        return getDefaultState().withProperty(BLOCK_CLASS, BlockClass.get(meta));
+    }
+
+    @Override
+    public int getMetaFromState(IBlockState state) {
+        return state.getValue(BLOCK_CLASS).md;
+    }
+
+    @Override
+    public boolean hasTileEntity(IBlockState state) {
+        return true;
     }
 
     @Override
@@ -55,53 +80,54 @@ public class BlockFactorization extends BlockContainer {
         return nuller;
     }
 
+    private static TileEntityCommon get(IBlockAccess w, BlockPos pos) {
+        TileEntity te = w.getTileEntity(pos);
+        if (te instanceof TileEntityCommon) return (TileEntityCommon) te;
+        return null;
+    }
+
     @Override
-    public ItemStack getPickBlock(MovingObjectPosition target, World world, int x, int y, int z) {
-        TileEntityCommon tec = new Coord(world, x, y, z).getTE(TileEntityCommon.class);
-        if (tec == null) {
-            return null;
-        }
+    public ItemStack getPickBlock(MovingObjectPosition target, World world, BlockPos pos, EntityPlayer player) {
+        TileEntityCommon tec = get(world, pos);
+        if (tec == null) return null;
         return tec.getPickedBlock();
     }
 
     @Override
-    public boolean hasTileEntity(int metadata) {
-        return true;
+    public boolean isBlockSolid(IBlockAccess world, BlockPos pos, EnumFacing side) {
+        TileEntityCommon tec = get(world, pos);
+        if (tec == null) return false;
+        return tec.isBlockSolidOnSide(side);
     }
 
     @Override
-    public boolean isBlockSolid(IBlockAccess world, int x, int y, int z, int side) {
-        TileEntity t = world.getTileEntity(x, y, z);
-        if (t == null || !(t instanceof TileEntityCommon)) {
-            return false;
-        }
-        TileEntityCommon te = (TileEntityCommon) t;
-        return te.isBlockSolidOnSide(side);
-    }
-    
-    @Override
-    public boolean isSideSolid(IBlockAccess world, int x, int y, int z, EnumFacing side) {
-        return isBlockSolid(world, x, y, z, side.ordinal());
-    }
-    
-    @Override
-    public void onNeighborBlockChange(World w, int x, int y, int z, Block neighbor) {
-        TileEntity te = w.getTileEntity(x, y, z);
-        if (te instanceof TileEntityCommon) {
-            TileEntityCommon tec = (TileEntityCommon) te;
-            tec.neighborChanged(neighbor);
-        }
+    @Deprecated
+    public boolean isSideSolid(IBlockAccess world, BlockPos pos, EnumFacing side) {
+        return isBlockSolid(world, pos, side);
     }
 
-    //TODO: Ctrl/alt clicking!
+    @Override
+    public void onNeighborChange(IBlockAccess world, BlockPos pos, BlockPos neighbor) {
+        TileEntityCommon tec = get(world, pos);
+        if (tec == null) return;
+        tec.neighborChanged();
+    }
 
     @Override
-    public boolean onBlockActivated(World w, int x, int y, int z, EntityPlayer player, int side, float vecx, float vecy, float vecz) {
+    public void onNeighborBlockChange(World world, BlockPos pos, IBlockState state, Block neighborBlock) {
+        TileEntityCommon tec = get(world, pos);
+        if (tec == null) return;
+        tec.neighborChanged(neighborBlock);
+    }
+
+    @Override
+    public boolean onBlockActivated(World w, BlockPos pos, IBlockState state, EntityPlayer player, EnumFacing side, float vecx, float vecy, float vecz) {
         // right click
-        Coord here = new Coord(w, x, y, z);
+        Coord here = new Coord(w, pos);
         TileEntityCommon t = here.getTE(TileEntityCommon.class);
         if (t == null && w.isRemote) {
             Core.network.broadcastMessage(null, here, MessageType.DescriptionRequest);
+            return false;
         }
         if (player.isSneaking()) {
             ItemStack cur = player.getCurrentEquippedItem();
@@ -111,15 +137,7 @@ public class BlockFactorization extends BlockContainer {
         }
 
         if (t != null) {
-            return t.activate(player, SpaceUtil.getOrientation(side));
-        }
-        if (w.isRemote) {
-            if (here.getTE() == null) {
-                //we may be about to get a GUI, incidentally...
-                Core.network.broadcastMessage(null, here, MessageType.DescriptionRequest);
-                return false;
-            }
-            return false; //...?
+            return t.activate(player, side);
         }
         player.addChatMessage(new ChatComponentText("This block is missing its TileEntity, possibly due to a bug in Factorization."));
         player.addChatMessage(new ChatComponentText("The block and its contents can not be recovered without cheating."));
@@ -127,98 +145,45 @@ public class BlockFactorization extends BlockContainer {
     }
 
     @Override
-    public void onBlockClicked(World w, int x, int y, int z, EntityPlayer player) {
+    public void onBlockClicked(World w, BlockPos pos, EntityPlayer player) {
         // left click
         if (w.isRemote) return;
-
-        TileEntity t = w.getTileEntity(x, y, z);
-        if (t instanceof TileEntityCommon) {
-            ((TileEntityCommon) t).click(player);
-        }
-    }
-    
-    @Override
-    public void registerBlockIcons(IIconRegister reg) {
-        FactorizationTextureLoader.register(reg, BlockIcons.class, null, "factorization:");
-        Core.proxy.texturepackChanged(reg);
-    }
-    
-    static public IIcon force_texture = null;
-    
-    @Override
-    public IIcon getIcon(IBlockAccess w, int x, int y, int z, int side) {
-        // Used for in-world rendering. Takes 'active' into consideration.
-        if (force_texture != null) {
-            return force_texture;
-        }
-        TileEntity te = w.getTileEntity(x, y, z);
-        if (te instanceof TileEntityCommon) {
-            TileEntityCommon tec = (TileEntityCommon) te;
-            return tec.getIcon(SpaceUtil.getOrientation(side));
-        }
-        return BlockIcons.error;
-    }
-
-    private IIcon tempParticleIIcon = null;
-    
-    @Override
-    public IIcon getIcon(int side, int md) {
-        if (tempParticleIIcon != null) {
-            IIcon ret = tempParticleIIcon;
-            tempParticleIIcon = null;
-            return ret;
-        }
-        // This shouldn't be called when rendering in the world.
-        // Is used for inventory!
-        FactoryType ft = FactoryType.fromMd((byte) md);
-        if (ft == null) {
-            return BlockIcons.default_icon;
-            //return BlockIcons.error;
-        }
-        TileEntityCommon rep = ft.getRepresentative();
-        if (rep == null) {
-            return BlockIcons.error;
-        }
-        return rep.getIcon(SpaceUtil.getOrientation(side));
-    }
-    
-    @Override
-    public int damageDropped(int i) {
-        return i;
+        TileEntityCommon tec = get(w, pos);
+        if (tec == null) return;
+        tec.click(player);
     }
 
     @Override
-    public int quantityDropped(int meta, int fortune, Random random) {
+    public int damageDropped(IBlockState state) {
+        return getMetaFromState(state);
+    }
+
+    @Override
+    public int quantityDropped(IBlockState state, int fortune, Random random) {
         return 1;
     }
-    
+
     LinkedList<TileEntityCommon> destroyed_tes = new LinkedList<TileEntityCommon>();
-    
+
     @Override
-    public void breakBlock(World w, int x, int y, int z, Block id, int md) {
-        Coord here = new Coord(w, x, y, z);
-        TileEntityCommon te = here.getTE(TileEntityCommon.class);
-        if (te != null) {
-            te.onRemove();
-            destroyed_tes.add(te);
+    public void breakBlock(World w, BlockPos pos, IBlockState state) {
+        TileEntityCommon tec = get(w, pos);
+        if (tec != null) {
+            tec.onRemove();
+            destroyed_tes.add(tec);
         }
-        super.breakBlock(w, x, y, z, id, md); //Just removes the TE; does nothing else.
-    }
-    
-    @Override
-    public boolean removedByPlayer(World world, EntityPlayer player, int x, int y, int z) {
-        return removedByPlayer(world, player, x, y, z, true);
+        super.breakBlock(w, pos, state); // Just removes the TE; does nothing else.
     }
 
     @Override
-    public boolean removedByPlayer(World world, EntityPlayer player, int x, int y, int z, boolean willHarvest) {
-        Coord here = new Coord(world, x, y, z);
+    public boolean removedByPlayer(World world, BlockPos pos, EntityPlayer player, boolean willHarvest) {
+        Coord here = new Coord(world, pos);
         TileEntityCommon tec = here.getTE(TileEntityCommon.class);
         if (tec == null) {
             if (!world.isRemote) {
                 new Notice(here, "There was no TileEntity!").send(player);
             }
-            return world.setBlockToAir(x, y, z);
+            return world.setBlockToAir(pos);
         }
         boolean ret = tec.removedByPlayer(player, willHarvest);
         if (!world.isRemote && !ret) {
@@ -230,16 +195,15 @@ public class BlockFactorization extends BlockContainer {
     }
 
     @Override
-    public ArrayList<ItemStack> getDrops(World world, int X, int Y, int Z, int md, int fortune) {
+    public List<ItemStack> getDrops(IBlockAccess world, BlockPos pos, IBlockState state, int fortune) {
         ArrayList<ItemStack> ret = new ArrayList<ItemStack>();
-        Coord here = new Coord(world, X, Y, Z);
-        TileEntityCommon f = here.getTE(TileEntityCommon.class);
+        TileEntityCommon f = get(world, pos);
         if (f == null) {
             Iterator<TileEntityCommon> it = destroyed_tes.iterator();
             TileEntityCommon destroyedTE = null;
             while (it.hasNext()) {
                 TileEntityCommon tec = it.next();
-                if (tec.getCoord().equals(here)) {
+                if (tec.getPos().equals(pos)) {
                     destroyedTE  = tec;
                     it.remove();
                 }
@@ -248,27 +212,24 @@ public class BlockFactorization extends BlockContainer {
                 Core.logWarning("No IFactoryType TE behind block that was destroyed, and nothing saved!");
                 return ret;
             }
-            Coord destr = destroyedTE.getCoord();
-            if (!destr.equals(here)) {
+            if (!destroyedTE.getPos().equals(pos)) {
                 Core.logWarning("Last saved destroyed TE wasn't for this location");
-                destroyedTE = null;
                 return ret;
             }
             f = destroyedTE;
-            destroyedTE = null;
         }
         ItemStack is = f.getDroppedBlock();
         if (is != null) ret.add(is);
         return ret;
     }
 
-    private static void put(List itemList, ItemStack item) {
+    private static void put(List<ItemStack> itemList, ItemStack item) {
         if (item == null) return;
         itemList.add(item);
     }
     
     @Override
-    public void getSubBlocks(Item me, CreativeTabs tab, List itemList) {
+    public void getSubBlocks(Item me, CreativeTabs tab, List<ItemStack> itemList) {
         if (this != Core.registry.factory_block) {
             return;
         }
@@ -359,118 +320,106 @@ public class BlockFactorization extends BlockContainer {
 
     ArrayList<ItemStack> todaysBarrels = null;
 
+
     @Override
-    public boolean canConnectRedstone(IBlockAccess world, int x, int y, int z, int dir) {
-        TileEntity te = world.getTileEntity(x, y, z);
-        if (te instanceof TileEntityCommon) {
-            TileEntityCommon tec = (TileEntityCommon) te;
-            return tec.getFactoryType().connectRedstone();
-        }
-        return false;
+    public boolean canConnectRedstone(IBlockAccess world, BlockPos pos, EnumFacing side) {
+        TileEntityCommon tec = get(world, pos);
+        if (tec == null) return false;
+        return tec.getFactoryType().connectRedstone();
     }
 
     @Override
-    public boolean isNormalCube(IBlockAccess world, int i, int j, int k) {
-        return BlockClass.get(world.getBlockMetadata(i, j, k)).isNormal();
+    public boolean isNormalCube(IBlockAccess world, BlockPos pos) {
+        return world.getBlockState(pos).getValue(BLOCK_CLASS).isNormal();
     }
 
     @Override
-    public int getFlammability(IBlockAccess world, int x, int y, int z, EnumFacing face) {
-        int md = world.getBlockMetadata(x, y, z);
-        if (BlockClass.Barrel.md == md) {
-            TileEntity te = world.getTileEntity(x, y, z);
+    public int getFlammability(IBlockAccess world, BlockPos pos, EnumFacing face) {
+        BlockClass bc = world.getBlockState(pos).getValue(BLOCK_CLASS);
+        if (BlockClass.Barrel == bc) {
+            TileEntityCommon te = get(world, pos);
             if (te instanceof TileEntityDayBarrel) {
                 return ((TileEntityDayBarrel) te).getFlamability();
             }
         }
         return 0;
     }
-    
+
     @Override
-    public boolean isFlammable(IBlockAccess world, int x, int y, int z, EnumFacing face) {
+    public boolean isFlammable(IBlockAccess world, BlockPos pos, EnumFacing face) {
         //Not really. But this keeps fire rendering.
-        return getFlammability(world, x, y, z, face) > 0;
+        return getFlammability(world, pos, face) > 0;
     }
 
-    //Lightair/lamp stuff
-
     @Override
-    public int getLightValue(IBlockAccess world, int x, int y, int z) {
-        int md = world.getBlockMetadata(x, y, z);
-        BlockClass c = BlockClass.get(md);
+    public int getLightValue(IBlockAccess world, BlockPos pos) {
+        IBlockState bs = world.getBlockState(pos);
+        BlockClass c = bs.getValue(BLOCK_CLASS);
+        if (c == null) return 0;
         if (c == BlockClass.MachineDynamicLightable || c == BlockClass.MachineLightable) {
-            TileEntity te = world.getTileEntity(x, y, z);
-            if (te instanceof TileEntityCommon) {
-                return ((TileEntityCommon) te).getDynamicLight();
-            }
+            TileEntityCommon tec = get(world, pos);
+            if (tec != null) return tec.getDynamicLight();
         }
         return c.lightValue;
     }
 
     @Override
-    public float getBlockHardness(World w, int x, int y, int z) {
-        BlockClass bc = BlockClass.get(w.getBlockMetadata(x, y, z));
+    public float getBlockHardness(World world, BlockPos pos) {
+        BlockClass bc = world.getBlockState(pos).getValue(BLOCK_CLASS);
         return bc.hardness;
     }
 
-    //smack these blocks up
+
     @Override
-    public MovingObjectPosition collisionRayTrace(World w, int x, int y, int z,
-            Vec3 startVec, Vec3 endVec) {
-        TileEntity te = w.getTileEntity(x, y, z);
-        if (!(te instanceof TileEntityCommon)) return super.collisionRayTrace(w, x, y, z, startVec, endVec);
-        TileEntityCommon tec = (TileEntityCommon) te;
-        return tec.collisionRayTrace(startVec, endVec);
+    public MovingObjectPosition collisionRayTrace(World world, BlockPos pos, Vec3 start, Vec3 end) {
+        TileEntityCommon tec = get(world, pos);
+        if (tec == null) return super.collisionRayTrace(world, pos, start, end);
+        return tec.collisionRayTrace(start, end);
     }
 
     @Override
-    public AxisAlignedBB getCollisionBoundingBoxFromPool(World w, int x, int y, int z) {
-        TileEntity te = w.getTileEntity(x, y, z);
-        if (!(te instanceof TileEntityCommon)) return super.getCollisionBoundingBoxFromPool(w, x, y, z);
-        TileEntityCommon tec = (TileEntityCommon) te;
+    public AxisAlignedBB getCollisionBoundingBox(World w, BlockPos pos, IBlockState state) {
+        // NORELEASE: Check state first. *most* things are just cubes.
+        TileEntityCommon tec = get(w, pos);
+        if (tec == null) return super.getCollisionBoundingBox(w, pos, state);
         return tec.getCollisionBoundingBoxFromPool();
     }
-    
+
     @Override
-    public void addCollisionBoxesToList(World w, int x, int y, int z, AxisAlignedBB aabb, List list, Entity entity) {
-        TileEntity te = w.getTileEntity(x, y, z);
-        TileEntityCommon tec = null;
-        if (te instanceof TileEntityCommon) {
-            tec = (TileEntityCommon) te;
-        }
+    public void addCollisionBoxesToList(World w, BlockPos pos, IBlockState state, AxisAlignedBB mask, List<AxisAlignedBB> list, Entity collidingEntity) {
+        // NORELEASE: Check state first. *most* things are just cubes.
+        TileEntityCommon tec = get(w, pos);
         Block test = w.isRemote ? Core.registry.clientTraceHelper : Core.registry.serverTraceHelper;
-        if (tec == null || !tec.addCollisionBoxesToList(test, aabb, list, entity)) {
-            super.addCollisionBoxesToList(w, x, y, z, aabb, list, entity);
+        if (tec == null || !tec.addCollisionBoxesToList(test, mask, list, collidingEntity)) {
+            super.addCollisionBoxesToList(w, pos, state, mask, list, collidingEntity);
         }
-    }
-    
-    @Override
-    public AxisAlignedBB getSelectedBoundingBoxFromPool(World w, int x, int y, int z) {
-        TileEntity te = w.getTileEntity(x, y, z);
-        if (te instanceof TileEntityCommon) {
-            TileEntityCommon tec = (TileEntityCommon) te;
-            if (tec.getFactoryType() == FactoryType.EXTENDED) {
-                AxisAlignedBB ret = tec.getCollisionBoundingBoxFromPool();
-                if (ret != null) {
-                    return ret;
-                }
-            }
-        }
-        return super.getSelectedBoundingBoxFromPool(w, x, y, z);
     }
 
     @Override
-    public void setBlockBoundsBasedOnState(IBlockAccess w, int x, int y, int z) {
-        TileEntity te = w.getTileEntity(x, y, z);
-        if (te == null || !(te instanceof TileEntityCommon)) {
+    public AxisAlignedBB getSelectedBoundingBox(World world, BlockPos pos) {
+        TileEntityCommon tec = get(world, pos);
+        if (tec != null && tec.getFactoryType() == FactoryType.EXTENDED) {
+            AxisAlignedBB ret = tec.getCollisionBoundingBoxFromPool();
+            if (ret != null) {
+                return ret;
+            }
+        }
+        return super.getSelectedBoundingBox(world, pos);
+    }
+
+    @Override
+    public void setBlockBoundsBasedOnState(IBlockAccess world, BlockPos pos) {
+        // NORELEASE: This could also be entirely state-based
+        TileEntityCommon tec = get(world, pos);
+        if (tec == null) {
             setBlockBounds(0, 0, 0, 1, 1, 1);
             return;
         }
-        ((TileEntityCommon) te).setBlockBounds(this);
+        tec.setBlockBounds(this);
     }
 
     @Override
-    public boolean renderAsNormalBlock() {
+    public boolean isNormalCube() {
         return false;
     }
 
@@ -480,11 +429,20 @@ public class BlockFactorization extends BlockContainer {
     }
 
     @Override
+    public boolean isVisuallyOpaque() {
+        return false;
+    }
+
+    @Override
+    public boolean isPassable(IBlockAccess world, BlockPos pos) {
+        BlockClass bc = world.getBlockState(pos).getValue(BLOCK_CLASS);
+        return bc.passable;
+    }
+
+    @Override
     public int getRenderType() {
-        if (fake_normal_render) {
-            return 0;
-        }
-        return Core.factory_rendertype;
+        // "The type of render function called. 3 for standard block models, 2 for TESR's, 1 for liquids, -1 is no render"
+        return 3; // Well, this is what enchanting tables return.
     }
 
     public static final float lamp_pad = 1F / 16F;
@@ -493,103 +451,68 @@ public class BlockFactorization extends BlockContainer {
     public boolean canProvidePower() {
         return true;
     }
-    
+
     @Override
-    public void updateTick(World w, int x, int y, int z, Random rand) {
-        TileEntity te = w.getTileEntity(x, y, z);
-        if (te instanceof TileEntityCommon) {
-            TileEntityCommon tec = (TileEntityCommon) te;
-            tec.blockUpdateTick(this);
-        }
+    public void updateTick(World world, BlockPos pos, IBlockState state, Random rand) {
+        TileEntityCommon tec = get(world, pos);
+        if (tec != null) tec.blockUpdateTick(this);
     }
-    
-    
+
     //Maybe we should only give weak power?
+
+
     @Override
-    public int isProvidingStrongPower(IBlockAccess w, int x, int y, int z, int side) {
+    public int isProvidingStrongPower(IBlockAccess worldIn, BlockPos pos, IBlockState state, EnumFacing side) {
         return 0;
     }
-    
+
     @Override
-    public int isProvidingWeakPower(IBlockAccess w, int x, int y, int z, int side) {
-        TileEntity te = w.getTileEntity(x, y, z);
-        if (te instanceof TileEntityCommon) {
-            return ((TileEntityCommon) te).power() ? 15 : 0;
+    public int isProvidingWeakPower(IBlockAccess world, BlockPos pos, IBlockState state, EnumFacing side) {
+        TileEntityCommon tec = get(world, pos);
+        if (tec != null) {
+            return tec.power() ? 15 : 0;
         }
         return 0;
     }
 
     @Override
-    @SideOnly(Side.CLIENT)
-    public void randomDisplayTick(World w, int x, int y, int z, Random rand) {
-        TileEntity te = w.getTileEntity(x, y, z);
-        if (te instanceof TileEntityCommon) {
-            TileEntityCommon tec = (TileEntityCommon) te;
+    public boolean hasComparatorInputOverride() {
+        return true;
+    }
+
+    @Override
+    public int getComparatorInputOverride(World world, BlockPos pos) {
+        TileEntityCommon tec = get(world, pos);
+        if (tec == null) return 0;
+        return tec.getComparatorValue(EnumFacing.UP /* Delete parameter? Nah, let's just keep it. */);
+    }
+
+    @Override
+    public void randomDisplayTick(World world, BlockPos pos, IBlockState state, Random rand) {
+        TileEntityCommon tec = get(world, pos);
+        if (tec != null) {
             tec.spawnDisplayTickParticles(rand);
         }
     }
 
-    
-    public static int CURRENT_PASS = 0;
+    final ThreadLocal<EnumWorldBlockLayer> CURRENT_PASS = new ThreadLocal<>(); // NORELEASE: This might be available in forge. Or maybe not. May not even be necessary!?
+    // TODO: This is a bit lame. A bit of overhead just for barrels and mixers...
+
     @Override
-    public boolean canRenderInPass(int pass) {
-        CURRENT_PASS = pass;
-        return pass == 0 || pass == 1;
-        // TODO: This is a bit lame. A bit of overhead just for barrels and mixers... 
+    public boolean canRenderInLayer(EnumWorldBlockLayer layer) {
+        CURRENT_PASS.set(layer);
+        return layer == EnumWorldBlockLayer.SOLID || layer == EnumWorldBlockLayer.TRANSLUCENT;
     }
 
     @Override
-    public int getRenderBlockPass() {
-        return 1;
+    public boolean shouldSideBeRendered(IBlockAccess world, BlockPos pos, EnumFacing side) {
+        BlockClass bc = world.getBlockState(pos).getValue(BLOCK_CLASS);
+        return !bc.isNormal() || super.shouldSideBeRendered(world, pos, side);
     }
-    
+
     @Override
-    public boolean shouldSideBeRendered(IBlockAccess iworld, int x, int y, int z, int side) {
-        int md = iworld.getBlockMetadata(x, y, z);
-        return !BlockClass.get(md).isNormal() || super.shouldSideBeRendered(iworld, x, y, z, side);
-    }
-    
-    @Override
-    @SideOnly(Side.CLIENT)
-    public boolean addHitEffects(World worldObj, MovingObjectPosition target, EffectRenderer effectRenderer) {
-        Coord here = new Coord(worldObj, target.blockX, target.blockY, target.blockZ);
-        TileEntityCommon tec = here.getTE(TileEntityCommon.class);
-        tempParticleIIcon = (tec == null) ? BlockIcons.default_icon : tec.getIcon(SpaceUtil.getOrientation(target.sideHit));
-        return false;
-    }
-    
-    @Override
-    @SideOnly(Side.CLIENT)
-    public boolean addDestroyEffects(World world, int x, int y, int z, int meta, EffectRenderer effectRenderer) {
-        TileEntity te = world.getTileEntity(x, y, z);
-        if (!(te instanceof TileEntityCommon)) {
-            return false;
-        }
-        TileEntityCommon tec = (TileEntityCommon) te;
-        IIcon theIIcon =  tec.getIcon(EnumFacing.DOWN);
-        
-        //copied & modified from EffectRenderer.addDestroyEffects
-        byte range = 4;
-        for (int dx = 0; dx < range; ++dx) {
-            for (int dy = 0; dy < range; ++dy) {
-                for (int dz = 0; dz < range; ++dz) {
-                    double px = x + (dx + 0.5) / range;
-                    double py = y + (dy + 0.5) / range;
-                    double pz = z + (dz + 0.5) / range;
-                    EntityDiggingFX fx = new EntityDiggingFX(world, px, py, pz, px - x - 0.5, py - y - 0.5, pz - z - 0.5, this, meta);
-                    fx.applyColourMultiplier(x, y, z);
-                    fx.setParticleIcon(theIIcon);
-                    effectRenderer.addEffect(fx);
-                }
-            }
-        }
-        
-        return true;
-    }
-    
-    @Override
-    public boolean rotateBlock(World worldObj, int x, int y, int z, EnumFacing axis) {
-        final Coord at = new Coord(worldObj, x, y, z);
+    public boolean rotateBlock(World world, BlockPos pos, EnumFacing axis) {
+        final Coord at = new Coord(world, pos);
         TileEntityCommon tec = at.getTE(TileEntityCommon.class);
         if (tec == null) {
             return false;
@@ -600,61 +523,28 @@ public class BlockFactorization extends BlockContainer {
         }
         return suc;
     }
-    
+
     @Override
-    public EnumFacing[] getValidRotations(World worldObj, int x, int y, int z) {
-        TileEntityCommon tec = new Coord(worldObj, x, y, z).getTE(TileEntityCommon.class);
+    public EnumFacing[] getValidRotations(World world, BlockPos pos) {
+        TileEntityCommon tec = get(world, pos);
         if (tec == null) {
             return TileEntityCommon.empty_rotation_array;
         }
         return tec.getValidRotations();
     }
-    
+
     @Override
-    public boolean hasComparatorInputOverride() {
-        return true;
-    }
-    
-    @Override
-    public int getComparatorInputOverride(World world, int x, int y, int z, int side) {
-        TileEntityCommon tec = new Coord(world, x, y, z).getTE(TileEntityCommon.class);
-        if (tec == null) {
-            return 0;
-        }
-        return tec.getComparatorValue(SpaceUtil.getOrientation(side));
-    }
-    
-    @Override
-    public boolean getBlocksMovement(IBlockAccess world, int x, int y, int z) {
-        int md = world.getBlockMetadata(x, y, z);
-        if (md == BlockClass.Wire.md) {
-            return true;
-        }
-        return false;
-    }
-    
-    @Override
-    public void onNeighborChange(IBlockAccess world, int x, int y, int z, int tilex, int tiley, int tilez) {
-        TileEntity te = world.getTileEntity(x, y, z);
-        if (te instanceof TileEntityCommon) {
-            ((TileEntityCommon) te).onNeighborTileChanged(tilex, tiley, tilez);
-        }
-    }
-    
-    @Override
-    public boolean recolourBlock(World world, int x, int y, int z, EnumFacing side, int colour) {
-        TileEntity te = world.getTileEntity(x, y, z);
-        if (te instanceof TileEntityCommon) {
-            return ((TileEntityCommon) te).recolourBlock(side, FzColor.fromVanillaColorIndex(colour));
-        }
-        return false;
+    public boolean recolorBlock(World world, BlockPos pos, EnumFacing side, EnumDyeColor color) {
+        TileEntityCommon tec = get(world, pos);
+        if (tec == null) return false;
+        return tec.recolourBlock(side, FzColor.fromVanilla(color));
     }
 
     @Override
-    public float getPlayerRelativeBlockHardness(EntityPlayer player, World w, int x, int y, int z) {
+    public float getPlayerRelativeBlockHardness(EntityPlayer player, World world, BlockPos pos) {
         if (!player.capabilities.allowEdit && this == Core.registry.factory_block_barrel) {
             return 0;
         }
-        return super.getPlayerRelativeBlockHardness(player, w, x, y, z);
+        return super.getPlayerRelativeBlockHardness(player, world, pos);
     }
 }

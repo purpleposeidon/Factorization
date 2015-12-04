@@ -192,7 +192,7 @@ public class BlockUndo {
         if (stillBusy(player)) return;
         if (!canUndo(event, x, y, z, block, md)) return;
         // Duplicate logic to figure out what the *actual* break speed will be, so that we don't make this actual break speed too fast
-        float hardness = block.getBlockHardness(player.worldObj, x, y, z);
+        float hardness = block.getBlockHardness(player.world, pos);
         if (hardness < 0.0F) {
             // Block is invulnerable
             return;

@@ -35,12 +35,12 @@ public class FluidUtil {
             return new FluidStack(vanilla, FluidContainerRegistry.BUCKET_VOLUME);
         }
         IFluidBlock block = (IFluidBlock) b;
-        if (!block.canDrain(worldObj, x, y, z)) return null;
-        FluidStack fs = block.drain(worldObj, x, y, z, false);
+        if (!block.canDrain(world, pos)) return null;
+        FluidStack fs = block.drain(world, pos, false);
         if (fs == null) return null;
         if (fs.getFluid() != targetFluid) return null;
         if (doDrain) {
-            fs = block.drain(worldObj, x, y, z, true);
+            fs = block.drain(world, pos, true);
         }
         if (fs == null || fs.amount <= 0) return null;
         return fs;

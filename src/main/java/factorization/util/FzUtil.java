@@ -1,6 +1,10 @@
 package factorization.util;
 
 import com.google.common.collect.Multimap;
+import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.BlockPos;
+import net.minecraft.world.IBlockAccess;
+import net.minecraft.world.IWorldAccess;
 import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.relauncher.Side;
@@ -209,5 +213,11 @@ public class FzUtil {
         if (Loader.isModLoaded(FZ)) {
             event.getModMetadata().parent = FZ;
         }
+    }
+
+    public static <T extends TileEntity> T getTE(IBlockAccess w, BlockPos at, Class<? extends T> klass) {
+        TileEntity te = w.getTileEntity(at);
+        if (klass.isInstance(te)) return (T) te;
+        return null;
     }
 }

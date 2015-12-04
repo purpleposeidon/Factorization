@@ -1,48 +1,50 @@
 package factorization.common;
 
-import java.util.List;
-
+import factorization.shared.BlockClass;
+import factorization.shared.Core;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
-import net.minecraft.client.renderer.texture.IIconRegister;
+import net.minecraft.block.properties.IProperty;
+import net.minecraft.block.properties.PropertyEnum;
+import net.minecraft.block.state.BlockState;
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.creativetab.CreativeTabs;
-import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
-import net.minecraft.util.IIcon;
+import net.minecraft.item.ItemStack;
+import net.minecraft.util.BlockPos;
+import net.minecraft.util.IStringSerializable;
 import net.minecraft.world.IBlockAccess;
-import net.minecraft.world.World;
-import factorization.api.Coord;
-import factorization.shared.Core;
+
+import java.util.List;
 
 public class BlockResource extends Block {
-    public IIcon[] icons = new IIcon[ResourceType.values().length];
-    
+    enum ResourceTypes implements IStringSerializable {
+        OLD_SILVER_ORE, SILVER_BLOCK, LEAD_BLOCK, DARK_IRON_BLOCK;
+
+        @Override
+        public String getName() {
+            return name();
+        }
+
+        public boolean isMetal() {
+            return this == SILVER_BLOCK || this == LEAD_BLOCK || this == DARK_IRON_BLOCK;
+        }
+    }
+
+    IProperty<ResourceTypes> TYPE = PropertyEnum.create("type", ResourceTypes.class);
+
     protected BlockResource() {
         super(Material.rock);
         setHardness(2.0F);
-        setBlockName("factorization.ResourceBlock");
-    }
-    
-    @Override
-    public void registerBlockIcons(IIconRegister reg) {
-        for (ResourceType rt : ResourceType.values()) {
-            if (rt.texture == null) {
-                continue;
-            }
-            icons[rt.md] = Core.texture(reg, rt.texture);
-        }
-        Core.registry.steamFluid.setIcons(BlockIcons.steam);
+        setUnlocalizedName("factorization.ResourceBlock");
     }
 
     @Override
-    public IIcon getIcon(int side, int md) {
-        if (md < icons.length && md >= 0) {
-            return icons[md];
-        }
-        return BlockIcons.error;
+    protected BlockState createBlockState() {
+        return getDefaultState().withProperty(TYPE, BlockClass.Machine);
     }
-    
-    public void addCreativeItems(List itemList) {
+
+    public void addCreativeItems(List<ItemStack> itemList) {
         itemList.add(Core.registry.silver_ore_item);
         itemList.add(Core.registry.silver_block_item);
         itemList.add(Core.registry.lead_block_item);
@@ -50,21 +52,23 @@ public class BlockResource extends Block {
     }
     
     @Override
-    public void getSubBlocks(Item par1, CreativeTabs par2CreativeTabs, List itemList) {
-        addCreativeItems((List) itemList);
+    public void getSubBlocks(Item par1, CreativeTabs par2CreativeTabs, List<ItemStack> itemList) {
+        addCreativeItems(itemList);
     }
 
     @Override
-    public int damageDropped(int i) {
-        return i;
+    public int damageDropped(IBlockState state) {
+        return state.getValue(TYPE).ordinal();
     }
-    
+
     @Override
-    public boolean isBeaconBase(IBlockAccess worldObj, int x, int y, int z,
-            int beaconX, int beaconY, int beaconZ) {
-        int md = worldObj.getBlockMetadata(x, y, z);
-        return md == Core.registry.silver_block_item.getItemDamage()
-                || md == Core.registry.lead_block_item.getItemDamage()
-                || md == Core.registry.dark_iron_block_item.getItemDamage();
+    public IBlockState getStateFromMeta(int meta) {
+        return getDefaultState().withProperty(TYPE, ResourceTypes.values()[meta]);
+    }
+
+    @Override
+    public boolean isBeaconBase(IBlockAccess world, BlockPos pos, BlockPos beacon) {
+        IBlockState bs = world.getBlockState(pos);
+        return bs.getValue(TYPE).isMetal();
     }
 }

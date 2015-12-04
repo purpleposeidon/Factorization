@@ -226,9 +226,9 @@ public class SocketScissors extends TileEntitySocketBase implements ICaptureDrop
     
     private boolean removeBlock(EntityPlayer thisPlayerMP, Block block, int md, int x, int y, int z) {
         if (block == null) return false;
-        block.onBlockHarvested(worldObj, x, y, z, md, thisPlayerMP);
+        block.onBlockHarvested(world, pos, md, thisPlayerMP);
         if (block.removedByPlayer(worldObj, thisPlayerMP, x, y, z, false)) {
-            block.onBlockDestroyedByPlayer(worldObj, x, y, z, md);
+            block.onBlockDestroyedByPlayer(world, pos, md);
             return true;
         }
         return false;

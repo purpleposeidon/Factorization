@@ -90,7 +90,7 @@ public class FactorizationProxy implements IGuiHandler {
         return true;
     }
     
-    public void texturepackChanged(IIconRegister reg) {}
+    public void texturepackChanged(IIconRegister reg) {} // NORELEASE: There's an event now.
     
     public boolean BlockRenderHelper_has_texture(BlockRenderHelper block, int f) { return true; }
     
