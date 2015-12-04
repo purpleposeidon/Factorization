@@ -22,7 +22,7 @@ public class ItemSpawnPoster extends ItemFactorization {
     }
 
     @Override
-    public boolean onItemUse(ItemStack is, EntityPlayer player, World w, int x, int y, int z, int side, float hitX, float hitY, float hitZ) {
+    public boolean onItemUse(ItemStack is, EntityPlayer player, World w, BlockPos pos, int side, float hitX, float hitY, float hitZ) {
         if (w.isRemote) return false;
         final PosterPlacer placer = new PosterPlacer(is, player, w, x, y, z, side);
         if (placer.invoke()) return false;
@@ -52,7 +52,7 @@ public class ItemSpawnPoster extends ItemFactorization {
         Quaternion rot;
         EnumFacing top;
 
-        public PosterPlacer(ItemStack is, EntityPlayer player, World w, int x, int y, int z, int side) {
+        public PosterPlacer(ItemStack is, EntityPlayer player, World w, BlockPos pos, int side) {
             this.is = is;
             this.player = player;
             this.w = w;

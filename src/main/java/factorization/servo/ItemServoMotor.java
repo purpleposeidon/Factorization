@@ -25,7 +25,7 @@ public class ItemServoMotor extends ItemCraftingComponent {
     }
     
     @Override
-    public boolean onItemUse(ItemStack is, EntityPlayer player, World w, int x, int y, int z, int side, float vecX, float vecY, float vecZ) {
+    public boolean onItemUse(ItemStack is, EntityPlayer player, World w, BlockPos pos, int side, float vecX, float vecY, float vecZ) {
         return false;
     }
 
@@ -34,7 +34,7 @@ public class ItemServoMotor extends ItemCraftingComponent {
     }
     
     @Override
-    public boolean onItemUseFirst(ItemStack is, EntityPlayer player, World w, int x, int y, int z, int side, float hitX, float hitY, float hitZ) {
+    public boolean onItemUseFirst(ItemStack is, EntityPlayer player, World w, BlockPos pos, int side, float hitX, float hitY, float hitZ) {
         Coord c = new Coord(w, x, y, z);
         if (c.getTE(TileEntityServoRail.class) == null) {
             return false;

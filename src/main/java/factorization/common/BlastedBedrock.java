@@ -24,7 +24,7 @@ public class BlastedBedrock extends Block {
     }
 
     @Override
-    public boolean canEntityDestroy(IBlockAccess world, int x, int y, int z, Entity entity) {
+    public boolean canEntityDestroy(IBlockAccess world, BlockPos pos, Entity entity) {
         return false;
     }
 
@@ -43,7 +43,7 @@ public class BlastedBedrock extends Block {
     }
 
     @Override
-    public void onBlockExploded(World world, int x, int y, int z, Explosion explosion) {
+    public void onBlockExploded(World world, BlockPos pos, Explosion explosion) {
         // Not explodable!
     }
 
@@ -53,7 +53,7 @@ public class BlastedBedrock extends Block {
     }
 
     @Override
-    public boolean isReplaceableOreGen(World world, int x, int y, int z, Block target) {
+    public boolean isReplaceableOreGen(World world, BlockPos pos, Block target) {
         return target == Blocks.bedrock || target == this;
     }
 }

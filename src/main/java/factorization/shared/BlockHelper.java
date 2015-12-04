@@ -113,7 +113,7 @@ public class BlockHelper
         return new ItemStack(itemId, stackSize, damage);
     }
 
-    public static ItemStack getPlacingItem(Block block, MovingObjectPosition target, World world, int x, int y, int z)
+    public static ItemStack getPlacingItem(Block block, MovingObjectPosition target, World world, BlockPos pos)
     {
         int md;
         switch (classifyBlock(block))

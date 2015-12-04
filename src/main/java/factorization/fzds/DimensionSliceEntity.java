@@ -491,7 +491,7 @@ public class DimensionSliceEntity extends IDeltaChunk implements IFzdsEntryContr
         updateUniversalCollisions();
     }
     
-    public void blocksChanged(int x, int y, int z) {
+    public void blocksChanged(BlockPos pos) {
         if (shadowArea == null) {
             needAreaUpdate = true;
             return;

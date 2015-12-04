@@ -75,7 +75,7 @@ class ShadowRenderGlobal implements IWorldAccess {
 
 
     @Override
-    public void playRecord(String recordName, int x, int y, int z) {
+    public void playRecord(String recordName, BlockPos pos) {
         Vec3 realCoords = DeltaChunk.shadow2nearestReal(Minecraft.getMinecraft().thePlayer, x, y, z);
         if (realCoords == null) {
             return;
@@ -84,7 +84,7 @@ class ShadowRenderGlobal implements IWorldAccess {
     }
 
     @Override
-    public void broadcastSound(int soundType, int x, int y, int z, int type) {
+    public void broadcastSound(int soundType, BlockPos pos, int type) {
         final Coord here = new Coord(DeltaChunk.getClientShadowWorld(), x, y, z);
         for (IDeltaChunk idc : DeltaChunk.getSlicesContainingPoint(here)) {
             Coord at = here.copy();
@@ -94,7 +94,7 @@ class ShadowRenderGlobal implements IWorldAccess {
     }
 
     @Override
-    public void playAuxSFX(EntityPlayer player, int soundType, int x, int y, int z, int soundData) {
+    public void playAuxSFX(EntityPlayer player, int soundType, BlockPos pos, int soundData) {
         final Coord here = new Coord(DeltaChunk.getClientShadowWorld(), x, y, z);
         for (IDeltaChunk idc : DeltaChunk.getSlicesContainingPoint(here)) {
             Coord at = here.copy();

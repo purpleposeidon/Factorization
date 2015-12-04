@@ -65,7 +65,7 @@ public class BlockUndo {
         final int w, x, y, z, idmd;
         final ItemStack orig;
 
-        private PlacedBlock(int w, int x, int y, int z, int idmd, ItemStack orig) {
+        private PlacedBlock(int w, BlockPos pos, int idmd, ItemStack orig) {
             this.w = w;
             this.x = x;
             this.y = y;
@@ -105,7 +105,7 @@ public class BlockUndo {
         return player.getCommandSenderName() + " #" + player.worldObj.isRemote;
     }
 
-    private static ItemStack toItem(Block b, World w, int x, int y, int z, int md) {
+    private static ItemStack toItem(Block b, World w, BlockPos pos, int md) {
         for (ItemStack is : b.getDrops(w, x, y, z, md, 0)) {
             return is;
         }
@@ -213,7 +213,7 @@ public class BlockUndo {
         // Maybe just a single blind speed, and be done with it?
     }
 
-    private boolean canUndo(PlayerEvent event, int x, int y, int z, Block block, int metadata) {
+    private boolean canUndo(PlayerEvent event, BlockPos pos, Block block, int metadata) {
         final EntityPlayer player = event.entityPlayer;
         ArrayList<PlacedBlock> coords = recentlyPlaced.get(getName(player));
         if (coords == null) return false;

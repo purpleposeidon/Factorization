@@ -74,12 +74,12 @@ public class HammerWorldProvider extends WorldProvider {
     }
 
     @Override
-    public boolean canBlockFreeze(int x, int y, int z, boolean byWater) {
+    public boolean canBlockFreeze(BlockPos pos, boolean byWater) {
         return false;
     }
 
     @Override
-    public boolean canSnowAt(int x, int y, int z, boolean checkLight) {
+    public boolean canSnowAt(BlockPos pos, boolean checkLight) {
         return false;
     }
 

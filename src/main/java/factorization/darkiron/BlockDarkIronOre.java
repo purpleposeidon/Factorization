@@ -29,7 +29,7 @@ public class BlockDarkIronOre extends Block {
     
     @Override
     @SideOnly(Side.CLIENT)
-    public void randomDisplayTick(World world, int x, int y, int z, Random random) {
+    public void randomDisplayTick(World world, BlockPos pos, Random random) {
         if (world.getTotalWorldTime() % 3 != 0) {
             return;
         }

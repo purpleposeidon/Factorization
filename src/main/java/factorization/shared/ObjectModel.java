@@ -45,7 +45,7 @@ public class ObjectModel {
 
     private WavefrontObject isbrh_model = null;
 
-    public boolean renderISBRH(RenderBlocks rb, IIcon icon, Block block, int x, int y, int z) {
+    public boolean renderISBRH(RenderBlocks rb, IIcon icon, Block block, BlockPos pos) {
         if (isbrh_model == null) {
             isbrh_model = readModel();
         }
@@ -64,7 +64,7 @@ public class ObjectModel {
         return true;
     }
 
-    public boolean renderBrightISBRH(RenderBlocks rb, IIcon icon, Block block, int x, int y, int z) {
+    public boolean renderBrightISBRH(RenderBlocks rb, IIcon icon, Block block, BlockPos pos) {
         if (isbrh_model == null) {
             isbrh_model = readModel();
         }
@@ -82,7 +82,7 @@ public class ObjectModel {
         return true;
     }
 
-    public boolean renderRotatedISBRH(RenderBlocks rb, IIcon icon, Block block, int x, int y, int z, Quaternion quat) {
+    public boolean renderRotatedISBRH(RenderBlocks rb, IIcon icon, Block block, BlockPos pos, Quaternion quat) {
         if (isbrh_model == null) {
             isbrh_model = readModel();
         }

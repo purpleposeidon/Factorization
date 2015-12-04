@@ -106,7 +106,7 @@ public class ItemSocketPart extends ItemFactorization {
     
     @Override
     public boolean onItemUse(ItemStack is, EntityPlayer player,
-            World world, int x, int y, int z, int side,
+            World world, BlockPos pos, int side,
             float hitX, float hitY, float hitZ) {
         return true;
     }

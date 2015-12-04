@@ -42,7 +42,7 @@ public class GargantuanBlock extends Block {
     }
     
     @Override
-    public boolean removedByPlayer(World world, EntityPlayer player, int x, int y, int z, boolean willHarvest) {
+    public boolean removedByPlayer(World world, EntityPlayer player, BlockPos pos, boolean willHarvest) {
         Coord at = new Coord(world, x, y, z);
         int md = at.getMd();
         EnumFacing dir = getDir(md);
@@ -95,7 +95,7 @@ public class GargantuanBlock extends Block {
     }
     
     @Override
-    public ArrayList<ItemStack> getDrops(World world, int x, int y, int z, int metadata, int fortune) {
+    public ArrayList<ItemStack> getDrops(World world, BlockPos pos, int metadata, int fortune) {
         /*EnumFacing dir = getDir(metadata);
         if (SpaceUtil.sign(dir) < 0) {
             Coord mate = new Coord(world, x, y, z).add(dir);

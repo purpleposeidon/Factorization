@@ -29,7 +29,7 @@ public class ItemDocBook extends ItemFactorization implements IDocBook {
     @SideOnly(Side.CLIENT)
     @Override
     public boolean onItemUse(ItemStack is, EntityPlayer player, World world,
-            int x, int y, int z, int side,
+            BlockPos pos, int side,
             float vx, float fy, float fz) {
         if (!world.isRemote) return false;
         if (!player.isSneaking()) return false;

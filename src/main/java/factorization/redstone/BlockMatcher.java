@@ -46,7 +46,7 @@ public class BlockMatcher extends Block {
         return (byte) (md & 0xC);
     }
 
-    byte match(IBlockAccess world, int x, int y, int z, EnumFacing axis) {
+    byte match(IBlockAccess world, BlockPos pos, EnumFacing axis) {
         // 0: Not at all similar
         // 1: Same solidity
         // 2: Same material
@@ -86,7 +86,7 @@ public class BlockMatcher extends Block {
     }
 
     @Override
-    public int getComparatorInputOverride(World world, int x, int y, int z, int side) {
+    public int getComparatorInputOverride(World world, BlockPos pos, int side) {
         int md = world.getBlockMetadata(x, y, z);
         EnumFacing axis = getAxis(md);
         EnumFacing mojangSide = SpaceUtil.demojangSide(side);
@@ -97,7 +97,7 @@ public class BlockMatcher extends Block {
     }
 
     @Override
-    public void onNeighborBlockChange(World world, int x, int y, int z, Block block) {
+    public void onNeighborBlockChange(World world, BlockPos pos, Block block) {
         if (block == this) return;
         int md = world.getBlockMetadata(x, y, z);
         byte state = getState(md);
@@ -123,7 +123,7 @@ public class BlockMatcher extends Block {
     }
 
     @Override
-    public boolean canConnectRedstone(IBlockAccess world, int x, int y, int z, int side) {
+    public boolean canConnectRedstone(IBlockAccess world, BlockPos pos, int side) {
         int md = world.getBlockMetadata(x, y, z);
         EnumFacing axis = getAxis(md);
         // Great job, forge! This is some right ol' stupid BS!
@@ -138,14 +138,14 @@ public class BlockMatcher extends Block {
     }
 
     @Override
-    public boolean isSideSolid(IBlockAccess world, int x, int y, int z, EnumFacing side) {
+    public boolean isSideSolid(IBlockAccess world, BlockPos pos, EnumFacing side) {
         int md = world.getBlockMetadata(x, y, z);
         EnumFacing axis = getAxis(md);
         return axis != side && axis != side.getOpposite(); // Look how much less stupid this is! :D
     }
 
     @Override
-    public int isProvidingWeakPower(IBlockAccess world, int x, int y, int z, int side) {
+    public int isProvidingWeakPower(IBlockAccess world, BlockPos pos, int side) {
         int md = world.getBlockMetadata(x, y, z);
         byte state = getState(md);
         if (state != STATE_FIRING) return 0;
@@ -158,7 +158,7 @@ public class BlockMatcher extends Block {
     }
 
     @Override
-    public void updateTick(World world, int x, int y, int z, Random random) {
+    public void updateTick(World world, BlockPos pos, Random random) {
         int md = world.getBlockMetadata(x, y, z);
         EnumFacing axis = getAxis(md);
         byte match = match(world, x, y, z, axis);
@@ -170,12 +170,12 @@ public class BlockMatcher extends Block {
     }
 
     @Override
-    public int onBlockPlaced(World w, int x, int y, int z, int side, float hitX, float hitY, float hitZ, int itemMetadata) {
+    public int onBlockPlaced(World w, BlockPos pos, int side, float hitX, float hitY, float hitZ, int itemMetadata) {
         return makeMd(SpaceUtil.getOrientation(side), STATE_READY);
     }
 
     @Override
-    public void onBlockAdded(World world, int x, int y, int z) {
+    public void onBlockAdded(World world, BlockPos pos) {
         int md = world.getBlockMetadata(x, y, z);
         byte state = getState(md);
         if (state == STATE_READY) return;

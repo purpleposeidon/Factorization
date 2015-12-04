@@ -60,7 +60,7 @@ public enum Sound {
         this.share = share;
     }
 
-    void share(World w, int x, int y, int z) {
+    void share(World w, BlockPos pos) {
         if (!share) {
             return;
         }

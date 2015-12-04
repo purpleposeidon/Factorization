@@ -227,7 +227,7 @@ public class ItemGoo extends ItemFactorization {
         return ItemUtil.identical(ais, b.getBrokenBlock());
     }
     
-    private void expandSelection(ItemStack is, GooData data, EntityPlayer player, World world, int x, int y, int z, EnumFacing dir) {
+    private void expandSelection(ItemStack is, GooData data, EntityPlayer player, World world, BlockPos pos, EnumFacing dir) {
         Coord src = new Coord(world, x, y, z);
         HashSet<Coord> found = new HashSet();
         for (int i = 0; i < data.coords.length; i += 3) {
@@ -365,7 +365,7 @@ public class ItemGoo extends ItemFactorization {
         }
     }
     
-    private boolean deselectCoord(ItemStack is, GooData data, World world, int x, int y, int z, boolean bulkAction) {
+    private boolean deselectCoord(ItemStack is, GooData data, World world, BlockPos pos, boolean bulkAction) {
         for (int i = 0; i < data.coords.length; i += 3) {
             int ix = data.coords[i + 0];
             int iy = data.coords[i + 1];

@@ -15,7 +15,7 @@ import net.minecraft.world.chunk.Chunk;
 import java.util.List;
 
 public class HookTargetsServer {
-    public static void diamondExploded(Object dis, World world, int x, int y, int z) {
+    public static void diamondExploded(Object dis, World world, BlockPos pos) {
         if (dis != Blocks.diamond_block) return;
         if (world.isRemote) {
             return;

@@ -48,7 +48,7 @@ public class ItemMatrixProgrammer extends ItemFactorization {
     }
     
     @Override
-    public boolean onItemUseFirst(ItemStack stack, EntityPlayer player, World world, int x, int y, int z, int side, float hitX, float hitY, float hitZ) {
+    public boolean onItemUseFirst(ItemStack stack, EntityPlayer player, World world, BlockPos pos, int side, float hitX, float hitY, float hitZ) {
         Coord c = new Coord(world, x, y, z);
         TileEntityNote noteBlock = c.getTE(TileEntityNote.class);
         if (noteBlock != null) {

@@ -225,7 +225,7 @@ public class SocketScissors extends TileEntitySocketBase implements ICaptureDrop
         return false;
     }
     
-    private boolean removeBlock(EntityPlayer thisPlayerMP, Block block, int md, int x, int y, int z) {
+    private boolean removeBlock(EntityPlayer thisPlayerMP, Block block, int md, BlockPos pos) {
         if (block == null) return false;
         block.onBlockHarvested(world, pos, md, thisPlayerMP);
         if (block.removedByPlayer(worldObj, thisPlayerMP, x, y, z, false)) {
@@ -235,7 +235,7 @@ public class SocketScissors extends TileEntitySocketBase implements ICaptureDrop
         return false;
     }
 
-    public static boolean canCutBlock(EntityPlayer player, World world, Block block, int x, int y, int z) {
+    public static boolean canCutBlock(EntityPlayer player, World world, Block block, BlockPos pos) {
         int md = world.getBlockMetadata(x, y, z);
         Material mat = block.getMaterial();
         if (block.getBlockHardness(world, x, y, z) == 0 && mat != Material.circuits && mat != Material.fire && mat != Material.air) {

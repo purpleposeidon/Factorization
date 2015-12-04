@@ -94,14 +94,14 @@ public class DocWorld extends WorldClient {
         return chunkX == 0 && chunkZ == 0;
     }
     
-    private int getIndex(int x, int y, int z) {
+    private int getIndex(BlockPos pos) {
         if (x < 0 || y < 0 || z < 0) return -1;
         if (x > 0xF || y > 0xF || z > 0xF) return -1;
         return x + (y << 4) + (z << 8);
     }
     
     @Override
-    public Block getBlock(int x, int y, int z) {
+    public Block getBlock(BlockPos pos) {
         int i = getIndex(x, y, z);
         if (i == -1) return Blocks.air;
         int id = blockIds[i];
@@ -117,14 +117,14 @@ public class DocWorld extends WorldClient {
     }
     
     @Override
-    public int getBlockMetadata(int x, int y, int z) {
+    public int getBlockMetadata(BlockPos pos) {
         int i = getIndex(x, y, z);
         if (i == -1) return 0;
         return blockMetadatas[i];
     }
     
     @Override
-    public TileEntity getTileEntity(int x, int y, int z) {
+    public TileEntity getTileEntity(BlockPos pos) {
         for (TileEntity te : tileEntities) {
             if (te.getPos().getX() == x && te.getPos().getY() == y && te.getPos().getZ() == z) {
                 return te;
@@ -173,17 +173,17 @@ public class DocWorld extends WorldClient {
     
     Chunk myChunk = new Chunk(this, 0, 0) {
         @Override
-        public Block getBlock(int x, int y, int z) {
+        public Block getBlock(BlockPos pos) {
             return DocWorld.this.getBlock(x, y, z);
         }
         
         @Override
-        public TileEntity func_150806_e(int x, int y, int z) {
+        public TileEntity func_150806_e(BlockPos pos) {
             return DocWorld.this.getTileEntity(x, y, z);
         }
         
         @Override
-        public TileEntity getTileEntityUnsafe(int x, int y, int z) {
+        public TileEntity getTileEntityUnsafe(BlockPos pos) {
             return DocWorld.this.getTileEntity(x, y, z);
         }
         
@@ -193,7 +193,7 @@ public class DocWorld extends WorldClient {
         }
         
         @Override
-        public int getBlockMetadata(int x, int y, int z) {
+        public int getBlockMetadata(BlockPos pos) {
             return DocWorld.this.getBlockMetadata(x, y, z);
         }		
         

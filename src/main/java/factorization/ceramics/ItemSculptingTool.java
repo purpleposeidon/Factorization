@@ -145,7 +145,7 @@ public class ItemSculptingTool extends ItemFactorization {
     }
     
     public boolean tryPlaceIntoWorld(ItemStack is, EntityPlayer player,
-            World w, int x, int y, int z, int side,
+            World w, BlockPos pos, int side,
             float vx, float vy, float vz) {
         if (w.isRemote) {
             return true;

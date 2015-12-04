@@ -22,7 +22,7 @@ public final class ServerShadowWorldAccess implements IWorldAccess {
     }
 
     @Override
-    public void playRecord(String sound, int x, int y, int z) {
+    public void playRecord(String sound, BlockPos pos) {
         final Coord here = new Coord(world, x, y, z);
         for (IDeltaChunk idc : DeltaChunk.getSlicesContainingPoint(here)) {
             Coord at = here.copy();
@@ -32,7 +32,7 @@ public final class ServerShadowWorldAccess implements IWorldAccess {
     }
 
     @Override
-    public void playAuxSFX(EntityPlayer player, int soundType, int x, int y, int z, int soundData) {
+    public void playAuxSFX(EntityPlayer player, int soundType, BlockPos pos, int soundData) {
         final Coord here = new Coord(world, x, y, z);
         for (IDeltaChunk idc : DeltaChunk.getSlicesContainingPoint(here)) {
             Coord at = here.copy();
@@ -55,7 +55,7 @@ public final class ServerShadowWorldAccess implements IWorldAccess {
 
 
     @Override
-    public void broadcastSound(int soundType, int x, int y, int z, int type) {
+    public void broadcastSound(int soundType, BlockPos pos, int type) {
         final Coord here = new Coord(world, x, y, z);
         for (IDeltaChunk idc : DeltaChunk.getSlicesContainingPoint(here)) {
             Coord at = here.copy();
@@ -70,12 +70,12 @@ public final class ServerShadowWorldAccess implements IWorldAccess {
     }
 
     @Override
-    public void markBlockForUpdate(int x, int y, int z) {
+    public void markBlockForUpdate(BlockPos pos) {
         markBlocksForUpdate(x, y, z, x, y, z);
     }
 
     @Override
-    public void markBlockForRenderUpdate(int x, int y, int z) {
+    public void markBlockForRenderUpdate(BlockPos pos) {
         markBlocksForUpdate(x, y, z, x, y, z);
     }
 

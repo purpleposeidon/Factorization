@@ -12,7 +12,7 @@ public interface IWindModel {
      * (What are the units? Probably some ratio of IC2's 'MCW', which are, uhm...)
      * The model may or may not take obstruction from other windmills into account; it's totally optional.
      */
-    Vec3 getWindPower(World w, int x, int y, int z, IWindmill mill);
+    Vec3 getWindPower(World w, BlockPos pos, IWindmill mill);
 
     /**
      * Windmills should register themselves with the wind model whenever they are loaded or placed.

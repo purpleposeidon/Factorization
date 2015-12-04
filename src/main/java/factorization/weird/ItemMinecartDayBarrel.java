@@ -76,7 +76,7 @@ public class ItemMinecartDayBarrel extends ItemFactorization implements IMinecar
     }
 
     @Override
-    public boolean onItemUse(ItemStack is, EntityPlayer player, World w, int x, int y, int z, int side, float hitX, float hitY, float hitZ) {
+    public boolean onItemUse(ItemStack is, EntityPlayer player, World w, BlockPos pos, int side, float hitX, float hitY, float hitZ) {
         if (w.isRemote) return true;
         if (!BlockRailBase.func_150051_a(w.getBlock(x, y, z))) {
             return true;
@@ -105,7 +105,7 @@ public class ItemMinecartDayBarrel extends ItemFactorization implements IMinecar
     }
 
     @Override
-    public EntityMinecart placeCart(GameProfile owner, ItemStack cart, World world, int x, int y, int z) {
+    public EntityMinecart placeCart(GameProfile owner, ItemStack cart, World world, BlockPos pos) {
         EntityMinecartDayBarrel minecart = new EntityMinecartDayBarrel(world, x + 0.5F, y + 0.5F, z + 0.5F);
         minecart.initFromStack(cart);
         cart.stackSize--;

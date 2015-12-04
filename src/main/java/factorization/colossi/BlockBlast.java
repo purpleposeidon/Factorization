@@ -27,19 +27,19 @@ public class BlockBlast extends Block {
     int blast_radius = 1;
 
     @Override
-    public void onNeighborBlockChange(World world, int x, int y, int z, Block block) {
+    public void onNeighborBlockChange(World world, BlockPos pos, Block block) {
         world.scheduleBlockUpdate(x, y, z, this, 6 + world.rand.nextInt(4));
     }
 
     @Override
-    public void onNeighborChange(IBlockAccess world, int x, int y, int z, int tileX, int tileY, int tileZ) {
+    public void onNeighborChange(IBlockAccess world, BlockPos pos, int tileX, int tileY, int tileZ) {
         /*if (world instanceof World) {
             onNeighborBlockChange((World) world, x, y, z, world.getBlock(tileX, tileY, tileZ));
         }*/
     }
 
     @Override
-    public void onBlockDestroyedByExplosion(World world, int x, int y, int z, Explosion explosion) {
+    public void onBlockDestroyedByExplosion(World world, BlockPos pos, Explosion explosion) {
         for (int dx = -blast_radius; dx <= +blast_radius; dx++) {
             for (int dy = -blast_radius; dy <= +blast_radius; dy++) {
                 for (int dz = -blast_radius; dz <= +blast_radius; dz++) {
@@ -53,14 +53,14 @@ public class BlockBlast extends Block {
     }
 
     @Override
-    public float getExplosionResistance(Entity explosion, World world, int x, int y, int z, double explosionX, double explosionY, double explosionZ) {
+    public float getExplosionResistance(Entity explosion, World world, BlockPos pos, double explosionX, double explosionY, double explosionZ) {
         world.setBlockMetadataWithNotify(x, y, z, 1, 0);
         onNeighborBlockChange(world, x, y, z, this);
         return super.getExplosionResistance(explosion, world, x, y, z, explosionX, explosionY, explosionZ);
     }
 
     @Override
-    public void updateTick(World world, int x, int y, int z, Random rand) {
+    public void updateTick(World world, BlockPos pos, Random rand) {
         boolean boom = world.getBlockMetadata(x, y, z) == 1;
         if (!boom) {
             for (EnumFacing dir : EnumFacing.VALUES) {

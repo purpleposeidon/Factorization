@@ -136,7 +136,7 @@ public class TileEntityWrathLamp extends TileEntityCommon {
         return null;
     }
 
-    private boolean inArea(int x, int y, int z) {
+    private boolean inArea(BlockPos pos) {
         if (y > pos.getY()) {
             return false;
         }
@@ -146,7 +146,7 @@ public class TileEntityWrathLamp extends TileEntityCommon {
         return pos.getX() - radius <= x && x <= pos.getX() + radius && pos.getZ() - radius <= z && z <= pos.getZ() + radius;
     }
 
-    private boolean lightsBlock(int x, int y, int z) {
+    private boolean lightsBlock(BlockPos pos) {
         if (!inArea(x, y, z)) {
             return false;
         }
@@ -194,7 +194,7 @@ public class TileEntityWrathLamp extends TileEntityCommon {
         }
     }
 
-    double dist(int x, int y, int z) {
+    double dist(BlockPos pos) {
         return Math.sqrt(x * x + y * y + z * z);
     }
 
@@ -249,7 +249,7 @@ public class TileEntityWrathLamp extends TileEntityCommon {
 
     }
 
-    boolean clearTo(int x, int y, int z) {
+    boolean clearTo(BlockPos pos) {
         return myTrace(x, z);
     }
 

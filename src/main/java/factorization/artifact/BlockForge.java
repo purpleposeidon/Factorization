@@ -33,7 +33,7 @@ public class BlockForge extends BlockAnvil {
     }
 
     @Override
-    public boolean onBlockActivated(World w, int x, int y, int z, EntityPlayer player, int side, float vx, float vy, float vz) {
+    public boolean onBlockActivated(World w, BlockPos pos, EntityPlayer player, int side, float vx, float vy, float vz) {
         if (w.isRemote) return true;
         if (InspirationManager.canMakeArtifact(player)) {
             player.openGui(Core.instance, FactoryType.ARTIFACTFORGEGUI.gui, w, x, y, z);

@@ -57,7 +57,7 @@ public class ItemServoRailWidget extends ItemFactorization {
     }
     
     @Override
-    public boolean onItemUse(ItemStack is, EntityPlayer player, World world, int x, int y, int z, int side, float vx, float vy, float vz) {
+    public boolean onItemUse(ItemStack is, EntityPlayer player, World world, BlockPos pos, int side, float vx, float vy, float vz) {
         ServoComponent sc = get(is);
         if (sc == null) {
             return false;

@@ -80,7 +80,7 @@ public class ColossalBlock extends Block {
     
     @Override
     @SideOnly(Side.CLIENT)
-    public IIcon getIcon(IBlockAccess w, int x, int y, int z, int side) {
+    public IIcon getIcon(IBlockAccess w, BlockPos pos, int side) {
         int md = w.getBlockMetadata(x, y, z);
         if (md == MD_EYE || md == MD_EYE_OPEN) {
             // This is here rather than up there so that the item form doesn't look lame
@@ -107,7 +107,7 @@ public class ColossalBlock extends Block {
     }
     
     @Override
-    public float getBlockHardness(World world, int x, int y, int z) {
+    public float getBlockHardness(World world, BlockPos pos) {
         int md = world.getBlockMetadata(x, y, z);
         if (md == MD_BODY_CRACKED || md == MD_MASK_CRACKED) {
             return 6; // 10
@@ -123,7 +123,7 @@ public class ColossalBlock extends Block {
         return super.getBlockHardness(world, x, y, z);
     }
     
-    boolean isSupportive(World world, int x, int y, int z) {
+    boolean isSupportive(World world, BlockPos pos) {
         if (world.getBlock(x, y, z) != this) return false;
         int md = world.getBlockMetadata(x, y, z);
         return md == MD_BODY || md == MD_BODY_COVERED || md == MD_EYE || md == MD_EYE_OPEN || md == MD_CORE;
@@ -155,7 +155,7 @@ public class ColossalBlock extends Block {
     }
     
     @Override
-    public ArrayList<ItemStack> getDrops(World world, int x, int y, int z, int md, int fortune) {
+    public ArrayList<ItemStack> getDrops(World world, BlockPos pos, int md, int fortune) {
         ArrayList<ItemStack> ret = new ArrayList();
         if (md == MD_MASK) {
             ret.add(new ItemStack(this, 1, md));
@@ -182,7 +182,7 @@ public class ColossalBlock extends Block {
     }
     
     @Override
-    public void randomDisplayTick(World world, int x, int y, int z, Random rand) {
+    public void randomDisplayTick(World world, BlockPos pos, Random rand) {
         if (world.provider.dimensionId != DeltaChunk.getDimensionId()) return;
         int md = world.getBlockMetadata(x, y, z);
         int r = md == MD_BODY_CRACKED ? 4 : 2;
@@ -216,12 +216,12 @@ public class ColossalBlock extends Block {
     }
     
     @Override
-    public ItemStack getPickBlock(MovingObjectPosition target, World world, int x, int y, int z) {
+    public ItemStack getPickBlock(MovingObjectPosition target, World world, BlockPos pos) {
         return new ItemStack(this, 1, world.getBlockMetadata(x, y, z));
     }
     
     @Override
-    public boolean onBlockActivated(World world, int x, int y, int z, EntityPlayer player, int side, float vecX, float vecY, float vecZ) {
+    public boolean onBlockActivated(World world, BlockPos pos, EntityPlayer player, int side, float vecX, float vecY, float vecZ) {
         if (world.isRemote) return false;
         if (player == null) return false;
         Coord at = new Coord(world, x, y, z);
@@ -285,7 +285,7 @@ public class ColossalBlock extends Block {
     }
 
     @Override
-    public void onBlockPlacedBy(World world, int x, int y, int z, EntityLivingBase player, ItemStack is) {
+    public void onBlockPlacedBy(World world, BlockPos pos, EntityLivingBase player, ItemStack is) {
         super.onBlockPlacedBy(world, x, y, z, player, is);
         if (is.getItemDamage() != MD_CORE) {
             return;
@@ -300,7 +300,7 @@ public class ColossalBlock extends Block {
     }
     
     @Override
-    public void breakBlock(World world, int x, int y, int z, Block block, int md) {
+    public void breakBlock(World world, BlockPos pos, Block block, int md) {
         super.breakBlock(world, x, y, z, block, md);
         if (world.isRemote) return;
         if (world == DeltaChunk.getServerShadowWorld()) return;
@@ -339,7 +339,7 @@ public class ColossalBlock extends Block {
     }
 
     @Override
-    public int getLightValue(IBlockAccess world, int x, int y, int z) {
+    public int getLightValue(IBlockAccess world, BlockPos pos) {
         return 8;
     }
 }

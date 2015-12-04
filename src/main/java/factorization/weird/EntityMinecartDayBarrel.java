@@ -137,7 +137,7 @@ public class EntityMinecartDayBarrel extends EntityMinecart implements IInventor
     }
 
     @Override
-    public void onActivatorRailPass(int x, int y, int z, boolean powered) {
+    public void onActivatorRailPass(BlockPos pos, boolean powered) {
         if (powered) {
             activatorRailTicks = barrel.getLogicSpeed();
         }

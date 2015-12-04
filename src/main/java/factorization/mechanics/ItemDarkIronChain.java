@@ -30,7 +30,7 @@ public class ItemDarkIronChain extends ItemFactorization {
     }
 
     @Override
-    public boolean onItemUseFirst(ItemStack is, EntityPlayer player, World world, int x, int y, int z, int side, float hitX, float hitY, float hitZ) {
+    public boolean onItemUseFirst(ItemStack is, EntityPlayer player, World world, BlockPos pos, int side, float hitX, float hitY, float hitZ) {
         if (world.isRemote) return false;
         Coord at = new Coord(world, x, y, z);
         if (player.isSneaking()) {
