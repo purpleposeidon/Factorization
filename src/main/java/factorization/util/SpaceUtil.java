@@ -522,4 +522,16 @@ public final class SpaceUtil {
     public static Vec3 subtract(Vec3 you, Vec3 me) {
         return you.subtract(me);
     }
+
+    public static Vec3 setX(Vec3 v, double x) {
+        return new Vec3(x, v.yCoord, v.zCoord);
+    }
+
+    public static Vec3 setY(Vec3 v, double y) {
+        return new Vec3(v.xCoord, y, v.zCoord);
+    }
+
+    public static Vec3 setZ(Vec3 v, double z) {
+        return new Vec3(v.xCoord, v.yCoord, z);
+    }
 }

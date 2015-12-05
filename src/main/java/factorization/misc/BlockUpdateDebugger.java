@@ -6,17 +6,18 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.AxisAlignedBB;
+import net.minecraft.util.BlockPos;
 import net.minecraft.world.IWorldAccess;
 
 public class BlockUpdateDebugger implements IWorldAccess {
     @Override
     public void markBlockForUpdate(BlockPos pos) {
-        markBlockRangeForRenderUpdate(pos, pos);
+        markBlockRangeForRenderUpdate(pos.getX(), pos.getY(), pos.getZ(), pos.getX(), pos.getY(), pos.getZ());
     }
 
     @Override
-    public void markBlockForRenderUpdate(BlockPos pos) {
-        markBlockRangeForRenderUpdate(pos, pos);
+    public void notifyLightSet(BlockPos pos) {
+        markBlockForUpdate(pos);
     }
 
     long last_time = -1;
@@ -42,14 +43,14 @@ public class BlockUpdateDebugger implements IWorldAccess {
         AabbDebugger.addBox(new AxisAlignedBB(minX + l, minY + l, minZ + l, maxX + h, maxY + h, maxZ + h));
     }
 
+
     @Override public void playSound(String p_72704_1_, double p_72704_2_, double p_72704_4_, double p_72704_6_, float p_72704_8_, float p_72704_9_) { }
     @Override public void playSoundToNearExcept(EntityPlayer p_85102_1_, String p_85102_2_, double p_85102_3_, double p_85102_5_, double p_85102_7_, float p_85102_9_, float p_85102_10_) { }
-    @Override public void spawnParticle(String p_72708_1_, double p_72708_2_, double p_72708_4_, double p_72708_6_, double p_72708_8_, double p_72708_10_, double p_72708_12_) { }
-    @Override public void onEntityCreate(Entity p_72703_1_) { }
-    @Override public void onEntityDestroy(Entity p_72709_1_) { }
-    @Override public void playRecord(String p_72702_1_, int p_72702_2_, int p_72702_3_, int p_72702_4_) { }
-    @Override public void broadcastSound(int p_82746_1_, int p_82746_2_, int p_82746_3_, int p_82746_4_, int p_82746_5_) { }
-    @Override public void playAuxSFX(EntityPlayer p_72706_1_, int p_72706_2_, int p_72706_3_, int p_72706_4_, int p_72706_5_, int p_72706_6_) {}
-    @Override public void destroyBlockPartially(int p_147587_1_, int p_147587_2_, int p_147587_3_, int p_147587_4_, int p_147587_5_) { }
-    @Override public void onStaticEntitiesChanged() { }
+    @Override public void spawnParticle(int particleID, boolean ignoreRange, double xCoord, double yCoord, double zCoord, double xOffset, double yOffset, double zOffset, int... p_180442_15_) { }
+    @Override public void onEntityAdded(Entity entityIn) { }
+    @Override public void onEntityRemoved(Entity entityIn) { }
+    @Override public void playRecord(String recordName, BlockPos blockPosIn) { }
+    @Override public void broadcastSound(int p_180440_1_, BlockPos p_180440_2_, int p_180440_3_) { }
+    @Override public void playAuxSFX(EntityPlayer player, int sfxType, BlockPos blockPosIn, int p_180439_4_) { }
+    @Override public void sendBlockBreakProgress(int breakerId, BlockPos pos, int progress) { }
 }

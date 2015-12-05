@@ -106,7 +106,7 @@ public enum WalkState implements IStateMachine<WalkState> {
             if (controller.atTarget()) return IDLE;
             IDeltaChunk body = controller.body;
             Vec3 target = controller.getTarget().createVector();
-            target.yCoord = controller.posY;
+            target = SpaceUtil.setY(target, controller.posY);
             Vec3 me = SpaceUtil.fromEntPos(body);
             Vec3 delta = me.subtract(target);
             double angle = Math.atan2(delta.xCoord, delta.zCoord) - Math.PI / 2;
@@ -155,7 +155,7 @@ public enum WalkState implements IStateMachine<WalkState> {
             if (controller.atTarget()) return;
             IDeltaChunk body = controller.body;
             Vec3 target = controller.getTarget().createVector();
-            target.yCoord = controller.posY;
+            target = SpaceUtil.setY(target, controller.posY);
             Vec3 me = SpaceUtil.fromEntPos(body);
             Vec3 delta = me.subtract(target);
             double walk_speed = Math.min(MAX_WALK_SPEED, delta.lengthVector()) * controller.getSpeedScale();
@@ -269,7 +269,7 @@ public enum WalkState implements IStateMachine<WalkState> {
             if (stomped.isAir()) continue;
             Block.SoundType sound = stomped.getBlock().stepSound;
             if (sound == null) continue;
-            idc.worldObj.playSoundEffect(realFoot.xCoord, realFoot.yCoord, realFoot.zCoord, sound.getStepResourcePath(), sound.getPitch() * 0.9F, sound.getVolume() * 1.1F);
+            idc.worldObj.playSoundEffect(realFoot.xCoord, realFoot.yCoord, realFoot.zCoord, sound.getStepSound(), sound.getFrequency() * 0.9F, sound.getVolume() * 1.1F);
         }
     }
 }
