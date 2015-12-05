@@ -138,7 +138,7 @@ public class HammerNet {
         double x = dis.readDouble();
         double y = dis.readDouble();
         double z = dis.readDouble();
-        Vec3 vec = new Vec3(pos);
+        Vec3 vec = new Vec3(x, y, z);
         dse.setRotationalCenterOffset(vec);
     }
     

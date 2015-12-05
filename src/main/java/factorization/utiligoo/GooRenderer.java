@@ -100,7 +100,7 @@ public enum GooRenderer {
             if (is == null || is.getItem() != Core.registry.utiligoo) continue;
             GooData data = GooData.getNullGooData(is, mc.theWorld);
             if (data == null) continue; 
-            if (data.dimensionId != mc.theWorld.provider.dimensionId) continue;
+            if (data.getDimensionId() != mc.theWorld.provider.getDimensionId()) continue;
             if (data.coords.length == 0) continue;
             if (!rendered_something) {
                 rendered_something = true;

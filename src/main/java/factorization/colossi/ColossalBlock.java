@@ -183,7 +183,7 @@ public class ColossalBlock extends Block {
     
     @Override
     public void randomDisplayTick(World world, BlockPos pos, Random rand) {
-        if (world.provider.dimensionId != DeltaChunk.getDimensionId()) return;
+        if (world.provider.getDimensionId() != DeltaChunk.getDimensionId()) return;
         int md = world.getBlockMetadata(pos);
         int r = md == MD_BODY_CRACKED ? 4 : 2;
         float px = x - 0.5F + rand.nextFloat()*r;

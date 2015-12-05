@@ -195,7 +195,7 @@ public class MiscClientCommands implements ICommand {
             }
             player.sendChatMessage("/me is at " + ((int) player.posX) + ", "
                     + ((int) player.posY) + ", " + ((int) player.posZ) + " in dimension "
-                    + player.worldObj.provider.dimensionId + append);
+                    + player.worldObj.provider.getDimensionId() + append);
         }
         
         @alias({"ss"})

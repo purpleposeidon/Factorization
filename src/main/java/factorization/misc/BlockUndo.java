@@ -18,6 +18,7 @@ import net.minecraft.init.Items;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.AxisAlignedBB;
+import net.minecraft.util.BlockPos;
 import net.minecraft.world.World;
 import net.minecraftforge.common.DimensionManager;
 import net.minecraftforge.common.ForgeHooks;
@@ -62,34 +63,33 @@ public class BlockUndo {
     }
 
     private static class PlacedBlock {
-        final int w, pos, idmd;
+        final int w, idmd;
+        final BlockPos pos;
         final ItemStack orig;
 
         private PlacedBlock(int w, BlockPos pos, int idmd, ItemStack orig) {
             this.w = w;
-            this.x = x;
-            this.y = y;
-            this.z = z;
+            this.pos = pos;
             this.idmd = idmd;
             this.orig = orig;
         }
 
         @Override
         public String toString() {
-            return x + " " + z;
+            return pos.toString();
         }
 
         void write(ByteBuf out) {
             out.writeInt(w);
-            out.writeInt(x);
-            out.writeInt(y);
-            out.writeInt(z);
+            out.writeInt(pos.getX());
+            out.writeInt(pos.getY());
+            out.writeInt(pos.getZ());
             out.writeInt(idmd);
             ByteBufUtils.writeItemStack(out, orig);
         }
 
         static PlacedBlock read(ByteBuf in) {
-            return new PlacedBlock(in.readInt(), in.readInt(), in.readInt(), in.readInt(), in.readInt(),
+            return new PlacedBlock(in.readInt(), new BlockPos(in.readInt(), in.readInt(), in.readInt()), in.readInt(),
                     ByteBufUtils.readItemStack(in));
         }
     }
@@ -123,9 +123,9 @@ public class BlockUndo {
         for (Iterator<PlacedBlock> it = coords.iterator(); it.hasNext(); ) {
             PlacedBlock c = it.next();
             World w = DimensionManager.getWorld(c.w);
-            if (w == null || w.isAirBlock(c.x, c.y, c.z)) {
+            if (w == null || w.isAirBlock(c.pos)) {
                 it.remove();
-            } else if (c.x == at.x && c.y == at.y && c.z == at.z) {
+            } else if (c.pos.equals(at.pos)) {
                 it.remove();
             }
         }

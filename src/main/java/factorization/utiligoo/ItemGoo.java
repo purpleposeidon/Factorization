@@ -103,7 +103,7 @@ public class ItemGoo extends ItemFactorization {
             }
         }
         data.coords = ArrayUtils.addAll(data.coords, pos.getX(), pos.getY(), pos.getZ());
-        data.dimensionId = FzUtil.getWorldDimension(world);
+        data.getDimensionId() = FzUtil.getWorldDimension(world);
         data.markDirty();
         is.stackSize--;
         return true;
@@ -457,7 +457,7 @@ public class ItemGoo extends ItemFactorization {
         if (data != null) {
             list.add(I18n.format("item.factorization:utiligoo.placed", data.coords.length / 3));
             if (player != null && player.worldObj != null) {
-                if (data.dimensionId != FzUtil.getWorldDimension(player.worldObj)) {
+                if (data.getDimensionId() != FzUtil.getWorldDimension(player.worldObj)) {
                     list.add(I18n.format("item.factorization:utiligoo.wrongDimension"));
                 }
             }

@@ -83,7 +83,7 @@ public class WorldgenManager {
         if (!test) return;
         final int chunkX = chunk.xPosition, chunkZ = chunk.zPosition;
         final World world = chunk.worldObj;
-        //log("Retrogenning %s in dimension %s at chunk coordinates (%s, %s)", genType, world.provider.dimensionId, chunkX, chunkZ);
+        //log("Retrogenning %s in dimension %s at chunk coordinates (%s, %s)", genType, world.provider.getDimensionId(), chunkX, chunkZ);
         
         //Thanks, FML!
         long worldSeed = world.getSeed();

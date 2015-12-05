@@ -126,7 +126,7 @@ public class GooData extends WorldSavedData {
     
     boolean checkWorld(EntityPlayer player, Coord complainAt) {
         if (coords.length == 0) return false;
-        if (dimensionId == player.worldObj.provider.dimensionId) return false;
+        if (dimensionId == player.worldObj.provider.getDimensionId()) return false;
         if (complainAt != null) {
             new Notice(complainAt, "item.factorization:utiligoo.wrongDimension").send(player);
         }

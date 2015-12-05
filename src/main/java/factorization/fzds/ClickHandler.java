@@ -54,7 +54,6 @@ public class ClickHandler {
             return;
         }
         event.setCanceled(true);
-        FMLProxyPacket toSend = null;
         switch (hit.typeOfHit) {
         case ENTITY:
             final byte packetId = rightClick ? HammerNetType.rightClickEntity : HammerNetType.leftClickEntity;

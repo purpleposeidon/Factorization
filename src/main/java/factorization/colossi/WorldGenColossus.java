@@ -96,7 +96,7 @@ public class WorldGenColossus implements IWorldGenerator {
                 int cz = chunkAt.chunkZPos + dz;
                 if (isGenChunk(cx, cz)) {
                     Chunk chunk = player.w.getChunkFromChunkCoords(cx, cz);
-                    if (forceLoad && !chunk.isTerrainPopulated) {
+                    if (forceLoad && !chunk.isTerrainPopulated()) {
                         int r = 1;
                         for (int rx = -r; rx <= +r; rx++) {
                             for (int rz = -r; rz <= +r; rz++) {
@@ -106,7 +106,7 @@ public class WorldGenColossus implements IWorldGenerator {
                         }
                     }
                     boolean unload = false;
-                    if (forceLoad && !chunk.isTerrainPopulated) {
+                    if (forceLoad && !chunk.isTerrainPopulated()) {
                         try {
                             forceLoadChunk(player.w, cx, cz);
                         } catch (Throwable t) {
@@ -157,8 +157,8 @@ public class WorldGenColossus implements IWorldGenerator {
         int max = target_noises[0];
         for (int i : target_noises) max = Math.max(max, i);
         if (event.newNoiseGens == null || max >= event.newNoiseGens.length) {
-            Core.logWarning("Colossi will not generate in dimension: " + event.world.provider.dimensionId);
-            dimensionBlacklist.put(event.world.provider.dimensionId, (byte) 1);
+            Core.logWarning("Colossi will not generate in dimension: " + event.world.provider.getDimensionId());
+            dimensionBlacklist.put(event.world.provider.getDimensionId(), (byte) 1);
             return;
         }
         for (int noise_index : target_noises) {
@@ -230,7 +230,7 @@ public class WorldGenColossus implements IWorldGenerator {
     }
     
     public static boolean genOnWorld(World world) {
-        return world.getWorldInfo().isMapFeaturesEnabled() && world.provider.isSurfaceWorld() && FzConfig.gen_colossi && !dimensionBlacklist.containsKey(world.provider.dimensionId);
+        return world.getWorldInfo().isMapFeaturesEnabled() && world.provider.isSurfaceWorld() && FzConfig.gen_colossi && !dimensionBlacklist.containsKey(world.provider.getDimensionId());
     }
     
     static Type[] forbiddenBiomeTypes = new Type[] {
