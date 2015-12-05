@@ -14,9 +14,6 @@ import factorization.sockets.TileEntitySocketBase;
 import factorization.util.NumUtil;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.block.Block;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.Tessellator;
-import net.minecraft.client.renderer.texture.TextureManager;
 import net.minecraft.init.Blocks;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
@@ -197,33 +194,7 @@ public abstract class SocketFanturpeller extends TileEntitySocketBase implements
     protected boolean isSafeToDiscard() {
         return true;
     }
-    
-    @Override
-    @SideOnly(Side.CLIENT)
-    public void renderStatic(ServoMotor motor, Tessellator tess) {
-        if (motor != null) {
-            TextureManager tex = Minecraft.getMinecraft().renderEngine;
-            tex.bindTexture(Core.blockAtlas);
-        }
-        BlockRenderHelper block = BlockRenderHelper.instance;
-        Quaternion rotation = Quaternion.fromOrientation(FzOrientation.fromDirection(facing.getOpposite()));
-        {
-            IIcon metal = BlockIcons.motor_texture;
-            float d = 4.0F / 16.0F;
-            float yd = -d + 0.003F;
-    
-            block.useTextures(metal, null,
-                    metal, metal,
-                    metal, metal);
-            float yoffset = 5F/16F;
-            float sd = motor == null ? 0 : 2F/16F;
-            block.setBlockBounds(d, d + yd + yoffset + 2F/16F + sd, d, 1 - d, 1 - (d + 0F/16F) + yd + yoffset, 1 - d);
-            block.beginWithMirroredUVs();
-            block.rotateCenter(rotation);
-            block.renderRotated(tess, pos.getX(), pos.getY(), pos.getZ());
-        }
-    }
-    
+
     protected float scaleRotation(float rotation) {
         return rotation;
     }

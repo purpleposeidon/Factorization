@@ -33,6 +33,7 @@ import net.minecraft.enchantment.Enchantment;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
@@ -149,7 +150,7 @@ public class SocketLacerator extends TileEntitySocketBase implements IChargeCond
         }
         
         if (previous_breaking_target != null && present_breaking_target != null) {
-            if (!previous_breaking_target.getBlockPos().equals(present_breaking_target.getBlockPos()) {
+            if (!previous_breaking_target.getBlockPos().equals(present_breaking_target.getBlockPos())) {
                 destroyPartially(previous_breaking_target, 99);
             }
         } else if (present_breaking_target == null) {
@@ -486,26 +487,7 @@ public class SocketLacerator extends TileEntitySocketBase implements IChargeCond
             }
         }
     }
-    
-    @Override
-    @SideOnly(Side.CLIENT)
-    public void renderStatic(ServoMotor motor, Tessellator tess) {
-        IIcon metal = BlockIcons.motor_texture;
-        float d = 4.0F / 16.0F;
-        float yd = -d + 0.003F;
-        BlockRenderHelper block = BlockRenderHelper.instance;
-        block.useTextures(null, null,
-                metal, metal,
-                metal, metal);
-        float yoffset = 5F/16F;
-        float sd = motor == null ? 0 : 2F/16F;
-        block.setBlockBounds(d, d + yd + yoffset + 2F/16F + sd, d, 1 - d, 1 - (d + 0F/16F) + yd + yoffset, 1 - d);
-        block.beginWithMirroredUVs();
-        block.rotateCenter(Quaternion.fromOrientation(FzOrientation.fromDirection(facing.getOpposite())));
-        block.renderRotated(tess, pos.getX(), pos.getY(), pos.getZ());
-    }
-    
-    
+
     @SideOnly(Side.CLIENT)
     static EffectRenderer particleTweaker, origER;
     @SideOnly(Side.CLIENT)

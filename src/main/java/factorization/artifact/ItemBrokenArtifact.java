@@ -4,7 +4,6 @@ import factorization.shared.Core;
 import factorization.shared.ItemFactorization;
 import factorization.util.ItemUtil;
 import factorization.util.LangUtil;
-import net.minecraft.client.renderer.texture.IIconRegister;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
@@ -13,8 +12,6 @@ import net.minecraft.item.ItemTool;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraftforge.event.AnvilUpdateEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
 
 import java.util.Collections;
 import java.util.List;
@@ -35,10 +32,6 @@ public class ItemBrokenArtifact extends ItemFactorization {
         ret.setItemDamage(Math.abs(out.hashCode()) % 1000);
         return ret;
     }
-
-    @Override
-    @SideOnly(Side.CLIENT)
-    public void registerIcons(IIconRegister register) { }
 
     public static ItemStack get(ItemStack orig) {
         if (orig == null) return null;
@@ -63,7 +56,7 @@ public class ItemBrokenArtifact extends ItemFactorization {
         ItemStack held = get(is);
         if (held == null) return;
         ItemStack fresh = new ItemStack(held.getItem());
-        ItemStack repair = new ItemStack(getRepairItem(fresh));
+        ItemStack repair = getRepairItem(fresh);
         String got = LangUtil.translateWithCorrectableFormat("item.factorization:brokenArtifact.repairhint", repair.getDisplayName());
         Collections.addAll(list, got.split("\\\\n"));
         List infos = held.getTooltip(player, false);
@@ -73,13 +66,13 @@ public class ItemBrokenArtifact extends ItemFactorization {
         }
     }
 
-    public Item getRepairItem(ItemStack held) {
+    public ItemStack getRepairItem(ItemStack held) {
         Item template = held.getItem();
 
         if (template instanceof ItemTool) {
-            return ((ItemTool) template).func_150913_i(/*getToolMaterial*/).func_150995_f(/*getRepairItem*/);
+            return ((ItemTool) template).getToolMaterial().getRepairItemStack();
         }
-        return template;
+        return new ItemStack(template);
     }
 
     @SubscribeEvent
@@ -89,9 +82,9 @@ public class ItemBrokenArtifact extends ItemFactorization {
         if (!ItemUtil.is(left, this)) return;
         ItemStack held = get(left);
         if (held == null) return;
-        Item template = getRepairItem(held);
+        ItemStack template = getRepairItem(held);
 
-        if (!ItemUtil.is(right, template)) return;
+        if (!ItemUtil.is(right, template.getItem())) return;
         if (right.getItemDamage() != 0) return;
         // Check for enchants? Previous repairs? Nah.
         held.setItemDamage(0);

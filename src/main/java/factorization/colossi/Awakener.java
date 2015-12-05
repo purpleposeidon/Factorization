@@ -202,15 +202,15 @@ public class Awakener {
             Vec3 joint = calculateJointPosition(leg, leg_size, leg_length, LimbType.LEG);
             SetAndInfo sai = new SetAndInfo(leg, leg_length, leg_size, joint, LimbType.LEG, getSide(leg));
             limbInfo.add(sai);
-            SpaceUtil.incrAdd(leg_sum, joint);
+            leg_sum = leg_sum.add(joint);
         }
         Vec3 body_center_of_mass = leg_sum;
-        SpaceUtil.incrScale(body_center_of_mass, 1.0 / legs.size());
+        body_center_of_mass = SpaceUtil.scale(body_center_of_mass, 1.0 / legs.size());
         //body_center_of_mass.yCoord += 1;
         SetAndInfo sai = new SetAndInfo(body, measure_dim(body, 1), leg_size, body_center_of_mass, LimbType.BODY, BodySide.RIGHT);
         limbInfo.add(sai);
         
-        ArrayList<Set<Coord>> all_members = new ArrayList();
+        ArrayList<Set<Coord>> all_members = new ArrayList<Set<Coord>>();
         all_members.add(body);
         all_members.addAll(arms);
         all_members.addAll(legs);
@@ -334,14 +334,8 @@ public class Awakener {
         }
         if (corner == null) return new Vec3(0, 0, 0);
         corner = corner.add(EnumFacing.UP); // Make the Y axis start at the top
-        Vec3 ret = corner.createVector();
-        ret.xCoord += size/2.0;
-        ret.zCoord += size/2.0;
-        if (type == LimbType.ARM) {
-            // Legs will be jointed at the top, and arms from the center.
-            ret.yCoord -= size/2.0;
-        }
-        return ret;
+        double h = size / 2;
+        return corner.createVector().addVector(h, type == LimbType.ARM ? -h : 0, h);
     }
 
     boolean verifyLegDimensions(ArrayList<Set<Coord>> legs) {

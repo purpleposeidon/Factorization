@@ -2,7 +2,6 @@ package factorization.sockets;
 
 import factorization.api.Coord;
 import factorization.api.FzOrientation;
-import factorization.api.Quaternion;
 import factorization.api.datahelpers.DataHelper;
 import factorization.api.datahelpers.IDataSerializable;
 import factorization.api.datahelpers.Share;
@@ -11,24 +10,19 @@ import factorization.fzds.DeltaChunk;
 import factorization.fzds.HammerEnabled;
 import factorization.servo.RenderServoMotor;
 import factorization.servo.ServoMotor;
-import factorization.shared.BlockRenderHelper;
 import factorization.shared.Core;
 import factorization.util.InvUtil;
 import factorization.util.InvUtil.FzInv;
 import factorization.util.ItemUtil;
 import factorization.util.PlayerUtil;
-import net.minecraft.block.Block;
-import net.minecraft.client.renderer.Tessellator;
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.crash.CrashReport;
 import net.minecraft.crash.CrashReportCategory;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.EnumFacing;
-import net.minecraft.util.MovingObjectPosition;
+import net.minecraft.util.*;
 import net.minecraft.util.MovingObjectPosition.MovingObjectType;
-import net.minecraft.util.ReportedException;
-import net.minecraft.util.Vec3;
 import net.minecraft.world.World;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
@@ -199,14 +193,12 @@ public class SocketRobotHand extends TileEntitySocketBase {
     boolean mcClick(EntityPlayer player, MovingObjectPosition mop, ItemStack itemstack) {
         //Yoinked and cleaned up from Minecraft.clickMouse and PlayerControllerMP.onPlayerRightClick
         final World world = player.worldObj;
-        final int x = mop.blockX;
-        final int y = mop.blockY;
-        final int z = mop.blockZ;
-        int side = mop.sideHit;
+        BlockPos pos = mop.getBlockPos();
+        EnumFacing side = mop.sideHit;
         final Vec3 hitVec = mop.hitVec;
-        final float dx = (float)hitVec.xCoord - (float)x;
-        final float dy = (float)hitVec.yCoord - (float)y;
-        final float dz = (float)hitVec.zCoord - (float)z;
+        final float dx = (float)hitVec.xCoord - (float)pos.getX();
+        final float dy = (float)hitVec.yCoord - (float)pos.getY();
+        final float dz = (float)hitVec.zCoord - (float)pos.getZ();
         final Item item = itemstack == null ? null : itemstack.getItem();
         final long origItemHash = ItemUtil.getItemHash(itemstack);
 
@@ -231,9 +223,9 @@ public class SocketRobotHand extends TileEntitySocketBase {
             }
             
             if (!player.isSneaking() || itemstack == null || item.doesSneakBypassUse(world, pos, player)) {
-                Block blockId = world.getBlock(pos);
+                IBlockState blockId = world.getBlockState(pos);
             
-                if (blockId != null && blockId.onBlockActivated(world, pos, player, side, dx, dy, dz)) {
+                if (blockId != null && blockId.getBlock().onBlockActivated(world, pos, blockId, player, side, dx, dy, dz)) {
                     ret = true;
                     break;
                 }
@@ -242,7 +234,7 @@ public class SocketRobotHand extends TileEntitySocketBase {
                 ret = false;
                 break;
             }
-            ret = itemstack.tryPlaceItemIntoWorld(player, world, pos, side, dx, dy, dz);
+            ret = itemstack.onItemUse(player, world, pos, side, dx, dy, dz);
             break;
         } while (false);
         if (itemstack == null) {
@@ -262,24 +254,7 @@ public class SocketRobotHand extends TileEntitySocketBase {
         player.inventory.mainInventory[player.inventory.currentItem] = mutatedItem;
         return ret;
     }
-    
-    @Override
-    @SideOnly(Side.CLIENT)
-    public void renderStatic(ServoMotor motor, Tessellator tess) {
-        BlockRenderHelper block = BlockRenderHelper.instance;
-        float w = 6F/16F;
-        block.setBlockBoundsOffset(w, 0, w);
-        block.useTextures(BlockIcons.socket$hand, null,
-                BlockIcons.socket$arm0, BlockIcons.socket$arm1, 
-                BlockIcons.socket$arm2, BlockIcons.socket$arm3);
-        block.beginWithRotatedUVs();
-        block.rotateCenter(Quaternion.fromOrientation(FzOrientation.fromDirection(facing.getOpposite())));
-        if (motor != null) {
-            block.translate(0, -2F/16F, 0);
-        }
-        block.renderRotated(tess, pos.getX(), pos.getY(), pos.getZ());
-    }
-    
+
     @Override
     public boolean activate(EntityPlayer entityplayer, EnumFacing side) {
         if (worldObj.isRemote) {

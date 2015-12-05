@@ -139,7 +139,7 @@ public enum FzOrientation {
                 return o;
             }
         }
-        return UNKNOWN;
+        return null;
     }
     
     
@@ -188,12 +188,12 @@ public enum FzOrientation {
         if (index >= 0 && index < valuesCache.length) {
             return valuesCache[index];
         }
-        return UNKNOWN;
+        return null;
     }
     
     public static FzOrientation fromDirection(EnumFacing dir) {
         if (dir == null) {
-            return UNKNOWN;
+            return null;
         }
         return valuesCache[dir.ordinal()*4];
     }
@@ -217,21 +217,10 @@ public enum FzOrientation {
         return rotation;
     }
     
-    public void setDiagonalVector(Vec3 vec) {
-        vec.xCoord = facing.getDirectionVec().getX();
-        vec.yCoord = facing.getDirectionVec().getY();
-        vec.zCoord = facing.getDirectionVec().getZ();
-        vec.xCoord += top.getDirectionVec().getX();
-        vec.yCoord += top.getDirectionVec().getY();
-        vec.zCoord += top.getDirectionVec().getZ();
+    public Vec3 getDiagonalVector(Vec3 vec) {
+        return new Vec3(facing.getDirectionVec()).add(new Vec3(top.getDirectionVec()));
     }
-    
-    public Vec3 getDiagonalVector() {
-        Vec3 ret = new Vec3(0, 0, 0);
-        setDiagonalVector(ret);
-        return ret;
-    }
-    
+
     public FzOrientation getSwapped() {
         return swapped;
     }

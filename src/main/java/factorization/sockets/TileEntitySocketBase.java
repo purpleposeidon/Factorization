@@ -445,10 +445,7 @@ public abstract class TileEntitySocketBase extends TileEntityCommon implements I
     
     @SideOnly(Side.CLIENT)
     public void renderTesr(ServoMotor motor, float partial) {}
-    
-    @SideOnly(Side.CLIENT)
-    public void renderStatic(ServoMotor motor, Tessellator tess) {}
-    
+
     @SideOnly(Side.CLIENT)
     public void renderInServo(ServoMotor motor, float partial) {
         float s = 12F/16F;

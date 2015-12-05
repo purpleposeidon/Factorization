@@ -1,8 +1,6 @@
 package factorization.sockets;
 
 import factorization.api.Coord;
-import factorization.api.FzOrientation;
-import factorization.api.Quaternion;
 import factorization.api.datahelpers.DataHelper;
 import factorization.api.datahelpers.IDataSerializable;
 import factorization.api.datahelpers.Share;
@@ -19,7 +17,6 @@ import factorization.util.InvUtil;
 import factorization.util.InvUtil.FzInv;
 import factorization.util.ItemUtil;
 import factorization.util.SpaceUtil;
-import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
@@ -399,29 +396,7 @@ public class SocketShifter extends TileEntitySocketBase {
         if (worldObj.isRemote) return false;
         return worldObj.getStrongestIndirectPower(pos.getX(), pos.getY(), pos.getZ()) > 0;
     }
-    
-    @Override
-    @SideOnly(Side.CLIENT)
-    public void renderStatic(ServoMotor motor, Tessellator tess) {
-        BlockRenderHelper block = BlockRenderHelper.instance;
-        block.useTextures(BlockIcons.socket$shifter_front, null,
-                BlockIcons.socket$shifter_side, BlockIcons.socket$shifter_side,
-                BlockIcons.socket$shifter_side, BlockIcons.socket$shifter_side,
-                BlockIcons.socket$shifter_side, BlockIcons.socket$shifter_side);
-        final float minYs[] = new float[] { 8F/16F, 3F/16F, -2F/16F };
-        final float ds[] = new float[] { 4F/16F, 5F/16F, 6F/16F };
-        int end = ds.length;
-        if (motor != null) end--;
-        for (int i = 0; i < end; i++) {
-            float d = ds[i];
-            float minY = minYs[i];
-            block.setBlockBounds(d, minY, d, 1-d, 12F/16F, 1-d);
-            block.beginWithMirroredUVs();
-            block.rotateCenter(Quaternion.fromOrientation(FzOrientation.fromDirection(facing.getOpposite())));
-            block.renderRotated(tess, pos.getX(), pos.getY(), pos.getZ());
-        }
-    }
-    
+
     @Override
     @SideOnly(Side.CLIENT)
     public void renderItemOnServo(RenderServoMotor render, ServoMotor motor, ItemStack is, float partial) {

@@ -17,7 +17,7 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 
 public class Quaternion implements IDataSerializable {
-    public double w, pos;
+    public double w, x, y, z;
     
     //Data functions
     public Quaternion() {
@@ -41,13 +41,6 @@ public class Quaternion implements IDataSerializable {
     public Quaternion(double[] init) {
         this(init[0], init[1], init[2], init[3]);
         assert init.length == 4;
-    }
-    
-    public void loadFrom(VectorUV v) {
-        this.w = 1;
-        this.x = v.x;
-        this.y = v.y;
-        this.z = v.z;
     }
     
     @Override
@@ -171,15 +164,9 @@ public class Quaternion implements IDataSerializable {
     public void update(Vec3 v) {
         update(0, v.xCoord, v.yCoord, v.zCoord);
     }
-    
-    public void copyToVector(Vec3 v) {
-        v.xCoord = x;
-        v.yCoord = y;
-        v.zCoord = z;
-    }
-    
+
     public Vec3 toVector() {
-        return new Vec3(pos);
+        return new Vec3(x, y, z);
     }
     
     /**
@@ -187,8 +174,7 @@ public class Quaternion implements IDataSerializable {
      */
     public Vec3 toRotationVector() {
         Vec3 rotVec = toVector().normalize();
-        SpaceUtil.incrScale(rotVec, getAngleRadians());
-        return rotVec;
+        return SpaceUtil.scale(rotVec, getAngleRadians());
     }
     
     public double getAngleRadians() {
@@ -236,7 +222,7 @@ public class Quaternion implements IDataSerializable {
     
     private static Quaternion[] quat_cache = new Quaternion[25 /*FzOrientation.values().length recursive reference, bleh*/];
     /***
-     * @param An {@link FzOrientation}
+     * @param orient An {@link FzOrientation}
      * @return A {@link Quaternion} that should not be mutated. It 
      */
     public static Quaternion fromOrientation(final FzOrientation orient) {
@@ -244,7 +230,7 @@ public class Quaternion implements IDataSerializable {
         if (quat_cache[ord] != null) {
             return quat_cache[ord];
         }
-        if (orient == FzOrientation.UNKNOWN) {
+        if (orient == null) {
             return quat_cache[ord] = new Quaternion();
         }
         final Quaternion q1;
@@ -288,20 +274,7 @@ public class Quaternion implements IDataSerializable {
         q2.incrMultiply(q1);
         return quat_cache[ord] = q2;
     }
-    
-    /**
-     * @param Vec3 that gets mutated to the axis of rotation
-     * @return the rotation
-     */
-    public double setVector(Vec3 axis) {
-        double halfAngle = Math.acos(w);
-        double sin = Math.sin(halfAngle);
-        axis.xCoord = x/sin;
-        axis.yCoord = y/sin;
-        axis.zCoord = z/sin;
-        return halfAngle*2;
-    }
-    
+
     @SideOnly(Side.CLIENT)
     public void glRotate() {
         double halfAngle = Math.acos(w);
@@ -503,10 +476,10 @@ public class Quaternion implements IDataSerializable {
      * Note: This assumes that this quaternion is normal (magnitude = 1).
      * @param p
      */
-    public void applyRotation(Vec3 p) {
+    public Vec3 applyRotation(Vec3 p) {
         //return this * p * this^-1
         if (this.isZero()) {
-            return;
+            return p;
         }
         if (_vector_conversion_cache == null) {
             _vector_conversion_cache = new Quaternion();
@@ -517,7 +490,7 @@ public class Quaternion implements IDataSerializable {
         this.incrConjugate();
         point.incrMultiply(this);
         this.incrConjugate();
-        point.copyToVector(p);
+        return point.toVector();
     }
     
     private Quaternion _vector_conversion_cache = null;
@@ -526,17 +499,6 @@ public class Quaternion implements IDataSerializable {
         incrConjugate();
         applyRotation(p);
         incrConjugate();
-    }
-    
-    private static Vec3 uvCache = new Vec3(0, 0, 0);
-    public void applyRotation(VectorUV vec) {
-        uvCache.xCoord = vec.x;
-        uvCache.yCoord = vec.y;
-        uvCache.zCoord = vec.z;
-        applyRotation(uvCache);
-        vec.x = uvCache.xCoord;
-        vec.y = uvCache.yCoord;
-        vec.z = uvCache.zCoord;
     }
     
     //Other math forms

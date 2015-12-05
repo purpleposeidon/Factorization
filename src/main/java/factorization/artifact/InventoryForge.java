@@ -11,10 +11,14 @@ import net.minecraft.inventory.ContainerRepair;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.util.ChatComponentText;
+import net.minecraft.util.ChatComponentTranslation;
+import net.minecraft.util.IChatComponent;
 import net.minecraft.util.StringUtils;
 import net.minecraftforge.oredict.OreDictionary;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
 
@@ -77,16 +81,6 @@ public class InventoryForge implements IInventory {
     }
 
     @Override
-    public String getInventoryName() {
-        return "factorization.inventory.forge";
-    }
-
-    @Override
-    public boolean hasCustomInventoryName() {
-        return false;
-    }
-
-    @Override
     public int getInventoryStackLimit() {
         return 1;
     }
@@ -108,15 +102,8 @@ public class InventoryForge implements IInventory {
         return true;
     }
 
-    @Override
-    public void openInventory() {
-
-    }
-
-    @Override
-    public void closeInventory() {
-
-    }
+    @Override public void openInventory(EntityPlayer player) { }
+    @Override public void closeInventory(EntityPlayer player) { }
 
 
     static String[] dyes = {
@@ -136,7 +123,7 @@ public class InventoryForge implements IInventory {
             "dyeMagenta",
             "dyeOrange",
             "dyeWhite"};
-    static ArrayList[] dyeList = new ArrayList[16];
+    static List[] dyeList = new List[16];
     static {
         for (int i = 0; i < dyes.length; i++) {
             dyeList[i] = OreDictionary.getOres(dyes[i]);
@@ -146,7 +133,7 @@ public class InventoryForge implements IInventory {
     public static int getDyeIndex(ItemStack stack) {
         if (stack == null) return -1;
         for (int i = 0; i < dyeList.length; i++) {
-            ArrayList<ItemStack> list = dyeList[i];
+            List<ItemStack> list = dyeList[i];
             for (ItemStack dye : list) {
                 if (ItemUtil.couldMerge(stack, dye)) return i;
             }
@@ -179,6 +166,41 @@ public class InventoryForge implements IInventory {
             return true;
         }
         return false;
+    }
+
+    @Override
+    public int getField(int id) {
+        return 0;
+    }
+
+    @Override
+    public void setField(int id, int value) {
+
+    }
+
+    @Override
+    public int getFieldCount() {
+        return 0;
+    }
+
+    @Override
+    public void clear() {
+
+    }
+
+    @Override
+    public String getCommandSenderName() {
+        return "factorization.inventory.forge";
+    }
+
+    @Override
+    public boolean hasCustomName() {
+        return false;
+    }
+
+    @Override
+    public IChatComponent getDisplayName() {
+        return new ChatComponentTranslation(getCommandSenderName());
     }
 
     class ArtifactBuilder {
@@ -260,7 +282,7 @@ public class InventoryForge implements IInventory {
                 ArrayList<Integer> enchantIds = new ArrayList<Integer>(enchants.keySet());
                 boolean any = false;
                 for (int id : enchantIds) {
-                    Enchantment ench = Enchantment.enchantmentsList[id];
+                    Enchantment ench = Enchantment.getEnchantmentById(id);
                     if (ench.getMaxLevel() == 1) continue;
                     int enchMax = ench.getMaxLevel();
                     int extra = enchMax * 3 / 2;
@@ -293,7 +315,7 @@ public class InventoryForge implements IInventory {
             for (int i = SLOT_ENCHANT_START; i < SLOT_ENCHANT_END; i++) {
                 ItemStack ench = inv[i];
                 if (ench == null) continue;
-                ContainerRepair anvil = new ContainerRepair(player.inventory, player.worldObj, -1, -1, -1, player);
+                ContainerRepair anvil = new ContainerRepair(player.inventory, player.worldObj, player);
                 anvil.putStackInSlot(0, output.copy());
                 anvil.putStackInSlot(1, ench.copy());
                 anvil.updateRepairOutput();

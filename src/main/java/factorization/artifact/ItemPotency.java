@@ -65,14 +65,6 @@ public class ItemPotency extends ItemCraftingComponent {
     }
 
     @Override
-    public IIcon getIconFromDamage(int damage) {
-        if (damage != 0) {
-            return ItemIcons.potencyBottleWasted;
-        }
-        return super.getIconFromDamage(damage);
-    }
-
-    @Override
     public void onUpdate(ItemStack stack, World world, Entity holder, int slotIndex, boolean isHeld) {
         // Does happen each tick. Probaly just in player inventories.
         if (world.isRemote) return;

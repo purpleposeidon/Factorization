@@ -14,12 +14,10 @@ import factorization.servo.ServoMotor;
 import factorization.shared.Core;
 import factorization.shared.EntityReference;
 import factorization.sockets.ISocketHolder;
-import factorization.sockets.SocketBareMotor;
 import factorization.sockets.TileEntitySocketBase;
 import factorization.util.NumUtil;
 import factorization.util.SpaceUtil;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.AxisAlignedBB;
@@ -358,16 +356,6 @@ public class SocketPoweredCrank extends TileEntitySocketBase implements IChargeC
     @Override
     public int getComparatorValue(EnumFacing side) {
         return compareValue;
-    }
-
-    @Override
-    @SideOnly(Side.CLIENT)
-    public void renderStatic(ServoMotor motor, Tessellator tess) {
-        SocketBareMotor sbm = (SocketBareMotor) FactoryType.SOCKET_BARE_MOTOR.getRepresentative();
-        getCoord().setAsTileEntityLocation(sbm);
-        sbm.facing = facing;
-        sbm.renderStatic(motor, tess);
-        sbm.setWorldObj(null); // Don't leak the world (TODO: Unset all worldObj for all representitives when the world unloads?)
     }
 
 

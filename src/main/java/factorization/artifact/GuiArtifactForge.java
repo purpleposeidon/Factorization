@@ -13,6 +13,8 @@ import net.minecraft.util.ResourceLocation;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.opengl.GL11;
 
+import java.io.IOException;
+
 public class GuiArtifactForge extends GuiContainer {
     ContainerForge container;
     GuiTextField name_field, lore_field;
@@ -28,7 +30,7 @@ public class GuiArtifactForge extends GuiContainer {
         String text = orig == null ? "" : orig.getText();
         int cornerX = (this.width - this.xSize) / 2;
         int cornerY = (this.height - this.ySize) / 2;
-        GuiTextField ret = new GuiTextField(this.fontRendererObj, cornerX + x, cornerY + y, width, 12);
+        GuiTextField ret = new GuiTextField(1337, this.fontRendererObj, cornerX + x, cornerY + y, width, 12);
         ret.setTextColor(-1);
         ret.setDisabledTextColour(-1);
         ret.setEnableBackgroundDrawing(true);
@@ -54,7 +56,7 @@ public class GuiArtifactForge extends GuiContainer {
     }
 
     @Override
-    protected void keyTyped(char c, int sym) {
+    protected void keyTyped(char c, int sym) throws IOException {
         if (name_field.textboxKeyTyped(c, sym) || lore_field.textboxKeyTyped(c, sym)) {
             container.forge.markDirty();
             syncFields();
@@ -63,7 +65,7 @@ public class GuiArtifactForge extends GuiContainer {
         }
     }
 
-    protected void mouseClicked(int mouseX, int mouseY, int mouseButton) {
+    protected void mouseClicked(int mouseX, int mouseY, int mouseButton) throws IOException {
         super.mouseClicked(mouseX, mouseY, mouseButton);
         name_field.mouseClicked(mouseX, mouseY, mouseButton);
         lore_field.mouseClicked(mouseX, mouseY, mouseButton);

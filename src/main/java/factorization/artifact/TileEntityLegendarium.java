@@ -25,8 +25,8 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.tileentity.TileEntitySign;
 import net.minecraft.util.AxisAlignedBB;
+import net.minecraft.util.ChatComponentText;
 import net.minecraft.util.EnumFacing;
-import net.minecraft.util.IIcon;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldSavedData;
 import net.minecraft.world.chunk.IChunkProvider;
@@ -203,7 +203,7 @@ public class TileEntityLegendarium extends TileEntityCommon {
 
         @Override
         public void writeToNBT(NBTTagCompound tag) {
-            for (String key : (Iterable<String>) data.func_150296_c()) {
+            for (String key : data.getKeySet()) {
                 tag.setInteger(key, data.getInteger(key));
             }
         }
@@ -245,7 +245,7 @@ public class TileEntityLegendarium extends TileEntityCommon {
             World w = MinecraftServer.getServer().worldServerForDimension(0);
             w.setItemData(legendariumCount, this);
             this.setDirty(true);
-            w.perWorldStorage.saveAllData();
+            w.getPerWorldStorage().saveAllData();
         }
     }
 
@@ -291,12 +291,6 @@ public class TileEntityLegendarium extends TileEntityCommon {
         queue.clear();
         LegendariumPopulation population = LegendariumPopulation.load();
         population.setOccupied(new Coord(this), null, false);
-    }
-
-    @Override
-    public IIcon getIcon(EnumFacing dir) {
-        if (dir.getDirectionVec().getY() == 0) return BlockIcons.artifact$legendarium_side;
-        return BlockIcons.artifact$legendarium_top;
     }
 
     List<EntityPoster> getPosters() {
@@ -364,13 +358,13 @@ public class TileEntityLegendarium extends TileEntityCommon {
                     // easy case
                     int sign_max_len = 15;
                     if (name.length() < sign_max_len) {
-                        sign.signText[1] = name;
+                        sign.signText[1] = new ChatComponentText(name);
                         return;
                     }
                     name = name.replaceAll("(§.)", "");
                     // Strip colors & try again
                     if (name.length() < sign_max_len) {
-                        sign.signText[1] = name;
+                        sign.signText[1] = new ChatComponentText(name);
                         return;
                     }
                     // Ahh, a tough guy, eh? We'll just see 'bout that!
@@ -393,7 +387,7 @@ public class TileEntityLegendarium extends TileEntityCommon {
                     if (out.size() <= 2) start = 1; // And center it vertically
                     int end = Math.min(sign.signText.length, out.size());
                     for (int i = start; i < end; i++) {
-                        sign.signText[i] = out.get(i);
+                        sign.signText[i] = new ChatComponentText(out.get(i));
                     }
                 }
             };
@@ -418,7 +412,7 @@ public class TileEntityLegendarium extends TileEntityCommon {
                     TileEntitySign sign = here.getTE(TileEntitySign.class);
                     if (sign == null) return;
                     for (int i = 0; i < sign.signText.length; i++) {
-                        sign.signText[i] = "";
+                        sign.signText[i] = new ChatComponentText("");
                     }
                     here.markBlockForUpdate();
                 }
@@ -440,13 +434,13 @@ public class TileEntityLegendarium extends TileEntityCommon {
     }
 
     void scheduleTick() {
-        worldObj.scheduleBlockUpdate(pos.getX(), pos.getY(), pos.getZ(), new Coord(this).getBlock(), (int) getWaitTicks());
+        new Coord(this).scheduleUpdate((int) getWaitTicks(), 0);
     }
 
     @Override
     public void markDirty() {
         super.markDirty();
         scheduleTick();
-        new Coord(this).w.notifyBlocksOfNeighborChange(new Coord(this).x, new Coord(this).y, new Coord(this).z, new Coord(this).getBlock());
+        new Coord(this).notifyBlockChange();
     }
 }

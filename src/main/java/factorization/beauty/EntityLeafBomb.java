@@ -7,6 +7,7 @@ import factorization.shared.Core;
 import factorization.util.DataUtil;
 import factorization.util.ItemUtil;
 import factorization.util.PlayerUtil;
+import factorization.util.SpaceUtil;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.enchantment.Enchantment;
@@ -17,6 +18,8 @@ import net.minecraft.entity.projectile.EntityThrowable;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.util.EnumFacing;
+import net.minecraft.util.EnumParticleTypes;
 import net.minecraft.util.MovingObjectPosition;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;
@@ -63,7 +66,7 @@ public class EntityLeafBomb extends EntityThrowable {
 
         Coord center = Coord.fromMop(worldObj, mop);
         if (mop.typeOfHit == MovingObjectPosition.MovingObjectType.BLOCK) {
-            center.adjust(SpaceUtil.getOrientation(mop.sideHit));
+            center.adjust(mop.sideHit);
         }
         shooter = PlayerUtil.makePlayer(center, "LeafBomb");
         int id = DataUtil.getId(stack);
@@ -201,10 +204,13 @@ public class EntityLeafBomb extends EntityThrowable {
     boolean set(Coord at) {
         if (ItemUtil.normalize(stack) == null) return false;
         if (!at.isReplacable()) return false;
-        if (stack.tryPlaceItemIntoWorld(shooter, at.w, at.x, at.y, at.z, 0, 0, 0, 0)) {
+        if (stack.onItemUse(shooter, at.w, at.toBlockPos(), EnumFacing.UP, 0, 0, 0)) {
             stack.stackSize--;
         }
-        ((WorldServer) worldObj).func_147487_a(particle, at.x + 0.5, at.y + 0.5, at.z + 0.5, 4, 0, 0, 0, 1);
+        ((WorldServer) worldObj).spawnParticle(EnumParticleTypes.BLOCK_CRACK, false,
+                at.x + 0.5, at.y + 0.5, at.z + 0.5, // xyz
+                4, 0.0, 0.0, 0.0, // number & color/velocity thing
+                0, 19); // speed & arguments
         return true;
     }
 }

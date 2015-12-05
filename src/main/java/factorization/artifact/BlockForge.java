@@ -4,11 +4,14 @@ import factorization.common.FactoryType;
 import factorization.shared.Core;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockAnvil;
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.BlockPos;
 import net.minecraft.util.ChatComponentTranslation;
+import net.minecraft.util.EnumFacing;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
@@ -31,10 +34,10 @@ public class BlockForge extends BlockAnvil {
     }
 
     @Override
-    public boolean onBlockActivated(World w, BlockPos pos, EntityPlayer player, int side, float vx, float vy, float vz) {
+    public boolean onBlockActivated(World w, BlockPos pos, IBlockState state, EntityPlayer player, EnumFacing side, float hitX, float hitY, float hitZ) {
         if (w.isRemote) return true;
         if (InspirationManager.canMakeArtifact(player)) {
-            player.openGui(Core.instance, FactoryType.ARTIFACTFORGEGUI.gui, w, pos);
+            player.openGui(Core.instance, FactoryType.ARTIFACTFORGEGUI.gui, w, pos.getX(), pos.getY(), pos.getZ());
         } else {
             player.addChatMessage(new ChatComponentTranslation("factorization.forge.wait").setChatStyle(InspirationManager.aqua));
         }

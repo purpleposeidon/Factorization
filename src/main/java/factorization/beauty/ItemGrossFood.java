@@ -22,11 +22,11 @@ public class ItemGrossFood extends ItemFactorization {
 
     @Override
     public EnumAction getItemUseAction(ItemStack stack) {
-        return EnumAction.eat;
+        return EnumAction.EAT;
     }
 
     @Override
-    public ItemStack onEaten(ItemStack stack, World world, EntityPlayer player) {
+    public ItemStack onItemUseFinish(ItemStack stack, World world, EntityPlayer player) {
         if (lmpFeed(player, stack)) {
             stack.splitStack(1);
             return stack;
@@ -40,7 +40,7 @@ public class ItemGrossFood extends ItemFactorization {
                     Potion.wither
             }) {
                 if (player.getActivePotionEffect(potion) != null) continue;
-                player.addPotionEffect(new PotionEffect(potion.getId(), 20 * 20, 4, false));
+                player.addPotionEffect(new PotionEffect(potion.getId(), 20 * 20, 4, true, true));
                 return stack;
             }
         }

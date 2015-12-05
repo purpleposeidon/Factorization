@@ -34,7 +34,7 @@ public class InspirationManager {
     }
 
     static void set(StatisticsFile statsFile, EntityPlayer player, StatBase field, int val) {
-        statsFile.func_150873_a(player, field, val);
+        statsFile.unlockAchievement(player, field, val);
     }
 
     static int get(StatisticsFile statsFile, EntityPlayer player, StatBase field) {
@@ -89,7 +89,7 @@ public class InspirationManager {
         EntityPlayer player = event.player;
         StatisticsFile statsFile = PlayerUtil.getStatsFile(player);
         if (statsFile == null) return;
-        if (statsFile.writeStat(lastArtifact) <= 0) {
+        if (get(statsFile, player, lastArtifact) <= 0) {
             resetArtifactDelay(player);
         } else {
             poke(player, true);
