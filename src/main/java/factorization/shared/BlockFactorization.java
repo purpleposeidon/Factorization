@@ -376,7 +376,7 @@ public class BlockFactorization extends BlockContainer {
         // NORELEASE: Check state first. *most* things are just cubes.
         TileEntityCommon tec = get(w, pos);
         if (tec == null) return super.getCollisionBoundingBox(w, pos, state);
-        return tec.getCollisionBoundingBoxFromPool();
+        return tec.getCollisionBoundingBox();
     }
 
     @Override
@@ -393,7 +393,7 @@ public class BlockFactorization extends BlockContainer {
     public AxisAlignedBB getSelectedBoundingBox(World world, BlockPos pos) {
         TileEntityCommon tec = get(world, pos);
         if (tec != null && tec.getFactoryType() == FactoryType.EXTENDED) {
-            AxisAlignedBB ret = tec.getCollisionBoundingBoxFromPool();
+            AxisAlignedBB ret = tec.getCollisionBoundingBox();
             if (ret != null) {
                 return ret;
             }

@@ -182,7 +182,7 @@ public class TileEntityHeater extends TileEntityCommon implements IChargeConduct
     }
 
     @Override
-    public boolean addCollisionBoxesToList(Block block, AxisAlignedBB aabb, List list, Entity entity) {
+    public boolean addCollisionBoxesToList(Block block, AxisAlignedBB aabb, List<AxisAlignedBB> list, Entity entity) {
         cookEntity(entity);
         return super.addCollisionBoxesToList(block, aabb, list, entity);
     }

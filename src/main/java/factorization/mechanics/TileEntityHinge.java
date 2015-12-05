@@ -396,7 +396,7 @@ public class TileEntityHinge extends TileEntityCommon implements IDCController, 
     }
 
     @Override
-    public boolean addCollisionBoxesToList(Block block, AxisAlignedBB aabb, List list, Entity entity) {
+    public boolean addCollisionBoxesToList(Block block, AxisAlignedBB aabb, List<AxisAlignedBB> list, Entity entity) {
         if (idc_ticking) return true;
         return super.addCollisionBoxesToList(block, aabb, list, entity);
     }
@@ -501,7 +501,7 @@ public class TileEntityHinge extends TileEntityCommon implements IDCController, 
 
     @SideOnly(Side.CLIENT)
     public void renderTesr(float partial) {
-        BlockRenderHelper block = BlockRenderHelper.instance;
+        Block block = Block.instance;
 
         if (idcRef.trackingEntity()) {
             IDeltaChunk idc = getIdc();

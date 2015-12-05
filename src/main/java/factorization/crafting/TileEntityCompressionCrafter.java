@@ -20,7 +20,6 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.EnumFacing;
-import net.minecraft.util.IIcon;
 import net.minecraft.util.ITickable;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
@@ -78,18 +77,6 @@ public class TileEntityCompressionCrafter extends TileEntityCommon implements IT
         powered = data.as(Share.PRIVATE, "rs").putBoolean(powered);
         buffer = data.as(Share.PRIVATE, "buff").putItemList(buffer);
     }
-    
-    @Override
-    @SideOnly(Side.CLIENT)
-    public IIcon getIcon(EnumFacing dir) {
-        EnumFacing f = getFacing();
-        if (dir == f) {
-            return BlockIcons.compactFace;
-        } else if (dir == f.getOpposite()) {
-            return BlockIcons.compactBack;
-        }
-        return BlockIcons.compactSide;
-    }
 
     @Override
     public void onPlacedBy(EntityPlayer player, ItemStack is, EnumFacing side, float hitX, float hitY, float hitZ) {
@@ -103,7 +90,7 @@ public class TileEntityCompressionCrafter extends TileEntityCommon implements IT
             if (!worldObj.isRemote && getFacing() != null && isCrafterRoot) {
                 getStateHelper().craft(false, this);
                 isCrafterRoot = false;
-                boolean signal = worldObj.isBlockIndirectlyGettingPowered(pos.getX(), pos.getY(), pos.getZ());
+                boolean signal = worldObj.isBlockPowered(pos); // NORELEASE: Indirect?
                 if (!signal) {
                     powered = false;
                 }
@@ -173,7 +160,7 @@ public class TileEntityCompressionCrafter extends TileEntityCommon implements IT
         if (worldObj.isRemote) {
             return;
         }
-        boolean signal = worldObj.isBlockIndirectlyGettingPowered(pos.getX(), pos.getY(), pos.getZ());
+        boolean signal = worldObj.isBlockPowered(pos); // NORELEASE: Indirect?
         if (signal != powered && signal && progress == 0) {
             getStateHelper().craft(true, this);
             isCrafterRoot = true;
@@ -219,7 +206,7 @@ public class TileEntityCompressionCrafter extends TileEntityCommon implements IT
     }
     
     TileEntityCompressionCrafter look(EnumFacing d) {
-        TileEntity te = worldObj.getTileEntity(pos.getX() + d.getDirectionVec().getX(), pos.getY() + d.getDirectionVec().getY(), pos.getZ() + d.getDirectionVec().getZ());
+        TileEntity te = worldObj.getTileEntity(pos.offset(d));
         if (te instanceof TileEntityCompressionCrafter) {
             return (TileEntityCompressionCrafter) te;
         }
@@ -283,16 +270,8 @@ public class TileEntityCompressionCrafter extends TileEntityCommon implements IT
     @SideOnly(Side.CLIENT)
     public AxisAlignedBB getRenderBoundingBox() {
         if (isPrimaryCrafter()) {
-            AxisAlignedBB ab = super.getRenderBoundingBox();
-            //This could be more precise.
             int d = 7;
-            ab.maxX += d;
-            ab.maxY += d;
-            ab.maxZ += d;
-            ab.minX -= d;
-            ab.minY -= d;
-            ab.minZ -= d;
-            return ab;
+            return super.getRenderBoundingBox().offset(d, d, d);
         }
         return super.getRenderBoundingBox();
     }

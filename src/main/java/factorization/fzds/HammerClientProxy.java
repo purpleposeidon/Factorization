@@ -8,7 +8,7 @@ import factorization.fzds.gui.ProxiedGuiContainer;
 import factorization.fzds.gui.ProxiedGuiScreen;
 import factorization.fzds.interfaces.IDeltaChunk;
 import factorization.fzds.network.WrapperAdapter;
-import factorization.shared.BlockRenderHelper;
+import factorization.shared.Block;
 import factorization.shared.Core;
 import factorization.util.NumUtil;
 import factorization.util.SpaceUtil;
@@ -385,7 +385,7 @@ public class HammerClientProxy extends HammerProxy {
             return;
         }
         Coord here = new Coord(DeltaChunk.getClientShadowWorld(), shadowSelected.blockX, shadowSelected.blockY, shadowSelected.blockZ);
-        Block hereBlock = BlockRenderHelper.instance; //here.getBlock();
+        Block hereBlock = Block.instance; //here.getBlock();
         hereBlock.setBlockBounds(
                 (float) (box.minX - here.x), (float) (box.minY - here.y), (float) (box.minZ - here.z),
                 (float) (box.maxX - here.x), (float) (box.maxY - here.y), (float) (box.maxZ - here.z)

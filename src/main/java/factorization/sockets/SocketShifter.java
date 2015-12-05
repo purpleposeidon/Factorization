@@ -11,7 +11,7 @@ import factorization.fzds.interfaces.IDeltaChunk;
 import factorization.notify.Notice;
 import factorization.servo.RenderServoMotor;
 import factorization.servo.ServoMotor;
-import factorization.shared.BlockRenderHelper;
+import factorization.shared.Block;
 import factorization.shared.Core;
 import factorization.util.InvUtil;
 import factorization.util.InvUtil.FzInv;

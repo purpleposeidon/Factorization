@@ -235,14 +235,14 @@ public abstract class TileEntityCommon extends TileEntity implements ICoord, IFa
         return pulseTime + 4 > worldObj.getTotalWorldTime();
     }
 
-    public AxisAlignedBB getCollisionBoundingBoxFromPool() {
+    public AxisAlignedBB getCollisionBoundingBox() {
         setBlockBounds(Core.registry.resource_block);
         AxisAlignedBB ret = Core.registry.resource_block.getCollisionBoundingBox(worldObj, pos, worldObj.getBlockState(pos));
         Core.registry.resource_block.setBlockBounds(0, 0, 0, 1, 1, 1);
         return ret;
     }
 
-    public boolean addCollisionBoxesToList(Block block, AxisAlignedBB aabb, List list, Entity entity) {
+    public boolean addCollisionBoxesToList(Block block, AxisAlignedBB aabb, List<AxisAlignedBB> list, Entity entity) {
         return false;
     }
 

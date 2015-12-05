@@ -1,6 +1,6 @@
 package factorization.utiligoo;
 
-import factorization.shared.BlockRenderHelper;
+import factorization.shared.Block;
 import factorization.shared.Core;
 import factorization.util.RenderUtil;
 import net.minecraft.block.Block;
@@ -134,7 +134,7 @@ public enum GooRenderer {
         boolean rendered_something = false;
         double render_dist_sq = 32*32;
         Tessellator tess = Tessellator.instance;
-        BlockRenderHelper block = BlockRenderHelper.instance;
+        Block block = Block.instance;
         RenderBlocks rb = RenderUtil.getRB();
         for (int i = 0; i < data.coords.length; i += 3) {
             int x = data.coords[i + 0];

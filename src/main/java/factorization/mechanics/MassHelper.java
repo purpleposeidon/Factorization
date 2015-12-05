@@ -12,7 +12,7 @@ public class MassHelper {
         double density = getMaterialDensity(at);
         if (!CONSIDER_VOLUME) return density;
         if (at.isNormalCube()) return density; // Possible shortcut.
-        AxisAlignedBB box = at.getCollisionBoundingBoxFromPool();
+        AxisAlignedBB box = at.getCollisionBoundingBox();
         if (box == null) return 0;
         return density * getVolume(box);
     }

@@ -879,7 +879,7 @@ public final class Coord implements IDataSerializable, ISaneCoord, Comparable<Co
         return spawnItem(new ItemStack(it));
     }
     
-    public AxisAlignedBB getCollisionBoundingBoxFromPool() {
+    public AxisAlignedBB getCollisionBoundingBox() {
         BlockPos pos = toBlockPos();
         IBlockState bs = w.getBlockState(pos);
         return bs.getBlock().getCollisionBoundingBox(w, pos, bs);

@@ -187,7 +187,7 @@ public class RenderMessages extends RenderMessagesProxy {
         ISaneCoord co = m.asCoordMaybe();
         if (co != null && !m.position_important) {
             Block b = co.w().getBlock(co.x(), co.y(), co.z());
-            AxisAlignedBB bb = b.getCollisionBoundingBoxFromPool(co.w(), co.x(), co.y(), co.z());
+            AxisAlignedBB bb = b.getCollisionBoundingBox(co.w(), co.x(), co.y(), co.z());
             if (bb != null) {
                 y += bb.maxY - bb.minY;
             } else {

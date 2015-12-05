@@ -375,7 +375,7 @@ public class RenderServoMotor extends RenderEntity {
     
     void renderServoColor(FzColor color) {
         if (color == FzColor.NO_COLOR) return;
-        BlockRenderHelper block = BlockRenderHelper.instance;
+        Block block = Block.instance;
         block.setBlockBoundsOffset(0, 0, 0);
         block.useTexture(null);
         block.setTexture(1 /* up */, colorIcon);

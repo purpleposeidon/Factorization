@@ -1,6 +1,6 @@
 package factorization.oreprocessing;
 
-import factorization.shared.BlockRenderHelper;
+import factorization.shared.Block;
 import factorization.shared.Core;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.model.PositionTextureVertex;
@@ -92,7 +92,7 @@ public class TileEntityGrinderRender {
         
         
         GL11.glTranslatef(0, 2F / 16F, 0);
-        BlockRenderHelper block = BlockRenderHelper.instance;
+        Block block = Block.instance;
         block.useTexture(Blocks.iron_block.getBlockTextureFromSide(0));
         float e = 1F/8F;
         block.setBlockBounds(e, 7F/16F, e, 1 - e, 8F/16F, 1 - e);

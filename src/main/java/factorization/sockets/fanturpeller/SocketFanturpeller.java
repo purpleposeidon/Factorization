@@ -103,7 +103,7 @@ public abstract class SocketFanturpeller extends TileEntitySocketBase implements
     }
     
     boolean noCollision(Coord at) {
-        return at.getCollisionBoundingBoxFromPool() == null;
+        return at.getCollisionBoundingBox() == null;
     }
     
     @Override

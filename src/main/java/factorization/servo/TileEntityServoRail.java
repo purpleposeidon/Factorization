@@ -10,7 +10,6 @@ import factorization.common.FactoryType;
 import factorization.notify.Notice;
 import factorization.notify.Style;
 import factorization.shared.BlockClass;
-import factorization.shared.BlockRenderHelper;
 import factorization.shared.Core;
 import factorization.shared.NetworkFactorization.MessageType;
 import factorization.shared.TileEntityCommon;
@@ -94,7 +93,7 @@ public class TileEntityServoRail extends TileEntityCommon implements IChargeCond
     }
     
     boolean has(EnumFacing dir) {
-        TileEntity te = worldObj.getTileEntity(pos.getX() + dir.getDirectionVec().getX(), pos.getY() + dir.getDirectionVec().getY(), pos.getZ() + dir.getDirectionVec().getZ());
+        TileEntity te = worldObj.getTileEntity(pos.offset(dir));
         if (te instanceof TileEntityServoRail) {
             return true;
         }
@@ -113,7 +112,7 @@ public class TileEntityServoRail extends TileEntityCommon implements IChargeCond
     
     private boolean getCollisionBoxes(AxisAlignedBB aabb, List list, Entity entity) {
         boolean remote = (entity != null && entity.worldObj != null) ? entity.worldObj.isRemote : FMLCommonHandler.instance().getEffectiveSide() == Side.CLIENT;
-        BlockRenderHelper block = remote ? Core.registry.clientTraceHelper : Core.registry.serverTraceHelper;
+        Block block = remote ? Core.registry.clientTraceHelper : Core.registry.serverTraceHelper;
         boolean[] sides = new boolean[6];
         fillSideInfo(sides);
         int count = 0;
@@ -125,7 +124,7 @@ public class TileEntityServoRail extends TileEntityCommon implements IChargeCond
             float low = sides[0] ? 0 : f;
             float high = sides[1] ? 1 : 1 - f;
             block.setBlockBounds(f, low, f, 1 - f, high, 1 - f);
-            AxisAlignedBB a = block.getCollisionBoundingBoxFromPool(worldObj, pos.getX(), pos.getY(), pos.getZ());
+            AxisAlignedBB a = block.getCollisionBoundingBox(worldObj, pos, null);
             if (aabb == null || aabb.intersectsWith(a)) {
                 list.add(a);
             }
@@ -136,7 +135,7 @@ public class TileEntityServoRail extends TileEntityCommon implements IChargeCond
             float low = sides[2] ? 0 : f;
             float high = sides[3] ? 1 : 1 - f;
             block.setBlockBounds(f, f, low, 1 - f, 1 - f, high);
-            AxisAlignedBB a = block.getCollisionBoundingBoxFromPool(worldObj, pos.getX(), pos.getY(), pos.getZ());
+            AxisAlignedBB a = block.getCollisionBoundingBox(worldObj, pos, null);
             if (aabb == null || aabb.intersectsWith(a)) {
                 list.add(a);
             }
@@ -147,14 +146,14 @@ public class TileEntityServoRail extends TileEntityCommon implements IChargeCond
             float low = sides[4] ? 0 : f;
             float high = sides[5] ? 1 : 1 - f;
             block.setBlockBounds(low, f, f, high, 1 - f, 1 - f);
-            AxisAlignedBB a = block.getCollisionBoundingBoxFromPool(worldObj, pos.getX(), pos.getY(), pos.getZ());
+            AxisAlignedBB a = block.getCollisionBoundingBox(worldObj, pos, null);
             if (aabb == null || aabb.intersectsWith(a)) {
                 list.add(a);
             }
         }
         if (count == 0) {
             block.setBlockBounds(f, f, f, 1 - f, 1 - f, 1 - f);
-            AxisAlignedBB a = block.getCollisionBoundingBoxFromPool(worldObj, pos.getX(), pos.getY(), pos.getZ());
+            AxisAlignedBB a = block.getCollisionBoundingBox(worldObj, pos, null);
             if (aabb == null || aabb.intersectsWith(a)) {
                 list.add(a);
             }
@@ -163,13 +162,13 @@ public class TileEntityServoRail extends TileEntityCommon implements IChargeCond
     }
     
     @Override
-    public boolean addCollisionBoxesToList(Block ignore, AxisAlignedBB aabb, List list, Entity entity) {
+    public boolean addCollisionBoxesToList(Block ignore, AxisAlignedBB aabb, List<AxisAlignedBB> list, Entity entity) {
         if (decoration != null && decoration.collides()) {
             float f = decoration.getSize();
             boolean remote = (entity != null && entity.worldObj != null) ? entity.worldObj.isRemote : FMLCommonHandler.instance().getEffectiveSide() == Side.CLIENT;
-            BlockRenderHelper block = remote ? Core.registry.clientTraceHelper : Core.registry.serverTraceHelper;
+            Block block = remote ? Core.registry.clientTraceHelper : Core.registry.serverTraceHelper;
             block.setBlockBounds(f, f, f, 1 - f, 1 - f, 1 - f);
-            AxisAlignedBB a = block.getCollisionBoundingBoxFromPool(worldObj, pos.getX(), pos.getY(), pos.getZ());
+            AxisAlignedBB a = block.getCollisionBoundingBox(worldObj, pos, null);
             if (aabb == null || aabb.intersectsWith(a)) {
                 list.add(a);
                 return true;
@@ -180,7 +179,7 @@ public class TileEntityServoRail extends TileEntityCommon implements IChargeCond
     }
     
     @Override
-    public AxisAlignedBB getCollisionBoundingBoxFromPool() {
+    public AxisAlignedBB getCollisionBoundingBox() {
         return null;
     }
     
@@ -190,10 +189,10 @@ public class TileEntityServoRail extends TileEntityCommon implements IChargeCond
         getCollisionBoxes(null, boxes, null);
         Block b = FMLCommonHandler.instance().getEffectiveSide() == Side.SERVER ? Core.registry.serverTraceHelper : Core.registry.clientTraceHelper;
         for (AxisAlignedBB ab : boxes) {
-            ab = ab.getOffsetBoundingBox(-pos.getX(), -pos.getY(), -pos.getZ());
+            ab = ab.addCoord(-pos.getX(), -pos.getY(), -pos.getZ());
             float d = 1F/16F;
             b.setBlockBounds((float) ab.minX - d, (float) ab.minY - d, (float) ab.minZ - d, (float) ab.maxX + d, (float) ab.maxY + d, (float) ab.maxZ + d);
-            MovingObjectPosition mop = b.collisionRayTrace(worldObj, pos.getX(), pos.getY(), pos.getZ(), startVec, endVec);
+            MovingObjectPosition mop = b.collisionRayTrace(worldObj, pos, startVec, endVec);
             if (mop != null) {
                 return mop;
             }
@@ -207,13 +206,7 @@ public class TileEntityServoRail extends TileEntityCommon implements IChargeCond
         float f = width; // - 1F/32F;
         b.setBlockBounds(f, f, f, 1 - f, 1 - f, 1 - f);
     }
-    
-    @Override
-    @SideOnly(Side.CLIENT)
-    public IIcon getIcon(EnumFacing dir) {
-        return BlockIcons.servo$rail;
-    }
-    
+
     public void setDecoration(Decorator newDecor) {
         decoration = newDecor;
         if (decoration != null) {

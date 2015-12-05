@@ -7,7 +7,7 @@ import factorization.fzds.DeltaChunk;
 import factorization.fzds.Hammer;
 import factorization.fzds.HammerEnabled;
 import factorization.servo.BlockRenderServoRail;
-import factorization.shared.BlockRenderHelper;
+import factorization.shared.Block;
 import factorization.shared.Core;
 import factorization.util.NumUtil;
 import net.minecraft.client.Minecraft;
@@ -242,7 +242,7 @@ public class RenderStepperEngine extends RenderEntity {
     void renderServoColor(FzColor color) {
         if (color == FzColor.NO_COLOR) return;
         IIcon colorIcon = BlockRenderServoRail.coloredRails[color.toVanillaColorIndex()];
-        BlockRenderHelper block = BlockRenderHelper.instance;
+        Block block = Block.instance;
         block.setBlockBoundsOffset(0, 0, 0);
         block.useTexture(null);
         block.setTexture(1 /* up */, colorIcon);

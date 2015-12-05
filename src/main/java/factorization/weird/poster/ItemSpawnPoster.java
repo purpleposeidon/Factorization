@@ -153,7 +153,7 @@ public class ItemSpawnPoster extends ItemFactorization {
                 blockBox = box;
             }
 
-            if (blockBox == null) blockBox = at.getCollisionBoundingBoxFromPool();
+            if (blockBox == null) blockBox = at.getCollisionBoundingBox();
             if (blockBox == null) {
                 MovingObjectPosition mop = at.getBlock().collisionRayTrace(at.w, at.x, at.y, at.z, playerEye, reachEnd);
                 if (mop != null) {

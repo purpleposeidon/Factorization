@@ -84,7 +84,7 @@ class MassCalculator implements ICoordFunction {
 
     private Vec3 boxMid = SpaceUtil.newVec();
     protected void handle(Coord here, double mass) {
-        final AxisAlignedBB box = here.getCollisionBoundingBoxFromPool();
+        final AxisAlignedBB box = here.getCollisionBoundingBox();
         if (box != null) {
             // Unlikely, my good sir!
             SpaceUtil.setMiddle(box, boxMid);

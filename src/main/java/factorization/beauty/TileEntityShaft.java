@@ -6,7 +6,7 @@ import factorization.api.datahelpers.DataHelper;
 import factorization.api.datahelpers.Share;
 import factorization.common.FactoryType;
 import factorization.shared.BlockClass;
-import factorization.shared.BlockRenderHelper;
+import factorization.shared.Block;
 import factorization.shared.Core;
 import factorization.shared.TileEntityCommon;
 import factorization.util.NumUtil;
@@ -203,7 +203,7 @@ public class TileEntityShaft extends TileEntityCommon implements IRotationalEner
     }
 
     @Override
-    public AxisAlignedBB getCollisionBoundingBoxFromPool() {
+    public AxisAlignedBB getCollisionBoundingBox() {
         EnumFacing dir = axis;
         float l = 0.5F - 2F / 16F;
         float h = 1 - l;
@@ -219,7 +219,7 @@ public class TileEntityShaft extends TileEntityCommon implements IRotationalEner
     @Override
     public MovingObjectPosition collisionRayTrace(Vec3 startVec, Vec3 endVec) {
         // TODO: This belongs... somewhere else
-        BlockRenderHelper block = worldObj.isRemote ? Core.registry.clientTraceHelper : Core.registry.serverTraceHelper;
+        Block block = worldObj.isRemote ? Core.registry.clientTraceHelper : Core.registry.serverTraceHelper;
         setBlockBounds(block);
         return block.collisionRayTrace(worldObj, pos.getX(), pos.getY(), pos.getZ(), startVec, endVec);
     }

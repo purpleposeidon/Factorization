@@ -890,7 +890,7 @@ public class DimensionSliceEntity extends IDeltaChunk implements IFzdsEntryContr
             @Override
             public void handle(Coord at) {
                 if (at.isAir()) return;
-                AxisAlignedBB box = at.getCollisionBoundingBoxFromPool();
+                AxisAlignedBB box = at.getCollisionBoundingBox();
                 if (box == null) return;
                 AabbDebugger.addBox(DimensionSliceEntity.this.metaAABB.convertShadowBoxToRealBox(box));
             }

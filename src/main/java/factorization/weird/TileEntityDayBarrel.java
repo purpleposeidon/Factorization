@@ -692,7 +692,7 @@ public class TileEntityDayBarrel extends TileEntityFactorization implements ISor
         if (b instanceof BlockRailBase) {
             return true;
         }
-        AxisAlignedBB ab = c.getCollisionBoundingBoxFromPool();
+        AxisAlignedBB ab = c.getCollisionBoundingBox();
         ArrayList<AxisAlignedBB> list = new ArrayList();
         b.addCollisionBoxesToList(c.w, c.x, c.y, c.z, ab, list, null);
         for (AxisAlignedBB bb : list) {

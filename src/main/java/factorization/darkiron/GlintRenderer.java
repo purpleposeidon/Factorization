@@ -1,7 +1,7 @@
 package factorization.darkiron;
 
 import factorization.darkiron.BlockDarkIronOre.Glint;
-import factorization.shared.BlockRenderHelper;
+import factorization.shared.Block;
 import factorization.shared.Core;
 import factorization.util.NumUtil;
 import net.minecraft.client.Minecraft;
@@ -45,7 +45,7 @@ public class GlintRenderer extends TileEntitySpecialRenderer {
         GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
         
         Tessellator tess = Tessellator.instance;
-        BlockRenderHelper block = BlockRenderHelper.instance;
+        Block block = Block.instance;
         EntityPlayer player = mc.thePlayer;
         
         Vec3 lookVec = player.getLook(partial).normalize();

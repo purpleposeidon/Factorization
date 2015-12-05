@@ -96,16 +96,16 @@ public class TileEntityExtension extends TileEntityCommon implements IFurnaceHea
     }
 
     @Override
-    public AxisAlignedBB getCollisionBoundingBoxFromPool() {
+    public AxisAlignedBB getCollisionBoundingBox() {
         TileEntityCommon p = getParent();
         if (p == null) {
-            return super.getCollisionBoundingBoxFromPool();
+            return super.getCollisionBoundingBox();
         }
-        return p.getCollisionBoundingBoxFromPool();
+        return p.getCollisionBoundingBox();
     }
     
     @Override
-    public boolean addCollisionBoxesToList(Block block, AxisAlignedBB aabb, List list, Entity entity) {
+    public boolean addCollisionBoxesToList(Block block, AxisAlignedBB aabb, List<AxisAlignedBB> list, Entity entity) {
         TileEntityCommon p = getParent();
         if (p == null) {
             return super.addCollisionBoxesToList(block, aabb, list, entity);

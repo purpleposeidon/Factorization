@@ -96,7 +96,7 @@ public class BlockDarkIronOre extends Block {
         @Override
         @SideOnly(Side.CLIENT)
         public AxisAlignedBB getRenderBoundingBox() {
-            return getBlockType().getCollisionBoundingBoxFromPool(worldObj, pos.getX(), pos.getY(), pos.getZ());
+            return getBlockType().getCollisionBoundingBox(worldObj, pos, bs);
         }
         
         @Override

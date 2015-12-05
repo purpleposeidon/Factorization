@@ -4,7 +4,7 @@ import factorization.api.Coord;
 import factorization.api.FzOrientation;
 import factorization.api.Quaternion;
 import factorization.common.BlockIcons.ExtendedIIcon;
-import factorization.shared.BlockRenderHelper;
+import factorization.shared.Block;
 import factorization.shared.Core;
 import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
@@ -58,7 +58,7 @@ public class TileEntityCompressionCrafterRenderer extends TileEntitySpecialRende
         float perc = cc.getProgressPerc();
         float p = perc*squishy;
         
-        BlockRenderHelper block = Core.registry.blockRender;
+        Block block = Core.registry.blockRender;
         textureOffset = p;
         
         block.useTextures(
@@ -144,7 +144,7 @@ public class TileEntityCompressionCrafterRenderer extends TileEntitySpecialRende
             return;
         }
         bindTexture(Core.blockAtlas);
-        BlockRenderHelper block = BlockRenderHelper.instance;
+        Block block = Block.instance;
         contentSize.maxX -= contentSize.minX;
         contentSize.minX = 0;
         contentSize.maxY -= contentSize.minY;

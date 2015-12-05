@@ -1,6 +1,6 @@
 package factorization.charge;
 
-import factorization.shared.BlockRenderHelper;
+import factorization.shared.Block;
 import factorization.shared.Core;
 import net.minecraft.client.renderer.RenderBlocks;
 import net.minecraft.client.renderer.Tessellator;
@@ -26,7 +26,7 @@ public class TileEntityHeaterRenderer extends TileEntitySpecialRenderer {
         GL11.glColor4f(color, color, color, 1.0F);
         float d = 0;
         GL11.glTranslatef((float) x + d, (float) y + d, (float) z + d);
-        BlockRenderHelper block = BlockRenderHelper.instance;
+        Block block = Block.instance;
         float m = 1F/128F;
         block.setBlockBoundsOffset(m, m, m);
         block.useTexture(BlockIcons.heater_heat);

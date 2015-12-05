@@ -189,11 +189,11 @@ public class Registry {
     public void makeBlocks() {
         if (FMLCommonHandler.instance().getSide() == Side.CLIENT) {
             //Theoretically, not necessary. I bet BUKKIT would flip its shit tho.
-            blockRender = new BlockRenderHelper();
+            blockRender = new Block();
             factory_rendering_block = new BlockFactorization(materialMachine);
         }
-        serverTraceHelper = new BlockRenderHelper();
-        clientTraceHelper = new BlockRenderHelper();
+        serverTraceHelper = new Block();
+        clientTraceHelper = new Block();
         factory_block = new BlockFactorization(materialMachine);
         factory_block_barrel = new BlockFactorization(materialBarrel);
         lightair_block = new BlockLightAir();
