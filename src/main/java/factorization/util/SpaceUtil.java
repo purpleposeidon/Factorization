@@ -405,6 +405,13 @@ public final class SpaceUtil {
                 Math.floor(vec.zCoord));
     }
 
+    public static Vec3i vInt(Vec3 vec) {
+        return new Vec3i(
+                Math.floor(vec.xCoord),
+                Math.floor(vec.yCoord),
+                Math.floor(vec.zCoord));
+    }
+
     public static Vec3 normalize(Vec3 v) {
         // Vanilla's threshold is too low for my purposes.
         double length = v.lengthVector();

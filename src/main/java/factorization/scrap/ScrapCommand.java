@@ -3,6 +3,7 @@ package factorization.scrap;
 import com.google.common.base.Joiner;
 import net.minecraft.command.CommandBase;
 import net.minecraft.command.ICommandSender;
+import net.minecraft.util.BlockPos;
 import net.minecraft.util.ChatComponentText;
 
 import java.util.ArrayList;
@@ -62,7 +63,7 @@ public class ScrapCommand extends CommandBase {
     }
 
     @Override
-    public List addTabCompletionOptions(ICommandSender sender, String[] args) {
+    public List<String> addTabCompletionOptions(ICommandSender sender, String[] args, BlockPos pos) {
         if (args.length <= 0) return null;
         if (args.length > 1) return null;
         ArrayList<String> all = new ArrayList<String>(ScrapManager.actionClasses.keySet());

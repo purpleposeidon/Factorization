@@ -1,5 +1,6 @@
 package factorization.darkiron;
 
+import factorization.util.SpaceUtil;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.client.Minecraft;
@@ -20,13 +21,7 @@ public class BlockDarkIronOre extends Block {
     public BlockDarkIronOre() {
         super(Material.rock);
     }
-    
-    @Override
-    @SideOnly(Side.CLIENT)
-    public IIcon getIcon(int par1, int par2) {
-        return BlockIcons.ore_dark_iron;
-    }
-    
+
     static int te_particles = 0;
     
     @Override
@@ -62,15 +57,11 @@ public class BlockDarkIronOre extends Block {
     
     static float maxDistSq = 6*6;
     
-    static boolean inRange(int xCoord, int yCoord, int zCoord, EntityPlayer player) {
+    static boolean inRange(BlockPos pos, EntityPlayer player) {
         if (player == null) {
             return false;
         }
-        double dx = (player.posX - xCoord);
-        double dy = (player.posY - yCoord);
-        double dz = (player.posZ - zCoord);
-        double distSq = dx*dx + dy*dy + dz*dz;
-        return distSq < maxDistSq;
+        return pos.distanceSq(SpaceUtil.vInt(SpaceUtil.fromEntPos(player))) < maxDistSq;
     }
     
     public static class Glint extends TileEntity implements ITickable {
