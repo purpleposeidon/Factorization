@@ -3,7 +3,6 @@ package factorization.ceramics;
 import factorization.api.Coord;
 import factorization.ceramics.TileEntityGreenware.ClayLump;
 import factorization.ceramics.TileEntityGreenware.ClayState;
-import factorization.common.ItemIcons;
 import factorization.notify.Notice;
 import factorization.shared.Core;
 import factorization.shared.Core.TabType;
@@ -18,7 +17,6 @@ import net.minecraft.init.Blocks;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.util.IIcon;
 import net.minecraft.util.MovingObjectPosition;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
@@ -38,52 +36,6 @@ public class ItemGlazeBucket extends ItemFactorization {
         Core.tab(this, TabType.ART);
     }
 
-    static final int CONTENTS_PASS = 10;
-
-    @Override
-    public IIcon getIcon(ItemStack is, int renderPass) {
-        if (renderPass != CONTENTS_PASS) {
-            if (!is.hasTagCompound()) return ItemIcons.ceramics$glaze_bucket_empty;
-            if (ItemUtil.couldMerge(is, Core.registry.base_common)) return ItemIcons.ceramics$glaze_bucket_base;
-            if (ItemUtil.couldMerge(is, Core.registry.glaze_base_mimicry)) return ItemIcons.ceramics$glaze_bucket_mimic;
-            if (ItemUtil.couldMerge(is, Core.registry.empty_glaze_bucket)) return ItemIcons.ceramics$glaze_bucket_empty;
-            if (!is.hasTagCompound()) return ItemIcons.ceramics$glaze_bucket_empty;
-            if (is.getTagCompound().hasNoTags()) return ItemIcons.ceramics$glaze_bucket_empty;
-            return super.getIconIndex(is);
-        }
-        Block block = getBlockId(is);
-        if (block == null) {
-            return BlockIcons.uv_test;
-            //Or could return the error icon.
-            //But I think this'll look less terribly awful if a block goes away.
-        }
-        try {
-            int side = getBlockSide(is);
-            if (side == -1) side = 1;
-            IIcon ret = block.getIcon(side, getBlockMd(is));
-            if (ret == null) ret = BlockIcons.error;
-            return ret;
-        } catch (Throwable t) {
-            if (!spammed) {
-                t.printStackTrace();
-                spammed = true;
-            }
-            return BlockIcons.error;
-        }
-    }
-
-    @Override
-    public boolean requiresMultipleRenderPasses() {
-        return true;
-    }
-
-    @Override
-    public int getRenderPasses(int metadata) {
-        return 1;
-    }
-
-    private boolean spammed = false;
-    
     @Override
     public String getUnlocalizedName(ItemStack is) {
         String base = super.getUnlocalizedName(is);
@@ -231,7 +183,7 @@ public class ItemGlazeBucket extends ItemFactorization {
 
     private ItemStack loadMimicingGlaze(ItemStack is, Coord at, int side, EntityPlayer player) {
         if (!ItemUtil.identical(is, Core.registry.glaze_base_mimicry)) return is;
-        Block id = at.getId();
+        Block id = at.getBlock();
         int md = at.getMd();
         if (!player.isSneaking()) side = -1;
         return makeMimicingGlaze(id, md, side);
@@ -252,7 +204,7 @@ public class ItemGlazeBucket extends ItemFactorization {
         final Coord at = new Coord(w, mop.getBlockPos());
         TileEntityGreenware clay = at.getTE(TileEntityGreenware.class);
         if (clay == null) {
-            return loadMimicingGlaze(is, at, mop.sideHit, player);
+            return loadMimicingGlaze(is, at, mop.sideHit.ordinal(), player);
         }
         if (!isUsable(is)) {
             return is;

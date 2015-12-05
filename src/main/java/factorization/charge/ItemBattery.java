@@ -5,15 +5,12 @@ import factorization.shared.Core;
 import factorization.shared.Core.TabType;
 import factorization.shared.ItemBlockProxy;
 import factorization.util.ItemUtil;
-import net.minecraft.client.renderer.texture.IIconRegister;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.StatCollector;
 import net.minecraft.world.World;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
 
 import java.util.List;
 
@@ -72,12 +69,9 @@ public class ItemBattery extends ItemBlockProxy implements IActOnCraft {
     public boolean hasContainerItem() {
         return true;
     }
-    
-    @Override
-    public boolean doesContainerItemLeaveCraftingGrid(ItemStack par1ItemStack) {
-        return false;
-    }
-    
+
+    // NORELEASE: doesContainerItemLeaveCraftingGrid has gone missing in 1.8?
+
     @Override
     public ItemStack getContainerItem(ItemStack is) {
         is = is.copy();
@@ -97,7 +91,7 @@ public class ItemBattery extends ItemBlockProxy implements IActOnCraft {
         normalizeDamage(is);
         if (result.getItem() == Core.registry.battery) {
             is.stackSize--;
-            result.func_150996_a(result.getItem());
+            result.setItem(result.getItem());
             result.stackSize = is.stackSize;
             result.setTagCompound(is.getTagCompound());
         }
@@ -120,8 +114,4 @@ public class ItemBattery extends ItemBlockProxy implements IActOnCraft {
     public boolean getShareTag() {
         return true;
     }
-    
-    @Override
-    @SideOnly(Side.CLIENT)
-    public void registerIcons(IIconRegister par1IconRegister) { }
 }

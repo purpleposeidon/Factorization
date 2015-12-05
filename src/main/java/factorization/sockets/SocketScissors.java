@@ -7,7 +7,6 @@ import factorization.api.datahelpers.DataHelper;
 import factorization.api.datahelpers.IDataSerializable;
 import factorization.api.datahelpers.Share;
 import factorization.common.FactoryType;
-import factorization.common.ItemIcons;
 import factorization.notify.Notice;
 import factorization.servo.ServoMotor;
 import factorization.shared.Core;

@@ -5,7 +5,6 @@ import factorization.api.FzOrientation;
 import factorization.api.Quaternion;
 import factorization.common.FactoryType;
 import factorization.common.FzConfig;
-import factorization.common.ItemIcons;
 import factorization.shared.Core;
 import factorization.shared.NetworkFactorization;
 import factorization.util.RenderUtil;

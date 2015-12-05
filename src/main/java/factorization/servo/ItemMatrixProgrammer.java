@@ -2,7 +2,6 @@ package factorization.servo;
 
 import factorization.api.Coord;
 import factorization.api.FzColor;
-import factorization.common.ItemIcons;
 import factorization.notify.Notice;
 import factorization.notify.Style;
 import factorization.shared.Core;
@@ -10,8 +9,6 @@ import factorization.shared.Core.TabType;
 import factorization.shared.ItemFactorization;
 import factorization.util.FzUtil;
 import factorization.util.PlayerUtil;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.entity.EntityClientPlayerMP;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityList;
 import net.minecraft.entity.item.EntityPainting;
@@ -22,8 +19,9 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.stats.StatBase;
 import net.minecraft.stats.StatisticsFile;
 import net.minecraft.tileentity.TileEntityNote;
+import net.minecraft.util.BlockPos;
 import net.minecraft.util.ChatComponentTranslation;
-import net.minecraft.util.IIcon;
+import net.minecraft.util.EnumFacing;
 import net.minecraft.world.World;
 import net.minecraftforge.common.ForgeHooks;
 import net.minecraftforge.event.entity.player.EntityInteractEvent;
@@ -31,8 +29,6 @@ import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.PlayerEvent;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
 
 public class ItemMatrixProgrammer extends ItemFactorization {
     public ItemMatrixProgrammer() {
@@ -42,13 +38,10 @@ public class ItemMatrixProgrammer extends ItemFactorization {
         Core.loadBus(this);
     }
     
+    // NORELEASE? Missing doesContainerItemLeaveCraftingGrid
+
     @Override
-    public boolean doesContainerItemLeaveCraftingGrid(ItemStack par1ItemStack) {
-        return false;
-    }
-    
-    @Override
-    public boolean onItemUseFirst(ItemStack stack, EntityPlayer player, World world, BlockPos pos, int side, float hitX, float hitY, float hitZ) {
+    public boolean onItemUseFirst(ItemStack stack, EntityPlayer player, World world, BlockPos pos, EnumFacing side, float hitX, float hitY, float hitZ) {
         Coord c = new Coord(world, pos);
         TileEntityNote noteBlock = c.getTE(TileEntityNote.class);
         if (noteBlock != null) {
@@ -121,10 +114,10 @@ public class ItemMatrixProgrammer extends ItemFactorization {
         }
         EntityPainting.EnumArt origArt = painting.art;
         EntityPainting.EnumArt art = origArt;
-        int hangingDirection = painting.hangingDirection;
+        EnumFacing hangingDirection = painting.facingDirection;
         while (true) {
             art = FzUtil.shiftEnum(art, EntityPainting.EnumArt.values(), d);
-            painting.setDirection(hangingDirection);
+            painting.facingDirection = hangingDirection;
             painting.art = art;
             if (art == origArt) {
                 return;
@@ -146,7 +139,8 @@ public class ItemMatrixProgrammer extends ItemFactorization {
         return armorType == 0;
     }
 
-    @Override
+    // NORELEASE: Change icon when sneaking, etc
+    /*@Override
     @SideOnly(Side.CLIENT)
     public IIcon getIconIndex(ItemStack stack) {
         final Minecraft mc = Minecraft.getMinecraft();
@@ -158,7 +152,7 @@ public class ItemMatrixProgrammer extends ItemFactorization {
             }
         }
         return super.getIconIndex(stack);
-    }
+    }*/
 
     @Override
     public ItemStack onItemRightClick(ItemStack stack, World world, EntityPlayer player) {

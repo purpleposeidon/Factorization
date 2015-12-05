@@ -2,7 +2,6 @@ package factorization.utiligoo;
 
 import factorization.api.Coord;
 import factorization.common.Command;
-import factorization.common.ItemIcons;
 import factorization.coremodhooks.HandleAttackKeyEvent;
 import factorization.coremodhooks.HandleUseKeyEvent;
 import factorization.shared.Core;

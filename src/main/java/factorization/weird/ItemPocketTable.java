@@ -1,13 +1,14 @@
 package factorization.weird;
 
-import factorization.common.*;
+import factorization.common.Command;
+import factorization.common.FactorizationKeyHandler;
+import factorization.common.FactoryType;
+import factorization.common.FzConfig;
 import factorization.coremodhooks.UnhandledGuiKeyEvent;
 import factorization.shared.Core;
 import factorization.shared.Core.TabType;
-import factorization.shared.FactorizationTextureLoader;
 import factorization.shared.ItemFactorization;
 import net.minecraft.client.gui.inventory.GuiContainer;
-import net.minecraft.client.renderer.texture.IIconRegister;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.entity.player.InventoryPlayer;
@@ -27,13 +28,6 @@ public class ItemPocketTable extends ItemFactorization {
         setMaxStackSize(1);
         setFull3D();
         Core.loadBus(this);
-    }
-    
-    @Override
-    @SideOnly(Side.CLIENT)
-    public void registerIcons(IIconRegister reg) {
-        super.registerIcons(reg);
-        FactorizationTextureLoader.register(reg, ItemIcons.class, null, "factorization:");
     }
 
     @Override

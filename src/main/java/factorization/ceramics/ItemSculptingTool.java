@@ -5,7 +5,6 @@ import factorization.api.Quaternion;
 import factorization.api.datahelpers.DataInNBT;
 import factorization.ceramics.TileEntityGreenware.ClayLump;
 import factorization.ceramics.TileEntityGreenware.ClayState;
-import factorization.common.ItemIcons;
 import factorization.notify.Notice;
 import factorization.shared.Core;
 import factorization.shared.Core.TabType;
@@ -13,7 +12,6 @@ import factorization.shared.ItemFactorization;
 import factorization.util.InvUtil;
 import factorization.util.InvUtil.FzInv;
 import factorization.util.ItemUtil;
-import net.minecraft.client.renderer.texture.IIconRegister;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
@@ -51,11 +49,8 @@ public class ItemSculptingTool extends ItemFactorization {
             Core.registry.shapelessOreRecipe(fromMode(mode[j]), fromMode(mode[i]));
         }
     }
-    
-    @Override
-    public void registerIcons(IIconRegister reg) { }
 
-    static enum ToolMode {
+    enum ToolMode {
         MOVER("move", true),
         STRETCHER("stretch", false),
         ROTATE_GLOBAL("rotate_global", true),
@@ -67,7 +62,7 @@ public class ItemSculptingTool extends ItemFactorization {
         boolean craftable;
         ToolMode next;
         
-        private ToolMode(String english, boolean craftable) {
+        ToolMode(String english, boolean craftable) {
             this.name = english;
             this.craftable = craftable;
             this.next = this;
@@ -102,23 +97,9 @@ public class ItemSculptingTool extends ItemFactorization {
     static ItemStack fromMode(ToolMode mode) {
         return new ItemStack(Core.registry.sculpt_tool, 1, mode.ordinal());
     }
-    
+
     @Override
-    public IIcon getIconFromDamage(int damage) {
-        //A bit lame. Lame.
-        switch (getMode(damage)) {
-        default:
-        case MOVER: return ItemIcons.move;
-        case RESETTER: return ItemIcons.reset;
-        case ROTATE_LOCAL: return ItemIcons.rotate_local;
-        case ROTATE_GLOBAL: return ItemIcons.rotate_global;
-        case STRETCHER: return ItemIcons.stretch;
-        case MOLD: return ItemIcons.mold;
-        }
-    }
-    
-    @Override
-    public void addExtraInformation(ItemStack is, EntityPlayer player, List list, boolean verbose) {
+    public void addExtraInformation(ItemStack is, EntityPlayer player, List<String> list, boolean verbose) {
         ToolMode mode = getMode(is.getItemDamage());
         String pre = "item.factorization:sculptTool.";
         list.add(StatCollector.translateToLocal(pre + mode));
@@ -131,21 +112,18 @@ public class ItemSculptingTool extends ItemFactorization {
         ToolMode mode = getMode(is.getItemDamage());
         is.setItemDamage(mode.next.ordinal());
     }
-    
+
     @Override
-    public boolean onItemUse(ItemStack par1ItemStack,
-            EntityPlayer par2EntityPlayer, World par3World, int par4, int par5,
-            int par6, int par7, float par8, float par9, float par10) {
-        return tryPlaceIntoWorld(par1ItemStack, par2EntityPlayer, par3World, par4, par5,
-                par6, par7, par8, par9, par10);
+    public boolean onItemUse(ItemStack stack, EntityPlayer player, World world, BlockPos pos, EnumFacing side, float hitX, float hitY, float hitZ) {
+        return tryPlaceIntoWorld(stack, player, world, pos, side, hitX, hitY, hitZ);
     }
-    
+
     public static MovingObjectPosition doRayTrace(EntityPlayer player) {
         return Core.registry.sculpt_tool.getMovingObjectPositionFromPlayer(player.worldObj, player, true);
     }
     
     public boolean tryPlaceIntoWorld(ItemStack is, EntityPlayer player,
-            World w, BlockPos pos, int side,
+            World w, BlockPos pos, EnumFacing side,
             float vx, float vy, float vz) {
         if (w.isRemote) {
             return true;
@@ -195,7 +173,7 @@ public class ItemSculptingTool extends ItemFactorization {
                 toDrop.setStackDisplayName(gw.customName);
             }
 
-            FzInv inv = InvUtil.openInventory(player.inventory, 0);
+            FzInv inv = InvUtil.openInventory(player.inventory, EnumFacing.UP);
             if (!player.capabilities.isCreativeMode) {
                 ItemStack theSlab = null;
                 int materialCount = 0;
@@ -297,37 +275,34 @@ public class ItemSculptingTool extends ItemFactorization {
         return true;
     }
     
-    void rotate_local(ClayLump cube, boolean reverse, int side, int strength) {
+    void rotate_local(ClayLump cube, boolean reverse, EnumFacing dir, int strength) {
         float delta = (float) Math.toRadians(-360F/32F*strength);
         if (reverse) {
             delta *= -1;
         }
-        EnumFacing direction = SpaceUtil.getOrientation(side);
-        cube.quat.incrMultiply(Quaternion.getRotationQuaternionRadians(delta, direction.getDirectionVec().getX(), direction.getDirectionVec().getY(), direction.getDirectionVec().getZ()));
+        cube.quat.incrMultiply(Quaternion.getRotationQuaternionRadians(delta, dir));
     }
     
-    void rotate_global(ClayLump cube, boolean reverse, int side, int strength) {
+    void rotate_global(ClayLump cube, boolean reverse, EnumFacing dir, int strength) {
         float delta = (float) Math.toRadians(-360F/32F*strength);
         if (reverse) {
             delta *= -1;
         }
-        EnumFacing direction = SpaceUtil.getOrientation(side);
-        Quaternion global = Quaternion.getRotationQuaternionRadians(delta, direction.getDirectionVec().getX(), direction.getDirectionVec().getY(), direction.getDirectionVec().getZ());
+        Quaternion global = Quaternion.getRotationQuaternionRadians(delta, dir);
         global.incrMultiply(cube.quat);
         cube.quat = global;
     }
     
-    void move(ClayLump cube, boolean reverse, int side, int strength) {
+    void move(ClayLump cube, boolean reverse, EnumFacing dir, int strength) {
         //shift origin 0.5, and corner by 0.5.
-        EnumFacing dir = SpaceUtil.getOrientation(side);
-        stretch(cube, reverse, dir.ordinal(), strength);
-        stretch(cube, !reverse, dir.getOpposite().ordinal(), strength);
+        stretch(cube, reverse, dir, strength);
+        stretch(cube, !reverse, dir.getOpposite(), strength);
     }
     
-    void stretch(ClayLump cube, boolean reverse, int side, int strength) {
+    void stretch(ClayLump cube, boolean reverse, EnumFacing dir, int strength) {
         //shift origin 0.5, and corner by 0.5.
-        EnumFacing dir = SpaceUtil.getOrientation(side);
         int delta = reverse ? -strength : strength;
+        if (dir == null) return;
         switch (dir) {
         case SOUTH:
             cube.maxZ += delta;
@@ -347,7 +322,6 @@ public class ItemSculptingTool extends ItemFactorization {
         case DOWN:
             cube.minY -= delta;
             break;
-        case UNKNOWN: break;
         }
     }
     

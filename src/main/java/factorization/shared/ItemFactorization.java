@@ -10,8 +10,6 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 import java.util.List;
 
 public class ItemFactorization extends Item {
-    private int spriteNumber = 1;
-
     public ItemFactorization(String name, TabType tabType) {
         setUnlocalizedName("factorization:" + name.replace('.', '/'));
         Core.tab(this, tabType);
@@ -24,28 +22,12 @@ public class ItemFactorization extends Item {
         accessableUnlocalizedName = name;
         return super.setUnlocalizedName(name);
     }
-    
+
     @Override
     @SideOnly(Side.CLIENT)
-    protected String getIconString() {
-        return accessableUnlocalizedName;
-    }
-    
-    @Override
-    @SideOnly(Side.CLIENT)
-    public final void addInformation(ItemStack is, EntityPlayer player, List list, boolean verbose) {
+    public final void addInformation(ItemStack is, EntityPlayer player, List<String> list, boolean verbose) {
         Core.brand(is, player, list, verbose);
     }
     
-    protected void addExtraInformation(ItemStack is, EntityPlayer player, List list, boolean verbose) {}
-    
-    @Override
-    @SideOnly(Side.CLIENT)
-    public int getSpriteNumber() {
-        return spriteNumber;
-    }
-    
-    public void setSpriteNumber(int num) {
-        this.spriteNumber = num;
-    }
+    protected void addExtraInformation(ItemStack is, EntityPlayer player, List<String> list, boolean verbose) {}
 }

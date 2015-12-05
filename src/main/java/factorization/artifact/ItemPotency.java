@@ -1,6 +1,5 @@
 package factorization.artifact;
 
-import factorization.common.ItemIcons;
 import factorization.shared.Core;
 import factorization.shared.ItemCraftingComponent;
 import factorization.util.ItemUtil;

@@ -6,7 +6,6 @@ import factorization.shared.ItemFactorization;
 import factorization.shared.Sound;
 import factorization.util.InvUtil;
 import factorization.util.ItemUtil;
-import net.minecraft.client.renderer.texture.IIconRegister;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Items;
@@ -14,7 +13,6 @@ import net.minecraft.item.EnumAction;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.DamageSource;
-import net.minecraft.util.IIcon;
 import net.minecraft.world.World;
 
 import java.util.List;
@@ -26,22 +24,7 @@ public class ItemAcidBottle extends ItemFactorization {
         setMaxStackSize(16);
         setHasSubtypes(true);
     }
-    
-    @Override
-    public boolean requiresMultipleRenderPasses() {
-        return true;
-    }
-    
-    @Override
-    public void registerIcons(IIconRegister par1IIconRegister) {
-        // Nada
-    }
-    
-    @Override
-    public IIcon getIconFromDamageForRenderPass(int damage, int renderPass) {
-        return Items.potionitem.getIconFromDamageForRenderPass(damage, renderPass);
-    }
-    
+
     @Override
     public int getColorFromItemStack(ItemStack stack, int renderPass) {
         if (renderPass == 0) {
@@ -69,7 +52,7 @@ public class ItemAcidBottle extends ItemFactorization {
 
     @Override
     public EnumAction getItemUseAction(ItemStack par1ItemStack) {
-        return EnumAction.drink;
+        return EnumAction.DRINK;
     }
 
     @Override
@@ -87,9 +70,9 @@ public class ItemAcidBottle extends ItemFactorization {
             setDamageBypassesArmor();
         }
     }
-    
+
     @Override
-    public ItemStack onEaten(ItemStack is, World w, EntityPlayer player) {
+    public ItemStack onItemUseFinish(ItemStack is, World w, EntityPlayer player) {
         is.stackSize--;
         Sound.acidBurn.playAt(player);
         if (w.isRemote) {
@@ -102,7 +85,7 @@ public class ItemAcidBottle extends ItemFactorization {
         InvUtil.givePlayerItem(player, bottle);
         return is;
     }
-    
+
     @Override
     public void getSubItems(Item id, CreativeTabs tab, List list) {
         super.getSubItems(id, tab, list);
