@@ -16,8 +16,6 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.*;
 import net.minecraft.world.World;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
 
 import java.io.IOException;
 import java.util.List;
@@ -25,7 +23,7 @@ import java.util.List;
 public class TileEntityExtension extends TileEntityCommon implements IFurnaceHeatable {
     private TileEntityCommon _parent = null;
     private DeltaCoord pc;
-    
+
     public TileEntityExtension() { }
     public TileEntityExtension(TileEntityCommon parent) {
         this._parent = parent;
@@ -53,12 +51,7 @@ public class TileEntityExtension extends TileEntityCommon implements IFurnaceHea
             p.onRemove();
         }
     }
-    
-    @Override
-    public boolean canUpdate() {
-        return false;
-    }
-    
+
     public TileEntityCommon getParent() {
         if (_parent != null && _parent.isInvalid()) {
             setParent(null);
@@ -73,7 +66,7 @@ public class TileEntityExtension extends TileEntityCommon implements IFurnaceHea
         }
         return _parent;
     }
-    
+
     public void setParent(TileEntityCommon newParent) {
         if (newParent == null || newParent.getClass() == TileEntityExtension.class) {
             _parent = null;
@@ -103,7 +96,7 @@ public class TileEntityExtension extends TileEntityCommon implements IFurnaceHea
         }
         return p.getCollisionBoundingBox();
     }
-    
+
     @Override
     public boolean addCollisionBoxesToList(Block block, AxisAlignedBB aabb, List<AxisAlignedBB> list, Entity entity) {
         TileEntityCommon p = getParent();
@@ -112,7 +105,7 @@ public class TileEntityExtension extends TileEntityCommon implements IFurnaceHea
         }
         return p.addCollisionBoxesToList(block, aabb, list, entity);
     }
-    
+
     @Override
     public void validate() {
         super.validate();
@@ -120,7 +113,7 @@ public class TileEntityExtension extends TileEntityCommon implements IFurnaceHea
             setParent(_parent);
         }
     }
-    
+
     @Override
     public boolean handleMessageFromServer(MessageType messageType, ByteBuf input) throws IOException {
         if (super.handleMessageFromServer(messageType, input)) {
@@ -132,7 +125,7 @@ public class TileEntityExtension extends TileEntityCommon implements IFurnaceHea
         }
         return false;
     }
-    
+
     @Override
     public boolean activate(EntityPlayer entityplayer, EnumFacing side) {
         TileEntityCommon p = getParent();
@@ -141,7 +134,7 @@ public class TileEntityExtension extends TileEntityCommon implements IFurnaceHea
         }
         return false;
     }
-    
+
     @Override
     public void neighborChanged() {
         TileEntityCommon p = getParent();
@@ -149,7 +142,7 @@ public class TileEntityExtension extends TileEntityCommon implements IFurnaceHea
             p.neighborChanged();
         }
     }
-    
+
     @Override
     public MovingObjectPosition collisionRayTrace(Vec3 startVec, Vec3 endVec) {
         TileEntityCommon p = getParent();
@@ -158,26 +151,14 @@ public class TileEntityExtension extends TileEntityCommon implements IFurnaceHea
             if (!(p instanceof TileEntityGreenware)) {
                 //hax
                 if (ret != null && ret.typeOfHit == MovingObjectPosition.MovingObjectType.BLOCK) {
-                    ret.blockX = pos.getX();
-                    ret.blockY = pos.getY();
-                    ret.blockZ = pos.getZ();
+                    return new MovingObjectPosition(ret.hitVec, ret.sideHit, pos);
                 }
             }
             return ret;
         }
         return super.collisionRayTrace(startVec, endVec);
     }
-    
-    @Override
-    @SideOnly(Side.CLIENT)
-    public IIcon getIcon(EnumFacing dir) {
-        TileEntityCommon p = getParent();
-        if (p == null) {
-            return super.getIcon(dir);
-        }
-        return p.getIcon(dir);
-    }
-    
+
     @Override
     public ItemStack getDroppedBlock() {
         TileEntityCommon p = getParent();

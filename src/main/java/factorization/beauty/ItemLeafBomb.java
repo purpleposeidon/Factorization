@@ -48,7 +48,7 @@ public class ItemLeafBomb extends ItemFactorization {
             world.spawnEntityInWorld(new EntityLeafBomb(world, player, stack.copy()));
         }
 
-        PlayerUtil.decr(player, stack);
+        PlayerUtil.cheatDecr(player, stack);
 
         return stack;
     }

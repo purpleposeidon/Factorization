@@ -5,11 +5,11 @@ import factorization.common.FactoryType;
 import factorization.shared.Core;
 import factorization.shared.ItemFactorization;
 import factorization.util.LangUtil;
-import mods.railcraft.api.core.items.IMinecartItem;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockDispenser;
 import net.minecraft.block.BlockRailBase;
 import net.minecraft.block.material.Material;
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.dispenser.BehaviorDefaultDispenseItem;
 import net.minecraft.dispenser.IBehaviorDispenseItem;
@@ -19,52 +19,53 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.util.BlockPos;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.world.World;
-import net.minecraftforge.fml.common.Optional;
 
 import java.util.List;
 
 /*
  * Created by asie on 6/11/15.
  */
-@Optional.Interface(iface = "mods.railcraft.api.core.items.IMinecartItem", modid = "Railcraft")
-public class ItemMinecartDayBarrel extends ItemFactorization implements IMinecartItem {
+// @Optional.Interface(iface = "mods.railcraft.api.core.items.IMinecartItem", modid = "Railcraft")
+public class ItemMinecartDayBarrel extends ItemFactorization {
+    // NORELEASE: I'm using more raw EnumProperty<EnumFacing> rather than a more specific FacingProperty in places
     private static final IBehaviorDispenseItem dispenserMinecartBehavior = new BehaviorDefaultDispenseItem() {
         private final BehaviorDefaultDispenseItem behaviourDefaultDispenseItem = new BehaviorDefaultDispenseItem();
 
         public ItemStack dispenseStack(IBlockSource at, ItemStack is) {
-            EnumFacing enumfacing = BlockDispenser.func_149937_b(at.getBlockMetadata());
             World world = at.getWorld();
+            IBlockState dispenserState = world.getBlockState(at.getBlockPos());
+            EnumFacing enumfacing = dispenserState.getValue(BlockDispenser.FACING);
             double x = at.getX() + (double) ((float) enumfacing.getFrontOffsetX() * 1.125F);
             double y = at.getY() + (double) ((float) enumfacing.getFrontOffsetY() * 1.125F);
             double z = at.getZ() + (double) ((float) enumfacing.getFrontOffsetZ() * 1.125F);
-            int targetX = at.getXInt() + enumfacing.getFrontOffsetX();
-            int targetY = at.getYInt() + enumfacing.getFrontOffsetY();
-            int targetZ = at.getZInt() + enumfacing.getFrontOffsetZ();
-            Block block = world.getBlock(targetX, targetY, targetZ);
+            BlockPos target = at.getBlockPos().offset(enumfacing);
+            IBlockState bs = world.getBlockState(target);
+            Block block = bs.getBlock();
             double yOffset;
 
-            if (BlockRailBase.func_150051_a(block)) {
+            if (BlockRailBase.isRailBlock(bs)) {
                 yOffset = 0.0D;
             } else {
-                if (block.getMaterial() != Material.air || !BlockRailBase.func_150051_a(world.getBlock(targetX, targetY - 1, targetZ))) {
+                if (block.getMaterial() != Material.air || !BlockRailBase.isRailBlock(world.getBlockState(target.down()))) {
                     return this.behaviourDefaultDispenseItem.dispense(at, is);
                 }
 
                 yOffset = -1.0D;
             }
 
-            EntityMinecart entityminecart = Core.registry.barrelCart.placeCart(null, is, at.getWorld(), (int) x, (int) y, (int) z);
+            EntityMinecart entityminecart = Core.registry.barrelCart.placeCart(null, is, at.getWorld(), new BlockPos((int) x, (int) y, (int) z));
 
             if (is.hasDisplayName()) {
-                entityminecart.setMinecartName(is.getDisplayName());
+                entityminecart.setCustomNameTag(is.getDisplayName());
             }
             return is;
         }
 
         protected void playDispenseSound(IBlockSource at) {
-            at.getWorld().playAuxSFX(1000, at.getXInt(), at.getYInt(), at.getZInt(), 0);
+            at.getWorld().playAuxSFX(1000, at.getBlockPos(), 0);
         }
     };
 
@@ -76,9 +77,9 @@ public class ItemMinecartDayBarrel extends ItemFactorization implements IMinecar
     }
 
     @Override
-    public boolean onItemUse(ItemStack is, EntityPlayer player, World w, BlockPos pos, int side, float hitX, float hitY, float hitZ) {
+    public boolean onItemUse(ItemStack is, EntityPlayer player, World w, BlockPos pos, EnumFacing side, float hitX, float hitY, float hitZ) {
         if (w.isRemote) return true;
-        if (!BlockRailBase.func_150051_a(w.getBlock(pos))) {
+        if (!BlockRailBase.isRailBlock(w.getBlockState(pos))) {
             return true;
         }
         placeCart(null, is, w, pos);
@@ -99,13 +100,19 @@ public class ItemMinecartDayBarrel extends ItemFactorization implements IMinecar
         return super.getItemStackDisplayName(is);
     }
 
+    /* NORELEASE: Railcraft?
     @Override
     public boolean canBePlacedByNonPlayer(ItemStack cart) {
         return true;
     }
 
-    @Override
+    */
+
+    // @Override
     public EntityMinecart placeCart(GameProfile owner, ItemStack cart, World world, BlockPos pos) {
+        int x = pos.getX();
+        int y = pos.getY();
+        int z = pos.getZ();
         EntityMinecartDayBarrel minecart = new EntityMinecartDayBarrel(world, x + 0.5F, y + 0.5F, z + 0.5F);
         minecart.initFromStack(cart);
         cart.stackSize--;
@@ -143,11 +150,6 @@ public class ItemMinecartDayBarrel extends ItemFactorization implements IMinecar
 
     @Override
     public boolean hasContainerItem(ItemStack stack) {
-        return true;
-    }
-
-    @Override
-    public boolean doesContainerItemLeaveCraftingGrid(ItemStack stack) {
         return true;
     }
 

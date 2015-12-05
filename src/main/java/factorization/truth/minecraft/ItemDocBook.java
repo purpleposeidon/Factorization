@@ -11,6 +11,8 @@ import factorization.util.FzUtil;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.BlockPos;
+import net.minecraft.util.EnumFacing;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.relauncher.Side;
@@ -25,19 +27,17 @@ public class ItemDocBook extends ItemFactorization implements IDocBook {
             DocReg.indexed_domains.add(getDocumentationDomain());
         }
     }
-    
+
     @SideOnly(Side.CLIENT)
     @Override
-    public boolean onItemUse(ItemStack is, EntityPlayer player, World world,
-            BlockPos pos, int side,
-            float vx, float fy, float fz) {
+    public boolean onItemUse(ItemStack stack, EntityPlayer player, World world, BlockPos pos, EnumFacing side, float hitX, float hitY, float hitZ) {
         if (!world.isRemote) return false;
         if (!player.isSneaking()) return false;
         Minecraft mc = Minecraft.getMinecraft();
         Coord at = new Coord(world, pos);
         ItemStack hit = FzUtil.getReifiedBarrel(at);
         if (hit == null) {
-            hit = at.getPickBlock(mc.objectMouseOver);
+            hit = at.getPickBlock(mc.objectMouseOver, player);
         }
         if (hit != null && DocReg.module != null) {
             DocReg.module.openBookForItem(hit, false);

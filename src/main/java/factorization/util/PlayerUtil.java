@@ -206,7 +206,7 @@ public final class PlayerUtil {
         return player.worldObj.rayTraceBlocks(pos, ray, false, false, true);
     }
 
-    public static ItemStack decr(EntityPlayer player, ItemStack stack) {
+    public static ItemStack cheatDecr(EntityPlayer player, ItemStack stack) {
         if (stack == null) return null;
         if (!isPlayerCreative(player)) {
             stack.stackSize--;

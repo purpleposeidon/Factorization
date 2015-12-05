@@ -387,7 +387,7 @@ public class EntityCitizen extends EntityFz {
             Vec3 you = SpaceUtil.fromEntPos(ent);
             Vec3 delta = SpaceUtil.subtract(you, me).normalize();
             SpaceUtil.incrScale(delta, r * 2 + Math.abs(rand.nextGaussian()));
-            Vec3 target = SpaceUtil.add(you, delta);
+            Vec3 target = you.add(delta);
             enderport(ent, target.xCoord, target.yCoord, target.zCoord);
         }
     }

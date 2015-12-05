@@ -80,7 +80,7 @@ public class ColossalBlock extends Block {
     
     @Override
     @SideOnly(Side.CLIENT)
-    public IIcon getIcon(IBlockAccess w, BlockPos pos, int side) {
+    public IIcon getIcon(IBlockAccess w, BlockPos pos, EnumFacing side) {
         int md = w.getBlockMetadata(pos);
         if (md == MD_EYE || md == MD_EYE_OPEN) {
             // This is here rather than up there so that the item form doesn't look lame

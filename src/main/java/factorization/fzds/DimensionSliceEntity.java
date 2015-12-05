@@ -638,7 +638,7 @@ public class DimensionSliceEntity extends IDeltaChunk implements IFzdsEntryContr
 
             // Errors accumulate, mainly during turns.
             Vec3 correctPos = shadow2real(child.parentShadowOrigin);
-            Vec3 nextChildAt = SpaceUtil.add(childAt, inst);
+            Vec3 nextChildAt = childAt.add(inst);
             Vec3 error = SpaceUtil.subtract(nextChildAt, correctPos);
             //SpaceUtil.incrScale(error, 0.5); // Okay I wasn't *really* expecting this to work! o_O This reduces jitters
             //if (NORELEASE.on) SpaceUtil.incrScale(error, 0.25); // Okay I wasn't *really* expecting this to work! o_O This reduces jitters

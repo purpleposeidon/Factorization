@@ -8,10 +8,7 @@ import factorization.util.ItemUtil;
 import factorization.util.SpaceUtil;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.AxisAlignedBB;
-import net.minecraft.util.EnumFacing;
-import net.minecraft.util.MovingObjectPosition;
-import net.minecraft.util.Vec3;
+import net.minecraft.util.*;
 import net.minecraft.world.World;
 
 import java.util.ArrayList;
@@ -22,7 +19,7 @@ public class ItemSpawnPoster extends ItemFactorization {
     }
 
     @Override
-    public boolean onItemUse(ItemStack is, EntityPlayer player, World w, BlockPos pos, int side, float hitX, float hitY, float hitZ) {
+    public boolean onItemUse(ItemStack is, EntityPlayer player, World w, BlockPos pos, EnumFacing side, float hitX, float hitY, float hitZ) {
         if (w.isRemote) return false;
         final PosterPlacer placer = new PosterPlacer(is, player, w, pos, side);
         if (placer.invoke()) return false;
@@ -38,9 +35,7 @@ public class ItemSpawnPoster extends ItemFactorization {
         private int x;
         private int y;
         private int z;
-        private int side;
-
-        final EnumFacing dir;
+        private EnumFacing dir;
 
         final Coord at;
         AxisAlignedBB blockBox = null;
@@ -52,16 +47,12 @@ public class ItemSpawnPoster extends ItemFactorization {
         Quaternion rot;
         EnumFacing top;
 
-        public PosterPlacer(ItemStack is, EntityPlayer player, World w, BlockPos pos, int side) {
+        public PosterPlacer(ItemStack is, EntityPlayer player, World w, BlockPos pos, EnumFacing side) {
             this.is = is;
             this.player = player;
             this.w = w;
-            this.x = x;
-            this.y = y;
-            this.z = z;
-            this.side = side;
+            this.dir = side;
             this.at = new Coord(w, pos);
-            this.dir = SpaceUtil.getOrientation(side);
         }
 
         boolean is() {
@@ -78,7 +69,7 @@ public class ItemSpawnPoster extends ItemFactorization {
             poster.setBase(bestWidth, rot, dir, top, bounds);
             final Vec3 spot = SpaceUtil.getMiddle(plane);
             if (SpaceUtil.sign(dir) == -1) {
-                SpaceUtil.incrAdd(spot, SpaceUtil.scale(SpaceUtil.fromDirection(dir), 1.0 / 2560.0));
+                spot.add(SpaceUtil.scale(SpaceUtil.fromDirection(dir), 1.0 / 2560.0));
             }
             SpaceUtil.toEntPos(poster, spot);
             result = poster;
@@ -133,12 +124,12 @@ public class ItemSpawnPoster extends ItemFactorization {
 
             final ArrayList<AxisAlignedBB> boxes = new ArrayList<AxisAlignedBB>();
             final AxisAlignedBB query = SpaceUtil.createAABB(at.add(-9, -9, -9), at.add(+9, +9, +9));
-            at.getBlock().addCollisionBoxesToList(at.w, at.x, at.y, at.z, query, boxes, player);
+            at.getBlock().addCollisionBoxesToList(at.w, at.toBlockPos(), at.getState(), query, boxes, player);
 
             final Vec3 playerEye = SpaceUtil.fromPlayerEyePos(player);
-            final Vec3 look = player.getLookVec();
-            SpaceUtil.incrScale(look, 8);
-            final Vec3 reachEnd = SpaceUtil.add(look, playerEye);
+            Vec3 look = player.getLookVec();
+            look = SpaceUtil.scale(look, 8);
+            final Vec3 reachEnd = look.add(playerEye);
 
             double minDist = Double.POSITIVE_INFINITY;
             for (AxisAlignedBB box : boxes) {
@@ -149,13 +140,13 @@ public class ItemSpawnPoster extends ItemFactorization {
                 double vecLen = mop.hitVec.lengthVector();
                 if (vecLen > minDist) continue;
                 minDist = vecLen;
-                side = mop.sideHit;
+                dir = mop.sideHit;
                 blockBox = box;
             }
 
             if (blockBox == null) blockBox = at.getCollisionBoundingBox();
             if (blockBox == null) {
-                MovingObjectPosition mop = at.getBlock().collisionRayTrace(at.w, at.x, at.y, at.z, playerEye, reachEnd);
+                MovingObjectPosition mop = at.getBlock().collisionRayTrace(at.w, at.toBlockPos(), playerEye, reachEnd);
                 if (mop != null) {
                     // Oh, look, the mop doesn't actually help us! Let's just act like this block's like BlockTorch and sets its bounds idiotically like it does
                     blockBox = at.getBlockBounds();

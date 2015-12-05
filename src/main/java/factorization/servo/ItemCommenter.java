@@ -6,6 +6,8 @@ import factorization.shared.ItemFactorization;
 import factorization.shared.NetworkFactorization.MessageType;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.BlockPos;
+import net.minecraft.util.EnumFacing;
 import net.minecraft.world.World;
 
 public class ItemCommenter extends ItemFactorization {
@@ -16,7 +18,7 @@ public class ItemCommenter extends ItemFactorization {
     }
 
     @Override
-    public boolean onItemUse(ItemStack is, EntityPlayer player, World world, BlockPos pos, int side, float vx,
+    public boolean onItemUse(ItemStack is, EntityPlayer player, World world, BlockPos pos, EnumFacing side, float vx,
             float vy, float vz) {
         if (player == null) {
             return false;

@@ -21,7 +21,6 @@ import factorization.util.InvUtil;
 import factorization.util.SpaceUtil;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.block.Block;
-import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
@@ -278,27 +277,6 @@ public class TileEntityGreenware extends TileEntityCommon implements IFurnaceHea
         return ClayState.WET;
     }
 
-    public IIcon getIcon(ClayLump lump, int side) {
-        //NOTE: This isn't what's actually used for rendering.
-        switch (getState()) {
-        case WET:
-            return Blocks.clay.getBlockTextureFromSide(side);
-        case DRY:
-            return BlockIcons.ceramics$dry;
-        case BISQUED:
-        case UNFIRED_GLAZED:
-            return BlockIcons.error;
-        case HIGHFIRED:
-            Item it = DataUtil.getItem(lump.icon_id);
-            if (it == null || lump.icon_id == Blocks.air) {
-                return BlockIcons.error;
-            }
-            return it.getIconFromDamage(lump.icon_md);
-        default:
-            return BlockIcons.error;
-        }
-    }
-
     public void touch() {
         if (getState() == ClayState.WET) {
             lastTouched = 0;
@@ -393,7 +371,7 @@ public class TileEntityGreenware extends TileEntityCommon implements IFurnaceHea
         } else {
             addLump();
         }
-        EnumFacing placement = SpaceUtil.getOrientation(SpaceUtil.determineFlatOrientation(player));
+        EnumFacing placement = SpaceUtil.determineFlatOrientation(player);
         if (tag == null || !tag.hasKey("front")) {
             front = placement;
             setRotation((byte) 0);
@@ -440,7 +418,6 @@ public class TileEntityGreenware extends TileEntityCommon implements IFurnaceHea
 
     @Override
     public void update() {
-        super.updateEntity();
         if (worldObj.isRemote) {
             return;
         }
@@ -556,9 +533,8 @@ public class TileEntityGreenware extends TileEntityCommon implements IFurnaceHea
         }
     }
 
-    ClayLump extrudeLump(ClayLump against, int side) {
+    ClayLump extrudeLump(ClayLump against, EnumFacing dir) {
         ClayLump lump = against.copy();
-        EnumFacing dir = SpaceUtil.getOrientation(side);
         Block b = Core.registry.serverTraceHelper;
         against.toBlockBounds(b);
         int wX = lump.maxX - lump.minX;
@@ -615,7 +591,7 @@ public class TileEntityGreenware extends TileEntityCommon implements IFurnaceHea
                     c.y += dy;
                     c.z += dz;
                     lump.toRotatedBlockBounds(this, block);
-                    AxisAlignedBB in = block.getCollisionBoundingBox(worldObj, pos, bs);
+                    AxisAlignedBB in = block.getCollisionBoundingBox(worldObj, pos, c.getState());
                     if (ab.intersectsWith(in)) {
                         // This block needs to be an Extension, or this
                         if (c.isAir() || c.isReplacable()) {
@@ -804,23 +780,19 @@ public class TileEntityGreenware extends TileEntityCommon implements IFurnaceHea
         }
         // It's possible for the startVec to be embedded in a lump (causing it
         // to hit the opposite side), so we must move it farther away
-        double dx = startVec.xCoord - endVec.xCoord;
-        double dy = startVec.yCoord - endVec.yCoord;
-        double dz = startVec.zCoord - endVec.zCoord;
+        Vec3 d = startVec.subtract(endVec);
         double scale = 5.2; // Diagonal of a 3³. (Was initially using incrScale = 2)
         // This isn't quite right; the dVector would properly be normalized here
         // & rescaled to the max diameter. But we can survive without it.
         // Unnormalized length of dVector is 6m in surviavl mode IIRC. This'll
         // be way longer than it needs to be.
         // Why is it + instead of -? Hmm.
-        startVec.xCoord += dx * scale;
-        startVec.yCoord += dy * scale;
-        startVec.zCoord += dz * scale;
+        startVec = startVec.add(SpaceUtil.scale(d, scale));
         MovingObjectPosition shortest = null;
         for (int i = 0; i < parts.size(); i++) {
             ClayLump lump = parts.get(i);
             lump.toRotatedBlockBounds(this, block);
-            MovingObjectPosition mop = block.collisionRayTrace(worldObj, pos.getX(), pos.getY(), pos.getZ(), startVec, endVec);
+            MovingObjectPosition mop = block.collisionRayTrace(worldObj, pos, startVec, endVec);
             if (mop != null) {
                 mop.subHit = i;
                 if (shortest == null) {
@@ -830,8 +802,7 @@ public class TileEntityGreenware extends TileEntityCommon implements IFurnaceHea
                     Vec3 m = mop.hitVec;
                     s = new Vec3(s.xCoord, s.yCoord, s.zCoord);
                     m = new Vec3(m.xCoord, m.yCoord, m.zCoord);
-                    offsetVector(startVec, s);
-                    offsetVector(startVec, m);
+                    startVec = startVec.subtract(s).subtract(m);
                     if (m.lengthVector() < s.lengthVector()) {
                         shortest = mop;
                     }
@@ -840,12 +811,6 @@ public class TileEntityGreenware extends TileEntityCommon implements IFurnaceHea
         }
         return shortest;
         // return super.collisionRayTrace(w, pos, startVec, endVec);
-    }
-
-    private void offsetVector(Vec3 player, Vec3 v) {
-        v.xCoord -= player.xCoord;
-        v.yCoord -= player.yCoord;
-        v.zCoord -= player.zCoord;
     }
 
     @SubscribeEvent
@@ -872,7 +837,7 @@ public class TileEntityGreenware extends TileEntityCommon implements IFurnaceHea
         double oX = player.lastTickPosX + (player.posX - player.lastTickPosX) * partial;
         double oY = player.lastTickPosY + (player.posY - player.lastTickPosY) * partial;
         double oZ = player.lastTickPosZ + (player.posZ - player.lastTickPosZ) * partial;
-        AxisAlignedBB bb = block.getSelectedBoundingBoxFromPool(c.w, c.x, c.y, c.z).expand(widen, widen, widen).getOffsetBoundingBox(-oX, -oY, -oZ);
+        AxisAlignedBB bb = block.getSelectedBoundingBox(c.w, c.toBlockPos()).expand(widen, widen, widen).offset(-oX, -oY, -oZ);
 
         GL11.glEnable(GL11.GL_BLEND);
         GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
@@ -891,36 +856,6 @@ public class TileEntityGreenware extends TileEntityCommon implements IFurnaceHea
         // Oooooh, we could also draw the offset position for *EVERY* tool...
     }
 
-    // Copied. Private in RenderGlobal.drawOutlinedBoundingBox. For some stupid
-    // pointless reason. Don't really feel like re-writing it to be public every
-    // update or submitting an AT. (GL_LINES)
-    private static void drawOutlinedBoundingBox(AxisAlignedBB aabb) {
-        Tessellator tessellator = Tessellator.instance;
-        tessellator.startDrawing(3);
-        tessellator.addVertex(aabb.minX, aabb.minY, aabb.minZ);
-        tessellator.addVertex(aabb.maxX, aabb.minY, aabb.minZ);
-        tessellator.addVertex(aabb.maxX, aabb.minY, aabb.maxZ);
-        tessellator.addVertex(aabb.minX, aabb.minY, aabb.maxZ);
-        tessellator.addVertex(aabb.minX, aabb.minY, aabb.minZ);
-        tessellator.draw();
-        tessellator.startDrawing(3);
-        tessellator.addVertex(aabb.minX, aabb.maxY, aabb.minZ);
-        tessellator.addVertex(aabb.maxX, aabb.maxY, aabb.minZ);
-        tessellator.addVertex(aabb.maxX, aabb.maxY, aabb.maxZ);
-        tessellator.addVertex(aabb.minX, aabb.maxY, aabb.maxZ);
-        tessellator.addVertex(aabb.minX, aabb.maxY, aabb.minZ);
-        tessellator.draw();
-        tessellator.startDrawing(1);
-        tessellator.addVertex(aabb.minX, aabb.minY, aabb.minZ);
-        tessellator.addVertex(aabb.minX, aabb.maxY, aabb.minZ);
-        tessellator.addVertex(aabb.maxX, aabb.minY, aabb.minZ);
-        tessellator.addVertex(aabb.maxX, aabb.maxY, aabb.minZ);
-        tessellator.addVertex(aabb.maxX, aabb.minY, aabb.maxZ);
-        tessellator.addVertex(aabb.maxX, aabb.maxY, aabb.maxZ);
-        tessellator.addVertex(aabb.minX, aabb.minY, aabb.maxZ);
-        tessellator.addVertex(aabb.minX, aabb.maxY, aabb.maxZ);
-        tessellator.draw();
-    }
 
     @Override
     public AxisAlignedBB getRenderBoundingBox() {
@@ -941,14 +876,14 @@ public class TileEntityGreenware extends TileEntityCommon implements IFurnaceHea
         ClayState state = getState();
         if (state == ClayState.WET) {
             block.setBlockBounds(0, 0, 0, 1, 1F / 8F, 1);
-            AxisAlignedBB a = block.getCollisionBoundingBox(worldObj, pos, bs);
+            AxisAlignedBB a = block.getCollisionBoundingBox(worldObj, pos, null);
             if (aabb.intersectsWith(a)) {
                 list.add(a);
             }
         }
         for (ClayLump lump : parts) {
             lump.toRotatedBlockBounds(this, block);
-            AxisAlignedBB a = block.getCollisionBoundingBox(worldObj, pos, bs);
+            AxisAlignedBB a = block.getCollisionBoundingBox(worldObj, pos, null);
             if (aabb.intersectsWith(a)) {
                 list.add(a);
             }
@@ -966,15 +901,6 @@ public class TileEntityGreenware extends TileEntityCommon implements IFurnaceHea
         return false;
     }
 
-    @Override
-    @SideOnly(Side.CLIENT)
-    public IIcon getIcon(EnumFacing dir) {
-        if (parts.size() == 0) {
-            return Blocks.clay.getBlockTextureFromSide(0);
-        }
-        return getIcon(parts.get(0), dir.ordinal());
-    }
-    
     @Override
     public ItemStack getDroppedBlock() {
         return getItem();

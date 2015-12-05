@@ -5,9 +5,11 @@ import factorization.api.FzOrientation;
 import factorization.shared.Core;
 import factorization.shared.Core.TabType;
 import factorization.shared.ItemCraftingComponent;
+import factorization.util.PlayerUtil;
 import factorization.util.SpaceUtil;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.BlockPos;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.Vec3;
 import net.minecraft.world.World;
@@ -23,18 +25,18 @@ public class ItemServoMotor extends ItemCraftingComponent {
         Core.tab(this, TabType.SERVOS);
         setMaxStackSize(16);
     }
-    
+
     @Override
-    public boolean onItemUse(ItemStack is, EntityPlayer player, World w, BlockPos pos, int side, float vecX, float vecY, float vecZ) {
+    public boolean onItemUse(ItemStack stack, EntityPlayer player, World world, BlockPos pos, EnumFacing side, float hitX, float hitY, float hitZ) {
         return false;
     }
 
     protected AbstractServoMachine makeMachine(World w) {
         return new ServoMotor(w);
     }
-    
+
     @Override
-    public boolean onItemUseFirst(ItemStack is, EntityPlayer player, World w, BlockPos pos, int side, float hitX, float hitY, float hitZ) {
+    public boolean onItemUseFirst(ItemStack stack, EntityPlayer player, World w, BlockPos pos, EnumFacing top, float hitX, float hitY, float hitZ) {
         Coord c = new Coord(w, pos);
         if (c.getTE(TileEntityServoRail.class) == null) {
             return false;
@@ -48,12 +50,11 @@ public class ItemServoMotor extends ItemCraftingComponent {
         motor.posZ = c.z;
         //c.setAsEntityLocation(motor);
         //w.spawnEntityInWorld(motor);
-        EnumFacing top = SpaceUtil.getOrientation(side);
-        
+
         ArrayList<FzOrientation> valid = new ArrayList();
         motor.motionHandler.beforeSpawn();
         
-        EnumFacing playerAngle = SpaceUtil.getOrientation(SpaceUtil.determineOrientation(player));
+        EnumFacing playerAngle = SpaceUtil.determineOrientation(player);
         
         for (EnumFacing fd : EnumFacing.VALUES) {
             if (top == fd || top.getOpposite() == fd) {
@@ -92,9 +93,7 @@ public class ItemServoMotor extends ItemCraftingComponent {
             motor.motionHandler.orientation = valid.get(0);
         }
         motor.motionHandler.prevOrientation = motor.motionHandler.orientation;
-        if (!player.capabilities.isCreativeMode) {
-            is.stackSize--;
-        }
+        PlayerUtil.cheatDecr(player, stack);
         motor.spawnServoMotor();
         return true;
     }

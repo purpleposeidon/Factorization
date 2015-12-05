@@ -12,7 +12,6 @@ import factorization.shared.NetworkFactorization.MessageType;
 import factorization.shared.TileEntityCommon;
 import factorization.util.FzUtil;
 import factorization.util.ItemUtil;
-import factorization.util.SpaceUtil;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
@@ -352,62 +351,6 @@ public final class Coord implements IDataSerializable, ISaneCoord, Comparable<Co
         return this.add(DeltaCoord.directNeighbors[r]);
     }
 
-    public Coord[] getNeighborsInPlane(int side) {
-        //For god's sake, don't change the order of these return values.
-        //That would mess up wire rendering.
-        switch (side) {
-        case 0:
-        case 1: //y
-            return new Coord[] {
-                    add(-1, 0, 0),
-                    add(+1, 0, 0),
-                    add(0, 0, -1),
-                    add(0, 0, +1)
-            };
-        case 2:
-        case 3: //z
-            return new Coord[] {
-                    add(-1, 0, 0),
-                    add(+1, 0, 0),
-                    add(0, -1, 0),
-                    add(0, +1, 0)
-            };
-        case 4:
-        case 5: //x
-            return new Coord[] {
-                    add(0, 0, -1),
-                    add(0, 0, +1),
-                    add(0, -1, 0),
-                    add(0, +1, 0)
-            };
-        }
-        return null;
-    }
-
-    public Coord[] getNeighborsOutOfPlane(int side) {
-        switch (side) {
-        case 0:
-        case 1: //y
-            return new Coord[] {
-                    add(0, -1, 0),
-                    add(0, +1, 0)
-            };
-        case 2:
-        case 3: //z
-            return new Coord[] {
-                    add(0, 0, -1),
-                    add(0, 0, +1),
-            };
-        case 4:
-        case 5: //x
-            return new Coord[] {
-                    add(-1, 0, 0),
-                    add(+1, 0, 0),
-            };
-        }
-        return null;
-    }
-    
     @Override
     public int compareTo(Coord o) {
         int d = y - o.y;
@@ -439,6 +382,10 @@ public final class Coord implements IDataSerializable, ISaneCoord, Comparable<Co
     public Coord add(DeltaCoord d) {
         return add(d.x, d.y, d.z);
     }
+
+    public Coord add(BlockPos pos) {
+        return add(pos.getX(), pos.getY(), pos.getZ());
+    }
     
     public Coord add(EnumFacing d) {
         return add(d.getDirectionVec().getX(), d.getDirectionVec().getY(), d.getDirectionVec().getZ());
@@ -458,34 +405,6 @@ public final class Coord implements IDataSerializable, ISaneCoord, Comparable<Co
     
     public Vec3 centerVec(Coord o) {
         return new Vec3((x + o.x)/2.0, (y + o.y)/2.0, (z + o.z)/2.0);
-    }
-    
-    /**
-     * Adjusts position. 0, 1: y; 2, 3: z; 4, 5: x
-     * 
-     */
-    public Coord towardSide(int side) {
-        switch (side) {
-        case 0:
-            y -= 1;
-            break;
-        case 1:
-            y += 1;
-            break;
-        case 2:
-            z -= 1;
-            break;
-        case 3:
-            z += 1;
-            break;
-        case 4:
-            x -= 1;
-            break;
-        case 5:
-            x += 1;
-            break;
-        }
-        return this;
     }
     
     public Coord adjust(DeltaCoord dc) { // aka incrAdd
@@ -687,15 +606,10 @@ public final class Coord implements IDataSerializable, ISaneCoord, Comparable<Co
         return getHardness() < 0;
     }
 
-    /** Let's try to use Orientation */
-    public boolean isSolidOnSide(int side) {
-        return w.isSideSolid(toBlockPos(), SpaceUtil.getOrientation(side));
-    }
-    
     public boolean isSolidOnSide(EnumFacing side) {
         return w.isSideSolid(toBlockPos(), side);
     }
-    
+
     public boolean isBlockBurning() {
         Block b = getBlock();
         if (b == null) return false;

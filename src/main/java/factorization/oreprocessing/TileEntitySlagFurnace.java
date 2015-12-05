@@ -43,15 +43,7 @@ public class TileEntitySlagFurnace extends TileEntityFactorization implements IF
     @Override
     public void onPlacedBy(EntityPlayer player, ItemStack is, EnumFacing side, float hitX, float hitY, float hitZ) {
         super.onPlacedBy(player, is, side, hitX, hitY, hitZ);
-        facing_direction = SpaceUtil.getOpposite(SpaceUtil.determineFlatOrientation(player));
-    }
-
-    @Override
-    public IIcon getIcon(EnumFacing dir) {
-        if (draw_active > 0 && facing_direction == dir.ordinal()) {
-            return BlockIcons.machine$slag_furnace_face_on;
-        }
-        return BlockIcons.slag_furnace.get(this, dir);
+        facing_direction = (byte) SpaceUtil.determineFlatOrientation(player).ordinal();
     }
 
     @Override

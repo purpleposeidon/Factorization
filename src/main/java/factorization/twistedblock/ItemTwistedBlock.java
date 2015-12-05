@@ -38,7 +38,7 @@ public class ItemTwistedBlock extends ItemBlockProxy {
     final int channel = Hammer.instance.hammerInfo.makeChannelFor(Core.name, "twistedBlocks", 10, 64, "Allows placement of blocks at angles");
 
     @Override
-    public boolean placeBlockAt(ItemStack stack, EntityPlayer player, World world, BlockPos pos, int side,
+    public boolean placeBlockAt(ItemStack stack, EntityPlayer player, World world, BlockPos pos, EnumFacing side,
             float hitX, float hitY, float hitZ, int metadata) {
         if (world.isRemote) return false;
         if (player instanceof FakePlayer) return false;

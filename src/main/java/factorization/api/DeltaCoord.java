@@ -10,6 +10,7 @@ import net.minecraft.util.Vec3;
 
 import java.io.IOException;
 
+// NORELEASE: Can probably deprecate DeltaCoord
 public class DeltaCoord implements IDataSerializable {
     public int x, y, z;
 

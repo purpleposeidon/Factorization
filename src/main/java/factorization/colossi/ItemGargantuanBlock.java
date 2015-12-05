@@ -17,7 +17,7 @@ public class ItemGargantuanBlock extends ItemBlock {
     }
     
     @Override
-    public boolean placeBlockAt(ItemStack stack, EntityPlayer player, World world, BlockPos pos, int side, float hitX, float hitY, float hitZ, int metadata) {
+    public boolean placeBlockAt(ItemStack stack, EntityPlayer player, World world, BlockPos pos, EnumFacing side, float hitX, float hitY, float hitZ, int metadata) {
         EnumFacing dir = SpaceUtil.getOrientation(side);
         if (dir == null) return false;
         Coord me = new Coord(world, pos);

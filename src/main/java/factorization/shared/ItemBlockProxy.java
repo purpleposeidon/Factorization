@@ -33,7 +33,7 @@ public class ItemBlockProxy extends ItemFactorization {
         this(Block.getBlockFromItem(proxy.getItem()), proxy, name, tabType);
     }
 
-    public boolean placeBlockAt(ItemStack stack, EntityPlayer player, World world, BlockPos pos, int side,
+    public boolean placeBlockAt(ItemStack stack, EntityPlayer player, World world, BlockPos pos, EnumFacing side,
             float hitX, float hitY, float hitZ, int metadata) {
         proxy.stackSize = stack.stackSize;
         proxy.setTagCompound(stack.getTagCompound());

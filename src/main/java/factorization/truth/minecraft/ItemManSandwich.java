@@ -7,8 +7,6 @@ import factorization.util.EvilUtil;
 import factorization.util.ItemUtil;
 import factorization.util.LangUtil;
 import factorization.util.PlayerUtil;
-import net.minecraft.block.Block;
-import net.minecraft.client.renderer.texture.IIconRegister;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
@@ -23,13 +21,10 @@ import net.minecraft.potion.PotionEffect;
 import net.minecraft.stats.StatBase;
 import net.minecraft.stats.StatisticsFile;
 import net.minecraft.util.ChatComponentTranslation;
-import net.minecraft.util.IIcon;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.FakePlayer;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -43,7 +38,6 @@ public class ItemManSandwich extends ItemFood implements IManwich {
         setPotionEffect(Potion.moveSlowdown.getId(), 12 /* 8 seconds long */, 9 /* modifier */, 1.0F /* probability */);
         Core.loadBus(this);
         setUnlocalizedName(itemName);
-        setTextureName(itemName.replaceFirst("item.", ""));
         String n = itemName + ".status";
         manwhichStatus = new StatBase(n, new ChatComponentTranslation(n)).registerStat();
         setMaxStackSize(1);
@@ -55,11 +49,6 @@ public class ItemManSandwich extends ItemFood implements IManwich {
     @Override
     public int getMaxItemUseDuration(ItemStack stack) {
         return super.getMaxItemUseDuration(stack); // I'd like '* 8', but it animates/SFXs poorly
-    }
-
-    @Override
-    public float getDigSpeed(ItemStack itemstack, Block block, int metadata) {
-        return super.getDigSpeed(itemstack, block, metadata); // / 2;
     }
 
     @Override
@@ -86,10 +75,10 @@ public class ItemManSandwich extends ItemFood implements IManwich {
             player.setFire(7);
             saturationTime = 20 * 60 * 5;
         } else {
-            player.addPotionEffect(new PotionEffect(Potion.confusion.getId(), 50, 1, false));
+            player.addPotionEffect(new PotionEffect(Potion.confusion.getId(), 50, 1, true, true));
             saturationTime = 20 * 25;
         }
-        player.addPotionEffect(new PotionEffect(Potion.field_76443_y.getId(), saturationTime, 1, !Core.dev_environ));
+        player.addPotionEffect(new PotionEffect(Potion.saturation.getId(), saturationTime, 1, !Core.dev_environ, !Core.dev_environ));
         super.onFoodEaten(stack, wrold, player);
     }
 
@@ -176,24 +165,6 @@ public class ItemManSandwich extends ItemFood implements IManwich {
         String t = LangUtil.translateThis(key);
         Collections.addAll(list, t.split("\\\\n"));
         Core.brand(stack, player, list, verbose);
-    }
-
-
-    @SideOnly(Side.CLIENT)
-    IIcon spicy;
-
-    @Override
-    @SideOnly(Side.CLIENT)
-    public IIcon getIconFromDamage(int damage) {
-        if (damage > 0) return spicy;
-        return super.getIconFromDamage(damage);
-    }
-
-    @Override
-    @SideOnly(Side.CLIENT)
-    public void registerIcons(IIconRegister reg) {
-        itemIcon = reg.registerIcon("factorization:mansandwich");
-        spicy = reg.registerIcon("factorization:mansandwich_spicy");
     }
 
     @Override
