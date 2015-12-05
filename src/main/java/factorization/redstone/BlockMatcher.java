@@ -2,48 +2,84 @@ package factorization.redstone;
 
 import factorization.api.Coord;
 import factorization.shared.Core;
+import factorization.util.FzUtil;
 import factorization.util.SpaceUtil;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
-import net.minecraft.client.renderer.texture.IIconRegister;
+import net.minecraft.block.properties.IProperty;
+import net.minecraft.block.properties.PropertyEnum;
+import net.minecraft.block.state.BlockState;
+import net.minecraft.block.state.IBlockState;
+import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.util.BlockPos;
 import net.minecraft.util.EnumFacing;
-import net.minecraft.util.IIcon;
+import net.minecraft.util.IStringSerializable;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 
 import java.util.Random;
 
 public class BlockMatcher extends Block {
+    public static final IProperty<EnumFacing.Axis> AXIS = PropertyEnum.create("axis", EnumFacing.Axis.class);
+    public static final IProperty<FireState> FIRING = PropertyEnum.create("firing", FireState.class);
+    public enum FireState implements IStringSerializable {
+        READY(0), FIRING(4), MATCHED(8);
+        final int field;
+
+        FireState(int field) {
+            this.field = field;
+        }
+
+        boolean on(int f) {
+            return (f & field) != 0;
+        }
+
+        @Override
+        public String getName() {
+            return toString();
+        }
+    }
+
     public BlockMatcher() {
         super(Material.rock);
         setTickRandomly(false);
         setCreativeTab(Core.tabFactorization);
-        setBlockName("BlockMatcher");
+        setUnlocalizedName("BlockMatcher");
     }
 
-    static final byte STATE_READY = 0, STATE_FIRING = 4, STATE_MATCHED = 8;
+    @Override
+    protected BlockState createBlockState() {
+        // NORELEASE: defualt state?
+        return new BlockState(this, AXIS, FIRING);
+    }
 
-    int makeMd(EnumFacing axis, byte state) {
-        if (SpaceUtil.sign(axis) == 1) axis = axis.getOpposite();
+    @Override
+    public int getMetaFromState(IBlockState state) {
+        EnumFacing.Axis axis = state.getValue(AXIS);
+        FireState firing = state.getValue(FIRING);
         int md = 0;
-        if (axis == EnumFacing.DOWN) md = 0;
-        if (axis == EnumFacing.NORTH) md = 1;
-        if (axis == EnumFacing.WEST) md = 2;
-        md |= state;
+        if (axis == EnumFacing.Axis.Y) md = 0;
+        if (axis == EnumFacing.Axis.Z) md = 1;
+        if (axis == EnumFacing.Axis.X) md = 2;
+        md |= firing.field;
         return md;
     }
 
-    EnumFacing getAxis(int md) {
-        switch (md & 0x3) {
-            default:
-            case 0: return EnumFacing.DOWN;
-            case 1: return EnumFacing.NORTH;
-            case 2: return EnumFacing.WEST;
+    @Override
+    public IBlockState getStateFromMeta(int meta) {
+        FireState firing = FireState.READY;
+        for (FireState f : FireState.values()) {
+            if (f.on(meta)) {
+                firing = f;
+                break;
+            }
         }
-    }
-
-    byte getState(int md) {
-        return (byte) (md & 0xC);
+        int fd = meta & 0b11;
+        EnumFacing.Axis a = EnumFacing.Axis.Y;
+        if (fd == 0)  a = EnumFacing.Axis.Y;
+        if (fd == 1) a = EnumFacing.Axis.Z;
+        if (fd == 2) a = EnumFacing.Axis.X;
+        return getDefaultState().withProperty(FIRING, firing).withProperty(AXIS, a);
     }
 
     byte match(IBlockAccess world, BlockPos pos, EnumFacing axis) {
@@ -54,27 +90,26 @@ public class BlockMatcher extends Block {
         // 4: Same MD
         // NORELEASE TODO: Barrels. Not just 'are the items identical', but 'is this item the same as that block'.
         // This stuff may be easier in 1.8.
-        @SuppressWarnings("UnnecessaryLocalVariable")
-        EnumFacing dir1 = axis;
-        EnumFacing dir2 = axis.getOpposite();
-        Block front = world.getBlock(x + dir1.getDirectionVec().getX(), y + dir1.getDirectionVec().getY(), z + dir1.getDirectionVec().getZ());
-        int frontMd = world.getBlockMetadata(x + dir1.getDirectionVec().getX(), y + dir1.getDirectionVec().getY(), z + dir1.getDirectionVec().getZ());
-        boolean frontAir = world.isAirBlock(x + dir1.getDirectionVec().getX(), y + dir1.getDirectionVec().getY(), z + dir1.getDirectionVec().getZ());
+        BlockPos frontpos = pos.offset(axis);
+        IBlockState frontbs = world.getBlockState(frontpos);
+        Block frontBlock = frontbs.getBlock();
+        boolean frontAir = frontBlock.isAir(world, frontpos);
 
-        Block back = world.getBlock(x + dir2.getDirectionVec().getX(), y + dir2.getDirectionVec().getY(), z + dir2.getDirectionVec().getZ());
-        int backMd = world.getBlockMetadata(x + dir2.getDirectionVec().getX(), y + dir2.getDirectionVec().getY(), z + dir2.getDirectionVec().getZ());
-        boolean backAir = world.isAirBlock(x + dir2.getDirectionVec().getX(), y + dir2.getDirectionVec().getY(), z + dir2.getDirectionVec().getZ());
-        if (frontAir || backAir) return 0;
-        if (front == back) {
-            if (frontMd == backMd) {
-                return 4;
-            }
+        BlockPos backpos = pos.offset(axis.getOpposite());
+        IBlockState backbs = world.getBlockState(backpos);
+        Block backBlock = backbs.getBlock();
+        boolean backAir = backBlock.isAir(world, backpos);
+
+        // NORELEASE if (frontAir && backAir) return 0;
+
+        if (frontBlock == backBlock) {
+            if (FzUtil.sameState(frontbs, backbs)) return 4;
             return 3;
         }
-        if (front.getMaterial() == back.getMaterial()) {
+        if (frontBlock.getMaterial() == backBlock.getMaterial()) {
             return 2;
         }
-        if (front.isNormalCube() == back.isNormalCube()) {
+        if (frontBlock.isNormalCube() == backBlock.isNormalCube()) {
             return 1;
         }
         return 0;
@@ -86,35 +121,33 @@ public class BlockMatcher extends Block {
     }
 
     @Override
-    public int getComparatorInputOverride(World world, BlockPos pos, int side) {
-        int md = world.getBlockMetadata(pos);
-        EnumFacing axis = getAxis(md);
-        EnumFacing mojangSide = SpaceUtil.demojangSide(side);
-        if (axis == mojangSide || axis == mojangSide.getOpposite()) return 0;
-        byte match = match(world, pos, axis);
+    public int getComparatorInputOverride(World world, BlockPos pos) {
+        // Oh no! We've lost the side in 1.8!
+        IBlockState bs = world.getBlockState(pos);
+        EnumFacing.Axis axis = bs.getValue(AXIS);
+        byte match = match(world, pos, SpaceUtil.fromAxis(axis));
         if (match == 0) return 0;
         return (match * 5) - 4;
     }
 
     @Override
-    public void onNeighborBlockChange(World world, BlockPos pos, Block block) {
-        if (block == this) return;
-        int md = world.getBlockMetadata(pos);
-        byte state = getState(md);
-        if (state == STATE_FIRING) return;
-        EnumFacing axis = getAxis(md);
-        byte match = match(world, pos, axis);
-        byte next_state = match >= 3 ? STATE_FIRING : STATE_READY;
-        world.func_147453_f(pos, this); // 'update comparators'; don't do this when firing as it might cause a loop?
-        if (state == STATE_MATCHED && next_state == STATE_FIRING) {
+    public void onNeighborBlockChange(World world, BlockPos pos, IBlockState bs, Block neighborBlock) {
+        if (neighborBlock == this) return;
+        FireState state = bs.getValue(FIRING);
+        if (state == FireState.FIRING) return;
+        EnumFacing.Axis axis = bs.getValue(AXIS);
+        byte match = match(world, pos, SpaceUtil.fromAxis(axis));
+        FireState next_state = match >= 3 ? FireState.FIRING : FireState.READY;
+        world.updateComparatorOutputLevel(pos, this); // 'update comparators'; don't do this when firing as it might cause a loop?
+        if (state == FireState.MATCHED && next_state == FireState.FIRING) {
             return;
         }
         int notify = Coord.UPDATE | Coord.NOTIFY_NEIGHBORS;
-        final int next_md = makeMd(axis, next_state);
-        if (md == next_md) return;
+        IBlockState nbs = bs.withProperty(FIRING, next_state);
+        if (FzUtil.sameState(bs, nbs)) return;
         //println("neighbor changed", block.getLocalizedName(), state, "-->", next_state);
-        world.setBlockMetadataWithNotify(pos, next_md, notify);
-        world.scheduleBlockUpdate(pos, this, 4);
+        world.setBlockState(pos, nbs, notify);
+        world.scheduleBlockUpdate(pos, this, 4, 0);
     }
 
     @Override
@@ -123,76 +156,48 @@ public class BlockMatcher extends Block {
     }
 
     @Override
-    public boolean canConnectRedstone(IBlockAccess world, BlockPos pos, int side) {
-        int md = world.getBlockMetadata(pos);
-        EnumFacing axis = getAxis(md);
-        // Great job, forge! This is some right ol' stupid BS!
-        if (axis == EnumFacing.DOWN) {
-            return side != -1 && side != -2 && side != 4;
-        } else if (axis == EnumFacing.NORTH) {
-            return side != 0 && side != 2;
-        } else if (axis == EnumFacing.WEST) {
-            return side != 1 && side != 3;
-        }
-        return false;
+    public boolean canConnectRedstone(IBlockAccess world, BlockPos pos, EnumFacing side) {
+        IBlockState bs = world.getBlockState(pos);
+        EnumFacing.Axis axis = bs.getValue(AXIS);
+        return !axis.apply(side);
     }
 
     @Override
     public boolean isSideSolid(IBlockAccess world, BlockPos pos, EnumFacing side) {
-        int md = world.getBlockMetadata(pos);
-        EnumFacing axis = getAxis(md);
-        return axis != side && axis != side.getOpposite(); // Look how much less stupid this is! :D
+        return canConnectRedstone(world, pos, side);
     }
 
     @Override
-    public int isProvidingWeakPower(IBlockAccess world, BlockPos pos, int side) {
-        int md = world.getBlockMetadata(pos);
-        byte state = getState(md);
-        if (state != STATE_FIRING) return 0;
-        EnumFacing axis = getAxis(md);
-        EnumFacing dir = SpaceUtil.getOrientation(side);
-        if (axis == dir || axis == dir.getOpposite()) return 0;
-        byte match = match(world, pos, axis);
+    public int isProvidingWeakPower(IBlockAccess world, BlockPos pos, IBlockState bs, EnumFacing side) {
+        FireState state = bs.getValue(FIRING);
+        if (state != FireState.FIRING) return 0;
+        EnumFacing.Axis axis = bs.getValue(AXIS);
+        if (axis.apply(side)) return 0;
+
+        byte match = match(world, pos, SpaceUtil.fromAxis(axis));
         if (match >= 3) return 0xF;
         return 0;
     }
 
+
     @Override
-    public void updateTick(World world, BlockPos pos, Random random) {
-        int md = world.getBlockMetadata(pos);
-        EnumFacing axis = getAxis(md);
-        byte match = match(world, pos, axis);
-        byte nextState = match >= 3 ? STATE_MATCHED : STATE_READY;
+    public void updateTick(World world, BlockPos pos, IBlockState bs, Random rand) {
+        EnumFacing.Axis axis = bs.getValue(AXIS);
+        byte match = match(world, pos, SpaceUtil.fromAxis(axis));
+        FireState nextState = match >= 3 ? FireState.MATCHED : FireState.READY;
         int notify = Coord.UPDATE | Coord.NOTIFY_NEIGHBORS;
-        int nextMd = makeMd(getAxis(md), nextState);
-        //println("update tick", state, "-->", nextState);
-        world.setBlockMetadataWithNotify(pos, nextMd, notify);
+        IBlockState nbs = bs.withProperty(FIRING, nextState);
+        world.setBlockState(pos, nbs, notify);
     }
 
     @Override
-    public int onBlockPlaced(World w, BlockPos pos, int side, float hitX, float hitY, float hitZ, int itemMetadata) {
-        return makeMd(SpaceUtil.getOrientation(side), STATE_READY);
+    public IBlockState onBlockPlaced(World world, BlockPos pos, EnumFacing facing, float hitX, float hitY, float hitZ, int meta, EntityLivingBase placer) {
+        return getDefaultState().withProperty(AXIS, facing.getAxis());
     }
 
     @Override
-    public void onBlockAdded(World world, BlockPos pos) {
-        int md = world.getBlockMetadata(pos);
-        byte state = getState(md);
-        if (state == STATE_READY) return;
-        EnumFacing axis = getAxis(md);
-        world.setBlockMetadataWithNotify(pos, makeMd(axis, STATE_READY), 0);
-    }
-
-    @Override
-    public void registerBlockIcons(IIconRegister register) {
-        this.blockIcon = BlockIcons.redstone$matcher_side;
-    }
-
-    @Override
-    public IIcon getIcon(int side, int md) {
-        EnumFacing dir = SpaceUtil.getOrientation(side);
-        EnumFacing axis = getAxis(md);
-        if (axis == dir || axis == dir.getOpposite()) return BlockIcons.redstone$matcher_face;
-        return BlockIcons.redstone$matcher_side;
+    public void onBlockAdded(World world, BlockPos pos, IBlockState bs) {
+        if (bs.getValue(FIRING) == FireState.READY) return;
+        world.setBlockState(pos, bs.withProperty(FIRING, FireState.READY));
     }
 }

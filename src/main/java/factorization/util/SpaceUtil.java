@@ -476,6 +476,10 @@ public final class SpaceUtil {
         return SpaceUtil.createAABB(at.add(-R, -R, -R), at.add(+R, +R, +R));
     }
 
+    public static Vec3 dup(double d) {
+        return new Vec3(d, d, d);
+    }
+
     public static EnumFacing demojangSide(int side) {
         switch (side) {
             case 0: return EnumFacing.SOUTH;
@@ -533,5 +537,12 @@ public final class SpaceUtil {
 
     public static Vec3 setZ(Vec3 v, double z) {
         return new Vec3(v.xCoord, v.yCoord, z);
+    }
+
+    public static EnumFacing fromAxis(EnumFacing.Axis a) {
+        if (a == EnumFacing.Axis.Y) return EnumFacing.DOWN;
+        if (a == EnumFacing.Axis.X) return EnumFacing.WEST;
+        if (a == EnumFacing.Axis.Z) return EnumFacing.NORTH;
+        return null;
     }
 }

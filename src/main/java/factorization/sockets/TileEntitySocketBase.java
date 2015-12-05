@@ -11,11 +11,8 @@ import factorization.servo.RenderServoMotor;
 import factorization.servo.ServoMotor;
 import factorization.shared.*;
 import factorization.shared.NetworkFactorization.MessageType;
-import factorization.util.FzUtil;
-import factorization.util.InvUtil;
+import factorization.util.*;
 import factorization.util.InvUtil.FzInv;
-import factorization.util.ItemUtil;
-import factorization.util.PlayerUtil;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import net.minecraft.client.Minecraft;
@@ -100,12 +97,10 @@ public abstract class TileEntitySocketBase extends TileEntityCommon implements I
                 c.x + top.getDirectionVec().getX(), c.y + top.getDirectionVec().getY(), c.z + top.getDirectionVec().getZ(),
                 c.x + one + top.getDirectionVec().getX(), c.y + one + top.getDirectionVec().getY(), c.z + one + top.getDirectionVec().getZ());
         if (d != 0) {
-            ab.minX -= d;
-            ab.minY -= d;
-            ab.minZ -= d;
-            ab.maxX += d - d * top.getDirectionVec().getX();
-            ab.maxY += d - d * top.getDirectionVec().getY();
-            ab.maxZ += d - d * top.getDirectionVec().getZ();
+            ab = ab.expand(d, d, d);
+            Vec3 min = SpaceUtil.getMin(ab);
+            Vec3 max = SpaceUtil.getMax(ab).add(SpaceUtil.componentMultiply(SpaceUtil.dup(d), new Vec3(top.getDirectionVec())));
+            ab = SpaceUtil.newBox(min, max);
         }
         return ab;
     }
@@ -242,7 +237,7 @@ public abstract class TileEntitySocketBase extends TileEntityCommon implements I
     
     protected IInventory getBackingInventory(ISocketHolder socket) {
         if (socket == this) {
-            TileEntity te = worldObj.getTileEntity(pos.getX() - facing.getDirectionVec().getX(), pos.getY() - facing.getDirectionVec().getY(), pos.getZ() - facing.getDirectionVec().getZ());
+            TileEntity te = worldObj.getTileEntity(pos.subtract(facing.getDirectionVec()));
             if (te instanceof IInventory) {
                 return (IInventory) te;
             }
@@ -275,9 +270,6 @@ public abstract class TileEntitySocketBase extends TileEntityCommon implements I
     public abstract FactoryType getFactoryType();
     public abstract ItemStack getCreatingItem();
     public abstract FactoryType getParentFactoryType();
-    
-    @Override
-    public abstract boolean canUpdate();
     
     @SideOnly(Side.CLIENT)
     @Override
@@ -412,7 +404,7 @@ public abstract class TileEntitySocketBase extends TileEntityCommon implements I
     }
     
     public boolean activateOnServo(EntityPlayer player, ServoMotor motor) {
-        if (getWorldObj() == null /* wtf? */ || getWorldObj().isRemote) {
+        if (worldObj == null /* wtf? */ || worldObj.isRemote) {
             return false;
         }
         ItemStack held = player.getHeldItem();

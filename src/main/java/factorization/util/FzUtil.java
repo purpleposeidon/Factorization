@@ -4,6 +4,7 @@ import com.google.common.collect.Multimap;
 import factorization.api.Coord;
 import factorization.shared.Core;
 import factorization.weird.TileEntityDayBarrel;
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.entity.ai.attributes.AttributeModifier;
@@ -221,5 +222,9 @@ public class FzUtil {
         TileEntity te = w.getTileEntity(at);
         if (klass.isInstance(te)) return (T) te;
         return null;
+    }
+
+    public static boolean sameState(IBlockState abs, IBlockState bbs) {
+        return abs == bbs;
     }
 }
