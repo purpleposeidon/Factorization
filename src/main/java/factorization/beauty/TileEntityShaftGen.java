@@ -10,15 +10,17 @@ import factorization.common.FactoryType;
 import factorization.shared.BlockClass;
 import factorization.shared.NetworkFactorization;
 import factorization.shared.TileEntityCommon;
+import factorization.util.SpaceUtil;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.IIcon;
+import net.minecraft.util.ITickable;
 
 import java.io.IOException;
 
-public class TileEntityShaftGen extends TileEntityCommon implements IChargeConductor {
+public class TileEntityShaftGen extends TileEntityCommon implements IChargeConductor, ITickable {
     final Charge charge = new Charge(this);
     double rotor_angle;
     EnumFacing shaft_direction = EnumFacing.DOWN;
@@ -111,7 +113,7 @@ public class TileEntityShaftGen extends TileEntityCommon implements IChargeCondu
     }
 
     @Override
-    public void updateEntity() {
+    public void update() {
         if (worldObj.isRemote) return;
         charge.update();
         if (shaftIsBroken()) {

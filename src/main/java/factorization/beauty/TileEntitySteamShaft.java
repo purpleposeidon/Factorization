@@ -18,6 +18,7 @@ import io.netty.buffer.ByteBuf;
 import net.minecraft.client.Minecraft;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.IIcon;
+import net.minecraft.util.ITickable;
 import net.minecraft.util.Vec3;
 import net.minecraftforge.fluids.*;
 import net.minecraftforge.fml.relauncher.Side;
@@ -26,7 +27,7 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 import java.io.IOException;
 import java.util.Random;
 
-public class TileEntitySteamShaft extends TileEntityCommon implements IFluidHandler, IRotationalEnergySource, IMeterInfo {
+public class TileEntitySteamShaft extends TileEntityCommon implements IFluidHandler, IRotationalEnergySource, IMeterInfo, ITickable {
     FluidTank steamTank = new FluidTank(/*this,*/ TileEntitySolarBoiler.steam_stack.copy(), 800);
 
     public static double Z = 1.6; // exponent on velocity for determining drag
@@ -113,7 +114,7 @@ public class TileEntitySteamShaft extends TileEntityCommon implements IFluidHand
     }
 
     @Override
-    public void updateEntity() {
+    public void update() {
         if (worldObj.isRemote) {
             prev_angle = angle;
             if (velocity != 0) {

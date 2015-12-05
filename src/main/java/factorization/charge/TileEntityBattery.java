@@ -15,11 +15,11 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.EnumFacing;
-import net.minecraft.util.IIcon;
+import net.minecraft.util.ITickable;
 
 import java.io.IOException;
 
-public class TileEntityBattery extends TileEntityCommon implements IChargeConductor {
+public class TileEntityBattery extends TileEntityCommon implements IChargeConductor, ITickable {
     Charge charge = new Charge(this);
     int storage = 0;
     static final int max_storage = 6400;
@@ -32,15 +32,6 @@ public class TileEntityBattery extends TileEntityCommon implements IChargeConduc
     @Override
     public Charge getCharge() {
         return charge;
-    }
-    
-    @Override
-    public IIcon getIcon(EnumFacing dir) {
-        switch (dir) {
-        case UP: return BlockIcons.battery_top;
-        case DOWN: return BlockIcons.battery_bottom;
-        default: return BlockIcons.battery_side;
-        }
     }
 
     @Override
@@ -72,7 +63,7 @@ public class TileEntityBattery extends TileEntityCommon implements IChargeConduc
     }
 
     @Override
-    public void updateEntity() {
+    public void update() {
         if (worldObj.isRemote) {
             return;
         }

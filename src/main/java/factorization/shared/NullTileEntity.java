@@ -3,15 +3,16 @@ package factorization.shared;
 import factorization.api.Coord;
 import factorization.shared.NetworkFactorization.MessageType;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.ITickable;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.relauncher.Side;
 
-public class NullTileEntity extends TileEntity {
+public class NullTileEntity extends TileEntity implements ITickable {
     int description_request_delay = 5;
     int fails = 1;
     
     @Override
-    public void updateEntity() {
+    public void update() {
         if (FMLCommonHandler.instance().getEffectiveSide() != Side.CLIENT) {
             new Coord(this).rmTE();
         }

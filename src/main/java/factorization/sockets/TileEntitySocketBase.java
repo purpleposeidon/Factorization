@@ -24,10 +24,7 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.AxisAlignedBB;
-import net.minecraft.util.EnumFacing;
-import net.minecraft.util.MovingObjectPosition;
-import net.minecraft.util.Vec3;
+import net.minecraft.util.*;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
@@ -40,7 +37,7 @@ import java.util.List;
 
 import static org.lwjgl.opengl.GL11.GL_LIGHTING;
 
-public abstract class TileEntitySocketBase extends TileEntityCommon implements ISocketHolder, IDataSerializable {
+public abstract class TileEntitySocketBase extends TileEntityCommon implements ISocketHolder, IDataSerializable, ITickable {
     /*
      * Some notes for when we get these moving on servos:
      * 		These vars need to be set: worldObj, [xyz]Coord, facing
@@ -188,7 +185,7 @@ public abstract class TileEntitySocketBase extends TileEntityCommon implements I
     }
     
     @Override
-    public void updateEntity() {
+    public void update() {
         genericUpdate(this, getCoord(), isBlockPowered());
     }
     

@@ -14,12 +14,13 @@ import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.IIcon;
+import net.minecraft.util.ITickable;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class TileEntityHeater extends TileEntityCommon implements IChargeConductor {
+public class TileEntityHeater extends TileEntityCommon implements IChargeConductor, ITickable {
     Charge charge = new Charge(this);
     public byte heat = 0;
     public static final byte maxHeat = 32;
@@ -82,7 +83,7 @@ public class TileEntityHeater extends TileEntityCommon implements IChargeConduct
     }
 
     @Override
-    public void updateEntity() {
+    public void update() {
         if (worldObj.isRemote) {
             return;
         }

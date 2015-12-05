@@ -49,7 +49,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
 
-public class SocketLacerator extends TileEntitySocketBase implements IChargeConductor, ICaptureDrops {
+public class SocketLacerator extends TileEntitySocketBase implements IChargeConductor, ICaptureDrops, ITickable {
     Charge charge = new Charge(this);
     
     @Override
@@ -105,7 +105,7 @@ public class SocketLacerator extends TileEntitySocketBase implements IChargeCond
     }
     
     @Override
-    public void updateEntity() {
+    public void update() {
         charge.update();
         super.updateEntity();
     }

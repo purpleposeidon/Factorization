@@ -24,17 +24,14 @@ import net.minecraft.block.BlockWall;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.AxisAlignedBB;
-import net.minecraft.util.DamageSource;
-import net.minecraft.util.EnumFacing;
-import net.minecraft.util.Vec3;
+import net.minecraft.util.*;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.relauncher.Side;
 
 import java.io.IOException;
 
-public class TileEntityWindMill extends TileEntityCommon implements IRotationalEnergySource, IDCController, IWindmill, IMeterInfo {
+public class TileEntityWindMill extends TileEntityCommon implements IRotationalEnergySource, IDCController, IWindmill, IMeterInfo, ITickable {
     EnumFacing sailDirection = EnumFacing.UP;
     boolean dirty = true;
     double power_per_tick, power_this_tick, target_velocity, velocity;
@@ -257,7 +254,7 @@ public class TileEntityWindMill extends TileEntityCommon implements IRotationalE
     }
 
     @Override
-    public void updateEntity() {
+    public void update() {
         if (worldObj.isRemote) return;
         if (!idcRef.entityFound()) {
             if (velocity != 0) {

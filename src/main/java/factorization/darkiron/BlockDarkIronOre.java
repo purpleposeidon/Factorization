@@ -6,8 +6,10 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.AxisAlignedBB;
+import net.minecraft.util.BlockPos;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.IIcon;
+import net.minecraft.util.ITickable;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
@@ -71,13 +73,13 @@ public class BlockDarkIronOre extends Block {
         return distSq < maxDistSq;
     }
     
-    public static class Glint extends TileEntity {
+    public static class Glint extends TileEntity implements ITickable {
         public int age = 0;
         public long lastRenderedTick = Long.MAX_VALUE;
         
         @SideOnly(Side.CLIENT)
         @Override
-        public void updateEntity() {
+        public void update() {
             age++;
             EntityPlayer player = Minecraft.getMinecraft().thePlayer;
             if (lastRenderedTick + 60 < worldObj.getTotalWorldTime() && !inRange(age, age, age, player)) {

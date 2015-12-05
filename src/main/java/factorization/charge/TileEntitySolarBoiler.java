@@ -15,11 +15,12 @@ import io.netty.buffer.ByteBuf;
 import net.minecraft.init.Blocks;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.IIcon;
+import net.minecraft.util.ITickable;
 import net.minecraftforge.fluids.*;
 
 import java.io.IOException;
 
-public class TileEntitySolarBoiler extends TileEntityCommon implements IReflectionTarget, IFluidHandler, IMeterInfo {
+public class TileEntitySolarBoiler extends TileEntityCommon implements IReflectionTarget, IFluidHandler, IMeterInfo, ITickable {
     public static Fluid steam;
     public static FluidStack water_stack = null;
     public static FluidStack steam_stack = null;
@@ -163,7 +164,7 @@ public class TileEntitySolarBoiler extends TileEntityCommon implements IReflecti
     }
 
     @Override
-    public void updateEntity() {
+    public void update() {
         if (worldObj.isRemote) {
             return;
         }

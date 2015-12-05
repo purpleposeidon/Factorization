@@ -13,6 +13,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.EnumFacing;
+import net.minecraft.util.ITickable;
 import net.minecraft.world.World;
 import net.minecraft.world.chunk.Chunk;
 
@@ -21,7 +22,7 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.PriorityQueue;
 
-public class TileEntityWrathLamp extends TileEntityCommon {
+public class TileEntityWrathLamp extends TileEntityCommon implements ITickable {
     static final int radius = 6;
     static final int radiusSq = radius * radius;
     static final int diameter = radius * 2;
@@ -155,7 +156,7 @@ public class TileEntityWrathLamp extends TileEntityCommon {
     }
 
     @Override
-    public void updateEntity() {
+    public void update() {
         Core.profileStart("WrathLamp");
         isUpdating = true;
         this.updater = this.updater.update();

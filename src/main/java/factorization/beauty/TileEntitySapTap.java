@@ -18,6 +18,7 @@ import factorization.util.ItemUtil;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockLog;
 import net.minecraft.block.material.Material;
+import net.minecraft.client.renderer.texture.ITickable;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
 import net.minecraft.inventory.ISidedInventory;
@@ -30,7 +31,7 @@ import net.minecraft.world.chunk.Chunk;
 import java.io.IOException;
 import java.util.HashSet;
 
-public class TileEntitySapTap extends TileEntityCommon implements ISidedInventory {
+public class TileEntitySapTap extends TileEntityCommon implements ISidedInventory, ITickable {
     ItemStack sap = new ItemStack(Core.registry.sap, 0, 0);
     int log_count = 0, leaf_count = 0;
     long sap_rate = 0;
@@ -130,7 +131,7 @@ public class TileEntitySapTap extends TileEntityCommon implements ISidedInventor
     }
 
     @Override
-    public void updateEntity() {
+    public void update() {
         if (worldObj.isRemote) return;
         final long nowish = worldObj.getTotalWorldTime() + this.hashCode();
         if (0 == nowish % (20 * 60 * 30)) {

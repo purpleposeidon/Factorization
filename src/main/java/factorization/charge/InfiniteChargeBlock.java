@@ -9,14 +9,15 @@ import factorization.shared.TileEntityCommon;
 import net.minecraft.init.Blocks;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.IIcon;
+import net.minecraft.util.ITickable;
 
 import java.io.IOException;
 
-public class InfiniteChargeBlock extends TileEntityCommon implements IChargeConductor {
+public class InfiniteChargeBlock extends TileEntityCommon implements IChargeConductor, ITickable {
     Charge charge = new Charge(this);
     
     @Override
-    public void updateEntity() {
+    public void update() {
         if (charge.getValue() < 100) {
             charge.setValue(100);
         }

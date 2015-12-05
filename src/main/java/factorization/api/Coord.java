@@ -1099,6 +1099,10 @@ public final class Coord implements IDataSerializable, ISaneCoord, Comparable<Co
             return BlockHelper.getPlacingItem(b, mop, w, toBlockPos());
         }
     }
+
+    public ItemStack getPickBlock(EnumFacing dir) {
+        return getPickBlock(dir, null);
+    }
     
     public ItemStack getPickBlock(MovingObjectPosition mop, EntityPlayer player) {
         Block b = getBlock();

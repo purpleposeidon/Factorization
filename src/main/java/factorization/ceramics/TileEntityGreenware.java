@@ -31,10 +31,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.AxisAlignedBB;
-import net.minecraft.util.EnumFacing;
-import net.minecraft.util.MovingObjectPosition;
-import net.minecraft.util.Vec3;
+import net.minecraft.util.*;
 import net.minecraftforge.client.event.DrawBlockHighlightEvent;
 import net.minecraftforge.common.util.Constants;
 import net.minecraftforge.fml.common.FMLCommonHandler;
@@ -49,7 +46,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-public class TileEntityGreenware extends TileEntityCommon implements IFurnaceHeatable {
+public class TileEntityGreenware extends TileEntityCommon implements IFurnaceHeatable, ITickable {
     public static int MAX_PARTS = 32;
     EnumFacing front = null;
     byte rotation = 0;
@@ -442,7 +439,7 @@ public class TileEntityGreenware extends TileEntityCommon implements IFurnaceHea
     private ClayState lastState = null;
 
     @Override
-    public void updateEntity() {
+    public void update() {
         super.updateEntity();
         if (worldObj.isRemote) {
             return;

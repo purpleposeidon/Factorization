@@ -17,6 +17,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.IIcon;
+import net.minecraft.util.ITickable;
 import net.minecraft.util.Vec3;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
@@ -24,7 +25,7 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 import java.io.IOException;
 import java.util.Random;
 
-public class TileEntityLeydenJar extends TileEntityCommon implements IChargeConductor {
+public class TileEntityLeydenJar extends TileEntityCommon implements IChargeConductor, ITickable {
     private Charge charge = new Charge(this);
     int storage = 0;
     
@@ -104,7 +105,7 @@ public class TileEntityLeydenJar extends TileEntityCommon implements IChargeCond
     }
     
     @Override
-    public void updateEntity() {
+    public void update() {
         charge.update();
         final Coord here = getCoord();
         if (worldObj.isRemote) {

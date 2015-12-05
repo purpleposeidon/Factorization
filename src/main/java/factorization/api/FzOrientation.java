@@ -3,7 +3,6 @@ package factorization.api;
 import factorization.util.SpaceUtil;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.Vec3;
-import org.omg.CORBA.UNKNOWN;
 
 public enum FzOrientation {
     FACE_DOWN_POINT_SOUTH(EnumFacing.DOWN, EnumFacing.SOUTH),

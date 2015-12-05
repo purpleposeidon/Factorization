@@ -15,16 +15,13 @@ import net.minecraft.block.Block;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.AxisAlignedBB;
-import net.minecraft.util.EnumFacing;
-import net.minecraft.util.MovingObjectPosition;
-import net.minecraft.util.Vec3;
+import net.minecraft.util.*;
 import net.minecraft.world.World;
 
 import java.io.IOException;
 import java.util.ArrayList;
 
-public class TileEntityShaft extends TileEntityCommon implements IRotationalEnergySource {
+public class TileEntityShaft extends TileEntityCommon implements IRotationalEnergySource, ITickable {
     EnumFacing axis = EnumFacing.UP;
     IRotationalEnergySource _src = null;
     Coord srcPos = null;
@@ -73,7 +70,7 @@ public class TileEntityShaft extends TileEntityCommon implements IRotationalEner
     }
 
     @Override
-    public void updateEntity() {
+    public void update() {
         if (worldObj.isRemote) {
             prev_angle = angle;
             if (useCustomVelocity) {

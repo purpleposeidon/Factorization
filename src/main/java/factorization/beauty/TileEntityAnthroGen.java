@@ -21,13 +21,14 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.IIcon;
+import net.minecraft.util.ITickable;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
 import java.io.IOException;
 import java.util.List;
 
-public class TileEntityAnthroGen extends TileEntityCommon implements IInventory, ICoordFunction {
+public class TileEntityAnthroGen extends TileEntityCommon implements IInventory, ICoordFunction, ITickable {
     public static int UPDATE_RATE = 20 * 60 * 7;
     public static int MIN_WANDER_DISTANCE = 12 * 12;
     public static int VILLAGER_CHECKS_PER_ENTHEAS = 8;
@@ -58,7 +59,7 @@ public class TileEntityAnthroGen extends TileEntityCommon implements IInventory,
     }
 
     @Override
-    public void updateEntity() {
+    public void update() {
         if (worldObj.isRemote) return;
         long now = worldObj.getTotalWorldTime() + this.hashCode();
         if ((now % UPDATE_RATE) != 0) {

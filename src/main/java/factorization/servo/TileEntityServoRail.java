@@ -15,6 +15,7 @@ import factorization.shared.Core;
 import factorization.shared.NetworkFactorization.MessageType;
 import factorization.shared.TileEntityCommon;
 import factorization.util.ItemUtil;
+import factorization.util.SpaceUtil;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.block.Block;
 import net.minecraft.entity.Entity;
@@ -35,7 +36,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class TileEntityServoRail extends TileEntityCommon implements IChargeConductor {
+public class TileEntityServoRail extends TileEntityCommon implements IChargeConductor, ITickable {
     public static final float width = 7F/16F;
     
     Charge charge = new Charge(this);
@@ -65,7 +66,7 @@ public class TileEntityServoRail extends TileEntityCommon implements IChargeCond
     }
     
     @Override
-    public void updateEntity() {
+    public void update() {
         charge.update();
     }
     

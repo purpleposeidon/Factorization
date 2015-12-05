@@ -18,10 +18,11 @@ import net.minecraft.init.Blocks;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.IIcon;
+import net.minecraft.util.ITickable;
 
 import java.io.IOException;
 
-public class TileEntityBiblioGen extends TileEntityCommon implements IRotationalEnergySource, IMeterInfo {
+public class TileEntityBiblioGen extends TileEntityCommon implements IRotationalEnergySource, IMeterInfo, ITickable {
     int bookCount = -1;
     double angle = 0, prev_angle = 0;
     double availablePower = 0;
@@ -72,7 +73,7 @@ public class TileEntityBiblioGen extends TileEntityCommon implements IRotational
     }
 
     @Override
-    public void updateEntity() {
+    public void update() {
         if (worldObj.isRemote) {
             prev_angle = angle;
             angle += getVelocity(EnumFacing.DOWN);

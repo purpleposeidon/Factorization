@@ -1,7 +1,6 @@
 package factorization.mechanics;
 
 import factorization.api.Coord;
-import factorization.common.ItemIcons;
 import factorization.fzds.DeltaChunk;
 import factorization.fzds.interfaces.DeltaCapability;
 import factorization.fzds.interfaces.IDeltaChunk;
@@ -14,8 +13,8 @@ import factorization.util.SpaceUtil;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.util.BlockPos;
 import net.minecraft.util.EnumFacing;
-import net.minecraft.util.IIcon;
 import net.minecraft.util.Vec3;
 import net.minecraft.world.World;
 import net.minecraftforge.common.DimensionManager;
@@ -30,7 +29,7 @@ public class ItemDarkIronChain extends ItemFactorization {
     }
 
     @Override
-    public boolean onItemUseFirst(ItemStack is, EntityPlayer player, World world, BlockPos pos, int side, float hitX, float hitY, float hitZ) {
+    public boolean onItemUseFirst(ItemStack is, EntityPlayer player, World world, BlockPos pos, EnumFacing dir, float hitX, float hitY, float hitZ) {
         if (world.isRemote) return false;
         Coord at = new Coord(world, pos);
         if (player.isSneaking()) {
@@ -39,7 +38,6 @@ public class ItemDarkIronChain extends ItemFactorization {
             new Notice(at, "item.factorization:darkIronChain.clear").sendTo(player);
             return true;
         }
-        EnumFacing dir = SpaceUtil.getOrientation(side);
         if (world == DeltaChunk.getServerShadowWorld()) {
             for (IDeltaChunk idc : DeltaChunk.getSlicesContainingPoint(at)) {
                 if (!acceptableIDC(idc)) continue;
@@ -120,7 +118,7 @@ public class ItemDarkIronChain extends ItemFactorization {
         int x = tag.getInteger(name + ":x");
         int y = tag.getInteger(name + ":y");
         int z = tag.getInteger(name + ":z");
-        return new Coord(w, pos);
+        return new Coord(w, x, y, z);
     }
 
     EnumFacing loadSide(ItemStack is, String name) {
@@ -164,10 +162,10 @@ public class ItemDarkIronChain extends ItemFactorization {
             return;
         }
         double d = 0.5;
-        final Vec3 anchorPoint = shadow.createVector().addVector(d, d, d);
+        Vec3 anchorPoint = shadow.createVector().addVector(d, d, d);
         EnumFacing dir = loadSide(is, "shadow");
         Vec3 dv = SpaceUtil.scale(SpaceUtil.fromDirection(dir), 0.5);
-        SpaceUtil.incrAdd(anchorPoint, dv);
+        anchorPoint = anchorPoint.add(dv);
 
         crank.setChain(toHook, anchorPoint, shadow);
         Notice.onscreen(player, "item.factorization:darkIronChain.finish"); // Not really necessary, since you should be able to see the chain
@@ -189,20 +187,8 @@ public class ItemDarkIronChain extends ItemFactorization {
     }
 
     @Override
-    public IIcon getIcon(ItemStack stack, int pass) {
-        if (stack.hasTagCompound()) {
-            NBTTagCompound tag = stack.getTagCompound();
-            if (tag.hasKey("real:w") || tag.hasKey("shadow:w")) {
-                return ItemIcons.darkIronChainHalf;
-            }
-        }
-        return super.getIcon(stack, pass);
-    }
-
-    @Override
-    public boolean hasEffect(ItemStack is, int pass) {
-        if (is.hasTagCompound()) return true;
-        return super.hasEffect(is, pass);
+    public boolean hasEffect(ItemStack stack) {
+        return stack.hasTagCompound();
     }
 
     @Override

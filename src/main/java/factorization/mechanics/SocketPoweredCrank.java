@@ -20,10 +20,7 @@ import factorization.util.SpaceUtil;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.AxisAlignedBB;
-import net.minecraft.util.DamageSource;
-import net.minecraft.util.EnumFacing;
-import net.minecraft.util.Vec3;
+import net.minecraft.util.*;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
@@ -31,7 +28,7 @@ import org.lwjgl.opengl.GL11;
 
 import java.io.IOException;
 
-public class SocketPoweredCrank extends TileEntitySocketBase implements IChargeConductor, IDCController {
+public class SocketPoweredCrank extends TileEntitySocketBase implements IChargeConductor, IDCController, ITickable {
     private Charge charge = new Charge(this);
     final EntityReference<IDeltaChunk> hookedIdc = MechanicsController.autoJoin(this);
     Vec3 hookLocation = SpaceUtil.newVec();
@@ -99,7 +96,7 @@ public class SocketPoweredCrank extends TileEntitySocketBase implements IChargeC
     }
 
     @Override
-    public void updateEntity() {
+    public void update() {
         charge.update();
         super.updateEntity();
     }

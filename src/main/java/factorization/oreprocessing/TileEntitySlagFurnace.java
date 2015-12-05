@@ -122,7 +122,7 @@ public class TileEntitySlagFurnace extends TileEntityFactorization implements IF
 
     boolean prevBurnState = false;
     @Override
-    public void updateEntity() {
+    public void update() {
         if (worldObj.isRemote) {
             return;
         }

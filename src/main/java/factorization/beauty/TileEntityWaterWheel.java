@@ -22,6 +22,7 @@ import net.minecraft.block.BlockFence;
 import net.minecraft.block.BlockLog;
 import net.minecraft.block.BlockWall;
 import net.minecraft.block.material.Material;
+import net.minecraft.client.renderer.texture.ITickable;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemStack;
@@ -37,7 +38,7 @@ import net.minecraftforge.fml.relauncher.Side;
 
 import java.io.IOException;
 
-public class TileEntityWaterWheel extends TileEntityCommon implements IRotationalEnergySource, IMeterInfo {
+public class TileEntityWaterWheel extends TileEntityCommon implements IRotationalEnergySource, IMeterInfo, ITickable {
     EnumFacing wheelDirection = EnumFacing.UP;
     double power_per_tick, power_this_tick, target_velocity, velocity;
     double water_strength = 0;
@@ -246,7 +247,7 @@ public class TileEntityWaterWheel extends TileEntityCommon implements IRotationa
     }
 
     @Override
-    public void updateEntity() {
+    public void update() {
         if (worldObj.isRemote) return;
         if (!idcRef.entityFound()) {
             if (velocity != 0) {

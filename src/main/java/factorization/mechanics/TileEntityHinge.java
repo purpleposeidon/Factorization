@@ -39,7 +39,7 @@ import java.util.List;
 import static factorization.util.SpaceUtil.*;
 import static org.lwjgl.opengl.GL11.*;
 
-public class TileEntityHinge extends TileEntityCommon implements IDCController {
+public class TileEntityHinge extends TileEntityCommon implements IDCController, ITickable {
     FzOrientation facing = FzOrientation.FACE_EAST_POINT_DOWN;
     final EntityReference<IDeltaChunk> idcRef = MechanicsController.autoJoin(this);
     Vec3 dseOffset = SpaceUtil.newVec();
@@ -404,7 +404,7 @@ public class TileEntityHinge extends TileEntityCommon implements IDCController {
     transient long ticks;
 
     @Override
-    public void updateEntity() {
+    public void update() {
         if (worldObj.isRemote) updateClient();
         else updateServer();
     }

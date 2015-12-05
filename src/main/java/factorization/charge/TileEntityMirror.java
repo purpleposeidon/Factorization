@@ -16,21 +16,21 @@ import factorization.util.DataUtil;
 import factorization.util.ItemUtil;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.block.Block;
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.BlockPos;
 import net.minecraft.util.EnumFacing;
-import net.minecraft.util.IIcon;
+import net.minecraft.util.ITickable;
 import net.minecraft.world.EnumSkyBlock;
 import net.minecraft.world.World;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
 import net.minecraftforge.oredict.OreDictionary;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-public class TileEntityMirror extends TileEntityCommon {
+public class TileEntityMirror extends TileEntityCommon implements ITickable {
     public Coord reflection_target = null;
 
     //don't save
@@ -110,9 +110,9 @@ public class TileEntityMirror extends TileEntityCommon {
     }
 
     public boolean hasSun() {
-        boolean raining = getWorldObj().isRaining() && getWorldObj().getBiomeGenForCoords(pos.getX(), pos.getY()).rainfall > 0;
+        boolean raining = worldObj.isRaining() && worldObj.getBiomeGenForCoords(pos).rainfall > 0;
         if (raining) return false;
-        if (worldObj.getSavedLightValue(EnumSkyBlock.Sky, pos.getX(), pos.getY(), pos.getZ()) < 0xF) return false;
+        if (worldObj.getLightFor(EnumSkyBlock.SKY, pos) < 0xF) return false;
         if (covered_by_other_mirror) return false;
         return worldObj.getSunBrightnessFactor(0) > 0.7;
     }
@@ -220,7 +220,7 @@ public class TileEntityMirror extends TileEntityCommon {
     public boolean last_drawn_as_lit = false;
     
     @Override
-    public void updateEntity() {
+    public void update() {
         if (next_check-- <= 0) {
             setNextCheck();
             if (worldObj.isRemote) {
@@ -336,19 +336,22 @@ public class TileEntityMirror extends TileEntityCommon {
         x -= dx;
         z -= dz;
         int bx = 0, bz = 0;
+        int y = pos.getY();
         for (int i = 0; i < length; i++) {
             bx = (int) Math.round(x + 0.5) - 1;
             bz = (int) Math.round(z + 0.5) - 1;
             if (bx == pos.getX() && bz == pos.getZ()) {
                 return true;
             }
-            final Block b = worldObj.getBlock(bx, pos.getY(), bz);
+            BlockPos pos = new BlockPos(bx, y, bz);
+            final IBlockState bs = worldObj.getBlockState(pos);
+            final Block b = bs.getBlock();
             boolean air_like = false;
             if (b == null) {
                 air_like = true;
             } else {
-                air_like = b.isAir(worldObj, bx, pos.getY(), bz);
-                air_like |= b.getCollisionBoundingBoxFromPool(worldObj, bx, pos.getY(), bz) == null;
+                air_like = b.isAir(worldObj, pos);
+                air_like |= b.getCollisionBoundingBox(worldObj, pos, bs) == null;
             }
             if (!air_like) {
                 return false;
@@ -363,13 +366,7 @@ public class TileEntityMirror extends TileEntityCommon {
     public boolean isBlockSolidOnSide(EnumFacing side) {
         return false;
     }
-    
-    @Override
-    @SideOnly(Side.CLIENT)
-    public IIcon getIcon(EnumFacing dir) {
-        return BlockIcons.mirror_front;
-    }
-    
+
     @Override
     public ItemStack getDroppedBlock() {
         return new ItemStack(Core.registry.mirror);

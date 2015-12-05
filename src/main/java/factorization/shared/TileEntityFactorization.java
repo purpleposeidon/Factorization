@@ -17,12 +17,13 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.util.EnumFacing;
+import net.minecraft.util.ITickable;
 import net.minecraftforge.common.util.Constants;
 
 import java.io.IOException;
 
 public abstract class TileEntityFactorization extends TileEntityCommon
-        implements IInventory, ISidedInventory, ICoord, IFactoryType {
+        implements IInventory, ISidedInventory, ICoord, IFactoryType, ITickable {
 
     //Save & Share
     public byte draw_active;
@@ -191,7 +192,7 @@ public abstract class TileEntityFactorization extends TileEntityCommon
     }
 
     @Override
-    public void updateEntity() {
+    public void update() {
         if (worldObj.isRemote) {
             if (draw_active > 0) {
                 makeNoise();

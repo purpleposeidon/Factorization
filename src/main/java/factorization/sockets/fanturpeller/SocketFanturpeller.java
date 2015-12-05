@@ -18,6 +18,7 @@ import net.minecraft.init.Blocks;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.IIcon;
+import net.minecraft.util.ITickable;
 import net.minecraftforge.fluids.IFluidBlock;
 import net.minecraftforge.fluids.IFluidHandler;
 import net.minecraftforge.fml.relauncher.Side;
@@ -26,7 +27,7 @@ import org.lwjgl.opengl.GL11;
 
 import java.io.IOException;
 
-public abstract class SocketFanturpeller extends TileEntitySocketBase implements IChargeConductor {
+public abstract class SocketFanturpeller extends TileEntitySocketBase implements IChargeConductor, ITickable {
     Charge charge = new Charge(this);
     boolean isSucking = true;
     byte target_speed = 1;
@@ -72,7 +73,7 @@ public abstract class SocketFanturpeller extends TileEntitySocketBase implements
     }
 
     @Override
-    public void updateEntity() {
+    public void update() {
         charge.update();
         super.updateEntity();
     }

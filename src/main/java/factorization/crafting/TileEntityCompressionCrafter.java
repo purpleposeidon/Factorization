@@ -21,23 +21,18 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.IIcon;
+import net.minecraft.util.ITickable;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
 import java.io.IOException;
 import java.util.ArrayList;
 
-public class TileEntityCompressionCrafter extends TileEntityCommon {
-    static ThreadLocal<CompressionState> states = new ThreadLocal();
-
-    ArrayList<ItemStack> buffer = new ArrayList();
+public class TileEntityCompressionCrafter extends TileEntityCommon implements ITickable {
+    ArrayList<ItemStack> buffer = new ArrayList<ItemStack>();
     
     CompressionState getStateHelper() {
-        CompressionState cs = states.get();
-        if (cs == null) {
-            states.set(cs = new CompressionState());
-        }
-        return cs;
+        return new CompressionState();
     }
     
     @Override
@@ -103,7 +98,7 @@ public class TileEntityCompressionCrafter extends TileEntityCommon {
     }
     
     @Override
-    public void updateEntity() {
+    public void update() {
         if (progress != 0 && progress++ == 20) {
             if (!worldObj.isRemote && getFacing() != null && isCrafterRoot) {
                 getStateHelper().craft(false, this);

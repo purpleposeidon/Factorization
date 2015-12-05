@@ -7,6 +7,7 @@ import factorization.fzds.DeltaChunk;
 import factorization.fzds.Hammer;
 import factorization.fzds.HammerEnabled;
 import factorization.shared.Core;
+import factorization.shared.FzModel;
 import factorization.sockets.TileEntitySocketBase;
 import factorization.util.NumUtil;
 import net.minecraft.block.Block;
@@ -33,8 +34,8 @@ import org.lwjgl.opengl.GL12;
 import java.util.Iterator;
 
 public class RenderServoMotor extends RenderEntity {
-    ObjectModel sprocket = new ObjectModel(Core.getResource("models/servo/sprocket.obj"));
-    ObjectModel chasis = new ObjectModel(Core.getResource("models/servo/chasis.obj"));
+    FzModel sprocket = new FzModel("servo/sprocket");
+    FzModel chasis = new FzModel("servo/chasis.obj");
 
     float interp(double a, double b, double part) {
         double d = a - b;
@@ -207,7 +208,7 @@ public class RenderServoMotor extends RenderEntity {
     void renderMainModel(ServoMotor motor, float partial, double ro, boolean hilighting) {
         GL11.glPushMatrix();
         bindTexture(Core.blockAtlas);
-        chasis.render(BlockIcons.servo$model$chasis);
+        chasis.draw();
         
         FzColor c = motor.motionHandler.color;
         renderServoColor(c);
@@ -225,7 +226,7 @@ public class RenderServoMotor extends RenderEntity {
         radius = -4.0/16.0;
 
         float rd = (float) (radius + rail_width);
-        if (motor.motionHandler.orientation != motor.motionHandler.prevOrientation && motor.motionHandler.prevOrientation != FzOrientation.UNKNOWN) {
+        if (motor.motionHandler.orientation != motor.motionHandler.prevOrientation && motor.motionHandler.prevOrientation != null) {
             // This could use some work: only stretch if the new direction is parallel to the old gear direction.
             double stretch_interp = ro * 2;
             if (stretch_interp < 1) {
@@ -242,14 +243,14 @@ public class RenderServoMotor extends RenderEntity {
             GL11.glPushMatrix();
             GL11.glTranslatef(0, height_d, rd);
             GL11.glRotatef((float) Math.toDegrees(angle), 0, 1, 0);
-            sprocket.render(BlockIcons.servo$model$sprocket);
+            sprocket.draw();
             GL11.glPopMatrix();
         }
         {
             GL11.glPushMatrix();
             GL11.glTranslatef(0, height_d, -rd);
             GL11.glRotatef((float) Math.toDegrees(-angle) + 360F / 9F, 0, 1, 0);
-            sprocket.render(BlockIcons.servo$model$sprocket);
+            sprocket.draw();
             GL11.glPopMatrix();
         }
         
@@ -374,7 +375,6 @@ public class RenderServoMotor extends RenderEntity {
     
     void renderServoColor(FzColor color) {
         if (color == FzColor.NO_COLOR) return;
-        IIcon colorIcon = BlockRenderServoRail.coloredRails[color.toVanillaColorIndex()];
         BlockRenderHelper block = BlockRenderHelper.instance;
         block.setBlockBoundsOffset(0, 0, 0);
         block.useTexture(null);
