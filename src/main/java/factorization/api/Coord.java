@@ -52,7 +52,7 @@ import java.util.Random;
 public final class Coord implements IDataSerializable, ISaneCoord, Comparable<Coord> {
     // NORELEASE: Inline things that create BlockPos.
     public World w;
-    public int pos;
+    public int x, y, z;
     private static final Random rand = new Random();
     private static final ThreadLocal<Coord> staticCoord = new ThreadLocal<Coord>();
     
@@ -125,7 +125,7 @@ public final class Coord implements IDataSerializable, ISaneCoord, Comparable<Co
     }
     
     public static Coord of(int x, int y, int z) {
-        return of((World) null, pos);
+        return of((World) null, x, y, z);
     }
     
     public static Coord of(double x, double y, double z) {
@@ -135,11 +135,11 @@ public final class Coord implements IDataSerializable, ISaneCoord, Comparable<Co
     public static Coord of(World w, int x, int y, int z) {
         Coord ret = staticCoord.get();
         if (ret == null) {
-            ret = new Coord(w, pos);
+            ret = new Coord(w, x, y, z);
             staticCoord.set(ret);
             return ret;
         }
-        ret.set(w, pos);
+        ret.set(w, x, y, z);
         return ret;
     }
 
@@ -227,7 +227,7 @@ public final class Coord implements IDataSerializable, ISaneCoord, Comparable<Co
     }
 
     public Coord copy() {
-        return new Coord(w, pos);
+        return new Coord(w, x, y, z);
     }
     
     public int get(int axis) {
@@ -249,7 +249,7 @@ public final class Coord implements IDataSerializable, ISaneCoord, Comparable<Co
     }
     
     public Vec3 createVector() {
-        return new Vec3(pos);
+        return new Vec3(x, y, z);
     }
     
     public MovingObjectPosition createMop(EnumFacing side, Vec3 hitVec) {
@@ -271,7 +271,7 @@ public final class Coord implements IDataSerializable, ISaneCoord, Comparable<Co
     }
     
     public DeltaCoord asDeltaCoord() {
-        return new DeltaCoord(pos);
+        return new DeltaCoord(x, y, z);
     }
 
     public double distance(Coord o) {
@@ -937,7 +937,7 @@ public final class Coord implements IDataSerializable, ISaneCoord, Comparable<Co
     }
 
     public Vec3 toVector() {
-        return new Vec3(pos);
+        return new Vec3(x, y, z);
     }
 
     public Vec3 toMiddleVector() {
@@ -945,7 +945,7 @@ public final class Coord implements IDataSerializable, ISaneCoord, Comparable<Co
     }
 
     public BlockPos toBlockPos() {
-        return new BlockPos(pos);
+        return new BlockPos(x, y, z);
     }
     
     public static void sort(Coord lower, Coord upper) {
@@ -989,7 +989,7 @@ public final class Coord implements IDataSerializable, ISaneCoord, Comparable<Co
         for (int x = a.x; x <= b.x; x++) {
             for (int y = a.y; y <= b.y; y++) {
                 for (int z = a.z; z <= b.z; z++) {
-                    here.set(here.w, pos);
+                    here.set(here.w, x, y, z);
                     func.handle(here);
                 }
             }
@@ -1096,7 +1096,7 @@ public final class Coord implements IDataSerializable, ISaneCoord, Comparable<Co
                 t.printStackTrace();*/
                 spam = true;
             }
-            return BlockHelper.getPlacingItem(b, mop, w, pos);
+            return BlockHelper.getPlacingItem(b, mop, w, x, y, z);
         }
     }
     

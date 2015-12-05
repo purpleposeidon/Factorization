@@ -1,7 +1,6 @@
 package factorization.beauty;
 
 import factorization.shared.Core;
-import factorization.shared.ObjectModel;
 import factorization.util.NumUtil;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;

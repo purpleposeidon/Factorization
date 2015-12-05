@@ -14,7 +14,6 @@ import factorization.shared.Core;
 import factorization.shared.DropCaptureHandler;
 import factorization.shared.ICaptureDrops;
 import factorization.shared.NetworkFactorization.MessageType;
-import factorization.shared.ObjectModel;
 import factorization.util.InvUtil;
 import factorization.util.ItemUtil;
 import factorization.util.PlayerUtil;
@@ -196,26 +195,26 @@ public class SocketScissors extends TileEntitySocketBase implements ICaptureDrop
         if (mop.typeOfHit == MovingObjectPosition.MovingObjectType.BLOCK) {
             ItemStack shears = new ItemStack(Items.shears, 0 /* In case it somehow gets yoinked from us */);
             shears.addEnchantment(Enchantment.silkTouch, 1);
-            Block block = worldObj.getBlock(mop.blockX, mop.blockY, mop.blockZ);
-            int metadata = worldObj.getBlockMetadata(mop.blockX, mop.blockY, mop.blockZ);
-            if (block.isAir(worldObj, mop.blockX, mop.blockY, mop.blockZ)) {
+            Block block = worldObj.getBlock(mop.getBlockPos());
+            int metadata = worldObj.getBlockMetadata(mop.getBlockPos());
+            if (block.isAir(worldObj, mop.getBlockPos())) {
                 return false;
             }
             EntityPlayer player = getFakePlayer();
-            if (canCutBlock(player, worldObj, block, mop.blockX, mop.blockY, mop.blockZ)) {
+            if (canCutBlock(player, worldObj, block, mop.getBlockPos())) {
                 player.inventory.mainInventory[0] = shears;
                 boolean sheared = false;
                 if (block instanceof IShearable) {
                     IShearable shearable = (IShearable) block;
-                    if (shearable.isShearable(shears, worldObj, mop.blockX, mop.blockY, mop.blockZ)) {
-                        Collection<ItemStack> drops = shearable.onSheared(shears, worldObj, mop.blockX, mop.blockY, mop.blockZ, 0);
+                    if (shearable.isShearable(shears, worldObj, mop.getBlockPos())) {
+                        Collection<ItemStack> drops = shearable.onSheared(shears, worldObj, mop.getBlockPos(), 0);
                         processCollectedItems(drops);
                         sheared = true;
                     }
                 }
-                boolean didRemove = removeBlock(player, block, metadata, mop.blockX, mop.blockY, mop.blockZ);
+                boolean didRemove = removeBlock(player, block, metadata, mop.getBlockPos());
                 if (didRemove && !sheared) {
-                    block.harvestBlock(worldObj, player, mop.blockX, mop.blockY, mop.blockZ, metadata);
+                    block.harvestBlock(worldObj, player, mop.getBlockPos(), metadata);
                 }
             } else {
                 blocked = true;

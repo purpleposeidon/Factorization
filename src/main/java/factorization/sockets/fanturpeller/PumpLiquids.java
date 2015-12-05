@@ -9,7 +9,6 @@ import factorization.api.datahelpers.Share;
 import factorization.common.FactoryType;
 import factorization.servo.ServoMotor;
 import factorization.shared.Core;
-import factorization.shared.ObjectModel;
 import factorization.sockets.ISocketHolder;
 import factorization.util.FluidUtil;
 import factorization.util.InvUtil;

@@ -203,7 +203,7 @@ public class ItemGoo extends ItemFactorization {
         } else if (held.getItem() == this) {
             int n = player.isSneaking() ? 1 : 2;
             for (int i = 0; i < n; i++) {
-                expandSelection(gooItem, data, player, player.worldObj, mop.blockX, mop.blockY, mop.blockZ, SpaceUtil.getOrientation(mop.sideHit));
+                expandSelection(gooItem, data, player, player.worldObj, mop.getBlockPos(), SpaceUtil.getOrientation(mop.sideHit));
             }
         } else if (held.getItem() instanceof ItemBlock) {
             replaceBlocks(gooItem, data, player.worldObj, player, mop, held);

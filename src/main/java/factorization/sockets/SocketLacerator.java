@@ -130,7 +130,7 @@ public class SocketLacerator extends TileEntitySocketBase implements IChargeCond
     
     void destroyPartially(MovingObjectPosition mop, int amount) {
         if (mop == null) return;
-        worldObj.destroyBlockInWorldPartially(hashCode(), mop.blockX, mop.blockY, mop.blockZ, amount);
+        worldObj.destroyBlockInWorldPartially(hashCode(), mop.getBlockPos(), amount);
     }
     
     @Override
@@ -325,11 +325,11 @@ public class SocketLacerator extends TileEntitySocketBase implements IChargeCond
             progress = 0;
             return true;
         } else if (mop.typeOfHit == MovingObjectPosition.MovingObjectType.BLOCK) {
-            Block block = mopWorld.getBlock(mop.blockX, mop.blockY, mop.blockZ);
-            if (block == null || block.isAir(mopWorld, mop.blockX, mop.blockY, mop.blockZ)) {
+            Block block = mopWorld.getBlock(mop.getBlockPos());
+            if (block == null || block.isAir(mopWorld, mop.getBlockPos())) {
                 return false;
             }
-            int md = mopWorld.getBlockMetadata(mop.blockX, mop.blockY, mop.blockZ);
+            int md = mopWorld.getBlockMetadata(mop.getBlockPos());
             if (!block.canCollideCheck(md, false)) {
                 return false;
             }
@@ -339,7 +339,7 @@ public class SocketLacerator extends TileEntitySocketBase implements IChargeCond
             TileEntity te = null;
             TileEntityDayBarrel barrel = null;
             if (block instanceof BlockFactorization) {
-                te = mopWorld.getTileEntity(mop.blockX, mop.blockY, mop.blockZ);
+                te = mopWorld.getTileEntity(mop.getBlockPos());
                 if (te instanceof TileEntityDayBarrel) {
                     barrel = (TileEntityDayBarrel) te;
                     if (barrel.item == null) {
@@ -352,7 +352,7 @@ public class SocketLacerator extends TileEntitySocketBase implements IChargeCond
             
             //Below: A brief demonstration of why Coord exists
             long foundHash = (mop.blockX) + (mop.blockY << 2) + (mop.blockZ << 4);
-            float hardness = block.getBlockHardness(mopWorld, mop.blockX, mop.blockY, mop.blockZ);
+            float hardness = block.getBlockHardness(mopWorld, mop.getBlockPos());
             if (hardness < 0) {
                 speed -= max_speed/5;
                 return true;
@@ -394,7 +394,7 @@ public class SocketLacerator extends TileEntitySocketBase implements IChargeCond
                 grab_items = true;
                 grind_items = true;
                 if (barrel == null) {
-                    mopWorld.playAuxSFX(2001, mop.blockX, mop.blockY, mop.blockZ, Block.getIdFromBlock(block) + md << 12);
+                    mopWorld.playAuxSFX(2001, mop.getBlockPos(), Block.getIdFromBlock(block) + md << 12);
                     
                     EntityPlayer player = getFakePlayer();
                     ItemStack pick = new ItemStack(Items.diamond_pickaxe);
@@ -405,15 +405,15 @@ public class SocketLacerator extends TileEntitySocketBase implements IChargeCond
                         canHarvest = block.canHarvestBlock(player, md);
                         canHarvest = true; //Hack-around for cobalt/ardite. Hmm.
 
-                        boolean didRemove = removeBlock(player, block, md, mopWorld, mop.blockX, mop.blockY, mop.blockZ);
+                        boolean didRemove = removeBlock(player, block, md, mopWorld, mop.getBlockPos());
                         if (didRemove) {
-                            block.harvestBlock(mopWorld, player, mop.blockX, mop.blockY, mop.blockZ, md);
+                            block.harvestBlock(mopWorld, player, mop.getBlockPos(), md);
                         }
                     }
-                    block.onBlockHarvested(mopWorld, mop.blockX, mop.blockY, mop.blockZ, md, player);
-                    if (block.removedByPlayer(mopWorld, player, mop.blockX, mop.blockY, mop.blockZ, true)) {
-                        block.onBlockDestroyedByPlayer(mopWorld, mop.blockX, mop.blockY, mop.blockZ, md);
-                        block.harvestBlock(mopWorld, player, mop.blockX, mop.blockY, mop.blockZ, 0);
+                    block.onBlockHarvested(mopWorld, mop.getBlockPos(), md, player);
+                    if (block.removedByPlayer(mopWorld, player, mop.getBlockPos(), true)) {
+                        block.onBlockDestroyedByPlayer(mopWorld, mop.getBlockPos(), md);
+                        block.harvestBlock(mopWorld, player, mop.getBlockPos(), 0);
                     }
                     player.inventory.mainInventory[0] = null;
                     PlayerUtil.recycleFakePlayer(player);

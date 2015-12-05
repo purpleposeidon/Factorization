@@ -479,8 +479,8 @@ public class HammerClientProxy extends HammerProxy {
                     break;
                 case BLOCK:
                     World w = DeltaChunk.getClientShadowWorld();
-                    Block block = w.getBlock(mop.blockX, mop.blockY, mop.blockZ);
-                    mopBox = block.getSelectedBoundingBoxFromPool(w, mop.blockX, mop.blockY, mop.blockZ);
+                    Block block = w.getBlock(mop.getBlockPos());
+                    mopBox = block.getSelectedBoundingBoxFromPool(w, mop.getBlockPos());
                     break;
                 default: return;
                 }

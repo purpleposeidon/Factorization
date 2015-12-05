@@ -7,7 +7,6 @@ import factorization.fzds.DeltaChunk;
 import factorization.fzds.Hammer;
 import factorization.fzds.HammerEnabled;
 import factorization.shared.Core;
-import factorization.shared.ObjectModel;
 import factorization.sockets.TileEntitySocketBase;
 import factorization.util.NumUtil;
 import net.minecraft.block.Block;

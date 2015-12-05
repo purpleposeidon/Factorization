@@ -3,7 +3,6 @@ package factorization.citizen;
 import factorization.api.Quaternion;
 import factorization.fzds.interfaces.Interpolation;
 import factorization.shared.NetworkFactorization;
-import factorization.shared.ObjectModel;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.entity.RenderEntity;
 import net.minecraft.client.renderer.entity.RenderItem;

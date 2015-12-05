@@ -100,7 +100,7 @@ public class SocketRobotHand extends TileEntitySocketBase {
         if (!ret && !mopIsThis
                 && mop.typeOfHit == MovingObjectType.BLOCK
                 && (!HammerEnabled.ENABLED || worldObj != DeltaChunk.getServerShadowWorld())) {
-            return !worldObj.isAirBlock(mop.blockX, mop.blockY, mop.blockZ);
+            return !worldObj.isAirBlock(mop.getBlockPos());
         }
         return ret;
     }

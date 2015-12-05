@@ -249,7 +249,7 @@ public class ItemGlazeBucket extends ItemFactorization {
         if (mop.typeOfHit != MovingObjectPosition.MovingObjectType.BLOCK) {
             return is;
         }
-        final Coord at = new Coord(w, mop.blockX, mop.blockY, mop.blockZ);
+        final Coord at = new Coord(w, mop.getBlockPos());
         TileEntityGreenware clay = at.getTE(TileEntityGreenware.class);
         if (clay == null) {
             return loadMimicingGlaze(is, at, mop.sideHit, player);

@@ -9,7 +9,6 @@ import factorization.fzds.HammerEnabled;
 import factorization.servo.BlockRenderServoRail;
 import factorization.shared.BlockRenderHelper;
 import factorization.shared.Core;
-import factorization.shared.ObjectModel;
 import factorization.util.NumUtil;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.Tessellator;
