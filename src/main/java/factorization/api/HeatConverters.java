@@ -1,5 +1,6 @@
 package factorization.api;
 
+import net.minecraft.util.BlockPos;
 import net.minecraft.world.World;
 
 import java.util.ArrayList;

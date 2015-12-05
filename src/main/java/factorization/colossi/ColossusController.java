@@ -347,9 +347,9 @@ public class ColossusController extends EntityFz implements IBossDisplayData, ID
     static int max_names = -1;
     transient int current_name = 0;
     transient int client_ticks = 0;
-    
+
     @Override
-    public IChatComponent func_145748_c_() {
+    public IChatComponent getDisplayName() {
         if (getDestroyedCracks() == 0) {
             return new ChatComponentTranslation("colossus.name.null");
         }
@@ -536,6 +536,6 @@ public class ColossusController extends EntityFz implements IBossDisplayData, ID
     }
 
     public boolean peaceful() {
-        return worldObj.difficultySetting == EnumDifficulty.PEACEFUL;
+        return worldObj.getDifficulty() == EnumDifficulty.PEACEFUL;
     }
 }

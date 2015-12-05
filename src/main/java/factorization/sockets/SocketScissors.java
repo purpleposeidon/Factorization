@@ -161,9 +161,9 @@ public class SocketScissors extends TileEntitySocketBase implements ICaptureDrop
             EntityLivingBase attacker = victim.func_94060_bK();
             String fightingMessage = ret + ".player";
             if (attacker != null && StatCollector.canTranslate(fightingMessage)) {
-                return new ChatComponentTranslation(fightingMessage, victim.func_145748_c_(), attacker.func_145748_c_());
+                return new ChatComponentTranslation(fightingMessage, victim.getDisplayName(), attacker.getDisplayName());
             } else {
-                return new ChatComponentTranslation(ret, victim.func_145748_c_());
+                return new ChatComponentTranslation(ret, victim.getDisplayName());
             }
         }
         

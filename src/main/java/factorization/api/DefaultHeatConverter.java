@@ -5,6 +5,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.FurnaceRecipes;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.tileentity.TileEntityFurnace;
+import net.minecraft.util.BlockPos;
 import net.minecraft.world.World;
 
 class DefaultHeatConverter implements HeatConverters.IHeatConverter {
@@ -46,8 +47,8 @@ class DefaultHeatConverter implements HeatConverters.IHeatConverter {
                     BlockFurnace.updateFurnaceBlockState(furnace.furnaceBurnTime > 0, furnace.getWorld(), furnace.getPos().getX(), furnace.getPos().getY(), furnace.getPos().getZ());
                 }
             } else {
-                furnace.furnaceCookTime += 1;
-                furnace.furnaceCookTime = Math.min(furnace.furnaceCookTime, 200 - 1);
+                furnace.cookTime += 1;
+                furnace.cookTime = Math.min(furnace.cookTime, 200 - 1);
             }
         }
 

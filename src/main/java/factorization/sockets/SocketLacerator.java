@@ -130,7 +130,7 @@ public class SocketLacerator extends TileEntitySocketBase implements IChargeCond
     
     void destroyPartially(MovingObjectPosition mop, int amount) {
         if (mop == null) return;
-        worldObj.destroyBlockInWorldPartially(hashCode(), mop.getBlockPos(), amount);
+        worldObj.sendBlockBreakProgress(hashCode(), mop.getBlockPos(), amount);
     }
     
     @Override
@@ -149,9 +149,7 @@ public class SocketLacerator extends TileEntitySocketBase implements IChargeCond
         }
         
         if (previous_breaking_target != null && present_breaking_target != null) {
-            if (previous_breaking_target.blockX != present_breaking_target.blockX
-                    || previous_breaking_target.blockY != present_breaking_target.blockY
-                    || previous_breaking_target.blockZ != present_breaking_target.blockZ) {
+            if (!previous_breaking_target.getBlockPos().equals(present_breaking_target.getBlockPos()) {
                 destroyPartially(previous_breaking_target, 99);
             }
         } else if (present_breaking_target == null) {
@@ -273,9 +271,9 @@ public class SocketLacerator extends TileEntitySocketBase implements IChargeCond
             EntityLivingBase attacker = victim.func_94060_bK();
             String fightingMessage = ret + ".player";
             if (attacker != null && StatCollector.canTranslate(fightingMessage)) {
-                return new ChatComponentTranslation(fightingMessage, victim.func_145748_c_(), attacker.func_145748_c_());
+                return new ChatComponentTranslation(fightingMessage, victim.getDisplayName(), attacker.getDisplayName());
             } else {
-                return new ChatComponentTranslation(ret, victim.func_145748_c_());
+                return new ChatComponentTranslation(ret, victim.getDisplayName());
             }
         }
     };

@@ -13,6 +13,7 @@ import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.renderer.RenderBlocks;
+import net.minecraft.client.renderer.RenderGlobal;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.entity.RenderEntity;
 import net.minecraft.client.renderer.entity.RenderManager;
@@ -106,8 +107,9 @@ public class RenderServoMotor extends RenderEntity {
         GL11.glPopMatrix();
         if (render_details) {
             GL11.glDisable(GL11.GL_DEPTH_TEST);
-            GL11.glRotatef(-RenderManager.instance.playerViewY, 0.0F, 1.0F, 0.0F);
-            GL11.glRotatef(RenderManager.instance.playerViewX, 1.0F, 0.0F, 0.0F);
+            RenderManager rm = Minecraft.getMinecraft().getRenderManager();
+            GL11.glRotatef(-rm.playerViewY, 0.0F, 1.0F, 0.0F);
+            GL11.glRotatef(rm.playerViewX, 1.0F, 0.0F, 0.0F);
             renderStacks(motor);
             GL11.glEnable(GL11.GL_DEPTH_TEST);
         }
@@ -117,38 +119,14 @@ public class RenderServoMotor extends RenderEntity {
         Core.profileEndRender();
     }
     
-    void drawOutlinedBoundingBox(AxisAlignedBB par1AxisAlignedBB) {
-        Tessellator tessellator = Tessellator.instance;
-        tessellator.startDrawing(3);
-        tessellator.addVertex(par1AxisAlignedBB.minX, par1AxisAlignedBB.minY, par1AxisAlignedBB.minZ);
-        tessellator.addVertex(par1AxisAlignedBB.maxX, par1AxisAlignedBB.minY, par1AxisAlignedBB.minZ);
-        tessellator.addVertex(par1AxisAlignedBB.maxX, par1AxisAlignedBB.minY, par1AxisAlignedBB.maxZ);
-        tessellator.addVertex(par1AxisAlignedBB.minX, par1AxisAlignedBB.minY, par1AxisAlignedBB.maxZ);
-        tessellator.addVertex(par1AxisAlignedBB.minX, par1AxisAlignedBB.minY, par1AxisAlignedBB.minZ);
-        tessellator.draw();
-        tessellator.startDrawing(3);
-        tessellator.addVertex(par1AxisAlignedBB.minX, par1AxisAlignedBB.maxY, par1AxisAlignedBB.minZ);
-        tessellator.addVertex(par1AxisAlignedBB.maxX, par1AxisAlignedBB.maxY, par1AxisAlignedBB.minZ);
-        tessellator.addVertex(par1AxisAlignedBB.maxX, par1AxisAlignedBB.maxY, par1AxisAlignedBB.maxZ);
-        tessellator.addVertex(par1AxisAlignedBB.minX, par1AxisAlignedBB.maxY, par1AxisAlignedBB.maxZ);
-        tessellator.addVertex(par1AxisAlignedBB.minX, par1AxisAlignedBB.maxY, par1AxisAlignedBB.minZ);
-        tessellator.draw();
-        tessellator.startDrawing(1);
-        tessellator.addVertex(par1AxisAlignedBB.minX, par1AxisAlignedBB.minY, par1AxisAlignedBB.minZ);
-        tessellator.addVertex(par1AxisAlignedBB.minX, par1AxisAlignedBB.maxY, par1AxisAlignedBB.minZ);
-        tessellator.addVertex(par1AxisAlignedBB.maxX, par1AxisAlignedBB.minY, par1AxisAlignedBB.minZ);
-        tessellator.addVertex(par1AxisAlignedBB.maxX, par1AxisAlignedBB.maxY, par1AxisAlignedBB.minZ);
-        tessellator.addVertex(par1AxisAlignedBB.maxX, par1AxisAlignedBB.minY, par1AxisAlignedBB.maxZ);
-        tessellator.addVertex(par1AxisAlignedBB.maxX, par1AxisAlignedBB.maxY, par1AxisAlignedBB.maxZ);
-        tessellator.addVertex(par1AxisAlignedBB.minX, par1AxisAlignedBB.minY, par1AxisAlignedBB.maxZ);
-        tessellator.addVertex(par1AxisAlignedBB.minX, par1AxisAlignedBB.maxY, par1AxisAlignedBB.maxZ);
-        tessellator.draw();
+    void drawOutlinedBoundingBox(AxisAlignedBB box) {
+        RenderGlobal.drawBox(box);
     }
     
     void orientMotor(ServoMotor motor, float partial, float reorientInterpolation) {
         final FzOrientation orientation = motor.motionHandler.orientation;
         FzOrientation prevOrientation = motor.motionHandler.prevOrientation;
-        if (prevOrientation == FzOrientation.UNKNOWN) {
+        if (prevOrientation == null) {
             prevOrientation = orientation;
         }
         

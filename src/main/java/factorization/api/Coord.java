@@ -1096,7 +1096,7 @@ public final class Coord implements IDataSerializable, ISaneCoord, Comparable<Co
                 t.printStackTrace();*/
                 spam = true;
             }
-            return BlockHelper.getPlacingItem(b, mop, w, x, y, z);
+            return BlockHelper.getPlacingItem(b, mop, w, toBlockPos());
         }
     }
     
