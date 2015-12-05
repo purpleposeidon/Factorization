@@ -17,7 +17,6 @@ import net.minecraft.block.Block;
 import net.minecraft.init.Blocks;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.IIcon;
 import net.minecraft.util.ITickable;
 import net.minecraftforge.fluids.IFluidBlock;
 import net.minecraftforge.fluids.IFluidHandler;
@@ -58,11 +57,6 @@ public abstract class SocketFanturpeller extends TileEntitySocketBase implements
     }
     
     @Override
-    public boolean canUpdate() {
-        return true;
-    }
-
-    @Override
     public String getInfo() {
         return null;
     }
@@ -75,7 +69,6 @@ public abstract class SocketFanturpeller extends TileEntitySocketBase implements
     @Override
     public void update() {
         charge.update();
-        super.updateEntity();
     }
     
     boolean isLiquid(Coord at) {
@@ -85,7 +78,7 @@ public abstract class SocketFanturpeller extends TileEntitySocketBase implements
         }
         if (block instanceof IFluidBlock) {
             IFluidBlock ifb = (IFluidBlock) block;
-            return ifb.canDrain(worldObj, at.x, at.y, at.z);
+            return ifb.canDrain(worldObj, at.toBlockPos());
         }
         return false;
     }

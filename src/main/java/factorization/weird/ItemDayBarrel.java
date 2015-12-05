@@ -3,7 +3,6 @@ package factorization.weird;
 import factorization.common.FactoryType;
 import factorization.shared.Core;
 import factorization.shared.Core.TabType;
-import factorization.shared.ItemBlockProxy;
 import factorization.util.LangUtil;
 import factorization.weird.TileEntityDayBarrel.Type;
 import net.minecraft.client.renderer.texture.IIconRegister;

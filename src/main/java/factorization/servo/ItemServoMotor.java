@@ -61,7 +61,7 @@ public class ItemServoMotor extends ItemCraftingComponent {
             }
             if (motor.motionHandler.validDirection(fd, false)) {
                 FzOrientation t = FzOrientation.fromDirection(fd).pointTopTo(top);
-                if (t != FzOrientation.UNKNOWN) {
+                if (t != null) {
                     if (fd == playerAngle) {
                         valid.clear();
                         valid.add(t);

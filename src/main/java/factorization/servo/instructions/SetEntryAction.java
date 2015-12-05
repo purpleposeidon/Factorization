@@ -12,7 +12,6 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumFacing;
-import net.minecraft.util.IIcon;
 
 import java.io.IOException;
 
@@ -45,17 +44,6 @@ public class SetEntryAction extends Instruction {
             motor.executioner.entry_action = mode;
         }
         return true;
-    }
-
-    @Override
-    public IIcon getIcon(EnumFacing side) {
-        switch (mode) {
-        default:
-        case ENTRY_EXECUTE: return BlockIcons.servo$entry_execute;
-        case ENTRY_LOAD: return BlockIcons.servo$entry_load;
-        case ENTRY_WRITE: return BlockIcons.servo$entry_write;
-        case ENTRY_IGNORE: return BlockIcons.servo$entry_ignore;
-        }
     }
 
     @Override

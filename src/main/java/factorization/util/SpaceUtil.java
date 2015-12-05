@@ -22,20 +22,21 @@ public final class SpaceUtil {
 
     private static ThreadLocal<ArrayList<EnumFacing>> direction_cache = new ThreadLocal<ArrayList<EnumFacing>>();
 
-    public static int determineOrientation(EntityPlayer player) {
+    public static EnumFacing determineOrientation(EntityPlayer player) {
         if (player.rotationPitch > 75) {
-            return 0;
+            return EnumFacing.DOWN;
         }
         if (player.rotationPitch <= -75) {
-            return 1;
+            return EnumFacing.UP;
         }
         return determineFlatOrientation(player);
     }
 
-    public static int determineFlatOrientation(EntityPlayer player) {
+    public static EnumFacing determineFlatOrientation(EntityPlayer player) {
         //stolen from BlockPistonBase.determineOrientation. It was reversed, & we handle the y-axis differently
         int var7 = MathHelper.floor_double((double) ((180 + player.rotationYaw) * 4.0F / 360.0F) + 0.5D) & 3;
-        return var7 == 0 ? 2 : (var7 == 1 ? 5 : (var7 == 2 ? 3 : (var7 == 3 ? 4 : 0)));
+        int r = var7 == 0 ? 2 : (var7 == 1 ? 5 : (var7 == 2 ? 3 : (var7 == 3 ? 4 : 0)));
+        return EnumFacing.VALUES[r];
     }
 
     public static DeltaCoord getFlatDiagonalFacing(EntityPlayer player) {
@@ -308,36 +309,35 @@ public final class SpaceUtil {
         return EnumFacing.VALUES[ordinal];
     }
 
-    public static FzOrientation getOrientation(EntityPlayer player, int side, float hitX, float hitY, float hitZ) {
-        EnumFacing facing = SpaceUtil.getOrientation(side);
+    public static FzOrientation getOrientation(EntityPlayer player, EnumFacing facing, Vec3 hit) {
         double u = 0.5, v = 0.5; //We pick the axiis based on which side gets clicked
         if (facing == null) facing = EnumFacing.DOWN;
         assert facing != null;
         switch (facing) {
             default:
             case DOWN:
-                u = 1 - hitX;
-                v = hitZ;
+                u = 1 - hit.xCoord;
+                v = hit.zCoord;
                 break;
             case UP:
-                u = hitX;
-                v = hitZ;
+                u = hit.xCoord;
+                v = hit.zCoord;
                 break;
             case NORTH:
-                u = hitX;
-                v = hitY;
+                u = hit.xCoord;
+                v = hit.yCoord;
                 break;
             case SOUTH:
-                u = 1 - hitX;
-                v = hitY;
+                u = 1 - hit.xCoord;
+                v = hit.yCoord;
                 break;
             case WEST:
-                u = 1 - hitZ;
-                v = hitY;
+                u = 1 - hit.zCoord;
+                v = hit.yCoord;
                 break;
             case EAST:
-                u = hitZ;
-                v = hitY;
+                u = hit.zCoord;
+                v = hit.yCoord;
                 break;
         }
         u -= 0.5;
@@ -351,11 +351,11 @@ public final class SpaceUtil {
         for (int X = 0; X < pointy; X++) {
             fo = fo.getNextRotationOnFace();
         }
-        if (SpaceUtil.determineOrientation(player) >= 2 /* player isn't looking straight down */
-                && side < 2 /* and the side is the bottom */) {
-            side = SpaceUtil.determineOrientation(player);
-            EnumFacing orientation = SpaceUtil.getOrientation(side);
-            fo = orientation == null ? null : FzOrientation.fromDirection(orientation.getOpposite());
+        EnumFacing orient = SpaceUtil.determineOrientation(player);
+        if (orient.getAxis() != EnumFacing.Axis.Y
+                && facing.getAxis() == EnumFacing.Axis.Y) {
+            facing = orient;
+            fo = orient == null ? null : FzOrientation.fromDirection(orient.getOpposite());
             if (fo != null) {
                 FzOrientation perfect = fo.pointTopTo(EnumFacing.UP);
                 if (perfect != null) {

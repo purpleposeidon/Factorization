@@ -19,7 +19,7 @@ public class MotionHandler {
     
     Coord pos_prev, pos_next;
     public float pos_progress;
-    public FzOrientation prevOrientation = FzOrientation.UNKNOWN, orientation = FzOrientation.UNKNOWN;
+    public FzOrientation prevOrientation = null, orientation = null;
     public EnumFacing nextDirection = null, lastDirection = null;
     byte speed_b;
     byte target_speed_index = 2;
@@ -103,7 +103,7 @@ public class MotionHandler {
     void updateSpeed() {
         byte target_speed_b = target_speeds_b[target_speed_index];
         
-        boolean should_accelerate = speed_b < target_speed_b && orientation != FzOrientation.UNKNOWN;
+        boolean should_accelerate = speed_b < target_speed_b && orientation != null;
         if (speed_b > target_speed_b) {
             speed_b = (byte)Math.max(target_speed_b, speed_b*3/4 - 1);
             return;
@@ -165,7 +165,7 @@ public class MotionHandler {
         EnumFacing orig_top = orientation.top;
         FzOrientation start = FzOrientation.fromDirection(dir);
         FzOrientation perfect = start.pointTopTo(orig_top);
-        if (perfect == FzOrientation.UNKNOWN) {
+        if (perfect == null) {
             if (dir == orig_top) {
                 //convex turn
                 perfect = start.pointTopTo(orig_direction.getOpposite());
@@ -173,7 +173,7 @@ public class MotionHandler {
                 //concave turn
                 perfect = start.pointTopTo(orig_direction);
             }
-            if (perfect == FzOrientation.UNKNOWN) {
+            if (perfect == null) {
                 perfect = start; //Might be impossible?
             }
         }
@@ -259,7 +259,7 @@ public class MotionHandler {
             changeOrientation(opposite);
             return true;
         }
-        orientation = FzOrientation.UNKNOWN;
+        orientation = null;
         return false;
     }
 
@@ -329,14 +329,14 @@ public class MotionHandler {
                 return;
             }
         }
-        if (orientation == FzOrientation.UNKNOWN) {
+        if (orientation == null) {
             pickNextOrientation();
         }
         if (!motor.worldObj.isRemote) {
             updateSpeed();
         }
         final double speed = getProperSpeed();
-        if (speed <= 0 || orientation == FzOrientation.UNKNOWN) {
+        if (speed <= 0 || orientation == null) {
             motor.updateSocket();
             return;
         }

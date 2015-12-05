@@ -129,7 +129,7 @@ public class RenderStepperEngine extends RenderEntity {
     void orientMotor(StepperEngine motor, float partial, float reorientInterpolation) {
         final FzOrientation orientation = motor.motionHandler.orientation;
         FzOrientation prevOrientation = motor.motionHandler.prevOrientation;
-        if (prevOrientation == FzOrientation.UNKNOWN) {
+        if (prevOrientation == null) {
             prevOrientation = orientation;
         }
 
@@ -206,7 +206,7 @@ public class RenderStepperEngine extends RenderEntity {
         final double angle = constant * partial_rotation;
 
         float rd = (float) radius;
-        if (motor.motionHandler.orientation != motor.motionHandler.prevOrientation && motor.motionHandler.prevOrientation != FzOrientation.UNKNOWN) {
+        if (motor.motionHandler.orientation != motor.motionHandler.prevOrientation && motor.motionHandler.prevOrientation != null) {
             // This could use some work: only stretch if the new direction is parallel to the old gear direction.
             double stretch_interp = ro * 2;
             if (stretch_interp < 1) {

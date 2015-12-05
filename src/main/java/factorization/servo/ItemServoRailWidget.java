@@ -5,12 +5,12 @@ import factorization.shared.Core;
 import factorization.shared.Core.TabType;
 import factorization.shared.ItemFactorization;
 import factorization.util.ItemUtil;
-import net.minecraft.client.renderer.texture.IIconRegister;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.IIcon;
+import net.minecraft.util.BlockPos;
+import net.minecraft.util.EnumFacing;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
@@ -57,7 +57,7 @@ public class ItemServoRailWidget extends ItemFactorization {
     }
     
     @Override
-    public boolean onItemUse(ItemStack is, EntityPlayer player, World world, BlockPos pos, int side, float vx, float vy, float vz) {
+    public boolean onItemUse(ItemStack is, EntityPlayer player, World world, BlockPos pos, EnumFacing side, float vx, float vy, float vz) {
         ServoComponent sc = get(is);
         if (sc == null) {
             return false;
@@ -115,50 +115,4 @@ public class ItemServoRailWidget extends ItemFactorization {
         loadSubItems();
         list.addAll(subItemsCache);
     }
-    
-    @Override
-    public IIcon getIcon(ItemStack stack, int renderPass, EntityPlayer player, ItemStack usingItem, int useRemaining) {
-        return getIcon(stack, renderPass);
-    }
-    
-    @Override
-    public IIcon getIcon(ItemStack stack, int pass) {
-        if (pass == 0) {
-            return BlockIcons.servo$instruction_plate;
-        }
-        if (pass == 1) {
-            ServoComponent sc = get(stack);
-            IIcon ret = null;
-            if (sc instanceof Decorator) {
-                ret = ((Decorator) sc).getIcon(null);
-            }
-            if (ret == null) {
-                ret = BlockIcons.uv_test;
-            }
-            return ret;
-        }
-        return null;
-        
-    }
-    
-    @Override
-    @SideOnly(Side.CLIENT)
-    public int getSpriteNumber() {
-        return 0;
-    }
-    
-    @Override
-    @SideOnly(Side.CLIENT)
-    public boolean requiresMultipleRenderPasses() {
-        return true;
-    }
-    
-    @Override
-    public int getRenderPasses(int metadata) {
-        return 2;
-    }
-    
-    @Override
-    @SideOnly(Side.CLIENT)
-    public void registerIcons(IIconRegister par1IIconRegister) { }
 }

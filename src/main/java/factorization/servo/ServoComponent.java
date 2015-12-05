@@ -6,10 +6,7 @@ import factorization.api.Coord;
 import factorization.api.datahelpers.*;
 import factorization.servo.instructions.*;
 import factorization.shared.Core;
-import factorization.util.RenderUtil;
 import io.netty.buffer.ByteBuf;
-import net.minecraft.client.renderer.RenderBlocks;
-import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
@@ -192,23 +189,7 @@ public abstract class ServoComponent implements IDataSerializable {
      * @return a unique name, something like "modname.componentType.name"
      */
     public abstract String getName();
-    
-    /**
-     * Render to the Tessellator. This must be appropriate for a SimpleBlockRenderingHandler.
-     * @param where to render it at in world. If null, it is being rendered in an inventory (or so). Render to 0,0,0.
-     * @param rb RenderBlocks
-     */
-    @SideOnly(Side.CLIENT)
-    public abstract void renderStatic(Coord where, RenderBlocks rb);
-    
-    @SideOnly(Side.CLIENT)
-    public void renderDynamic() {
-        Tessellator tess = Tessellator.instance;
-        tess.startDrawingQuads();
-        renderStatic(null, RenderUtil.getRB());
-        tess.draw();
-    }
-    
+
     @SideOnly(Side.CLIENT)
     public void addInformation(List info) {
         //info.add("Servo Component");

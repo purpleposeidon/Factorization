@@ -4,12 +4,12 @@ import factorization.common.FactoryType;
 import factorization.shared.Core.TabType;
 import factorization.shared.ItemFactorization;
 import factorization.util.LangUtil;
-import net.minecraft.client.renderer.texture.IIconRegister;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.IIcon;
+import net.minecraft.util.BlockPos;
+import net.minecraft.util.EnumFacing;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
@@ -63,21 +63,7 @@ public class ItemSocketPart extends ItemFactorization {
         }
         return socketTypes;
     }
-    
-    @SideOnly(Side.CLIENT)
-    IIcon[] socketIIcons;
 
-    @Override
-    @SideOnly(Side.CLIENT)
-    public void registerIcons(IIconRegister register) {
-        socketIIcons = new IIcon[FactoryType.MAX_ID];
-        ItemStack me = new ItemStack(this);
-        for (FactoryType ft : getSockets()) {
-            me.setItemDamage(ft.md);
-            socketIIcons[ft.md] = register.registerIcon(getUnlocalizedName(me).replace("item.", ""));
-        }
-    }
-    
     @Override
     public String getUnlocalizedName(ItemStack is) {
         int md = is.getItemDamage();
@@ -94,23 +80,12 @@ public class ItemSocketPart extends ItemFactorization {
             list.add(ft.asSocketItem());
         }
     }
-    
+
     @Override
-    @SideOnly(Side.CLIENT)
-    public IIcon getIconFromDamage(int md) {
-        if (md > 0 && md < socketIIcons.length) {
-            return socketIIcons[md];
-        }
-        return super.getIconFromDamage(md);
-    }
-    
-    @Override
-    public boolean onItemUse(ItemStack is, EntityPlayer player,
-            World world, BlockPos pos, int side,
-            float hitX, float hitY, float hitZ) {
+    public boolean onItemUse(ItemStack stack, EntityPlayer player, World world, BlockPos pos, EnumFacing side, float hitX, float hitY, float hitZ) {
         return true;
     }
-    
+
     @Override
     protected void addExtraInformation(ItemStack is, EntityPlayer player, List list, boolean verbose) {
         list.add(LangUtil.translate("item.factorization:socket_info"));

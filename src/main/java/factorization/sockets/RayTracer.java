@@ -75,7 +75,7 @@ public class RayTracer {
 
         for (IDeltaChunk idc : DeltaChunk.getSlicesContainingPoint(trueCoord)) {
             FzOrientation orientation = shadowOrientation(idc);
-            if (orientation == FzOrientation.UNKNOWN) continue;
+            if (orientation == null) continue;
             Coord at = new Coord(base);
             Vec3 v = SpaceUtil.newVec();
             at.setAsVector(v);
@@ -132,11 +132,11 @@ public class RayTracer {
         EnumFacing top = SpaceUtil.round(topVec, null);
         EnumFacing facing = SpaceUtil.round(faceVec, top);
         FzOrientation to = FzOrientation.fromDirection(top);
-        if (to == FzOrientation.UNKNOWN) {
+        if (to == null) {
             return FzOrientation.fromDirection(facing);
         }
         FzOrientation tofo = to.pointTopTo(facing);
-        if (tofo == FzOrientation.UNKNOWN) {
+        if (tofo == null) {
             return to;
         }
         return tofo;

@@ -29,10 +29,7 @@ import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.AxisAlignedBB;
-import net.minecraft.util.EnumFacing;
-import net.minecraft.util.MovingObjectPosition;
-import net.minecraft.util.Vec3;
+import net.minecraft.util.*;
 import net.minecraftforge.client.IItemRenderer;
 import net.minecraftforge.client.event.RenderWorldLastEvent;
 import net.minecraftforge.common.ForgeHooks;
@@ -137,10 +134,10 @@ public class TileEntityDayBarrel extends TileEntityFactorization implements ISor
         }
         needLogic();
         
-        if (orientation == FzOrientation.UNKNOWN) {
+        if (orientation == null) {
             return;
         }
-        if (notice_target == this && worldObj.getBlockPowerInput(pos.getX(), pos.getY(), pos.getZ()) > 0) {
+        if (notice_target == this && worldObj.getStrongPower(pos) > 0) {
             return;
         }
         boolean youve_changed_jim = false;
@@ -377,7 +374,7 @@ public class TileEntityDayBarrel extends TileEntityFactorization implements ISor
     }
     
     void updateClients(MessageType messageType) {
-        if (getWorldObj() == null || getWorldObj().isRemote) {
+        if (worldObj == null || worldObj.isRemote) {
             return;
         }
         broadcastMessage(null, getPacket(messageType));
@@ -525,7 +522,7 @@ public class TileEntityDayBarrel extends TileEntityFactorization implements ISor
                 spammed = true;
             }
         }
-        worldObj.markTileEntityChunkModified(pos.getX(), pos.getY(), pos.getZ(), this);
+        worldObj.markChunkDirty(pos, this);
     }
 
     @Override
@@ -693,8 +690,8 @@ public class TileEntityDayBarrel extends TileEntityFactorization implements ISor
             return true;
         }
         AxisAlignedBB ab = c.getCollisionBoundingBox();
-        ArrayList<AxisAlignedBB> list = new ArrayList();
-        b.addCollisionBoxesToList(c.w, c.x, c.y, c.z, ab, list, null);
+        ArrayList<AxisAlignedBB> list = new ArrayList<AxisAlignedBB>();
+        b.addCollisionBoxesToList(c.w, c.toBlockPos(), c.getState(), ab, list, null);
         for (AxisAlignedBB bb : list) {
             if (bb.maxY - c.y <= 0.51) {
                 return true;
@@ -777,7 +774,7 @@ public class TileEntityDayBarrel extends TileEntityFactorization implements ISor
         }
         src.rmTE();
         src.setAir();
-        if (newOrientation != FzOrientation.UNKNOWN) {
+        if (newOrientation != null) {
             this.orientation = newOrientation;
         }
         this.validate();
@@ -810,7 +807,7 @@ public class TileEntityDayBarrel extends TileEntityFactorization implements ISor
             return;
         }
         ItemStack origHeldItem = entityplayer.getHeldItem();
-        if (ForgeHooks.canToolHarvestBlock(Blocks.log, 0, origHeldItem)) {
+        if (ForgeHooks.canToolHarvestBlock(worldObj, pos, origHeldItem)) {
             return;
         }
         
@@ -880,24 +877,7 @@ public class TileEntityDayBarrel extends TileEntityFactorization implements ISor
         float v = count/(float)max;
         return (int) Math.max(1, v*14);
     }
-    
-    @Override
-    @SideOnly(Side.CLIENT)
-    public IIcon getIcon(EnumFacing dir) {
-        if (dir.getDirectionVec().getY() != 0) {
-            Block ws = DataUtil.getBlock(woodSlab);
-            if (ws != null) {
-                return ws.getIcon(0, woodSlab.getItemDamage());
-            }
-            return woodSlab.getItem().getIcon(woodSlab, 0);
-        }
-        Block wl = DataUtil.getBlock(woodLog);
-        if (wl != null) {
-            return wl.getIcon(2, woodLog.getItemDamage());
-        }
-        return woodLog.getItem().getIcon(woodLog, 0);
-    }
-    
+
     @Override
     public void dropContents() {
         if (type == Type.CREATIVE || (type == Type.SILKY && broken_with_silk_touch)) {
@@ -1155,7 +1135,7 @@ public class TileEntityDayBarrel extends TileEntityFactorization implements ISor
         MovingObjectPosition mop = mc.objectMouseOver;
         if (mop == null || mop.hitVec == null || mop.typeOfHit != MovingObjectPosition.MovingObjectType.BLOCK) return;
         Vec3 vec = mop.hitVec;
-        FzOrientation orientation = SpaceUtil.getOrientation(player, mop.sideHit, (float) (vec.xCoord - mop.blockX), (float) (vec.yCoord - mop.blockY), (float) (vec.zCoord - mop.blockZ));
+        FzOrientation orientation = SpaceUtil.getOrientation(player, mop.sideHit, vec.subtract(new Vec3(mop.getBlockPos())));
         if (orientation.top.getDirectionVec().getY() == 1) {
             /*
              * The purpose of this is two-fold:
@@ -1166,14 +1146,15 @@ public class TileEntityDayBarrel extends TileEntityFactorization implements ISor
         }
         GL11.glPushMatrix();
         {
-            EntityLivingBase camera = Minecraft.getMinecraft().renderViewEntity;
+            Entity camera = Minecraft.getMinecraft().getRenderViewEntity();
             double cx = camera.lastTickPosX + (camera.posX - camera.lastTickPosX) * (double) event.partialTicks;
             double cy = camera.lastTickPosY + (camera.posY - camera.lastTickPosY) * (double) event.partialTicks;
             double cz = camera.lastTickPosZ + (camera.posZ - camera.lastTickPosZ) * (double) event.partialTicks;
             GL11.glTranslated(-cx, -cy, -cz);
         }
-        EnumFacing fd = SpaceUtil.getOrientation(mop.sideHit);
-        GL11.glTranslatef(mop.blockX + fd.getDirectionVec().getX(), mop.blockY + fd.getDirectionVec().getY(), mop.blockZ + fd.getDirectionVec().getZ());
+        EnumFacing fd = mop.sideHit;
+        BlockPos v = mop.getBlockPos().add(fd.getDirectionVec());
+        GL11.glTranslatef(v.getX(), v.getY(), v.getZ());
         GL11.glColor4f(0.0F, 0.0F, 0.0F, 0.4F);
         GL11.glDisable(GL11.GL_ALPHA_TEST);
         GL11.glDisable(GL11.GL_TEXTURE_2D);

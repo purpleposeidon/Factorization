@@ -50,7 +50,7 @@ public class Spin extends Instruction {
             newTop = newTop.getRotation(motor.getOrientation().facing);
         }
         FzOrientation next = motor.getOrientation().pointTopTo(newTop);
-        if (next != FzOrientation.UNKNOWN) {
+        if (next != null) {
             motor.setOrientation(next);
         }
     }

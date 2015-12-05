@@ -11,13 +11,14 @@ import factorization.fzds.interfaces.Interpolation;
 import factorization.shared.Core;
 import factorization.shared.Core.TabType;
 import factorization.shared.ItemBlockProxy;
+import factorization.util.SpaceUtil;
 import net.minecraft.block.Block;
-import net.minecraft.client.renderer.texture.IIconRegister;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.util.BlockPos;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.Vec3;
 import net.minecraft.world.World;
@@ -106,12 +107,9 @@ public class ItemTwistedBlock extends ItemBlockProxy {
 
         return true;
     }
-    
+
     @Override
     public void getSubItems(Item itemId, CreativeTabs tab, List list) {
         list.add(new ItemStack(this));
     }
-
-    @Override
-    public void registerIcons(IIconRegister registry) { }
 }

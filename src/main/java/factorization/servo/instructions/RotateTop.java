@@ -41,7 +41,7 @@ public class RotateTop extends Instruction {
 
     void hit(AbstractServoMachine motor) {
         FzOrientation o = motor.getOrientation().pointTopTo(top.getOpposite());
-        if (o != FzOrientation.UNKNOWN) {
+        if (o != null) {
             motor.setOrientation(o);
         }
     }
