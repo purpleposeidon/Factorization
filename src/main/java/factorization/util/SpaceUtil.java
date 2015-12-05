@@ -229,6 +229,12 @@ public final class SpaceUtil {
         return new AxisAlignedBB(minX, minY, minZ, maxX, maxY, maxZ);
     }
 
+    public static AxisAlignedBB newBoxUnsort(Vec3 min, Vec3 max) {
+        return new AxisAlignedBB(
+                min.xCoord, min.yCoord, min.zCoord,
+                max.xCoord, max.yCoord, max.zCoord);
+    }
+
     public static AxisAlignedBB createAABB(Coord min, Coord max) {
         return new AxisAlignedBB(min.x, min.y, min.z,
                 max.x, max.y, max.z);
@@ -257,6 +263,34 @@ public final class SpaceUtil {
                 new Vec3(box.maxX, box.maxY, box.maxZ),
                 new Vec3(box.maxX, box.minY, box.maxZ)
         };
+    }
+
+    public static Vec3 getLowest(Vec3[] vs) {
+        double x, y, z;
+        x = vs[0].xCoord;
+        y = vs[0].yCoord;
+        z = vs[0].zCoord;
+        for (int i = 1; i < vs.length; i++) {
+            Vec3 v = vs[i];
+            if (v.xCoord < x) x = v.xCoord;
+            if (v.yCoord < y) y = v.yCoord;
+            if (v.zCoord < z) z = v.zCoord;
+        }
+        return new Vec3(x, y, z);
+    }
+
+    public static Vec3 getHighest(Vec3[] vs) {
+        double x, y, z;
+        x = vs[0].xCoord;
+        y = vs[0].yCoord;
+        z = vs[0].zCoord;
+        for (int i = 1; i < vs.length; i++) {
+            Vec3 v = vs[i];
+            if (v.xCoord > x) x = v.xCoord;
+            if (v.yCoord > y) y = v.yCoord;
+            if (v.zCoord > z) z = v.zCoord;
+        }
+        return new Vec3(x, y, z);
     }
 
     public static ArrayList<EnumFacing> getRandomDirections(Random rand) {
@@ -551,5 +585,9 @@ public final class SpaceUtil {
         if (a == EnumFacing.Axis.X) return EnumFacing.WEST;
         if (a == EnumFacing.Axis.Z) return EnumFacing.NORTH;
         return null;
+    }
+
+    public static AxisAlignedBB newBox() {
+        return new AxisAlignedBB(0, 0, 0, 0, 0, 0);
     }
 }

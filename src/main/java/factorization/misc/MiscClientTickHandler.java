@@ -67,7 +67,7 @@ public class MiscClientTickHandler {
         if (player == null) {
             return;
         }
-        boolean keyPressed = pickBlock.getIsKeyPressed();
+        boolean keyPressed = pickBlock.isKeyDown();
         if (!keyPressed) {
             was_activated = false;
             return;
@@ -203,7 +203,7 @@ public class MiscClientTickHandler {
         if (sprint.getKeyCode() == 0) {
             return;
         }
-        final boolean state = sprint.getIsKeyPressed();
+        final boolean state = sprint.isKeyDown();
         final int forwardCode = mc.gameSettings.keyBindForward.getKeyCode();
         if (state) {
             if (!mc.thePlayer.isSneaking()) {

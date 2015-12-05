@@ -21,6 +21,7 @@ import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.NetHandlerPlayServer;
 import net.minecraft.server.management.ItemInWorldManager;
+import net.minecraft.util.BlockPos;
 import net.minecraft.util.MovingObjectPosition;
 import net.minecraft.util.Vec3;
 import net.minecraft.world.World;
@@ -383,6 +384,12 @@ public class HammerNet {
          * Some GUIs might be whitelisted. Crafting tables shouldn't be too hard; chests shouldn't be any harder; furnaces might be achievable.
          */
     }
+
+    public static void writePos(ByteArrayDataOutput out, BlockPos pos) {
+        out.writeInt(pos.getX());
+        out.writeInt(pos.getY());
+        out.writeInt(pos.getZ());
+    }
     
     public static FMLProxyPacket makePacket(byte type, Object... items) {
         ByteArrayDataOutput dos = ByteStreams.newDataOutput();
@@ -401,10 +408,8 @@ public class HammerNet {
                 dos.writeDouble((Double) obj);
             } else if (obj instanceof MovingObjectPosition) { 
                 MovingObjectPosition mop = (MovingObjectPosition) obj;
-                dos.writeInt(mop.blockX);
-                dos.writeInt(mop.blockY);
-                dos.writeInt(mop.blockZ);
-                dos.writeByte((byte) mop.sideHit);
+                writePos(dos, mop.getBlockPos());
+                dos.writeByte((byte) mop.sideHit.ordinal());
             } else if (obj instanceof Vec3) {
                 Vec3 vec = (Vec3) obj;
                 dos.writeDouble(vec.xCoord);

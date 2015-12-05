@@ -381,7 +381,7 @@ public class TileEntityWaterWheel extends TileEntityCommon implements IRotationa
                 boolean lavaOkay = lavaOkay(here, hereBlock);
                 if (!waterOkay && !lavaOkay) return;
 
-                Coord real = idc.shadow2realCoordPrecise(here);
+                Coord real = idc.shadow2realPrecise(here);
                 Block realBlock = real.getBlock();
                 tmp.xCoord = tmp.yCoord = tmp.zCoord = 0;
                 if (waterOkay && realBlock.getMaterial() == Material.water) {

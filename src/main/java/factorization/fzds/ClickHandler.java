@@ -7,12 +7,13 @@ import factorization.fzds.network.HammerNet.HammerNetType;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.entity.EntityClientPlayerMP;
+import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.client.multiplayer.PlayerControllerMP;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.MovingObjectPosition;
+import net.minecraft.util.Vec3;
 import net.minecraft.world.World;
 import net.minecraftforge.event.entity.player.AttackEntityEvent;
 import net.minecraftforge.event.entity.player.EntityInteractEvent;
@@ -53,6 +54,7 @@ public class ClickHandler {
         if (!parent.can(DeltaCapability.INTERACT)) {
             return;
         }
+        FMLProxyPacket toSend;
         event.setCanceled(true);
         switch (hit.typeOfHit) {
         case ENTITY:
@@ -63,16 +65,14 @@ public class ClickHandler {
         case BLOCK:
             if (rightClick) {
                 toSend = HammerNet.makePacket(HammerNetType.rightClickBlock, parent.getEntityId(), hit,
-                        (float) (hit.hitVec.xCoord - hit.blockX),
-                        (float) (hit.hitVec.yCoord - hit.blockY),
-                        (float) (hit.hitVec.zCoord - hit.blockZ));
+                        hit.hitVec.subtract(new Vec3(hit.getBlockPos())));
                 Coord at = new Coord(DeltaChunk.getClientShadowWorld(), hit);
                 Block block = at.getBlock();
                 EntityPlayer real_player = Minecraft.getMinecraft().thePlayer;
                 Hammer.proxy.setShadowWorld();
                 try {
                     EntityPlayer shadow_player = Minecraft.getMinecraft().thePlayer;
-                    if (block.onBlockActivated(at.w, at.x, at.y, at.z, shadow_player, hit.sideHit, (float) hit.hitVec.xCoord, (float) hit.hitVec.yCoord, (float) hit.hitVec.zCoord)) {
+                    if (block.onBlockActivated(at.w, at.toBlockPos(), at.getState(), shadow_player, hit.sideHit, (float) hit.hitVec.xCoord, (float) hit.hitVec.yCoord, (float) hit.hitVec.zCoord)) {
                         real_player.swingItem();
                     }
                 } finally {
@@ -83,9 +83,7 @@ public class ClickHandler {
                     return;
                 }
                 toSend = HammerNet.makePacket(HammerNetType.leftClickBlock, parent.getEntityId(), hit,
-                        (float) (hit.hitVec.xCoord - hit.blockX),
-                        (float) (hit.hitVec.yCoord - hit.blockY),
-                        (float) (hit.hitVec.zCoord - hit.blockZ));
+                        hit.hitVec.subtract(new Vec3(hit.getBlockPos())));
                 current_attacking_target = hit;
                 // Digging code happens in a ticker
             }
@@ -110,9 +108,7 @@ public class ClickHandler {
             return;
         }
         MovingObjectPosition hit = Hammer.proxy.getShadowHit();
-        if (current_attacking_target.blockX != hit.blockX
-                || current_attacking_target.blockY != hit.blockY
-                || current_attacking_target.blockZ != hit.blockZ
+        if (!current_attacking_target.getBlockPos().equals(hit.getBlockPos())
                 || current_attacking_target.subHit != hit.subHit) {
             resetClick();
             resetProgress();
@@ -134,25 +130,25 @@ public class ClickHandler {
             left_click_delay--;
             return;
         }
-        EntityClientPlayerMP player = Minecraft.getMinecraft().thePlayer;
+        EntityPlayerSP player = Minecraft.getMinecraft().thePlayer;
         if (player == null) return;
         World shadowWorld = DeltaChunk.getClientShadowWorld();
         Minecraft mc = Minecraft.getMinecraft();
         Coord at = new Coord(shadowWorld, hit);
         Block hitBlock = at.getBlock();
         PlayerControllerMP controller = mc.playerController;
-        if (!(mc.currentScreen == null && mc.gameSettings.keyBindAttack.getIsKeyPressed() && mc.inGameHasFocus)) {
+        if (!(mc.currentScreen == null && mc.gameSettings.keyBindAttack.isKeyDown() && mc.inGameHasFocus)) {
             resetProgress();
             return;
         }
-        if (controller.currentGameType.isAdventure() && !player.isCurrentToolAdventureModeExempt(hit.blockX, hit.blockY, hit.blockZ)) return;
+        if (!player.canPlayerEdit(hit.getBlockPos(), hit.sideHit, player.getHeldItem())) return;
         if (controller.currentGameType.isCreative()) {
             if (!Hammer.proxy.getHitIDC().can(DeltaCapability.BLOCK_MINE)) return;
             sendDigPacket(HammerNetType.digFinish, hit);
             Hammer.proxy.setShadowWorld();
             try {
-                if (shadowWorld.extinguishFire(player, hit.blockX, hit.blockY, hit.blockZ, hit.sideHit)) return; // :|
-                controller.onPlayerDestroyBlock(hit.blockX, hit.blockY, hit.blockZ, hit.sideHit);
+                if (shadowWorld.extinguishFire(player, hit.getBlockPos(), hit.sideHit)) return; // :|
+                controller.onPlayerDestroyBlock(hit.getBlockPos(), hit.sideHit);
             }
             finally {
                 Hammer.proxy.restoreRealWorld();
@@ -165,7 +161,7 @@ public class ClickHandler {
         }
         
         if (progress == 0) {
-            hitBlock.onBlockClicked(shadowWorld, hit.blockX, hit.blockY, hit.blockZ, player);
+            hitBlock.onBlockClicked(shadowWorld, hit.getBlockPos(), player);
             original_block = hit;
             original_tool = player.getHeldItem();
         } else {
@@ -186,12 +182,12 @@ public class ClickHandler {
                     return;
                 }
             }
-            if (hit.blockX != original_block.blockX || hit.blockY != original_block.blockY || hit.blockZ != original_block.blockZ) {
+            if (!hit.getBlockPos().equals(original_block.getBlockPos())) {
                 resetProgress();
                 return;
             }
         }
-        progress += hitBlock.getPlayerRelativeBlockHardness(player, shadowWorld, hit.blockX, hit.blockY, hit.blockZ);
+        progress += hitBlock.getPlayerRelativeBlockHardness(player, shadowWorld, hit.getBlockPos());
         player.swingItem();
         byte packetType = progress == 0 ? HammerNetType.digStart : HammerNetType.digProgress;
         if (progress >= 1) {
@@ -203,12 +199,12 @@ public class ClickHandler {
             resetClick();
             Hammer.proxy.setShadowWorld();
             try {
-                controller.onPlayerDestroyBlock(hit.blockX, hit.blockY, hit.blockZ, hit.sideHit);
+                controller.onPlayerDestroyBlock(hit.getBlockPos(), hit.sideHit);
             } finally {
                 Hammer.proxy.restoreRealWorld();
             }
         } else {
-            HammerClientProxy.shadowRenderGlobal.destroyBlockPartially(player.getEntityId(), hit.blockX, hit.blockY, hit.blockZ, (int) (progress*10F) - 1);
+            HammerClientProxy.shadowRenderGlobal.sendBlockBreakProgress(player.getEntityId(), hit.getBlockPos(), (int) (progress * 10F) - 1);
         }
     }
     
@@ -225,7 +221,7 @@ public class ClickHandler {
         if (current_attacking_target != null) {
             EntityPlayer player = Minecraft.getMinecraft().thePlayer;
             MovingObjectPosition hit = current_attacking_target;
-            HammerClientProxy.shadowRenderGlobal.destroyBlockPartially(player.getEntityId(), hit.blockX, hit.blockY, hit.blockZ, -1);
+            HammerClientProxy.shadowRenderGlobal.sendBlockBreakProgress(player.getEntityId(), hit.getBlockPos(), -1);
         }
         progress = 0;
         current_attacking_target = null;

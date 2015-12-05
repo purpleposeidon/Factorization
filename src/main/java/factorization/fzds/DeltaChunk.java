@@ -5,9 +5,11 @@ import factorization.api.DeltaCoord;
 import factorization.fzds.interfaces.IDeltaChunk;
 import factorization.fzds.network.InteractionLiason;
 import factorization.fzds.network.PacketProxyingPlayer;
+import factorization.util.SpaceUtil;
 import gnu.trove.set.hash.THashSet;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.util.BlockPos;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.Vec3;
 import net.minecraft.world.World;
@@ -131,20 +133,18 @@ public class DeltaChunk {
         }
         return closest;
     }
-    
-    private static Vec3 buffer = new Vec3(0, 0, 0);
-    
-    public static Vec3 shadow2nearestReal(Entity player, double x, double y, double z) {
+
+    public static BlockPos shadow2nearestReal(Entity player, BlockPos pos) {
+        return new BlockPos(shadow2nearestReal(player, new Vec3(pos)));
+    }
+
+    public static Vec3 shadow2nearestReal(Entity player, Vec3 vec) {
         //The JVM sometimes segfaults in this function.
-        IDeltaChunk closest = findClosest(player, new Coord(player.world, pos));
+        IDeltaChunk closest = findClosest(player, new Coord(player.worldObj, vec));
         if (closest == null) {
             return null;
         }
-        buffer.xCoord = x;
-        buffer.yCoord = y;
-        buffer.zCoord = z;
-        Vec3 ret = closest.shadow2real(buffer);
-        return ret;
+        return closest.shadow2real(vec);
     }
 
     public static int getDimensionId() {
@@ -229,7 +229,7 @@ public class DeltaChunk {
         for (Chunk chunk : chunks) {
             for (EnumFacing fd : EnumFacing.VALUES) {
                 if (fd.getDirectionVec().getY() != 0) continue;
-                edges.add(chunk.worldObj.getChunkFromChunkCoords(chunk.xPosition + fd.getDirectionVec().getX(), chunk.zPosition + fd.getDirectionVec().getZ()));
+                edges.add(chunk.getWorld().getChunkFromChunkCoords(chunk.xPosition + fd.getDirectionVec().getX(), chunk.zPosition + fd.getDirectionVec().getZ()));
             }
         }
         chunks.addAll(edges);

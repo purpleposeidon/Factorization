@@ -4,6 +4,7 @@ import com.google.common.collect.BiMap;
 import factorization.fzds.interfaces.IFzdsShenanigans;
 import factorization.shared.Core;
 import net.minecraft.network.EnumConnectionState;
+import net.minecraft.network.EnumPacketDirection;
 import net.minecraft.network.Packet;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.network.play.client.C17PacketCustomPayload;
@@ -13,28 +14,13 @@ import net.minecraftforge.fml.common.network.internal.FMLProxyPacket;
 import java.io.IOException;
 
 public abstract class WrappedPacket extends Packet implements IFzdsShenanigans {
-    /**
-     * These fields hold the packet maps.
-     * See {@link net.minecraft.util.MessageDeserializer#decode}
-     */
-    static final BiMap<Integer, Class> serverPacketMap = EnumConnectionState.PLAY.func_150755_b();
-    static final BiMap<Integer, Class> clientPacketMap = EnumConnectionState.PLAY.func_150753_a();
-    
-    
-    static int server_packet_id = 92;
-    static int client_packet_id = 92;
     public static void registerPacket() {
-        if (serverPacketMap.containsKey(server_packet_id)) {
-            throw new RuntimeException("Packet " + server_packet_id + " is already registered!");
-        }
-        serverPacketMap.put(server_packet_id, WrappedPacketFromServer.class); //server -> client packets
-        EnumConnectionState.PLAY.field_150761_f.put(WrappedPacketFromServer.class, EnumConnectionState.PLAY);
-
-        if (clientPacketMap.containsKey(client_packet_id)) {
-            throw new RuntimeException("Packet " + client_packet_id + " is already registered!");
-        }
-        clientPacketMap.put(client_packet_id, WrappedPacketFromClient.class);
-        EnumConnectionState.PLAY.field_150761_f.put(WrappedPacketFromClient.class, EnumConnectionState.PLAY);
+        EnumConnectionState.PLAY.registerPacket(EnumPacketDirection.CLIENTBOUND, WrappedPacketFromServer.class);
+        EnumConnectionState.PLAY.registerPacket(EnumPacketDirection.SERVERBOUND, WrappedPacketFromClient.class);
+        int clientBound = EnumConnectionState.PLAY.getPacketId(EnumPacketDirection.CLIENTBOUND, new WrappedPacketFromServer());
+        int serverBound = EnumConnectionState.PLAY.getPacketId(EnumPacketDirection.SERVERBOUND, new WrappedPacketFromClient());
+        Core.logSevere("clientBound FZDS packet ID: " + clientBound);
+        Core.logSevere("serverBound FZDS packet ID: " + serverBound);
     }
     
     Packet wrapped = null;

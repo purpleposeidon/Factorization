@@ -7,6 +7,8 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.DestroyBlockProgress;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.util.BlockPos;
+import net.minecraft.util.EnumParticleTypes;
 import net.minecraft.util.Vec3;
 import net.minecraft.world.IWorldAccess;
 import net.minecraft.world.World;
@@ -24,15 +26,22 @@ class ShadowRenderGlobal implements IWorldAccess {
         this.realWorld = realWorld;
     }
     //The coord arguments are always in shadowspace.
-    
+
+
     @Override
-    public void markBlockForUpdate(int var1, int var2, int var3) {
-        markBlocksForUpdate(var1 - 1, var2 - 1, var3 - 1, var1 + 1, var2 + 1, var3 + 1);
+    public void markBlockForUpdate(BlockPos pos) {
+        int x = pos.getX();
+        int y = pos.getY();
+        int z = pos.getZ();
+        markBlockRangeForRenderUpdate(x, y, z, x, y, z);
     }
 
     @Override
-    public void markBlockForRenderUpdate(int var1, int var2, int var3) {
-        markBlocksForUpdate(var1 - 1, var2 - 1, var3 - 1, var1 + 1, var2 + 1, var3 + 1);
+    public void notifyLightSet(BlockPos pos) {
+        int x = pos.getX();
+        int y = pos.getY();
+        int z = pos.getZ();
+        markBlockRangeForRenderUpdate(x, y, z, x, y, z);
     }
 
     @Override
@@ -59,7 +68,7 @@ class ShadowRenderGlobal implements IWorldAccess {
     @Override
     public void playSound(String sound, double x, double y, double z, float volume, float pitch) {
         if (sound == null) return; // Odd. Has happened a few times tho.
-        Vec3 realCoords = DeltaChunk.shadow2nearestReal(Minecraft.getMinecraft().thePlayer, pos);
+        Vec3 realCoords = DeltaChunk.shadow2nearestReal(Minecraft.getMinecraft().thePlayer, new Vec3(x, y, z));
         if (realCoords == null) {
             return;
         }
@@ -69,18 +78,18 @@ class ShadowRenderGlobal implements IWorldAccess {
     @Override
     public void playSoundToNearExcept(EntityPlayer entityplayer, String sound, double x, double y, double z, float volume, float pitch) {
         if (entityplayer != Minecraft.getMinecraft().thePlayer) {
-            playSound(sound, pos, volume, pitch);
+            playSound(sound, x, y, z, volume, pitch);
         }
     }
 
 
     @Override
     public void playRecord(String recordName, BlockPos pos) {
-        Vec3 realCoords = DeltaChunk.shadow2nearestReal(Minecraft.getMinecraft().thePlayer, pos);
+        BlockPos realCoords = DeltaChunk.shadow2nearestReal(Minecraft.getMinecraft().thePlayer, pos);
         if (realCoords == null) {
             return;
         }
-        HammerClientProxy.getRealRenderGlobal().playRecord(recordName, (int) realCoords.xCoord, (int) realCoords.yCoord, (int) realCoords.zCoord);
+        HammerClientProxy.getRealRenderGlobal().playRecord(recordName, realCoords);
     }
 
     @Override
@@ -97,54 +106,56 @@ class ShadowRenderGlobal implements IWorldAccess {
     public void playAuxSFX(EntityPlayer player, int soundType, BlockPos pos, int soundData) {
         final Coord here = new Coord(DeltaChunk.getClientShadowWorld(), pos);
         for (IDeltaChunk idc : DeltaChunk.getSlicesContainingPoint(here)) {
-            Coord at = here.copy();
-            idc.shadow2real(at);
-            at.w.playAuxSFXAtEntity /* MCP name fail */(player, soundType, at.x, at.y, at.z, soundData);
+            Coord at = idc.shadow2realCoord(here);
+            at.w.playAuxSFXAtEntity(player, soundType, at.toBlockPos(), soundData);
         }
     }
 
+    EnumParticleTypes[] particles = EnumParticleTypes.values();
+
     @Override
-    public void spawnParticle(String particle, double x, double y, double z, double vx, double vy, double vz) {
-        Vec3 realCoords = DeltaChunk.shadow2nearestReal(Minecraft.getMinecraft().thePlayer, pos);
+    public void spawnParticle(int particleID, boolean ignoreRange, double x, double y, double z, double vx, double vy, double vz, int... params) {
+        Vec3 realCoords = DeltaChunk.shadow2nearestReal(Minecraft.getMinecraft().thePlayer, new Vec3(x, y, z));
         if (realCoords == null) {
             return;
         }
+        // NORELEASE: Block break particles are still in need of fixing.
+        x = realCoords.xCoord;
+        y = realCoords.yCoord;
+        z = realCoords.zCoord;
         if (!Hammer.proxy.isInShadowWorld()) {
             // Shouldn't happen
-            realWorld.spawnParticle(particle, realCoords.xCoord, realCoords.yCoord, realCoords.zCoord, vx, vy, vz);
+            realWorld.spawnParticle(particles[particleID], ignoreRange, x, y, z, vx, vy, vz, params);
         } else {
             Hammer.proxy.restoreRealWorld();
-            realWorld.spawnParticle(particle, realCoords.xCoord, realCoords.yCoord, realCoords.zCoord, vx, vy, vz);
+            realWorld.spawnParticle(particles[particleID], ignoreRange, x, y, z, vx, vy, vz, params);
             Hammer.proxy.setShadowWorld();
         }
     }
-    
+
     @Override
-    public void onEntityCreate(Entity entity) {
-        HammerClientProxy.getRealRenderGlobal().onEntityCreate(entity);
-    }
-    
-    @Override
-    public void onEntityDestroy(Entity entity) {
-        HammerClientProxy.getRealRenderGlobal().onEntityDestroy(entity);
+    public void onEntityAdded(Entity entity) {
+        HammerClientProxy.getRealRenderGlobal().onEntityAdded(entity);
     }
 
-    HashMap<Integer, DestroyBlockProgress> damagedBlocks = new HashMap();
-    
     @Override
-    public void destroyBlockPartially(int breakerId, int blockX, int blockY, int blockZ, int damageProgress) {
+    public void onEntityRemoved(Entity entity) {
+        HammerClientProxy.getRealRenderGlobal().onEntityRemoved(entity);
+    }
+
+    HashMap<Integer, DestroyBlockProgress> damagedBlocks = new HashMap<Integer, DestroyBlockProgress>();
+
+    @Override
+    public void sendBlockBreakProgress(int breakerId, BlockPos pos, int damageProgress) {
         if (!(damageProgress >= 0 && damageProgress < 10)) {
             damagedBlocks.remove(Integer.valueOf(breakerId));
             return;
         }
         DestroyBlockProgress destroyblockprogress = (DestroyBlockProgress) damagedBlocks.get(Integer.valueOf(breakerId));
 
-        if (destroyblockprogress == null
-                || destroyblockprogress.getPartialBlockX() != blockX
-                || destroyblockprogress.getPartialBlockY() != blockY
-                || destroyblockprogress.getPartialBlockZ() != blockZ) {
-            destroyblockprogress = new DestroyBlockProgress(breakerId, blockX, blockY, blockZ);
-            damagedBlocks.put(Integer.valueOf(breakerId), destroyblockprogress);
+        if (destroyblockprogress == null || !destroyblockprogress.getPosition().equals(pos)) {
+            destroyblockprogress = new DestroyBlockProgress(breakerId, pos);
+            damagedBlocks.put(breakerId, destroyblockprogress);
         }
 
         destroyblockprogress.setPartialBlockDamage(damageProgress);
@@ -166,9 +177,4 @@ class ShadowRenderGlobal implements IWorldAccess {
         }
     }
 
-    @Override
-    public void onStaticEntitiesChanged() {
-        // TODO Auto-generated method stub
-    }
-    
 }

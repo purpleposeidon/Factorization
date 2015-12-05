@@ -5,6 +5,7 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.BlockPos;
 import net.minecraft.util.ChatComponentTranslation;
 import net.minecraft.util.IChatComponent;
 import net.minecraft.util.Vec3;
@@ -228,12 +229,12 @@ public class Notice {
             }
         } else if (where instanceof ISaneCoord) {
             ISaneCoord coord = (ISaneCoord) where;
-            if (!coord.w().blockExists(coord.x(), coord.y(), coord.z())) {
+            if (!coord.w().isBlockLoaded(new BlockPos(coord.x(), coord.y(), coord.z()))) {
                 return false;
             }
         } else if (where instanceof Vec3 && world != null) {
             Vec3 vec = (Vec3) where;
-            if (!world.blockExists((int) vec.xCoord, (int) vec.yCoord, (int) vec.zCoord)) {
+            if (!world.isBlockLoaded(new BlockPos(vec))) {
                 return false;
             }
         }

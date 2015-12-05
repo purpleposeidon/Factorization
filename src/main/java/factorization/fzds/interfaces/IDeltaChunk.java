@@ -131,16 +131,10 @@ public abstract class IDeltaChunk extends EntityFz {
      */
     public void changeRotationCenter(Vec3 newCenter) {
         Vec3 origCenter = getRotationalCenterOffset();
-        Vec3 shadowCenter = real2shadow(newCenter);
         Coord min = getCorner();
-        shadowCenter.xCoord -= min.x;
-        shadowCenter.yCoord -= min.y;
-        shadowCenter.zCoord -= min.z;
+        Vec3 shadowCenter = real2shadow(newCenter).subtract(min.x, min.y, min.z);
         setRotationalCenterOffset(shadowCenter);
-        Vec3 ds = origCenter.subtract(shadowCenter);
-        ds.xCoord += posX;
-        ds.yCoord += posY;
-        ds.zCoord += posZ;
+        Vec3 ds = origCenter.subtract(shadowCenter).add(SpaceUtil.fromEntPos(this));
         setPosition(ds.xCoord, ds.yCoord, ds.zCoord);
     }
     
@@ -221,37 +215,16 @@ public abstract class IDeltaChunk extends EntityFz {
      */
     public abstract Vec3 shadow2real(final Vec3 shadowVector);
 
-    /** TODO: Remove usages
-     * @param realCoord A {@link Coord} in real world coordinates that will be mutated into shadow coordinates.
-     */
-    @Deprecated // Use real2shadowCoord
-    public abstract void real2shadow(Coord realCoord);
-
-    /** TODO: Remove usages
-     * @param shadowCoord A {@link Coord} in shadow coordinates that will be mutated into real coordinates
-     */
-    @Deprecated // Use shadow2realCoord
-    public abstract void shadow2real(Coord shadowCoord);
-
-    public Coord shadow2realCoord(Coord realCoord) {
+    public Coord shadow2real(Coord realCoord) {
         Coord ret = realCoord.copy();
         shadow2real(ret);
         return ret;
     }
 
-    public Coord shadow2realCoordPrecise(Coord real) {
-        Vec3 r = real.toVector();
-        r.xCoord += 0.5;
-        r.yCoord += 0.5;
-        r.zCoord += 0.5;
+    public Coord shadow2realPrecise(Coord real) {
+        Vec3 r = real.toMiddleVector();
         Vec3 s = shadow2real(r);
         return new Coord(worldObj, (int) Math.floor(s.xCoord), (int) Math.floor(s.yCoord), (int) Math.floor(s.zCoord));
-    }
-
-    public Coord real2shadowCoord(Coord realCoord) {
-        Coord ret = realCoord.copy();
-        real2shadow(ret);
-        return ret;
     }
 
     /**
