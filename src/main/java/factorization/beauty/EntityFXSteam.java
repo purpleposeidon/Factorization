@@ -8,7 +8,7 @@ import net.minecraft.world.World;
 
 public class EntityFXSteam extends EntityFX {
     int ux, vx;
-    protected EntityFXSteam(World world, double x, double y, double z, IIcon icon) {
+    protected EntityFXSteam(World world, double x, double y, double z) {
         super(world, x, y, z);
         setParticleIcon(icon);
         ux = world.rand.nextInt(0xF - 4);

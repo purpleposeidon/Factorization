@@ -590,4 +590,8 @@ public final class SpaceUtil {
     public static AxisAlignedBB newBox() {
         return new AxisAlignedBB(0, 0, 0, 0, 0, 0);
     }
+
+    public static Vec3 newVec() {
+        return new Vec3(0, 0, 0);
+    }
 }

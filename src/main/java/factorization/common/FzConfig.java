@@ -77,7 +77,6 @@ public class FzConfig {
     public static String retrogen_key = "DEFAULT";
     public static boolean retrogen_silver = false;
     public static boolean retrogen_dark_iron = false;
-    public static boolean sort_renderers = !Loader.isModLoaded("optifine"); // Just as a guess.
 
     public ArrayList<Property> editable_main = new ArrayList<Property>();
     public ArrayList<Property> editable_runtime = new ArrayList<Property>();

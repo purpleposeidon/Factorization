@@ -6,9 +6,6 @@ import factorization.api.datahelpers.DataHelper;
 import factorization.common.FactoryType;
 import factorization.shared.BlockClass;
 import factorization.shared.TileEntityCommon;
-import net.minecraft.init.Blocks;
-import net.minecraft.util.EnumFacing;
-import net.minecraft.util.IIcon;
 import net.minecraft.util.ITickable;
 
 import java.io.IOException;
@@ -47,11 +44,5 @@ public class InfiniteChargeBlock extends TileEntityCommon implements IChargeCond
     @Override
     public BlockClass getBlockClass() {
         return BlockClass.Machine;
-    }
-    
-    @Override
-    public IIcon getIcon(EnumFacing dir) {
-        if (dir.getDirectionVec().getY() != 0) return BlockIcons.battery_top;
-        return Blocks.bedrock.getIcon(0, 0);
     }
 }

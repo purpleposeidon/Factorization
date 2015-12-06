@@ -19,8 +19,10 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntityFurnace;
+import net.minecraft.util.ChatComponentTranslation;
 import net.minecraft.util.EnumFacing;
-import net.minecraft.util.IIcon;
+import net.minecraft.util.EnumParticleTypes;
+import net.minecraft.util.IChatComponent;
 import net.minecraft.world.World;
 
 import java.io.IOException;
@@ -58,15 +60,15 @@ public class TileEntitySlagFurnace extends TileEntityFactorization implements IF
     }
 
     @Override
-    public String getInventoryName() {
-        return "Slag Furnace";
+    public IChatComponent getDisplayName() {
+        return new ChatComponentTranslation("factorization.slagfurnace");
     }
 
     private static final int[] INPUT_s = {inputSlotIndex, inputSlotIndex + 1}, FUEL_s = {fuelSlotIndex}, OUTPUT_s = {outputSlotIndex, outputSlotIndex + 1};
-    
+
     @Override
-    public int[] getAccessibleSlotsFromSide(int s) {
-        EnumFacing side = SpaceUtil.getOrientation(s);
+    public int[] getSlotsForFace(EnumFacing side) {
+        if (side == null) return INPUT_s;
         switch (side) {
         case DOWN: return OUTPUT_s;
         case UP: return INPUT_s;
@@ -381,17 +383,17 @@ public class TileEntitySlagFurnace extends TileEntityFactorization implements IF
         float rng = rand.nextFloat() * 0.6F - 0.3F;
         
         if (direction == 4) {
-            w.spawnParticle("smoke", px - d, py, pz + rng, 0, 0, 0);
-            w.spawnParticle("flame", px - d, py, pz + rng, 0, 0, 0);
+            w.spawnParticle(EnumParticleTypes.SMOKE_NORMAL, px - d, py, pz + rng, 0, 0, 0);
+            w.spawnParticle(EnumParticleTypes.FLAME, px - d, py, pz + rng, 0, 0, 0);
         } else if (direction == 5) {
-            w.spawnParticle("smoke", px + d, py, pz + rng, 0, 0, 0);
-            w.spawnParticle("flame", px + d, py, pz + rng, 0, 0, 0);
+            w.spawnParticle(EnumParticleTypes.SMOKE_NORMAL, px + d, py, pz + rng, 0, 0, 0);
+            w.spawnParticle(EnumParticleTypes.FLAME, px + d, py, pz + rng, 0, 0, 0);
         } else if (direction == 2) {
-            w.spawnParticle("smoke", px + rng, py, pz - d, 0, 0, 0);
-            w.spawnParticle("flame", px + rng, py, pz - d, 0, 0, 0);
+            w.spawnParticle(EnumParticleTypes.SMOKE_NORMAL, px + rng, py, pz - d, 0, 0, 0);
+            w.spawnParticle(EnumParticleTypes.FLAME, px + rng, py, pz - d, 0, 0, 0);
         } else if (direction == 3) {
-            w.spawnParticle("smoke", px + rng, py, pz + d, 0, 0, 0);
-            w.spawnParticle("flame", px + rng, py, pz + d, 0, 0, 0);
+            w.spawnParticle(EnumParticleTypes.SMOKE_NORMAL, px + rng, py, pz + d, 0, 0, 0);
+            w.spawnParticle(EnumParticleTypes.FLAME, px + rng, py, pz + d, 0, 0, 0);
         }
     }
 

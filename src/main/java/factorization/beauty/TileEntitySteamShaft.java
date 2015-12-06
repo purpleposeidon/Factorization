@@ -17,7 +17,6 @@ import factorization.util.SpaceUtil;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.client.Minecraft;
 import net.minecraft.util.EnumFacing;
-import net.minecraft.util.IIcon;
 import net.minecraft.util.ITickable;
 import net.minecraft.util.Vec3;
 import net.minecraftforge.fluids.*;
@@ -64,15 +63,6 @@ public class TileEntitySteamShaft extends TileEntityCommon implements IFluidHand
         if (take_spead < 0) take_spead = 1;
     }
 
-
-    @Override
-    public IIcon getIcon(EnumFacing dir) {
-        switch (dir) {
-            case UP: return BlockIcons.turbine_top;
-            case DOWN: return BlockIcons.turbine_bottom;
-            default: return BlockIcons.turbine_side;
-        }
-    }
 
     boolean dry = true;
 
@@ -124,7 +114,7 @@ public class TileEntitySteamShaft extends TileEntityCommon implements IFluidHand
             return;
         }
         double force = 0;
-        if (worldObj.getBlockPowerInput(pos.getX(), pos.getY(), pos.getZ()) == 0) {
+        if (worldObj.getStrongPower(pos) == 0) {
             FluidStack steam = steamTank.getFluid();
             if (steam == null) { // Has happened on occasion
                 steamTank.setFluid(steam = FluidRegistry.getFluidStack("steam", 0));
@@ -191,7 +181,7 @@ public class TileEntitySteamShaft extends TileEntityCommon implements IFluidHand
                 rot.applyRotation(pos);
                 rot.applyRotation(mot);
 
-                EntityFXSteam steam = new EntityFXSteam(worldObj, pos.getX() + 0.5 + pos.xCoord, pos.getY() + 0.5 + pos.yCoord, pos.getZ() + 0.5 + pos.zCoord, BlockIcons.steam);
+                EntityFXSteam steam = new EntityFXSteam(worldObj, pos.xCoord + 0.5 + pos.xCoord, pos.yCoord + 0.5 + pos.yCoord, pos.zCoord + 0.5 + pos.zCoord);
                 SpaceUtil.toEntVel(steam, mot);
                 Minecraft.getMinecraft().effectRenderer.addEffect(steam);
             }

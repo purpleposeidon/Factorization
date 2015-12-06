@@ -12,8 +12,6 @@ import factorization.shared.Core;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.EnumFacing;
-import net.minecraft.util.IIcon;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -59,15 +57,6 @@ public class InstructionGroup extends Instruction {
             stuff.push(ss.pop());
         }
         return true;
-    }
-
-    @Override
-    public IIcon getIcon(EnumFacing side) {
-        if (stuff.getSize() > 0) {
-            return BlockIcons.servo$group_something;
-        } else {
-            return BlockIcons.servo$group_empty;
-        }
     }
 
     @Override

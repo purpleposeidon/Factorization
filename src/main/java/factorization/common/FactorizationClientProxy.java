@@ -25,7 +25,6 @@ import factorization.mechanics.TileEntityHinge;
 import factorization.mechanics.TileEntityHingeRenderer;
 import factorization.oreprocessing.*;
 import factorization.redstone.GuiParasieve;
-import factorization.rendersorting.RenderSorter;
 import factorization.servo.RenderServoMotor;
 import factorization.servo.ServoMotor;
 import factorization.servo.stepper.RenderStepperEngine;
@@ -55,7 +54,6 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.network.play.client.C07PacketPlayerDigging;
 import net.minecraft.profiler.Profiler;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.BlockPos;
 import net.minecraft.util.MovingObjectPosition;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
@@ -67,13 +65,9 @@ import net.minecraftforge.fml.relauncher.Side;
 
 public class FactorizationClientProxy extends FactorizationProxy {
     public FactorizationKeyHandler keyHandler = new FactorizationKeyHandler();
-    public RenderSorter renderSorter;
 
     public FactorizationClientProxy() {
         Core.loadBus(this);
-        if (FzConfig.sort_renderers) {
-            Core.loadBus(renderSorter = new RenderSorter());
-        }
     }
 
     @Override
@@ -90,11 +84,12 @@ public class FactorizationClientProxy extends FactorizationProxy {
         if (ID == FactoryType.POCKETCRAFTGUI.gui) {
             return new GuiPocketTable(new ContainerPocket(player));
         }
+        Coord at = new Coord(world, x, y, z);
         if (ID == FactoryType.ARTIFACTFORGEGUI.gui) {
-            return new GuiArtifactForge(new ContainerForge(new Coord(world, pos), player));
+            return new GuiArtifactForge(new ContainerForge(at, player));
         }
         
-        TileEntity te = world.getTileEntity(new BlockPos(pos));
+        TileEntity te = world.getTileEntity(at.toBlockPos());
         if (!(te instanceof TileEntityFactorization)) {
             return null;
         }

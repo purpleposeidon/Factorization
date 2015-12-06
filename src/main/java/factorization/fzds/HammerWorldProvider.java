@@ -1,6 +1,6 @@
 package factorization.fzds;
 
-import net.minecraft.util.ChunkCoordinates;
+import net.minecraft.util.BlockPos;
 import net.minecraft.world.WorldProvider;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.chunk.IChunkProvider;
@@ -15,7 +15,7 @@ public class HammerWorldProvider extends WorldProvider {
     }
 
     @Override
-    public void setAllowedSpawnTypes(boolean hostiles, boolean peacefuls) {
+    public void setAllowedSpawnTypes(boolean hostiles, boolean peaceful) {
         super.setAllowedSpawnTypes(false, false);
     }
     
@@ -23,7 +23,12 @@ public class HammerWorldProvider extends WorldProvider {
     public String getDimensionName() {
         return "FZHammer";
     }
-    
+
+    @Override
+    public String getInternalNameSuffix() {
+        return "_fzhammer";
+    }
+
     @Override
     public IChunkProvider createChunkGenerator() {
         if (chunkProvider == null) {
@@ -56,21 +61,10 @@ public class HammerWorldProvider extends WorldProvider {
     public double getVoidFogYFactor() {
         return 1D;
     }
-    
-    @Override
-    public ChunkCoordinates getEntrancePortalLocation() {
-        //err, this probably never gets called...
-        return new ChunkCoordinates(0, 128, 00);
-    }
-    
-    @Override
-    public boolean getWorldHasVoidParticles() {
-        return false;
-    }
 
     @Override
-    public ChunkCoordinates getRandomizedSpawnPoint() {
-        return new ChunkCoordinates(0, 0, 0);
+    public BlockPos getRandomizedSpawnPoint() {
+        return new BlockPos(0, 0, 0);
     }
 
     @Override

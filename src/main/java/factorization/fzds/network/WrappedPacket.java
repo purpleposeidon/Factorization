@@ -7,13 +7,15 @@ import net.minecraft.network.EnumConnectionState;
 import net.minecraft.network.EnumPacketDirection;
 import net.minecraft.network.Packet;
 import net.minecraft.network.PacketBuffer;
+import net.minecraft.network.play.INetHandlerPlayClient;
 import net.minecraft.network.play.client.C17PacketCustomPayload;
 import net.minecraft.network.play.server.S3FPacketCustomPayload;
 import net.minecraftforge.fml.common.network.internal.FMLProxyPacket;
 
 import java.io.IOException;
+import java.util.List;
 
-public abstract class WrappedPacket extends Packet implements IFzdsShenanigans {
+public abstract class WrappedPacket implements IFzdsShenanigans, Packet {
     public static void registerPacket() {
         EnumConnectionState.PLAY.registerPacket(EnumPacketDirection.CLIENTBOUND, WrappedPacketFromServer.class);
         EnumConnectionState.PLAY.registerPacket(EnumPacketDirection.SERVERBOUND, WrappedPacketFromClient.class);
@@ -24,6 +26,7 @@ public abstract class WrappedPacket extends Packet implements IFzdsShenanigans {
     }
     
     Packet wrapped = null;
+    List<Packet<INetHandlerPlayClient>> wrappedList = null;
     boolean localPacket = true;
 
     public WrappedPacket() {
@@ -40,7 +43,10 @@ public abstract class WrappedPacket extends Packet implements IFzdsShenanigans {
     }
     
     private Packet unwrapPacket(PacketBuffer buf) {
-        int packetId = buf.readVarIntFromBuffer();
+        // NORELEASE: Do the state-switch thing instead of the wrap thing
+        // NORELEASE: Is this packet queue thing gonna be a problem?
+        PacketBuffer pb = new PacketBuffer(buf);
+        int packetId = pb.readVarIntFromBuffer();
         if (packetId == -1) {
             Core.logWarning("Recieved null packet");
             return null;
@@ -65,8 +71,8 @@ public abstract class WrappedPacket extends Packet implements IFzdsShenanigans {
         return recieved_packet;
     }
 
-    protected abstract boolean isServerside();
-    protected abstract BiMap<Integer, Class> getPacketMap();
+    protected abstract EnumPacketDirection getDirection();
+    protected abstract EnumConnectionState getPacketMap();
 
     @Override
     public void writePacketData(PacketBuffer data) {
@@ -77,7 +83,15 @@ public abstract class WrappedPacket extends Packet implements IFzdsShenanigans {
         }
         if (wrapped instanceof FMLProxyPacket) {
             FMLProxyPacket pp = (FMLProxyPacket) wrapped;
-            wrapped = this.isServerside() ? pp.toS3FPacket() : pp.toC17Packet();
+            if (getDirection() == EnumPacketDirection.CLIENTBOUND) {
+                try {
+                    wrappedList = pp.toS3FPackets();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            } else {
+                wrapped = pp.toC17Packet();
+            }
         }
         Integer packetId = getPacketMap().inverse().get(wrapped.getClass());
         if (packetId == null || packetId == -1) {
@@ -93,7 +107,7 @@ public abstract class WrappedPacket extends Packet implements IFzdsShenanigans {
         buff.writeVarIntToBuffer(packetId);
         try {
             wrapped.writePacketData(buff);
-        } catch (Exception e /* IOException. Compiler derpage. */) {
+        } catch (IOException e) {
             e.printStackTrace();
             // FIXME: Uh oh. Should we do data.clear() here?
         }

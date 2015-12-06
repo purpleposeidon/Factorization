@@ -13,7 +13,6 @@ import factorization.fzds.interfaces.IDCController;
 import factorization.fzds.interfaces.IDeltaChunk;
 import factorization.fzds.interfaces.Interpolation;
 import factorization.shared.BlockClass;
-import factorization.shared.Core;
 import factorization.shared.EntityReference;
 import factorization.shared.TileEntityCommon;
 import factorization.util.NumUtil;
@@ -21,23 +20,16 @@ import factorization.util.PlayerUtil;
 import factorization.util.SpaceUtil;
 import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.texture.TextureManager;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.*;
 import net.minecraft.world.World;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
-import org.lwjgl.opengl.GL11;
-import org.lwjgl.opengl.GL12;
 
 import java.io.IOException;
 import java.util.List;
 
 import static factorization.util.SpaceUtil.*;
-import static org.lwjgl.opengl.GL11.*;
 
 public class TileEntityHinge extends TileEntityCommon implements IDCController, ITickable {
     FzOrientation facing = FzOrientation.FACE_EAST_POINT_DOWN;
@@ -63,12 +55,12 @@ public class TileEntityHinge extends TileEntityCommon implements IDCController, 
 
     @Override
     public void onPlacedBy(EntityPlayer player, ItemStack is, EnumFacing side, float hitX, float hitY, float hitZ) {
-        facing = getOrientation(player, side, hitX, hitY, hitZ);
+        facing = getOrientation(player, side, new Vec3(hitX, hitY, hitZ));
     }
 
     @Override
     public boolean isBlockSolidOnSide(EnumFacing side) {
-        return SpaceUtil.getOrientation(side) == facing.facing.getOpposite();
+        return side == facing.facing.getOpposite();
     }
 
     @Override
@@ -125,25 +117,22 @@ public class TileEntityHinge extends TileEntityCommon implements IDCController, 
         Vec3 half = fromDirection(facing.facing);
         half = scale(half, 0.5 * faceSign);
         if (topSign > 0) {
-            half = add(half, fromDirection(facing.top));
+            half = half.add(fromDirection(facing.top));
         }
 
         Vec3 com = idc.getRotationalCenterOffset();
-        com = add(com, half);
+        com = com.add(half);
         idc.setRotationalCenterOffset(com);
-        toEntPos(idc, add(idcPos, half));
+        toEntPos(idc, idcPos.add(half));
 
         Coord dest = idc.getCenter();
-        DeltaCoord hingePoint = dest.difference(idc.getCorner());
         worldObj.spawnEntityInWorld(idc);
         MechanicsController.register(idc, this);
         idcRef.trackEntity(idc);
         updateComparators();
         markDirty();
         getCoord().syncTE();
-        dseOffset.xCoord = idc.posX - pos.getX();
-        dseOffset.yCoord = idc.posY - pos.getY();
-        dseOffset.zCoord = idc.posZ - pos.getZ();
+        dseOffset = SpaceUtil.fromEntPos(idc).subtract(new Vec3(pos));
     }
 
     void setProperPosition(IDeltaChunk idc) {
@@ -161,11 +150,11 @@ public class TileEntityHinge extends TileEntityCommon implements IDCController, 
 
     void setSlabBounds(Block b) {
         float d = 0.5F;
+        if (facing == null) return;
         switch (facing.facing) {
             case DOWN:
                 b.setBlockBounds(0, d, 0, 1, 1, 1);
                 break;
-            case UNKNOWN:
             case UP:
                 b.setBlockBounds(0, 0, 0, 1, d, 1);
                 break;
@@ -235,7 +224,7 @@ public class TileEntityHinge extends TileEntityCommon implements IDCController, 
         }
         forceMultiplier *= PlayerUtil.getPuntStrengthMultiplier(player);
         Vec3 force = player.getLookVec().normalize();
-        incrScale(force, forceMultiplier);
+        force = SpaceUtil.scale(force, forceMultiplier);
 
         applyForce(idc, at, force);
         limitBend(idc);
@@ -253,20 +242,20 @@ public class TileEntityHinge extends TileEntityCommon implements IDCController, 
         Vec3 hitBlock = at.createVector();
 
         Vec3 idcCorner = idc.getCorner().createVector();
-        Vec3 idcRot = add(idcCorner, idc.getRotationalCenterOffset());
+        Vec3 idcRot = idcCorner.add(idc.getRotationalCenterOffset());
 
         Vec3 leverArm = subtract(hitBlock, idcRot);
 
-        incrScale(force, 2.0 / I);
+        force = SpaceUtil.scale(force, 2.0 / I);
 
         Vec3 torque = leverArm.crossProduct(force);
         idc.getRotation().applyRotation(torque);
 
         if (SpaceUtil.sum(rotationAxis) < 0) {
-            incrScale(rotationAxis, -1);
+            rotationAxis = SpaceUtil.scale(rotationAxis, -1);
         }
 
-        incrComponentMultiply(torque, rotationAxis);
+        torque = SpaceUtil.componentMultiply(torque, rotationAxis);
 
         Quaternion qx = Quaternion.getRotationQuaternionRadians(torque.xCoord, EnumFacing.EAST);
         Quaternion qy = Quaternion.getRotationQuaternionRadians(torque.yCoord, EnumFacing.UP);
@@ -345,10 +334,6 @@ public class TileEntityHinge extends TileEntityCommon implements IDCController, 
         limitVelocity(idc);
     }
 
-    private boolean bendMode() {
-        return sign(facing.facing.getRotation(facing.top)) == -1;
-    }
-
     private void limitBend(IDeltaChunk idc) {
         final Quaternion rotationalVelocity = idc.getRotationalVelocity();
         if (!idc.hasOrderedRotation() && rotationalVelocity.isZero()) return;
@@ -362,8 +347,6 @@ public class TileEntityHinge extends TileEntityCommon implements IDCController, 
 
         if (angle < end) return;
 
-        double p = end / angle;
-        Quaternion armAngle = Quaternion.getRotationQuaternionRadians(0, middle);
         if (idc.hasOrderedRotation()) {
             idc.cancelOrderedRotation();
         } else {
@@ -417,7 +400,7 @@ public class TileEntityHinge extends TileEntityCommon implements IDCController, 
         ticks++;
         MovingObjectPosition mop = Minecraft.getMinecraft().objectMouseOver;
         if (mop == null || mop.typeOfHit != MovingObjectPosition.MovingObjectType.BLOCK) return;
-        if (mop.blockX == pos.getX() && mop.blockY == pos.getY() && mop.blockZ == pos.getZ()) {
+        if (mop.getBlockPos().equals(pos)) {
             ticks = 0;
         }
     }
@@ -431,11 +414,6 @@ public class TileEntityHinge extends TileEntityCommon implements IDCController, 
                 updateComparators();
             }
         }
-    }
-
-    @Override
-    public boolean canUpdate() {
-        return true;
     }
 
     @Override
@@ -489,84 +467,6 @@ public class TileEntityHinge extends TileEntityCommon implements IDCController, 
         return ret;
     }
 
-    @SideOnly(Side.CLIENT)
-    public static ObjectModel hingeTop;
-
-    @Override
-    @SideOnly(Side.CLIENT)
-    public void representYoSelf() {
-        super.representYoSelf();
-        hingeTop = new ObjectModel(Core.getResource("models/hingeTop.obj"));
-    }
-
-    @SideOnly(Side.CLIENT)
-    public void renderTesr(float partial) {
-        Block block = Block.instance;
-
-        if (idcRef.trackingEntity()) {
-            IDeltaChunk idc = getIdc();
-            if (idc != null) {
-                EnumFacing face = facing.facing, top = facing.top;
-                float faced = 0.5F, topd = 0.0F;
-
-                if (sign(facing.top) == +1) topd = 1;
-                if (sign(facing.facing) == -1) faced *= -1;
-
-                float dx = face.getDirectionVec().getX() * faced + top.getDirectionVec().getX() * topd;
-                float dy = face.getDirectionVec().getY() * faced + top.getDirectionVec().getY() * topd;
-                float dz = face.getDirectionVec().getZ() * faced + top.getDirectionVec().getZ() * topd;
-
-                GL11.glTranslatef(dx, dy, dz);
-                idc.getRotation().glRotate();
-                GL11.glTranslatef(-dx, -dy, -dz);
-            }
-            setupHingeRotation2();
-        } else {
-            setupHingeRotation2();
-            float nowish = ticks + partial;
-            double now = (Math.cos(nowish / 24.0) - 1) * -6;
-            GL11.glRotated(now, 0, 0, 1);
-        }
-
-        TextureManager tex = Minecraft.getMinecraft().renderEngine;
-        tex.bindTexture(Core.blockAtlas);
-        glEnable(GL_LIGHTING);
-        glDisable(GL11.GL_CULL_FACE);
-        glEnable(GL12.GL_RESCALE_NORMAL);
-        hingeTop.render(BlockIcons.mechanism$hinge_uvs);
-        glEnable(GL11.GL_CULL_FACE);
-        glEnable(GL_LIGHTING);
-    }
-
-    private void setupHingeRotation2() {
-        // Well, it's better than my 125 line first try. I bet Player could do better tho.
-        final EnumFacing face = facing.facing;
-        final EnumFacing top = facing.top;
-        final int fsign = face.ordinal() % 2 == 0 ? -1 : +1;
-        final int tsign = top.ordinal() % 2 == 0 ? -1 : +1;
-        float dx = 0, dy = 0, dz = 0;
-        if (tsign == +1) {
-            EnumFacing v = top;
-            dx += v.getDirectionVec().getX(); dy += v.getDirectionVec().getY(); dz += v.getDirectionVec().getZ();
-        }
-        if (fsign == +1) {
-            EnumFacing v = facing.rotateOnFace(1).top;
-            dx += v.getDirectionVec().getX(); dy += v.getDirectionVec().getY(); dz += v.getDirectionVec().getZ();
-        }
-        GL11.glTranslatef(dx, dy, dz);
-        Quaternion.fromOrientation(facing).glRotate();
-        boolean left = false;
-        if (face.getDirectionVec().getX() != 0) left = top == EnumFacing.NORTH || top == EnumFacing.UP;
-        if (face.getDirectionVec().getY() != 0) left = top == EnumFacing.WEST || top == EnumFacing.SOUTH;
-        if (face.getDirectionVec().getZ() != 0) left = top == EnumFacing.DOWN || top == EnumFacing.EAST;
-
-        float dleft = 0.5F;
-        if (left) {
-            dleft += fsign;
-        }
-        GL11.glTranslatef(0, 0.5F * fsign, dleft);
-    }
-
     @Override
     public AxisAlignedBB getRenderBoundingBox() {
         int a = -2, b = +3;
@@ -598,10 +498,5 @@ public class TileEntityHinge extends TileEntityCommon implements IDCController, 
         angle /= 90;
         angle = 1 - angle;
         return (byte) (0xF * angle);
-    }
-
-    @Override
-    public IIcon getIcon(EnumFacing dir) {
-        return Blocks.iron_block.getIcon(0, 0);
     }
 }

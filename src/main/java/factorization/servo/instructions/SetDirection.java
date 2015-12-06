@@ -8,25 +8,17 @@ import factorization.servo.AbstractServoMachine;
 import factorization.servo.Instruction;
 import factorization.servo.ServoMotor;
 import factorization.servo.stepper.StepperEngine;
+import factorization.util.SpaceUtil;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumFacing;
-import net.minecraft.util.IIcon;
 
 import java.io.IOException;
 
 public class SetDirection extends Instruction {
     EnumFacing dir = EnumFacing.UP;
-    
-    @Override
-    public IIcon getIcon(EnumFacing side) {
-        if (side == null) {
-            return BlockIcons.servo$set_direction.side_W;
-        }
-        return BlockIcons.servo$set_direction.get(dir.getOpposite(), side);
-    }
-    
+
     @Override
     public boolean onClick(EntityPlayer player, Coord block, EnumFacing side) {
         if (playerHasProgrammer(player)) {

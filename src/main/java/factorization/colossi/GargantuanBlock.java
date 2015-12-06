@@ -4,48 +4,40 @@ import factorization.api.Coord;
 import factorization.util.SpaceUtil;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
-import net.minecraft.client.renderer.IconFlipped;
-import net.minecraft.client.renderer.texture.IIconRegister;
+import net.minecraft.block.properties.IProperty;
+import net.minecraft.block.properties.PropertyDirection;
+import net.minecraft.block.state.BlockState;
+import net.minecraft.block.state.IBlockState;
+import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.item.ItemStack;
+import net.minecraft.util.BlockPos;
 import net.minecraft.util.EnumFacing;
-import net.minecraft.util.IIcon;
 import net.minecraft.world.World;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
-
-import java.util.ArrayList;
 
 public class GargantuanBlock extends Block {
+    public static final IProperty<EnumFacing> FACE = PropertyDirection.create("face");
+
 
     public GargantuanBlock() {
         super(Material.rock);
         setHardness(2.0F).setResistance(10.0F).setStepSound(soundTypePiston);
     }
-    
-    @SideOnly(Side.CLIENT)
-    IIcon end, low, high, low_f, high_f, low_fu, high_fu;
-    
+
     @Override
-    public void registerBlockIcons(IIconRegister registry) {
-        end = registry.registerIcon("factorization:colossi/gargantuan_end");
-        low = registry.registerIcon("factorization:colossi/gargantuan_low");
-        high = registry.registerIcon("factorization:colossi/gargantuan_high");
-        low_f = registry.registerIcon("factorization:colossi/gargantuan_low_f");
-        high_f = registry.registerIcon("factorization:colossi/gargantuan_high_f");
-        low_fu = new IconFlipped(low_f, true, false);
-        high_fu = new IconFlipped(high_f, true, false);
+    protected BlockState createBlockState() {
+        return new BlockState(this, FACE);
     }
-    
-    EnumFacing getDir(int md) {
-        return SpaceUtil.getOrientation(md);
-    }
-    
+
     @Override
-    public boolean removedByPlayer(World world, EntityPlayer player, BlockPos pos, boolean willHarvest) {
+    public IBlockState onBlockPlaced(World world, BlockPos pos, EnumFacing facing, float hitX, float hitY, float hitZ, int meta, EntityLivingBase placer) {
+        return getDefaultState().withProperty(FACE, facing);
+    }
+
+    @Override
+    public boolean removedByPlayer(World world, BlockPos pos, EntityPlayer player, boolean willHarvest) {
         Coord at = new Coord(world, pos);
-        int md = at.getMd();
-        EnumFacing dir = getDir(md);
+        IBlockState bs = world.getBlockState(pos);
+        EnumFacing dir = bs.getValue(FACE);
         boolean good = false;
         // Return false if we are missing our mate & our direction is negative.
         // Missing mates can be caused by pistons; so this prevents duping.
@@ -53,55 +45,15 @@ public class GargantuanBlock extends Block {
         // (So I guess when we get rotated, we'd have to break our direction if the mate is missing)
         if (dir != null) {
             Coord child = at.add(dir);
-            if (child.getId() == this && getDir(child.getMd()) == dir.getOpposite()) {
+            IBlockState cbs = child.getState();
+            if (cbs.getBlock() == this && cbs.getValue(FACE) == dir.getOpposite()) {
                 child.setAir();
                 good = true;
             } else {
                 good = SpaceUtil.sign(dir) > 0;
             }
         }
-        return super.removedByPlayer(world, player, pos, willHarvest) && good;
-    }
-    
-    @Override
-    public IIcon getIcon(int side_, int md) {
-        EnumFacing dir = getDir(md);
-        EnumFacing side = SpaceUtil.getOrientation(side_);
-        if (dir == side || dir.getOpposite() == side) {
-            return end;
-        }
-        if (dir.getDirectionVec().getX() != 0) {
-            return (dir == EnumFacing.EAST) ^ (side.getDirectionVec().getZ() == -1) ? high : low;
-        }
-        if (dir == EnumFacing.SOUTH) {
-            if (side == EnumFacing.DOWN) return high_fu;
-            if (side == EnumFacing.UP) return high_fu; //return high_f;
-            if (side == EnumFacing.EAST) return low;
-            if (side == EnumFacing.WEST) return high;
-        }
-        if (dir == EnumFacing.NORTH) {
-            if (side == EnumFacing.DOWN) return low_fu;
-            if (side == EnumFacing.UP) return low_fu;
-            if (side == EnumFacing.EAST) return high;
-            if (side == EnumFacing.WEST) return low;
-        }
-        if (dir == EnumFacing.DOWN) {
-            return high_fu;
-        }
-        if (dir == EnumFacing.UP) {
-            return low_fu;
-        }
-        return end;
-    }
-    
-    @Override
-    public ArrayList<ItemStack> getDrops(World world, BlockPos pos, int metadata, int fortune) {
-        /*EnumFacing dir = getDir(metadata);
-        if (SpaceUtil.sign(dir) < 0) {
-            Coord mate = new Coord(world, pos).add(dir);
-            if (mate.getBlock() != this || getDir(mate.getMd()) != dir.getOpposite()) return new ArrayList<ItemStack>();
-        }*/
-        return super.getDrops(world, pos, metadata, fortune);
+        return super.removedByPlayer(world, pos, player, willHarvest) && good;
     }
 
 }

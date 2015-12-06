@@ -16,8 +16,7 @@ import net.minecraft.inventory.ISidedInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
-import net.minecraft.util.EnumFacing;
-import net.minecraft.util.ITickable;
+import net.minecraft.util.*;
 import net.minecraftforge.common.util.Constants;
 
 import java.io.IOException;
@@ -50,7 +49,7 @@ public abstract class TileEntityFactorization extends TileEntityCommon
         if (player == null) {
             return;
         }
-        facing_direction = (byte) side;
+        facing_direction = (byte) side.ordinal();
     }
 
     protected void needLogic() {
@@ -102,22 +101,24 @@ public abstract class TileEntityFactorization extends TileEntityCommon
 
     @Override
     public boolean isUseableByPlayer(EntityPlayer player) {
-        if (worldObj.getTileEntity(pos.getX(), pos.getY(), pos.getZ()) != this) {
+        if (worldObj.getTileEntity(pos) != this) {
             return false;
         }
         return 8 * 8 >= player.getDistanceSq(pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5);
     }
 
     @Override
-    public final void openInventory() {
+    public void openInventory(EntityPlayer player) {
+
     }
 
     @Override
-    public final void closeInventory() {
+    public void closeInventory(EntityPlayer player) {
+
     }
 
     @Override
-    public boolean hasCustomInventoryName() {
+    public boolean isItemValidForSlot(int index, ItemStack stack) {
         return false;
     }
 
@@ -165,16 +166,6 @@ public abstract class TileEntityFactorization extends TileEntityCommon
         return null;
     }
     
-    @Override
-    public boolean canInsertItem(int i, ItemStack itemstack, int j) {
-        return isItemValidForSlot(i, itemstack);
-    }
-    
-    @Override
-    public boolean canExtractItem(int slot, ItemStack itemstack, int side) {
-        return true;
-    }
-
     public void drawActive(int add_time) {
         int new_active = draw_active + add_time;
         if (new_active < 0) {
@@ -220,4 +211,36 @@ public abstract class TileEntityFactorization extends TileEntityCommon
         }
         return false;
     }
+
+    @Override
+    public String getCommandSenderName() {
+        return "factorization." + getFactoryType().toString();
+    }
+
+    @Override
+    public boolean hasCustomName() {
+        return customName != null;
+    }
+
+    @Override
+    public IChatComponent getDisplayName() {
+        if (customName != null) return new ChatComponentText(customName);
+        return new ChatComponentTranslation("factorization.gui." + getFactoryType().toString());
+    }
+
+    @Override
+    public boolean canInsertItem(int index, ItemStack itemStackIn, EnumFacing direction) {
+        return isItemValidForSlot(index, itemStackIn);
+    }
+
+    @Override
+    public boolean canExtractItem(int index, ItemStack stack, EnumFacing direction) {
+        return true;
+    }
+
+    @Override public int getField(int id) { return 0; }
+    @Override public void setField(int id, int value) { }
+    @Override public int getFieldCount() { return 0; }
+    public abstract void clear();
+
 }

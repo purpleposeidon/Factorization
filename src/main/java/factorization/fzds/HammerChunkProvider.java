@@ -1,15 +1,15 @@
 package factorization.fzds;
 
 import net.minecraft.entity.EnumCreatureType;
+import net.minecraft.util.BlockPos;
 import net.minecraft.util.IProgressUpdate;
-import net.minecraft.world.ChunkPosition;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.BiomeGenBase;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.chunk.IChunkProvider;
 
-import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 public class HammerChunkProvider implements IChunkProvider {
@@ -26,8 +26,13 @@ public class HammerChunkProvider implements IChunkProvider {
     }
 
     @Override
-    public Chunk provideChunk(int chunkX, int chunkZ) {
-        Chunk chunk = new Chunk(world, chunkX, chunkZ);
+    public Chunk provideChunk(BlockPos pos) {
+        return provideChunk(pos.getX(), pos.getZ());
+    }
+
+    @Override
+    public Chunk provideChunk(int x, int z) {
+        Chunk chunk = new Chunk(world, x >> 4, z >> 4);
         chunk.generateSkylightMap();
         byte[] biomes = chunk.getBiomeArray();
         Arrays.fill(biomes, (byte) BiomeGenBase.plains.biomeID);
@@ -36,12 +41,12 @@ public class HammerChunkProvider implements IChunkProvider {
     }
 
     @Override
-    public Chunk loadChunk(int chunkX, int chunkZ) {
-        return this.provideChunk(chunkX, chunkZ);
-    }
+    public void populate(IChunkProvider var1, int var2, int var3) {}
 
     @Override
-    public void populate(IChunkProvider var1, int var2, int var3) {}
+    public boolean func_177460_a(IChunkProvider p_177460_1_, Chunk p_177460_2_, int p_177460_3_, int p_177460_4_) {
+        return false; // Not sure what this is.
+    }
 
     @Override
     public boolean saveChunks(boolean var1, IProgressUpdate var2) {
@@ -65,22 +70,22 @@ public class HammerChunkProvider implements IChunkProvider {
     }
 
     @Override
-    public List getPossibleCreatures(EnumCreatureType var1, int var2, int var3, int var4) {
-        return new ArrayList();
-    }
-
-    @Override
-    public ChunkPosition func_147416_a(World var1, String var2, int var3, int var4, int var5) { //findClosestStructure
-        return null;
+    public List<BiomeGenBase.SpawnListEntry> getPossibleCreatures(EnumCreatureType creatureType, BlockPos pos) {
+        return Collections.EMPTY_LIST;
     }
 
     @Override
     public int getLoadedChunkCount() {
         return 0;
     }
-    
+
     @Override
-    public void recreateStructures(int var1, int var2) { }
+    public BlockPos getStrongholdGen(World world, String structureName, BlockPos position) {
+        return null;
+    }
+
+    @Override
+    public void recreateStructures(Chunk chunk, int x, int z) { }
 
     @Override
     public void saveExtraData() { }
