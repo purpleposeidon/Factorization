@@ -5,6 +5,7 @@ import factorization.api.DeltaCoord;
 import factorization.shared.Core;
 import factorization.util.DataUtil;
 import net.minecraft.block.Block;
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.WorldClient;
 import net.minecraft.entity.Entity;
@@ -13,12 +14,11 @@ import net.minecraft.init.Blocks;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.BlockPos;
 import net.minecraft.world.EnumSkyBlock;
 import net.minecraft.world.WorldSettings;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraftforge.common.util.Constants;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
 
 import java.util.ArrayList;
 
@@ -33,7 +33,7 @@ public class DocWorld extends WorldClient {
     Coord orig = new Coord(this, 0, 0, 0);
     
     public DocWorld() {
-        super(mc.getNetHandler(), new WorldSettings(mc.theWorld.getWorldInfo()), 0, mc.theWorld.difficultySetting, mc.mcProfiler);
+        super(mc.getNetHandler(), new WorldSettings(mc.theWorld.getWorldInfo()), 0, mc.theWorld.getDifficulty(), mc.mcProfiler);
         blockIds = new int[LEN];
         blockMetadatas = new int[LEN];
     }
@@ -88,13 +88,17 @@ public class DocWorld extends WorldClient {
         tag.setTag(ENTITY_LIST, entList);
         tag.setInteger(DIAGONAL, diagonal);
     }
-    
+
     @Override
-    protected boolean chunkExists(int chunkX, int chunkZ) {
-        return chunkX == 0 && chunkZ == 0;
+    protected boolean isChunkLoaded(int x, int z, boolean allowEmpty) {
+        return false;
     }
-    
+
     private int getIndex(BlockPos pos) {
+        int x = pos.getX();
+        int y = pos.getY();
+        int z = pos.getZ();
+
         if (x < 0 || y < 0 || z < 0) return -1;
         if (x > 0xF || y > 0xF || z > 0xF) return -1;
         return x + (y << 4) + (z << 8);
@@ -115,16 +119,20 @@ public class DocWorld extends WorldClient {
             return DataUtil.getBlock(id);
         }
     }
-    
-    @Override
+
     public int getBlockMetadata(BlockPos pos) {
         int i = getIndex(pos);
         if (i == -1) return 0;
         return blockMetadatas[i];
     }
     
+
     @Override
     public TileEntity getTileEntity(BlockPos pos) {
+        int x = pos.getX();
+        int y = pos.getY();
+        int z = pos.getZ();
+
         for (TileEntity te : tileEntities) {
             if (te.getPos().getX() == x && te.getPos().getY() == y && te.getPos().getZ() == z) {
                 return te;
@@ -132,20 +140,19 @@ public class DocWorld extends WorldClient {
         }
         return null;
     }
-    
+
     @Override
-    public int getBlockLightValue(int par1, int par2, int par3) {
+    public float getLightBrightness(BlockPos pos) {
         return 0xF;
     }
-    
+
     @Override
-    @SideOnly(Side.CLIENT)
-    public int getSkyBlockTypeBrightness(EnumSkyBlock par1EnumSkyBlock, int par2, int par3, int par4) {
+    public int getLightFor(EnumSkyBlock type, BlockPos pos) {
         return 0xF;
     }
-    
+
     void setIdMdTe(DeltaCoord dc, Block block, int md, TileEntity te) {
-        int i = getIndex(dc.x, dc.y, dc.z);
+        int i = getIndex(dc.toBlockPos());
         if (i == -1) return;
         int useId = DataUtil.getId(block);
         if (block == Core.registry.factory_block || block == Core.registry.factory_block_barrel) {
@@ -160,9 +167,7 @@ public class DocWorld extends WorldClient {
         
         if (te == null) return;
         TileEntity clone = DataUtil.cloneTileEntity(te);
-        clone.getPos().getX() = dc.x;
-        clone.getPos().getY() = dc.y;
-        clone.getPos().getZ() = dc.z;
+        clone.setPos(dc.toBlockPos());
         tileEntities.add(clone);
     }
     
@@ -176,26 +181,27 @@ public class DocWorld extends WorldClient {
         public Block getBlock(BlockPos pos) {
             return DocWorld.this.getBlock(pos);
         }
-        
+
         @Override
-        public TileEntity func_150806_e(BlockPos pos) {
+        public TileEntity getTileEntity(BlockPos pos, EnumCreateEntityType p_177424_2_) {
             return DocWorld.this.getTileEntity(pos);
         }
-        
-        @Override
-        public TileEntity getTileEntityUnsafe(BlockPos pos) {
-            return DocWorld.this.getTileEntity(pos);
-        }
-        
+
         @Override
         public boolean getAreLevelsEmpty(int par1, int par2) {
             return false;
         }
-        
+
+        @Override
+        public IBlockState getBlockState(BlockPos pos) {
+            Block b = getBlock(pos);
+            return b.getStateFromMeta(getBlockMetadata(pos));
+        }
+
         @Override
         public int getBlockMetadata(BlockPos pos) {
             return DocWorld.this.getBlockMetadata(pos);
-        }		
+        }
         
     };
     

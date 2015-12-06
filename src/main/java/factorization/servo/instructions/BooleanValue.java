@@ -10,7 +10,6 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumFacing;
-import net.minecraft.util.IIcon;
 
 import java.io.IOException;
 
@@ -39,11 +38,6 @@ public class BooleanValue extends Instruction {
             return true;
         }
         return false;
-    }
-    
-    @Override
-    public IIcon getIcon(EnumFacing side) {
-        return val ? BlockIcons.servo$true : BlockIcons.servo$false;
     }
 
     @Override

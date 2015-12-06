@@ -24,7 +24,9 @@ import net.minecraft.init.Blocks;
 import net.minecraft.inventory.ISidedInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.ChatComponentTranslation;
 import net.minecraft.util.EnumFacing;
+import net.minecraft.util.IChatComponent;
 import net.minecraft.util.IIcon;
 import net.minecraft.world.chunk.Chunk;
 
@@ -82,12 +84,17 @@ public class TileEntitySapTap extends TileEntityCommon implements ISidedInventor
     }
 
     @Override
-    public String getInventoryName() {
-        return "fz.sapextractor";
+    public IChatComponent getDisplayName() {
+        return new ChatComponentTranslation("fz.sapextractor");
     }
 
     @Override
-    public boolean hasCustomInventoryName() {
+    public String getCommandSenderName() {
+        return null;
+    }
+
+    @Override
+    public boolean hasCustomName() {
         return false;
     }
 
@@ -97,23 +104,29 @@ public class TileEntitySapTap extends TileEntityCommon implements ISidedInventor
     }
 
     @Override
-    public boolean isUseableByPlayer(EntityPlayer p_70300_1_) {
+    public boolean isUseableByPlayer(EntityPlayer player) {
         return false;
     }
 
-    @Override
-    public void openInventory() {
+    @Override public void openInventory(EntityPlayer player) { }
 
-    }
-
-    @Override
-    public void closeInventory() {
-
-    }
+    @Override public void closeInventory(EntityPlayer player) { }
 
     @Override
     public boolean isItemValidForSlot(int slot, ItemStack stack) {
         return stack == null;
+    }
+
+    @Override public int getField(int id) { return 0; }
+    @Override public void setField(int id, int value) { }
+    @Override public int getFieldCount() { return 0; }
+
+    @Override
+    public void clear() {
+        sap = null;
+        log_count = 0;
+        leaf_count = 0;
+        ticks = 0;
     }
 
     @Override
@@ -130,8 +143,9 @@ public class TileEntitySapTap extends TileEntityCommon implements ISidedInventor
         ticks = data.as(Share.PRIVATE, "ticks").putInt(ticks);
     }
 
+
     @Override
-    public void update() {
+    public void tick() {
         if (worldObj.isRemote) return;
         final long nowish = worldObj.getTotalWorldTime() + this.hashCode();
         if (0 == nowish % (20 * 60 * 30)) {
@@ -235,19 +249,19 @@ public class TileEntitySapTap extends TileEntityCommon implements ISidedInventor
     }
 
     @Override
-    public int[] getAccessibleSlotsFromSide(int side) {
-        if (side == EnumFacing.DOWN.ordinal()) return new int[] {0};
+    public int[] getSlotsForFace(EnumFacing side) {
+        if (side == EnumFacing.DOWN) return new int[] { 0 };
         return new int[0];
     }
 
     @Override
-    public boolean canInsertItem(int side, ItemStack stack, int slot) {
+    public boolean canInsertItem(int index, ItemStack itemStackIn, EnumFacing direction) {
         return false;
     }
 
     @Override
-    public boolean canExtractItem(int side, ItemStack stack, int slot) {
-        return slot == 0 && sap.stackSize > 1;
+    public boolean canExtractItem(int index, ItemStack stack, EnumFacing direction) {
+        return index == 0 && sap.stackSize > 1;
     }
 
     private class CrowdedCheck implements ICoordFunction {

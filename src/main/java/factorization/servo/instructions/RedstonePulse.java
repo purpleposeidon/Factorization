@@ -11,7 +11,6 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumFacing;
-import net.minecraft.util.IIcon;
 
 import java.io.IOException;
 
@@ -32,11 +31,6 @@ public class RedstonePulse extends Instruction {
             return; //Just back away, very slowly...
         }
         tef.pulse();
-    }
-
-    @Override
-    public IIcon getIcon(EnumFacing side) {
-        return BlockIcons.servo$pulse;
     }
 
     @Override

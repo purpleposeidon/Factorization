@@ -16,6 +16,7 @@ import net.minecraft.client.renderer.GLAllocation;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.entity.RenderItem;
 import net.minecraft.client.renderer.entity.RenderManager;
+import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.renderer.texture.TextureManager;
 import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
 import net.minecraft.client.resources.IResourceManager;
@@ -87,12 +88,12 @@ public class TileEntityDayBarrelRenderer extends TileEntitySpecialRenderer {
         }
         Core.profileStart("barrel");
         GL11.glPushMatrix();
-        GL11.glTranslated(pos);
+        GL11.glTranslated(x, y, z);
 
         if (FzConfig.render_barrel_use_displaylists && barrel.type != Type.HOPPING && barrel.should_use_display_list && barrel != FactoryType.DAYBARREL.getRepresentative()) {
             if (barrel.display_list == -1) {
                 Item item = is.getItem();
-                boolean crazyItem = item.hasEffect(is, 0) && item.requiresMultipleRenderPasses();
+                boolean crazyItem = item.hasEffect(is) && item.requiresMultipleRenderPasses();
                 if (!crazyItem) {
                     crazyItem = itemHasCustomRender(is);
                 }
@@ -177,7 +178,7 @@ public class TileEntityDayBarrelRenderer extends TileEntitySpecialRenderer {
             return false;
         }
         GL11.glRotatef(180, 0, 0, 1);
-        final IIcon font;
+        final TextureAtlasSprite font;
         final Minecraft mc = Minecraft.getMinecraft();
         if (item.getItemSpriteNumber() == 1) {
             font = BlockIcons.barrel_font;

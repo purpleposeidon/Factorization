@@ -3,9 +3,9 @@ package factorization.weird;
 import factorization.common.FactoryType;
 import factorization.shared.Core;
 import factorization.shared.Core.TabType;
+import factorization.shared.ItemBlockProxy;
 import factorization.util.LangUtil;
 import factorization.weird.TileEntityDayBarrel.Type;
-import net.minecraft.client.renderer.texture.IIconRegister;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.fml.relauncher.Side;
@@ -25,13 +25,7 @@ public class ItemDayBarrel extends ItemBlockProxy {
     public boolean getShareTag() {
         return true;
     }
-    
-    @Override
-    @SideOnly(Side.CLIENT)
-    public int getSpriteNumber() {
-        return 0;
-    }
-    
+
     @Override
     public String getItemStackDisplayName(ItemStack is) {
         Type upgrade = TileEntityDayBarrel.getUpgrade(is);
@@ -67,8 +61,4 @@ public class ItemDayBarrel extends ItemBlockProxy {
             }
         }
     }
-    
-    @Override
-    @SideOnly(Side.CLIENT)
-    public void registerIcons(IIconRegister par1IIconRegister) { }
 }

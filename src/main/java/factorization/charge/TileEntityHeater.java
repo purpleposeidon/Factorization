@@ -12,8 +12,6 @@ import net.minecraft.block.Block;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.util.AxisAlignedBB;
-import net.minecraft.util.EnumFacing;
-import net.minecraft.util.IIcon;
 import net.minecraft.util.ITickable;
 
 import java.io.IOException;
@@ -28,11 +26,6 @@ public class TileEntityHeater extends TileEntityCommon implements IChargeConduct
     @Override
     public FactoryType getFactoryType() {
         return FactoryType.HEATER;
-    }
-    
-    @Override
-    public IIcon getIcon(EnumFacing dir) {
-        return BlockIcons.heater_spiral;
     }
 
     @Override
@@ -114,7 +107,7 @@ public class TileEntityHeater extends TileEntityCommon implements IChargeConduct
                 heaters.add(c.getTE(TileEntityHeater.class));
                 continue;
             }
-            IFurnaceHeatable furnace = HeatConverters.convert(c.w, c.x, c.y, c.z);
+            IFurnaceHeatable furnace = HeatConverters.convert(c.w, c.toBlockPos());
             if (furnace != null && sendHeat(furnace)) {
                 action++;
                 if (!canSendHeat()) return;
@@ -133,7 +126,7 @@ public class TileEntityHeater extends TileEntityCommon implements IChargeConduct
             return;
         }
         for (Coord c : heater.getCoord().getRandomNeighborsAdjacent()) {
-            IFurnaceHeatable adj = HeatConverters.convert(c.w, c.x, c.y, c.z);
+            IFurnaceHeatable adj = HeatConverters.convert(c.w, c.toBlockPos());
             if (adj == null) continue;
             if (heater.sendHeat(adj)) {
                 heat -= to_take;

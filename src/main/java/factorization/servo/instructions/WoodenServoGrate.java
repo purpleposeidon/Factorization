@@ -9,7 +9,6 @@ import factorization.shared.Core;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
 import net.minecraft.util.EnumFacing;
-import net.minecraft.util.IIcon;
 
 import java.io.IOException;
 
@@ -22,11 +21,6 @@ public class WoodenServoGrate extends Decorator {
 
     @Override
     public void motorHit(ServoMotor motor) { }
-
-    @Override
-    public IIcon getIcon(EnumFacing side) {
-        return Blocks.trapdoor.getBlockTextureFromSide(0);
-    }
 
     @Override
     public boolean onClick(EntityPlayer player, Coord block, EnumFacing side) {

@@ -10,12 +10,10 @@ import factorization.common.FactoryType;
 import factorization.shared.BlockClass;
 import factorization.shared.NetworkFactorization;
 import factorization.shared.TileEntityCommon;
-import factorization.util.SpaceUtil;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumFacing;
-import net.minecraft.util.IIcon;
 import net.minecraft.util.ITickable;
 
 import java.io.IOException;
@@ -48,7 +46,7 @@ public class TileEntityShaftGen extends TileEntityCommon implements IChargeCondu
     @Override
     public void onPlacedBy(EntityPlayer player, ItemStack is, EnumFacing side, float hitX, float hitY, float hitZ) {
         super.onPlacedBy(player, is, side, hitX, hitY, hitZ);
-        shaft_direction = SpaceUtil.getOrientation(side);
+        shaft_direction = side;
         if (player.isSneaking()) {
             shaft_direction = shaft_direction.getOpposite();
             return;
@@ -144,10 +142,5 @@ public class TileEntityShaftGen extends TileEntityCommon implements IChargeCondu
             // ask for a redraw? Nah; things are getting redrawn constantly anyways
         }
         return super.handleMessageFromServer(messageType, input);
-    }
-
-    @Override
-    public IIcon getIcon(EnumFacing dir) {
-        return BlockIcons.beauty$shaft_gen_side;
     }
 }

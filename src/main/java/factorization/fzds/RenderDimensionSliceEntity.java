@@ -46,12 +46,13 @@ public class RenderDimensionSliceEntity extends Render implements IFzdsShenaniga
     
     private Set<DSRenderInfo> renderInfoTracker = new HashSet<DSRenderInfo>();
     private static long megatickCount = 0;
-    
-    public RenderDimensionSliceEntity() {
+
+    protected RenderDimensionSliceEntity(RenderManager renderManager) {
+        super(renderManager);
         instance = this;
         Core.loadBus(this);
     }
-    
+
     @Override
     protected ResourceLocation getEntityTexture(Entity entity) { return null; }
 
@@ -62,8 +63,9 @@ public class RenderDimensionSliceEntity extends Render implements IFzdsShenaniga
         @Override public void writeEntityToNBT(NBTTagCompound var1) { }
         @Override public ItemStack getHeldItem() { return null; }
         @Override public ItemStack getEquipmentInSlot(int var1) { return null; }
+        @Override public ItemStack getCurrentArmor(int slotIn) { return null; }
         @Override public void setCurrentItemOrArmor(int var1, ItemStack var2) { }
-        @Override public ItemStack[] getLastActiveItems() { return null; }
+        @Override public ItemStack[] getInventory() { return null; }
         @Override public void setHealth(float par1) { }
     };
     

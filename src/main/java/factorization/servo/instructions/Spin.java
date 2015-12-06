@@ -14,7 +14,6 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumFacing;
-import net.minecraft.util.IIcon;
 
 import java.io.IOException;
 
@@ -63,11 +62,6 @@ public class Spin extends Instruction {
     @Override
     public void stepperHit(StepperEngine engine) {
         hit(engine);
-    }
-
-    @Override
-    public IIcon getIcon(EnumFacing side) {
-        return cc ? BlockIcons.servo$spin_cc : BlockIcons.servo$spin_ccc;
     }
 
     @Override

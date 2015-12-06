@@ -1,6 +1,7 @@
 package factorization.beauty;
 
 import factorization.shared.Core;
+import factorization.shared.FzModel;
 import factorization.util.NumUtil;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
@@ -10,10 +11,10 @@ import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL12;
 
 public class TileEntityShaftRenderer extends TileEntitySpecialRenderer {
-    public static ObjectModel shaftModel = new ObjectModel(new ResourceLocation("factorization", "models/shaft.obj"));
+    public static FzModel shaftModel = new FzModel("shaft");
 
     @Override
-    public void renderTileEntityAt(TileEntity te, double dx, double dy, double dz, float partial) {
+    public void renderTileEntityAt(TileEntity te, double dx, double dy, double dz, float partial, int destroyingStage) {
         GL11.glEnable(GL11.GL_TEXTURE_2D);
         GL11.glPushAttrib(GL11.GL_TRANSFORM_BIT);
         GL11.glEnable(GL12.GL_RESCALE_NORMAL);
@@ -28,7 +29,7 @@ public class TileEntityShaftRenderer extends TileEntitySpecialRenderer {
         }
         double angle = Math.toDegrees(NumUtil.interp(shaft.prev_angle, shaft.angle, partial));
         GL11.glRotatef((float) angle, 0, 1, 0);
-        shaftModel.render(BlockIcons.beauty$shaft);
+        shaftModel.draw();
         GL11.glPopAttrib();
         GL11.glPopMatrix();
     }

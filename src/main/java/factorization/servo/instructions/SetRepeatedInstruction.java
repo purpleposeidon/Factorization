@@ -6,8 +6,6 @@ import factorization.servo.Instruction;
 import factorization.servo.ServoMotor;
 import factorization.shared.Core;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.EnumFacing;
-import net.minecraft.util.IIcon;
 
 import java.io.IOException;
 
@@ -30,11 +28,6 @@ public class SetRepeatedInstruction extends Instruction {
             obj = null;
         }
         motor.executioner.setEntryInstruction(obj);
-    }
-
-    @Override
-    public IIcon getIcon(EnumFacing side) {
-        return BlockIcons.servo$repeated_instruction;
     }
 
     @Override

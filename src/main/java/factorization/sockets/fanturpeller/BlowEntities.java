@@ -1,5 +1,6 @@
 package factorization.sockets.fanturpeller;
 
+import com.google.common.base.Predicate;
 import factorization.api.Coord;
 import factorization.api.datahelpers.DataHelper;
 import factorization.api.datahelpers.IDataSerializable;
@@ -18,7 +19,6 @@ import factorization.util.InvUtil;
 import factorization.util.InvUtil.FzInv;
 import factorization.util.NumUtil;
 import factorization.util.SpaceUtil;
-import net.minecraft.command.IEntitySelector;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.IProjectile;
@@ -33,10 +33,9 @@ import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.init.Items;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.AxisAlignedBB;
-import net.minecraft.util.DamageSource;
-import net.minecraft.util.EnumFacing;
-import net.minecraft.util.Vec3;
+import net.minecraft.potion.Potion;
+import net.minecraft.potion.PotionEffect;
+import net.minecraft.util.*;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
@@ -45,7 +44,7 @@ import org.lwjgl.opengl.GL11;
 import java.io.IOException;
 import java.util.ArrayList;
 
-public class BlowEntities extends SocketFanturpeller implements IEntitySelector {
+public class BlowEntities extends SocketFanturpeller implements Predicate<Entity> {
     short dropDelay = 0;
     ArrayList<ItemStack> buffer = new ArrayList<ItemStack>(1);
     
@@ -81,17 +80,6 @@ public class BlowEntities extends SocketFanturpeller implements IEntitySelector 
         return 1 + target_speed*target_speed;
     }
     
-    private AxisAlignedBB area = new AxisAlignedBB(0, 0, 0, 0, 0, 0);
-    private AxisAlignedBB death_area = new AxisAlignedBB(0, 0, 0, 0, 0, 0);
-    
-    void addCoord(double x, double y, double z) {
-        if (x < 0.0D) area.minX += x;
-        if (x > 0.0D) area.maxX += x;
-        if (y < 0.0D) area.minY += y;
-        if (y > 0.0D) area.maxY += y;
-        if (z < 0.0D) area.minZ += z;
-        if (z > 0.0D) area.maxZ += z;
-    }
 
     @Override
     protected void fanturpellerUpdate(ISocketHolder socket, Coord coord, boolean powered) {
@@ -109,32 +97,37 @@ public class BlowEntities extends SocketFanturpeller implements IEntitySelector 
             coord.adjust(facing);
             // Since that var isn't a copy, we need to adjust it back as well.
         }
-        area.minX = death_area.minX = coord.x;
-        area.minY = death_area.minY = coord.y;
-        area.minZ = death_area.minZ = coord.z;
-        area.maxX = death_area.maxX = coord.x + 1;
-        area.maxY = death_area.maxY = coord.y + 1;
-        area.maxZ = death_area.maxZ = coord.z + 1;
         if (socket == this) {
             coord.adjust(facing.getOpposite());
         }
         int side_range = target_speed;
         int front_range = 3 + target_speed*target_speed;
         if (isSucking) front_range++;
-        for (EnumFacing dir : EnumFacing.VALUES) {
+        Vec3 start = new Coord(this).toMiddleVector();
+        Vec3[] range = new Vec3[6];
+        EnumFacing[] values = EnumFacing.VALUES;
+        for (int i = 0; i < values.length; i++) {
+            EnumFacing dir = values[i];
+            int scale = 0;
             if (dir == facing) {
-                addCoord(dir.getDirectionVec().getX()*front_range, dir.getDirectionVec().getY()*front_range, dir.getDirectionVec().getZ()*front_range);
+                scale = front_range;
             } else if (dir.getOpposite() != facing) {
-                addCoord(dir.getDirectionVec().getX()*side_range, dir.getDirectionVec().getY()*side_range, dir.getDirectionVec().getZ()*side_range);
+                scale = side_range;
+            } else {
+                range[i] = start;
+                continue;
             }
+            range[i] = start.add(SpaceUtil.scale(new Vec3(dir.getDirectionVec()), scale));
         }
         double s = 0.025;
         EnumFacing dir = isSucking ? facing.getOpposite() : facing;
         found_player = false;
+        AxisAlignedBB death_area = new AxisAlignedBB(coord.toBlockPos(), coord.add(1, 1, 1).toBlockPos());
+        AxisAlignedBB area = SpaceUtil.newBox(range);
         iterateEntities(front_range, s, dir, area, death_area, worldObj);
         if (worldObj == DeltaChunk.getWorld(worldObj)) {
             for (IDeltaChunk idc : DeltaChunk.getSlicesContainingPoint(coord)) {
-                iterateFzdsEntities(front_range, s, dir, idc);
+                iterateFzdsEntities(front_range, s, dir, idc, area, death_area);
             }
         }
 
@@ -155,18 +148,18 @@ public class BlowEntities extends SocketFanturpeller implements IEntitySelector 
                 double y = pick(area.minY, area.maxY) + d.getDirectionVec().getY()*ds;
                 double z = pick(area.minZ, area.maxZ) + d.getDirectionVec().getZ()*ds;
                 //Good ones: explode, cloud, smoke, snowshovel
-                worldObj.spawnParticle("cloud", pos, facing.getDirectionVec().getX()*s, facing.getDirectionVec().getY()*s, facing.getDirectionVec().getZ()*s);
+                worldObj.spawnParticle(EnumParticleTypes.CLOUD, x, y, z, facing.getDirectionVec().getX()*s, facing.getDirectionVec().getY()*s, facing.getDirectionVec().getZ()*s);
             }
         }
     }
 
-    private void iterateFzdsEntities(int front_range, double s, EnumFacing dir, IDeltaChunk idc) {
+    private void iterateFzdsEntities(int front_range, double s, EnumFacing dir, IDeltaChunk idc, AxisAlignedBB area, AxisAlignedBB death_area) {
         iterateEntities(front_range, s, idc.shadow2real(dir), idc.shadow2real(area), idc.shadow2real(death_area), idc.worldObj);
         if (!worldObj.isRemote && Core.dev_environ && idc.getController() instanceof MechanicsController) {
             Vec3 force = SpaceUtil.fromDirection(dir);
             double forceScale = target_speed / 20.0;
             if (isSucking) forceScale *= -1;
-            SpaceUtil.incrScale(force, forceScale);
+            force = SpaceUtil.scale(force, forceScale);
             MechanicsController.push(idc, getCoord(), force);
         }
     }
@@ -174,12 +167,12 @@ public class BlowEntities extends SocketFanturpeller implements IEntitySelector 
     private void iterateEntities(int front_range, double s, EnumFacing dir, AxisAlignedBB box, AxisAlignedBB deathBox, World w) {
         //AabbDebugger.addBox(box);
         boolean rising = dir.getDirectionVec().getY() == (isSucking ? -1 : +1);
-        for (Entity ent : (Iterable<Entity>)w.getEntitiesWithinAABBExcludingEntity(null, box, this)) {
+        for (Entity ent : w.getEntitiesInAABBexcluding(null, box, this)) {
             if (rising) {
                 waftEntity(ent);
             }
             suckEntity(ent, front_range, dir, s);
-            if (!w.isRemote && isSucking && ent.boundingBox != null && ent.boundingBox.intersectsWith(deathBox)) {
+            if (!w.isRemote && isSucking && ent.getCollisionBoundingBox() != null && ent.getCollisionBoundingBox().intersectsWith(deathBox)) {
                 murderEntity(ent);
             }
             ent.fallDistance *= 0.8F;
@@ -246,10 +239,9 @@ public class BlowEntities extends SocketFanturpeller implements IEntitySelector 
             EntityGhast ghast = (EntityGhast) ent;
             if (worldObj.getTotalWorldTime() % 30 == 0) {
                 ghast.attackEntityFrom(DamageSource.generic, 1);
-                ghast.waypointX = ghast.posX;
-                ghast.waypointY = ghast.posY;
-                ghast.waypointZ = ghast.posZ;
-                ghast.courseChangeCooldown = 40;
+                if (ghast.getActivePotionEffect(Potion.moveSlowdown) == null) {
+                    ghast.addPotionEffect(new PotionEffect(Potion.moveSlowdown.id, 4, 20, true, true));
+                }
                 if (ghast.isDead) {
                     //NOTE: Potential for bonus ghast tears here. I'm okay with this?
                     buffer.add(new ItemStack(Items.ghast_tear));
@@ -268,14 +260,16 @@ public class BlowEntities extends SocketFanturpeller implements IEntitySelector 
                 chicken.attackEntityFrom(DamageSource.generic, 1);
             }
         } else if (ent instanceof EntityBat) {
+            // NORELEASE: witchery wool of bat!
             EntityBat bat = (EntityBat) ent;
             bat.attackEntityFrom(DamageSource.generic, 1);
         }
     }
     
     boolean found_player = false;
+
     @Override
-    public boolean isEntityApplicable(Entity entity) {
+    public boolean apply(Entity entity) {
         if (entity instanceof EntityItem) {
             return true;
         }

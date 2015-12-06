@@ -7,8 +7,6 @@ import factorization.api.datahelpers.Share;
 import factorization.common.FactoryType;
 import factorization.notify.Notice;
 import factorization.notify.NoticeUpdater;
-import factorization.rendersorting.ISortableRenderer;
-import factorization.rendersorting.RenderSorter;
 import factorization.shared.*;
 import factorization.shared.NetworkFactorization.MessageType;
 import factorization.util.*;
@@ -21,7 +19,6 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.GLAllocation;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.init.Blocks;
@@ -30,7 +27,6 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.*;
-import net.minecraftforge.client.IItemRenderer;
 import net.minecraftforge.client.event.RenderWorldLastEvent;
 import net.minecraftforge.common.ForgeHooks;
 import net.minecraftforge.common.util.FakePlayer;
@@ -47,7 +43,7 @@ import org.lwjgl.opengl.GL11;
 import java.io.IOException;
 import java.util.ArrayList;
 
-public class TileEntityDayBarrel extends TileEntityFactorization implements ISortableRenderer<TileEntityDayBarrel> {
+public class TileEntityDayBarrel extends TileEntityFactorization  {
     public ItemStack item;
     private ItemStack topStack;
     private int middleCount;
@@ -122,11 +118,7 @@ public class TileEntityDayBarrel extends TileEntityFactorization implements ISor
     
     
     //Barrel-type Code
-    @Override
-    public boolean canUpdate() {
-        return type == Type.HOPPING;
-    }
-    
+
     @Override
     protected void doLogic() {
         if (type != Type.HOPPING) {
@@ -320,7 +312,7 @@ public class TileEntityDayBarrel extends TileEntityFactorization implements ISor
     
     @Override
     public void onPlacedBy(EntityPlayer player, ItemStack is, EnumFacing side, float hitX, float hitY, float hitZ) {
-        orientation = SpaceUtil.getOrientation(player, side, hitX, hitY, hitZ);
+        orientation = SpaceUtil.getOrientation(player, side, new Vec3(hitX, hitY, hitZ));
         loadFromStack(is);
         needLogic();
     }
@@ -526,11 +518,6 @@ public class TileEntityDayBarrel extends TileEntityFactorization implements ISor
     }
 
     @Override
-    public String getInventoryName() {
-        return "Barrel";
-    }
-
-    @Override
     public boolean isItemValidForSlot(int i, ItemStack is) {
         if (i != 0) {
             return false;
@@ -543,18 +530,16 @@ public class TileEntityDayBarrel extends TileEntityFactorization implements ISor
         }
         return itemMatch(is);
     }
-    
+
     @Override
-    public boolean canExtractItem(int slot, ItemStack itemstack, int side) {
-        EnumFacing d = SpaceUtil.getOrientation(side);
-        return isTop(d.getOpposite());
+    public boolean canExtractItem(int index, ItemStack stack, EnumFacing direction) {
+        return isTop(direction.getOpposite());
     }
 
-    
+
     private static final int[] top_slot = new int[] {0}, bottom_slot = new int[] {1}, no_slots = new int[] {};
     @Override
-    public int[] getAccessibleSlotsFromSide(int i) {
-        EnumFacing d = SpaceUtil.getOrientation(i);
+    public int[] getSlotsForFace(EnumFacing d) {
         if (isTopOrBack(d)) {
             return top_slot;
         }
@@ -678,7 +663,7 @@ public class TileEntityDayBarrel extends TileEntityFactorization implements ISor
         if (event.entityPlayer.worldObj.isRemote) {
             return;
         }
-        last_hit_side = event.face;
+        last_hit_side = event.face.ordinal();
     }
 
     static boolean isStairish(Coord c) {
@@ -1220,10 +1205,5 @@ public class TileEntityDayBarrel extends TileEntityFactorization implements ISor
     public int getFlamability() {
         // The creative barrel I give you can't burn, so won't check for CREATIVE.
         return isWooden() ? 20 : 0;
-    }
-
-    @Override
-    public int compareRenderer(TileEntityDayBarrel other) {
-        return RenderSorter.compareItemRender(item, other.item, IItemRenderer.ItemRenderType.INVENTORY);
     }
 }

@@ -5,6 +5,7 @@ import factorization.api.datahelpers.DataHelper;
 import factorization.api.datahelpers.IDataSerializable;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.util.BlockPos;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.Vec3;
 
@@ -238,5 +239,9 @@ public class DeltaCoord implements IDataSerializable {
         x += dir.getDirectionVec().getX();
         y += dir.getDirectionVec().getY();
         z += dir.getDirectionVec().getZ();
+    }
+
+    public BlockPos toBlockPos() {
+        return new BlockPos(x, y, z);
     }
 }

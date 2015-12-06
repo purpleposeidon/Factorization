@@ -19,14 +19,11 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.util.EnumFacing;
-import net.minecraft.util.IIcon;
-import net.minecraft.util.ITickable;
+import net.minecraft.util.*;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
 import java.io.IOException;
-import java.util.List;
 
 public class TileEntityAnthroGen extends TileEntityCommon implements IInventory, ICoordFunction, ITickable {
     public static int UPDATE_RATE = 20 * 60 * 7;
@@ -99,7 +96,7 @@ public class TileEntityAnthroGen extends TileEntityCommon implements IInventory,
     @Override
     public boolean handleMessageFromServer(NetworkFactorization.MessageType messageType, ByteBuf input) throws IOException {
         if (messageType == NetworkFactorization.MessageType.GeneratorParticles) {
-            worldObj.spawnParticle("flame", pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5, 0, 0, 0);
+            worldObj.spawnParticle(EnumParticleTypes.FLAME, pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5, 0, 0, 0);
             return true;
         }
         return super.handleMessageFromServer(messageType, input);
@@ -107,9 +104,8 @@ public class TileEntityAnthroGen extends TileEntityCommon implements IInventory,
 
     @Override
     public void handle(Coord here) {
-        for (List list : here.getChunk().entityLists) {
-            for (Object obj : list) {
-                Entity ent = (Entity) obj;
+        for (ClassInheritanceMultiMap<Entity> list : here.getChunk().getEntityLists()) {
+            for (Entity ent : list) {
                 if (!(ent instanceof INpc)) continue;
                 if (hashEnt(ent)) {
                     satisfactory_villagers++;
@@ -195,43 +191,18 @@ public class TileEntityAnthroGen extends TileEntityCommon implements IInventory,
     }
 
     @Override
-    public String getInventoryName() {
-        return "fz.AnthroGen";
+    public IChatComponent getDisplayName() {
+        return new ChatComponentTranslation("fz.AnthroGen");
     }
 
     @Override
-    public boolean hasCustomInventoryName() {
+    public String getCommandSenderName() {
+        return null;
+    }
+
+    @Override
+    public boolean hasCustomName() {
         return false;
-    }
-
-    @Override
-    public int getInventoryStackLimit() {
-        return 64;
-    }
-
-    @Override
-    public boolean isUseableByPlayer(EntityPlayer p_70300_1_) {
-        return false;
-    }
-
-    @Override
-    public void openInventory() {
-
-    }
-
-    @Override
-    public void closeInventory() {
-
-    }
-
-    @Override
-    public boolean isItemValidForSlot(int slot, ItemStack stack) {
-        return false;
-    }
-
-    @Override
-    public IIcon getIcon(EnumFacing dir) {
-        return BlockIcons.beauty$anthrogen;
     }
 
     @Override
@@ -253,6 +224,29 @@ public class TileEntityAnthroGen extends TileEntityCommon implements IInventory,
 
     @Override
     public boolean isBlockSolidOnSide(EnumFacing side) {
-        return side == 0;
+        return side == EnumFacing.DOWN;
+    }
+
+    @Override
+    public int getInventoryStackLimit() {
+        return 64;
+    }
+
+    @Override
+    public boolean isItemValidForSlot(int slot, ItemStack stack) {
+        return false;
+    }
+
+    @Override public int getField(int id) { return 0; }
+    @Override public void setField(int id, int value) { }
+    @Override public int getFieldCount() { return 0; }
+    @Override public boolean isUseableByPlayer(EntityPlayer player) { return false; }
+    @Override public void openInventory(EntityPlayer player) { }
+    @Override public void closeInventory(EntityPlayer player) { }
+
+    @Override
+    public void clear() {
+        entheas = null;
+        satisfactory_villagers = 0;
     }
 }

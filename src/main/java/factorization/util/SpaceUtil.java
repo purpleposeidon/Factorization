@@ -211,6 +211,10 @@ public final class SpaceUtil {
                 max.xCoord, max.yCoord, max.zCoord);
     }
 
+    public static AxisAlignedBB newBox(Vec3[] parts) {
+        return newBox(getLowest(parts), getHighest(parts));
+    }
+
     public static Vec3 scale(Vec3 base, double s) {
         return new Vec3(base.xCoord * s, base.yCoord * s, base.zCoord * s);
     }
@@ -593,5 +597,9 @@ public final class SpaceUtil {
 
     public static Vec3 newVec() {
         return new Vec3(0, 0, 0);
+    }
+
+    public static BlockPos newPos() {
+        return new BlockPos(0, 0, 0);
     }
 }

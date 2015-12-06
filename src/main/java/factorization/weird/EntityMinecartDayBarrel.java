@@ -5,15 +5,16 @@ import factorization.api.datahelpers.DataHelper;
 import factorization.api.datahelpers.DataInNBT;
 import factorization.api.datahelpers.DataOutNBT;
 import factorization.shared.Core;
-import net.minecraft.block.Block;
+import factorization.util.SpaceUtil;
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.item.EntityMinecart;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.util.BlockPos;
 import net.minecraft.util.DamageSource;
 import net.minecraft.util.EnumFacing;
-import net.minecraft.util.MathHelper;
 import net.minecraft.world.World;
 
 import java.io.IOException;
@@ -28,7 +29,7 @@ public class EntityMinecartDayBarrel extends EntityMinecart implements IInventor
     }
 
     public EntityMinecartDayBarrel(World world, double x, double y, double z) {
-        super(world, pos);
+        super(world, x, y, z);
     }
 
     @Override
@@ -39,8 +40,8 @@ public class EntityMinecartDayBarrel extends EntityMinecart implements IInventor
         }
 
         ItemStack itemstack = getCartItem();
-        if (this.func_95999_t() != null) {
-            itemstack.setStackDisplayName(this.func_95999_t());
+        if (this.getCustomNameTag() != null) {
+            itemstack.setStackDisplayName(getCustomNameTag());
         }
 
         this.entityDropItem(itemstack, 0.0F);
@@ -55,8 +56,8 @@ public class EntityMinecartDayBarrel extends EntityMinecart implements IInventor
     }
 
     @Override
-    public int getMinecartType() {
-        return 1;
+    public EnumMinecartType getMinecartType() {
+        return EnumMinecartType.CHEST;
     }
 
     public void initFromStack(ItemStack is) {
@@ -68,7 +69,7 @@ public class EntityMinecartDayBarrel extends EntityMinecart implements IInventor
         if (barrel != null) return;
         barrel = new TileEntityDayBarrel();
         barrel.setWorldObj(worldObj);
-        barrel.getPos().getX() = barrel.getPos().getY() = barrel.getPos().getZ() = 0;
+        barrel.setPos(SpaceUtil.newPos());
         barrel.validate();
         barrel.orientation = FzOrientation.fromDirection(EnumFacing.WEST).pointTopTo(EnumFacing.UP);
         barrel.notice_target = this;
@@ -137,7 +138,7 @@ public class EntityMinecartDayBarrel extends EntityMinecart implements IInventor
     }
 
     @Override
-    public void onActivatorRailPass(BlockPos pos, boolean powered) {
+    public void onActivatorRailPass(int x, int y, int z, boolean powered) {
         if (powered) {
             activatorRailTicks = barrel.getLogicSpeed();
         }
@@ -147,7 +148,7 @@ public class EntityMinecartDayBarrel extends EntityMinecart implements IInventor
     public void onUpdate() {
         super.onUpdate();
 
-        if (worldObj.isRemote && dataWatcher.hasChanges()) {
+        if (worldObj.isRemote && dataWatcher.hasObjectChanged()) {
             barrel.item = dataWatcher.getWatchableObjectItemStack(23);
             barrel.setItemCount(dataWatcher.getWatchableObjectInt(24));
             barrel.woodLog = dataWatcher.getWatchableObjectItemStack(25);
@@ -157,12 +158,10 @@ public class EntityMinecartDayBarrel extends EntityMinecart implements IInventor
         }
 
         if (!worldObj.isRemote) {
-            barrel.getPos().getX() = MathHelper.floor_double(posX);
-            barrel.getPos().getY() = MathHelper.floor_double(posY);
-            barrel.getPos().getZ() = MathHelper.floor_double(posZ);
+            barrel.setPos(new BlockPos(this));
             if (activatorRailTicks > 0) activatorRailTicks--;
 
-            if (barrel.canUpdate() && activatorRailTicks <= 0 && worldObj.getTotalWorldTime() % barrel.getLogicSpeed() == 0) {
+            if (activatorRailTicks <= 0 && worldObj.getTotalWorldTime() % barrel.getLogicSpeed() == 0) {
                 barrel.doLogic();
                 updateDataWatcher(false);
             }
@@ -170,8 +169,8 @@ public class EntityMinecartDayBarrel extends EntityMinecart implements IInventor
     }
 
     @Override
-    public Block func_145817_o() {
-        return Core.registry.factory_block;
+    public IBlockState getDefaultDisplayTile() {
+        return Core.registry.factory_block_barrel.getDefaultState();
     }
 
     @Override
@@ -233,11 +232,6 @@ public class EntityMinecartDayBarrel extends EntityMinecart implements IInventor
     }
 
     @Override
-    public String getInventoryName() {
-        return barrel.getInventoryName();
-    }
-
-    @Override
     public int getInventoryStackLimit() {
         return barrel.getInventoryStackLimit();
     }
@@ -253,18 +247,18 @@ public class EntityMinecartDayBarrel extends EntityMinecart implements IInventor
         return barrel.isUseableByPlayer(player);
     }
 
-    @Override
-    public void openInventory() {
-        barrel.openInventory();
-    }
-
-    @Override
-    public void closeInventory() {
-        barrel.closeInventory();
-    }
-
-    @Override
-    public boolean isItemValidForSlot(int slot, ItemStack stack) {
+    @Override public void openInventory(EntityPlayer player) { }
+    @Override public void closeInventory(EntityPlayer player) { }
+    @Override public boolean isItemValidForSlot(int slot, ItemStack stack) {
         return barrel.isItemValidForSlot(slot, stack);
+    }
+
+    @Override public int getField(int id) { return 0; }
+    @Override public void setField(int id, int value) { }
+    @Override public int getFieldCount() { return 0; }
+
+    @Override
+    public void clear() {
+        barrel.clear();
     }
 }

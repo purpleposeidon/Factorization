@@ -8,15 +8,13 @@ import factorization.util.InvUtil;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.inventory.Container;
-import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.Slot;
-import net.minecraft.inventory.SlotFurnace;
-import net.minecraft.item.Item;
+import net.minecraft.inventory.SlotFurnaceOutput;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntityFurnace;
 
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.Collections;
 
 public class ContainerFactorization extends Container {
     public TileEntityFactorization factory;
@@ -32,86 +30,17 @@ public class ContainerFactorization extends Container {
         this.type = factory.getFactoryType();
     }
 
-    class FactorySlot extends Slot {
-        Item[] allowed;
-        Item[] forbidden;
-
-        public FactorySlot(IInventory iinventory, int slotNumber, int posX, int posY, Item[] a, Item[] f) {
-            super(iinventory, slotNumber, posX, posY);
-            allowed = a;
-            forbidden = f;
-        }
-
-        @Override
-        public boolean isItemValid(ItemStack itemstack) {
-            if (!super.isItemValid(itemstack)) {
-                return false;
-            }
-            if (allowed != null) {
-                for (Item a : allowed) {
-                    if (itemstack.getItem() == a) {
-                        return true;
-                    }
-                }
-                return false;
-            }
-            if (forbidden != null) {
-                for (Item f : forbidden) {
-                    if (itemstack.getItem() == f) {
-                        return false;
-                    }
-                }
-                return true;
-            }
-            return false;
-        }
-    }
-
-    class StackLimitedSlot extends Slot {
-        int max_size;
-
-        public StackLimitedSlot(int max_size, IInventory par1iInventory, int par2, int par3,
-                int par4) {
-            super(par1iInventory, par2, par3, par4);
-            this.max_size = max_size;
-        }
-
-        @Override
-        public int getSlotStackLimit() {
-            return max_size;
-        }
-
-    }
 
     public void addSlotsForGui(TileEntityFactorization ent, InventoryPlayer inventoryplayer) {
         FactoryType type = ent.getFactoryType();
         EntityPlayer player = inventoryplayer.player;
         switch (type) {
-        case STAMPER:
-        case PACKAGER:
-            TileEntityStamper stamper = (TileEntityStamper) ent;
-            addSlotToContainer(new Slot(stamper, 0, 44, 43));
-            addSlotToContainer(new FactorySlot(stamper, 1, 116, 43, null, null));
-            break;
         case SLAGFURNACE:
             TileEntitySlagFurnace furnace = (TileEntitySlagFurnace) ent;
             addSlotToContainer(new Slot(furnace, 0, 56, 17));
             addSlotToContainer(new Slot(furnace, 1, 56, 53));
-            addSlotToContainer(new SlotFurnace(player, furnace, 2, 114, 22));
-            addSlotToContainer(new SlotFurnace(player, furnace, 3, 114, 48));
-            break;
-        case MIXER:
-            TileEntityMixer mixer = (TileEntityMixer) ent;
-            //inputs
-            addSlotToContainer(new Slot(mixer, 0, 38, 25));
-            addSlotToContainer(new Slot(mixer, 1, 56, 25));
-            addSlotToContainer(new Slot(mixer, 2, 38, 43));
-            addSlotToContainer(new Slot(mixer, 3, 56, 43));
-            //outputs
-            addSlotToContainer(new SlotFurnace(player, mixer, 4, 112, 25));
-            addSlotToContainer(new SlotFurnace(player, mixer, 5, 130, 25));
-            addSlotToContainer(new SlotFurnace(player, mixer, 6, 112, 43));
-            addSlotToContainer(new SlotFurnace(player, mixer, 7, 130, 43));
+            addSlotToContainer(new SlotFurnaceOutput(player, furnace, 2, 114, 22));
+            addSlotToContainer(new SlotFurnaceOutput(player, furnace, 3, 114, 48));
             break;
         case CRYSTALLIZER:
             TileEntityCrystallizer crys = (TileEntityCrystallizer) ent;
@@ -123,7 +52,7 @@ public class ContainerFactorization extends Container {
             addSlotToContainer(new Slot(crys, 4, 52, 55));
             addSlotToContainer(new Slot(crys, 5, 52, 29));
             //central output
-            addSlotToContainer(new SlotFurnace(player, crys, 6, 80, 40));
+            addSlotToContainer(new SlotFurnaceOutput(player, crys, 6, 80, 40));
             break;
         case PARASIEVE:
             TileEntityParaSieve proto = (TileEntityParaSieve) ent;
@@ -169,7 +98,7 @@ public class ContainerFactorization extends Container {
     @Override
     //transferStackInSlot
     public ItemStack transferStackInSlot(EntityPlayer player, int i) {
-        Slot slot = (Slot) inventorySlots.get(i);
+        Slot slot = inventorySlots.get(i);
         ItemStack itemstack = slot.getStack();
         if (itemstack == null) {
             return null;
@@ -180,32 +109,17 @@ public class ContainerFactorization extends Container {
         case SLAGFURNACE:
             if (i >= 4) {
                 if (TileEntityFurnace.getItemBurnTime(itemstack) > 0) {
-                    return InvUtil.transferSlotToSlots(player, slot, Arrays.asList((Slot) inventorySlots.get(1)));
+                    return InvUtil.transferSlotToSlots(player, slot, Collections.singletonList((Slot) inventorySlots.get(1)));
                 } else {
-                    return InvUtil.transferSlotToSlots(player, slot, Arrays.asList((Slot) inventorySlots.get(0)));
+                    return InvUtil.transferSlotToSlots(player, slot, Collections.singletonList((Slot) inventorySlots.get(0)));
                 }
-            }
-            break;
-        case STAMPER:
-        case PACKAGER:
-            if (i >= 2) {
-                return InvUtil.transferSlotToSlots(player, slot, Arrays.asList((Slot) inventorySlots.get(0)));
-            }
-            break;
-        case MIXER:
-            if (i >= 8) {
-                ArrayList<Slot> av = new ArrayList(4);
-                for (int j = 0; j < 4; j++) {
-                    av.add((Slot)inventorySlots.get(j));
-                }
-                return InvUtil.transferSlotToSlots(player, slot, av);
             }
             break;
         case CRYSTALLIZER:
             if (i >= 8) {
-                ArrayList<Slot> av = new ArrayList(6);
+                ArrayList<Slot> av = new ArrayList<Slot>(6);
                 for (int j = 0; j < 6; j++) {
-                    av.add((Slot)inventorySlots.get(j));
+                    av.add(inventorySlots.get(j));
                 }
                 return InvUtil.transferSlotToSlots(player, slot, av);
             }

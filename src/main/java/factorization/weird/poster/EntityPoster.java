@@ -4,8 +4,6 @@ import factorization.api.Coord;
 import factorization.api.Quaternion;
 import factorization.api.datahelpers.DataHelper;
 import factorization.api.datahelpers.Share;
-import factorization.rendersorting.ISortableRenderer;
-import factorization.rendersorting.RenderSorter;
 import factorization.shared.Core;
 import factorization.shared.EntityFz;
 import factorization.util.ItemUtil;
@@ -20,13 +18,12 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.*;
 import net.minecraft.world.World;
-import net.minecraftforge.client.IItemRenderer;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
 import java.io.IOException;
 
-public class EntityPoster extends EntityFz implements ISortableRenderer<EntityPoster> {
+public class EntityPoster extends EntityFz  {
     public ItemStack inv = new ItemStack(Core.registry.spawnPoster);
     public Quaternion rot = new Quaternion();
     public double scale = 1.0;
@@ -40,13 +37,12 @@ public class EntityPoster extends EntityFz implements ISortableRenderer<EntityPo
 
     public EntityPoster(World w) {
         super(w);
-        yOffset = 0;
         setSize(0.5F, 0.5F);
     }
 
     void updateSize() {
         Vec3 here = SpaceUtil.fromEntPos(this);
-        SpaceUtil.setAABB(this.boundingBox, here, here);
+        Vec3[] parts = new Vec3[6];
         for (EnumFacing dir : EnumFacing.VALUES) {
             if (dir == norm) continue;
             float s = (float) scale;
@@ -56,11 +52,9 @@ public class EntityPoster extends EntityFz implements ISortableRenderer<EntityPo
                 s /= 2;
             }
             Vec3 d = SpaceUtil.fromDirection(dir);
-            SpaceUtil.incrScale(d, s);
-            rot.applyRotation(d);
-            SpaceUtil.incrAdd(d, here);
-            SpaceUtil.include(this.boundingBox, d);
+            parts[dir.ordinal()] = rot.applyRotation(SpaceUtil.scale(d, s)).add(here);
         }
+        setEntityBoundingBox(SpaceUtil.newBox(parts));
     }
 
     public void setItem(ItemStack item) {
@@ -102,7 +96,7 @@ public class EntityPoster extends EntityFz implements ISortableRenderer<EntityPo
         this.tilt = SpaceUtil.round(tiltV, norm);
 
         updateSize();
-        SpaceUtil.copyTo(this.boundingBox, bounds);
+        setEntityBoundingBox(bounds);
     }
 
     public void updateValues() {
@@ -211,7 +205,7 @@ public class EntityPoster extends EntityFz implements ISortableRenderer<EntityPo
         final boolean hasPoster = held.getItem() == Core.registry.spawnPoster;
         final boolean hasLmp = held.getItem() == Core.registry.logicMatrixProgrammer;
         if (hasPoster || hasLmp) {
-            EnumFacing clickDir = SpaceUtil.getOrientation(SpaceUtil.determineOrientation(player));
+            EnumFacing clickDir = SpaceUtil.determineOrientation(player);
             if (hasPoster) {
                 if (clickDir == norm || clickDir == norm.getOpposite()) {
                     spin_normal -= d;
@@ -243,21 +237,16 @@ public class EntityPoster extends EntityFz implements ISortableRenderer<EntityPo
         int x = MathHelper.floor_double(posX);
         int z = MathHelper.floor_double(posZ);
 
-        if (!worldObj.blockExists(x, 0, z)) return 0;
         double d = -0.5;
         if (EnumFacing.UP == top) {
             d = +0;
         }
-        return worldObj.getLightBrightnessForSkyBlocks(x, MathHelper.floor_double(posY + d), z, 0);
+        BlockPos blockpos = new BlockPos(x, MathHelper.floor_double(posY + d), z);
+        return worldObj.getCombinedLight(blockpos, 0);
     }
 
     @Override
     public boolean isInRangeToRenderDist(double dist) {
         return dist < 32 * 32;
-    }
-
-    @Override
-    public int compareRenderer(EntityPoster other) {
-        return RenderSorter.compareItemRender(inv, other.inv, IItemRenderer.ItemRenderType.ENTITY);
     }
 }

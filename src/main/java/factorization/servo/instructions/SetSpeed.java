@@ -11,7 +11,6 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumFacing;
-import net.minecraft.util.IIcon;
 
 import java.io.IOException;
 
@@ -38,18 +37,6 @@ public class SetSpeed extends Instruction {
         motor.setTargetSpeed(speed);
         if (origSpeed != motor.getTargetSpeed()) {
             motor.markDirty();
-        }
-    }
-
-    @Override
-    public IIcon getIcon(EnumFacing side) {
-        switch (speed) {
-        default:
-        case 1: return BlockIcons.servo$speed1;
-        case 2: return BlockIcons.servo$speed2;
-        case 3: return BlockIcons.servo$speed3;
-        case 4: return BlockIcons.servo$speed4;
-        case 5: return BlockIcons.servo$speed5;
         }
     }
 

@@ -7,9 +7,10 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.WorldClient;
 import net.minecraft.client.renderer.EntityRenderer;
 import net.minecraft.client.renderer.Tessellator;
-import net.minecraft.client.renderer.culling.Frustrum;
+import net.minecraft.client.renderer.culling.Frustum;
 import net.minecraft.client.renderer.culling.ICamera;
 import net.minecraft.client.renderer.texture.TextureManager;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.ResourceLocation;
@@ -76,8 +77,8 @@ public class ChainRender {
         final float partial = event.partialTicks;
         final ICamera camera = getFrustum(partial);
 
-        final WorldClient w = event.context.theWorld;
         final Minecraft mc = Minecraft.getMinecraft();
+        final WorldClient w = mc.theWorld;
         final EntityRenderer er = mc.entityRenderer;
         final TextureManager textureManager = mc.getTextureManager();
         final Tessellator tess = Tessellator.instance;
@@ -135,14 +136,14 @@ public class ChainRender {
     ICamera getFrustum(float partial) {
         // Unfortunately we have to make our own Frustum.
         final Minecraft mc = Minecraft.getMinecraft();
-        final EntityLivingBase eye = mc.renderViewEntity;
+        final Entity eye = mc.getRenderViewEntity();
         double eyeX = eye.lastTickPosX + (eye.posX - eye.lastTickPosX) * (double)partial;
         double eyeY = eye.lastTickPosY + (eye.posY - eye.lastTickPosY) * (double)partial;
         double eyeZ = eye.lastTickPosZ + (eye.posZ - eye.lastTickPosZ) * (double)partial;
 
-        Frustrum frustrum = new Frustrum(); // Notch can't spell
-        frustrum.setPosition(eyeX, eyeY, eyeZ);
-        return frustrum;
+        Frustum frustum = new Frustum(); // Notch can't spell
+        frustum.setPosition(eyeX, eyeY, eyeZ);
+        return frustum;
     }
 
 

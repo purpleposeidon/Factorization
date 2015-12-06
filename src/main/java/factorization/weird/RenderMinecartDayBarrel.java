@@ -4,6 +4,7 @@ import factorization.common.FactoryType;
 import net.minecraft.block.Block;
 import net.minecraft.client.renderer.RenderBlocks;
 import net.minecraft.client.renderer.Tessellator;
+import net.minecraft.client.renderer.entity.RenderManager;
 import net.minecraft.client.renderer.entity.RenderMinecart;
 import net.minecraft.client.renderer.tileentity.TileEntityRendererDispatcher;
 import net.minecraft.entity.item.EntityMinecart;
@@ -15,7 +16,11 @@ public class RenderMinecartDayBarrel extends RenderMinecart {
     static {
         tesr.func_147497_a(TileEntityRendererDispatcher.instance);
     }
-    
+
+    public RenderMinecartDayBarrel(RenderManager renderManagerIn) {
+        super(renderManagerIn);
+    }
+
     @Override
     protected void func_147910_a(EntityMinecart minecart, float partial, Block block, int metadata) {
         FactorizationBlockRender render = BlockRenderDayBarrel.getRenderer(FactoryType.DAYBARREL.md);

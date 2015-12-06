@@ -16,7 +16,6 @@ import factorization.util.ItemUtil;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumFacing;
-import net.minecraft.util.IIcon;
 
 import java.io.IOException;
 
@@ -34,15 +33,6 @@ public class TileEntityCrystallizer extends TileEntityFactorization implements I
     public int heating_amount = default_heating_amount;
 
     IVexatiousCrafting<TileEntityCrystallizer> active_recipe;
-    
-    @Override
-    public IIcon getIcon(EnumFacing dir) {
-        switch (dir) {
-            case UP: return BlockIcons.crystallizer.top;
-            case DOWN: return BlockIcons.crystallizer.bottom;
-            default: return BlockIcons.crystallizer.side;
-        }
-    }
 
     @Override
     public void putData(DataHelper data) throws IOException {
@@ -86,16 +76,10 @@ public class TileEntityCrystallizer extends TileEntityFactorization implements I
         markDirty();
     }
 
-    @Override
-    public String getInventoryName() {
-        return "Crystallizer";
-    }
-
     private static final int[] INPUTS_s = {0, 1, 2, 3, 4, 5}, OUTPUT_s = {6};
-    
+
     @Override
-    public int[] getAccessibleSlotsFromSide(int s) {
-        EnumFacing side = SpaceUtil.getOrientation(s);
+    public int[] getSlotsForFace(EnumFacing side) {
         if (side == EnumFacing.DOWN) {
             return OUTPUT_s;
         }
@@ -362,7 +346,16 @@ public class TileEntityCrystallizer extends TileEntityFactorization implements I
         }
         return false;
     }
-    
+
+    @Override
+    public void clear() {
+        for (int i = 0; i < inputs.length; i++) inputs[i] = null;
+        output = null;
+        heat = progress = 0;
+        growing_crystal = solution = null;
+        cool_time = heating_amount = 0;
+    }
+
     @Override
     public double getMaxRenderDistanceSquared() {
         return 576; //24²

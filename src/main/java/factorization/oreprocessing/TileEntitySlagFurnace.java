@@ -35,6 +35,32 @@ public class TileEntitySlagFurnace extends TileEntityFactorization implements IF
     public int currentFuelItemBurnTime;
     public int furnaceCookTime;
 
+    @Override
+    public int getFieldCount() {
+        return 2;
+    }
+
+    @Override
+    public int getField(int id) {
+        if (id == 0) return furnaceBurnTime;
+        if (id == 1) return currentFuelItemBurnTime;
+        if (id == 2) return furnaceCookTime;
+        return 0;
+    }
+
+    @Override
+    public void setField(int id, int value) {
+        if (id == 0) furnaceBurnTime = value;
+        if (id == 1) currentFuelItemBurnTime = value;
+        if (id == 2) furnaceCookTime = value;
+    }
+
+    @Override
+    public void clear() {
+        for (int i = 0; i < inv.length; i++) inv[i] = null;
+        furnaceCookTime = furnaceBurnTime = currentFuelItemBurnTime = 0;
+    }
+
     static final int inputSlotIndex = 0, fuelSlotIndex = 1, outputSlotIndex = 2;
 
     @Override
