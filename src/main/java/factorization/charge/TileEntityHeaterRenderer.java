@@ -12,7 +12,7 @@ public class TileEntityHeaterRenderer extends TileEntitySpecialRenderer {
     static RenderBlocks rb = new RenderBlocks();
 
     @Override
-    public void renderTileEntityAt(TileEntity te, double x, double y, double z, float partial) {
+    public void renderTileEntityAt(TileEntity te, double x, double y, double z, float partial, int breaking) {
         GL11.glPushAttrib(GL11.GL_ENABLE_BIT);
         GL11.glDisable(GL11.GL_LIGHTING);
         GL11.glPushMatrix();

@@ -14,7 +14,6 @@ import factorization.util.FluidUtil;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.init.Blocks;
 import net.minecraft.util.EnumFacing;
-import net.minecraft.util.IIcon;
 import net.minecraft.util.ITickable;
 import net.minecraftforge.fluids.*;
 
@@ -46,14 +45,6 @@ public class TileEntitySolarBoiler extends TileEntityCommon implements IReflecti
     @Override
     public FactoryType getFactoryType() {
         return FactoryType.SOLARBOILER;
-    }
-    
-    @Override
-    public IIcon getIcon(EnumFacing dir) {
-        switch (dir) {
-        case UP: return BlockIcons.boiler_top;
-        default: return BlockIcons.boiler_side;
-        }
     }
 
     @Override

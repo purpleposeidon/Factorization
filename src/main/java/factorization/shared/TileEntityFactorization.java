@@ -213,17 +213,17 @@ public abstract class TileEntityFactorization extends TileEntityCommon
     }
 
     @Override
-    public String getCommandSenderName() {
+    public final String getCommandSenderName() {
         return "factorization." + getFactoryType().toString();
     }
 
     @Override
-    public boolean hasCustomName() {
+    public final boolean hasCustomName() {
         return customName != null;
     }
 
     @Override
-    public IChatComponent getDisplayName() {
+    public final IChatComponent getDisplayName() {
         if (customName != null) return new ChatComponentText(customName);
         return new ChatComponentTranslation("factorization.gui." + getFactoryType().toString());
     }

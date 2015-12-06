@@ -90,7 +90,7 @@ public class ItemTwistedBlock extends ItemBlockProxy {
         }) {
             idc.permit(allowed);
         }
-        EnumFacing axis = SpaceUtil.getOrientation(side);
+        EnumFacing axis = side;
         double amount = Math.toRadians(45);
         idc.getCenter().setIdMd(darkIron, darkIronMd, true);
         idc.posX = at.x + 0.5;
@@ -103,7 +103,7 @@ public class ItemTwistedBlock extends ItemBlockProxy {
 
         Quaternion rotation = Quaternion.getRotationQuaternionRadians(amount, axis);
         idc.orderTargetRotation(rotation, 40, Interpolation.SMOOTH);
-        at.add(SpaceUtil.getOrientation(side)).spawnItem(Core.registry.dark_iron_sprocket.copy());
+        at.add(side).spawnItem(Core.registry.dark_iron_sprocket.copy());
 
         return true;
     }

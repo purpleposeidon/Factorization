@@ -6,7 +6,6 @@ import factorization.api.datahelpers.DataHelper;
 import factorization.api.datahelpers.Share;
 import factorization.common.FactoryType;
 import factorization.shared.BlockClass;
-import factorization.shared.Block;
 import factorization.shared.Core;
 import factorization.shared.TileEntityCommon;
 import factorization.util.NumUtil;
@@ -62,11 +61,6 @@ public class TileEntityShaft extends TileEntityCommon implements IRotationalEner
     @Override
     public FactoryType getFactoryType() {
         return FactoryType.SHAFT;
-    }
-
-    @Override
-    public boolean canUpdate() {
-        return true;
     }
 
     @Override
@@ -221,7 +215,7 @@ public class TileEntityShaft extends TileEntityCommon implements IRotationalEner
         // TODO: This belongs... somewhere else
         Block block = worldObj.isRemote ? Core.registry.clientTraceHelper : Core.registry.serverTraceHelper;
         setBlockBounds(block);
-        return block.collisionRayTrace(worldObj, pos.getX(), pos.getY(), pos.getZ(), startVec, endVec);
+        return block.collisionRayTrace(worldObj, pos, startVec, endVec);
     }
 
     @Override
@@ -287,9 +281,7 @@ public class TileEntityShaft extends TileEntityCommon implements IRotationalEner
         invalidateConnections();
     }
 
-    private void joinAdjacent(EntityPlayer player, int side) {
-        EnumFacing defaultDirection = SpaceUtil.getOrientation(side);
-
+    private void joinAdjacent(EntityPlayer player, EnumFacing defaultDirection) {
         Coord at = getCoord();
         ArrayList<Coord> lockedNeighbors = new ArrayList<Coord>();
         ArrayList<Coord> freeNeighbors = new ArrayList<Coord>();
@@ -370,10 +362,5 @@ public class TileEntityShaft extends TileEntityCommon implements IRotationalEner
         invalidateConnections();
         this.axis = axis;
         return true;
-    }
-
-    @Override
-    public IIcon getIcon(EnumFacing dir) {
-        return BlockIcons.beauty$shaft;
     }
 }

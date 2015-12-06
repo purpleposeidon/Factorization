@@ -2,6 +2,7 @@ package factorization.citizen;
 
 import factorization.api.Quaternion;
 import factorization.fzds.interfaces.Interpolation;
+import factorization.shared.FzModel;
 import factorization.shared.NetworkFactorization;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.entity.RenderEntity;
@@ -18,6 +19,10 @@ import org.lwjgl.opengl.GL11;
 public class RenderCitizen extends RenderEntity {
     private EntityLiving dummy_entity = new EntityEnderman(null);
 
+    public RenderCitizen(RenderManager renderManagerIn) {
+        super(renderManagerIn);
+    }
+
     @Override
     public void doRender(Entity ent, double x, double y, double z, float yaw, float partial) {
         EntityCitizen citizen = (EntityCitizen) ent;
@@ -26,7 +31,7 @@ public class RenderCitizen extends RenderEntity {
 
         Minecraft.getMinecraft().getTextureManager().bindTexture(getEntityTexture(ent));
         GL11.glPushMatrix();
-        GL11.glTranslated(pos);
+        GL11.glTranslated(x, y, z);
 
         float t = (partial + citizen.spinning_ticks) / EntityCitizen.TICKS_PER_SPIN;
         if (t < 0) t = 0;
@@ -43,7 +48,7 @@ public class RenderCitizen extends RenderEntity {
         GL11.glPushMatrix();
         GL11.glRotatef(90, 1, 0, 0);
         GL11.glRotatef(-90, 0, 0, 1);
-        model.render();
+        model.draw();
         GL11.glPopMatrix();
         if (citizen.held != null && citizen.held.stackSize > 0) {
             float s = 0.5F;
@@ -69,7 +74,7 @@ public class RenderCitizen extends RenderEntity {
     }
 
     ResourceLocation skin = new ResourceLocation("factorization", "textures/entity/citizen.png");
-    ObjectModel model = new ObjectModel(new ResourceLocation("factorization", "models/citizen.obj"));
+    FzModel model = new FzModel("citizen");
 
     @Override
     protected ResourceLocation getEntityTexture(Entity ent) {

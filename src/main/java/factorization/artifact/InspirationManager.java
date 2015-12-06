@@ -4,6 +4,7 @@ import factorization.api.Coord;
 import factorization.shared.Core;
 import factorization.shared.Sound;
 import factorization.util.PlayerUtil;
+import factorization.util.StatUtil;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.server.MinecraftServer;
@@ -33,13 +34,6 @@ public class InspirationManager {
         Core.loadBus(instance);
     }
 
-    static void set(StatisticsFile statsFile, EntityPlayer player, StatBase field, int val) {
-        statsFile.unlockAchievement(player, field, val);
-    }
-
-    static int get(StatisticsFile statsFile, EntityPlayer player, StatBase field) {
-        return statsFile.writeStat(field);
-    }
 
     static int today() {
         final Calendar cal = Calendar.getInstance();
@@ -49,8 +43,9 @@ public class InspirationManager {
         return cal.get(Calendar.DAY_OF_YEAR) + cal.get(Calendar.YEAR) * 365; // Close enough?
     }
 
-    static boolean canMakeArtifact(StatisticsFile statsFile, EntityPlayer player) {
-        int lastArtifactDay = get(statsFile, player, lastArtifact);
+    static boolean canMakeArtifact(EntityPlayer player) {
+        if (PlayerUtil.isPlayerCreative(player)) return true;
+        int lastArtifactDay = StatUtil.load(player, lastArtifact).get();
         if (lastArtifactDay + days_per_artifact > today()) return false;
         return true;
     }
@@ -59,9 +54,8 @@ public class InspirationManager {
 
     public void poke(EntityPlayer player, boolean isLogin) {
         if (PlayerUtil.isPlayerCreative(player)) return;
-        StatisticsFile statsFile = PlayerUtil.getStatsFile(player);
-        if (!canMakeArtifact(statsFile, player)) return;
-        int lastNoticeSent = get(statsFile, player, beenNotified);
+        if (!canMakeArtifact(player)) return;
+        int lastNoticeSent = StatUtil.load(player, beenNotified).get();
         boolean update = false;
         if (lastNoticeSent <= 0) {
             player.addChatMessage(new ChatComponentTranslation("factorization.artifact.cancreate").setChatStyle(aqua));
@@ -73,23 +67,22 @@ public class InspirationManager {
             update = true;
         }
         if (update) {
-            set(statsFile, player, beenNotified, today);
+            StatUtil.load(player, beenNotified).set(today);
         }
 
     }
 
     public static void resetArtifactDelay(EntityPlayer player) {
-        StatisticsFile statsFile = PlayerUtil.getStatsFile(player);
-        set(statsFile, player, lastArtifact, today());
-        set(statsFile, player, beenNotified, 0);
+        StatUtil.load(player, lastArtifact).set(today());
+        StatUtil.load(player, beenNotified).set(0);
     }
 
     @SubscribeEvent
     public void login(PlayerEvent.PlayerLoggedInEvent event) {
         EntityPlayer player = event.player;
-        StatisticsFile statsFile = PlayerUtil.getStatsFile(player);
+        StatisticsFile statsFile = StatUtil.getStatsFile(player);
         if (statsFile == null) return;
-        if (get(statsFile, player, lastArtifact) <= 0) {
+        if (StatUtil.load(player, lastArtifact).get() <= 0) {
             resetArtifactDelay(player);
         } else {
             poke(player, true);
@@ -106,11 +99,6 @@ public class InspirationManager {
             EntityPlayer player = (EntityPlayer) obj;
             poke(player, false);
         }
-    }
-
-    public static boolean canMakeArtifact(EntityPlayer player) {
-        StatisticsFile statsFile = PlayerUtil.getStatsFile(player);
-        return canMakeArtifact(statsFile, player) || PlayerUtil.isPlayerCreative(player);
     }
 
     public static void makeArtifact(EntityPlayer player, ItemStack artifact) {

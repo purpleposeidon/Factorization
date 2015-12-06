@@ -18,9 +18,6 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemFood;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumFacing;
-import net.minecraft.util.IIcon;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
 
 import java.io.IOException;
 
@@ -69,11 +66,6 @@ public class TileEntityCaliometricBurner extends TileEntityFactorization {
     }
 
     @Override
-    public String getInventoryName() {
-        return "Caliometric Burner";
-    }
-    
-    @Override
     public BlockClass getBlockClass() {
         return BlockClass.Machine;
     }
@@ -120,21 +112,13 @@ public class TileEntityCaliometricBurner extends TileEntityFactorization {
     }
 
     private static final int[] nomslots = new int[] {0}, emptySlots = new int[] {};
+
     @Override
-    public int[] getAccessibleSlotsFromSide(int side) {
-        if (SpaceUtil.getOrientation(side).getDirectionVec().getY() != 0) {
+    public int[] getSlotsForFace(EnumFacing side) {
+        if (side == null || side.getDirectionVec().getY() != 0) {
             return emptySlots; //Food goes in through the teeth
         }
         return nomslots;
-    }
-    
-    @Override
-    @SideOnly(Side.CLIENT)
-    public IIcon getIcon(EnumFacing dir) {
-        if (dir.getDirectionVec().getY() != 0) {
-            return BlockIcons.caliometric_top;
-        }
-        return BlockIcons.caliometric_side;
     }
 
     @Override
@@ -189,8 +173,8 @@ public class TileEntityCaliometricBurner extends TileEntityFactorization {
             sat = fi.sat;
         } else if (it instanceof ItemFood) {
             ItemFood nom = (ItemFood) it;
-            heal = nom.func_150905_g(is);
-            sat = nom.func_150906_h(is);
+            heal = nom.getHealAmount(is);
+            sat = nom.getSaturationModifier(is);
         }
         if (heal < sat) {
             double swapah = heal;
@@ -248,9 +232,16 @@ public class TileEntityCaliometricBurner extends TileEntityFactorization {
         }
         new Notice(this, stomache.stackSize + " {ITEM_NAME}" + append).withItem(stomache).send(entityplayer);
     }
-    
+
     @Override
-    public boolean canExtractItem(int slot, ItemStack itemstack, int side) {
+    public boolean canExtractItem(int index, ItemStack stack, EnumFacing direction) {
         return false;
+    }
+
+    @Override
+    public void clear() {
+        stomache = null;
+        foodQuality = 0;
+        ticksUntilNextDigestion = 0;
     }
 }

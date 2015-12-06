@@ -3,7 +3,7 @@ package factorization.artifact;
 import factorization.shared.Core;
 import factorization.shared.ItemCraftingComponent;
 import factorization.util.ItemUtil;
-import factorization.util.PlayerUtil;
+import factorization.util.StatUtil;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
@@ -27,15 +27,19 @@ public class ItemPotency extends ItemCraftingComponent {
         Core.tab(this, Core.TabType.ARTIFACT);
     }
 
+    int getDeaths(EntityPlayer player) {
+        return StatUtil.load(player, StatList.deathsStat).get();
+    }
+
     @Override
     public void onCreated(ItemStack stack, World world, EntityPlayer _player) {
         EntityPlayerMP player = (EntityPlayerMP) _player;
         NBTTagCompound tag = ItemUtil.getTag(stack);
         String ownerId = player.getGameProfile().getId().toString();
         String ownerName = player.getCommandSenderName();
-        StatisticsFile stats = PlayerUtil.getStatsFile(player);
+        StatisticsFile stats = StatUtil.getStatsFile(player);
         if (stats == null) return;
-        int deaths = stats.writeStat(StatList.deathsStat);
+        int deaths = getDeaths(player);
 
         tag.setString("ownerId", ownerId);
         tag.setString("ownerName", ownerName);
@@ -54,9 +58,7 @@ public class ItemPotency extends ItemCraftingComponent {
         NBTTagCompound tag = ItemUtil.getTag(stack);
         String ownerId = player.getGameProfile().getId().toString();
         String ownerName = player.getCommandSenderName();
-        StatisticsFile stats = PlayerUtil.getStatsFile(player);
-        if (stats == null) return stack.getItemDamage();
-        int deaths = stats.writeStat(StatList.deathsStat);
+        int deaths = StatUtil.load(player, StatList.deathsStat).get();
         if (!ownerId.equals(tag.getString("ownerId")) && !ownerName.equals(tag.getString("ownerName"))) return 2;
         if (deaths != tag.getInteger("deathId")) return 1;
         return 0;
@@ -73,11 +75,6 @@ public class ItemPotency extends ItemCraftingComponent {
             }
             stack.setItemDamage(checkDamage(stack, player));
         }
-    }
-
-    @Override
-    public boolean hasEffect(ItemStack stack, int pass) {
-        return pass == 0 && stack.getItemDamage() == 0;
     }
 
     @SubscribeEvent

@@ -21,13 +21,11 @@ import net.minecraft.block.Block;
 import net.minecraft.block.BlockFence;
 import net.minecraft.block.BlockLog;
 import net.minecraft.block.BlockWall;
+import net.minecraft.block.material.Material;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.*;
 import net.minecraft.world.World;
-import net.minecraftforge.fml.common.FMLCommonHandler;
-import net.minecraftforge.fml.relauncher.Side;
 
 import java.io.IOException;
 
@@ -101,7 +99,7 @@ public class TileEntityWindMill extends TileEntityCommon implements IRotationalE
     @Override
     public void onPlacedBy(EntityPlayer player, ItemStack is, EnumFacing side, float hitX, float hitY, float hitZ) {
         super.onPlacedBy(player, is, side, hitX, hitY, hitZ);
-        sailDirection = SpaceUtil.getOrientation(side);
+        sailDirection = side;
     }
 
     @Override
@@ -240,17 +238,15 @@ public class TileEntityWindMill extends TileEntityCommon implements IRotationalE
     private boolean isFenceish(Coord fenceLocation) {
         final Block block = fenceLocation.getBlock();
         if (block instanceof BlockFence) return true;
-        if (block.getRenderType() == Blocks.fence.getRenderType()) return true;
         if (block instanceof BlockWall) return true;
-        if (block.getRenderType() == Blocks.cobblestone_wall.getRenderType()) return true;
         if (block instanceof BlockLog) return true;
-        if (block instanceof BlockCompressed) return true;
+        if (block.getMaterial() == Material.iron) {
+            BlockPos pos = fenceLocation.toBlockPos();
+            if (block.isBeaconBase(worldObj, pos, pos)) {
+                return true;
+            }
+        }
         return false;
-    }
-
-    @Override
-    public boolean canUpdate() {
-        return FMLCommonHandler.instance().getEffectiveSide() == Side.SERVER;
     }
 
     @Override
@@ -364,7 +360,7 @@ public class TileEntityWindMill extends TileEntityCommon implements IRotationalE
             updatePowerPerTick();
             return;
         }
-        Vec3 wind = WindModel.activeModel.getWindPower(worldObj, pos.getX(), pos.getY(), pos.getZ(), this);
+        Vec3 wind = WindModel.activeModel.getWindPower(worldObj, pos, this);
         // TODO: Dot product or something to reverse the velocity
         wind_strength = wind.lengthVector();
         updatePowerPerTick();
@@ -389,11 +385,6 @@ public class TileEntityWindMill extends TileEntityCommon implements IRotationalE
         return "Efficiency: " + (int) (efficiency * 100) + "%" +
                 "\nWind: " + wind_strength +
                 "\nSpeed: " + speed;
-    }
-
-    @Override
-    public IIcon getIcon(EnumFacing dir) {
-        return BlockIcons.beauty$wind_side;
     }
 
     private static final byte UNSET = 0, POWERED = 1, UNPOWERED = 2;

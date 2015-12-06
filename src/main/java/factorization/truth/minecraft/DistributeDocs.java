@@ -4,7 +4,7 @@ import factorization.api.Coord;
 import factorization.api.ICoordFunction;
 import factorization.common.FzConfig;
 import factorization.shared.Core;
-import factorization.util.PlayerUtil;
+import factorization.util.StatUtil;
 import net.minecraft.block.material.Material;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
@@ -37,14 +37,14 @@ public class DistributeDocs {
     
     static boolean givenBook(EntityPlayer player) {
         if (!FzConfig.players_discover_colossus_guides) return true;
-        StatisticsFile statsFile = PlayerUtil.getStatsFile(player);
+        StatisticsFile statsFile = StatUtil.getStatsFile(player);
         return (statsFile != null && statsFile.writeStat(guideGet) > 0) || player.getEntityData().hasKey(guideKey);
     }
     
     static void setGivenBook(EntityPlayer player) {
         if (!FzConfig.players_discover_colossus_guides) return;
         needyPlayers.remove(player.getCommandSenderName());
-        StatisticsFile statsFile = PlayerUtil.getStatsFile(player);
+        StatisticsFile statsFile = StatUtil.getStatsFile(player);
         if (statsFile != null) {
             statsFile.func_150873_a(player, guideGet, 1);
         }
@@ -75,7 +75,7 @@ public class DistributeDocs {
         if (!needyPlayers.contains(name)) {
             return;
         }
-        StatisticsFile sfw = PlayerUtil.getStatsFile(player);
+        StatisticsFile sfw = StatUtil.getStatsFile(player);
         if (sfw == null) return;
         if (!sfw.hasAchievementUnlocked(AchievementList.diamonds)) {
             return;

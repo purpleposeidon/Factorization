@@ -3,7 +3,7 @@ package factorization.misc;
 import factorization.common.FzConfig;
 import factorization.shared.Core;
 import factorization.util.FzUtil;
-import factorization.util.PlayerUtil;
+import factorization.util.StatUtil;
 import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.EntityAgeable;
@@ -220,7 +220,7 @@ public class MiscellaneousNonsense {
         {
             // Give the first achievement, because it is stupid and nobody cares.
             // If you're using this mod, you've probably opened your inventory before anyways.
-            StatisticsFile sfw = PlayerUtil.getStatsFile(event.player);
+            StatisticsFile sfw = StatUtil.getStatsFile(event.player);
             if (sfw != null && !sfw.hasAchievementUnlocked(AchievementList.openInventory) && FMLCommonHandler.instance().getSide() == Side.CLIENT) {
                 sfw.func_150873_a(event.player, AchievementList.openInventory, -1);
                 sfw.func_150873_a(event.player, AchievementList.openInventory, 300); // Literally, hundreds of times. :D

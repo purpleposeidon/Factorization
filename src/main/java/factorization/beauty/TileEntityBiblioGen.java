@@ -14,10 +14,8 @@ import factorization.shared.BlockFactorization;
 import factorization.shared.TileEntityCommon;
 import net.minecraft.block.Block;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.init.Blocks;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
-import net.minecraft.util.IIcon;
 import net.minecraft.util.ITickable;
 
 import java.io.IOException;
@@ -65,11 +63,6 @@ public class TileEntityBiblioGen extends TileEntityCommon implements IRotational
             return true;
         }
         return false;
-    }
-
-    @Override
-    public boolean canUpdate() {
-        return true;
     }
 
     @Override
@@ -145,17 +138,12 @@ public class TileEntityBiblioGen extends TileEntityCommon implements IRotational
                     interference = te;
                 }
             }
-            books += block.getEnchantPowerBonus(here.w, here.x, here.y, here.z) > 0 ? 1 : 0;
+            books += block.getEnchantPowerBonus(here.w, here.toBlockPos()) > 0 ? 1 : 0;
         }
     }
 
     @Override
     public void setBlockBounds(Block b) {
         b.setBlockBounds(0.0F, 0.0F, 0.0F, 1.0F, 0.75F, 1.0F);
-    }
-
-    @Override
-    public IIcon getIcon(EnumFacing dir) {
-        return Blocks.enchanting_table.getIcon(0, 0);
     }
 }

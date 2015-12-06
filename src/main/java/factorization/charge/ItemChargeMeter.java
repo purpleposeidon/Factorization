@@ -14,6 +14,8 @@ import factorization.util.PlayerUtil;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.BlockPos;
+import net.minecraft.util.EnumFacing;
 import net.minecraft.world.World;
 
 public class ItemChargeMeter extends ItemFactorization {
@@ -22,17 +24,9 @@ public class ItemChargeMeter extends ItemFactorization {
         super("tool/charge_meter", TabType.TOOLS);
         setMaxStackSize(1);
     }
-    
-    @Override
-    public boolean onItemUse(ItemStack par1ItemStack,
-            EntityPlayer par2EntityPlayer, World par3World, int par4, int par5,
-            int par6, int par7, float par8, float par9, float par10) {
-        return tryPlaceIntoWorld(par1ItemStack, par2EntityPlayer, par3World, par4, par5,
-                par6, par7, par8, par9, par10);
-    }
 
-    public boolean tryPlaceIntoWorld(ItemStack is, EntityPlayer player, World w, int x, int y,
-            int z, int side, float vecx, float vecy, float vecz) {
+    @Override
+    public boolean onItemUse(ItemStack is, EntityPlayer player, World w, BlockPos pos, EnumFacing side, float hitX, float hitY, float hitZ) {
         if (w.isRemote) {
             return true;
         }
@@ -67,9 +61,9 @@ public class ItemChargeMeter extends ItemFactorization {
                     inf = "\n" + inf;
                 }
                 String txt;
-                if (Core.dev_environ) { 
+                if (Core.dev_environ) {
                     txt = "Charge: " + ic.getCharge().getValue() + "/" + ret.totalCharge
-                        + "\nConductors: " + ret.conductorCount;
+                            + "\nConductors: " + ret.conductorCount;
                 } else {
                     txt = "Charge: " + ic.getCharge().getValue();
                 }

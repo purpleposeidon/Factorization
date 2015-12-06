@@ -16,11 +16,8 @@ import io.netty.buffer.ByteBuf;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.EnumFacing;
-import net.minecraft.util.IIcon;
 import net.minecraft.util.ITickable;
 import net.minecraft.util.Vec3;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
 
 import java.io.IOException;
 import java.util.Random;
@@ -97,7 +94,7 @@ public class TileEntityLeydenJar extends TileEntityCommon implements IChargeCond
         double level = getLevel()*4/5;
         if (level > rand.nextDouble()) {
             Vec3 src = new Vec3(0.5, randomizeDirection(0)/2 + 0.2, 0.5);
-            EnumFacing fo = SpaceUtil.getOrientation(2 + rand.nextInt(4));
+            EnumFacing fo = EnumFacing.Plane.HORIZONTAL.random(rand);
             Vec3 dest = new Vec3(randomizeDirection(fo.getDirectionVec().getX()), randomizeDirection(fo.getDirectionVec().getY()), randomizeDirection(fo.getDirectionVec().getZ()));
             the_sparks.spark(src, dest, 12, 1, 3, 2.0, 8.0, /*0xF0FF00*/ /*0xEEDB02*/ 0xEEE59D);
         }
@@ -182,12 +179,6 @@ public class TileEntityLeydenJar extends TileEntityCommon implements IChargeCond
     @Override
     public void putData(DataHelper data) throws IOException {
         storage = data.as(Share.VISIBLE, "store").putInt(storage);
-    }
-    
-    @Override
-    @SideOnly(Side.CLIENT)
-    public IIcon getIcon(EnumFacing dir) {
-        return BlockIcons.leyden.bottom;
     }
 
     @Override

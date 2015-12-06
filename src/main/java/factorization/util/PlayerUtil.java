@@ -121,13 +121,6 @@ public final class PlayerUtil {
         return player.capabilities.isCreativeMode;
     }
 
-    public static StatisticsFile getStatsFile(EntityPlayer player) {
-        MinecraftServer server = MinecraftServer.getServer();
-        if (server == null) return null;
-        ServerConfigurationManager cm = server.getConfigurationManager();
-        return cm.getPlayerStatsFile(player);
-    }
-
     public static int getPuntStrengthOrWeakness(EntityPlayer player) {
         if (player == null) return 1;
         //strength * knocback

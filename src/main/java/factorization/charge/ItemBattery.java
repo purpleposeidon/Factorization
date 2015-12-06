@@ -3,6 +3,7 @@ package factorization.charge;
 import factorization.api.IActOnCraft;
 import factorization.shared.Core;
 import factorization.shared.Core.TabType;
+import factorization.shared.ItemBlockProxy;
 import factorization.util.ItemUtil;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;

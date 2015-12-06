@@ -3,10 +3,7 @@ package factorization.truth.minecraft;
 import factorization.shared.Core;
 import factorization.truth.api.DocReg;
 import factorization.truth.api.IManwich;
-import factorization.util.EvilUtil;
-import factorization.util.ItemUtil;
-import factorization.util.LangUtil;
-import factorization.util.PlayerUtil;
+import factorization.util.*;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
@@ -65,7 +62,7 @@ public class ItemManSandwich extends ItemFood implements IManwich {
         }
         boolean spicy = stack.getItemDamage() > 0;
         int nomage = spicy ? 7 : 1;
-        StatisticsFile stats = PlayerUtil.getStatsFile(player);
+        StatisticsFile stats = StatUtil.getStatsFile(player);
         if (stats != null) {
             stats.func_150873_a(player, manwhichStatus, nomage);
             syncStat(player);
@@ -84,7 +81,7 @@ public class ItemManSandwich extends ItemFood implements IManwich {
 
     public int hasManual(EntityPlayer player) {
         if (PlayerUtil.isPlayerCreative(player)) return 1;
-        StatisticsFile stats = PlayerUtil.getStatsFile(player);
+        StatisticsFile stats = StatUtil.getStatsFile(player);
         if (stats == null) return 0;
         return stats.writeStat(manwhichStatus);
     }
@@ -93,7 +90,7 @@ public class ItemManSandwich extends ItemFood implements IManwich {
     public void digestManwhich(PlayerEvent.Clone event) {
         if (!event.wasDeath) return;
         EntityPlayer player = event.entityPlayer;
-        StatisticsFile stats = PlayerUtil.getStatsFile(player);
+        StatisticsFile stats = StatUtil.getStatsFile(player);
         if (stats == null) return;
         int sandwiches = stats.writeStat(manwhichStatus);
         if (sandwiches > 0) {
@@ -128,7 +125,7 @@ public class ItemManSandwich extends ItemFood implements IManwich {
     void syncStat(EntityPlayer _player) {
         if (!(_player instanceof EntityPlayerMP)) return;
         EntityPlayerMP player = (EntityPlayerMP) _player;
-        StatisticsFile stats = PlayerUtil.getStatsFile(player);
+        StatisticsFile stats = StatUtil.getStatsFile(player);
         if (stats == null) return;
         int sandwiches = stats.writeStat(manwhichStatus);
         HashMap statInfo = new HashMap();

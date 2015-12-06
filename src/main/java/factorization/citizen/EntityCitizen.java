@@ -39,7 +39,7 @@ public class EntityCitizen extends EntityFz {
     public ItemStack held = new ItemStack(Blocks.stone, 0);
     private int ticks = 0;
     boolean spinning = false, visible = false, player_lost_visibility_state = false;
-    public transient int spinning_ticks = 0, appearing_ticks = 0;
+    public transient int spinning_ticks = 0;
 
     public static final float TICKS_PER_SPIN = 90;
     private static final Quaternion NORMAL = new Quaternion(),
@@ -242,7 +242,7 @@ public class EntityCitizen extends EntityFz {
 
     private static void pot(EntityPlayer player, Potion potion, int power, int duration) {
         boolean ambient = potion != Potion.blindness;
-        PotionEffect effect = new PotionEffect(potion.getId(), duration, power, ambient);
+        PotionEffect effect = new PotionEffect(potion.getId(), duration, power, ambient, ambient);
         effect.getCurativeItems().clear();
         player.addPotionEffect(effect);
     }
@@ -381,12 +381,12 @@ public class EntityCitizen extends EntityFz {
 
     private void remove_nearby_hostiles() {
         int r = 12;
-        AxisAlignedBB range = boundingBox.expand(r, r, r);
+        AxisAlignedBB range = getEntityBoundingBox().expand(r, r, r);
         Vec3 me = SpaceUtil.fromEntPos(this);
-        for (Entity ent : (Iterable<Entity>) worldObj.selectEntitiesWithinAABB(Entity.class, range, IMob.mobSelector)) {
+        for (Entity ent : worldObj.getEntitiesInAABBexcluding(this, range, IMob.mobSelector)) {
             Vec3 you = SpaceUtil.fromEntPos(ent);
             Vec3 delta = SpaceUtil.subtract(you, me).normalize();
-            SpaceUtil.incrScale(delta, r * 2 + Math.abs(rand.nextGaussian()));
+            delta = SpaceUtil.scale(delta, r * 2 + Math.abs(rand.nextGaussian()));
             Vec3 target = you.add(delta);
             enderport(ent, target.xCoord, target.yCoord, target.zCoord);
         }
@@ -404,11 +404,12 @@ public class EntityCitizen extends EntityFz {
         int j = MathHelper.floor_double(ent.posY);
         int k = MathHelper.floor_double(ent.posZ);
 
-        if (ent.worldObj.blockExists(i, j, k)) {
+        BlockPos pos = new BlockPos(i, j, k);
+        if (ent.worldObj.isBlockLoaded(pos)) {
             boolean flag1 = false;
 
             while (!flag1 && j > 0) {
-                Block block = ent.worldObj.getBlock(i, j - 1, k);
+                Block block = ent.worldObj.getBlock(pos.down());
 
                 if (block.getMaterial().blocksMovement()) {
                     flag1 = true;
@@ -421,7 +422,7 @@ public class EntityCitizen extends EntityFz {
             if (flag1) {
                 ent.setPosition(ent.posX, ent.posY, ent.posZ);
 
-                if (ent.worldObj.getCollidingBoundingBoxes(ent, ent.boundingBox).isEmpty() && !ent.worldObj.isAnyLiquid(ent.boundingBox)) {
+                if (ent.worldObj.getCollidingBoundingBoxes(ent, ent.getCollisionBoundingBox()).isEmpty() && !ent.worldObj.isAnyLiquid(ent.getCollisionBoundingBox())) {
                     flag = true;
                 }
             }
@@ -442,7 +443,7 @@ public class EntityCitizen extends EntityFz {
                 double d7 = d3 + (ent.posX - d3) * d6 + (rand.nextDouble() - 0.5D) * (double) ent.width * 2.0D;
                 double d8 = d4 + (ent.posY - d4) * d6 + rand.nextDouble() * (double) ent.height;
                 double d9 = d5 + (ent.posZ - d5) * d6 + (rand.nextDouble() - 0.5D) * (double) ent.width * 2.0D;
-                ent.worldObj.spawnParticle("portal", d7, d8, d9, (double) f, (double) f1, (double) f2);
+                ent.worldObj.spawnParticle(EnumParticleTypes.PORTAL, d7, d8, d9, (double) f, (double) f1, (double) f2);
             }
 
             ent.worldObj.playSoundEffect(d3, d4, d5, "mob.endermen.portal", 1.0F, 1.0F);

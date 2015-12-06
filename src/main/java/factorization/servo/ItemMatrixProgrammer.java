@@ -9,6 +9,7 @@ import factorization.shared.Core.TabType;
 import factorization.shared.ItemFactorization;
 import factorization.util.FzUtil;
 import factorization.util.PlayerUtil;
+import factorization.util.StatUtil;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityList;
 import net.minecraft.entity.item.EntityPainting;
@@ -194,12 +195,12 @@ public class ItemMatrixProgrammer extends ItemFactorization {
     public static boolean isUserAuthenticated(EntityPlayerMP player) {
         if (PlayerUtil.isPlayerCreative(player)) return true;
         if (Core.dev_environ) return false;
-        StatisticsFile statsFile = PlayerUtil.getStatsFile(player);
+        StatisticsFile statsFile = StatUtil.getStatsFile(player);
         return (statsFile != null && statsFile.writeStat(authStat) > 0) || player.getEntityData().hasKey(authTagName);
     }
 
     public static void setUserAuthenticated(EntityPlayerMP player) {
-        StatisticsFile statsFile = PlayerUtil.getStatsFile(player);
+        StatisticsFile statsFile = StatUtil.getStatsFile(player);
         if (statsFile != null) {
             statsFile.func_150873_a(player, authStat, 1);
         }
