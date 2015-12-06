@@ -1,5 +1,6 @@
 package factorization.notify;
 
+import factorization.api.ISaneCoord;
 import net.minecraft.tileentity.TileEntity;
 
 public enum Style {

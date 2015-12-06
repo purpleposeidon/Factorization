@@ -1,10 +1,12 @@
 package factorization.notify;
 
+import factorization.api.ISaneCoord;
+import net.minecraft.util.BlockPos;
 import net.minecraft.world.World;
 
 public class SimpleCoord implements ISaneCoord {
     World w;
-    int pos;
+    int x, y, z;
     
     public SimpleCoord(World w, int x, int y, int z) {
         this.w = w;
@@ -14,8 +16,10 @@ public class SimpleCoord implements ISaneCoord {
     }
     
     @Override public World w() { return w; }
-    @Override public int x() { return x; }
-    @Override public int y() { return y; }
-    @Override public int z() { return z; }
+
+    @Override
+    public BlockPos toBlockPos() {
+        return new BlockPos(x, y, z);
+    }
 
 }

@@ -1,6 +1,9 @@
 package factorization.notify;
 
+import factorization.api.ISaneCoord;
 import net.minecraft.block.Block;
+import net.minecraft.block.state.BlockState;
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.renderer.Tessellator;
@@ -11,10 +14,7 @@ import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.AxisAlignedBB;
-import net.minecraft.util.IChatComponent;
-import net.minecraft.util.StatCollector;
-import net.minecraft.util.Vec3;
+import net.minecraft.util.*;
 import net.minecraft.world.World;
 import net.minecraftforge.client.ClientCommandHandler;
 import net.minecraftforge.client.event.RenderWorldLastEvent;
@@ -186,8 +186,9 @@ public class RenderMessages extends RenderMessagesProxy {
         
         ISaneCoord co = m.asCoordMaybe();
         if (co != null && !m.position_important) {
-            Block b = co.w().getBlock(co.x(), co.y(), co.z());
-            AxisAlignedBB bb = b.getCollisionBoundingBox(co.w(), co.x(), co.y(), co.z());
+            BlockPos pos = co.toBlockPos();
+            IBlockState bs = co.w().getBlockState(pos);
+            AxisAlignedBB bb = bs.getBlock().getCollisionBoundingBox(co.w(), pos, bs);
             if (bb != null) {
                 y += bb.maxY - bb.minY;
             } else {

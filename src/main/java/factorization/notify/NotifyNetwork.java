@@ -1,5 +1,6 @@
 package factorization.notify;
 
+import factorization.api.ISaneCoord;
 import factorization.util.DataUtil;
 import io.netty.buffer.ByteBufInputStream;
 import io.netty.buffer.Unpooled;
@@ -12,6 +13,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompressedStreamTools;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.BlockPos;
 import net.minecraft.util.IChatComponent;
 import net.minecraft.util.Vec3;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
@@ -139,6 +141,10 @@ public class NotifyNetwork {
         try {
             ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
             DataOutputStream output = new DataOutputStream(outputStream);
+
+            if (where instanceof ISaneCoord) {
+                where = ((ISaneCoord) where).toBlockPos();
+            }
             
             if (where instanceof Vec3) {
                 output.writeByte(VEC3);
@@ -146,12 +152,12 @@ public class NotifyNetwork {
                 output.writeDouble(v.xCoord);
                 output.writeDouble(v.yCoord);
                 output.writeDouble(v.zCoord);
-            } else if (where instanceof ISaneCoord) {
+            } else if (where instanceof BlockPos) {
                 output.writeByte(COORD);
-                ISaneCoord c = (ISaneCoord) where;
-                output.writeInt(c.x());
-                output.writeInt(c.y());
-                output.writeInt(c.z());
+                BlockPos pos = (BlockPos) where;
+                output.writeInt(pos.getX());
+                output.writeInt(pos.getY());
+                output.writeInt(pos.getZ());
             } else if (where instanceof Entity) {
                 output.writeByte(ENTITY);
                 Entity ent = (Entity) where;

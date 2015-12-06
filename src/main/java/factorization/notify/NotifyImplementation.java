@@ -1,10 +1,12 @@
 package factorization.notify;
 
+import factorization.api.ISaneCoord;
 import factorization.util.FzUtil;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.BlockPos;
 import net.minecraft.util.IChatComponent;
 import net.minecraft.util.Vec3;
 import net.minecraft.world.World;
@@ -81,18 +83,15 @@ public class NotifyImplementation {
                 final int range = style.contains(Style.DRAWFAR) ? 128 : 32;
                 int x = 0, y = 0, z = 0;
                 boolean failed = false;
+                BlockPos pos = null;
                 if (where instanceof ISaneCoord) {
                     ISaneCoord c = (ISaneCoord) where;
+                    pos = c.toBlockPos();
                     world = c.w();
-                    x = c.x();
-                    y = c.y();
-                    z = c.z();
                 } else if (where instanceof TileEntity) {
                     TileEntity te = (TileEntity) where;
                     world = te.getWorld();
-                    x = te.getPos().getX();
-                    y = te.getPos().getY();
-                    z = te.getPos().getZ();
+                    pos = te.getPos();
                 } else if (where instanceof Entity) {
                     Entity ent = (Entity) where;
                     world = ent.worldObj;
@@ -104,12 +103,19 @@ public class NotifyImplementation {
                     x = (int) vec.xCoord;
                     y = (int) vec.yCoord;
                     z = (int) vec.zCoord;
+                } else if (where instanceof BlockPos) {
+                    pos = (BlockPos) where;
                 } else {
                     failed = true;
                 }
+                if (pos != null) {
+                    x = pos.getX();
+                    y = pos.getY();
+                    z = pos.getZ();
+                }
                 if (world != null && !failed) {
-                    int dimension = world.getWorldInfo().getVanillaDimension();
-                    target = new TargetPoint(dimension, pos, range);
+                    int dimension = FzUtil.getWorldDimension(world);
+                    target = new TargetPoint(dimension, x, y, z, range);
                 }
             }
             if (args == null) args = new String[0];

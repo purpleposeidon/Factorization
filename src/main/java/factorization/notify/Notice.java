@@ -1,5 +1,6 @@
 package factorization.notify;
 
+import factorization.api.ISaneCoord;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Items;
@@ -229,7 +230,7 @@ public class Notice {
             }
         } else if (where instanceof ISaneCoord) {
             ISaneCoord coord = (ISaneCoord) where;
-            if (!coord.w().isBlockLoaded(new BlockPos(coord.x(), coord.y(), coord.z()))) {
+            if (!coord.w().isBlockLoaded(coord.toBlockPos())) {
                 return false;
             }
         } else if (where instanceof Vec3 && world != null) {

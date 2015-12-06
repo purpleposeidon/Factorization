@@ -1,5 +1,6 @@
 package factorization.notify;
 
+import factorization.api.ISaneCoord;
 import factorization.util.LangUtil;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
@@ -112,7 +113,7 @@ class ClientMessage {
             final double x = interp(e.prevPosX, e.posX, partial) + w / 2;
             final double y = interp(e.prevPosY, e.posY, partial) + eye_height;
             final double z = interp(e.prevPosZ, e.posZ, partial) + w / 2;
-            return new Vec3(pos);
+            return new Vec3(x, y, z);
         }
         if (locus instanceof TileEntity) {
             TileEntity te = ((TileEntity) locus);
@@ -120,7 +121,7 @@ class ClientMessage {
         }
         if (locus instanceof ISaneCoord) {
             ISaneCoord c = (ISaneCoord) locus;
-            return new Vec3(c.x(), c.y(), c.z());
+            return new Vec3(c.toBlockPos());
         }
         return null;
     }

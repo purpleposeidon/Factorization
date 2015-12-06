@@ -4,7 +4,6 @@ import com.google.common.io.ByteArrayDataInput;
 import com.google.common.io.ByteArrayDataOutput;
 import factorization.api.datahelpers.DataHelper;
 import factorization.api.datahelpers.IDataSerializable;
-import factorization.notify.ISaneCoord;
 import factorization.shared.BlockHelper;
 import factorization.shared.Core;
 import factorization.shared.FzNetDispatch;
@@ -100,9 +99,9 @@ public final class Coord implements IDataSerializable, ISaneCoord, Comparable<Co
     }
     
     @Override public World w() { return w; }
-    @Override public int x() { return x; }
-    @Override public int y() { return y; }
-    @Override public int z() { return z; }
+    public int x() { return x; }
+    public int y() { return y; }
+    public int z() { return z; }
     
     public static Coord tryLoad(World world, Object o) {
         if (o instanceof Coord) {
@@ -858,6 +857,7 @@ public final class Coord implements IDataSerializable, ISaneCoord, Comparable<Co
         return new Vec3(x + 0.5, y + 0.5, z + 0.5);
     }
 
+    @Override
     public BlockPos toBlockPos() {
         return new BlockPos(x, y, z);
     }
