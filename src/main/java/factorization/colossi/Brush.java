@@ -3,6 +3,7 @@ package factorization.colossi;
 import factorization.api.Coord;
 import factorization.api.DeltaCoord;
 import factorization.util.NumUtil;
+import net.minecraft.block.state.IBlockState;
 
 import java.util.Random;
 
@@ -20,19 +21,19 @@ public class Brush {
         }
     }
     
-    ColossusBuilderBlock fill;
+    IBlockState fill;
     BrushMask mask;
     DeltaCoord[] points;
     Random rand;
     
-    public Brush(ColossusBuilderBlock fill, BrushMask mask, Random rand) {
+    public Brush(IBlockState fill, BrushMask mask, Random rand) {
         this.fill = fill;
         this.mask = mask;
         this.rand = rand;
         points = new DeltaCoord[] {new DeltaCoord(0, 0, 0)};
     }
     
-    public Brush(ColossusBuilderBlock fill, BrushMask mask, Random rand, DeltaCoord... points) {
+    public Brush(IBlockState fill, BrushMask mask, Random rand, DeltaCoord... points) {
         this.fill = fill;
         this.mask = mask;
         this.rand = rand;
@@ -45,7 +46,7 @@ public class Brush {
             target.set(at);
             target.adjust(dc);
             if (mask.applies(at)) {
-                at.setIdMd(fill.block, fill.md, true);
+                at.set(fill, true);
             }
         }
     }

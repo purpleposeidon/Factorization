@@ -25,16 +25,20 @@ public class ColossalBuilder {
     int body_arm_padding, body_back_padding, body_front_padding;
     int shoulder_start;
     int face_width, face_height, face_depth;
-    
-    static final ColossusBuilderBlock LEG = new ColossusBuilderBlock(Core.registry.colossal_block, ColossalBlock.MD_LEG);
-    static final ColossusBuilderBlock BODY = new ColossusBuilderBlock(Core.registry.colossal_block, ColossalBlock.MD_BODY);
-    static final ColossusBuilderBlock ARM = new ColossusBuilderBlock(Core.registry.colossal_block, ColossalBlock.MD_ARM);
-    static final ColossusBuilderBlock MASK = new ColossusBuilderBlock(Core.registry.colossal_block, ColossalBlock.MD_MASK);
-    static final ColossusBuilderBlock EYE = new ColossusBuilderBlock(Core.registry.colossal_block, ColossalBlock.MD_EYE);
-    static final ColossusBuilderBlock HEART = new ColossusBuilderBlock(Core.registry.colossal_block, ColossalBlock.MD_CORE);
-    static final ColossusBuilderBlock BODY_CRACK = new ColossusBuilderBlock(Core.registry.colossal_block, ColossalBlock.MD_BODY_CRACKED);
-    static final ColossusBuilderBlock MASK_CRACK = new ColossusBuilderBlock(Core.registry.colossal_block, ColossalBlock.MD_MASK_CRACKED);
-    static final ColossusBuilderBlock AIR = new ColossusBuilderBlock(Blocks.air, 0);
+
+    private static final IBlockState cb = Core.registry.colossal_block.getDefaultState();
+    private static IBlockState get(ColossalBlock.Md md) {
+        return cb.withProperty(ColossalBlock.VARIANT, md);
+    }
+    static final IBlockState LEG = get(ColossalBlock.Md.LEG);
+    static final IBlockState BODY = get(ColossalBlock.Md.BODY);
+    static final IBlockState ARM = get(ColossalBlock.Md.ARM);
+    static final IBlockState MASK = get(ColossalBlock.Md.MASK);
+    static final IBlockState EYE = get(ColossalBlock.Md.EYE);
+    static final IBlockState HEART = get(ColossalBlock.Md.CORE);
+    static final IBlockState BODY_CRACK = get(ColossalBlock.Md.BODY_CRACKED);
+    static final IBlockState MASK_CRACK = get(ColossalBlock.Md.MASK_CRACKED);
+    static final IBlockState AIR = Blocks.air.getDefaultState();
     
     public ColossalBuilder(int seed, Coord start) {
         this.seed = seed;
@@ -206,7 +210,7 @@ public class ColossalBuilder {
         
         Coord heart_crack = start.add(leg_size + body_front_padding, leg_height + 1 + ((body_height + 1) / 2), leg_size + ((1 + leg_spread) / 2));
         Coord hc_front = heart_crack.add(EnumFacing.EAST);
-        if (MASK.matches(hc_front) || EYE.matches(hc_front)) {
+        if (hc_front.stateIs(MASK) || hc_front.stateIs(EYE)) {
             heart_crack.adjust(EnumFacing.EAST);
             fill(heart_crack, heart_crack, MASK_CRACK);
         } else {
@@ -219,7 +223,7 @@ public class ColossalBuilder {
         heart.setTE(heartTe);
     }
     
-    void fill(Coord min, Coord max, ColossusBuilderBlock state) {
+    void fill(Coord min, Coord max, IBlockState state) {
         min = min.copy();
         max = max.copy();
         Coord.sort(min, max);
@@ -230,7 +234,7 @@ public class ColossalBuilder {
                 at.y = y;
                 for (int z = min.z; z <= max.z; z++) {
                     at.z = z;
-                    at.setIdMd(state.block, state.md, true);
+                    at.set(state, true);
                 }
             }
         }

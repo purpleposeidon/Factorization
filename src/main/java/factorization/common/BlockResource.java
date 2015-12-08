@@ -17,7 +17,7 @@ import net.minecraft.world.IBlockAccess;
 import java.util.List;
 
 public class BlockResource extends Block {
-    enum ResourceTypes implements IStringSerializable {
+    enum ResourceTypes implements IStringSerializable, Comparable<ResourceTypes> {
         OLD_SILVER_ORE, SILVER_BLOCK, LEAD_BLOCK, DARK_IRON_BLOCK;
 
         @Override

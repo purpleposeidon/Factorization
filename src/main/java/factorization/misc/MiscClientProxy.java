@@ -26,7 +26,7 @@ import net.minecraftforge.client.ClientCommandHandler;
 import net.minecraftforge.client.event.GuiScreenEvent.ActionPerformedEvent;
 import net.minecraftforge.client.event.GuiScreenEvent.InitGuiEvent;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
-import net.minecraftforge.client.event.sound.PlaySoundEvent17;
+import net.minecraftforge.client.event.sound.PlaySoundEvent;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
@@ -159,7 +159,7 @@ public class MiscClientProxy extends MiscProxy {
     static final double logMax = Math.log(max_event);
 
     @SubscribeEvent(priority = EventPriority.LOW)
-    public void supressExcessiveSound(PlaySoundEvent17 event) {
+    public void supressExcessiveSound(PlaySoundEvent event) {
         // Basically, divide the volume by the number of events minus some threshold
         Minecraft mc = Minecraft.getMinecraft();
         if (mc.theWorld == null) {

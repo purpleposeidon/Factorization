@@ -11,8 +11,8 @@ public class ProxiedSound implements ISound {
     }
 
     @Override
-    public ResourceLocation getPositionedSoundLocation() {
-        return parent.getPositionedSoundLocation();
+    public ResourceLocation getSoundLocation() {
+        return parent.getSoundLocation();
     }
 
     @Override

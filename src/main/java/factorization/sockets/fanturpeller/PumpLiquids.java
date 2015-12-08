@@ -9,6 +9,7 @@ import factorization.api.datahelpers.Share;
 import factorization.common.FactoryType;
 import factorization.servo.ServoMotor;
 import factorization.shared.Core;
+import factorization.shared.FzModel;
 import factorization.sockets.ISocketHolder;
 import factorization.util.FluidUtil;
 import factorization.util.InvUtil;
@@ -22,6 +23,7 @@ import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemBucket;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.BlockPos;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.world.World;
 import net.minecraftforge.fluids.*;
@@ -106,38 +108,35 @@ public class PumpLiquids extends SocketFanturpeller implements IFluidHandler {
         void pumpOut();
     }
     
-    static final class PumpCoord {
-        final int pos;
+    private static final class PumpCoord {
+        final BlockPos pos;
         final short pathDistance;
         final PumpCoord parent;
         PumpCoord(Coord at, PumpCoord parent, int pathDistance) {
-            x = at.x;
-            y = at.y;
-            z = at.z;
+            this.pos = at.toBlockPos();
             this.pathDistance = (short) pathDistance;
             this.parent = parent;
         }
         
         PumpCoord(PumpCoord parent, EnumFacing d) {
-            this.x = parent.x + d.getDirectionVec().getX();
-            this.y = parent.y + d.getDirectionVec().getY();
-            this.z = parent.z + d.getDirectionVec().getZ();
+            this.pos = parent.pos.offset(d);
             this.pathDistance = (short) (parent.pathDistance + 1);
             this.parent = parent;
         }
         
         
         
+        @SuppressWarnings("EqualsWhichDoesntCheckParameterClass")
         @Override
         public boolean equals(Object obj) {
-            // No instanceof for efficiency. Probably safe & worthwhile.
+            // No instanceof for efficiency. This is a very private class; should be worthwile?
             PumpCoord o = (PumpCoord) obj;
-            return o.x == x && o.y == y && o.z == z;
+            return pos.equals(o.pos);
         }
-        
+
         @Override
         public int hashCode() {
-            return (((x * 11) % 71) << 7) + ((z * 7) % 479) + y; //TODO: This hashcode is probably terrible.
+            return pos.hashCode();
         }
         
         boolean verifyConnection(PumpAction pump, World w) {
@@ -163,10 +162,10 @@ public class PumpLiquids extends SocketFanturpeller implements IFluidHandler {
     
     private class Drainer implements PumpAction {
         // o <-- o <-- o <-- o <-- o
-        final ArrayDeque<PumpCoord> frontier = new ArrayDeque();
-        final HashSet<PumpCoord> visited = new HashSet();
+        final ArrayDeque<PumpCoord> frontier = new ArrayDeque<PumpCoord>();
+        final HashSet<PumpCoord> visited = new HashSet<PumpCoord>();
         final PriorityQueue<PumpCoord> queue = new PriorityQueue<PumpCoord>(128, getComparator());
-        final ArrayDeque<FoundFluidHandler> foundContainers = new ArrayDeque();
+        final ArrayDeque<FoundFluidHandler> foundContainers = new ArrayDeque<FoundFluidHandler>();
         /*
          * Eh. Memory inefficient.
          * Could we switch to packed arrays?
@@ -177,10 +176,10 @@ public class PumpLiquids extends SocketFanturpeller implements IFluidHandler {
                 @Override
                 public int compare(PumpCoord a, PumpCoord b) {
                     // If we're draining, we want the furthest & highest liquid
-                    if (a.y == b.y) { 
+                    if (a.pos.getY() == b.pos.getY()) {
                         return b.pathDistance - a.pathDistance;
                     }
-                    return b.y - a.y;
+                    return b.pos.getY() - a.pos.getY();
                 }
             };
         }
@@ -213,11 +212,11 @@ public class PumpLiquids extends SocketFanturpeller implements IFluidHandler {
         
         @Override
         public FluidStack drainBlock(PumpCoord probe, boolean doDrain) {
-            return FluidUtil.drainSpecificBlockFluid(worldObj, probe.x, probe.y, probe.z, doDrain, targetFluid);
+            return FluidUtil.drainSpecificBlockFluid(worldObj, probe.pos, doDrain, targetFluid);
         }
         
         FluidStack probeAbove(PumpCoord probe) {
-            return FluidUtil.drainSpecificBlockFluid(worldObj, probe.x, probe.y + 1, probe.z, false, targetFluid);
+            return FluidUtil.drainSpecificBlockFluid(worldObj, probe.pos.up(), false, targetFluid);
         }
         
         boolean updateFrontier() {
@@ -229,16 +228,16 @@ public class PumpLiquids extends SocketFanturpeller implements IFluidHandler {
             for (int amount = Math.max(frontier.size(), 1024); amount > 0; amount--) {
                 PumpCoord pc = frontier.poll();
                 if (pc == null) return true;
-                if (pc.y >= maxHeight) continue;
+                if (pc.pos.getY() >= maxHeight) continue;
                 if (pc.pathDistance >= maxDistance) continue;
                 boolean orig_is_liquid = drainBlock(pc, false) != null;
                 if (!orig_is_liquid) {
                     continue; //...oops!
                 }
                 for (EnumFacing dir : EnumFacing.VALUES) {
-                    if (!isSucking && pc.y + dir.getDirectionVec().getY() >= maxHeight) continue;
+                    if (!isSucking && dir == EnumFacing.UP && pc.pos.getY() + 1 >= maxHeight) continue;
                     PumpCoord at = new PumpCoord(pc, dir);
-                    probe.set(worldObj, at.x, at.y, at.z);
+                    probe.set(worldObj, at.pos);
                     if (visited.contains(at) || !probe.blockExists()) continue;
                     boolean is_liquid = drainBlock(at, false) != null;
                     boolean replaceable = probe.isReplacable();
@@ -320,7 +319,7 @@ public class PumpLiquids extends SocketFanturpeller implements IFluidHandler {
                 @Override
                 public int compare(PumpCoord a, PumpCoord b) {
                     // If we're flooding, we want the furthest & lowest liquid
-                    if (a.y == b.y) {
+                    if (a.pos.getY() == b.pos.getY()) {
                         if (a.pathDistance == b.pathDistance) {
                             return 0;
                         } else if (a.pathDistance > b.pathDistance) {
@@ -328,7 +327,7 @@ public class PumpLiquids extends SocketFanturpeller implements IFluidHandler {
                         } else {
                             return -1;
                         }
-                    } else if (a.y > b.y) {
+                    } else if (a.pos.getY() > b.pos.getY()) {
                         return 1;
                     } else {
                         return -1;
@@ -420,9 +419,7 @@ public class PumpLiquids extends SocketFanturpeller implements IFluidHandler {
         private Coord at = new Coord(worldObj, 0, 0, 0);
         boolean placeFluid(PumpCoord pc, Fluid fluid) {
             at.w = worldObj;
-            at.x = pc.x;
-            at.y = pc.y;
-            at.z = pc.z;
+            at.set(pc.pos);
             if (!at.isReplacable()) return false;
             Block block = fluid.getBlock();
             if (block == null) return false;
@@ -431,8 +428,9 @@ public class PumpLiquids extends SocketFanturpeller implements IFluidHandler {
             else if (block == Blocks.lava) block = Blocks.flowing_lava;
             
             if (block == Blocks.flowing_water) {
-                ((ItemBucket) Items.water_bucket).tryPlaceContainedLiquid(at.w, at.x, at.y, at.z);
+                ((ItemBucket) Items.water_bucket).tryPlaceContainedLiquid(at.w, pos);
             } else {
+                // NORELEASE: Is there a 1.8-ish way of placing fluid blocks now?
                 at.setIdMd(block, block instanceof BlockFluidFinite ? 0xF : 0, true);
             }
             buffer.setFluid(null);
@@ -633,15 +631,8 @@ public class PumpLiquids extends SocketFanturpeller implements IFluidHandler {
     }
     
     @SideOnly(Side.CLIENT)
-    private static ObjectModel corkscrew;
-    
-    @Override
-    @SideOnly(Side.CLIENT)
-    public void representYoSelf() {
-        super.representYoSelf();
-        corkscrew = new ObjectModel(Core.getResource("models/corkscrew.obj"));
-    }
-    
+    private static FzModel corkscrew = new FzModel("corkscrew");
+
     @Override
     @SideOnly(Side.CLIENT)
     public void renderTesr(ServoMotor motor, float partial) {
@@ -667,7 +658,7 @@ public class PumpLiquids extends SocketFanturpeller implements IFluidHandler {
         glEnable(GL_LIGHTING);
         glDisable(GL11.GL_CULL_FACE);
         glEnable(GL12.GL_RESCALE_NORMAL);
-        corkscrew.render(BlockIcons.socket$corkscrew);
+        corkscrew.draw();
         glEnable(GL11.GL_CULL_FACE);
         glEnable(GL_LIGHTING);
     }

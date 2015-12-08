@@ -16,7 +16,8 @@ import net.minecraft.block.Block;
 import net.minecraft.block.material.MapColor;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.properties.PropertyEnum;
-import net.minecraft.client.renderer.texture.IIconRegister;
+import net.minecraft.block.state.BlockState;
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
@@ -24,20 +25,19 @@ import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.*;
-import net.minecraft.util.IIcon;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import net.minecraftforge.common.ChestGenHooks;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 import java.util.UUID;
 
+import static factorization.colossi.ColossalBlock.Md.*;
+
 public class ColossalBlock extends Block {
-    public enum MD implements IStringSerializable {
+    public enum Md implements IStringSerializable, Comparable<Md> {
         MASK, BODY, BODY_CRACKED, ARM, LEG, EYE, CORE, EYE_OPEN, BODY_COVERED, MASK_CRACKED;
 
         @Override
@@ -45,13 +45,18 @@ public class ColossalBlock extends Block {
             return this.toString();
         }
     }
-    public static final PropertyEnum VARIANT = PropertyEnum.create("variant", MD.class);
+    enum Capping implements IStringSerializable, Comparable<Capping> {
+        NONE, UP, DOWN;
+
+        @Override
+        public String getName() {
+            return this.toString();
+        }
+    }
+    public static final PropertyEnum VARIANT = PropertyEnum.create("variant", Md.class);
+    public static final PropertyEnum CAPPING = PropertyEnum.create("capping", Capping.class);
 
     static Material collosal_material = new Material(MapColor.purpleColor);
-
-    static final int UP = EnumFacing.UP.ordinal();
-    static final int DOWN = EnumFacing.DOWN.ordinal();
-    static final int EAST = EnumFacing.EAST.ordinal();
 
     public ColossalBlock() {
         super(collosal_material);
@@ -63,65 +68,35 @@ public class ColossalBlock extends Block {
         Core.tab(this, TabType.BLOCKS);
         DeltaChunk.assertEnabled();
     }
-    
 
     @Override
-    public IIcon getIcon(int side, int md) {
-        switch (md) {
-        case MD_BODY: return BlockIcons.colossi$body;
-        case MD_BODY_COVERED: return BlockIcons.colossi$body;
-        case MD_BODY_CRACKED: return BlockIcons.colossi$body_cracked;
-        case MD_ARM: return BlockIcons.colossi$arm_side; // Item-only
-        case MD_LEG: return BlockIcons.colossi$leg;
-        case MD_MASK: return BlockIcons.colossi$mask;
-        case MD_MASK_CRACKED: return BlockIcons.colossi$mask_cracked;
-        case MD_EYE: return BlockIcons.colossi$eye; // Item-only
-        case MD_CORE: {
-            if (side == EAST) return BlockIcons.colossi$core;
-            return BlockIcons.colossi$core_back;
-        }
-        case MD_EYE_OPEN: return BlockIcons.colossi$eye_open;
-        default: return super.getIcon(side, md);
-        }
+    protected BlockState createBlockState() {
+        return new BlockState(this, VARIANT, CAPPING);
     }
-    
-    @Override
-    @SideOnly(Side.CLIENT)
-    public IIcon getIcon(IBlockAccess w, BlockPos pos, EnumFacing side) {
-        int md = w.getBlockMetadata(pos);
-        if (md == MD_EYE || md == MD_EYE_OPEN) {
-            // This is here rather than up there so that the item form doesn't look lame
-            if (side != EAST) return BlockIcons.colossi$mask;
-            return md == MD_EYE_OPEN ? BlockIcons.colossi$eye_open : BlockIcons.colossi$eye;
-        }
-        if (md == MD_ARM) {
-            if (side == UP) return BlockIcons.colossi$arm_top;
-            if (side == DOWN) return BlockIcons.colossi$arm_bottom;
-            Block downId = w.getBlock(x, y - 1, z);
-            int downMd = w.getBlockMetadata(x, y - 1, z);
-            Block upId = w.getBlock(x, y + 1, z);
-            int upMd = w.getBlockMetadata(x, y + 1, z);
 
-            if (downId == this && downMd == MD_ARM) {
-                if (upId != this || upMd != MD_ARM) {
-                    return BlockIcons.colossi$arm_side_top;
-                }
-                return BlockIcons.colossi$arm_side;
+    @Override
+    public IBlockState getActualState(IBlockState bs, IBlockAccess w, BlockPos pos) {
+        if (bs.getValue(VARIANT) == ARM) {
+            if (w.getBlockState(pos.down()).getValue(VARIANT) == ARM) {
+                return bs.withProperty(CAPPING, Capping.DOWN);
             }
-            return BlockIcons.colossi$arm_side_bottom;
+            if (w.getBlockState(pos.up()).getValue(VARIANT) == ARM) {
+                return bs.withProperty(CAPPING, Capping.UP);
+            }
         }
-        return getIcon(side, md);
+        return super.getActualState(bs, w, pos);
     }
-    
+
     @Override
     public float getBlockHardness(World world, BlockPos pos) {
-        int md = world.getBlockMetadata(pos);
-        if (md == MD_BODY_CRACKED || md == MD_MASK_CRACKED) {
-            return 6; // 10
+        IBlockState bs = world.getBlockState(pos);
+        Md md = bs.<Md>getValue(VARIANT);
+        if (md == BODY_CRACKED || md == MASK_CRACKED) {
+            return 6;
         }
-        if (md == MD_MASK) {
+        if (md == MASK) {
             for (EnumFacing dir : EnumFacing.VALUES) {
-                if (isSupportive(world, x + dir.getDirectionVec().getX(), y + dir.getDirectionVec().getY(), z + dir.getDirectionVec().getZ())) {
+                if (isSupportive(world, pos.offset(dir))) {
                     return super.getBlockHardness(world, pos);
                 }
             }
@@ -132,18 +107,16 @@ public class ColossalBlock extends Block {
     
     boolean isSupportive(World world, BlockPos pos) {
         if (world.getBlock(pos) != this) return false;
-        int md = world.getBlockMetadata(pos);
-        return md == MD_BODY || md == MD_BODY_COVERED || md == MD_EYE || md == MD_EYE_OPEN || md == MD_CORE;
+        IBlockState bs = world.getBlockState(pos);
+        Md md = bs.<Md>getValue(VARIANT);
+        return md == BODY || md == BODY_COVERED || md == EYE || md == EYE_OPEN || md == CORE;
     }
-    
+
     @Override
-    public void registerBlockIcons(IIconRegister iconRegistry) { }
-    
-    @Override
-    public void getSubBlocks(Item item, CreativeTabs tab, List list) {
-        for (byte md = MD_MASK; md <= MD_MASK_CRACKED; md++) {
-            if (md == MD_BODY_COVERED) continue; // Technical block; skip
-            list.add(new ItemStack(this, 1, md));
+    public void getSubBlocks(Item item, CreativeTabs tab, List<ItemStack> list) {
+        for (Md md : values()) {
+            if (md == BODY_COVERED) continue;
+            list.add(new ItemStack(this, 1, getMetaFromState(getDefaultState().withProperty(VARIANT, md))));
         }
     }
     
@@ -160,91 +133,94 @@ public class ColossalBlock extends Block {
 
         return fractureChest;
     }
-    
+
+    Random rand = new Random();
     @Override
-    public ArrayList<ItemStack> getDrops(World world, BlockPos pos, int md, int fortune) {
-        ArrayList<ItemStack> ret = new ArrayList();
-        if (md == MD_MASK) {
-            ret.add(new ItemStack(this, 1, md));
+    public List<ItemStack> getDrops(IBlockAccess world, BlockPos pos, IBlockState bs, int fortune) {
+        ArrayList<ItemStack> ret = new ArrayList<ItemStack>();
+        Md md = bs.<Md>getValue(VARIANT);
+        if (md == MASK) {
+            ret.add(createStackedBlock(bs));
         }
-        if (md == MD_BODY_CRACKED || md == MD_MASK_CRACKED) {
-            int count = 1 + world.rand.nextInt(1 + fortune);
+        if (md == BODY_CRACKED || md == MASK_CRACKED) {
+            int count = 1 + rand.nextInt(1 + fortune);
             for (int i = 0; i < count; i++) {
-                ret.add(getChest().getOneItem(world.rand));
+                ret.add(getChest().getOneItem(rand));
             }
         }
-        if (md == MD_CORE) {
+        if (md == CORE) {
             ret.add(new ItemStack(Core.registry.logicMatrixProgrammer));
         }
-        if (md == MD_BODY_CRACKED || md == MD_MASK_CRACKED) {
-            Coord me = new Coord(world, pos);
-            Coord back = me.add(EnumFacing.WEST);
-            if (back.getBlock() == this && back.getMd() == MD_CORE) {
-                TransferLib.move(back, me, true, true);
-                back.setIdMd(this, MD_BODY, true);
+        if (md == BODY_CRACKED || md == MASK_CRACKED) {
+            if (world instanceof World) {
+                // Need World for the TransferLib call
+                Coord me = new Coord((World) world, pos);
+                Coord back = me.add(EnumFacing.WEST);
+                if (me.has(VARIANT, CORE)) {
+                    TransferLib.move(back, me, true, true);
+                    back.set(getDefaultState().withProperty(VARIANT, BODY), true);
+                }
+                Awakener.awaken(me);
             }
-            Awakener.awaken(me);
         }
         return ret;
     }
-    
+
     @Override
-    public void randomDisplayTick(World world, BlockPos pos, Random rand) {
+    public void randomDisplayTick(World world, BlockPos pos, IBlockState state, Random rand) {
         if (world.provider.getDimensionId() != DeltaChunk.getDimensionId()) return;
-        int md = world.getBlockMetadata(pos);
-        int r = md == MD_BODY_CRACKED ? 4 : 2;
-        float px = x - 0.5F + rand.nextFloat()*r;
-        float py = y - 0.5F + rand.nextFloat()*r;
-        float pz = z - 0.5F + rand.nextFloat()*r;
+        Md md = state.<Md>getValue(VARIANT);
+        int r = md == BODY_CRACKED ? 4 : 2;
+        float px = pos.getX() - 0.5F + rand.nextFloat()*r;
+        float py = pos.getY() - 0.5F + rand.nextFloat()*r;
+        float pz = pos.getZ() - 0.5F + rand.nextFloat()*r;
+        EnumParticleTypes particle;
         switch (md) {
-        case MD_BODY_CRACKED:
-        case MD_MASK_CRACKED:
-            world.spawnParticle("flame", px, py, pz, 0, 0, 0);
+        case BODY_CRACKED:
+        case MASK_CRACKED:
+            particle = EnumParticleTypes.FLAME;
             break;
-        case MD_CORE:
-            world.spawnParticle("reddust", px, py, pz, 0, 0, 0);
+        case CORE:
+            particle = EnumParticleTypes.REDSTONE;
             break;
-        case MD_BODY:
-        case MD_BODY_COVERED:
-            if (rand.nextInt(256) == 0) {
-                world.spawnParticle("explode", px, py, pz, 0, 0, 0);
+        case BODY:
+        case BODY_COVERED:
+            if (rand.nextInt(256) != 0) {
+                return;
             }
+            particle = EnumParticleTypes.EXPLOSION_NORMAL;
             break;
-        case MD_MASK:
-        case MD_EYE:
-        case MD_EYE_OPEN:
-            world.spawnParticle("depthsuspend", px, py, pz, 0, 0, 0);
+        case MASK:
+        case EYE:
+        case EYE_OPEN:
+            particle = EnumParticleTypes.SUSPENDED_DEPTH;
             break;
         default:
-        case MD_ARM:
-        case MD_LEG:
-            break;
-        } 
+        case ARM:
+        case LEG:
+            return;
+        }
+        world.spawnParticle(particle, px, py, pz, 0, 0, 0);
     }
-    
+
     @Override
-    public ItemStack getPickBlock(MovingObjectPosition target, World world, BlockPos pos) {
-        return new ItemStack(this, 1, world.getBlockMetadata(pos));
-    }
-    
-    @Override
-    public boolean onBlockActivated(World world, BlockPos pos, EntityPlayer player, int side, float vecX, float vecY, float vecZ) {
+    public boolean onBlockActivated(World world, BlockPos pos, IBlockState state, EntityPlayer player, EnumFacing side, float hitX, float hitY, float hitZ) {
         if (world.isRemote) return false;
         if (player == null) return false;
         Coord at = new Coord(world, pos);
         ItemStack held = player.getHeldItem();
-        int md = at.getMd();
-        if (md != MD_CORE) return false;
-        /*if (held != null && held.getItem() == Core.registry.logicMatrixProgrammer && world == DeltaChunk.getServerShadowWorld()) {
-            if (Core.registry.logicMatrixProgrammer.isAuthenticated(held)) return true;
+        Md md = state.<Md>getValue(VARIANT);
+        if (md != Md.CORE) return false;
+        if (held != null && held.getItem() == Core.registry.logicMatrixProgrammer && world == DeltaChunk.getServerShadowWorld()) {
+            /*if (Core.registry.logicMatrixProgrammer.isAuthenticated(held)) return true;
             EntityPlayer realPlayer = DeltaChunk.getRealPlayer(player);
             if (realPlayer instanceof FakePlayer || realPlayer == null) {
                 return true;
             }
             if (realPlayer.worldObj == world) return true;
             return giveUserAuthentication(held, realPlayer, at);
-            NORELEASE.fixme("Wither test: player should be able to survive a wither while grabbed by a citizen");
-        }*/
+            NORELEASE.fixme("Wither test: player should be able to survive a wither while grabbed by a citizen"); */
+        }
         if (PlayerUtil.isPlayerCreative(player)) {
             TileEntityColossalHeart heart = at.getTE(TileEntityColossalHeart.class);
             if (heart != null) {
@@ -278,7 +254,7 @@ public class ColossalBlock extends Block {
     }
 
     private void placePoster(ItemStack held, EntityPlayer player, Coord at) {
-        ItemSpawnPoster.PosterPlacer placer = new ItemSpawnPoster.PosterPlacer(new ItemStack(Core.registry.spawnPoster), player, at.w, at.x, at.y, at.z, EnumFacing.EAST.ordinal());
+        ItemSpawnPoster.PosterPlacer placer = new ItemSpawnPoster.PosterPlacer(new ItemStack(Core.registry.spawnPoster), player, at.w, at.toBlockPos(), EnumFacing.EAST);
         placer.invoke();
         final EntityPoster poster = placer.result;
         poster.locked = true;
@@ -292,35 +268,34 @@ public class ColossalBlock extends Block {
     }
 
     @Override
-    public void onBlockPlacedBy(World world, BlockPos pos, EntityLivingBase player, ItemStack is) {
-        super.onBlockPlacedBy(world, pos, player, is);
-        if (is.getItemDamage() != MD_CORE) {
-            return;
-        }
+    public IBlockState onBlockPlaced(World world, BlockPos pos, EnumFacing facing, float hitX, float hitY, float hitZ, int meta, EntityLivingBase placer) {
+        IBlockState ibs =  super.onBlockPlaced(world, pos, facing, hitX, hitY, hitZ, meta, placer);
+        if (ibs.getValue(VARIANT) != Md.CORE) return ibs;
         Coord at = new Coord(world, pos);
         at.setTE(new TileEntityColossalHeart());
+        return ibs;
     }
-    
+
     @Override
-    public boolean hasTileEntity(int metadata) {
-        return metadata == MD_CORE;
+    public boolean hasTileEntity(IBlockState state) {
+        return state.getValue(VARIANT) == Md.CORE;
     }
-    
+
     @Override
-    public void breakBlock(World world, BlockPos pos, Block block, int md) {
-        super.breakBlock(world, pos, block, md);
+    public void breakBlock(World world, BlockPos pos, IBlockState state) {
+        super.breakBlock(world, pos, state);
         if (world.isRemote) return;
         if (world == DeltaChunk.getServerShadowWorld()) return;
         Coord at = new Coord(world, pos);
-        if (md == MD_BODY_CRACKED || md == MD_MASK_CRACKED) {
+        if (at.has(VARIANT, Md.BODY_CRACKED, Md.MASK_CRACKED)) {
             for (Coord neighbor : at.getNeighborsAdjacent()) {
-                if (neighbor.getBlock() == this && neighbor.getMd() == MD_BODY) {
+                if (neighbor.has(VARIANT, Md.BODY)) {
                     int air = 0;
                     for (Coord n2 : neighbor.getNeighborsAdjacent()) {
                         if (n2.isAir()) air++;
                     }
                     if (air <= 1) {
-                        neighbor.setMd(MD_BODY_COVERED);
+                        neighbor.set(VARIANT, Md.BODY_COVERED);
                     }
                 }
             }

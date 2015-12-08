@@ -6,16 +6,16 @@ import factorization.truth.api.IHtmlTypesetter;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.renderer.Tessellator;
-import net.minecraft.util.IIcon;
+import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import org.lwjgl.opengl.GL11;
 
 public class IconWord extends Word {
     public static final int BLOCK_TEXTURE = 234, ITEM_TEXTURE = 567;
     
-    private final IIcon icon;
+    private final TextureAtlasSprite icon;
     private final boolean isBlock;
     
-    public IconWord(IIcon icon, int texture) {
+    public IconWord(TextureAtlasSprite icon, int texture) {
         if (icon == null) icon = BlockIcons.error;
         this.icon = icon;
         isBlock = texture == BLOCK_TEXTURE;

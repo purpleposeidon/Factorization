@@ -1,5 +1,6 @@
 package factorization.api;
 
+import com.google.common.collect.ImmutableMap;
 import com.google.common.io.ByteArrayDataInput;
 import com.google.common.io.ByteArrayDataOutput;
 import factorization.api.datahelpers.DataHelper;
@@ -41,10 +42,7 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 
 // Note: The rules for holding on to references to Coord are the same as for holding on to World.
 // Don't keep references to them outside of things that are in worlds to avoid mem-leaks; or be careful about it.
@@ -1102,6 +1100,13 @@ public final class Coord implements IDataSerializable, ISaneCoord, Comparable<Co
             if (v == actual) return true;
         }
         return false;
+    }
+
+    public boolean stateIs(IBlockState otherState) {
+        IBlockState mine = getState();
+        Block myBlock = mine.getBlock();
+        if (myBlock != otherState.getBlock()) return false;
+        return myBlock.getMetaFromState(mine) == myBlock.getMetaFromState(otherState);
     }
 
 }

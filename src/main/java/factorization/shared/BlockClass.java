@@ -10,7 +10,7 @@ import java.util.Locale;
  * This associates various block properties with metadata.
  * 
  */
-public enum BlockClass implements IStringSerializable {
+public enum BlockClass implements IStringSerializable, Comparable<BlockClass> {
 
     Default(0, true, 0, 0, 1F),
     DarkIron(1, true, 0, 0, 3.25F),

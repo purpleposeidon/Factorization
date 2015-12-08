@@ -6,7 +6,6 @@ import net.minecraft.init.Blocks;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.BlockPos;
-import net.minecraft.world.ChunkPosition;
 import net.minecraft.world.EnumSkyBlock;
 import net.minecraft.world.NextTickListEntry;
 import net.minecraft.world.chunk.Chunk;
@@ -18,7 +17,6 @@ public class TransferLib {
     public static int default_set_method = 0;
     public static final int SET_SNEAKY = 0,
             SET_SNEAKY_NO_LIGHTING_UPDATES = 1,
-            SET_ISREMOTE = 2,
             SET_DIRECT = 3,
             SET_VANILLA_FLAGS = 4,
             SET_CHUNKY = 5;
@@ -79,15 +77,14 @@ public class TransferLib {
             if (extendedblockstorage == null) {
                 if (id == Blocks.air) return;
 
-                extendedblockstorage = storageArrays[c.y >> 4] = new ExtendedBlockStorage(c.y >> 4 << 4, !chunk.worldObj.provider.hasNoSky);
+                extendedblockstorage = storageArrays[c.y >> 4] = new ExtendedBlockStorage(c.y >> 4 << 4, !c.w.provider.getHasNoSky());
                 extendsHeight = c.y >= origColumHeight;
             }
 
-            extendedblockstorage.func_150818_a(blockXChunk, blockYChunk, blockZChunk, id);
-            extendedblockstorage.setExtBlockMetadata(blockXChunk, blockYChunk, blockZChunk, md);
+            extendedblockstorage.set(blockXChunk, blockYChunk, blockZChunk, origBlock.getStateFromMeta(origMd));
             if (extendedblockstorage.getBlockByExtId(blockXChunk, c.y & 15, blockZChunk) != id) return;
             if (use_method == SET_SNEAKY_NO_LIGHTING_UPDATES) return;
-            chunk.isModified = true;
+            chunk.setChunkModified();
             if (extendsHeight) {
                 chunk.generateSkylightMap();
                 return;
@@ -103,42 +100,32 @@ public class TransferLib {
                 chunk.relightBlock(blockXChunk, c.y, blockZChunk);
             }
             if (newOpacity == oldOpacity) return;
-            if (newOpacity < oldOpacity 
-                    || chunk.getSavedLightValue(EnumSkyBlock.Sky, blockXChunk, c.y, blockZChunk) > 0
-                    || chunk.getSavedLightValue(EnumSkyBlock.Block, blockXChunk, c.y, blockZChunk) > 0) {
+            if (newOpacity < oldOpacity
+                    || chunk.getLightFor(EnumSkyBlock.SKY, pos) > 0
+                    || chunk.getLightFor(EnumSkyBlock.BLOCK, pos) > 0) {
                 chunk.propagateSkylightOcclusion(blockXChunk, blockZChunk);
             }
 
             break;
         }
-        case SET_ISREMOTE:
-            boolean rem = c.w.isRemote;
-            c.w.isRemote = true;
-            try {
-                c.setIdMd(id, md, false);
-            } finally {
-                c.w.isRemote = rem;
-            }
-            break;
         case SET_DIRECT:
             c.setIdMd(id, md, false);
             break;
         case SET_VANILLA_FLAGS:
-            c.w.setBlock(c.x, c.y, c.z, id, md, 0);
+            c.w.setBlockState(c.toBlockPos(), id.getStateFromMeta(md), 0);
             break;
-        case SET_CHUNKY:
-            Chunk chunk = c.w.getChunkFromBlockCoords(c.x, c.z);
-            chunk.func_150807_a(c.x & 15, c.y, c.z & 15, id, md);
+        case SET_CHUNKY: {
+            BlockPos pos = c.toBlockPos();
+            Chunk chunk = c.w.getChunkFromBlockCoords(pos);
+            chunk.setBlockState(pos, id.getStateFromMeta(md));
             c.markBlockForUpdate();
             break;
+            }
         }
     }
-    
-    private static TileEntity wiper = new TileEntity();
-    
+
     public static void rawRemoveTE(Coord c) {
-        Chunk chunk = c.w.getChunkFromBlockCoords(c.x, c.z);
-        chunk.chunkTileEntityMap.remove(new ChunkPosition(c.x & 15, c.y, c.z & 15));
+        c.getChunk().chunkTileEntityMap.remove(c.toBlockPos());
     }
     
     public static TileEntity move(Coord src, Coord dest, boolean wipeSrc, boolean overwriteDestination) {
@@ -146,7 +133,7 @@ public class TransferLib {
     }
 
     public static TileEntity move(Coord src, Coord dest, boolean wipeSrc, boolean overwriteDestination, int setMethod) {
-        Block id = src.getId();
+        Block id = src.getBlock();
         int md = src.getMd();
         int blockLight = src.getLightLevelBlock();
         int skyLight = src.getLightLevelSky();
@@ -155,12 +142,14 @@ public class TransferLib {
         }
         long block_tick_time = -1;
         int block_tick_priority = -1;
+
+        BlockPos srcPos = src.toBlockPos();
         
         {
             List<NextTickListEntry> pendingTicks = (List<NextTickListEntry>) src.w.getPendingBlockUpdates(src.getChunk(), false);
             if (pendingTicks != null) {
                 for (NextTickListEntry tick : pendingTicks) {
-                    if (tick.xCoord == src.x && tick.yCoord == src.y && tick.zCoord == src.z){
+                    if (tick.position.equals(srcPos)) {
                         block_tick_time = tick.scheduledTime - src.w.getWorldInfo().getWorldTotalTime();
                         block_tick_priority = tick.priority;
                         break;
@@ -175,15 +164,12 @@ public class TransferLib {
             teData = new NBTTagCompound();
             te.writeToNBT(teData);
             if (wipeSrc) {
-                wiper.validate();
-                src.setTE(wiper);
                 rawRemoveTE(src);
             }
         }
         if (wipeSrc) {
             setRaw(src, Blocks.air, 0);
         }
-        wiper.setWorldObj(null); //Don't hold onto a reference
         if (dest.getTE() != null) {
             rawRemoveTE(dest);
         }
@@ -200,7 +186,7 @@ public class TransferLib {
             dest.setTE(ret);
         }
         if (block_tick_time > -1) {
-            dest.w.scheduleBlockUpdateWithPriority(dest.x, dest.y, dest.z, id, (int) block_tick_time, block_tick_priority);
+            dest.w.scheduleBlockUpdate(dest.toBlockPos(), id, (int) block_tick_time, block_tick_priority);
         }
         return ret;
     }

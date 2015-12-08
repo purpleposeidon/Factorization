@@ -7,7 +7,7 @@ import factorization.api.DeltaCoord;
 import factorization.api.ICoordFunction;
 import factorization.api.Quaternion;
 import factorization.citizen.EntityCitizen;
-import factorization.colossi.ColossalBlock.MD;
+import factorization.colossi.ColossalBlock.Md;
 import factorization.colossi.ColossusController.BodySide;
 import factorization.colossi.ColossusController.LimbType;
 import factorization.fzds.TransferLib;
@@ -35,7 +35,7 @@ import net.minecraft.world.WorldServer;
 
 import java.util.*;
 
-import static factorization.colossi.ColossalBlock.MD.*;
+import static factorization.colossi.ColossalBlock.Md.*;
 import static factorization.colossi.TechniqueKind.*;
 
 public enum Technique implements IStateMachine<Technique> {
@@ -978,7 +978,7 @@ public enum Technique implements IStateMachine<Technique> {
                     @Override
                     public void handle(Coord here) {
                         if (here.getBlock() != Core.registry.colossal_block) return;
-                        ColossalBlock.MD md = (MD) here.getProperty(ColossalBlock.VARIANT);
+                        Md md = (Md) here.getProperty(ColossalBlock.VARIANT);
                         if (md == null) return;
                         switch (md) {
                         default: return;
@@ -988,7 +988,7 @@ public enum Technique implements IStateMachine<Technique> {
                             here.setAir();
                             Vec3 core = idc.shadow2real(here.createVector().addVector(0.5, 0.5, 0.5));
                             controller.worldObj.newExplosion(null, core.xCoord, core.yCoord, core.zCoord, 0.25F, false, true);
-                            if (md == ColossalBlock.MD.CORE) {
+                            if (md == Md.CORE) {
                                 ItemStack lmp = new ItemStack(Core.registry.logicMatrixProgrammer);
                                 EntityItem ei = new EntityItem(controller.worldObj, core.xCoord, core.yCoord, core.zCoord, lmp);
                                 ei.invulnerable = true;
@@ -1116,7 +1116,7 @@ public enum Technique implements IStateMachine<Technique> {
                 Coord.iterateCube(controller.body.getCorner(), controller.body.getFarCorner(), new ICoordFunction() {
                     @Override
                     public void handle(Coord here) {
-                        if (here.has(ColossalBlock.VARIANT, MD.EYE, MD.EYE_OPEN)) {
+                        if (here.has(ColossalBlock.VARIANT, Md.EYE, Md.EYE_OPEN)) {
                             eyes.give(here.copy());
                         }
                     }

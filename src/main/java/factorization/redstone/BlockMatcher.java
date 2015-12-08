@@ -21,12 +21,12 @@ import java.util.Random;
 
 public class BlockMatcher extends Block {
     public static final IProperty<EnumFacing.Axis> AXIS = PropertyEnum.create("axis", EnumFacing.Axis.class);
-    public static final IProperty<FireState> FIRING = PropertyEnum.create("firing", FireState.class);
-    public enum FireState implements IStringSerializable {
+    public static final IProperty<FiringState> FIRING = PropertyEnum.create("firing", FiringState.class);
+    public enum FiringState implements IStringSerializable, Comparable<FiringState> {
         READY(0), FIRING(4), MATCHED(8);
         final int field;
 
-        FireState(int field) {
+        FiringState(int field) {
             this.field = field;
         }
 
@@ -56,7 +56,7 @@ public class BlockMatcher extends Block {
     @Override
     public int getMetaFromState(IBlockState state) {
         EnumFacing.Axis axis = state.getValue(AXIS);
-        FireState firing = state.getValue(FIRING);
+        FiringState firing = state.getValue(FIRING);
         int md = 0;
         if (axis == EnumFacing.Axis.Y) md = 0;
         if (axis == EnumFacing.Axis.Z) md = 1;
@@ -67,8 +67,8 @@ public class BlockMatcher extends Block {
 
     @Override
     public IBlockState getStateFromMeta(int meta) {
-        FireState firing = FireState.READY;
-        for (FireState f : FireState.values()) {
+        FiringState firing = FiringState.READY;
+        for (FiringState f : FiringState.values()) {
             if (f.on(meta)) {
                 firing = f;
                 break;
@@ -133,13 +133,13 @@ public class BlockMatcher extends Block {
     @Override
     public void onNeighborBlockChange(World world, BlockPos pos, IBlockState bs, Block neighborBlock) {
         if (neighborBlock == this) return;
-        FireState state = bs.getValue(FIRING);
-        if (state == FireState.FIRING) return;
+        FiringState state = bs.getValue(FIRING);
+        if (state == FiringState.FIRING) return;
         EnumFacing.Axis axis = bs.getValue(AXIS);
         byte match = match(world, pos, SpaceUtil.fromAxis(axis));
-        FireState next_state = match >= 3 ? FireState.FIRING : FireState.READY;
+        FiringState next_state = match >= 3 ? FiringState.FIRING : FiringState.READY;
         world.updateComparatorOutputLevel(pos, this); // 'update comparators'; don't do this when firing as it might cause a loop?
-        if (state == FireState.MATCHED && next_state == FireState.FIRING) {
+        if (state == FiringState.MATCHED && next_state == FiringState.FIRING) {
             return;
         }
         int notify = Coord.UPDATE | Coord.NOTIFY_NEIGHBORS;
@@ -169,8 +169,8 @@ public class BlockMatcher extends Block {
 
     @Override
     public int isProvidingWeakPower(IBlockAccess world, BlockPos pos, IBlockState bs, EnumFacing side) {
-        FireState state = bs.getValue(FIRING);
-        if (state != FireState.FIRING) return 0;
+        FiringState state = bs.getValue(FIRING);
+        if (state != FiringState.FIRING) return 0;
         EnumFacing.Axis axis = bs.getValue(AXIS);
         if (axis.apply(side)) return 0;
 
@@ -184,7 +184,7 @@ public class BlockMatcher extends Block {
     public void updateTick(World world, BlockPos pos, IBlockState bs, Random rand) {
         EnumFacing.Axis axis = bs.getValue(AXIS);
         byte match = match(world, pos, SpaceUtil.fromAxis(axis));
-        FireState nextState = match >= 3 ? FireState.MATCHED : FireState.READY;
+        FiringState nextState = match >= 3 ? FiringState.MATCHED : FiringState.READY;
         int notify = Coord.UPDATE | Coord.NOTIFY_NEIGHBORS;
         IBlockState nbs = bs.withProperty(FIRING, nextState);
         world.setBlockState(pos, nbs, notify);
@@ -197,7 +197,7 @@ public class BlockMatcher extends Block {
 
     @Override
     public void onBlockAdded(World world, BlockPos pos, IBlockState bs) {
-        if (bs.getValue(FIRING) == FireState.READY) return;
-        world.setBlockState(pos, bs.withProperty(FIRING, FireState.READY));
+        if (bs.getValue(FIRING) == FiringState.READY) return;
+        world.setBlockState(pos, bs.withProperty(FIRING, FiringState.READY));
     }
 }

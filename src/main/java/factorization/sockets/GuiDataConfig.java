@@ -9,7 +9,6 @@ import factorization.util.LangUtil;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.renderer.texture.TextureManager;
@@ -34,12 +33,9 @@ public class GuiDataConfig extends GuiScreen {
     boolean orig_f1_state;;
     
     static class UsefulButton extends GuiButton {
-        static FontRenderer fontRenderer = Minecraft.getMinecraft().fontRenderer;
         public UsefulButton(int id, int xPos, int yPos, String text) {
-            super(id, xPos, yPos - 4, fontRenderer.getStringWidth(text) + 8, 20, text);
+            super(id, xPos, yPos - 4, Minecraft.getMinecraft().fontRendererObj.getStringWidth(text) + 8, 20, text);
         }
-
-        public boolean isHovered() { return field_146123_n; }
     }
     
     class Field {
@@ -100,7 +96,7 @@ public class GuiDataConfig extends GuiScreen {
         
         void mouseClick(int mouseX, int mouseY, boolean rightClick) {
             for (UsefulButton button : buttons) {
-                if (button.isHovered()) {
+                if (button.isMouseOver()) {
                     buttonPressed(button, rightClick);
                     break;
                 }
@@ -255,7 +251,7 @@ public class GuiDataConfig extends GuiScreen {
     }
     
     void closeScreen() {
-        keyTyped('\0', 1);
+        mc.displayGuiScreen(null);
     }
     
     
@@ -358,14 +354,14 @@ public class GuiDataConfig extends GuiScreen {
             field.render(mouseX, mouseY);
         }
     }
-    
+
     @Override
-    protected void mouseClicked(int mouseX, int mouseY, int button) {
+    protected void mouseClickMove(int mouseX, int mouseY, int button, long timeSinceLastClick) {
         for (Field field : fields) {
             field.mouseClick(mouseX, mouseY, button == 1);
         }
         valueChanged();
-        super.mouseClicked(mouseX, mouseY, button);
+        super.mouseClickMove(mouseX, mouseY, button, timeSinceLastClick);
     }
     
     void valueChanged() {
@@ -404,9 +400,10 @@ public class GuiDataConfig extends GuiScreen {
     public boolean doesGuiPauseGame() {
         return false;
     }
-    
+
+
     @Override
-    protected void keyTyped(char chr, int keySym) {
+    protected void keyTyped(char chr, int keySym) throws IOException {
         super.keyTyped(chr, keySym);
         if (keySym == 1) {
             return;
