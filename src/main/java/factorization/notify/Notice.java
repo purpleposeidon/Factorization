@@ -13,6 +13,7 @@ import net.minecraft.util.Vec3;
 import net.minecraft.world.World;
 
 import java.util.EnumSet;
+import javax.annotation.CheckReturnValue;
 
 public class Notice {
     final Object where;
@@ -62,6 +63,7 @@ public class Notice {
      * 
      */
 
+    @CheckReturnValue
     public Notice(Object where, String message, String... messageParameters) {
         this.where = where;
         this.message = message;
@@ -97,6 +99,7 @@ public class Notice {
      *             The {@link NoticeUpdater} object.
      * 
      */
+    @CheckReturnValue
     public Notice(Object where, NoticeUpdater updater) {
         this.where = where;
         withUpdater(updater);
@@ -126,6 +129,7 @@ public class Notice {
      * with a newline, unless the information list is empty.
      * </p>
      */
+    @CheckReturnValue
     public Notice withItem(ItemStack item) {
         if (isUpdating && !changed) {
             cmpIs(this.item, item);
@@ -138,6 +142,7 @@ public class Notice {
     /**
      * Sets the {@link Style}s for the message. See {@link Style} for details.
      */
+    @CheckReturnValue
     public Notice withStyle(Style... styles) {
         boolean addedStyle = false;
         for (Style s : styles) {
@@ -153,6 +158,7 @@ public class Notice {
      * Sets the world of the Notice. (This is only needed for sending a
      * notification at a Vec3 position to everyone;)
      */
+    @CheckReturnValue
     public Notice withWorld(World world) {
         this.world = world;
         return this;
@@ -163,6 +169,7 @@ public class Notice {
      * <code>{@link NoticeUpdater.update}(this)</code> will be called until no
      * longer necessary.
      */
+    @CheckReturnValue
     public Notice withUpdater(NoticeUpdater updater) {
         this.updater = updater;
         return this;
@@ -249,7 +256,16 @@ public class Notice {
     /**
      * @see sendTo
      */
+    @Deprecated
     public void send(EntityPlayer player) {
+        sendTo(player);
+    }
+    
+    /**
+     * Dispatches the Notice to the player. If the player is null, then all
+     * players in the world will see it.
+     */
+    public void sendTo(EntityPlayer player) {
         if (isUpdating) {
             // In this case, it is our responsibility. Shouldn't be called.
             return;
@@ -266,21 +282,13 @@ public class Notice {
             addedToRecurList = true;
         }
     }
-    
-    /**
-     * Dispatches the Notice to the player. If the player is null, then all
-     * players in the world will see it.
-     */
-    public void sendTo(EntityPlayer player) {
-        send(player);
-    }
 
     /**
      * Sends the Notice to everyone in the world.
      * @see sendTo
      */
     public void sendToAll() {
-        send(null);
+        sendTo(null);
     }
 
     /**
@@ -307,7 +315,16 @@ public class Notice {
     public static void onscreen(EntityPlayer player, String message, String... formatArguments) {
         NotifyImplementation.instance.doSendOnscreenMessage(player, message, formatArguments);
     }
-    
+
+    public static void title(EntityPlayer player, String title, String subtitle) {
+        // NORELEASE: Implement. Just needs a little packet?
+        onscreen(player, title + " " + subtitle);
+    }
+
+    public static void title(EntityPlayer player, String title) {
+        onscreen(player, title);
+    }
+
     /**
      * Sends an updatable chat message to the player. If a message with the same msgKey is sent,
      * then all other messages with the same key will be removed.

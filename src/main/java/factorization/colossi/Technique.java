@@ -1,11 +1,13 @@
 package factorization.colossi;
 
+import com.google.common.base.Predicate;
 import factorization.algos.ReservoirSampler;
 import factorization.api.Coord;
 import factorization.api.DeltaCoord;
 import factorization.api.ICoordFunction;
 import factorization.api.Quaternion;
 import factorization.citizen.EntityCitizen;
+import factorization.colossi.ColossalBlock.MD;
 import factorization.colossi.ColossusController.BodySide;
 import factorization.colossi.ColossusController.LimbType;
 import factorization.fzds.TransferLib;
@@ -27,11 +29,13 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.potion.Potion;
 import net.minecraft.potion.PotionEffect;
 import net.minecraft.util.EnumFacing;
+import net.minecraft.util.EnumParticleTypes;
 import net.minecraft.util.Vec3;
 import net.minecraft.world.WorldServer;
 
 import java.util.*;
 
+import static factorization.colossi.ColossalBlock.MD.*;
 import static factorization.colossi.TechniqueKind.*;
 
 public enum Technique implements IStateMachine<Technique> {
@@ -80,7 +84,6 @@ public enum Technique implements IStateMachine<Technique> {
             Collections.shuffle(avail);
             Technique chosen_offense = null;
             Technique chosen_defense = null;
-            boolean force_idler = iteratePotentialPlayers(controller) == null;
             for (Technique tech : avail) {
                 TechniqueKind kind = tech.getKind();
                 if (use_defense && kind != DEFENSIVE) continue;
@@ -265,7 +268,7 @@ public enum Technique implements IStateMachine<Technique> {
             if (mobs > 8) mobs = 8;
             while (mobs-- > 0) {
                 EntityCreeper creeper = new EntityCreeper(controller.worldObj);
-                creeper.addPotionEffect(new PotionEffect(Potion.jump.getId(), 20 * 5, 3, true));
+                creeper.addPotionEffect(new PotionEffect(Potion.jump.getId(), 20 * 5, 3, true, true));
                 double ex = controller.posX + rng(controller);
                 double ey = controller.posY + controller.height;
                 double ez = controller.posZ + rng(controller);
@@ -304,19 +307,14 @@ public enum Technique implements IStateMachine<Technique> {
             Coord.iterateCube(controller.body.getCorner(), controller.body.getFarCorner(), new ICoordFunction() {
                 @Override
                 public void handle(Coord here) {
-                    if (here.getBlock() != Core.registry.colossal_block) return;
-                    if (here.getMd() != ColossalBlock.MD_MASK) return;
+                    if (here.getProperty(ColossalBlock.VARIANT) != MASK) return;
                     if (!here.add(EnumFacing.UP).isAir()) return;
                     if (here.add(EnumFacing.EAST).isAir()) return;
                     sampler.give(here.copy());
                 }
             });
             for (Coord found : sampler) {
-                if (found.getMd() == ColossalBlock.MD_MASK && found.getId() == Core.registry.colossal_block) {
-                    found.setIdMd(Core.registry.colossal_block, ColossalBlock.MD_MASK_CRACKED, true);
-                } else {
-                    found.setIdMd(Core.registry.colossal_block, ColossalBlock.MD_BODY_CRACKED, true);
-                }
+                found.set(Core.registry.colossal_block.getDefaultState().withProperty(ColossalBlock.VARIANT, MASK_CRACKED), true);
                 return;
             }
             // No suitable mask to crack? Might be a custom design. Silently skip this bow then.
@@ -341,13 +339,14 @@ public enum Technique implements IStateMachine<Technique> {
                     if (isExposedSkin(here)) {
                         sampler.give(here.copy());
                     }
-                    if (here.getBlock() == Core.registry.colossal_block && here.getMd() == ColossalBlock.MD_EYE) {
-                        here.setMd(ColossalBlock.MD_EYE_OPEN, true);
+                    if (here.has(ColossalBlock.VARIANT, EYE)) {
+                        here.set(ColossalBlock.VARIANT, EYE_OPEN);
                     }
                 }
             });
             for (Coord found : sampler) {
-                found.setIdMd(Core.registry.colossal_block, ColossalBlock.MD_BODY_CRACKED /* Unlike the case above, we DO want MD_BODY_CRACKED. I know you're going to mess this up. Don't do it. */, true);
+                found.set(ColossalBlock.VARIANT, BODY_CRACKED);
+                // Unlike the case above, we DO want MD_BODY_CRACKED. I know you're going to mess this up. Don't do it.
             }
             int newCracks = sampler.size();
             int destroyed = controller.getDestroyedCracks();
@@ -356,8 +355,7 @@ public enum Technique implements IStateMachine<Technique> {
         }
         
         boolean isExposedSkin(Coord cell) {
-            if (cell.getBlock() != Core.registry.colossal_block) return false;
-            if (cell.getMd() != ColossalBlock.MD_BODY) return false;
+            if (!cell.has(ColossalBlock.VARIANT, BODY)) return false;
             for (EnumFacing dir : EnumFacing.VALUES) {
                 Coord n = cell.add(dir);
                 if (n.isAir() || n.isReplacable()) return true;
@@ -907,11 +905,7 @@ public enum Technique implements IStateMachine<Technique> {
                     @Override
                     public void handle(Coord here) {
                         if (here.isAir()) return;
-                        if (here.getBlock() == Core.registry.colossal_block) {
-                            int md = here.getMd();
-                            if (md == ColossalBlock.MD_MASK) return;
-                            if (md == ColossalBlock.MD_CORE) return;
-                        }
+                        if (here.has(ColossalBlock.VARIANT, MASK, CORE)) return;
                         sampler.give(here.copy());
                     }
                 });
@@ -937,8 +931,7 @@ public enum Technique implements IStateMachine<Technique> {
             int md = src.getMd();
             float explosionPower = 2F;
             float explodeChance = 0.125F;
-            if (b == Core.registry.colossal_block && md == ColossalBlock.MD_EYE) {
-                explodeChance = 1;
+            if (src.has(ColossalBlock.VARIANT, EYE_OPEN, EYE)) {
                 explodeChance = 4;
             }
             if (src.w.rand.nextFloat() < explodeChance) {
@@ -954,8 +947,8 @@ public enum Technique implements IStateMachine<Technique> {
                 return;
             }
             TransferLib.move(src, dest, true, true);
-            EntityFallingBlock sand = new EntityFallingBlock(dest.w, dest.x, dest.y, dest.z, dest.getId(), dest.getMd());
-            sand.field_145812_b = 1; // "Time" field. This is set to make it not suicide immediately.
+            EntityFallingBlock sand = new EntityFallingBlock(dest.w, dest.x, dest.y, dest.z, dest.getState());
+            sand.fallTime = 1; // This is set to make it not suicide immediately.
             dest.setAir();
             double gs = 1.0/20.0;
             sand.motionX = 0; //dest.w.rand.nextGaussian() * gs;
@@ -976,7 +969,7 @@ public enum Technique implements IStateMachine<Technique> {
         
         @Override
         public void onEnterState(final ColossusController controller, Technique prevState) {
-            final ArrayList<Entity> lmps = new ArrayList();
+            final ArrayList<Entity> debris = new ArrayList<Entity>();
             for (final LimbInfo li : controller.limbs) {
                 final IDeltaChunk idc = li.idc.getEntity();
                 Coord min = idc.getCorner();
@@ -985,33 +978,33 @@ public enum Technique implements IStateMachine<Technique> {
                     @Override
                     public void handle(Coord here) {
                         if (here.getBlock() != Core.registry.colossal_block) return;
-                        int md = here.getMd();
+                        ColossalBlock.MD md = (MD) here.getProperty(ColossalBlock.VARIANT);
+                        if (md == null) return;
                         switch (md) {
                         default: return;
-                        case ColossalBlock.MD_EYE:
-                        case ColossalBlock.MD_BODY_CRACKED:
-                        case ColossalBlock.MD_CORE:
+                        case EYE:
+                        case BODY_CRACKED:
+                        case CORE:
                             here.setAir();
                             Vec3 core = idc.shadow2real(here.createVector().addVector(0.5, 0.5, 0.5));
                             controller.worldObj.newExplosion(null, core.xCoord, core.yCoord, core.zCoord, 0.25F, false, true);
-                            if (md == ColossalBlock.MD_CORE) {
+                            if (md == ColossalBlock.MD.CORE) {
                                 ItemStack lmp = new ItemStack(Core.registry.logicMatrixProgrammer);
                                 EntityItem ei = new EntityItem(controller.worldObj, core.xCoord, core.yCoord, core.zCoord, lmp);
                                 ei.invulnerable = true;
                                 ei.motionY = 1;
-                                lmps.add(ei);
+                                debris.add(ei);
                                 EntityFireworkRocket flare = new EntityFireworkRocket(controller.worldObj, core.xCoord, core.yCoord, core.zCoord, null);
-                                lmps.add(flare);
+                                debris.add(flare);
                             }
                             break;
-                        case ColossalBlock.MD_MASK:
+                        case MASK:
                             here.setAir();
-                            Coord real = here.copy();
-                            idc.shadow2real(real);
+                            Coord real = idc.shadow2real(here);
                             if (real.isReplacable()) {
-                                EntityFallingBlock mask = new EntityFallingBlock(real.w, real.x, real.y, real.z, Core.registry.colossal_block, ColossalBlock.MD_MASK);
-                                mask.field_145812_b = 1; // "Time" field. This is set to make it not suicide immediately.
-                                lmps.add(mask);
+                                EntityFallingBlock mask = new EntityFallingBlock(real.w, real.x, real.y, real.z, here.getState());
+                                mask.fallTime = 1; // This is set to make it not suicide immediately.
+                                debris.add(mask);
                             }
                             break;
                         }
@@ -1019,8 +1012,8 @@ public enum Technique implements IStateMachine<Technique> {
                 });
             }
             
-            // This is so that they don't get blown up by the core explosion
-            for (Entity l : lmps) {
+            // This happens later so that they don't get blown up by the core explosion
+            for (Entity l : debris) {
                 l.worldObj.spawnEntityInWorld(l);
             }
             
@@ -1045,8 +1038,8 @@ public enum Technique implements IStateMachine<Technique> {
             Coord.iterateCube(controller.body.getCorner(), controller.body.getFarCorner(), new ICoordFunction() {
                 @Override
                 public void handle(Coord here) {
-                    if (here.getBlock() == Core.registry.colossal_block && here.getMd() == ColossalBlock.MD_EYE) {
-                        here.setMd(ColossalBlock.MD_EYE_OPEN, true);
+                    if (here.has(ColossalBlock.VARIANT, EYE)) {
+                        here.set(ColossalBlock.VARIANT, EYE_OPEN);
                     }
                 }
             });
@@ -1096,8 +1089,8 @@ public enum Technique implements IStateMachine<Technique> {
                 for (LimbInfo limb : controller.limbs) {
                     IDeltaChunk idc = limb.idc.getEntity();
                     if (idc == null) continue;
-                    final Coord corner = idc.shadow2realCoord(idc.getCorner());
-                    final Coord farCorner = idc.shadow2realCoord(idc.getFarCorner());
+                    final Coord corner = idc.shadow2real(idc.getCorner());
+                    final Coord farCorner = idc.shadow2real(idc.getFarCorner());
                     Coord.sort(corner, farCorner);
                     if (min == null) {
                         min = corner;
@@ -1113,8 +1106,7 @@ public enum Technique implements IStateMachine<Technique> {
                     @Override
                     public void handle(Coord here) {
                         if (world.rand.nextInt(5) > 0) return;
-                        //sendParticlePacket(String particleName, double x, double y, double z, int particleCount, double R, double G, double B, double blastRange)
-                        world.func_147487_a("portal", here.x, here.y, here.z, 1, 0, 4, 0, 1);
+                        world.spawnParticle(EnumParticleTypes.PORTAL, true, here.x, here.y, here.z, 1.0, 0.0, 4.0, 0, 1);
                     }
                 });
                 return DEAD;
@@ -1124,9 +1116,7 @@ public enum Technique implements IStateMachine<Technique> {
                 Coord.iterateCube(controller.body.getCorner(), controller.body.getFarCorner(), new ICoordFunction() {
                     @Override
                     public void handle(Coord here) {
-                        if (here.getBlock() != Core.registry.colossal_block) return;
-                        final int md = here.getMd();
-                        if (md == ColossalBlock.MD_EYE || md == ColossalBlock.MD_EYE_OPEN) {
+                        if (here.has(ColossalBlock.VARIANT, MD.EYE, MD.EYE_OPEN)) {
                             eyes.give(here.copy());
                         }
                     }
@@ -1263,20 +1253,13 @@ public enum Technique implements IStateMachine<Technique> {
         int d = 64;
         Coord min = at.add(-d, -d, -d);
         Coord max = at.add(+d, +d, +d);
-        Coord.iterateChunks(min, max, new ICoordFunction() {
+        controller.worldObj.getEntitiesWithinAABB(EntityCreeper.class, SpaceUtil.newBox(min, max), new Predicate<EntityCreeper>() {
             @Override
-            public void handle(Coord here) {
-                if (!here.blockExists()) return;
-                for (List list : here.getChunk().entityLists) {
-                    for (Object obj : list) {
-                        if (obj instanceof EntityCreeper) {
-                            EntityCreeper creeper = (EntityCreeper) obj;
-                            if (creeper.getEntityData().getBoolean(ColossusController.creeper_tag)) {
-                                creeper.setHealth(0);
-                            }
-                        }
-                    }
+            public boolean apply(EntityCreeper input) {
+                if (input.getEntityData().getBoolean(ColossusController.creeper_tag)) {
+                    input.setHealth(0);
                 }
+                return false;
             }
         });
     }

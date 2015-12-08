@@ -46,10 +46,6 @@ public final class SpaceUtil {
         return new DeltaCoord(dx, 0, dz);
     }
 
-    public static byte getOpposite(int dir) {
-        return (byte) SpaceUtil.getOrientation(dir).getOpposite().ordinal();
-    }
-
     public static Vec3 newvec() {
         return new Vec3(0, 0, 0);
     }
@@ -242,6 +238,10 @@ public final class SpaceUtil {
     public static AxisAlignedBB createAABB(Coord min, Coord max) {
         return new AxisAlignedBB(min.x, min.y, min.z,
                 max.x, max.y, max.z);
+    }
+
+    public static AxisAlignedBB newBox(Coord min, Coord max) {
+        return createAABB(min, max);
     }
 
     public static AxisAlignedBB addCoord(AxisAlignedBB box, Vec3 vec) {

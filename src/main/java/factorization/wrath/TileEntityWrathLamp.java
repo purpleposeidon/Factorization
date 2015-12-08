@@ -6,6 +6,7 @@ import factorization.shared.BlockClass;
 import factorization.shared.Core;
 import factorization.shared.TileEntityCommon;
 import net.minecraft.block.Block;
+import net.minecraft.block.material.Material;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
@@ -24,7 +25,6 @@ import java.util.PriorityQueue;
 
 public class TileEntityWrathLamp extends TileEntityCommon implements ITickable {
     static final int radius = 6;
-    static final int radiusSq = radius * radius;
     static final int diameter = radius * 2;
     static final int maxDepth = 24; //XXX TODO
     private short beamDepths[] = new short[(diameter + 1) * (diameter + 1)];
@@ -122,13 +122,16 @@ public class TileEntityWrathLamp extends TileEntityCommon implements ITickable {
                 toVisit.add(world.getChunkFromBlockCoords(dpos));
             }
         }
+        int x = pos.getX();
+        int y = pos.getY();
+        int z = pos.getZ();
         for (Chunk chunk : toVisit) {
             for (Object o : chunk.chunkTileEntityMap.values()) {
                 if (!(o instanceof TileEntityWrathLamp)) {
                     continue;
                 }
                 TileEntityWrathLamp lamp = (TileEntityWrathLamp) o;
-                if (lamp.lightsBlock(pos)) {
+                if (lamp.lightsBlock(x, y, z)) {
                     // NOTE: It's possible for two lamps to overlap eachother...
                     return lamp;
                 }
@@ -137,7 +140,7 @@ public class TileEntityWrathLamp extends TileEntityCommon implements ITickable {
         return null;
     }
 
-    private boolean inArea(BlockPos pos) {
+    private boolean inArea(int x, int y, int z) {
         if (y > pos.getY()) {
             return false;
         }
@@ -147,8 +150,8 @@ public class TileEntityWrathLamp extends TileEntityCommon implements ITickable {
         return pos.getX() - radius <= x && x <= pos.getX() + radius && pos.getZ() - radius <= z && z <= pos.getZ() + radius;
     }
 
-    private boolean lightsBlock(BlockPos pos) {
-        if (!inArea(pos)) {
+    private boolean lightsBlock(int x, int y, int z) {
+        if (!inArea(x, y, z)) {
             return false;
         }
         int depth = beamDepths[getDepthIndex(x, z)];
@@ -172,16 +175,10 @@ public class TileEntityWrathLamp extends TileEntityCommon implements ITickable {
         invalidating.set(Boolean.TRUE);
         try {
             Core.profileStart("WrathLamp");
-            for (int x = pos.getX() - radius; x <= pos.getX() + radius; x++) {
-                for (int z = pos.getZ() - radius; z <= pos.getZ() + radius; z++) {
-                    Block id = worldObj.getBlock(x, pos.getY(), z);
-                    if (id == Core.registry.lightair_block) {
-                        if (worldObj.isRemote) {
-                            worldObj.setBlockToAir(x, pos.getY(), z);
-                        } else {
-                            worldObj.setBlock(x, pos.getY(), z, Blocks.air);
-                        }
-                    }
+            for (BlockPos bp : BlockPos.getAllInBoxMutable(pos.add(-radius, pos.getY(), -radius), pos.add(radius, pos.getY(), radius))) {
+                Block id = worldObj.getBlock(bp);
+                if (id == Core.registry.lightair_block) {
+                    worldObj.setBlockToAir(bp);
                 }
             }
             Core.profileEnd();
@@ -193,14 +190,6 @@ public class TileEntityWrathLamp extends TileEntityCommon implements ITickable {
         } finally {
             invalidating.remove();
         }
-    }
-
-    double dist(BlockPos pos) {
-        return Math.sqrt(x * x + y * y + z * z);
-    }
-
-    boolean eq(double a, double b) {
-        return Math.abs(a - b) < 0.9;
     }
 
     float div(int a, int b) {
@@ -215,11 +204,14 @@ public class TileEntityWrathLamp extends TileEntityCommon implements ITickable {
         float idealm = div(dz, dx);
 
         float old_dist = Float.MAX_VALUE;
+        int Y = pos.getY();
+        BlockPos.MutableBlockPos probe = new BlockPos.MutableBlockPos();
         while (true) {
             if (x == pos.getX() && z == pos.getZ()) {
                 return true;
             }
-            Block id = worldObj.getBlock(x, pos.getY(), z);
+            probe.func_181079_c(x, Y, z);
+            Block id = worldObj.getBlock(probe);
             if (id != null && id.isOpaqueCube() && id.getLightOpacity() != 0) {
                 return false;
             }
@@ -250,7 +242,7 @@ public class TileEntityWrathLamp extends TileEntityCommon implements ITickable {
 
     }
 
-    boolean clearTo(BlockPos pos) {
+    boolean clearTo(int x, int y, int z) {
         return myTrace(x, z);
     }
 
@@ -309,38 +301,40 @@ public class TileEntityWrathLamp extends TileEntityCommon implements ITickable {
                 }
             }
             //NORELEASE: I've probably messed this up
-            for (int x = pos.getX() - radius; x <= pos.getX() + radius; x++) {
-                for (int z = pos.getZ() - radius; z <= pos.getZ() + radius; z++) {
-                    // If it is air, make it LightAir™
-                    // If already lightair, carry on
-                    // if a (solid?) block, stop
-                    int index = getDepthIndex(x, z);
-                    if (beamDepths[index] != 0) {
-                        continue;
-                    }
-                    Block block = worldObj.getBlock(x, height, z);
-                    Block belowBlock = worldObj.getBlock(x, height - 3, z);
-                    if (belowBlock != Core.registry.lightair_block && height != pos.getY()) {
-                        beamDepths[index] = (short) height;
-                        continue;
-                    }
+            BlockPos lamp = TileEntityWrathLamp.this.getPos();
+            BlockPos.MutableBlockPos belowPos = new BlockPos.MutableBlockPos();
+            for (BlockPos pos : BlockPos.getAllInBoxMutable(lamp.add(-radius, height, -radius), lamp.add(+radius, height, +radius))) {
+                // If it is air, make it LightAir™
+                // If already lightair, carry on
+                // if a (solid?) block, stop
+                int index = getDepthIndex(pos.getX(), pos.getZ());
+                if (beamDepths[index] != 0) {
+                    continue;
+                }
+                Block block = worldObj.getBlock(pos);
+                belowPos.func_181079_c(pos.getX(), height - 3, pos.getZ());
+                Block belowBlock = worldObj.getBlock(belowPos);
+                if (belowBlock != Core.registry.lightair_block && height != pos.getY()) {
+                    beamDepths[index] = (short) height;
+                    continue;
+                }
                     /*if (block == 0 && worldObj.getBlock(x, height - 1, z) == Blocks.cobblestone_wall) {
                         block = -1;
                     }*/
-                    if (worldObj.getBlock(x, height, z) == Blocks.air) {
-                        //Nice work, Mojang. If we didn't do this the hard way, the client will lag very badly near chunks that are unloaded.
-                        //XXX TODO FIXME: Seems a bit difficult. What's the right way to do this?
-                        Chunk chunk = worldObj.getChunkFromBlockCoords(x, z);
-                        chunk.func_150807_a(x & 15, height, z & 15, Core.registry.lightair_block, 0);
-                        worldObj.markBlockForUpdate(x, height, z);
-                    } else if (block == Core.registry.lightair_block) {
-                    } else if (x == pos.getX() && height == pos.getY() && z == pos.getZ()) {
-                        //this is ourself. Hi, self.
-                        //Don't terminate the beamDepth early.
-                    } else {
-                        beamDepths[index] = (short) height;
-                    }
-
+                if (block == Core.registry.lightair_block) {
+                    //noinspection UnnecessaryContinue
+                    continue;
+                } else if (block.getMaterial() == Material.air) {
+                    //Nice work, Mojang. If we didn't do this the hard way, the client will lag very badly near chunks that are unloaded.
+                    //XXX TODO FIXME: Seems a bit difficult. What's the right way to do this?
+                    Chunk chunk = worldObj.getChunkFromBlockCoords(pos);
+                    chunk.setBlockState(pos, Blocks.air.getDefaultState());
+                    worldObj.markBlockForUpdate(pos);
+                } else if (TileEntityWrathLamp.this.pos.equals(pos)) {
+                    //this is ourself. Hi, self.
+                    //Don't terminate the beamDepth early.
+                } else {
+                    beamDepths[index] = (short) height;
                 }
             }
 
@@ -408,17 +402,15 @@ public class TileEntityWrathLamp extends TileEntityCommon implements ITickable {
         @Override
         public void onUpdate() {
             delay -= 1;
-            if (delay == 0) {
-                int r = radius + 15;
-                for (int x = (int) (posX - r); x <= posX + r; x++) {
-                    for (int z = (int) (posZ - r); z <= posZ + r; z++) {
-                        for (int y = (int) posY; y >= posY - maxDepth; y--) {
-                            worldObj.func_147451_t(pos);
-                        }
-                    }
-                }
-                this.setDead();
+            if (delay != 0) {
+                return;
             }
+            int r = radius + 15;
+            BlockPos lamp = new BlockPos(this);
+            for (BlockPos pos : BlockPos.getAllInBoxMutable(lamp.add(-r, -maxDepth, -r), lamp.add(+r, 0, +r))) {
+                worldObj.checkLight(pos);
+            }
+            this.setDead();
         }
     }
 

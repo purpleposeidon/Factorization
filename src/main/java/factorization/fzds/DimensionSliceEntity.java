@@ -139,9 +139,9 @@ public class DimensionSliceEntity extends IDeltaChunk implements IFzdsEntryContr
     }
 
     @Override
-    public Coord shadow2real(Coord c) {
+    public Coord shadow2real(Coord shadow) {
         double d = 1.0;
-        Vec3 vec = new Vec3(c.x + d, c.y + d, c.z + d);
+        Vec3 vec = new Vec3(shadow.x + d, shadow.y + d, shadow.z + d);
         return new Coord(worldObj, shadow2real(vec));
     }
     
@@ -275,8 +275,7 @@ public class DimensionSliceEntity extends IDeltaChunk implements IFzdsEntryContr
         Vec3 max = SpaceUtil.getHighest(corners);
         realArea = SpaceUtil.newBox(min, max);
         setEntityBoundingBox(realArea);
-        if (metaAABB == null) metaAABB = new MetaAxisAlignedBB(this, cornerMin.w);
-        metaAABB.setUnderlying(realArea);
+        metaAABB = new MetaAxisAlignedBB(this, cornerMin.w, realArea);
         needAreaUpdate = false;
     }
     

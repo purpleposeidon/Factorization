@@ -472,7 +472,7 @@ public class SocketPoweredCrank extends TileEntitySocketBase implements IChargeC
     }
 
     @Override
-    public boolean breakBlock(IDeltaChunk idc, EntityPlayer player, Coord at, byte sideHit) {
+    public boolean breakBlock(IDeltaChunk idc, EntityPlayer player, Coord at, EnumFacing sideHit) {
         Coord anchorPoint = getAnchorBlock();
         if (anchorPoint == null) return false;
         if (anchorPoint.equals(at)) {
@@ -483,12 +483,12 @@ public class SocketPoweredCrank extends TileEntitySocketBase implements IChargeC
     }
 
     @Override
-    public boolean hitBlock(IDeltaChunk idc, EntityPlayer player, Coord at, byte sideHit) {
+    public boolean hitBlock(IDeltaChunk idc, EntityPlayer player, Coord at, EnumFacing sideHit) {
         return false;
     }
 
     @Override
-    public boolean useBlock(IDeltaChunk idc, EntityPlayer player, Coord at, byte sideHit) {
+    public boolean useBlock(IDeltaChunk idc, EntityPlayer player, Coord at, EnumFacing sideHit) {
         return false;
     }
 

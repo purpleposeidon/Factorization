@@ -5,6 +5,7 @@ import net.minecraft.block.Block;
 import net.minecraft.init.Blocks;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.BlockPos;
 import net.minecraft.world.ChunkPosition;
 import net.minecraft.world.EnumSkyBlock;
 import net.minecraft.world.NextTickListEntry;
@@ -56,12 +57,13 @@ public class TransferLib {
             if (c.y >= chunk.precipitationHeightMap[xzIndex] - 1) {
                 chunk.precipitationHeightMap[xzIndex] = -999;
             }
-            
-            TileEntity te = chunk.getTileEntityUnsafe(blockXChunk, c.y, blockZChunk);
+
+            BlockPos pos = c.toBlockPos();
+            TileEntity te = chunk.getTileEntity(pos, Chunk.EnumCreateEntityType.CHECK);
             if (te != null) {
-                chunk.worldObj.removeTileEntity(c.x, c.y, c.z);
+                chunk.removeTileEntity(pos);
             }
-            
+
             final int origColumHeight = chunk.heightMap[xzIndex];
             final Block origBlock = chunk.getBlock(blockXChunk, c.y, blockZChunk);
             final int origMd = chunk.getBlockMetadata(blockXChunk, c.y, blockZChunk);

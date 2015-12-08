@@ -13,9 +13,9 @@ class DSTeleporter extends Teleporter {
     public DSTeleporter(WorldServer par1WorldServer) {
         super(par1WorldServer);
     }
-    
+
     @Override
-    public void placeInPortal(Entity player, double par2, double par4, double par6, float par8) {
+    public void placeInPortal(Entity player, float rotationYaw) {
         if (preciseDestination != null) {
             player.posX = preciseDestination.xCoord;
             player.posY = preciseDestination.yCoord;
@@ -24,4 +24,5 @@ class DSTeleporter extends Teleporter {
         }
         destination.setAsEntityLocation(player);
     }
+
 }

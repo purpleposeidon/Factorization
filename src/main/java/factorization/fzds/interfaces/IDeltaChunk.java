@@ -5,11 +5,14 @@ import factorization.api.Quaternion;
 import factorization.shared.EntityFz;
 import factorization.util.SpaceUtil;
 import net.minecraft.util.AxisAlignedBB;
+import net.minecraft.util.BlockPos;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.Vec3;
 import net.minecraft.world.World;
 
 import java.util.List;
+
+import javax.annotation.CheckReturnValue;
 
 import static factorization.fzds.interfaces.DeltaCapability.*;
 
@@ -207,36 +210,50 @@ public abstract class IDeltaChunk extends EntityFz {
      * @param realVector A {@link Vec3} in real-world coordinates.
      * @return a new {@link Vec3} in shadow coordinates with translations & rotations applied.
      */
+    @CheckReturnValue
     public abstract Vec3 real2shadow(final Vec3 realVector);
 
     /**
      * @param shadowVector A {@link Vec3} in shadow coordinates
      * @return a new {@link Vec3} in real-world coordinates with translations & rotations unapplied
      */
+    @CheckReturnValue
     public abstract Vec3 shadow2real(final Vec3 shadowVector);
 
-    public Coord shadow2real(Coord realCoord) {
-        Coord ret = realCoord.copy();
-        shadow2real(ret);
-        return ret;
+    @CheckReturnValue
+    public Coord real2shadow(Coord real) {
+        Vec3 s = real2shadow(real.toMiddleVector());
+        return new Coord(worldObj, (int) Math.floor(s.xCoord), (int) Math.floor(s.yCoord), (int) Math.floor(s.zCoord));
     }
 
-    public Coord shadow2realPrecise(Coord real) {
-        Vec3 r = real.toMiddleVector();
-        Vec3 s = shadow2real(r);
-        return new Coord(worldObj, (int) Math.floor(s.xCoord), (int) Math.floor(s.yCoord), (int) Math.floor(s.zCoord));
+    @CheckReturnValue
+    public Coord shadow2real(Coord shadow) {
+        Vec3 r = shadow2real(shadow.toMiddleVector());
+        return new Coord(worldObj, (int) Math.floor(r.xCoord), (int) Math.floor(r.yCoord), (int) Math.floor(r.zCoord));
+    }
+
+    @CheckReturnValue
+    public BlockPos real2shadow(BlockPos real) {
+        return new BlockPos(real2shadow(new Vec3(real)));
+    }
+
+    @CheckReturnValue
+    public BlockPos shadow2real(BlockPos shadow) {
+        return new BlockPos(shadow2real(new Vec3(shadow)));
     }
 
     /**
      * @param shadowBox Box to convert from shadow space to real space.
      * @return The real-space box. Warning: not guaranteed to match MetaAABB's converted collision box!
      */
+    @CheckReturnValue
     public abstract AxisAlignedBB shadow2real(AxisAlignedBB shadowBox);
 
     /**
      * @param realBox Box to convert from real space to shadow space.
      * @return The shadow-space box. Warning: Not guaranteed to match MetaAABB's converted collision box!
      */
+    @CheckReturnValue
     public abstract AxisAlignedBB real2shadow(AxisAlignedBB realBox);
 
     /**
@@ -244,6 +261,7 @@ public abstract class IDeltaChunk extends EntityFz {
      * @param dir EnumFacing in shadow space
      * @return dir with rotation applied. Slight possibility for it to be the UNKNOWN direction.
      */
+    @CheckReturnValue
     public EnumFacing shadow2real(EnumFacing dir) {
         Vec3 v = SpaceUtil.fromDirection(dir);
         getRotation().applyRotation(v);
@@ -255,6 +273,7 @@ public abstract class IDeltaChunk extends EntityFz {
      * @param dir EnumFacing in real space
      * @return dir with reverse-rotation applied. Slight possibility for it to be the UNKNOWN direction.
      */
+    @CheckReturnValue
     public EnumFacing real2shadow(EnumFacing dir) {
         Vec3 v = SpaceUtil.fromDirection(dir);
         getRotation().applyReverseRotation(v);

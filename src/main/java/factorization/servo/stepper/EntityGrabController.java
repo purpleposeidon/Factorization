@@ -96,7 +96,7 @@ public class EntityGrabController extends EntityFz implements IDCController {
         EnumFacing up = EnumFacing.UP;
         EnumFacing south = EnumFacing.SOUTH;
         EnumFacing east = EnumFacing.EAST;
-        final Coord realStart = idc.shadow2realCoord(min);
+        final Coord realStart = idc.shadow2real(min);
         DeltaCoord range = max.difference(min);
 
         // Rotate our axiis
@@ -130,9 +130,9 @@ public class EntityGrabController extends EntityFz implements IDCController {
     transient AxisAlignedBB hitReal, hitShadow;
 
     @Override public boolean placeBlock(IDeltaChunk idc, EntityPlayer player, Coord at) { return true; }
-    @Override public boolean breakBlock(IDeltaChunk idc, EntityPlayer player, Coord at, byte sideHit) { return true; }
-    @Override public boolean hitBlock(IDeltaChunk idc, EntityPlayer player, Coord at, byte sideHit) { return true; }
-    @Override public boolean useBlock(IDeltaChunk idc, EntityPlayer player, Coord at, byte sideHit) { return true; }
+    @Override public boolean breakBlock(IDeltaChunk idc, EntityPlayer player, Coord at, EnumFacing sideHit) { return true; }
+    @Override public boolean hitBlock(IDeltaChunk idc, EntityPlayer player, Coord at, EnumFacing sideHit) { return true; }
+    @Override public boolean useBlock(IDeltaChunk idc, EntityPlayer player, Coord at, EnumFacing sideHit) { return true; }
     @Override public void beforeUpdate(IDeltaChunk idc) {
         Entity holder = holderRef.getEntity();
         if (holder == null) {
@@ -151,8 +151,8 @@ public class EntityGrabController extends EntityFz implements IDCController {
     }
     @Override public boolean onAttacked(IDeltaChunk idc, DamageSource damageSource, float damage) { return false; }
     @Override public CollisionAction collidedWithWorld(World realWorld, AxisAlignedBB realBox, World shadowWorld, AxisAlignedBB shadowBox) {
-        hitReal = realBox.copy();
-        hitShadow = shadowBox.copy();
+        hitReal = realBox;
+        hitShadow = shadowBox;
         return CollisionAction.STOP_INSIDE;
     }
 

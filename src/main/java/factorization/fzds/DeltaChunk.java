@@ -242,10 +242,8 @@ public class DeltaChunk {
     public static void paste(IDeltaChunk selected, boolean overwriteDestination) {
         Coord a = new Coord(DeltaChunk.getServerShadowWorld(), 0, 0, 0);
         Coord b = a.copy();
-        Vec3 vShadowMin = new Vec3(0, 0, 0);
-        Vec3 vShadowMax = new Vec3(0, 0, 0);
-        selected.getCorner().setAsVector(vShadowMin);
-        selected.getFarCorner().setAsVector(vShadowMax);
+        Vec3 vShadowMin = selected.getCorner().toVector();
+        Vec3 vShadowMax = selected.getFarCorner().toVector();
         a.set(vShadowMin);
         b.set(vShadowMax);
         Coord dest = new Coord(selected);
@@ -253,16 +251,17 @@ public class DeltaChunk {
         
         int minX = 0, minY = 0, minZ = 0, maxX = 0, maxY = 0, maxZ = 0;
         boolean first = true;
-        
+
+        BlockPos.MutableBlockPos tmp = new BlockPos.MutableBlockPos();
         for (int x = a.x; x <= b.x; x++) {
             for (int y = a.y; y <= b.y; y++) {
                 for (int z = a.z; z <= b.z; z++) {
-                    c.set(a.w, pos);
+                    c.set(a.w, x, y, z);
                     if (c.isAir()) continue;
                     dest.set(c);
                     selected.shadow2real(dest);
                     TransferLib.move(c, dest, false, overwriteDestination);
-                    dest.w.markBlockForUpdate(dest.x, dest.y, dest.z);
+                    dest.w.markBlockForUpdate(dest.copyTo(tmp));
                     if (first) {
                         minX = maxX = x;
                         minY = maxY = y;
@@ -284,20 +283,18 @@ public class DeltaChunk {
     public static void clear(IDeltaChunk selected) {
         Coord a = new Coord(DeltaChunk.getServerShadowWorld(), 0, 0, 0);
         Coord b = a.copy();
-        Vec3 vShadowMin = new Vec3(0, 0, 0);
-        Vec3 vShadowMax = new Vec3(0, 0, 0);
-        selected.getCorner().setAsVector(vShadowMin);
-        selected.getFarCorner().setAsVector(vShadowMax);
+        Vec3 vShadowMin = selected.getCorner().toVector();
+        Vec3 vShadowMax = selected.getFarCorner().toVector();
         a.set(vShadowMin);
         b.set(vShadowMax);
         
         Coord c = new Coord(a.w, 0, 0, 0);
+        BlockPos.MutableBlockPos tmp = new BlockPos.MutableBlockPos();
         for (int x = a.x; x < b.x; x++) {
             for (int y = a.y; y < b.y; y++) {
                 for (int z = a.z; z < b.z; z++) {
-                    c.set(a.w, pos);
-                    selected.shadow2real(c);
-                    c.markBlockForUpdate();
+                    c.set(a.w, x, y, z);
+                    selected.shadow2real(c).markBlockForUpdate();
                 }
             }
         }

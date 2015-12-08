@@ -45,7 +45,7 @@ public class GlintRenderer extends TileEntitySpecialRenderer {
         GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
         
         Tessellator tess = Tessellator.instance;
-        Block block = Block.instance;
+        Block block = Core.registry.clientTraceHelper;
         EntityPlayer player = mc.thePlayer;
         
         Vec3 lookVec = player.getLook(partial).normalize();

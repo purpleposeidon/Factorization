@@ -15,10 +15,7 @@ import factorization.util.LangUtil;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.boss.IBossDisplayData;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.util.AxisAlignedBB;
-import net.minecraft.util.ChatComponentTranslation;
-import net.minecraft.util.DamageSource;
-import net.minecraft.util.IChatComponent;
+import net.minecraft.util.*;
 import net.minecraft.world.EnumDifficulty;
 import net.minecraft.world.World;
 
@@ -485,7 +482,7 @@ public class ColossusController extends EntityFz implements IBossDisplayData, ID
     }
 
     @Override
-    public boolean breakBlock(IDeltaChunk idc, EntityPlayer player, Coord at, byte sideHit) {
+    public boolean breakBlock(IDeltaChunk idc, EntityPlayer player, Coord at, EnumFacing sideHit) {
         if (at.getBlock() != Core.registry.colossal_block) return false;
         int md = at.getMd();
         if (md == ColossalBlock.MD_MASK_CRACKED || md == ColossalBlock.MD_BODY_CRACKED) {
@@ -495,12 +492,12 @@ public class ColossusController extends EntityFz implements IBossDisplayData, ID
     }
 
     @Override
-    public boolean hitBlock(IDeltaChunk idc, EntityPlayer player, Coord at, byte sideHit) {
+    public boolean hitBlock(IDeltaChunk idc, EntityPlayer player, Coord at, EnumFacing sideHit) {
         return false;
     }
 
     @Override
-    public boolean useBlock(IDeltaChunk idc, EntityPlayer player, Coord at, byte sideHit) {
+    public boolean useBlock(IDeltaChunk idc, EntityPlayer player, Coord at, EnumFacing sideHit) {
         return false;
     }
 

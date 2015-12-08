@@ -45,16 +45,12 @@ public class TileEntityCompressionCrafter extends TileEntityCommon implements IT
     }
     
     byte progress = 0;
-    byte b_facing = (byte) EnumFacing.UP.ordinal();
+    EnumFacing facing = EnumFacing.UP;
     boolean isCrafterRoot = false;
     boolean powered = false;
     public Coord upperCorner, lowerCorner;
     public EnumFacing craftingAxis = EnumFacing.UP;
-    
-    public EnumFacing getFacing() {
-        return SpaceUtil.getOrientation(b_facing);
-    }
-    
+
     public float getProgressPerc() {
         if (progress == 0) {
             return 0;
@@ -72,7 +68,7 @@ public class TileEntityCompressionCrafter extends TileEntityCommon implements IT
     @Override
     public void putData(DataHelper data) throws IOException {
         progress = data.as(Share.PRIVATE, "prog").putByte(progress);
-        b_facing = data.as(Share.VISIBLE, "dir").putByte(b_facing);
+        facing = data.as(Share.VISIBLE, "dir").putEnum(facing); // This used to be a byte. Hopefully it'll load!
         isCrafterRoot = data.as(Share.VISIBLE, "root").putBoolean(isCrafterRoot);
         powered = data.as(Share.PRIVATE, "rs").putBoolean(powered);
         buffer = data.as(Share.PRIVATE, "buff").putItemList(buffer);
@@ -81,13 +77,13 @@ public class TileEntityCompressionCrafter extends TileEntityCommon implements IT
     @Override
     public void onPlacedBy(EntityPlayer player, ItemStack is, EnumFacing side, float hitX, float hitY, float hitZ) {
         super.onPlacedBy(player, is, side, hitX, hitY, hitZ);
-        b_facing = SpaceUtil.getOpposite(SpaceUtil.determineOrientation(player));
+        facing = SpaceUtil.determineOrientation(player).getOpposite();
     }
     
     @Override
     public void update() {
         if (progress != 0 && progress++ == 20) {
-            if (!worldObj.isRemote && getFacing() != null && isCrafterRoot) {
+            if (!worldObj.isRemote && facing != null && isCrafterRoot) {
                 getStateHelper().craft(false, this);
                 isCrafterRoot = false;
                 boolean signal = worldObj.isBlockPowered(pos); // NORELEASE: Indirect?
@@ -125,7 +121,6 @@ public class TileEntityCompressionCrafter extends TileEntityCommon implements IT
         FzInv[] ret = new FzInv[6*5];
         int i = 0;
         Coord me = getCoord();
-        final EnumFacing facing = getFacing();
         final EnumFacing behind = facing.getOpposite();
         for (EnumFacing fd : EnumFacing.VALUES) {
             if (fd == facing) {
@@ -139,7 +134,7 @@ public class TileEntityCompressionCrafter extends TileEntityCommon implements IT
             } else if (fd != behind) {
                 TileEntityCompressionCrafter neighbor = sc.getTE(TileEntityCompressionCrafter.class);
                 if (neighbor == null) continue;
-                if (neighbor.getFacing() != facing) continue;
+                if (neighbor.facing != facing) continue;
                 //recursiveish search
                 for (EnumFacing nfd : EnumFacing.VALUES) {
                     if (nfd == facing) continue;
@@ -175,7 +170,7 @@ public class TileEntityCompressionCrafter extends TileEntityCommon implements IT
             return true;
         }
         if (messageType == MessageType.CompressionCrafter) {
-            b_facing = input.readByte();
+            facing = EnumFacing.getFront(input.readByte());
             progress = input.readByte();
             return true;
         }
@@ -215,11 +210,8 @@ public class TileEntityCompressionCrafter extends TileEntityCommon implements IT
     
     @Override
     public boolean rotate(EnumFacing axis) {
-        byte new_b = (byte) axis.ordinal();
-        if (new_b == b_facing) {
-            return false;
-        }
-        b_facing = new_b;
+        if (facing == axis) return false;
+        facing = axis;
         return true;
     }
     

@@ -20,19 +20,19 @@ public class Brush {
         }
     }
     
-    BlockState fill;
+    ColossusBuilderBlock fill;
     BrushMask mask;
     DeltaCoord[] points;
     Random rand;
     
-    public Brush(BlockState fill, BrushMask mask, Random rand) {
+    public Brush(ColossusBuilderBlock fill, BrushMask mask, Random rand) {
         this.fill = fill;
         this.mask = mask;
         this.rand = rand;
         points = new DeltaCoord[] {new DeltaCoord(0, 0, 0)};
     }
     
-    public Brush(BlockState fill, BrushMask mask, Random rand, DeltaCoord... points) {
+    public Brush(ColossusBuilderBlock fill, BrushMask mask, Random rand, DeltaCoord... points) {
         this.fill = fill;
         this.mask = mask;
         this.rand = rand;

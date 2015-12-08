@@ -114,13 +114,13 @@ public class TileEntityWindMill extends TileEntityCommon implements IRotationalE
     }
 
     @Override
-    public boolean breakBlock(IDeltaChunk idc, EntityPlayer player, Coord at, byte sideHit) {
+    public boolean breakBlock(IDeltaChunk idc, EntityPlayer player, Coord at, EnumFacing sideHit) {
         dirty = true;
         return false;
     }
 
-    @Override public boolean hitBlock(IDeltaChunk idc, EntityPlayer player, Coord at, byte sideHit) { return false; }
-    @Override public boolean useBlock(IDeltaChunk idc, EntityPlayer player, Coord at, byte sideHit) { return false; }
+    @Override public boolean hitBlock(IDeltaChunk idc, EntityPlayer player, Coord at, EnumFacing sideHit) { return false; }
+    @Override public boolean useBlock(IDeltaChunk idc, EntityPlayer player, Coord at, EnumFacing sideHit) { return false; }
     @Override public void idcDied(IDeltaChunk idc) { }
     @Override public void beforeUpdate(IDeltaChunk idc) { }
     @Override public void afterUpdate(IDeltaChunk idc) { }

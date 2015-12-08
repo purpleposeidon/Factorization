@@ -13,6 +13,7 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.DamageSource;
+import net.minecraft.util.EnumFacing;
 import net.minecraft.util.Vec3;
 import net.minecraft.world.World;
 import org.apache.commons.lang3.ArrayUtils;
@@ -185,7 +186,7 @@ public class MechanicsController implements IDCController {
     }
 
     @Override
-    public boolean breakBlock(IDeltaChunk idc, EntityPlayer player, Coord at, byte sideHit) {
+    public boolean breakBlock(IDeltaChunk idc, EntityPlayer player, Coord at, EnumFacing sideHit) {
         for (IDCController c : constraints) {
             if (c.breakBlock(idc, player, at, sideHit)) return true;
         }
@@ -193,7 +194,7 @@ public class MechanicsController implements IDCController {
     }
 
     @Override
-    public boolean hitBlock(IDeltaChunk idc, EntityPlayer player, Coord at, byte sideHit) {
+    public boolean hitBlock(IDeltaChunk idc, EntityPlayer player, Coord at, EnumFacing sideHit) {
         for (IDCController c : constraints) {
             if (c.hitBlock(idc, player, at, sideHit)) return true;
         }
@@ -201,7 +202,7 @@ public class MechanicsController implements IDCController {
     }
 
     @Override
-    public boolean useBlock(IDeltaChunk idc, EntityPlayer player, Coord at, byte sideHit) {
+    public boolean useBlock(IDeltaChunk idc, EntityPlayer player, Coord at, EnumFacing sideHit) {
         for (IDCController c : constraints) {
             if (c.useBlock(idc, player, at, sideHit)) return true;
         }

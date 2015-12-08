@@ -15,6 +15,7 @@ import factorization.weird.poster.ItemSpawnPoster;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.MapColor;
 import net.minecraft.block.material.Material;
+import net.minecraft.block.properties.PropertyEnum;
 import net.minecraft.client.renderer.texture.IIconRegister;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.EntityLivingBase;
@@ -22,10 +23,8 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.EnumFacing;
+import net.minecraft.util.*;
 import net.minecraft.util.IIcon;
-import net.minecraft.util.MovingObjectPosition;
-import net.minecraft.util.WeightedRandomChestContent;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import net.minecraftforge.common.ChestGenHooks;
@@ -38,7 +37,15 @@ import java.util.Random;
 import java.util.UUID;
 
 public class ColossalBlock extends Block {
-    static final byte MD_MASK = 0, MD_BODY = 4, MD_BODY_CRACKED = 1, MD_ARM = 2, MD_LEG = 3, MD_EYE = 5, MD_CORE = 6, MD_EYE_OPEN = 7, MD_BODY_COVERED = 8, MD_MASK_CRACKED = 9;
+    public enum MD implements IStringSerializable {
+        MASK, BODY, BODY_CRACKED, ARM, LEG, EYE, CORE, EYE_OPEN, BODY_COVERED, MASK_CRACKED;
+
+        @Override
+        public String getName() {
+            return this.toString();
+        }
+    }
+    public static final PropertyEnum VARIANT = PropertyEnum.create("variant", MD.class);
 
     static Material collosal_material = new Material(MapColor.purpleColor);
 
@@ -52,7 +59,7 @@ public class ColossalBlock extends Block {
         setResistance(150);
         setHarvestLevel("pickaxe", 2);
         setStepSound(soundTypePiston);
-        setBlockName("factorization:colossalBlock");
+        setUnlocalizedName("factorization:colossalBlock");
         Core.tab(this, TabType.BLOCKS);
         DeltaChunk.assertEnabled();
     }

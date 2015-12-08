@@ -26,7 +26,7 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.management.ServerConfigurationManager;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.tileentity.TileEntityCommandBlock;
-import net.minecraft.util.ChunkCoordinates;
+import net.minecraft.util.BlockPos;
 import net.minecraft.util.EnumChatFormatting;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.Vec3;
@@ -87,7 +87,7 @@ public class FZDSCommand extends CommandBase {
         IDeltaChunk selected;
         
         /** args: the arguments, not including the name */
-        abstract void call(String[] args);
+        abstract void call(String[] args) throws CommandException;
         
         private void reset() {
             sender = null;
@@ -211,7 +211,7 @@ public class FZDSCommand extends CommandBase {
     }
     
     @Override
-    public void processCommand(ICommandSender sender, String[] args) {
+    public void processCommand(ICommandSender sender, String[] args) throws CommandException {
         if (sender instanceof EntityPlayerMP) {
             EntityPlayerMP player = (EntityPlayerMP) sender;
             boolean op = PlayerUtil.isPlayerOpped(player);
@@ -243,7 +243,7 @@ public class FZDSCommand extends CommandBase {
         currentSelection = new WeakReference<IDeltaChunk>(dse);
     }
     
-    public static Coord parseCoord(World world, String src) {
+    public static Coord parseCoord(World world, String src) throws WrongUsageException {
         ArrayList<Integer> parts = new ArrayList<Integer>();
         for (String part : comma.split(src)) {
             parts.add(Integer.parseInt(part));
@@ -260,7 +260,7 @@ public class FZDSCommand extends CommandBase {
     private static Splitter comma = Splitter.on(",");
     
     private static World visitedWorld;
-    void visitWorld(World w) {
+    void visitWorld(World w) throws CommandException {
         if (visitedWorld == null) {
             visitedWorld = w;
         } else if (visitedWorld != w) {
@@ -268,7 +268,7 @@ public class FZDSCommand extends CommandBase {
         }
     }
     
-    void runSubCommand(SubCommand cmd, ICommandSender sender, String[] args) {
+    void runSubCommand(SubCommand cmd, ICommandSender sender, String[] args) throws CommandException {
         cmd.reset();
         cmd.setup(sender);
         ArrayList<String> cleanedArgs = new ArrayList<String>();
@@ -282,7 +282,7 @@ public class FZDSCommand extends CommandBase {
                 if (!cmd.op) {
                     throw new CommandException("You are not allowed to use arbitrary players");
                 }
-                cmd.player = MinecraftServer.getServer().getConfigurationManager().func_152612_a(a.substring(1));
+                cmd.player = MinecraftServer.getServer().getConfigurationManager().getPlayerByUsername(a.substring(1));
                 if (cmd.player == null) {
                     throw new CommandException("Player not found");
                 }
@@ -290,7 +290,7 @@ public class FZDSCommand extends CommandBase {
             } else if (a.startsWith("#")) {
                 cmd.user = parseCoord(sender.getEntityWorld(), a.substring(1));
                 visitWorld(cmd.user.w);
-            } else if (a.startsWith("@") && first == false && !a.startsWith("@?") && !a.equals("@")) {
+            } else if (a.startsWith("@") && !first && !a.startsWith("@?") && !a.equals("@")) {
                 String name = a.substring(1);
                 Coord replace = positionVariables.get(name);
                 if (replace == null) {
@@ -316,7 +316,7 @@ public class FZDSCommand extends CommandBase {
         if (cmd.needCoord && cmd.user == null) {
             throw new CommandException("No coordinate specified");
         }
-        if (cmd.needOp && cmd.op == false && !Core.dev_environ) {
+        if (cmd.needOp && !cmd.op && !Core.dev_environ) {
             throw new CommandException("Insufficient permissions");
         }
         if (cmd.needSelection && cmd.selected == null) {
@@ -445,7 +445,7 @@ public class FZDSCommand extends CommandBase {
                     targetDimId = Integer.parseInt(args[0]);
                 }
                 World w = DimensionManager.getWorld(targetDimId);
-                ChunkCoordinates target = player.getBedLocation(targetDimId);
+                BlockPos target = player.getBedLocation(targetDimId);
                 if (target == null) {
                     target = w.getSpawnPoint(); 
                 }
@@ -502,7 +502,7 @@ public class FZDSCommand extends CommandBase {
                         for (int x = lower.x; x <= upper.x; x++) {
                             for (int y = lower.y; y <= upper.y; y++) {
                                 for (int z = lower.z; z <= upper.z; z++) {
-                                    here.set(here.w, pos);
+                                    here.set(here.w, x, y, z);
                                     destination.include(here);
                                 }
                             }
@@ -555,7 +555,7 @@ public class FZDSCommand extends CommandBase {
                         for (int x = lower.x; x <= upper.x; x++) {
                             for (int y = lower.y; y <= upper.y; y++) {
                                 for (int z = lower.z; z <= upper.z; z++) {
-                                    here.set(here.w, pos);
+                                    here.set(here.w, x, y, z);
                                     destination.include(here);
                                 }
                             }
@@ -762,7 +762,7 @@ public class FZDSCommand extends CommandBase {
             @Override
             String details() { return "Sets the Slice's rotation"; }
             @Override
-            void call(String[] args) {
+            void call(String[] args) throws CommandException {
                 if (args.length != 2 && args.length != 1) {
                     throw new SyntaxErrorException();
                 }
@@ -833,24 +833,24 @@ public class FZDSCommand extends CommandBase {
                     } else if (type == 'v') {
                         selected.addVelocity(x/20, y/20, z/20);
                     } else if (type == 'r') {
-                        selected.getRotation().incrAdd(new Quaternion(w, pos));
+                        selected.getRotation().incrAdd(new Quaternion(w, x, y, z));
                     } else if (type == 'w') {
-                        selected.getRotationalVelocity().incrAdd(new Quaternion(w, pos));
+                        selected.getRotationalVelocity().incrAdd(new Quaternion(w, x, y, z));
                     } else {
                         sendChat("Not a command?");
                     }
                 } else if (args[0].equals("=")) {
                     if (type == 'd' || type == 's') {
-                        selected.setPosition(pos);
+                        selected.setPosition(x, y, z);
                     } else if (type == 'v') {
                         selected.motionX = 0;
                         selected.motionY = 0;
                         selected.motionZ = 0;
                         selected.addVelocity(x/20, y/20, z/20);
                     } else if (type == 'r') {
-                        selected.setRotation((new Quaternion(w, pos)));
+                        selected.setRotation((new Quaternion(w, x, y, z)));
                     } else if (type == 'w') {
-                        Quaternion omega = (new Quaternion(w, pos));
+                        Quaternion omega = (new Quaternion(w, x, y, z));
                         selected.setRotationalVelocity(omega);
                     } else {
                         sendChat("Not a command?");
@@ -943,7 +943,7 @@ public class FZDSCommand extends CommandBase {
                 return "Set position variables ('@name' gets replaced with position)";
             }
             @Override
-            void call(String[] args) {
+            void call(String[] args) throws WrongUsageException {
                 String name = args[0];
                 Coord val = user;
                 if (args.length == 2) {

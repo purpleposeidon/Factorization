@@ -20,8 +20,10 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.NetHandlerPlayServer;
+import net.minecraft.network.PacketBuffer;
 import net.minecraft.server.management.ItemInWorldManager;
 import net.minecraft.util.BlockPos;
+import net.minecraft.util.EnumFacing;
 import net.minecraft.util.MovingObjectPosition;
 import net.minecraft.util.Vec3;
 import net.minecraft.world.World;
@@ -178,13 +180,14 @@ public class HammerNet {
             int x = dis.readInt();
             int y = dis.readInt();
             int z = dis.readInt();
-            byte sideHit = dis.readByte();
+            BlockPos pos = new BlockPos(x, y, z);
+            EnumFacing sideHit = EnumFacing.getFront(dis.readByte());
             if (type == HammerNetType.digFinish) {
                 breakBlock(idc, player, dis, pos, sideHit);
             } else if (type == HammerNetType.digStart) {
                 punchBlock(idc, player, dis, pos, sideHit);
             }
-            idc.blocksChanged(pos);
+            idc.blocksChanged(x, y, z);
         } else if (type == HammerNetType.rightClickBlock) {
             /*if (!idc.can(DeltaCapability.BLOCK_PLACE)) {
                 Core.logWarning("%s tried to use an item on IDC that doesn't permit that %s", player, idc);
@@ -193,7 +196,8 @@ public class HammerNet {
             int x = dis.readInt();
             int y = dis.readInt();
             int z = dis.readInt();
-            byte sideHit = dis.readByte();
+            BlockPos pos = new BlockPos(x, y, z);
+            EnumFacing sideHit = EnumFacing.getFront(dis.readByte());
             float vecX = dis.readFloat();
             float vecY = dis.readFloat();
             float vecZ = dis.readFloat();
@@ -205,15 +209,16 @@ public class HammerNet {
                 dont_check_range = true;
                 active_idc = null;
             }
-            idc.blocksChanged(pos);
+            idc.blocksChanged(x, y, z);
         } else if (type == HammerNetType.leftClickBlock) {
             int x = dis.readInt();
             int y = dis.readInt();
             int z = dis.readInt();
-            byte sideHit = dis.readByte();
+            EnumFacing sideHit = EnumFacing.getFront(dis.readByte());
             float vecX = dis.readFloat();
             float vecY = dis.readFloat();
             float vecZ = dis.readFloat();
+            BlockPos pos = new BlockPos(x, y, z);
             leftClickBlock(idc, player, dis, pos, sideHit, vecX, vecY, vecZ);
         } else if (type == HammerNetType.rightClickEntity || type == HammerNetType.leftClickEntity) {
             int entId = dis.readInt();
@@ -249,12 +254,13 @@ public class HammerNet {
         Coord min = active_idc.getCorner();
         if (event.world != min.w) return;
         Coord max = active_idc.getFarCorner();
-        if (in(min.x, event.x, max.x) && in(min.y, event.y, max.y) && in(min.z, event.z, max.z)) return;
+        BlockPos pos = event.blockSnapshot.pos;
+        if (in(min.x, pos.getX(), max.x) && in(min.y, pos.getY(), max.y) && in(min.z, pos.getZ(), max.z)) return;
         event.setCanceled(true);
     }
 
     void askController(PlaceEvent event) {
-        if (active_idc.getController().placeBlock(active_idc, event.player, new Coord(event.world, event.x, event.y, event.z))) {
+        if (active_idc.getController().placeBlock(active_idc, event.player, new Coord(event.world, event.blockSnapshot.pos))) {
             event.setCanceled(true);
         }
     }
@@ -271,7 +277,7 @@ public class HammerNet {
         return distance <= reach_distance;
     }
     
-    void breakBlock(IDeltaChunk idc, EntityPlayerMP player, ByteBuf dis, int x, int y, int z, byte sideHit) {
+    void breakBlock(IDeltaChunk idc, EntityPlayerMP player, ByteBuf dis, BlockPos pos, EnumFacing sideHit) {
         Coord at = new Coord(DeltaChunk.getServerShadowWorld(), pos);
         if (at.isAir()) return;
         if (!blockInReach(idc, player, at)) return;
@@ -280,13 +286,13 @@ public class HammerNet {
         player.theItemInWorldManager.theWorld = DeltaChunk.getServerShadowWorld();
         try {
             // NORELEASE: Not quite right; this will send packets to the player, not through the proxy
-            player.theItemInWorldManager.tryHarvestBlock(at.x, at.y, at.z);
+            player.theItemInWorldManager.tryHarvestBlock(at.toBlockPos());
         } finally {
             player.theItemInWorldManager.theWorld = origWorld;
         }
     }
     
-    void punchBlock(IDeltaChunk idc, EntityPlayerMP player, ByteBuf dis, int x, int y, int z, byte sideHit) {
+    void punchBlock(IDeltaChunk idc, EntityPlayerMP player, ByteBuf dis, BlockPos pos, EnumFacing sideHit) {
         Coord at = new Coord(DeltaChunk.getServerShadowWorld(), pos);
         if (at.isAir()) return;
         if (!blockInReach(idc, player, at)) return;
@@ -298,7 +304,7 @@ public class HammerNet {
         liason.finishUsingLiason();
     }
 
-    void leftClickBlock(IDeltaChunk idc, EntityPlayerMP player, ByteBuf dis, int x, int y, int z, byte sideHit, float vecX, float vecY, float vecZ) {
+    void leftClickBlock(IDeltaChunk idc, EntityPlayerMP player, ByteBuf dis, BlockPos pos, EnumFacing sideHit, float vecX, float vecY, float vecZ) {
         Coord at = new Coord(DeltaChunk.getServerShadowWorld(), pos);
         if (at.isAir()) return;
         if (!blockInReach(idc, player, at)) return;
@@ -325,7 +331,7 @@ public class HammerNet {
         return liason;
     }
 
-    private boolean do_click(IDeltaChunk idc, WorldServer world, EntityPlayerMP player, int x, int y, int z, byte sideHit, float vecX, float vecY, float vecZ) {
+    private boolean do_click(IDeltaChunk idc, WorldServer world, EntityPlayerMP player, BlockPos pos, EnumFacing sideHit, float vecX, float vecY, float vecZ) {
         // Copy of PlayerControllerMP.onPlayerRightClick
         ItemStack is = player.getHeldItem();
         if (is != null && is.getItem().onItemUseFirst(is, player, world, pos, sideHit, vecX, vecY, vecZ)) {
@@ -335,7 +341,7 @@ public class HammerNet {
 
         if (!player.isSneaking() || player.getHeldItem() == null
                 || player.getHeldItem().getItem().doesSneakBypassUse(world, pos, player)) {
-            ret = world.getBlock(pos).onBlockActivated(world, pos, player, sideHit, vecX, vecY, vecZ);
+            ret = world.getBlock(pos).onBlockActivated(world, pos, world.getBlockState(pos), player, sideHit, vecX, vecY, vecZ);
         }
 
         if (ret) {
@@ -345,13 +351,13 @@ public class HammerNet {
         } else if (PlayerUtil.isPlayerCreative(player)) {
             int j1 = is.getItemDamage();
             int i1 = is.stackSize;
-            boolean flag1 = is.tryPlaceItemIntoWorld(player, world, pos,
+            boolean flag1 = is.onItemUse(player, world, pos,
                     sideHit, vecX, vecY, vecZ);
             is.setItemDamage(j1);
             is.stackSize = i1;
             return flag1;
         } else {
-            if (!is.tryPlaceItemIntoWorld(player, world, pos, sideHit, vecX, vecY, vecZ)) {
+            if (!is.onItemUse(player, world, pos, sideHit, vecX, vecY, vecZ)) {
                 return false;
             }
             if (is.stackSize <= 0) {
@@ -361,7 +367,7 @@ public class HammerNet {
         }
     }
     
-    void clickBlock(IDeltaChunk idc, EntityPlayerMP real_player, int x, int y, int z, byte sideHit, float vecX, float vecY, float vecZ) throws IOException {
+    void clickBlock(IDeltaChunk idc, EntityPlayerMP real_player, BlockPos pos, EnumFacing sideHit, float vecX, float vecY, float vecZ) throws IOException {
         WorldServer shadowWorld = (WorldServer) DeltaChunk.getServerShadowWorld();
         Coord at = new Coord(shadowWorld, pos);
         if (at.isAir()) return;
@@ -419,7 +425,7 @@ public class HammerNet {
                 throw new IllegalArgumentException("Can only do Quaternions/Integers/Bytes/Floats/Doubles/MovingObjectPosition/Vec3! Not " + obj);
             }
         }
-        return new FMLProxyPacket(Unpooled.wrappedBuffer(dos.toByteArray()), channelName);
+        return new FMLProxyPacket(new PacketBuffer(Unpooled.wrappedBuffer(dos.toByteArray())), channelName);
     }
 
     @SubscribeEvent

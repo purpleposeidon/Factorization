@@ -49,12 +49,7 @@ public class SocketRobotHand extends TileEntitySocketBase {
     public ItemStack getCreatingItem() {
         return Core.registry.socket_robot_hand;
     }
-    
-    @Override
-    public boolean canUpdate() {
-        return true;
-    }
-    
+
     @Override
     public IDataSerializable serialize(String prefix, DataHelper data) throws IOException {
         wasPowered = data.as(Share.PRIVATE, "pow").putBoolean(wasPowered);

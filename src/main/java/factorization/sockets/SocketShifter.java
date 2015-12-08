@@ -301,7 +301,7 @@ public class SocketShifter extends TileEntitySocketBase {
 
             Coord real = new Coord(idc.worldObj, (int) Math.floor(v.xCoord), (int) Math.floor(v.yCoord), (int) Math.floor(v.zCoord));
 
-            //Coord real = idc.shadow2realCoord(target);
+            //Coord real = idc.shadow2real(target);
             foreignInv = InvUtil.openInventory(real.getTE(IInventory.class), realBack);
             //AabbDebugger.addBox(real);
             if (foreignInv != null) return foreignInv;

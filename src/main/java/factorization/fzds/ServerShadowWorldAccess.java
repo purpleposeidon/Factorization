@@ -4,6 +4,7 @@ import factorization.api.Coord;
 import factorization.fzds.interfaces.IDeltaChunk;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.util.BlockPos;
 import net.minecraft.world.IWorldAccess;
 import net.minecraft.world.World;
 
@@ -22,12 +23,10 @@ public final class ServerShadowWorldAccess implements IWorldAccess {
     }
 
     @Override
-    public void playRecord(String sound, BlockPos pos) {
+    public void playRecord(String name, BlockPos pos) {
         final Coord here = new Coord(world, pos);
         for (IDeltaChunk idc : DeltaChunk.getSlicesContainingPoint(here)) {
-            Coord at = here.copy();
-            idc.shadow2real(at);
-            at.w.playRecord(sound, at.x, at.y, at.z);
+            idc.worldObj.playRecord(idc.shadow2real(pos), name);
         }
     }
 
@@ -35,15 +34,13 @@ public final class ServerShadowWorldAccess implements IWorldAccess {
     public void playAuxSFX(EntityPlayer player, int soundType, BlockPos pos, int soundData) {
         final Coord here = new Coord(world, pos);
         for (IDeltaChunk idc : DeltaChunk.getSlicesContainingPoint(here)) {
-            Coord at = here.copy();
-            idc.shadow2real(at);
-            at.w.playAuxSFXAtEntity /* MCP name fail */(player, soundType, at.x, at.y, at.z, soundData);
+            idc.worldObj.playAuxSFXAtEntity(player, soundType, idc.shadow2real(pos), soundData);
         }
     }
 
     @Override
     public void playSoundToNearExcept(EntityPlayer player, String sound, double x, double y, double z, float volume, float pitch) {
-        final Coord here = new Coord(world, pos);
+        final Coord here = new Coord(world, x, y, z);
         for (IDeltaChunk idc : DeltaChunk.getSlicesContainingPoint(here)) {
             Coord at = here.copy();
             idc.shadow2real(at);

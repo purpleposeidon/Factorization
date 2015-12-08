@@ -1,5 +1,6 @@
 package factorization.fzds;
 
+import factorization.aabbdebug.AabbDebugger;
 import factorization.api.Coord;
 import factorization.api.Quaternion;
 import factorization.coremodhooks.HookTargetsClient;
@@ -8,13 +9,13 @@ import factorization.fzds.gui.ProxiedGuiContainer;
 import factorization.fzds.gui.ProxiedGuiScreen;
 import factorization.fzds.interfaces.IDeltaChunk;
 import factorization.fzds.network.WrapperAdapter;
-import factorization.shared.Block;
 import factorization.shared.Core;
 import factorization.util.NumUtil;
 import factorization.util.SpaceUtil;
 import net.minecraft.block.Block;
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.entity.EntityClientPlayerMP;
+import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.client.multiplayer.ChunkProviderClient;
@@ -28,6 +29,7 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.profiler.Profiler;
 import net.minecraft.util.AxisAlignedBB;
+import net.minecraft.util.BlockPos;
 import net.minecraft.util.MovingObjectPosition;
 import net.minecraft.util.Vec3;
 import net.minecraft.world.EnumDifficulty;
@@ -54,7 +56,7 @@ public class HammerClientProxy extends HammerProxy {
     static HammerClientProxy instance;
 
     public HammerClientProxy() {
-        RenderDimensionSliceEntity rwe = new RenderDimensionSliceEntity();
+        RenderDimensionSliceEntity rwe = new RenderDimensionSliceEntity(Minecraft.getMinecraft().getRenderManager());
         RenderingRegistry.registerEntityRenderingHandler(DimensionSliceEntity.class, rwe);
         Core.loadBus(rwe);
         HammerClientProxy.instance = this;
@@ -139,7 +141,7 @@ public class HammerClientProxy extends HammerProxy {
             Hammer.worldClient = new HammerWorldClient(send_queue,
                     new WorldSettings(wi),
                     DeltaChunk.getDimensionId(),
-                    world.difficultySetting,
+                    world.getDifficulty(),
                     Core.proxy.getProfiler());
         } finally {
             HookTargetsClient.clientWorldLoadEventAbort.remove();
@@ -191,7 +193,7 @@ public class HammerClientProxy extends HammerProxy {
         send_queue.clientWorldController = wc;
     }
 
-    private void setWorldAndPlayer(WorldClient wc, EntityClientPlayerMP player) {
+    private void setWorldAndPlayer(WorldClient wc, EntityPlayerSP player) {
         Minecraft mc = Minecraft.getMinecraft();
         if (wc == null || player == null) {
             throw new NullPointerException("Tried setting world/player to null!");
@@ -199,6 +201,7 @@ public class HammerClientProxy extends HammerProxy {
         //For logic
         if (mc.renderViewEntity == mc.thePlayer) {
             mc.renderViewEntity = player;
+            // We *can not* use the setter here.
         }
         mc.theWorld = wc;
         mc.thePlayer = player;
@@ -207,13 +210,14 @@ public class HammerClientProxy extends HammerProxy {
         
         //For rendering
         mc.renderViewEntity = player;
-        if (TileEntityRendererDispatcher.instance.field_147550_f != null) {
-            TileEntityRendererDispatcher.instance.field_147550_f = wc;
+        if (TileEntityRendererDispatcher.instance.worldObj != null) {
+            TileEntityRendererDispatcher.instance.worldObj = wc;
         }
-        if (RenderManager.instance.worldObj != null) {
-            RenderManager.instance.worldObj = wc;
+        RenderManager rm = mc.getRenderManager();
+        if (rm.worldObj != null) {
+            rm.worldObj = wc;
         }
-        renderglobal_cache.put(mc.renderGlobal.theWorld, mc.renderGlobal);
+        renderglobal_cache.put(mc.renderGlobal.theWorld /* 1.8.8: no getter */, mc.renderGlobal);
         mc.renderGlobal = getRenderGlobalForWorld(wc);
         if (mc.renderGlobal == null) {
             throw new NullPointerException("mc.renderGlobal");
@@ -248,9 +252,9 @@ public class HammerClientProxy extends HammerProxy {
         return null;
     }
     
-    private EntityClientPlayerMP real_player = null;
+    private EntityPlayerSP real_player = null;
     private WorldClient real_world = null;
-    private EntityClientPlayerMP fake_player = null;
+    private EntityPlayerSP fake_player = null;
     private RenderGlobal real_renderglobal = null;
     
     @Override
@@ -271,10 +275,10 @@ public class HammerClientProxy extends HammerProxy {
         }
         real_player.worldObj = w;
         if (fake_player == null || w != fake_player.worldObj) {
-            fake_player = new EntityClientPlayerMP(
+            fake_player = new EntityPlayerSP(
                     mc,
                     mc.theWorld /* why is this real world? NORELEASE: world leakage? */,
-                    mc.getSession(), real_player.sendQueue /* not sure about this one. */,
+                    real_player.sendQueue /* not sure about this one. */,
                     real_player.getStatFileWriter());
             fake_player.movementInput = real_player.movementInput;
         }
@@ -319,7 +323,7 @@ public class HammerClientProxy extends HammerProxy {
             return;
         }
         int range = 10;
-        AxisAlignedBB nearby = mcPlayer.boundingBox.expand(range, range, range);
+        AxisAlignedBB nearby = mcPlayer.getEntityBoundingBox().expand(range, range, range);
         Iterable<IDeltaChunk> nearbyChunks = mcWorld.getEntitiesWithinAABB(IDeltaChunk.class, nearby);
         setShadowWorld();
         Core.profileStart("FZDStick");
@@ -384,8 +388,8 @@ public class HammerClientProxy extends HammerProxy {
         if (event.isCanceled()) {
             return;
         }
-        Coord here = new Coord(DeltaChunk.getClientShadowWorld(), shadowSelected.blockX, shadowSelected.blockY, shadowSelected.blockZ);
-        Block hereBlock = Block.instance; //here.getBlock();
+        Coord here = new Coord(DeltaChunk.getClientShadowWorld(), shadowSelected.getBlockPos());
+        Block hereBlock = Core.registry.clientTraceHelper;
         hereBlock.setBlockBounds(
                 (float) (box.minX - here.x), (float) (box.minY - here.y), (float) (box.minZ - here.z),
                 (float) (box.maxX - here.x), (float) (box.maxY - here.y), (float) (box.maxZ - here.z)
@@ -475,12 +479,13 @@ public class HammerClientProxy extends HammerProxy {
                 }
                 switch (mop.typeOfHit) {
                 case ENTITY:
-                    mopBox = mop.entityHit.boundingBox;
+                    mopBox = mop.entityHit.getEntityBoundingBox(); // NORELEASE: Or the other bounding box?
                     break;
                 case BLOCK:
                     World w = DeltaChunk.getClientShadowWorld();
-                    Block block = w.getBlock(mop.getBlockPos());
-                    mopBox = block.getSelectedBoundingBoxFromPool(w, mop.getBlockPos());
+                    BlockPos pos = mop.getBlockPos();
+                    IBlockState bs = w.getBlockState(pos);
+                    mopBox = bs.getBlock().getCollisionBoundingBox(w, pos, bs);
                     break;
                 default: return;
                 }
@@ -495,22 +500,18 @@ public class HammerClientProxy extends HammerProxy {
             {
                 final DimensionSliceEntity rayParent = ray.parent;
                 Vec3 corners[] = SpaceUtil.getCorners(mopBox);
-                min = rayParent.shadow2real(corners[0]);
-                max = SpaceUtil.copy(min);
-                for (int i = 1; i < corners.length; i++) {
-                    Vec3 c = rayParent.shadow2real(corners[i]);
-                    min.xCoord = Math.min(c.xCoord, min.xCoord);
-                    min.yCoord = Math.min(c.yCoord, min.yCoord);
-                    min.zCoord = Math.min(c.zCoord, min.zCoord);
-                    max.xCoord = Math.max(c.xCoord, max.xCoord);
-                    max.yCoord = Math.max(c.yCoord, max.yCoord);
-                    max.zCoord = Math.max(c.zCoord, max.zCoord);
+                for (int i = 0; i < corners.length; i++) {
+                    corners[i] = rayParent.shadow2real(corners[i]);
                 }
+                min = SpaceUtil.getLowest(corners);
+                max = SpaceUtil.getHighest(corners);
             }
             ray.setPosition((min.xCoord + max.xCoord) / 2, (min.yCoord + max.yCoord) / 2, (min.zCoord + max.zCoord) / 2);
-            SpaceUtil.setMin(ray.boundingBox, min);
-            SpaceUtil.setMax(ray.boundingBox, max);
-            //AabbDebugger.addBox(ray.boundingBox); // It's always nice to see this.
+            AxisAlignedBB newBox;
+            newBox = SpaceUtil.setMin(ray.getEntityBoundingBox(), min);
+            newBox = SpaceUtil.setMax(newBox, max);
+            ray.setEntityBoundingBox(newBox);
+            AabbDebugger.addBox(newBox); // It's always nice to see this.
             offerHit(mop, ray, mopBox);
             got_hit = true;
         } finally {

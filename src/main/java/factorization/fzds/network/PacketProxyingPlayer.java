@@ -16,10 +16,7 @@ import io.netty.channel.ChannelOutboundHandlerAdapter;
 import io.netty.channel.ChannelPromise;
 import io.netty.channel.embedded.EmbeddedChannel;
 import net.minecraft.entity.player.EntityPlayerMP;
-import net.minecraft.network.EnumConnectionState;
-import net.minecraft.network.NetHandlerPlayServer;
-import net.minecraft.network.NetworkManager;
-import net.minecraft.network.Packet;
+import net.minecraft.network.*;
 import net.minecraft.network.play.server.S26PacketMapChunkBulk;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.management.ItemInWorldManager;
@@ -45,7 +42,7 @@ public class PacketProxyingPlayer extends EntityPlayerMP implements
     
     
     EmbeddedChannel proxiedChannel = new EmbeddedChannel(new WrappedMulticastHandler());
-    NetworkManager networkManager = new CustomChannelNetworkManager(proxiedChannel, false);
+    NetworkManager networkManager = new CustomChannelNetworkManager(proxiedChannel, EnumPacketDirection.CLIENTBOUND);
     
     class WrappedMulticastHandler extends ChannelOutboundHandlerAdapter implements IFzdsShenanigans {
         @Override
@@ -124,13 +121,13 @@ public class PacketProxyingPlayer extends EntityPlayerMP implements
             int orig = savePlayerViewRadius();
             restorePlayerViewRadius(chunkRadius);
             try {
-                scm.func_72375_a(this, null);
+                scm.preparePlayer(this, null /* previous world; allowed to be null */);
             } finally {
                 restorePlayerViewRadius(orig);
                 // altho the server might just crash anyways. Then again, there might be a handler higher up.
             }
         } else {
-            scm.func_72375_a(this, null);
+            scm.preparePlayer(this, null /* previous world; allowed to be null */);
         }
         initWrapping();
     }
@@ -202,22 +199,21 @@ public class PacketProxyingPlayer extends EntityPlayerMP implements
         DimensionSliceEntity dse = dimensionSlice.get();
         if (dse == null) return;
         // Inspired by EntityPlayerMP.onUpdate. Shame we can't just add chunks directly to target's chunkwatcher... but there'd be no wrapper for the packets.
-        ArrayList<Chunk> chunks = new ArrayList();
-        ArrayList<TileEntity> tileEntities = new ArrayList();
+        final ArrayList<Chunk> chunks = new ArrayList<Chunk>();
+        final ArrayList<TileEntity> tileEntities = new ArrayList<TileEntity>();
         World world = DeltaChunk.getServerShadowWorld();
 
-        Coord low = dse.getCorner();
-        Coord far = dse.getFarCorner();
-        for (int x = low.x - 16; x <= far.x + 16; x += 16) {
-            for (int z = low.z - 16; z <= far.z + 16; z += 16) {
-                if (!world.blockExists(x + 1, 0, z + 1)) {
-                    continue;
-                }
-                Chunk chunk = world.getChunkFromBlockCoords(x, z);
+        Coord low = dse.getCorner().add(-16, 0, -16);
+        Coord far = dse.getFarCorner().add(+16, 0, +16);
+        Coord.iterateChunks(low, far, new ICoordFunction() {
+            @Override
+            public void handle(Coord here) {
+                if (!here.blockExists()) return;
+                Chunk chunk = here.getChunk();
                 chunks.add(chunk);
                 tileEntities.addAll(chunk.chunkTileEntityMap.values());
             }
-        }
+        });
 
         // NOTE: This has the potential to go badly if there's a large amount of data in the chunks.
         if (!chunks.isEmpty()) {

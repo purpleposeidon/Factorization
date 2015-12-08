@@ -106,7 +106,7 @@ class ShadowRenderGlobal implements IWorldAccess {
     public void playAuxSFX(EntityPlayer player, int soundType, BlockPos pos, int soundData) {
         final Coord here = new Coord(DeltaChunk.getClientShadowWorld(), pos);
         for (IDeltaChunk idc : DeltaChunk.getSlicesContainingPoint(here)) {
-            Coord at = idc.shadow2realCoord(here);
+            Coord at = idc.shadow2real(here);
             at.w.playAuxSFXAtEntity(player, soundType, at.toBlockPos(), soundData);
         }
     }

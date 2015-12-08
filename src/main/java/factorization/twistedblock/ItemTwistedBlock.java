@@ -71,7 +71,7 @@ public class ItemTwistedBlock extends ItemBlockProxy {
         tag.setBoolean("isTwistedBlockIDC", true);
         tag.setString("placedByName", player.getCommandSenderName());
         tag.setString("playerByUUID", player.getUniqueID().toString());
-        tag.setInteger("placedSide", side);
+        tag.setInteger("placedSide", side.ordinal());
         tag.setInteger("turns", 0);
         for (DeltaCapability forbidden : new DeltaCapability[] {
                 

@@ -3,13 +3,13 @@ package factorization.darkiron;
 import factorization.util.SpaceUtil;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.EnumFacing;
-import net.minecraft.util.IIcon;
 import net.minecraft.util.ITickable;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
@@ -23,10 +23,10 @@ public class BlockDarkIronOre extends Block {
     }
 
     static int te_particles = 0;
-    
+
     @Override
     @SideOnly(Side.CLIENT)
-    public void randomDisplayTick(World world, BlockPos pos, Random random) {
+    public void randomDisplayTick(World world, BlockPos pos, IBlockState state, Random rand) {
         if (world.getTotalWorldTime() % 3 != 0) {
             return;
         }
@@ -40,7 +40,7 @@ public class BlockDarkIronOre extends Block {
             return;
         }
         for (EnumFacing dir : EnumFacing.VALUES) {
-            if (world.isBlockNormalCubeDefault(x + dir.getDirectionVec().getX(), y + dir.getDirectionVec().getY(), z + dir.getDirectionVec().getZ(), true)) {
+            if (world.isBlockNormalCube(pos.offset(dir), true)) {
                 continue;
             }
             TileEntity te = new Glint();
@@ -49,12 +49,12 @@ public class BlockDarkIronOre extends Block {
             return;
         }
     }
-    
+
     @Override
-    public boolean hasTileEntity(int metadata) {
+    public boolean hasTileEntity(IBlockState state) {
         return true;
     }
-    
+
     static float maxDistSq = 6*6;
     
     static boolean inRange(BlockPos pos, EntityPlayer player) {
@@ -73,8 +73,8 @@ public class BlockDarkIronOre extends Block {
         public void update() {
             age++;
             EntityPlayer player = Minecraft.getMinecraft().thePlayer;
-            if (lastRenderedTick + 60 < worldObj.getTotalWorldTime() && !inRange(age, age, age, player)) {
-                worldObj.removeTileEntity(pos.getX(), pos.getY(), pos.getZ());
+            if (lastRenderedTick + 60 < worldObj.getTotalWorldTime() && !inRange(new BlockPos(age, age, age), player)) {
+                worldObj.removeTileEntity(pos);
             }
         }
         
@@ -87,7 +87,8 @@ public class BlockDarkIronOre extends Block {
         @Override
         @SideOnly(Side.CLIENT)
         public AxisAlignedBB getRenderBoundingBox() {
-            return getBlockType().getCollisionBoundingBox(worldObj, pos, bs);
+            Block b = getBlockType();
+            return b.getCollisionBoundingBox(worldObj, pos, b.getDefaultState());
         }
         
         @Override

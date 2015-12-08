@@ -3,11 +3,11 @@ package factorization.colossi;
 import factorization.api.Coord;
 import net.minecraft.block.Block;
 
-public class BlockState {
+public class ColossusBuilderBlock {
     public final Block block;
     public final int md;
     
-    public BlockState(Block block, int md) {
+    public ColossusBuilderBlock(Block block, int md) {
         this.block = block;
         this.md = md;
     }

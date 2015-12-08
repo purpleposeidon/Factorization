@@ -9,7 +9,6 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumFacing;
-import net.minecraft.util.IIcon;
 
 import java.io.IOException;
 
@@ -30,19 +29,6 @@ public class IntegerValue extends Instruction {
     @Override
     public void motorHit(ServoMotor motor) {
         motor.getArgStack().push(getVal());
-    }
-
-    @Override
-    public IIcon getIcon(EnumFacing side) {
-        if (getVal() == 1) {
-            return BlockIcons.servo$one;
-        } else if (getVal() == 0) {
-            return BlockIcons.servo$zero;
-        } else if (getVal() == -1) {
-            return BlockIcons.servo$negative_one;
-        } else {
-            return BlockIcons.servo$number;
-        }
     }
 
     @Override

@@ -180,13 +180,13 @@ public class TileEntityHinge extends TileEntityCommon implements IDCController, 
     }
 
     @Override
-    public boolean breakBlock(IDeltaChunk idc, EntityPlayer player, Coord at, byte sideHit) {
+    public boolean breakBlock(IDeltaChunk idc, EntityPlayer player, Coord at, EnumFacing sideHit) {
         dirtyInertia();
         return false;
     }
 
     @Override
-    public boolean useBlock(IDeltaChunk idc, EntityPlayer player, Coord at, byte sideHit) {
+    public boolean useBlock(IDeltaChunk idc, EntityPlayer player, Coord at, EnumFacing sideHit) {
         if (player.isSneaking()) return false;
         if (worldObj.isRemote) return false;
         final ItemStack held = player.getHeldItem();
@@ -208,7 +208,7 @@ public class TileEntityHinge extends TileEntityCommon implements IDCController, 
     }
 
     @Override
-    public boolean hitBlock(IDeltaChunk idc, EntityPlayer player, Coord at, byte sideHit) {
+    public boolean hitBlock(IDeltaChunk idc, EntityPlayer player, Coord at, EnumFacing sideHit) {
         if (player.isSneaking()) return false;
         if (worldObj.isRemote) return false;
         return applyForce(idc, player, at, 1);

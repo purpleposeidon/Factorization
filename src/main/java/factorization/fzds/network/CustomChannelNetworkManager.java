@@ -4,11 +4,12 @@ import factorization.fzds.interfaces.IFzdsShenanigans;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
 import net.minecraft.network.EnumConnectionState;
+import net.minecraft.network.EnumPacketDirection;
 import net.minecraft.network.NetworkManager;
 
 class CustomChannelNetworkManager extends NetworkManager implements IFzdsShenanigans {
-    public CustomChannelNetworkManager(Channel myChannel, boolean isRemote) {
-        super(isRemote);
+    public CustomChannelNetworkManager(Channel myChannel, EnumPacketDirection direction) {
+        super(direction);
         this.channel = myChannel;
     }
 
@@ -21,7 +22,6 @@ class CustomChannelNetworkManager extends NetworkManager implements IFzdsShenani
     public void setConnectionState(EnumConnectionState state) {
         if (state != EnumConnectionState.PLAY) throw new IllegalArgumentException("No solicitors!");
         super.setConnectionState(state);
-        return;
     }
 
     @Override

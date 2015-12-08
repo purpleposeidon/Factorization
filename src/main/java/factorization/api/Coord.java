@@ -13,6 +13,7 @@ import factorization.util.FzUtil;
 import factorization.util.ItemUtil;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.block.Block;
+import net.minecraft.block.properties.IProperty;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.item.EntityItem;
@@ -226,6 +227,10 @@ public final class Coord implements IDataSerializable, ISaneCoord, Comparable<Co
 
     public Coord copy() {
         return new Coord(w, x, y, z);
+    }
+
+    public BlockPos.MutableBlockPos copyTo(BlockPos.MutableBlockPos pos) {
+        return pos.func_181079_c(x, y, z);
     }
     
     public int get(int axis) {
@@ -1078,4 +1083,25 @@ public final class Coord implements IDataSerializable, ISaneCoord, Comparable<Co
     public static Coord getInvalid() {
         return new Coord(null, 0, -1, 0);
     }
+
+    public <T extends Comparable<T>> T getProperty(IProperty<T> PROPERTY) {
+        return getState().getValue(PROPERTY);
+    }
+
+    public <T extends Comparable<T>> void set(IProperty<T> PROPERTY, T value, boolean notify) {
+        set(getState().withProperty(PROPERTY, value), notify);
+    }
+
+    public <T extends Comparable<T>> void set(IProperty<T> PROPERTY, T value) {
+        set(getState().withProperty(PROPERTY, value), true);
+    }
+
+    public <T extends Comparable<T>> boolean has(IProperty<T> PROPERTY, T... values) {
+        T actual = getProperty(PROPERTY);
+        for (T v : values) {
+            if (v == actual) return true;
+        }
+        return false;
+    }
+
 }

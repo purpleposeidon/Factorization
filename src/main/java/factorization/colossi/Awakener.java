@@ -123,7 +123,7 @@ public class Awakener {
     }
     
     int ground_level = -1;
-    BlockState valid_natural_blocks = new BlockState(null, 0) {
+    ColossusBuilderBlock valid_natural_blocks = new ColossusBuilderBlock(null, 0) {
         @Override
         public boolean matches(Coord at) {
             if (at.y <= ground_level) return false;
@@ -134,7 +134,7 @@ public class Awakener {
         }
     };
     
-    BlockState BODY_ANY = new BlockState(null, 0) {
+    ColossusBuilderBlock BODY_ANY = new ColossusBuilderBlock(null, 0) {
         @Override
         public boolean matches(Coord at) {
             if (at.getBlock() == Core.registry.colossal_block) {
@@ -441,7 +441,7 @@ public class Awakener {
         return min.y;
     }
     
-    Set<Coord> iterateFrom(Set<Coord> start, BlockState block, boolean diag) {
+    Set<Coord> iterateFrom(Set<Coord> start, ColossusBuilderBlock block, boolean diag) {
         ArrayList<Coord> frontier = new ArrayList(start.size());
         Set<Coord> ret = new HashSet();
         frontier.addAll(start);
@@ -462,7 +462,7 @@ public class Awakener {
         return ret;
     }
     
-    ArrayList<Set<Coord>> getConnectedLimbs(Set<Coord> body, BlockState block) {
+    ArrayList<Set<Coord>> getConnectedLimbs(Set<Coord> body, ColossusBuilderBlock block) {
         ArrayList<Set<Coord>> ret = new ArrayList();
         for (Coord at : body) {
             for (Coord neighbor : at.getNeighborsAdjacent()) {

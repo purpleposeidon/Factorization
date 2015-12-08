@@ -7,9 +7,12 @@ import factorization.colossi.Brush.BrushMask;
 import factorization.shared.Core;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockFalling;
+import net.minecraft.block.BlockSand;
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.init.Blocks;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.world.biome.BiomeGenBase;
+import net.minecraft.world.chunk.ChunkPrimer;
 import net.minecraft.world.gen.NoiseGeneratorOctaves;
 
 import java.util.*;
@@ -23,15 +26,15 @@ public class ColossalBuilder {
     int shoulder_start;
     int face_width, face_height, face_depth;
     
-    static final BlockState LEG = new BlockState(Core.registry.colossal_block, ColossalBlock.MD_LEG);
-    static final BlockState BODY = new BlockState(Core.registry.colossal_block, ColossalBlock.MD_BODY);
-    static final BlockState ARM = new BlockState(Core.registry.colossal_block, ColossalBlock.MD_ARM);
-    static final BlockState MASK = new BlockState(Core.registry.colossal_block, ColossalBlock.MD_MASK);
-    static final BlockState EYE = new BlockState(Core.registry.colossal_block, ColossalBlock.MD_EYE);
-    static final BlockState HEART = new BlockState(Core.registry.colossal_block, ColossalBlock.MD_CORE);
-    static final BlockState BODY_CRACK = new BlockState(Core.registry.colossal_block, ColossalBlock.MD_BODY_CRACKED);
-    static final BlockState MASK_CRACK = new BlockState(Core.registry.colossal_block, ColossalBlock.MD_MASK_CRACKED);
-    static final BlockState AIR = new BlockState(Blocks.air, 0);
+    static final ColossusBuilderBlock LEG = new ColossusBuilderBlock(Core.registry.colossal_block, ColossalBlock.MD_LEG);
+    static final ColossusBuilderBlock BODY = new ColossusBuilderBlock(Core.registry.colossal_block, ColossalBlock.MD_BODY);
+    static final ColossusBuilderBlock ARM = new ColossusBuilderBlock(Core.registry.colossal_block, ColossalBlock.MD_ARM);
+    static final ColossusBuilderBlock MASK = new ColossusBuilderBlock(Core.registry.colossal_block, ColossalBlock.MD_MASK);
+    static final ColossusBuilderBlock EYE = new ColossusBuilderBlock(Core.registry.colossal_block, ColossalBlock.MD_EYE);
+    static final ColossusBuilderBlock HEART = new ColossusBuilderBlock(Core.registry.colossal_block, ColossalBlock.MD_CORE);
+    static final ColossusBuilderBlock BODY_CRACK = new ColossusBuilderBlock(Core.registry.colossal_block, ColossalBlock.MD_BODY_CRACKED);
+    static final ColossusBuilderBlock MASK_CRACK = new ColossusBuilderBlock(Core.registry.colossal_block, ColossalBlock.MD_MASK_CRACKED);
+    static final ColossusBuilderBlock AIR = new ColossusBuilderBlock(Blocks.air, 0);
     
     public ColossalBuilder(int seed, Coord start) {
         this.seed = seed;
@@ -216,7 +219,7 @@ public class ColossalBuilder {
         heart.setTE(heartTe);
     }
     
-    void fill(Coord min, Coord max, BlockState state) {
+    void fill(Coord min, Coord max, ColossusBuilderBlock state) {
         min = min.copy();
         max = max.copy();
         Coord.sort(min, max);
@@ -402,35 +405,41 @@ public class ColossalBuilder {
                     return a.x - b.x;
                 }
             });
-            Block[] blocks = new Block[0x100];
-            byte[] mds = new byte[0x100];
-            
+            ChunkPrimer primer = new ChunkPrimer(); // Urgh, so fat! :(
             double stoneNoise = rand.nextDouble();
             Coord lastCol = null;
+            boolean firstCol = true;
+            int min = 0, max = 0;
+            IBlockState air = Blocks.air.getDefaultState();
             for (Coord at : sorted) {
                 if (lastCol == null || (lastCol.x != at.x || lastCol.z != at.z)) {
-                    biomeifyBlocks(lastCol, blocks, mds, biome, stoneNoise);
+                    biomeifyBlocks(lastCol, primer, biome, stoneNoise, min, max);
                     lastCol = at;
-                    Arrays.fill(blocks, Blocks.air);
-                    Arrays.fill(mds, (byte) 0);
+                    firstCol = true;
+                    for (int y = min; y <= max; y++) {
+                        primer.setBlockState(0, y, 0, air);
+                    }
                 }
-                blocks[at.y] = at.getBlock();
-                mds[at.y]= (byte) at.getMd(); 
+                if (firstCol) {
+                    min = max = at.y;
+                    firstCol = false;
+                } else {
+                    min = Math.min(min, at.y);
+                    max = Math.max(max, at.y);
+                }
+                primer.setBlockState(0, at.y, 0, at.getState());
             }
-            biomeifyBlocks(lastCol, blocks, mds, biome, stoneNoise);
-            
-            
-            
+            biomeifyBlocks(lastCol, primer, biome, stoneNoise, min, max);
         }
         
-        void biomeifyBlocks(Coord col, Block[] blocks, byte[] mds, BiomeGenBase biome, double stoneNoise) {
+        void biomeifyBlocks(Coord col, ChunkPrimer primer, BiomeGenBase biome, double stoneNoise, int min, int max) {
             if (col == null) return;
-            biome.genTerrainBlocks(col.w, rand, blocks, mds, 0, 0, stoneNoise);
+            biome.genTerrainBlocks(col.w, rand, primer, 0, 0, stoneNoise);
             Coord at = col.copy();
             boolean onSolid = false;
-            for (int y = 0; y < blocks.length; y++) {
-                Block id = blocks[y];
-                byte md = mds[y];
+            for (int y = min; y <= max; y++) {
+                IBlockState bs = primer.getBlockState(0, y, 0);
+                Block id = bs.getBlock();
                 if (id == Blocks.bedrock) continue;
                 if (id == Blocks.air) {
                     onSolid = false;
@@ -438,21 +447,23 @@ public class ColossalBuilder {
                 }
                 if (!onSolid && id instanceof BlockFalling) {
                     if (id == Blocks.sand) {
-                        id = Blocks.sandstone;
-                        md = 0;
-                        // NORELEASE: 1.8 red sandstone
+                        boolean isRed = bs.getValue(BlockSand.VARIANT) == BlockSand.EnumType.RED_SAND;
+                        if (isRed) {
+                            bs = Blocks.red_sandstone.getDefaultState();
+                        } else {
+                            bs = Blocks.sandstone.getDefaultState();
+                        }
                     } else {
-                        id = Blocks.stone;
-                        md = 0;
+                        bs = Blocks.stone.getDefaultState();
                     }
                 }
                 at.y = y;
                 if (id == Blocks.grass) {
                     at.y++;
-                    if (at.isSolid()) id = Blocks.dirt;
+                    if (at.isSolid()) bs = Blocks.dirt.getDefaultState();
                     at.y--;
                 }
-                at.setIdMd(id, md, false);
+                at.set(bs, true); // Notify only if triggered by command?
                 onSolid = true;
             }
         }
