@@ -2,6 +2,8 @@ package factorization.api.energy;
 
 
 import com.google.common.base.Preconditions;
+import net.minecraft.entity.Entity;
+import net.minecraft.tileentity.TileEntity;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -19,7 +21,8 @@ import javax.annotation.Nullable;
  * WorkUnit converters should have some inefficiency, such as using 1 input unit for each 16 units converted.
  * <p/>
  * Some types of energy need special information. For example, a machine powered by pressure might want to know what
- * the fluid is; a gearbox needs to keep in sync with the crankshaft.
+ * the fluid is; a gearbox needs to keep in sync with the crankshaft. You can make this information available by
+ * extending this class.
  */
 public class WorkUnit {
     @Nonnull

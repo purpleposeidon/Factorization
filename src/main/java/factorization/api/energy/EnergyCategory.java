@@ -5,14 +5,20 @@ package factorization.api.energy;
  */
 public enum EnergyCategory {
     /**
-     * Linear and rotational energy; mass in relative motion. Falling anvils and turning waterwheels.
+     * Mass moving in a straight line. Anvils fall; a camshaft drives a reciprocating follower.
      */
-    KINETIC,
+    LINEAR,
+
+    /**
+     * Mass rotating around a point, typically a center of mass. A waterwheel drives a shaft; gears invert the axis
+     * of rotation
+     */
+    ROTATIONAL,
 
     /**
      * Energy held in substances that is released under certain conditions, often after some threshold of input energy
      * is breached. Gunpowder can explode; steak can be digested. Uranium and hydrogen can undergo fission or fusion.
-     * Sand can hover in the air.
+     * Sand can hover in the air until a block update causes it to fall.
      * <p/>
      * Not really a unit of energy; more of a unit of storage. Usefully converting chemical energy between other
      * forms tends to be slightly difficult.
@@ -22,13 +28,14 @@ public enum EnergyCategory {
     /**
      * Positive pressure, such as from steam and compressed air.
      * The atmosphere is a pressure source to a relative vacuum.
+     * Steam drives a piston. Hydrolic oil drives a piston.
      */
     PRESSURE,
 
     /**
      * Sub-atomic particles moving at or near the speed of light.
      * Photons, being light/electromagnetic radiation, are here.
-     * Also includes free-moving protons, electrons, etc.
+     * Also includes protons, electrons, etc.
      */
     RADIATION,
 
@@ -45,13 +52,14 @@ public enum EnergyCategory {
     ELECTRIC,
 
     /**
-     * Redstone. Strangely easy to create. Is fundamentally suppressive, but this suppression is often itself
-     * suppressed. Should be interpreted as a quick redstone pulse.
+     * Redstone signal. Strangely easy to create. Is fundamentally suppressive, but this suppression is often itself
+     * suppressed. Receiving a SIGNAL should probably be interpreted as a quick redstone pulse. Implementing this
+     * behavior is not at all obligatory, particularly in blocky contexts.
      */
     SIGNAL,
 
     /**
-     * Periodic motion along an elastic medium. Waves roll along the ocean; two tectonic plates slide past
+     * Periodic motion along an elastic medium. Waves crash against rocks; two tectonic plates slide past
      * one another, producing tremors; the noteblock plays a tone.
      */
     OSCILLATION,
