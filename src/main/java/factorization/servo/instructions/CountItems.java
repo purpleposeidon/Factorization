@@ -8,7 +8,6 @@ import factorization.util.InvUtil;
 import factorization.util.InvUtil.FzInv;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.EnumFacing;
 import net.minecraft.util.IIcon;
 
 import java.io.IOException;
@@ -21,7 +20,7 @@ public class CountItems extends Instruction {
     }
 
     @Override
-    protected ItemStack getRecipeItem() {
+    protected Object getRecipeItem() {
         return new ItemStack(Items.comparator);
     }
 
@@ -35,11 +34,6 @@ public class CountItems extends Instruction {
             count += is.stackSize;
         }
         motor.getArgStack().push(count);
-    }
-
-    @Override
-    public IIcon getIcon(EnumFacing side) {
-        return BlockIcons.servo$count_items;
     }
 
     @Override

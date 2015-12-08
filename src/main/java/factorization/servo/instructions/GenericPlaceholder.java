@@ -5,9 +5,6 @@ import factorization.api.datahelpers.IDataSerializable;
 import factorization.servo.Instruction;
 import factorization.servo.ServoComponent;
 import factorization.servo.ServoMotor;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.EnumFacing;
-import net.minecraft.util.IIcon;
 
 import java.io.IOException;
 
@@ -16,18 +13,13 @@ import java.io.IOException;
  */
 public class GenericPlaceholder extends Instruction {
     @Override
-    protected ItemStack getRecipeItem() {
+    protected Object getRecipeItem() {
         return null;
     }
 
     @Override
     public void motorHit(ServoMotor motor) {
 
-    }
-
-    @Override
-    public IIcon getIcon(EnumFacing side) {
-        return null;
     }
 
     @Override

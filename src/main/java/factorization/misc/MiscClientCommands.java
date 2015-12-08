@@ -7,29 +7,27 @@ import factorization.common.FzConfig;
 import factorization.notify.Notice;
 import factorization.notify.Style;
 import factorization.shared.Core;
+import factorization.util.DataUtil;
 import factorization.util.FzUtil;
 import factorization.util.RenderUtil;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.entity.EntityClientPlayerMP;
-import net.minecraft.client.renderer.Tessellator;
-import net.minecraft.client.renderer.WorldRenderer;
+import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.client.renderer.tileentity.TileEntityRendererDispatcher;
 import net.minecraft.command.ICommand;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.item.EntityItem;
+import net.minecraft.entity.player.EnumPlayerModelParts;
 import net.minecraft.init.Blocks;
-import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.util.BlockPos;
 import net.minecraft.util.ChatComponentText;
 import net.minecraft.util.EnumChatFormatting;
 import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.StringUtils;
 import net.minecraft.world.IWorldAccess;
 import net.minecraft.world.World;
-import net.minecraft.world.chunk.Chunk;
 import net.minecraftforge.fml.client.GuiModList;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
@@ -58,11 +56,6 @@ public class MiscClientCommands implements ICommand {
     
     public int compareTo(ICommand other) {
         return this.getCommandName().compareTo(other.getCommandName());
-    }
-
-    @Override
-    public int compareTo(Object obj) {
-        return this.compareTo((ICommand) obj);
     }
 
     @Override
@@ -110,7 +103,7 @@ public class MiscClientCommands implements ICommand {
     }
     
     public static class miscCommands {
-        static EntityClientPlayerMP player;
+        static EntityPlayerSP player;
         static String arg0, arg1;
         static List<String> args;
         
@@ -203,26 +196,6 @@ public class MiscClientCommands implements ICommand {
         public static String savesettings() {
             mc.gameSettings.saveOptions();
             return "Saved settings";
-        }
-        
-        @alias({"render_everything_lagfest"})
-        @help("Render a ton of terrain at once (may lock your game up for a while)")
-        public static void render_above() {
-            WorldRenderer[] lizt = mc.renderGlobal.sortedWorldRenderers;
-            int did = 0;
-            int total = 0;
-            boolean lagfest = arg0.contains("lagfest");
-            for (WorldRenderer wr : lizt) {
-                total++;
-                if (wr.needsUpdate) {
-                    if (wr.posY - 16*3 > mc.thePlayer.posY && wr.posY < mc.thePlayer.posY + 16*8 || lagfest) {
-                        wr.updateRenderer(mc.thePlayer);
-                        wr.needsUpdate = false;
-                        did++;
-                    }
-                }
-            }
-            player.addChatMessage(new ChatComponentText("Rendered " + did + " chunks out of " + total));
         }
         
         @alias("c")
@@ -340,112 +313,6 @@ public class MiscClientCommands implements ICommand {
             }
         }
         
-        @cheaty
-        @help("Saves terrain to a 3D model. Slow! Watch the console. /f exportWorld [radius] --ply --obj --player-origin --world-origin")
-        public static String exportWorld() {
-            double maxDist = mc.gameSettings.renderDistanceChunks * 16;
-            if (!StringUtils.isNullOrEmpty(arg1)) {
-                try {
-                    maxDist = Double.parseDouble(arg1);
-                } catch (NumberFormatException e) {
-                    // ignored
-                }
-            }
-            WorldRenderer[] lizt = mc.renderGlobal.sortedWorldRenderers;
-            Tessellator real_tess = Tessellator.instance;
-            boolean use_ply = true;
-            boolean at_player = true;
-            for (String arg : args) {
-                if (arg.equalsIgnoreCase("--ply")) {
-                    use_ply = true;
-                } else if (arg.equalsIgnoreCase("--obj")) {
-                    use_ply = false;
-                } else if (arg.equals("--player-origin")) {
-                    at_player = true;
-                } else if (arg.equals("--world-origin")) {
-                    at_player = false;
-                }
-            }
-            File output = new File("./worldExport." + (use_ply ? "ply" : "obj"));
-            
-            try {
-                ExporterTessellatorObj ex_obj = null;
-                ExporterTessellatorPly ex_ply = null;
-                if (use_ply) {
-                    Tessellator.instance = ex_ply = new ExporterTessellatorPly(output);
-                } else {
-                    Tessellator.instance = ex_obj = new ExporterTessellatorObj(output);
-                }
-                int total = lizt.length;
-                double px = mc.thePlayer.posX, py = mc.thePlayer.posY, pz = mc.thePlayer.posZ;
-                int skipped = 0;
-                for (int i = 0; i < total; i++) {
-                    WorldRenderer wr = lizt[i];
-                    double dx = wr.posX - px;
-                    double dy = wr.posY - py;
-                    double dz = wr.posZ - pz;
-                    /*if (at_player) {
-                        Tessellator.instance.setTranslation(dx, dy, dz);
-                    } else {
-                        Tessellator.instance.setTranslation(wr.posX, wr.posY, wr.posZ);
-                    }*/
-                    Tessellator.instance.setTranslation(0, 0, 0);
-                    double dist = Math.sqrt(dx*dx + dy*dy + dz*dz);
-                    if (dist > maxDist) {
-                        skipped++;
-                        continue;
-                    }
-                    System.out.println("Writing chunk " + i + "/" + total + " at " + wr.posX + " " + wr.posY + " " + wr.posZ);
-                    wr.markDirty();
-                    wr.updateRenderer(mc.thePlayer);
-                }
-                System.out.println("Skipped " + skipped + " chunks outside the render distance");
-                if (use_ply) {
-                    ex_ply.doneDumping();
-                } else {
-                    ex_obj.doneDumping();
-                }
-            } finally {
-                Tessellator.instance = real_tess;
-            }
-            return "Done!";
-        }
-        
-        @cheaty
-        @help("Re-renders the chunk as a wireframe")
-        public static String wireframe() {
-            WorldRenderer[] lizt = mc.renderGlobal.sortedWorldRenderers;
-            double px = mc.thePlayer.posX, py = mc.thePlayer.posY, pz = mc.thePlayer.posZ;
-            for (WorldRenderer wr : lizt) {
-                if (wr.posXMinus < px && px < wr.posXPlus
-                        && wr.posYMinus < py && py < wr.posYPlus
-                        && wr.posZMinus < pz && pz < wr.posZPlus) {
-                    Tessellator real_tess = Tessellator.instance;
-                    Tessellator.instance = new WireframeTessellator();
-                    wr.markDirty();
-                    wr.updateRenderer(mc.thePlayer);
-                    Tessellator.instance = real_tess;
-                    return null;
-                }
-            }
-            return "You aren't in a rendering chunk. Remarkable.";
-        }
-        
-        static Tessellator orig = null;
-        @cheaty
-        @help("Render all the things with a wireframe")
-        public static String wireframeGlobal() {
-            if (orig == null) {
-                orig = Tessellator.instance;
-                Tessellator.instance = new WireframeTessellator();
-                return "Run the command again to disable. Note that some effects may persist until MC is restarted.";
-            } else {
-                Tessellator.instance = orig;
-                orig = null;
-                return "Restored normal Tessellator";
-            }
-        }
-        
         static Map backup = null, empty = new HashMap();
         
         @help("Disable or enable TileEntity special renderers")
@@ -534,7 +401,7 @@ public class MiscClientCommands implements ICommand {
             if (is == null) {
                 return "Not holding anything";
             }
-            String name = Item.itemRegistry.getNameForObject(is.getItem());
+            String name = DataUtil.getName(is);
             FzUtil.copyStringToClipboard(name);
             return "Copied to clipboard: " + name;
         }
@@ -594,31 +461,12 @@ public class MiscClientCommands implements ICommand {
         private static String pick(Random rng, String... args) {
             return args[rng.nextInt(args.length)];
         }
-        
-        @help("Temp-fix for the entity interaction bug")
-        public static String mc2713() {
-            int failed = 0;
-            World world = mc.theWorld;
-            nextEntity: for (Entity ent : (Iterable<Entity>) world.loadedEntityList) {
-                Chunk chunk = world.getChunkFromChunkCoords(ent.chunkCoordX, ent.chunkCoordZ);
-                for (Entity e : (Iterable<Entity>) chunk.entityLists[ent.chunkCoordY]) {
-                    if (e == ent) continue nextEntity;
-                }
-                failed++;
-                chunk.addEntity(ent);
-            }
-            if (failed == 0) {
-                return "No broken entities; neptune thinks he's fixed the bug!";
-            }
-            return "Fixed " + failed + " entities";
-        }
-
 
         
         @help("Turns your cape on or off")
         public static void cape() {
-            mc.gameSettings.showCape ^= true;
-            mc.gameSettings.sendSettingsToServer();
+            boolean inv = !mc.gameSettings.getModelParts().contains(EnumPlayerModelParts.CAPE);
+            mc.gameSettings.setModelPartEnabled(EnumPlayerModelParts.CAPE, inv);
         }
 
         private static int active_world_hash = 0;
@@ -706,9 +554,9 @@ public class MiscClientCommands implements ICommand {
     public String getCommandUsage(ICommandSender icommandsender) {
         return "/" + FzConfig.f + " <subcommand, such as 'help' or 'list'>";
     }
-    
+
     @Override
-    public List addTabCompletionOptions(ICommandSender sender, String[] args) {
+    public List<String> addTabCompletionOptions(ICommandSender sender, String[] args, BlockPos pos) {
         try {
             if (args.length == 1) {
                 String arg0 = args[0];

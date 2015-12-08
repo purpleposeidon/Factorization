@@ -77,16 +77,8 @@ public class RayTracer {
             FzOrientation orientation = shadowOrientation(idc);
             if (orientation == null) continue;
             Coord at = new Coord(base);
-            Vec3 v = SpaceUtil.newVec();
-            at.setAsVector(v);
-            v.xCoord += 0.5 + trueOrientation.top.getDirectionVec().getX();
-            v.yCoord += 0.5 + trueOrientation.top.getDirectionVec().getY();
-            v.zCoord += 0.5 + trueOrientation.top.getDirectionVec().getZ();
-            v = idc.shadow2real(v);
+            Vec3 v = idc.shadow2real(at.toMiddleVector().add(new Vec3(trueOrientation.top.getDirectionVec())));
             idc.shadow2real(at);
-            AxisAlignedBB box = SpaceUtil.createAABB(v, v);
-            box.minY += 2;
-            //AabbDebugger.addBox(box);
             double x = v.xCoord;
             double y = v.yCoord;
             double z = v.zCoord;
@@ -104,13 +96,6 @@ public class RayTracer {
                     shadowBaseLocation.setAsTileEntityLocation(base);
                 }
             }
-
-            /*if (mopBlock(target, orientation.facing)) {
-                return true;
-            }*/
-
-            /*idc.shadow2real(at);
-            if (runPass(orientation, at, idc)) return true;*/
         }
         return false;
     }

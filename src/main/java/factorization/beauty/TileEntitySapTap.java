@@ -20,14 +20,12 @@ import net.minecraft.block.BlockLog;
 import net.minecraft.block.material.Material;
 import net.minecraft.client.renderer.texture.ITickable;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.init.Blocks;
 import net.minecraft.inventory.ISidedInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ChatComponentTranslation;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.IChatComponent;
-import net.minecraft.util.IIcon;
 import net.minecraft.world.chunk.Chunk;
 
 import java.io.IOException;
@@ -206,19 +204,6 @@ public class TileEntitySapTap extends TileEntityCommon implements ISidedInventor
         return super.activate(player, side);
     }
 
-    @Override
-    public IIcon getIcon(EnumFacing dir) {
-        Block bup = worldObj == null ? Blocks.planks : worldObj.getBlock(pos.getX(), pos.getY() + 1, pos.getZ());
-        int md;
-        if (worldObj != null && bup.getMaterial() == Material.wood && bup instanceof BlockLog) {
-            md = worldObj.getBlockMetadata(pos.getX(), pos.getY() + 1, pos.getZ());
-        } else {
-            bup = Blocks.log2;
-            md = 1;
-        }
-        return bup.getIcon(dir.ordinal(), md);
-    }
-
     boolean isLog(Coord c) {
         Block b = c.getBlock();
         return b.getMaterial() == Material.wood && b instanceof BlockLog;
@@ -270,7 +255,7 @@ public class TileEntitySapTap extends TileEntityCommon implements ISidedInventor
         @Override
         public void handle(Coord here) {
             Chunk chunk = here.getChunk();
-            for (TileEntity te : (Iterable<TileEntity>) chunk.chunkTileEntityMap.values()) {
+            for (TileEntity te : chunk.chunkTileEntityMap.values()) {
                 if (te.isInvalid()) continue;
                 if (!(te instanceof TileEntitySapTap)) continue;
                 Coord tec = new Coord(te);

@@ -59,7 +59,7 @@ public class SetDirection extends Instruction {
     }
     
     @Override
-    protected ItemStack getRecipeItem() {
+    protected Object getRecipeItem() {
         return new ItemStack(Items.arrow);
     }
 

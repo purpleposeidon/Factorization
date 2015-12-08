@@ -6,6 +6,7 @@ import io.netty.buffer.ByteBuf;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.BlockPos;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.relauncher.Side;
@@ -38,7 +39,7 @@ public enum Sound {
     boolean share;
 
     static class sound {
-        static ArrayList<Sound> list = new ArrayList();
+        static ArrayList<Sound> list = new ArrayList<Sound>();
     }
 
     void init(String src, double volume, double pitch) {
@@ -86,14 +87,15 @@ public enum Sound {
     @Deprecated // Doesn't work.
     public void playAt(Entity ent) {
         ent.worldObj.playSoundAtEntity(ent, src, volume, pitch);
-        share(ent.worldObj, (int) ent.posX, (int) (ent.posY - ent.yOffset), (int) ent.posZ);
+        share(ent.worldObj, new BlockPos((int) ent.posX, (int) (ent.posY - ent.getYOffset()), (int) ent.posZ));
     }
 
     public void playAt(World world, double x, double y, double z) {
         if (FMLCommonHandler.instance().getEffectiveSide() == Side.CLIENT) {
-            world.playSound(pos, src, volume, pitch, false);
+            world.playSound(x, y, z, src, volume, pitch, false);
         }
-        share(world, (int) x, (int) y, (int) z);
+        BlockPos pos = new BlockPos((int) x, (int) y, (int) z);
+        share(world, pos);
     }
 
     public void playAt(TileEntity ent) {

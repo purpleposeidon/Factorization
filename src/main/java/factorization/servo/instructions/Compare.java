@@ -12,25 +12,13 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumFacing;
-import net.minecraft.util.IIcon;
 
 import java.io.IOException;
 
 public class Compare extends Instruction {
     static enum CmpType {
         LT, LE, EQ, NE, GE, GT;
-        IIcon getIcon() {
-            switch (this) {
-            default:
-            case EQ: return BlockIcons.servo$cmp_eq;
-            case NE: return BlockIcons.servo$cmp_ne;
-            case GE: return BlockIcons.servo$cmp_ge;
-            case GT: return BlockIcons.servo$cmp_gt;
-            case LE: return BlockIcons.servo$cmp_le;
-            case LT: return BlockIcons.servo$cmp_lt;
-            }
-        }
-        
+
         boolean apply(Comparable a, Comparable b) {
             @SuppressWarnings("unchecked")
             int cmp = (int) Math.signum(a.compareTo(b));
@@ -55,7 +43,7 @@ public class Compare extends Instruction {
     }
 
     @Override
-    protected ItemStack getRecipeItem() {
+    protected Object getRecipeItem() {
         return new ItemStack(Items.quartz);
     }
 
@@ -77,11 +65,6 @@ public class Compare extends Instruction {
             return;
         }
         ss.push(cmp.apply((Comparable)a, (Comparable)b));
-    }
-
-    @Override
-    public IIcon getIcon(EnumFacing side) {
-        return cmp.getIcon();
     }
 
     @Override

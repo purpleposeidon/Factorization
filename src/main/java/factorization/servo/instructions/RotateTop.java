@@ -11,29 +11,21 @@ import factorization.servo.Instruction;
 import factorization.servo.ServoMotor;
 import factorization.servo.stepper.StepperEngine;
 import factorization.shared.Core;
+import factorization.util.FzUtil;
+import factorization.util.SpaceUtil;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumFacing;
-import net.minecraft.util.IIcon;
 
 import java.io.IOException;
 
 public class RotateTop extends Instruction {
     EnumFacing top = EnumFacing.UP;
-    
-    @Override
-    public IIcon getIcon(EnumFacing side) {
-        if (side == null) {
-            return BlockIcons.servo$set_facing.side_W;
-        }
-        return BlockIcons.servo$set_facing.get(top.getOpposite(), side);
-    }
-    
+
     @Override
     public boolean onClick(EntityPlayer player, Coord block, EnumFacing side) {
         if (playerHasProgrammer(player)) {
-            int i = top.ordinal();
-            top = SpaceUtil.getOrientation((i + 1) % 6);
+            top = FzUtil.shiftEnum(top, EnumFacing.VALUES, 1);
             return true;
         }
         return false;
@@ -68,7 +60,7 @@ public class RotateTop extends Instruction {
     }
     
     @Override
-    protected ItemStack getRecipeItem() {
+    protected Object getRecipeItem() {
         return new ItemStack(Core.registry.fan);
     }
     

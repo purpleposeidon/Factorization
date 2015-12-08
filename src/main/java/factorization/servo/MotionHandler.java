@@ -119,7 +119,7 @@ public class MotionHandler {
     public Vec3 getVelocity() {
         double speed = getProperSpeed();
         Vec3 direction = pos_next.difference(pos_prev).toVector().normalize();
-        return SpaceUtil.incrScale(direction, speed);
+        return SpaceUtil.scale(direction, speed);
     }
     
     public void penalizeSpeed() {

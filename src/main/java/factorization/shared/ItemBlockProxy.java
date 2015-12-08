@@ -3,6 +3,7 @@ package factorization.shared;
 import factorization.shared.Core.TabType;
 import factorization.util.DataUtil;
 import net.minecraft.block.Block;
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
@@ -35,10 +36,10 @@ public class ItemBlockProxy extends ItemFactorization {
     }
 
     public boolean placeBlockAt(ItemStack stack, EntityPlayer player, World world, BlockPos pos, EnumFacing side,
-            float hitX, float hitY, float hitZ, int metadata) {
+            float hitX, float hitY, float hitZ, IBlockState bs) {
         proxy.stackSize = stack.stackSize;
         proxy.setTagCompound(stack.getTagCompound());
-        boolean ret = theBlockItem.placeBlockAt(proxy, player, world, pos, side, hitX, hitY, hitZ, metadata);
+        boolean ret = theBlockItem.placeBlockAt(proxy, player, world, pos, side, hitX, hitY, hitZ, bs);
         stack.stackSize = proxy.stackSize;
         return ret;
     }
@@ -47,6 +48,35 @@ public class ItemBlockProxy extends ItemFactorization {
     //Why is that even necessary...?
     //TODO: Fix this stupidity. Seems like every other release it gets messed up.
     //Ah! Might have something to do with clicking on blocks that have an incorrect return. At one point clicking on colossal blocks made it place even if you were in front...
+
+    public boolean onItemUse(ItemStack stack, EntityPlayer player, World world, BlockPos pos, EnumFacing side, float hitX, float hitY, float hitZ) {
+        IBlockState iblockstate = world.getBlockState(pos);
+        Block block = iblockstate.getBlock();
+
+        if (!block.isReplaceable(world, pos)) {
+            pos = pos.offset(side);
+        }
+
+        if (stack.stackSize == 0) {
+            return false;
+        } else if (!player.canPlayerEdit(pos, side, stack)) {
+            return false;
+        } else if (world.canBlockBePlaced(this.block, pos, false, side, null, stack)) {
+            int i = this.getMetadata(stack.getMetadata());
+            IBlockState iblockstate1 = this.block.onBlockPlaced(world, pos, side, hitX, hitY, hitZ, i, player);
+
+            if (placeBlockAt(stack, player, world, pos, side, hitX, hitY, hitZ, iblockstate1)) {
+                world.playSoundEffect((double) ((float) pos.getX() + 0.5F), (double) ((float) pos.getY() + 0.5F), (double) ((float) pos.getZ() + 0.5F), this.block.stepSound.getPlaceSound(), (this.block.stepSound.getVolume() + 1.0F) / 2.0F, this.block.stepSound.getFrequency() * 0.8F);
+                --stack.stackSize;
+            }
+
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+
     @Override
     public boolean onItemUse(ItemStack par1ItemStack, EntityPlayer par2EntityPlayer, World par3World, int par4, int par5, int par6, int par7, float par8, float par9, float par10)
     {

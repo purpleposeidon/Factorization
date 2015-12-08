@@ -123,7 +123,7 @@ public class Awakener {
     }
     
     int ground_level = -1;
-    ColossusBuilderBlock valid_natural_blocks = new ColossusBuilderBlock(null, 0) {
+    ColossusBuilderBlock valid_natural_blocks = new ColossusBuilderBlock(null) {
         @Override
         public boolean matches(Coord at) {
             if (at.y <= ground_level) return false;
@@ -134,14 +134,10 @@ public class Awakener {
         }
     };
     
-    ColossusBuilderBlock BODY_ANY = new ColossusBuilderBlock(null, 0) {
+    ColossusBuilderBlock BODY_ANY = new ColossusBuilderBlock(null) {
         @Override
         public boolean matches(Coord at) {
-            if (at.getBlock() == Core.registry.colossal_block) {
-                int md = at.getMd();
-                return md == ColossalBlock.MD_BODY || md == ColossalBlock.MD_BODY_CRACKED || md == ColossalBlock.MD_BODY_COVERED;
-            }
-            return false;
+            return at.has(ColossalBlock.VARIANT, ColossalBlock.Md.BODY, ColossalBlock.Md.BODY_CRACKED, ColossalBlock.Md.BODY_COVERED);
         }
     };
     
@@ -363,7 +359,7 @@ public class Awakener {
     
     void markCoveredBodyBlocks(Set<Coord> body) {
         for (Coord c : body) {
-            if (!(c.getBlock() == Core.registry.colossal_block && c.getMd() == ColossalBlock.MD_BODY)) continue;
+            if (!c.has(ColossalBlock.VARIANT, ColossalBlock.Md.BODY)) continue;
             boolean has_air = false;
             boolean has_arm_or_leg = false;
             for (Coord at : c.getNeighborsAdjacent()) {
@@ -372,12 +368,12 @@ public class Awakener {
                     continue;
                 }
                 int md = at.getMd();
-                if (md == ColossalBlock.MD_ARM || md == ColossalBlock.MD_LEG || md == ColossalBlock.MD_BODY_COVERED) {
+                if (at.has(ColossalBlock.VARIANT, ColossalBlock.Md.ARM, ColossalBlock.Md.LEG, ColossalBlock.Md.BODY_COVERED)) {
                     has_arm_or_leg = true;
                 }
             }
             if (!has_air && has_arm_or_leg) {
-                c.setMd(ColossalBlock.MD_BODY_COVERED);
+                c.set(ColossalBlock.VARIANT, ColossalBlock.Md.BODY_COVERED);
             }
         }
     }
@@ -442,8 +438,8 @@ public class Awakener {
     }
     
     Set<Coord> iterateFrom(Set<Coord> start, ColossusBuilderBlock block, boolean diag) {
-        ArrayList<Coord> frontier = new ArrayList(start.size());
-        Set<Coord> ret = new HashSet();
+        ArrayList<Coord> frontier = new ArrayList<Coord>(start.size());
+        Set<Coord> ret = new HashSet<Coord>();
         frontier.addAll(start);
         for (Coord s : start) {
             if (block.matches(s)) {
@@ -463,11 +459,11 @@ public class Awakener {
     }
     
     ArrayList<Set<Coord>> getConnectedLimbs(Set<Coord> body, ColossusBuilderBlock block) {
-        ArrayList<Set<Coord>> ret = new ArrayList();
+        ArrayList<Set<Coord>> ret = new ArrayList<Set<Coord>>();
         for (Coord at : body) {
             for (Coord neighbor : at.getNeighborsAdjacent()) {
                 if (!body.contains(neighbor) && !inClasses(ret, neighbor) && block.matches(neighbor)) {
-                    Set<Coord> newSeed = new HashSet();
+                    Set<Coord> newSeed = new HashSet<Coord>();
                     newSeed.add(neighbor);
                     Set<Coord> newTerrain = iterateFrom(newSeed, block, false);
                     ret.add(newTerrain);

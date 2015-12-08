@@ -1,6 +1,9 @@
 package factorization.shared;
 
-import factorization.api.*;
+import factorization.api.Coord;
+import factorization.api.DeltaCoord;
+import factorization.api.IEntityMessage;
+import factorization.api.Quaternion;
 import factorization.api.datahelpers.DataInByteBuf;
 import factorization.artifact.ContainerForge;
 import factorization.common.Command;
@@ -16,13 +19,13 @@ import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.BlockPos;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.common.network.ByteBufUtils;
 import net.minecraftforge.fml.common.network.internal.FMLProxyPacket;
 import net.minecraftforge.fml.relauncher.Side;
 
 import java.io.IOException;
-import java.util.Random;
 
 public class NetworkFactorization {
     public static final ItemStack EMPTY_ITEMSTACK = new ItemStack(Blocks.air);
@@ -50,11 +53,6 @@ public class NetworkFactorization {
                 ItemStack is = (ItemStack) item;
                 if (is == EMPTY_ITEMSTACK) is = null;
                 ByteBufUtils.writeItemStack(output, is);
-            } else if (item instanceof VectorUV) {
-                VectorUV v = (VectorUV) item;
-                output.writeFloat((float) v.x);
-                output.writeFloat((float) v.y);
-                output.writeFloat((float) v.z);
             } else if (item instanceof DeltaCoord) {
                 DeltaCoord dc = (DeltaCoord) item;
                 dc.write(output);
@@ -164,7 +162,8 @@ public class NetworkFactorization {
             int x = input.readInt();
             int y = input.readInt();
             int z = input.readInt();
-            Coord here = new Coord(world, pos);
+            Coord here = new Coord(world, x, y, z);
+            BlockPos pos = here.toBlockPos();
             
             if (Core.debug_network) {
                 if (world.isRemote) {
@@ -249,7 +248,7 @@ public class NetworkFactorization {
         }
     }
 
-    void handleForeignMessage(World world, int x, int y, int z, TileEntity ent, MessageType messageType, ByteBuf input) throws IOException {
+    void handleForeignMessage(World world, BlockPos pos, TileEntity ent, MessageType messageType, ByteBuf input) throws IOException {
         if (!world.isRemote) {
             //Nothing for the server to deal with
         } else {
@@ -272,23 +271,7 @@ public class NetworkFactorization {
     }
     
     boolean handleForeignEntityMessage(Entity ent, MessageType messageType, ByteBuf input) throws IOException {
-        if (messageType == MessageType.EntityParticles) {
-            Random rand = new Random();
-            double px = rand.nextGaussian() * 0.02;
-            double py = rand.nextGaussian() * 0.02;
-            double pz = rand.nextGaussian() * 0.02;
-            
-            byte count = input.readByte();
-            String type = ByteBufUtils.readUTF8String(input);
-            for (int i = 0; i < count; i++) {
-                ent.worldObj.spawnParticle(type,
-                        ent.posX + rand.nextFloat() * ent.width * 2.0 - ent.width,
-                        ent.posY + 0.5 + rand.nextFloat() * ent.height,
-                        ent.posZ + rand.nextFloat() * ent.width * 2.0 - ent.width,
-                        px, py, pz);
-            }
-            return true;
-        } else if (messageType == MessageType.UtilityGooState) {
+        if (messageType == MessageType.UtilityGooState) {
             ItemGoo.handlePacket(input);
             return true;
         }
@@ -371,7 +354,7 @@ public class NetworkFactorization {
 
     public enum MessageType {
         factorizeCmdChannel,
-        PlaySound, EntityParticles(true),
+        PlaySound,
         
         DrawActive, FactoryType, DescriptionRequest, DataHelperEdit, RedrawOnClient, DataHelperEditOnEntity(true), OpenDataHelperGui, OpenDataHelperGuiOnEntity(true),
         TileEntityMessageOnEntity(true),

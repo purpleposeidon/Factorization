@@ -39,7 +39,7 @@ public class Spin extends Instruction {
     }
 
     @Override
-    protected ItemStack getRecipeItem() {
+    protected Object getRecipeItem() {
         return new ItemStack(Items.string);
     }
 

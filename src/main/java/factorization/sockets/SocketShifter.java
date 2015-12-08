@@ -11,17 +11,15 @@ import factorization.fzds.interfaces.IDeltaChunk;
 import factorization.notify.Notice;
 import factorization.servo.RenderServoMotor;
 import factorization.servo.ServoMotor;
-import factorization.shared.Block;
 import factorization.shared.Core;
 import factorization.util.InvUtil;
 import factorization.util.InvUtil.FzInv;
 import factorization.util.ItemUtil;
-import factorization.util.SpaceUtil;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.Vec3;
 import net.minecraftforge.fml.relauncher.Side;
@@ -54,11 +52,6 @@ public class SocketShifter extends TileEntitySocketBase {
     @Override
     public ItemStack getCreatingItem() {
         return Core.registry.socket_shifter;
-    }
-    
-    @Override
-    public boolean canUpdate() {
-        return true;
     }
     
     @Override
@@ -278,7 +271,8 @@ public class SocketShifter extends TileEntitySocketBase {
         if (foreignInv != null) return foreignInv;
         final EnumFacing top = facing;
 
-        for (Entity entity : (Iterable<EntityItem>)worldObj.getEntitiesWithinAABB(IInventory.class, getEntityBox(socket, coord, top, 0))) {
+        AxisAlignedBB entityBox = getEntityBox(socket, coord, top, 0);
+        for (Entity entity : worldObj.getEntitiesWithinAABB(Entity.class, entityBox)) {
             foreignInv = InvUtil.openInventory(entity, false);
             if (foreignInv != null) {
                 break;
@@ -291,13 +285,7 @@ public class SocketShifter extends TileEntitySocketBase {
         for (IDeltaChunk idc : DeltaChunk.getSlicesContainingPoint(target)) {
             final EnumFacing realBack = idc.shadow2real(back);
 
-            Vec3 v = SpaceUtil.newVec();
-            target.setAsVector(v);
-            v.xCoord += 0.5;
-            v.yCoord += 0.5;
-            v.zCoord += 0.5;
-
-            v = idc.shadow2real(v);
+            Vec3 v = idc.shadow2real(target.toMiddleVector());
 
             Coord real = new Coord(idc.worldObj, (int) Math.floor(v.xCoord), (int) Math.floor(v.yCoord), (int) Math.floor(v.zCoord));
 
@@ -394,7 +382,7 @@ public class SocketShifter extends TileEntitySocketBase {
     @Override
     protected boolean isBlockPowered() {
         if (worldObj.isRemote) return false;
-        return worldObj.getStrongestIndirectPower(pos.getX(), pos.getY(), pos.getZ()) > 0;
+        return worldObj.isBlockIndirectlyGettingPowered(pos) > 0;
     }
 
     @Override

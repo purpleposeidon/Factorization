@@ -11,6 +11,7 @@ import factorization.notify.Notice;
 import factorization.servo.ServoMotor;
 import factorization.shared.Core;
 import factorization.shared.DropCaptureHandler;
+import factorization.shared.FzModel;
 import factorization.shared.ICaptureDrops;
 import factorization.shared.NetworkFactorization.MessageType;
 import factorization.util.InvUtil;
@@ -19,6 +20,7 @@ import factorization.util.PlayerUtil;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.block.*;
 import net.minecraft.block.material.Material;
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.texture.TextureManager;
 import net.minecraft.enchantment.Enchantment;
@@ -27,6 +29,7 @@ import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
+import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.*;
 import net.minecraft.world.World;
 import net.minecraftforge.common.IShearable;
@@ -72,11 +75,6 @@ public class SocketScissors extends TileEntitySocketBase implements ICaptureDrop
     @Override
     public ItemStack getCreatingItem() {
         return new ItemStack(Core.registry.giant_scissors);
-    }
-
-    @Override
-    public boolean canUpdate() {
-        return true;
     }
 
     @Override
@@ -148,7 +146,7 @@ public class SocketScissors extends TileEntitySocketBase implements ICaptureDrop
 
     public static final DamageSource ScissorsDamge = new DamageSource("scissors") {
         @Override
-        public IChatComponent func_151519_b(EntityLivingBase victim) {
+        public IChatComponent getDeathMessage(EntityLivingBase victim) {
             String ret = "death.attack.scissors.";
             if (victim.worldObj != null) {
                 long now = victim.worldObj.getTotalWorldTime();
@@ -156,7 +154,7 @@ public class SocketScissors extends TileEntitySocketBase implements ICaptureDrop
             } else {
                 ret += "1";
             }
-            
+
             EntityLivingBase attacker = victim.func_94060_bK();
             String fightingMessage = ret + ".player";
             if (attacker != null && StatCollector.canTranslate(fightingMessage)) {
@@ -165,7 +163,7 @@ public class SocketScissors extends TileEntitySocketBase implements ICaptureDrop
                 return new ChatComponentTranslation(ret, victim.getDisplayName());
             }
         }
-        
+
         public Entity getEntity() {
             return SocketScissors.lootingPlayer;
         }
@@ -194,26 +192,28 @@ public class SocketScissors extends TileEntitySocketBase implements ICaptureDrop
         if (mop.typeOfHit == MovingObjectPosition.MovingObjectType.BLOCK) {
             ItemStack shears = new ItemStack(Items.shears, 0 /* In case it somehow gets yoinked from us */);
             shears.addEnchantment(Enchantment.silkTouch, 1);
-            Block block = worldObj.getBlock(mop.getBlockPos());
-            int metadata = worldObj.getBlockMetadata(mop.getBlockPos());
-            if (block.isAir(worldObj, mop.getBlockPos())) {
+            BlockPos blockPos = mop.getBlockPos();
+            IBlockState bs = worldObj.getBlockState(blockPos);
+            Block block = bs.getBlock();
+            if (block.isAir(worldObj, blockPos)) {
                 return false;
             }
+            TileEntity te = worldObj.getTileEntity(pos);
             EntityPlayer player = getFakePlayer();
-            if (canCutBlock(player, worldObj, block, mop.getBlockPos())) {
+            if (canCutBlock(player, worldObj, bs, blockPos)) {
                 player.inventory.mainInventory[0] = shears;
                 boolean sheared = false;
                 if (block instanceof IShearable) {
                     IShearable shearable = (IShearable) block;
-                    if (shearable.isShearable(shears, worldObj, mop.getBlockPos())) {
-                        Collection<ItemStack> drops = shearable.onSheared(shears, worldObj, mop.getBlockPos(), 0);
+                    if (shearable.isShearable(shears, worldObj, blockPos)) {
+                        Collection<ItemStack> drops = shearable.onSheared(shears, worldObj, blockPos, 0);
                         processCollectedItems(drops);
                         sheared = true;
                     }
                 }
-                boolean didRemove = removeBlock(player, block, metadata, mop.getBlockPos());
+                boolean didRemove = removeBlock(player, bs, blockPos);
                 if (didRemove && !sheared) {
-                    block.harvestBlock(worldObj, player, mop.getBlockPos(), metadata);
+                    block.harvestBlock(worldObj, player, blockPos, bs, te);
                 }
             } else {
                 blocked = true;
@@ -223,18 +223,19 @@ public class SocketScissors extends TileEntitySocketBase implements ICaptureDrop
         return false;
     }
     
-    private boolean removeBlock(EntityPlayer thisPlayerMP, Block block, int md, BlockPos pos) {
-        if (block == null) return false;
-        block.onBlockHarvested(world, pos, md, thisPlayerMP);
-        if (block.removedByPlayer(worldObj, thisPlayerMP, pos, false)) {
-            block.onBlockDestroyedByPlayer(world, pos, md);
+    private boolean removeBlock(EntityPlayer thisPlayerMP, IBlockState bs, BlockPos pos) {
+        Block block = bs.getBlock();
+        if (bs == null || block.isAir(worldObj, pos)) return false;
+        block.onBlockHarvested(worldObj, pos, bs, thisPlayerMP);
+        if (block.removedByPlayer(worldObj, pos, thisPlayerMP, false)) {
+            block.onBlockDestroyedByPlayer(worldObj, pos, bs);
             return true;
         }
         return false;
     }
 
-    public static boolean canCutBlock(EntityPlayer player, World world, Block block, BlockPos pos) {
-        int md = world.getBlockMetadata(pos);
+    public static boolean canCutBlock(EntityPlayer player, World world, IBlockState bs, BlockPos pos) {
+        Block block = bs.getBlock();
         Material mat = block.getMaterial();
         if (block.getBlockHardness(world, pos) == 0 && mat != Material.circuits && mat != Material.fire && mat != Material.air) {
             return true;
@@ -319,29 +320,29 @@ public class SocketScissors extends TileEntitySocketBase implements ICaptureDrop
         TextureManager tex = Minecraft.getMinecraft().renderEngine;
         tex.bindTexture(Core.blockAtlas);
         
-        piston_base.render(BlockIcons.socket$mini_piston);
+        piston_base.draw();
         GL11.glTranslatef(0, 0, -6f/16f);
-        piston_base.render(BlockIcons.socket$mini_piston);
+        piston_base.draw();
         float offset = -1F/16F * ((float)openCount/(float)openTime) - 1F/16F;
         GL11.glTranslatef(0, offset, 0f);
-        piston_head.render(BlockIcons.socket$mini_piston);
+        piston_head.draw();
         GL11.glTranslatef(0, 0, 6f/16f);
-        piston_head.render(BlockIcons.socket$mini_piston);
+        piston_head.draw();
 
         GL11.glPopMatrix();
     }
 
     @SideOnly(Side.CLIENT)
-    private static ObjectModel piston_base;
+    private static FzModel piston_base;
     @SideOnly(Side.CLIENT)
-    private static ObjectModel piston_head;
+    private static FzModel piston_head;
     
     @Override
     @SideOnly(Side.CLIENT)
     public void representYoSelf() {
         super.representYoSelf();
-        piston_base = new ObjectModel(Core.getResource("models/mini_piston/mini_piston_base.obj"));
-        piston_head = new ObjectModel(Core.getResource("models/mini_piston/mini_piston_head.obj"));
+        piston_base = new FzModel("mini_piston/mini_piston_base");
+        piston_head = new FzModel("mini_piston/mini_piston_head");
     }
 
     @Override

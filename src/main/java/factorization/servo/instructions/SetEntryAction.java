@@ -25,7 +25,7 @@ public class SetEntryAction extends Instruction {
     }
 
     @Override
-    protected ItemStack getRecipeItem() {
+    protected Object getRecipeItem() {
         return new ItemStack(Items.writable_book);
     }
 

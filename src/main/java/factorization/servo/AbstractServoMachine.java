@@ -15,6 +15,7 @@ import io.netty.buffer.Unpooled;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.DamageSource;
 import net.minecraft.util.EntityDamageSourceIndirect;
 import net.minecraft.util.EnumFacing;
@@ -247,7 +248,7 @@ public abstract class AbstractServoMachine extends Entity implements IEntityAddi
 
     @Override
     @SideOnly(Side.CLIENT)
-    public void setPositionAndRotation2(double x, double y, double z, float yaw, float pitch, int three) {
+    public void setPositionAndRotation2(double x, double y, double z, float yaw, float pitch, int posRotationIncrements, boolean p_180426_10_) {
         // The servers sends crappy packets. TODO: Sure would be nice if it didn't send those packets...
     }
 
@@ -258,19 +259,7 @@ public abstract class AbstractServoMachine extends Entity implements IEntityAddi
         this.posY = y;
         this.posZ = z;
         double dp = 1;
-        this.boundingBox.setBounds(pos, x + dp, y + dp, z + dp);
-        /*
-        double neg_size = -0.25;
-        double pos_size = 0.75;
-        double height = 2F/16F;
-        double dy = 0.5;
-        this.boundingBox.setBounds(x - neg_size, dy + y - height, z - neg_size, x + pos_size, dy + y + height, z + pos_size);
-        */
-    }
-
-    @Override
-    public void setPositionAndRotation(double x, double y, double z, float yaw, float pitch) {
-        super.setPositionAndRotation(pos, yaw, pitch);
+        this.setEntityBoundingBox(new AxisAlignedBB(x, y, z, x + dp, y + dp, z + dp));
     }
 
     protected MotionHandler newMotionHandler() {

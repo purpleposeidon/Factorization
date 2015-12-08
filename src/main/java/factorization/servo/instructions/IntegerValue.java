@@ -22,7 +22,7 @@ public class IntegerValue extends Instruction {
     }
 
     @Override
-    protected ItemStack getRecipeItem() {
+    protected Object getRecipeItem() {
         return new ItemStack(Blocks.iron_bars);
     }
 

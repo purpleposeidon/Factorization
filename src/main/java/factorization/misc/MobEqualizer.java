@@ -6,6 +6,8 @@ import net.minecraft.entity.monster.EntityMob;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.EnumAction;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.BlockPos;
+import net.minecraft.world.EnumDifficulty;
 import net.minecraftforge.event.entity.living.LivingSpawnEvent;
 import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
@@ -15,14 +17,15 @@ import java.util.ArrayList;
 public class MobEqualizer {
     @SubscribeEvent(priority = EventPriority.LOW)
     public void upgradeMob(LivingSpawnEvent.SpecialSpawn event) {
-        if (event.world.difficultySetting == null || event.world.difficultySetting.getDifficultyId() <= 1) {
+        EnumDifficulty difficulty = event.world.getDifficulty();
+        if (difficulty == null || difficulty.getDifficultyId() <= 1) {
             return;
         }
         if (!(event.entityLiving instanceof EntityMob)) {
             return;
         }
         EntityMob ent = (EntityMob) event.entityLiving;
-        if (event.world.rand.nextInt(400) > event.world.difficultySetting.getDifficultyId()) {
+        if (event.world.rand.nextInt(400) > difficulty.getDifficultyId()) {
             return;
         }
         if (!ent.canPickUpLoot()) return;
@@ -43,7 +46,7 @@ public class MobEqualizer {
                 //It's okay to leave slots empty
             }
         }
-        ArrayList<ItemStack> weapons = new ArrayList();
+        ArrayList<ItemStack> weapons = new ArrayList<ItemStack>();
         if (!(ent instanceof IRangedAttackMob) || event.world.rand.nextBoolean()) {
             ItemStack orig_weapon = ent.getHeldItem();
             double orig_damage = FzUtil.rateDamage(orig_weapon);
@@ -54,7 +57,7 @@ public class MobEqualizer {
                     continue;
                 }
                 EnumAction act = is.getItemUseAction();
-                if (act != EnumAction.block && act != EnumAction.none && act != EnumAction.bow) {
+                if (act != EnumAction.BLOCK && act != EnumAction.NONE && act != EnumAction.BOW) {
                     continue;
                 }
                 double new_damage = FzUtil.rateDamage(is);
@@ -72,7 +75,8 @@ public class MobEqualizer {
         }
         
         event.setCanceled(true);
-        ent.onSpawnWithEgg(null); // We need to cancel the event so that we can call this before the below happens
+        ent.onInitialSpawn(ent.worldObj.getDifficultyForLocation(new BlockPos(event.entity)), null);
+        // We need to cancel the event so that we can call this before the below happens
         ent.setCanPickUpLoot(false);
         if (weaponCopy != null) {
             ent.setCurrentItemOrArmor(0, weaponCopy);
@@ -92,7 +96,7 @@ public class MobEqualizer {
         double maxDistanceSq = Math.pow(16*8, 2);
         EntityPlayer secretary = null;
         int interviews = 0;
-        for (EntityPlayer player : (Iterable<EntityPlayer>)event.world.playerEntities) {
+        for (EntityPlayer player : event.world.playerEntities) {
             if (player.capabilities.isCreativeMode) {
                 continue;
             }

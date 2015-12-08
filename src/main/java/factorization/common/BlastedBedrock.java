@@ -1,12 +1,14 @@
 package factorization.common;
 
+import com.google.common.base.Predicate;
 import factorization.shared.Core;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.Entity;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
+import net.minecraft.util.BlockPos;
 import net.minecraft.world.Explosion;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
@@ -19,8 +21,7 @@ public class BlastedBedrock extends Block {
         setBlockUnbreakable();
         setResistance(6000000);
         setCreativeTab(Core.tabFactorization);
-        setBlockName("factorization:blasted_bedrock");
-        setBlockTextureName("factorization:blasted_bedrock");
+        setUnlocalizedName("factorization:blasted_bedrock");
     }
 
     @Override
@@ -29,16 +30,21 @@ public class BlastedBedrock extends Block {
     }
 
     @Override
-    public Item getItemDropped(int p_149650_1_, Random p_149650_2_, int p_149650_3_) {
+    public Item getItem(World world, BlockPos pos) {
         return null;
     }
 
     @Override
-    protected void dropBlockAsItem(World p_149642_1_, int p_149642_2_, int p_149642_3_, int p_149642_4_, ItemStack p_149642_5_) {
+    public Item getItemDropped(IBlockState state, Random rand, int fortune) {
+        return null;
     }
 
     @Override
-    public boolean canDropFromExplosion(Explosion p_149659_1_) {
+    public void dropBlockAsItemWithChance(World world, BlockPos pos, IBlockState state, float chance, int fortune) {
+    }
+
+    @Override
+    public boolean canDropFromExplosion(Explosion explosion) {
         return false;
     }
 
@@ -53,7 +59,7 @@ public class BlastedBedrock extends Block {
     }
 
     @Override
-    public boolean isReplaceableOreGen(World world, BlockPos pos, Block target) {
-        return target == Blocks.bedrock || target == this;
+    public boolean isReplaceableOreGen(World world, BlockPos pos, Predicate<IBlockState> target) {
+        return target.apply(Blocks.bedrock.getDefaultState());
     }
 }

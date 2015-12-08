@@ -15,6 +15,7 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.AxisAlignedBB;
+import net.minecraft.util.BlockPos;
 import net.minecraft.util.ChatComponentText;
 import net.minecraft.util.EnumFacing;
 
@@ -22,12 +23,9 @@ import java.util.List;
 
 final class FzdocSerialize implements ICommand {
     @Override
-    public int compareTo(Object arg0) {
-        if (arg0 instanceof ICommand) {
-            ICommand other = (ICommand) arg0;
-            return getCommandName().compareTo(other.getCommandName());
-        }
-        return 0;
+    public int compareTo(ICommand arg0) {
+        ICommand other = (ICommand) arg0;
+        return getCommandName().compareTo(other.getCommandName());
     }
 
     @Override
@@ -49,7 +47,9 @@ final class FzdocSerialize implements ICommand {
     }
 
     @Override
-    public List addTabCompletionOptions(ICommandSender icommandsender, String[] astring) { return null; }
+    public List<String> addTabCompletionOptions(ICommandSender sender, String[] args, BlockPos pos) {
+        return null;
+    }
 
     @Override
     public boolean isUsernameIndex(String[] astring, int i) { return false; }
@@ -120,7 +120,7 @@ final class FzdocSerialize implements ICommand {
         Coord.iterateCube(min, max, new ICoordFunction() { @Override public void handle(Coord here) {
             if (here.isAir()) return;
             DeltaCoord dc = here.difference(min).add(start);
-            w.setIdMdTe(dc, here.getId(), here.getMd(), here.getTE());
+            w.setIdMdTe(dc, here.getBlock(), here.getMd(), here.getTE());
         }});
         DeltaCoord d = max.difference(min);
         d.y /= 2; // The top always points up, so it can be pretty tall

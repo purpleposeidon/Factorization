@@ -10,6 +10,7 @@ import factorization.util.DataUtil;
 import factorization.util.InvUtil;
 import factorization.util.InvUtil.FzInv;
 import factorization.util.ItemUtil;
+import factorization.util.SpaceUtil;
 import net.minecraft.entity.Entity;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.ISidedInventory;
@@ -17,14 +18,12 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.AxisAlignedBB;
+import net.minecraft.util.BlockPos;
 import net.minecraft.util.EnumFacing;
-import net.minecraft.util.IIcon;
 import net.minecraft.util.MathHelper;
 import net.minecraftforge.fml.common.event.FMLModIdMappingEvent;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.fml.common.registry.GameRegistry.UniqueIdentifier;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -46,7 +45,7 @@ public class TileEntityParaSieve extends TileEntityFactorization implements ISid
     }
     
     public TileEntityParaSieve() {
-        facing_direction = 2;
+        facing_direction = EnumFacing.UP;
     }
     
     @Override
@@ -81,7 +80,7 @@ public class TileEntityParaSieve extends TileEntityFactorization implements ISid
     }
     
     public EnumFacing getFacing() {
-        return SpaceUtil.getOrientation(facing_direction).getOpposite();
+        return facing_direction.getOpposite();
     }
 
     static Coord hereCache = new Coord(null, 0, 0, 0);
@@ -205,25 +204,19 @@ public class TileEntityParaSieve extends TileEntityFactorization implements ISid
         stack_recursion.set(Math.max(0, sr - 1));
     }
     
-    AxisAlignedBB target_area = new AxisAlignedBB(0, 0, 0, 0, 0, 0);
     AxisAlignedBB getTargetArea() {
         final EnumFacing f = getFacing();
-        target_area.minX = pos.getX() + f.getDirectionVec().getX();
-        target_area.minY = pos.getY() + f.getDirectionVec().getY();
-        target_area.minZ = pos.getZ() + f.getDirectionVec().getZ();
-        target_area.maxX = target_area.minX + 1;
-        target_area.maxY = target_area.minY + 1;
-        target_area.maxZ = target_area.minZ + 1;
-        return target_area;
+        BlockPos spot = pos.offset(f);
+        return SpaceUtil.newBoxAround(spot);
     }
     
-    boolean isEntityInRange(Entity ent) {
+    boolean isEntityInRange(Entity ent, AxisAlignedBB target_area) {
         if (ent == null) return false;
-        return ent.getBoundingBox().intersectsWith(getTargetArea());
+        return ent.getEntityBoundingBox().intersectsWith(target_area);
     }
     
     IInventory getRecursiveTarget() {
-        if (_beginRecursion() || putting_nbt || getWorldObj() == null || getWorldObj().isRemote) {
+        if (_beginRecursion() || putting_nbt || worldObj == null || worldObj.isRemote) {
             return null;
         }
         EnumFacing facing = getFacing();
@@ -236,17 +229,17 @@ public class TileEntityParaSieve extends TileEntityFactorization implements ISid
             }
             cached_te = null;
         } else if (cached_ent != null) {
-            if (!cached_ent.isDead && cached_ent.boundingBox.intersectsWith(getTargetArea())) {
+            if (!cached_ent.isDead && cached_ent.getEntityBoundingBox().intersectsWith(getTargetArea())) {
                 return (IInventory) cached_ent;
             }
             cached_ent = null;
         }
-        TileEntity te = worldObj.getTileEntity(pos.getX() + facing.getDirectionVec().getX(), pos.getY() + facing.getDirectionVec().getY(), pos.getZ() + facing.getDirectionVec().getZ());
+        TileEntity te = worldObj.getTileEntity(pos.offset(facing));
         if (te instanceof IInventory) {
             cached_te = te;
             return InvUtil.openDoubleChest((IInventory) te, true);
         }
-        for (Entity ent : (Iterable<Entity>)worldObj.getEntitiesWithinAABB(IInventory.class, getTargetArea())) {
+        for (Entity ent : worldObj.getEntitiesWithinAABB(Entity.class, getTargetArea())) {
             if (ent instanceof IInventory) {
                 cached_ent = ent;
                 return (IInventory) ent;
@@ -305,11 +298,6 @@ public class TileEntityParaSieve extends TileEntityFactorization implements ISid
     }
 
     @Override
-    public String getInventoryName() {
-        return "Parasieve";
-    }
-
-    @Override
     public boolean isItemValidForSlot(int i, ItemStack itemstack) {
         if (i < filters.length) {
             return true;
@@ -326,7 +314,7 @@ public class TileEntityParaSieve extends TileEntityFactorization implements ISid
     }
 
     @Override
-    public int[] getAccessibleSlotsFromSide(int side) {
+    public int[] getSlotsForFace(EnumFacing side) {
         try {
             IInventory target = getRecursiveTarget();
             if (target == null) {
@@ -334,7 +322,7 @@ public class TileEntityParaSieve extends TileEntityFactorization implements ISid
             }
             side = facing_direction;
             if (target instanceof ISidedInventory) {
-                int[] slotList = ((ISidedInventory)target).getAccessibleSlotsFromSide(side);
+                int[] slotList = ((ISidedInventory)target).getSlotsForFace(side);
                 int[] ret = java.util.Arrays.copyOf(slotList, slotList.length);
                 for (int i = 0; i < ret.length; i++) {
                     ret[i] += filters.length;
@@ -352,9 +340,9 @@ public class TileEntityParaSieve extends TileEntityFactorization implements ISid
             endRecursion();
         }
     }
-    
+
     @Override
-    public boolean canInsertItem(int slot, ItemStack itemstack, int side) {
+    public boolean canInsertItem(int slot, ItemStack itemstack, EnumFacing direction) {
         if (slot < filters.length) {
             return true;
         }
@@ -364,17 +352,17 @@ public class TileEntityParaSieve extends TileEntityFactorization implements ISid
                 return true;
             }
             if (target instanceof ISidedInventory) {
-                return ((ISidedInventory) target).canInsertItem(slot - filters.length, itemstack, getFacing().getOpposite().ordinal()) && itemPassesFilter(itemstack);
+                return ((ISidedInventory) target).canInsertItem(slot - filters.length, itemstack, facing_direction) && itemPassesFilter(itemstack);
             }
             return itemPassesFilter(itemstack);
         } finally {
             endRecursion();
         }
     }
-    
+
     @Override
-    public boolean canExtractItem(int slot, ItemStack itemstack, int side) {
-        if (slot < filters.length) {
+    public boolean canExtractItem(int index, ItemStack itemstack, EnumFacing direction) {
+        if (index < filters.length) {
             return true;
         }
         try {
@@ -383,35 +371,22 @@ public class TileEntityParaSieve extends TileEntityFactorization implements ISid
                 return true;
             }
             if (target instanceof ISidedInventory) {
-                return ((ISidedInventory) target).canExtractItem(slot - filters.length, itemstack, facing_direction) && itemPassesFilter(itemstack);
+                return ((ISidedInventory) target).canExtractItem(index - filters.length, itemstack, facing_direction) && itemPassesFilter(itemstack);
             }
             return itemPassesFilter(itemstack);
         } finally {
             endRecursion();
         }
     }
-    
+
+    @Override
+    public void clear() {
+        for (int i = 0; i < filters.length; i++) filters[i] = null;
+    }
+
     @Override
     protected void doLogic() { }
 
-    @Override
-    public boolean canUpdate() {
-        return false;
-    }
-
-    @Override
-    @SideOnly(Side.CLIENT)
-    public IIcon getIcon(EnumFacing dir) {
-        EnumFacing face = getFacing();
-        if (dir == face) {
-            return BlockIcons.parasieve_front;
-        } else if (dir == face.getOpposite()) {
-            return BlockIcons.parasieve_back;
-        } else {
-            return BlockIcons.parasieve_side;
-        }
-    }
-    
     @Override
     public int getComparatorValue(EnumFacing side) {
         try {
@@ -491,11 +466,10 @@ public class TileEntityParaSieve extends TileEntityFactorization implements ISid
     @Override
     public boolean rotate(EnumFacing axis) {
         dirtyCache();
-        byte ao = (byte) axis.ordinal();
-        if (ao == facing_direction) {
+        if (axis == facing_direction) {
             return false;
         }
-        facing_direction = ao;
+        facing_direction = axis;
         return true;
     }
     

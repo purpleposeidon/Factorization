@@ -7,8 +7,6 @@ import factorization.servo.ServoMotor;
 import factorization.servo.ServoStack;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.EnumFacing;
-import net.minecraft.util.IIcon;
 
 import java.io.IOException;
 
@@ -19,7 +17,7 @@ public class Sum extends Instruction {
     }
 
     @Override
-    protected ItemStack getRecipeItem() {
+    protected Object getRecipeItem() {
         return new ItemStack(Blocks.iron_bars);
     }
     
@@ -36,11 +34,6 @@ public class Sum extends Instruction {
         if (a == null) a = 0;
         if (b == null) b = 0;
         stack.push(a + b);
-    }
-
-    @Override
-    public IIcon getIcon(EnumFacing side) {
-        return BlockIcons.servo$sum;
     }
 
     @Override

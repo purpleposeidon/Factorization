@@ -10,9 +10,7 @@ import factorization.servo.ServoMotor;
 import factorization.servo.stepper.StepperEngine;
 import factorization.shared.Core;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumFacing;
-import net.minecraft.util.IIcon;
 
 import java.io.IOException;
 
@@ -27,7 +25,7 @@ public class SocketCtrl extends Instruction {
     }
 
     @Override
-    protected ItemStack getRecipeItem() {
+    protected Object getRecipeItem() {
         return Core.registry.empty_socket_item;
     }
 
@@ -57,16 +55,6 @@ public class SocketCtrl extends Instruction {
         }
     }
 
-    @Override
-    public IIcon getIcon(EnumFacing side) {
-        if (mode == 1) {
-            return BlockIcons.servo$socket_on;
-        } else if (mode == 2) {
-            return BlockIcons.servo$socket_off;
-        }
-        return BlockIcons.servo$socket_pulse;
-    }
-    
     @Override
     public String getInfo() {
         if (mode == MODE_POWER) {

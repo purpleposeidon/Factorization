@@ -26,7 +26,7 @@ public abstract class TileEntityFactorization extends TileEntityCommon
 
     //Save & Share
     public byte draw_active;
-    public byte facing_direction = 3;
+    public EnumFacing facing_direction;
 
     //Runtime
     protected transient boolean need_logic_check = true;
@@ -49,7 +49,7 @@ public abstract class TileEntityFactorization extends TileEntityCommon
         if (player == null) {
             return;
         }
-        facing_direction = (byte) side.ordinal();
+        facing_direction = side;
     }
 
     protected void needLogic() {
@@ -125,7 +125,7 @@ public abstract class TileEntityFactorization extends TileEntityCommon
     @Override
     public void putData(DataHelper data) throws IOException {
         draw_active = data.as(Share.VISIBLE, "draw_active_byte").putByte(draw_active);
-        facing_direction = data.as(Share.VISIBLE, "facing").putByte(facing_direction);
+        facing_direction = data.as(Share.VISIBLE, "facing").putEnum(facing_direction);
     }
 
     public final void putSlots(DataHelper data) {

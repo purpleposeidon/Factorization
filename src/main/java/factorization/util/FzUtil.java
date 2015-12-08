@@ -32,7 +32,7 @@ import java.util.Collection;
 public class FzUtil {
 
 
-    public static <E extends Enum> E shiftEnum(E current, E values[], int delta) {
+    public static <E extends Enum> E shiftEnum(E current, E values[], int delta) { // 'cycleEnum'
         int next = current.ordinal() + delta;
         if (next < 0) {
             return values[values.length - 1];

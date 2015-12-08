@@ -9,7 +9,6 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumFacing;
-import net.minecraft.util.IIcon;
 
 import java.io.IOException;
 
@@ -22,7 +21,7 @@ public class Jump extends Instruction {
     }
 
     @Override
-    protected ItemStack getRecipeItem() {
+    protected Object getRecipeItem() {
         return new ItemStack(Blocks.piston);
     }
 
@@ -48,17 +47,6 @@ public class Jump extends Instruction {
         }
     }
 
-    @Override
-    public IIcon getIcon(EnumFacing side) {
-        if (mode == Executioner.JMP_NEXT_INSTRUCTION) {
-            return BlockIcons.servo$jmp_instruction;
-        } else if (mode == Executioner.JMP_NEXT_TILE) {
-            return BlockIcons.servo$jmp_tile;
-        } else {
-            return BlockIcons.error;
-        }
-    }
-    
     @Override
     public boolean onClick(EntityPlayer player, Coord block, EnumFacing side) {
         if (!playerHasProgrammer(player)) {

@@ -8,7 +8,6 @@ import factorization.servo.ServoStack;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumFacing;
-import net.minecraft.util.IIcon;
 
 import java.io.IOException;
 
@@ -19,7 +18,7 @@ public class Dup extends Instruction {
     }
 
     @Override
-    protected ItemStack getRecipeItem() {
+    protected Object getRecipeItem() {
         return new ItemStack(Items.egg);
     }
 
@@ -33,11 +32,6 @@ public class Dup extends Instruction {
         }
         stack.push(a);
         stack.push(a);
-    }
-
-    @Override
-    public IIcon getIcon(EnumFacing side) {
-        return BlockIcons.servo$dup;
     }
 
     @Override

@@ -1,6 +1,5 @@
 package factorization.utiligoo;
 
-import factorization.shared.Block;
 import factorization.shared.Core;
 import factorization.util.RenderUtil;
 import net.minecraft.block.Block;

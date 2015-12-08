@@ -7,10 +7,7 @@ import factorization.servo.Instruction;
 import factorization.servo.ServoMotor;
 import factorization.servo.TileEntityServoRail;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.init.Blocks;
-import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumFacing;
-import net.minecraft.util.IIcon;
 
 import java.io.IOException;
 
@@ -46,17 +43,12 @@ public class EntryControl extends Instruction {
     }
 
     @Override
-    protected ItemStack getRecipeItem() {
-        return new ItemStack(Blocks.fence_gate);
+    protected Object getRecipeItem() {
+        return "fenceGateWood";
     }
 
     @Override
     public void motorHit(ServoMotor motor) { }
-
-    @Override
-    public IIcon getIcon(EnumFacing side) {
-        return blocking ? BlockIcons.servo$entry_forbid : BlockIcons.servo$entry_require;
-    }
 
     @Override
     public String getName() {

@@ -2,13 +2,14 @@ package factorization.colossi;
 
 import factorization.api.Coord;
 import factorization.shared.Core;
+import net.minecraft.block.BlockSign;
+import net.minecraft.block.BlockStandingSign;
 import net.minecraft.command.CommandBase;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.init.Blocks;
 import net.minecraft.tileentity.TileEntityCommandBlock;
 import net.minecraft.tileentity.TileEntitySign;
 import net.minecraft.util.ChatComponentText;
-import net.minecraft.util.ChunkCoordinates;
 
 public class BuildColossusCommand extends CommandBase {
     @Override
@@ -32,25 +33,24 @@ public class BuildColossusCommand extends CommandBase {
     }
 
     @Override
-    public void processCommand(ICommandSender player, String[] args) {
+    public void processCommand(ICommandSender sender, String[] args) {
         if (args.length == 0) {
-            player.addChatMessage(new ChatComponentText(getCommandUsage(player)));
+            sender.addChatMessage(new ChatComponentText(getCommandUsage(sender)));
             return;
         }
         if (args[0].equalsIgnoreCase("reload-masks")) {
             MaskLoader.reloadMasks();
             return;
         }
-        ChunkCoordinates cc = player.getPlayerCoordinates();
-        Coord at = new Coord(player.getEntityWorld(), cc.posX, cc.posY, cc.posZ);
-        if (player.getCommandSenderName().startsWith("@")) {
+        Coord at = new Coord(sender.getEntityWorld(), sender.getPosition());
+        if (sender.getCommandSenderName().startsWith("@")) {
             at = at.add(0, 6, 0);		    
         }
         if (args[0].equalsIgnoreCase("spam") || args[0].equals("$")) {
             int randSeed;
             if (args[0].equals("$")) {
                 MaskLoader.reloadMasks();
-                randSeed = player.getEntityWorld().rand.nextInt();
+                randSeed = sender.getEntityWorld().rand.nextInt();
                 Core.logInfo("seed: " + randSeed);
             } else {
                 randSeed = Integer.parseInt(args[1]);
@@ -74,11 +74,11 @@ public class BuildColossusCommand extends CommandBase {
         builder.construct();
         
         if (signAt.getTE(TileEntityCommandBlock.class) != null) {
-            signAt.setIdMd(Blocks.standing_sign, 12, true);
+            signAt.set(BlockStandingSign.ROTATION, 12, true);
             TileEntitySign sign = signAt.getTE(TileEntitySign.class);
             if (sign != null) {
-                sign.signText[0] = "Colossus Seed";
-                sign.signText[1] = "" + randSeed;
+                sign.signText[0] = new ChatComponentText("Colossus Seed");
+                sign.signText[1] = new ChatComponentText("" + randSeed);
                 signAt.markBlockForUpdate();
             }
         }

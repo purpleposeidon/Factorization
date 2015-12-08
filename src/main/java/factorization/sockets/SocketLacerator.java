@@ -17,23 +17,19 @@ import factorization.shared.Core;
 import factorization.shared.DropCaptureHandler;
 import factorization.shared.ICaptureDrops;
 import factorization.shared.NetworkFactorization.MessageType;
-import factorization.util.InvUtil;
-import factorization.util.ItemUtil;
-import factorization.util.NumUtil;
-import factorization.util.PlayerUtil;
+import factorization.util.*;
 import factorization.weird.TileEntityDayBarrel;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.block.Block;
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.particle.EffectRenderer;
 import net.minecraft.client.particle.EntityFX;
-import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.texture.TextureManager;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
@@ -100,14 +96,8 @@ public class SocketLacerator extends TileEntitySocketBase implements IChargeCond
     }
     
     @Override
-    public boolean canUpdate() {
-        return true;
-    }
-    
-    @Override
     public void update() {
         charge.update();
-        super.updateEntity();
     }
     
     @Override
@@ -260,7 +250,7 @@ public class SocketLacerator extends TileEntitySocketBase implements IChargeCond
     
     public static final DamageSource laceration = new DamageSource("laceration") {
         @Override
-        public IChatComponent func_151519_b(EntityLivingBase victim) {
+        public IChatComponent getDeathMessage(EntityLivingBase victim) {
             String ret = "death.attack.laceration.";
             if (victim.worldObj != null) {
                 long now = victim.worldObj.getTotalWorldTime();
@@ -328,8 +318,8 @@ public class SocketLacerator extends TileEntitySocketBase implements IChargeCond
             if (block == null || block.isAir(mopWorld, mop.getBlockPos())) {
                 return false;
             }
-            int md = mopWorld.getBlockMetadata(mop.getBlockPos());
-            if (!block.canCollideCheck(md, false)) {
+            IBlockState bs = mopWorld.getBlockState(mop.getBlockPos());
+            if (!block.canCollideCheck(bs, false)) {
                 return false;
             }
             if (!FzConfig.lacerator_block_graylist.passes(block)) {
@@ -350,13 +340,13 @@ public class SocketLacerator extends TileEntitySocketBase implements IChargeCond
             socket.extractCharge(1); //It's fine if it fails
             
             //Below: A brief demonstration of why Coord exists
-            long foundHash = (mop.blockX) + (mop.blockY << 2) + (mop.blockZ << 4);
+            long foundHash = mop.getBlockPos().hashCode();
             float hardness = block.getBlockHardness(mopWorld, mop.getBlockPos());
             if (hardness < 0) {
                 speed -= max_speed/5;
                 return true;
             }
-            foundHash = (foundHash << 4) + block.hashCode() + md;
+            foundHash = (foundHash << 4) + block.hashCode();
             if (barrel != null) {
                 foundHash += barrel.item.hashCode()*5 + barrel.item.getItemDamage()*10;
             }
@@ -367,7 +357,7 @@ public class SocketLacerator extends TileEntitySocketBase implements IChargeCond
                 progress++;
                 if (socket == this && worldObj.rand.nextInt(4) == 0) {
                     // Torsion!?
-                    TileEntity partner = mopWorld.getTileEntity(mop.blockX + facing.getDirectionVec().getX(), mop.blockY + facing.getDirectionVec().getY(), mop.blockZ + facing.getDirectionVec().getZ());
+                    TileEntity partner = mopWorld.getTileEntity(mop.getBlockPos().offset(facing));
                     if (partner instanceof SocketLacerator) {
                         SocketLacerator pardner = (SocketLacerator) partner;
                         if (pardner.workCheck()) {
@@ -393,7 +383,7 @@ public class SocketLacerator extends TileEntitySocketBase implements IChargeCond
                 grab_items = true;
                 grind_items = true;
                 if (barrel == null) {
-                    mopWorld.playAuxSFX(2001, mop.getBlockPos(), Block.getIdFromBlock(block) + md << 12);
+                    mopWorld.playAuxSFX(2001, mop.getBlockPos(), Block.getIdFromBlock(block));
                     
                     EntityPlayer player = getFakePlayer();
                     ItemStack pick = new ItemStack(Items.diamond_pickaxe);
@@ -401,18 +391,18 @@ public class SocketLacerator extends TileEntitySocketBase implements IChargeCond
                     player.inventory.mainInventory[0] = pick;
                     {
                         boolean canHarvest = false;
-                        canHarvest = block.canHarvestBlock(player, md);
+                        canHarvest = block.canHarvestBlock(mopWorld, mop.getBlockPos(), player);
                         canHarvest = true; //Hack-around for cobalt/ardite. Hmm.
 
-                        boolean didRemove = removeBlock(player, block, md, mopWorld, mop.getBlockPos());
+                        boolean didRemove = removeBlock(player, block, bs, mopWorld, mop.getBlockPos());
                         if (didRemove) {
-                            block.harvestBlock(mopWorld, player, mop.getBlockPos(), md);
+                            block.harvestBlock(mopWorld, player, mop.getBlockPos(), bs, te);
                         }
                     }
-                    block.onBlockHarvested(mopWorld, mop.getBlockPos(), md, player);
-                    if (block.removedByPlayer(mopWorld, player, mop.getBlockPos(), true)) {
-                        block.onBlockDestroyedByPlayer(mopWorld, mop.getBlockPos(), md);
-                        block.harvestBlock(mopWorld, player, mop.getBlockPos(), 0);
+                    block.onBlockHarvested(mopWorld, mop.getBlockPos(), bs, player);
+                    if (block.removedByPlayer(mopWorld, mop.getBlockPos(), player, true)) {
+                        block.onBlockDestroyedByPlayer(mopWorld, mop.getBlockPos(), bs);
+                        block.harvestBlock(mopWorld, player, mop.getBlockPos(), bs, te);
                     }
                     player.inventory.mainInventory[0] = null;
                     PlayerUtil.recycleFakePlayer(player);
@@ -431,11 +421,11 @@ public class SocketLacerator extends TileEntitySocketBase implements IChargeCond
         }
     }
     
-    private boolean removeBlock(EntityPlayer thisPlayerMP, Block block, int md, World mopWorld, BlockPos pos) {
+    private boolean removeBlock(EntityPlayer thisPlayerMP, Block block, IBlockState bs, World mopWorld, BlockPos pos) {
         if (block == null) return false;
-        block.onBlockHarvested(mopWorld, pos, md, thisPlayerMP);
-        if (block.removedByPlayer(mopWorld, thisPlayerMP, pos, false)) {
-            block.onBlockDestroyedByPlayer(mopWorld, pos, md);
+        block.onBlockHarvested(mopWorld, pos, bs, thisPlayerMP);
+        if (block.removedByPlayer(mopWorld, pos, thisPlayerMP, false)) {
+            block.onBlockDestroyedByPlayer(mopWorld, pos, bs);
             return true;
         }
         return false;
@@ -493,8 +483,6 @@ public class SocketLacerator extends TileEntitySocketBase implements IChargeCond
     @SideOnly(Side.CLIENT)
     static SocketLacerator me;
     @SideOnly(Side.CLIENT)
-    static int px, py, pz;
-    @SideOnly(Side.CLIENT)
     static double facex, facey, facez;
     
     @SideOnly(Side.CLIENT)
@@ -503,17 +491,12 @@ public class SocketLacerator extends TileEntitySocketBase implements IChargeCond
         if (particleTweaker == null) {
             particleTweaker = new ParticleWarper(worldObj, mc.renderEngine);
         }
-        px = pos.getX() + facing.getDirectionVec().getX();
-        py = pos.getY() + facing.getDirectionVec().getY();
-        pz = pos.getZ() + facing.getDirectionVec().getZ();
-        
+        BlockPos forward = pos.offset(facing);
+
         EnumFacing op = facing.getOpposite();
-        
-        facex = px + 0.5 + 0.5*op.getDirectionVec().getX();
-        facey = py + 0.5 + 0.5*op.getDirectionVec().getY();
-        facez = pz + 0.5 + 0.5*op.getDirectionVec().getZ();
-        
-        Block b = worldObj.getBlock(px, py, pz);
+        Vec3 face = new Vec3(forward.add(0.5, 0.5, 0.5)).add(SpaceUtil.scale(new Vec3(op.getDirectionVec()), 0.5));
+
+        Block b = worldObj.getBlock(forward);
         if (b == null) {
             return;
         }
@@ -522,7 +505,7 @@ public class SocketLacerator extends TileEntitySocketBase implements IChargeCond
         mc.effectRenderer = particleTweaker;
         try {
             for (int i = 0; i < 1; i++) {
-                particleTweaker.addBlockHitEffects(px, py, pz, op.ordinal());
+                particleTweaker.addBlockHitEffects(pos, op);
             }
         } finally {
             me = null;

@@ -38,7 +38,7 @@ public abstract class Instruction extends Decorator {
         return new ItemStack(Core.registry.instruction_plate);
     }
     
-    protected abstract ItemStack getRecipeItem();
+    protected abstract Object getRecipeItem();
     
     /** returns for how long the instruction should block for. */
     public CpuBlocking getBlockingBehavior() {

@@ -29,7 +29,7 @@ public class InstructionGroup extends Instruction {
     }
 
     @Override
-    protected ItemStack getRecipeItem() {
+    protected Object getRecipeItem() {
         return new ItemStack(Items.slime_ball);
     }
     

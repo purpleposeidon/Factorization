@@ -22,7 +22,7 @@ public class BooleanValue extends Instruction {
     }
 
     @Override
-    protected ItemStack getRecipeItem() {
+    protected Object getRecipeItem() {
         return new ItemStack(Blocks.lever);
     }
 

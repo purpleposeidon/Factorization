@@ -5,7 +5,6 @@ import factorization.api.datahelpers.IDataSerializable;
 import factorization.servo.Instruction;
 import factorization.servo.ServoMotor;
 import factorization.shared.Core;
-import net.minecraft.item.ItemStack;
 
 import java.io.IOException;
 
@@ -17,7 +16,7 @@ public class SetRepeatedInstruction extends Instruction {
     }
 
     @Override
-    protected ItemStack getRecipeItem() {
+    protected Object getRecipeItem() {
         return Core.registry.dark_iron_sprocket.copy();
     }
 

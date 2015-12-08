@@ -7,7 +7,6 @@ import factorization.servo.Instruction;
 import factorization.servo.ServoMotor;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.EnumFacing;
 import net.minecraft.util.IIcon;
 
 import java.io.IOException;
@@ -20,7 +19,7 @@ public class Trap extends Instruction {
     }
 
     @Override
-    protected ItemStack getRecipeItem() {
+    protected Object getRecipeItem() {
         return new ItemStack(Blocks.trapped_chest);
     }
 
@@ -33,11 +32,6 @@ public class Trap extends Instruction {
         if (!motor.getCurrentPos().isWeaklyPowered()) {
             motor.setStopped(true);
         }
-    }
-
-    @Override
-    public IIcon getIcon(EnumFacing side) {
-        return BlockIcons.servo$trap;
     }
 
     @Override

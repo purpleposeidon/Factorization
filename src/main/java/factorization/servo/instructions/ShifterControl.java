@@ -13,7 +13,6 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumFacing;
-import net.minecraft.util.IIcon;
 
 import java.io.IOException;
 
@@ -41,7 +40,7 @@ public class ShifterControl extends Instruction {
     }
 
     @Override
-    protected ItemStack getRecipeItem() {
+    protected Object getRecipeItem() {
         return new ItemStack(Blocks.hopper);
     }
 
@@ -110,21 +109,6 @@ public class ShifterControl extends Instruction {
         case PULSE_EXACT: return "Pulse Transfer Exact";
         case PULSE_SOME: return "Pulse Transfer Some";
         case PROBE: return "Probe";
-        }
-    }
-    
-    @Override
-    public IIcon getIcon(EnumFacing side) {
-        switch (mode) {
-        default:
-        case EXPORT_MODE: return BlockIcons.servo$ctrl$shift_export;
-        case IMPORT_MODE: return BlockIcons.servo$ctrl$shift_import;
-        case TRANSFER_LIMIT: return BlockIcons.servo$ctrl$shift_transfer_limit;
-        case TARGET_SLOT: return BlockIcons.servo$ctrl$shift_target_slot;
-        case PULSE_EXACT: return BlockIcons.servo$ctrl$shift_pulse_exact;
-        case PULSE_SOME: return BlockIcons.servo$ctrl$shift_pulse_some;
-        case STREAM: return BlockIcons.servo$ctrl$shift_stream;
-        case PROBE: return BlockIcons.servo$ctrl$shift_probe;
         }
     }
 

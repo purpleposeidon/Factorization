@@ -6,10 +6,9 @@ import factorization.api.datahelpers.IDataSerializable;
 import factorization.servo.Instruction;
 import factorization.servo.ServoMotor;
 import net.minecraft.block.BlockRedstoneWire;
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.EnumFacing;
-import net.minecraft.util.IIcon;
 
 import java.io.IOException;
 
@@ -21,27 +20,23 @@ public class ReadRedstone extends Instruction {
     }
 
     @Override
-    protected ItemStack getRecipeItem() {
+    protected Object getRecipeItem() {
         return new ItemStack(Items.redstone);
     }
 
     @Override
     public void motorHit(ServoMotor motor) {
         Coord at = motor.getCurrentPos().add(motor.getOrientation().top);
-        int power = 0;
-        if (at.getBlock() instanceof BlockRedstoneWire) {
-            power = at.getMd();
+        int power;
+        IBlockState bs = at.getState();
+        if (bs.getBlock() instanceof BlockRedstoneWire) {
+            power = bs.getValue(BlockRedstoneWire.POWER);
         } else {
-            power = at.w.getStrongestIndirectPower(at.x, at.y, at.z);
+            power = at.w.isBlockIndirectlyGettingPowered(at.toBlockPos());
             //power = at.w.getBlockPowerInput(at.x, at.y, at.z);
             //power = at.w.getIndirectPowerLevelTo(at.x, at.y, at.z, motor.getOrientation().top.ordinal());
         }
         motor.getArgStack().push(power);
-    }
-
-    @Override
-    public IIcon getIcon(EnumFacing side) {
-        return BlockIcons.servo$read_redstone;
     }
 
     @Override

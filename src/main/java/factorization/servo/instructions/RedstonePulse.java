@@ -49,7 +49,7 @@ public class RedstonePulse extends Instruction {
     }
 
     @Override
-    protected ItemStack getRecipeItem() {
+    protected Object getRecipeItem() {
         return new ItemStack(Blocks.stone_pressure_plate);
     }
     

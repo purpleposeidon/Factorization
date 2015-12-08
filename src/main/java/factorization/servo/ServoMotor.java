@@ -28,10 +28,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.Packet;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.AxisAlignedBB;
-import net.minecraft.util.EnumFacing;
-import net.minecraft.util.MovingObjectPosition;
-import net.minecraft.util.Vec3;
+import net.minecraft.util.*;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.common.network.internal.FMLNetworkHandler;
 import net.minecraftforge.fml.common.network.internal.FMLProxyPacket;
@@ -366,13 +363,13 @@ public class ServoMotor extends AbstractServoMachine implements IInventory, ISoc
     }
 
     @Override
-    public String getInventoryName() {
-        return "Servo Motor Inventory";
+    public IChatComponent getDisplayName() {
+        return new ChatComponentTranslation("factorization.servo.inventory");
     }
 
     @Override
-    public boolean hasCustomInventoryName() {
-        return true;
+    public boolean hasCustomName() {
+        return false;
     }
 
     @Override
@@ -400,27 +397,26 @@ public class ServoMotor extends AbstractServoMachine implements IInventory, ISoc
         getNextPos().getChunk().setChunkModified();
     }
     
-    @Override
-    public boolean isUseableByPlayer(EntityPlayer entityplayer) {
-        return false;
-    }
-
-    @Override
-    public void openInventory() { }
-
-    @Override
-    public void closeInventory() { }
+    @Override public boolean isUseableByPlayer(EntityPlayer entityplayer) { return false; }
+    @Override public void openInventory(EntityPlayer player) { }
+    @Override public void closeInventory(EntityPlayer player) { }
+    @Override public int getField(int id) { return 0; }
+    @Override public void setField(int id, int value) { }
+    @Override public int getFieldCount() { return 0; }
 
     @Override
     public boolean isItemValidForSlot(int i, ItemStack itemstack) {
         return true;
     }
 
-    
-    
-    
-    
-    
+    @Override
+    public void clear() {
+        for (int i = 0; i < inv.length; i++) {
+            setInventorySlotContents(i, null);
+        }
+    }
+
+
     // ISocketHolder implementation
     
     private final ArrayList<MovingObjectPosition> ret = new ArrayList<MovingObjectPosition>();
@@ -442,7 +438,6 @@ public class ServoMotor extends AbstractServoMachine implements IInventory, ISoc
             ret.add(new MovingObjectPosition(entity));
         }
         
-        nullVec.xCoord = nullVec.yCoord = nullVec.zCoord = 0;
         Coord targetBlock = c.add(top);
         mopBlock(ret, targetBlock, top.getOpposite()); //nose-to-nose with the servo
         mopBlock(ret, targetBlock.add(top), top.getOpposite()); //a block away
@@ -458,12 +453,11 @@ public class ServoMotor extends AbstractServoMachine implements IInventory, ISoc
         return ret;
     }
     
-    private static final Vec3 nullVec = new Vec3(0, 0, 0);
     void mopBlock(ArrayList<MovingObjectPosition> list, Coord target, EnumFacing side) {
         if (target.isAir()) {
             return;
         }
-        list.add(target.createMop(side, nullVec));
+        list.add(target.createMop(side, new Vec3(0, 0, 0)));
     }
     
     @Override

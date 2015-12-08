@@ -2,17 +2,16 @@ package factorization.colossi;
 
 import factorization.api.Coord;
 import net.minecraft.block.Block;
+import net.minecraft.block.state.IBlockState;
 
 public class ColossusBuilderBlock {
-    public final Block block;
-    public final int md;
-    
-    public ColossusBuilderBlock(Block block, int md) {
-        this.block = block;
-        this.md = md;
+    public final IBlockState bs;
+
+    public ColossusBuilderBlock(IBlockState bs) {
+        this.bs = bs;
     }
     
     public boolean matches(Coord at) {
-        return at.getBlock() == block && at.getMd() == md;
+        return at.is(bs);
     }
 }

@@ -3,6 +3,7 @@ package factorization.truth.export;
 import factorization.truth.AbstractTypesetter;
 import factorization.truth.api.*;
 import factorization.truth.word.Word;
+import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.IIcon;
 
@@ -62,7 +63,7 @@ public class HtmlConversionTypesetter extends AbstractTypesetter implements IHtm
     @Override
     public void putItem(ItemStack theItem, String link) {
         String imgType = null;
-        IIcon iconIndex = null;
+        TextureAtlasSprite iconIndex = null;
         if (theItem != null) {
             imgType = theItem.getItemSpriteNumber() == 1 ? "items" : "blocks";
             iconIndex = theItem.getIconIndex();

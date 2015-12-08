@@ -148,7 +148,7 @@ public class StepperEngine extends AbstractServoMachine {
             EntityGrabController egc = (EntityGrabController) idc.getController();
             if (!egc.isUngrabbed()) continue;
             if (getDistanceSqToEntity(idc) > extreme_max) continue;
-            Coord grabPoint = idc.real2shadowCoord(front);
+            Coord grabPoint = idc.real2shadow(front);
             if (SpaceUtil.contains(SpaceUtil.createAABB(idc.getCorner(), idc.getFarCorner()), grabPoint)) {
                 grabIdc(idc);
                 return true;

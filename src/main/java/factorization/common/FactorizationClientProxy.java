@@ -31,7 +31,6 @@ import factorization.servo.stepper.RenderStepperEngine;
 import factorization.servo.stepper.StepperEngine;
 import factorization.shared.Core;
 import factorization.shared.EmptyRender;
-import factorization.shared.ItemRenderCapture;
 import factorization.shared.TileEntityFactorization;
 import factorization.sockets.SocketLacerator;
 import factorization.sockets.SocketScissors;
