@@ -85,8 +85,8 @@ public class Embarkener {
         if (!(is.getItem() instanceof ItemBlock)) return;
         Block theBlock = Block.getBlockFromItem(is.getItem());
         if (!isWoodish(theBlock)) return;
-        Coord target = new Coord(event.entityPlayer.worldObj, event.x, event.y, event.z);
-        target.adjust(SpaceUtil.getOrientation(event.face));
+        Coord target = new Coord(event.entityPlayer.worldObj, event.pos);
+        target.adjust(event.face);
         if (!target.isReplacable()) return;
         embarkenQueue.add(new EmbarkenEvent(target, is.stackSize, is, event.entityPlayer, (BlockLog) theBlock));
     }

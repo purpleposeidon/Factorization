@@ -108,8 +108,8 @@ public enum FzOrientation {
     }
 
     private void setup() {
-        nextFaceRotation = find(facing, top.getRotation(facing));
-        prevFaceRotation = find(facing, top.getRotation(facing).getRotation(facing).getRotation(facing));
+        nextFaceRotation = find(facing, SpaceUtil.rotate(top, facing));
+        prevFaceRotation = find(facing, SpaceUtil.rotateBack(top, facing));
     }
     
     private void setupRotation() {

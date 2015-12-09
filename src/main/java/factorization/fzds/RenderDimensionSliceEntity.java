@@ -283,7 +283,7 @@ public class RenderDimensionSliceEntity extends Render implements IFzdsShenaniga
             Coord a = dse.getCorner();
             Coord b = dse.getFarCorner();
             
-            Tessellator tess = Tessellator.instance;
+            Tessellator tess = Tessellator.getInstance();
             startDamageDrawing(tess, player, partial);
             Minecraft mc = Minecraft.getMinecraft();
 

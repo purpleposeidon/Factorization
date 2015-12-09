@@ -106,8 +106,8 @@ public class GooData extends WorldSavedData {
         if (file != null && file.exists()) {
             file.delete();
         }
-        world.mapStorage.loadedDataList.remove(this);
-        world.mapStorage.loadedDataMap.remove(this);
+        world.getMapStorage().loadedDataList.remove(this);
+        world.getMapStorage().loadedDataMap.remove(this);
     }
     
     void removeIndices(ArrayList<Integer> indices, ItemStack is, World world) {

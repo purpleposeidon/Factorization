@@ -9,6 +9,7 @@ import factorization.util.CraftUtil;
 import factorization.util.InvUtil;
 import factorization.util.InvUtil.FzInv;
 import factorization.util.ItemUtil;
+import factorization.util.SpaceUtil;
 import factorization.weird.TileEntityDayBarrel;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
@@ -43,7 +44,7 @@ public class CompressionState {
     
     void error(TileEntityCompressionCrafter at, String msg, String... args) {
         if (errored) return;
-        new Notice(at, msg, args).withStyle(Style.FORCE).send(player);
+        new Notice(at, msg, args).withStyle(Style.FORCE).sendTo(player);
         errored = true;
     }
     
@@ -73,7 +74,7 @@ public class CompressionState {
          *  assert height == height2
          */
         start = cc;
-        up = cc.getFacing();
+        up = cc.facing;
         
         if (up == null) {
             error(cc, "Broken direction");
@@ -121,7 +122,7 @@ public class CompressionState {
     
     private static EnumFacing[] forgeDirections = new EnumFacing[] { EnumFacing.DOWN, EnumFacing.NORTH, EnumFacing.WEST };
     private static TileEntityCompressionCrafter findEdgeRoot(TileEntityCompressionCrafter at) {
-        final EnumFacing cd = at.getFacing();
+        final EnumFacing cd = at.facing;
         TileEntityCompressionCrafter first = at;
         for (int directionIndex = 0; directionIndex < forgeDirections.length; directionIndex++) {
             EnumFacing d = forgeDirections[directionIndex];
@@ -131,7 +132,7 @@ public class CompressionState {
             boolean found = false;
             for (int i = 0; i < 2; i++) {
                 TileEntityCompressionCrafter l = at.look(d);
-                if (l == null || l.getFacing() != cd) {
+                if (l == null || l.facing != cd) {
                     break;
                 }
                 at = l;
@@ -155,7 +156,7 @@ public class CompressionState {
                 continue;
             }
             TileEntityCompressionCrafter cc = here.add(dir).getTE(TileEntityCompressionCrafter.class);
-            if (cc != null && cc.getFacing() == up) {
+            if (cc != null && cc.facing == up) {
                 return dir;
             } else if (cc != null) {
                 error(cc, "Inconsistent direction");
@@ -170,7 +171,7 @@ public class CompressionState {
                 continue;
             }
             TileEntityCompressionCrafter cc = front.add(dir).getTE(TileEntityCompressionCrafter.class);
-            if (cc != null && cc.getFacing().getOpposite() == dir) {
+            if (cc != null && cc.facing.getOpposite() == dir) {
                 return dir;
             }
         }
@@ -257,7 +258,7 @@ public class CompressionState {
     private void getCells() {
         Coord corner = root.getCoord();
         corner.adjust(up);
-        EnumFacing out = right.getRotation(up);
+        EnumFacing out = SpaceUtil.rotate(right, up);
         for (int dx = 0; dx < width; dx++) {
             for (int dy = 0; dy < height; dy++) {
                 Coord c = corner.add(dx*right.getDirectionVec().getX() + dy*up.getDirectionVec().getX(), dx*right.getDirectionVec().getY() + dy*up.getDirectionVec().getY(), dx*right.getDirectionVec().getZ() + dy*up.getDirectionVec().getZ());
@@ -390,7 +391,7 @@ public class CompressionState {
             if (other == null) {
                 break; //short frame
             }
-            if (other.getFacing() != up) {
+            if (other.facing != up) {
                 error(other, "Inconsistent direction");
                 return -1;
             }
@@ -402,12 +403,8 @@ public class CompressionState {
         return distance;
     }
     
-    static boolean isFrame(Coord c) {
-        return c.getTE(TileEntityCompressionCrafter.class) != null;
-    }
-
     int getPairDistance(HashSet<TileEntityCompressionCrafter> walls, TileEntityCompressionCrafter start) {
-        final EnumFacing cd = start.getFacing();
+        final EnumFacing cd = start.facing;
         if (!start.buffer.isEmpty()) {
             error(start, "Buffered output");
             return -1;
@@ -418,7 +415,7 @@ public class CompressionState {
             here.adjust(cd);
             TileEntityCompressionCrafter cc = here.getTE(TileEntityCompressionCrafter.class);
             if (cc != null) {
-                if (cc.getFacing().getOpposite() != cd) {
+                if (cc.facing.getOpposite() != cd) {
                     error(cc, "Facing the wrong way");
                     return -1;
                 }
@@ -431,7 +428,7 @@ public class CompressionState {
                 return i;
             }
         }
-        if (start.getCoord().add(start.getFacing()).getTE(TileEntityCompressionCrafter.class) != null) {
+        if (start.getCoord().add(start.facing).getTE(TileEntityCompressionCrafter.class) != null) {
             error(start, "Must be 1-3 blocks away from\nthe other Compression Crafter");
             return -1;
         }
@@ -588,7 +585,7 @@ public class CompressionState {
             maxY = Math.max(c.y, maxY);
             maxZ = Math.max(c.z, maxZ);
         }
-        EnumFacing axis = right.getRotation(up);
+        EnumFacing axis = SpaceUtil.rotate(right, up);
         start.broadcastMessage(null, MessageType.CompressionCrafterBounds, minX, minY, minZ, maxX, maxY, maxZ, (byte) axis.ordinal());
     }
     

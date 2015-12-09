@@ -20,6 +20,7 @@ import net.minecraft.potion.Potion;
 import net.minecraft.potion.PotionEffect;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.integrated.IntegratedServer;
+import net.minecraft.stats.Achievement;
 import net.minecraft.stats.AchievementList;
 import net.minecraft.stats.StatisticsFile;
 import net.minecraft.util.MathHelper;
@@ -220,11 +221,12 @@ public class MiscellaneousNonsense {
         {
             // Give the first achievement, because it is stupid and nobody cares.
             // If you're using this mod, you've probably opened your inventory before anyways.
-            StatisticsFile sfw = StatUtil.getStatsFile(event.player);
-            if (sfw != null && !sfw.hasAchievementUnlocked(AchievementList.openInventory) && FMLCommonHandler.instance().getSide() == Side.CLIENT) {
-                sfw.func_150873_a(event.player, AchievementList.openInventory, -1);
-                sfw.func_150873_a(event.player, AchievementList.openInventory, 300); // Literally, hundreds of times. :D
+            StatUtil.FzStat stat = StatUtil.load(event.player, AchievementList.openInventory);
+            if (stat.get() <= 0 && FMLCommonHandler.instance().getSide() == Side.CLIENT) {
+                stat.set(-1);
+                stat.set(300); // Literally, hundreds of times! :D
                 Core.logInfo("Achievement Get! %s, you've opened your inventory hundreds of times already! Yes! You're welcome!", event.player.getCommandSenderName());
+                // NORELEASE: Verify this works.
             }
         }
         {

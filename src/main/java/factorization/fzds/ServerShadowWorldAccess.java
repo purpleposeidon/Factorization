@@ -12,11 +12,11 @@ public final class ServerShadowWorldAccess implements IWorldAccess {
     // "IWorldAccess" is poorly named; "IWorldWatcher" would be better.
     static final World world = DeltaChunk.getServerShadowWorld();
 
-    @Override public void spawnParticle(String var1, double var2, double var4, double var6, double var8, double var10, double var12) { }
+    @Override public void spawnParticle(int particleID, boolean ignoreRange, double xCoord, double yCoord, double zCoord, double xOffset, double yOffset, double zOffset, int... p_180442_15_) { }
 
-    @Override public void onEntityCreate(Entity entity) { }
+    @Override public void onEntityAdded(Entity entityIn) { }
 
-    @Override public void onEntityDestroy(Entity entity) { }
+    @Override public void onEntityRemoved(Entity entityIn) { }
 
     @Override public void playSound(String sound, double var2, double var4, double var6, float var8, float var9) {
         // Doesn't seem to be used on the server
@@ -68,12 +68,12 @@ public final class ServerShadowWorldAccess implements IWorldAccess {
 
     @Override
     public void markBlockForUpdate(BlockPos pos) {
-        markBlocksForUpdate(pos, pos);
+        markBlocksForUpdate(pos.getX(), pos.getY(), pos.getZ(), pos.getX(), pos.getY(), pos.getZ());
     }
 
     @Override
-    public void markBlockForRenderUpdate(BlockPos pos) {
-        markBlocksForUpdate(pos, pos);
+    public void notifyLightSet(BlockPos pos) {
+        markBlockForUpdate(pos);
     }
 
     void markBlocksForUpdate(int lx, int ly, int lz, int hx, int hy, int hz) {
@@ -89,11 +89,5 @@ public final class ServerShadowWorldAccess implements IWorldAccess {
         }
     }
 
-    @Override public void destroyBlockPartially(int var1, int var2, int var3, int var4, int var5) { }
-
-
-    @Override
-    public void onStaticEntitiesChanged() {
-        // TODO: Implement? We may just render them lame-style
-    }
+    @Override public void sendBlockBreakProgress(int breakerId, BlockPos pos, int progress) { }
 }

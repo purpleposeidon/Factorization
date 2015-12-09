@@ -12,6 +12,7 @@ import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompressedStreamTools;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.network.PacketBuffer;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.IChatComponent;
@@ -57,13 +58,11 @@ public class NotifyNetwork {
     @SideOnly(Side.CLIENT)
     void handleNotify(DataInput input, EntityPlayer me) throws IOException {
         Object target = null;
-        int pos;
+        BlockPos pos;
         switch (input.readByte()) {
         case COORD:
-            x = input.readInt();
-            y = input.readInt();
-            z = input.readInt();
-            target = new SimpleCoord(me.world, pos);
+            pos = new BlockPos(input.readInt(), input.readInt(), input.readInt());
+            target = new SimpleCoord(me.worldObj, pos);
             break;
         case ENTITY:
             int id = input.readInt();
@@ -74,12 +73,10 @@ public class NotifyNetwork {
             }
             break;
         case TILEENTITY:
-            x = input.readInt();
-            y = input.readInt();
-            z = input.readInt();
+            pos = new BlockPos(input.readInt(), input.readInt(), input.readInt());
             target = me.worldObj.getTileEntity(pos);
             if (target == null) {
-                target = new SimpleCoord(me.world, pos);
+                target = new SimpleCoord(me.worldObj, pos);
             }
             break;
         case VEC3:
@@ -93,7 +90,7 @@ public class NotifyNetwork {
         case REPLACEABLE:
             String str = input.readUTF();
             int msgKey = input.readInt();
-            IChatComponent msg = IChatComponent.Serializer.func_150699_a(str);
+            IChatComponent msg = IChatComponent.Serializer.jsonToComponent(str);
             NotifyImplementation.proxy.replaceable(msg, msgKey);
             return;
         default: return;
@@ -205,7 +202,7 @@ public class NotifyNetwork {
     }
     
     static FMLProxyPacket replaceableChatPacket(IChatComponent msg, int msgKey) {
-        String str = IChatComponent.Serializer.func_150696_a(msg);
+        String str = IChatComponent.Serializer.componentToJson(msg);
         try {
             ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
             DataOutputStream output = new DataOutputStream(outputStream);
@@ -223,6 +220,6 @@ public class NotifyNetwork {
     
     
     public static FMLProxyPacket generate(ByteArrayOutputStream baos) {
-        return new FMLProxyPacket(Unpooled.wrappedBuffer(baos.toByteArray()), channelName);
+        return new FMLProxyPacket(new PacketBuffer(Unpooled.wrappedBuffer(baos.toByteArray())), channelName);
     }
 }

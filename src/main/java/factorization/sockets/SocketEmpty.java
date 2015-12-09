@@ -15,12 +15,7 @@ public class SocketEmpty extends TileEntitySocketBase {
     
     @Override
     public IDataSerializable serialize(String prefix, DataHelper data) throws IOException { return this; }
-    
-    @Override
-    public boolean canUpdate() {
-        return false;
-    }
-    
+
     @Override
     public ItemStack getCreatingItem() {
         return null;

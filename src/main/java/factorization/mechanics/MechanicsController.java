@@ -149,7 +149,7 @@ public class MechanicsController implements IDCController {
          * of the body, let us therefor grant unto our idc an IMPULSE OF VELOCITY
          * equal to the force multiplied by the inverse of the mass.
          */
-        SpaceUtil.incrScale(force, 1 / mass);
+        force = SpaceUtil.scale(force, 1 / mass);
         Vec3 newVel = force.add(SpaceUtil.fromEntVel(idc));
         SpaceUtil.toEntVel(idc, newVel);
     }

@@ -257,7 +257,7 @@ public class SocketScissors extends TileEntitySocketBase implements ICaptureDrop
     }
 
     @Override
-    public boolean captureDrops(ArrayList<ItemStack> stacks) {
+    public boolean captureDrops(List<ItemStack> stacks) {
         processCollectedItems(stacks);
         return true;
     }

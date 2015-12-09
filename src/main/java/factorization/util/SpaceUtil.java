@@ -5,10 +5,7 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.*;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Random;
+import java.util.*;
 
 /**
  * Operations on AxisAlignedBB (aka 'Box'), Vec3, Entities, and conversions between the three.
@@ -606,5 +603,37 @@ public final class SpaceUtil {
     public static AxisAlignedBB newBoxAround(BlockPos pos) {
         return new AxisAlignedBB(pos.getX(), pos.getY(), pos.getZ(),
                 pos.getX() + 1, pos.getY() + 1, pos.getZ() + 1);
+    }
+
+
+    private static final int[][] ROTATION_MATRIX = {
+            {0, 1, 4, 5, 3, 2},
+            {0, 1, 5, 4, 2, 3},
+            {5, 4, 2, 3, 0, 1},
+            {4, 5, 2, 3, 1, 0},
+            {2, 3, 1, 0, 4, 5},
+            {3, 2, 0, 1, 4, 5},
+            {0, 1, 2, 3, 4, 5}
+    };
+    // Rescued from Forge. (This is a table of simple mathematical facts and involves
+    // no creativity or arrangement, therefore copyright doesn't apply. So there.)
+
+    public static EnumFacing rotate(EnumFacing dir, EnumFacing axis) {
+        // EnumFacing admittedly does have rotate methods.
+        // However, I don't feel like trusting them to work the same as ForgeDirection did.
+        // If this is in fact unnecessarily it'll be easy enough to inline the appropriate code.
+        return EnumFacing.VALUES[ROTATION_MATRIX[axis.ordinal()][dir.ordinal()]];
+    }
+
+    public static EnumFacing rotateBack(EnumFacing dir, EnumFacing axis) {
+        return rotate(rotate(rotate(dir, axis), axis), axis);
+    }
+
+    public static Iterable<BlockPos.MutableBlockPos> iteratePos(BlockPos src, int r) {
+        return BlockPos.getAllInBoxMutable(src.add(-r, -r, -r), src.add(+r, +r, +r));
+    }
+
+    public static Vec3 toVec(BlockPos pos) {
+        return new Vec3(pos.getX(), pos.getY(), pos.getZ());
     }
 }

@@ -8,6 +8,7 @@ import factorization.util.NumUtil;
 import gnu.trove.map.hash.TIntByteHashMap;
 import net.minecraft.block.material.Material;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.BlockPos;
 import net.minecraft.world.ChunkCoordIntPair;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.BiomeGenBase;
@@ -245,7 +246,7 @@ public class WorldGenColossus implements IWorldGenerator {
     };
     
     boolean isBadBiome(World w, int chunkX, int chunkZ) {
-        BiomeGenBase biome = w.getBiomeGenForCoords(8 + chunkX * 16, 8 + chunkZ * 16);
+        BiomeGenBase biome = w.getBiomeGenForCoords(new BlockPos(8 + chunkX * 16, 64, 8 + chunkZ * 16));
         for (Type bad : forbiddenBiomeTypes) {
             if (BiomeDictionary.isBiomeOfType(biome, bad)) {
                 return true;
@@ -293,8 +294,8 @@ public class WorldGenColossus implements IWorldGenerator {
     public void cancelDecorations(Decorate event) {
         if (!genOnWorld(event.world)) return;
         final Decorate.EventType type = event.type;
-        if (type == Decorate.EventType.BIG_SHROOM || type == Decorate.EventType.LAKE || type == Decorate.EventType.PUMPKIN || type == Decorate.EventType.TREE) {
-            if (cancel(event.world, event.chunkX / 16, event.chunkZ / 16)) {
+        if (type == Decorate.EventType.BIG_SHROOM || type == Decorate.EventType.LAKE_WATER || type == Decorate.EventType.LAKE_LAVA || type == Decorate.EventType.PUMPKIN || type == Decorate.EventType.TREE) {
+            if (cancel(event.world, event.pos.getX() / 16, event.pos.getZ() / 16)) {
                 event.setResult(Result.DENY);
             }
             return;

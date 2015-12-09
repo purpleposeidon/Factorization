@@ -199,7 +199,8 @@ public class ItemWord extends Word {
             t.printStackTrace();
             itemErrored();
             try {
-                Tessellator.instance.draw();
+                // Try to finish drawing the item.
+                Tessellator.getInstance().draw();
             } catch (IllegalStateException e) {
                 // Ignore it.
             }

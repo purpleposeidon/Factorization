@@ -99,7 +99,7 @@ public class RenderStepperEngine extends RenderEntity {
     }
 
     void drawOutlinedBoundingBox(AxisAlignedBB par1AxisAlignedBB) {
-        Tessellator tessellator = Tessellator.instance;
+        Tessellator tessellator = Tessellator.getInstance();
         tessellator.startDrawing(3);
         tessellator.addVertex(par1AxisAlignedBB.minX, par1AxisAlignedBB.minY, par1AxisAlignedBB.minZ);
         tessellator.addVertex(par1AxisAlignedBB.maxX, par1AxisAlignedBB.minY, par1AxisAlignedBB.minZ);
@@ -259,10 +259,10 @@ public class RenderStepperEngine extends RenderEntity {
             float t = 3.2F/16F;
             GL11.glTranslatef(t, 0, t);
         }
-        Tessellator.instance.startDrawingQuads();
+        Tessellator.getInstance().startDrawingQuads();
         block.renderForTileEntity();
         //GL11.glDisable(GL11.GL_LIGHTING);
-        Tessellator.instance.draw();
+        Tessellator.getInstance().draw();
         //GL11.glEnable(GL11.GL_LIGHTING);
         GL11.glPopMatrix();
     }

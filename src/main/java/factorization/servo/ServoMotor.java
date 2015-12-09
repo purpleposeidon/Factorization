@@ -426,12 +426,12 @@ public class ServoMotor extends AbstractServoMachine implements IInventory, ISoc
         final Coord c = getCurrentPos();
         final EnumFacing top = motionHandler.orientation.top;
         final EnumFacing face = motionHandler.orientation.facing;
-        final EnumFacing right = face.getRotation(top);
+        final EnumFacing right = SpaceUtil.rotate(face, top);
         
         AxisAlignedBB ab = new AxisAlignedBB(
                 c.x + top.getDirectionVec().getX(), c.y + top.getDirectionVec().getY(), c.z + top.getDirectionVec().getZ(),  
                 c.x + 1 + top.getDirectionVec().getX(), c.y + 1 + top.getDirectionVec().getY(), c.z + 1 + top.getDirectionVec().getZ());
-        for (Entity entity : (Iterable<Entity>)worldObj.getEntitiesWithinAABBExcludingEntity(this, ab)) {
+        for (Entity entity : worldObj.getEntitiesWithinAABBExcludingEntity(this, ab)) {
             if (!entity.canBeCollidedWith()) {
                 continue;
             }

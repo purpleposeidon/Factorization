@@ -29,6 +29,6 @@ public class TileEntityFzNull extends TileEntity {
         if (replacement == null) return; // Nothing can be done here.
         invalidate();
         replacement.validate();
-        worldObj.setTileEntity(pos.getX(), pos.getY(), pos.getZ(), replacement);
+        worldObj.setTileEntity(pos, replacement);
     }
 }

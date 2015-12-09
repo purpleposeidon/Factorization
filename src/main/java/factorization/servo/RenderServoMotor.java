@@ -392,10 +392,10 @@ public class RenderServoMotor extends RenderEntity {
             float t = 3.2F/16F;
             GL11.glTranslatef(t, 0, t);
         }
-        Tessellator.instance.startDrawingQuads();
+        Tessellator.getInstance().startDrawingQuads();
         block.renderForTileEntity();
         //GL11.glDisable(GL11.GL_LIGHTING);
-        Tessellator.instance.draw();
+        Tessellator.getInstance().draw();
         //GL11.glEnable(GL11.GL_LIGHTING);
         GL11.glPopMatrix();
     }

@@ -219,14 +219,14 @@ class ReflectionComponent {
             NBTBase value = tag.getTag(nbtKey);
             switch (value.getId()) {
                 case Constants.NBT.TAG_END: return null;
-                case Constants.NBT.TAG_BYTE: return "" + ((NBTTagByte) value).func_150290_f();
-                case Constants.NBT.TAG_SHORT: return "" + ((NBTTagShort) value).func_150289_e();
-                case Constants.NBT.TAG_INT: return "" + ((NBTTagInt) value).func_150287_d();
-                case Constants.NBT.TAG_LONG: return "" + ((NBTTagLong) value).func_150291_c();
-                case Constants.NBT.TAG_FLOAT: return "" + ((NBTTagFloat) value).func_150288_h();
-                case Constants.NBT.TAG_DOUBLE: return "" + ((NBTTagDouble) value).func_150286_g();
+                case Constants.NBT.TAG_BYTE: return "" + ((NBTTagByte) value).getByte();
+                case Constants.NBT.TAG_SHORT: return "" + ((NBTTagShort) value).getShort();
+                case Constants.NBT.TAG_INT: return "" + ((NBTTagInt) value).getInt();
+                case Constants.NBT.TAG_LONG: return "" + ((NBTTagLong) value).getLong();
+                case Constants.NBT.TAG_FLOAT: return "" + ((NBTTagFloat) value).getFloat();
+                case Constants.NBT.TAG_DOUBLE: return "" + ((NBTTagDouble) value).getDouble();
                 case Constants.NBT.TAG_BYTE_ARRAY: return null; // No way to handle
-                case Constants.NBT.TAG_STRING: return ((NBTTagString) value).func_150285_a_();
+                case Constants.NBT.TAG_STRING: return ((NBTTagString) value).getString();
                 case Constants.NBT.TAG_LIST: return null; // No way to handle
                 case Constants.NBT.TAG_COMPOUND: return value;
                 case Constants.NBT.TAG_INT_ARRAY: return null; // No way to handle

@@ -1,7 +1,6 @@
 package factorization.misc;
 
 import factorization.api.Coord;
-import factorization.api.ICoordFunction;
 import factorization.common.FzConfig;
 import factorization.util.FzUtil;
 import factorization.util.ItemUtil;
@@ -11,13 +10,11 @@ import net.minecraft.client.audio.PositionedSoundRecord;
 import net.minecraft.client.gui.GuiMainMenu;
 import net.minecraft.client.settings.GameSettings;
 import net.minecraft.client.settings.KeyBinding;
-import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.*;
 import net.minecraft.world.World;
-import net.minecraft.world.chunk.Chunk;
 import net.minecraftforge.fml.client.registry.ClientRegistry;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
@@ -39,7 +36,6 @@ public class MiscClientTickHandler {
         checkSprintKey();
         MiscClientCommands.tick();
         notifyTimeOnFullScreen();
-        fix_mc2713();
     }
     
     int count = 0;
@@ -49,7 +45,7 @@ public class MiscClientTickHandler {
         if (count == 40) {
             //playing any earlier doesn't seem to work (sound is probably loaded in a separate thread?)
             if (mc.currentScreen instanceof GuiMainMenu) {
-                mc.getSoundHandler().playSound(PositionedSoundRecord.func_147674_a(new ResourceLocation("gui.button.press"), 1.0F));
+                mc.getSoundHandler().playSound(PositionedSoundRecord.create(new ResourceLocation("gui.button.press"), 1.0F));
             }
             hit = true;
             LagssieWatchDog.start();
@@ -81,7 +77,7 @@ public class MiscClientTickHandler {
             // I suppose we could try pulling from the player's inventory.
             // And creative mode inventories tend to get super-ugly cluttered with duplicate crap...
             // But it doesn't work. :(
-            mc.func_147112_ai();
+            mc.middleClickMouse();
             return;
         }
         MovingObjectPosition mop = mc.objectMouseOver;
@@ -107,9 +103,9 @@ public class MiscClientTickHandler {
         }
         if (mop.typeOfHit == MovingObjectPosition.MovingObjectType.BLOCK) {
             Coord here = Coord.fromMop(player.worldObj, mop);
-            validItems.add(here.getPickBlock(mop));
+            validItems.add(here.getPickBlock(mop, player));
             validItems.add(here.getBrokenBlock());
-            validItems.add(new ItemStack(here.getId(), 1, here.getMd()));
+            validItems.add(new ItemStack(here.getBlock(), 1, here.getMd()));
             ItemStack b = FzUtil.getReifiedBarrel(here);
             if (b != null) validItems.add(b);
         } else if (mop.typeOfHit == MovingObjectPosition.MovingObjectType.ENTITY) {
@@ -258,43 +254,7 @@ public class MiscClientTickHandler {
         return true;
     }
 
-    void fix_mc2713() { // NORELEASE: Seems to be fixed in 1.8. Are we in 1.8?
-        World world = mc.theWorld;
-        if (world == null || world.loadedEntityList == null) return;
-        if (!chunkChanged()) return;
-        int d = 16 * 3 / 2;
-        final HashSet<Entity> properly_known_entities = new HashSet<Entity>();
-        Coord at = new Coord(mc.thePlayer);
-        Coord.iterateChunks(at.add(-d, -d, -d), at.add(d, d, d), new ICoordFunction() {
-            @Override
-            public void handle(Coord here) {
-                final Chunk chunk = here.getChunk();
-                if (chunk == null) return;
-                for (List l : chunk.entityLists) {
-                    if (l == null) continue;
-                    properly_known_entities.addAll((Collection<Entity>) l);
-                }
-            }
-        });
-        nextEntity:
-        for (Entity ent : (Iterable<Entity>) world.loadedEntityList) {
-            int ecx = MathHelper.floor_double(ent.posX / 16.0D);
-            int ecz = MathHelper.floor_double(ent.posZ / 16.0D);
-            int dx = (last_chunk_x - ecx);
-            int dz = (last_chunk_z - ecz);
-            int dSq = dx * dx + dz * dz;
-            boolean near = dSq <= 4;
-            if (!near) continue nextEntity;
-
-            Chunk chunk = world.getChunkFromChunkCoords(ecx, ecz);
-            if (chunk.entityLists[ent.chunkCoordY].size() < 16) {
-                for (Entity e : (Iterable<Entity>) chunk.entityLists[ent.chunkCoordY]) {
-                    if (e == ent) continue nextEntity;
-                }
-            } else if (properly_known_entities.contains(ent)) {
-                continue nextEntity;
-            }
-            chunk.addEntity(ent);
-        }
-    }
+    /* Used to have a fix for MC-2713 (being unable to interact with entities if you walk a medium ways away from a
+    chunk and come back. It seems to be fixed in 1.8.
+     */
 }

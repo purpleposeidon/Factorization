@@ -62,11 +62,8 @@ public class MutterCommand extends CommandBase {
     }
     
     // o_ó eclipse has no trouble compiling without these two methods...
+    @Override
     public int compareTo(ICommand otherCmd) {
         return this.getCommandName().compareTo(otherCmd.getCommandName());
-    }
-
-    public int compareTo(Object obj) {
-        return this.compareTo((ICommand)obj);
     }
 }

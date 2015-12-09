@@ -1,11 +1,8 @@
 package factorization.fzds.network;
 
-import com.google.common.collect.BiMap;
 import factorization.fzds.Hammer;
 import factorization.shared.Core;
-import net.minecraft.network.INetHandler;
-import net.minecraft.network.NetHandlerPlayServer;
-import net.minecraft.network.Packet;
+import net.minecraft.network.*;
 import net.minecraft.network.play.client.C00PacketKeepAlive;
 import net.minecraftforge.fml.common.network.handshake.NetworkDispatcher;
 import net.minecraftforge.fml.common.network.internal.FMLProxyPacket;
@@ -14,6 +11,16 @@ import net.minecraftforge.fml.relauncher.Side;
 public class WrappedPacketFromClient extends WrappedPacket {
     public WrappedPacketFromClient(Packet towrap) {
         super(towrap);
+    }
+
+    @Override
+    protected EnumPacketDirection getDirection() {
+        return EnumPacketDirection.SERVERBOUND;
+    }
+
+    @Override
+    protected EnumConnectionState getPacketMap() {
+        return EnumConnectionState.PLAY;
     }
 
     public WrappedPacketFromClient() {
@@ -49,15 +56,5 @@ public class WrappedPacketFromClient extends WrappedPacket {
             }
         }
         wrapped.processPacket(handler);
-    }
-
-    @Override
-    protected BiMap<Integer, Class> getPacketMap() {
-        return clientPacketMap;
-    }
-
-    @Override
-    protected boolean isServerside() {
-        return false;
     }
 }

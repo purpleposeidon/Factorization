@@ -388,7 +388,7 @@ public class TileEntityGreenware extends TileEntityCommon implements IFurnaceHea
                         r = i;
                         break;
                     }
-                    f = f.getRotation(EnumFacing.UP);
+                    f = SpaceUtil.rotate(f, EnumFacing.UP);
                 }
                 setRotation(r);
             }

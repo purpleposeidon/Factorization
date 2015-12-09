@@ -81,17 +81,18 @@ public class ChainRender {
         final WorldClient w = mc.theWorld;
         final EntityRenderer er = mc.entityRenderer;
         final TextureManager textureManager = mc.getTextureManager();
-        final Tessellator tess = Tessellator.instance;
+        final Tessellator tess = Tessellator.getInstance();
 
         boolean setup = false;
         final AxisAlignedBB workBox = SpaceUtil.newBox();
-        final Vec3 workStart = SpaceUtil.newVec(), workEnd = SpaceUtil.newVec();
         for (WeakReference<ChainLink> ref : chains) {
             ChainLink chain = ref.get();
             if (chain == null) {
                 needsRebag = true;
                 continue;
             }
+            Vec3 workStart = chain.getStart(partial);
+            Vec3 workEnd = chain.getEnd(partial);
             if (!chain.cameraCheck(camera, partial, workBox, workStart, workEnd)) continue;
             if (!setup) {
                 setup = true;

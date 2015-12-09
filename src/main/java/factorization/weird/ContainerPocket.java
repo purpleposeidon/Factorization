@@ -11,6 +11,7 @@ import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.inventory.*;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.IRecipe;
+import net.minecraft.util.IChatComponent;
 import net.minecraft.world.World;
 
 import java.lang.reflect.Field;
@@ -24,9 +25,9 @@ public class ContainerPocket extends Container {
     IInventory craftResult = new InventoryCraftResult();
     final World world;
 
-    ArrayList<Slot> nonCraftingInventorySlots = new ArrayList();
-    ArrayList<Slot> craftingSlots = new ArrayList();
-    ArrayList<Slot> mainInvThenHotbarSlots = new ArrayList();
+    ArrayList<Slot> nonCraftingInventorySlots = new ArrayList<Slot>();
+    ArrayList<Slot> craftingSlots = new ArrayList<Slot>();
+    ArrayList<Slot> mainInvThenHotbarSlots = new ArrayList<Slot>();
     Slot craftResultSlot;
 
     ItemStack fake_is;
@@ -81,7 +82,7 @@ public class ContainerPocket extends Container {
     
 
     class RedirectedSlotCrafting extends SlotCrafting {
-        public RedirectedSlotCrafting(EntityPlayer player, IInventory craftMatrix, IInventory craftResult, int posX, int posY) {
+        public RedirectedSlotCrafting(EntityPlayer player, InventoryCrafting craftMatrix, IInventory craftResult, int posX, int posY) {
             super(player, craftMatrix, craftResult, 0, posX, posY);
         }
 
@@ -153,8 +154,18 @@ public class ContainerPocket extends Container {
         }
 
         @Override
-        public String getInventoryName() {
-            return src.getInventoryName();
+        public IChatComponent getDisplayName() {
+            return src.getDisplayName();
+        }
+
+        @Override
+        public String getCommandSenderName() {
+            return src.getCommandSenderName();
+        }
+
+        @Override
+        public boolean hasCustomName() {
+            return src.hasCustomName();
         }
 
         @Override
@@ -174,23 +185,38 @@ public class ContainerPocket extends Container {
         }
 
         @Override
-        public void openInventory() {
-            src.openInventory();
+        public void openInventory(EntityPlayer player) {
+            src.openInventory(player);
         }
 
         @Override
-        public void closeInventory() {
-            src.closeInventory();
-        }
-
-        @Override
-        public boolean hasCustomInventoryName() {
-            return false;
+        public void closeInventory(EntityPlayer player) {
+            src.closeInventory(player);
         }
 
         @Override
         public boolean isItemValidForSlot(int i, ItemStack itemstack) {
             return true;
+        }
+
+        @Override
+        public int getField(int id) {
+            return src.getField(id);
+        }
+
+        @Override
+        public void setField(int id, int value) {
+            src.setField(id, value);
+        }
+
+        @Override
+        public int getFieldCount() {
+            return src.getFieldCount();
+        }
+
+        @Override
+        public void clear() {
+            src.clear();
         }
     }
     

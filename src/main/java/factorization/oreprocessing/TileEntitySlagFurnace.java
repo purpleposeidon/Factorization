@@ -71,7 +71,7 @@ public class TileEntitySlagFurnace extends TileEntityFactorization implements IF
     @Override
     public void onPlacedBy(EntityPlayer player, ItemStack is, EnumFacing side, float hitX, float hitY, float hitZ) {
         super.onPlacedBy(player, is, side, hitX, hitY, hitZ);
-        facing_direction = (byte) SpaceUtil.determineFlatOrientation(player).ordinal();
+        facing_direction = SpaceUtil.determineFlatOrientation(player);
     }
 
     @Override
@@ -83,11 +83,6 @@ public class TileEntitySlagFurnace extends TileEntityFactorization implements IF
     public void setInventorySlotContents(int i, ItemStack is) {
         inv[i] = is;
         markDirty();
-    }
-
-    @Override
-    public IChatComponent getDisplayName() {
-        return new ChatComponentTranslation("factorization.slagfurnace");
     }
 
     private static final int[] INPUT_s = {inputSlotIndex, inputSlotIndex + 1}, FUEL_s = {fuelSlotIndex}, OUTPUT_s = {outputSlotIndex, outputSlotIndex + 1};
@@ -387,9 +382,8 @@ public class TileEntitySlagFurnace extends TileEntityFactorization implements IF
         if (axis.getDirectionVec().getY() != 0) {
             return false;
         }
-        byte newd = (byte) axis.ordinal();
-        if (newd != facing_direction) {
-            facing_direction = newd;
+        if (axis != facing_direction) {
+            facing_direction = axis;
             return true;
         }
         return false;
@@ -400,26 +394,33 @@ public class TileEntitySlagFurnace extends TileEntityFactorization implements IF
         if (draw_active <= 0) {
             return;
         }
-        int direction = facing_direction;
-        World w = worldObj;
-        float px = pos.getX() + 0.5F;
-        float py = pos.getY() + 0.0F + rand.nextFloat() * 6.0F / 16.0F;
-        float pz = pos.getZ() + 0.5F;
-        float d = 0.52F;
-        float rng = rand.nextFloat() * 0.6F - 0.3F;
-        
-        if (direction == 4) {
-            w.spawnParticle(EnumParticleTypes.SMOKE_NORMAL, px - d, py, pz + rng, 0, 0, 0);
-            w.spawnParticle(EnumParticleTypes.FLAME, px - d, py, pz + rng, 0, 0, 0);
-        } else if (direction == 5) {
-            w.spawnParticle(EnumParticleTypes.SMOKE_NORMAL, px + d, py, pz + rng, 0, 0, 0);
-            w.spawnParticle(EnumParticleTypes.FLAME, px + d, py, pz + rng, 0, 0, 0);
-        } else if (direction == 2) {
-            w.spawnParticle(EnumParticleTypes.SMOKE_NORMAL, px + rng, py, pz - d, 0, 0, 0);
-            w.spawnParticle(EnumParticleTypes.FLAME, px + rng, py, pz - d, 0, 0, 0);
-        } else if (direction == 3) {
-            w.spawnParticle(EnumParticleTypes.SMOKE_NORMAL, px + rng, py, pz + d, 0, 0, 0);
-            w.spawnParticle(EnumParticleTypes.FLAME, px + rng, py, pz + d, 0, 0, 0);
+        // Shamefully yoinked from BlockFurnace.
+        EnumFacing enumfacing = facing_direction;
+        World world = worldObj;
+        double d0 = (double)pos.getX() + 0.5D;
+        double d1 = (double)pos.getY() + rand.nextDouble() * 6.0D / 16.0D;
+        double d2 = (double)pos.getZ() + 0.5D;
+        double d3 = 0.52D;
+        double d4 = rand.nextDouble() * 0.6D - 0.3D;
+
+        switch (enumfacing)
+        {
+            case WEST:
+                world.spawnParticle(EnumParticleTypes.SMOKE_NORMAL, d0 - d3, d1, d2 + d4, 0.0D, 0.0D, 0.0D, new int[0]);
+                world.spawnParticle(EnumParticleTypes.FLAME, d0 - d3, d1, d2 + d4, 0.0D, 0.0D, 0.0D, new int[0]);
+                break;
+            case EAST:
+                world.spawnParticle(EnumParticleTypes.SMOKE_NORMAL, d0 + d3, d1, d2 + d4, 0.0D, 0.0D, 0.0D, new int[0]);
+                world.spawnParticle(EnumParticleTypes.FLAME, d0 + d3, d1, d2 + d4, 0.0D, 0.0D, 0.0D, new int[0]);
+                break;
+            case NORTH:
+                world.spawnParticle(EnumParticleTypes.SMOKE_NORMAL, d0 + d4, d1, d2 - d3, 0.0D, 0.0D, 0.0D, new int[0]);
+                world.spawnParticle(EnumParticleTypes.FLAME, d0 + d4, d1, d2 - d3, 0.0D, 0.0D, 0.0D, new int[0]);
+                break;
+            case SOUTH:
+                world.spawnParticle(EnumParticleTypes.SMOKE_NORMAL, d0 + d4, d1, d2 + d3, 0.0D, 0.0D, 0.0D, new int[0]);
+                world.spawnParticle(EnumParticleTypes.FLAME, d0 + d4, d1, d2 + d3, 0.0D, 0.0D, 0.0D, new int[0]);
+                break;
         }
     }
 

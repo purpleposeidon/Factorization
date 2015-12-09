@@ -1,6 +1,5 @@
 package factorization.fzds.network;
 
-import com.google.common.collect.BiMap;
 import factorization.fzds.interfaces.IFzdsShenanigans;
 import factorization.shared.Core;
 import net.minecraft.network.EnumConnectionState;
@@ -120,13 +119,7 @@ public abstract class WrappedPacket implements IFzdsShenanigans, Packet {
             FMLProxyPacket p = (FMLProxyPacket) wrapped;
             info += " channel:" + p.channel();
         }
-        info += " serializes:" + wrapped.serialize();
         info += " toString:" + wrapped.toString();
         return info;
-    }
-
-    @Override
-    public String serialize() {
-        return getClass().getSimpleName() + ":" + wrappedToString();
     }
 }

@@ -49,8 +49,8 @@ public class Symmetry {
         for (int i = 0; i < 4; i++) {
             rights[i] = _R;
             ups[i] = _U;
-            _R = _R.getRotation(normal);
-            _U = _U.getRotation(normal);
+            _R = SpaceUtil.rotate(_R, normal);
+            _U = SpaceUtil.rotate(_U, normal);
             dRight[i] = new DeltaCoord();
         }
 

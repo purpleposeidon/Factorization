@@ -132,7 +132,7 @@ public enum GooRenderer {
     void renderGooFor(RenderWorldLastEvent event, GooData data, EntityPlayer player) {
         boolean rendered_something = false;
         double render_dist_sq = 32*32;
-        Tessellator tess = Tessellator.instance;
+        Tessellator tess = Tessellator.getInstance();
         Block block = Block.instance;
         RenderBlocks rb = RenderUtil.getRB();
         for (int i = 0; i < data.coords.length; i += 3) {

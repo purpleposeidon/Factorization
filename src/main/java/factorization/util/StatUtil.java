@@ -1,10 +1,14 @@
 package factorization.util;
 
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.network.play.server.S37PacketStatistics;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.management.ServerConfigurationManager;
 import net.minecraft.stats.StatBase;
 import net.minecraft.stats.StatisticsFile;
+
+import java.util.HashMap;
 
 public class StatUtil {
     public static StatisticsFile getStatsFile(EntityPlayer player) {
@@ -40,9 +44,22 @@ public class StatUtil {
             set(get() + val);
             return get();
         }
+
+
+        public void sync() {
+            if (!(player instanceof EntityPlayerMP)) return;
+            EntityPlayerMP player = (EntityPlayerMP) this.player;
+            int value = get();
+            HashMap<StatBase, Integer> statInfo = new HashMap<StatBase, Integer>();
+            statInfo.put(stat, value);
+            player.playerNetServerHandler.sendPacket(new S37PacketStatistics(statInfo));
+        }
     }
 
     public static FzStat load(EntityPlayer player, StatBase field) {
         return new FzStat(player, field);
     }
+
+
+
 }

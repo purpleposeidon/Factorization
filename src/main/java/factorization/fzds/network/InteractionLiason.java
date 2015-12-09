@@ -10,6 +10,7 @@ import io.netty.channel.embedded.EmbeddedChannel;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.network.EnumConnectionState;
+import net.minecraft.network.EnumPacketDirection;
 import net.minecraft.network.NetHandlerPlayServer;
 import net.minecraft.network.NetworkManager;
 import net.minecraft.server.MinecraftServer;
@@ -44,7 +45,7 @@ public class InteractionLiason extends EntityPlayerMP implements IFzdsShenanigan
 
     private void initLiason() {
         // We're fairly similar to PacketProxyingPlayer.initWrapping()
-        networkManager = new CustomChannelNetworkManager(proxiedChannel, false);
+        networkManager = new CustomChannelNetworkManager(proxiedChannel, EnumPacketDirection.SERVERBOUND);
         this.playerNetServerHandler = new NetHandlerPlayServer(MinecraftServer.getServer(), networkManager, this);
         playerNetServerHandler.netManager.channel().attr(NetworkDispatcher.FML_DISPATCHER).set(new NetworkDispatcher(networkManager));
         //Compare net.minecraftforge.fml.common.network.FMLOutboundHandler.OutboundTarget.PLAYER.{...}.selectNetworks(Object, ChannelHandlerContext, FMLProxyPacket)

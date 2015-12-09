@@ -42,19 +42,14 @@ class InertiaCalculator extends MassCalculator implements ICoordFunction {
 
     protected InertiaCalculator(IDeltaChunk idc, Vec3 axisOfRotation) {
         super(idc);
-        Vec3 minVec = SpaceUtil.newVec();
-        min.setAsVector(minVec);
-        origin = SpaceUtil.incrAdd(minVec, idc.getRotationalCenterOffset());
+        origin = min.toVector().add(idc.getRotationalCenterOffset());
         this.axisOfRotation = axisOfRotation;
     }
-
-    private Vec3 here = SpaceUtil.newVec();
 
     @Override
     public void handle(Coord coordHere, double blockMass) {
         super.handle(coordHere, blockMass);
-        coordHere.setAsVector(here);
-        SpaceUtil.incrSubtract(here, origin);
+        Vec3 here = coordHere.toVector().subtract(origin);
         double d = SpaceUtil.lineDistance(axisOfRotation, here);
         inertiaSum += blockMass * d * d;
     }

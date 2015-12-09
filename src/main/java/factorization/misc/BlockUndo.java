@@ -9,6 +9,7 @@ import factorization.util.PlayerUtil;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import net.minecraft.block.Block;
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.entity.item.EntityItem;
@@ -17,6 +18,7 @@ import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.init.Items;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.BlockPos;
 import net.minecraft.world.World;
@@ -105,8 +107,8 @@ public class BlockUndo {
         return player.getCommandSenderName() + " #" + player.worldObj.isRemote;
     }
 
-    private static ItemStack toItem(Block b, World w, BlockPos pos, int md) {
-        for (ItemStack is : b.getDrops(w, pos, md, 0)) {
+    private static ItemStack toItem(Block b, World w, BlockPos pos, IBlockState bs) {
+        for (ItemStack is : b.getDrops(w, pos, bs, 0)) {
             return is;
         }
         return null;
@@ -137,15 +139,17 @@ public class BlockUndo {
 
     @SubscribeEvent(priority = EventPriority.LOWEST) // Act after any cancellations
     public void recordBlock(BlockEvent.PlaceEvent event) {
+        IBlockState bs = event.placedBlock;
+        Block block = bs.getBlock();
         if (event.player == null) return;
         if (event.world.isRemote) return;
         if (event.player instanceof FakePlayer) return;
-        if (event.block.getBlockHardness(event.world, event.x, event.y, event.z) <= 0F) return;
+        if (block.getBlockHardness(event.world, event.pos) <= 0F) return;
         if (PlayerUtil.isPlayerCreative(event.player)) return;
-        int md = event.world.getBlockMetadata(event.x, event.y, event.z); // Notable for NOT being the same as event.blockMetadata for Railcraft quarried stone! :|
-        int idmd = (DataUtil.getId(event.block) << 4) /*+ event.blockMetadata*/;
-        final ItemStack theItem = toItem(event.block, event.world, event.x, event.y, event.z, md);
-        final PlacedBlock at = new PlacedBlock(FzUtil.getWorldDimension(event.world), event.x, event.y, event.z, idmd, theItem);
+
+        int idmd = hash(bs);
+        final ItemStack theItem = toItem(block, event.world, event.pos, bs);
+        final PlacedBlock at = new PlacedBlock(FzUtil.getWorldDimension(event.world), event.pos, idmd, theItem);
         markPlacement(event.player, at);
         if (!event.world.isRemote && event.player instanceof EntityPlayerMP) {
             send((EntityPlayerMP) event.player, at);
@@ -182,17 +186,17 @@ public class BlockUndo {
 
 
     private void determineBreakSpeed(PlayerEvent.BreakSpeed event) {
-        final int y = event.y;
+        final int y = event.pos.getY();
         if (y == -1) return; // Event specifies that 'y' might be -1 for unknown usage?
-        final Block block = event.block;
-        final int md = event.metadata;
-        final int x = event.x;
-        final int z = event.z;
+        final IBlockState bs = event.state;
+        final Block block = bs.getBlock();
+        final int x = event.pos.getX();
+        final int z = event.pos.getZ();
         final EntityPlayer player = event.entityPlayer;
         if (stillBusy(player)) return;
-        if (!canUndo(event, pos, block, md)) return;
+        if (!canUndo(event, event.pos, block, bs)) return;
         // Duplicate logic to figure out what the *actual* break speed will be, so that we don't make this actual break speed too fast
-        float hardness = block.getBlockHardness(player.world, pos);
+        float hardness = block.getBlockHardness(player.worldObj, event.pos);
         if (hardness < 0.0F) {
             // Block is invulnerable
             return;
@@ -202,8 +206,8 @@ public class BlockUndo {
         if (heldName.startsWith("TConstruct:")) {
             return; // avoid warp-speed issues
         }
-        final float harvestingSpeed = ForgeHooks.canHarvestBlock(block, player, md) ? 30F : 100F;
-        final float max_true_speed = block.hasTileEntity(md) ? MAX_TRUE_SPEED_TILEENTITY : MAX_TRUE_SPEED_STANDARD;
+        final float harvestingSpeed = ForgeHooks.canHarvestBlock(block, player, player.worldObj, event.pos) ? 30F : 100F;
+        final float max_true_speed = block.hasTileEntity(bs) ? MAX_TRUE_SPEED_TILEENTITY : MAX_TRUE_SPEED_STANDARD;
         float true_speed = event.newSpeed / hardness / harvestingSpeed;
         if (true_speed > max_true_speed) return;
         float boost = max_true_speed * hardness * harvestingSpeed;
@@ -213,22 +217,25 @@ public class BlockUndo {
         // Maybe just a single blind speed, and be done with it?
     }
 
-    private boolean canUndo(PlayerEvent event, BlockPos pos, Block block, int metadata) {
+    private boolean canUndo(PlayerEvent event, BlockPos pos, Block block, IBlockState bs) {
         final EntityPlayer player = event.entityPlayer;
         ArrayList<PlacedBlock> coords = recentlyPlaced.get(getName(player));
         if (coords == null) return false;
 
         int w = FzUtil.getWorldDimension(player.worldObj);
         for (PlacedBlock hot : coords) {
-            if (hot.w == w && hot.x == x && hot.y == y && hot.z == z) {
-                int idmd = (DataUtil.getId(block) << 4) /*+ metadata*/;
-                if (idmd != hot.idmd) {
+            if (hot.w == w && hot.pos.equals(pos)) {
+                if (hash(bs) != hot.idmd) {
                     continue;
                 }
                 return true;
             }
         }
         return false;
+    }
+
+    static int hash(IBlockState bs) {
+        return DataUtil.getId(bs.getBlock());
     }
 
     @SubscribeEvent(priority = EventPriority.HIGH) // Cancel before most things, but permission-handlers can cancel before us
@@ -239,16 +246,17 @@ public class BlockUndo {
         if (coords == null) return;
         PlacedBlock heat = null;
         final World w = event.world;
-        final int x = event.x;
-        final int y = event.y;
-        final int z = event.z;
-        final Block block = event.block;
-        final int md = event.blockMetadata;
+        final int x = event.pos.getX();
+        final int y = event.pos.getY();
+        final int z = event.pos.getZ();
+        final BlockPos pos = event.pos;
+        final IBlockState bs = event.state;
+        final Block block = event.state.getBlock();
         int wDim = FzUtil.getWorldDimension(w);
         if (PlayerUtil.isPlayerCreative(thePlayer)) return;
         for (Iterator<PlacedBlock> iterator = coords.iterator(); iterator.hasNext(); ) {
             PlacedBlock hot = iterator.next();
-            if (hot.w == wDim && hot.x == x && hot.y == y && hot.z == z) {
+            if (hot.w == wDim && hot.pos.equals(event.pos)) {
                 heat = hot;
                 iterator.remove();
                 break;
@@ -257,7 +265,7 @@ public class BlockUndo {
         if (heat == null || !(thePlayer instanceof EntityPlayerMP)) {
             return;
         }
-        if (!ItemUtil.identical(heat.orig, toItem(block, w, pos, md))) {
+        if (!ItemUtil.identical(heat.orig, toItem(block, w, pos, bs))) {
             return;
         }
         EntityPlayerMP real_player = (EntityPlayerMP) thePlayer;
@@ -267,16 +275,16 @@ public class BlockUndo {
         if (heldName.startsWith("TConstruct:")) {
             return; // avoid warp-speed issues
         }
-        if (ForgeHooks.canToolHarvestBlock(block, md, heldItem)) {
+        if (ForgeHooks.canToolHarvestBlock(w, pos, heldItem)) {
             return;
         }
-        if (block.getItemDropped(md, thePlayer.worldObj.rand, 0) != DataUtil.getItem(block)) {
+        if (block.getItemDropped(bs, thePlayer.worldObj.rand, 0) != DataUtil.getItem(block)) {
             if (!real_player.isSneaking() && block.getBlockHardness(w, pos) < 1) {
                 return;
             }
         }
-        String harvestTool = block.getHarvestTool(md);
-        int harvestLevel = block.getHarvestLevel(md);
+        String harvestTool = block.getHarvestTool(bs);
+        int harvestLevel = block.getHarvestLevel(bs);
         Item harvester = findAppropriateTool(harvestTool, harvestLevel);
         if (harvester == null) return;
         event.setCanceled(true);
@@ -289,15 +297,16 @@ public class BlockUndo {
         {
             double r = 0.5;
             AxisAlignedBB box = new AxisAlignedBB(x - r, y - r, z - r, x + 1 + r, y + 1 + r, z + 1 + r);
-            block.onBlockHarvested(w, pos, md, fake_player);
-            boolean canDestroy = block.removedByPlayer(w, fake_player, pos, true);
+            block.onBlockHarvested(w, pos, bs, fake_player);
+            boolean canDestroy = block.removedByPlayer(w, pos, fake_player, true);
+            TileEntity te = w.getTileEntity(pos);
 
             if (canDestroy) {
-                block.onBlockDestroyedByPlayer(w, pos, md);
+                block.onBlockDestroyedByPlayer(w, pos, bs);
             }
-            block.harvestBlock(w, fake_player, pos, md);
+            block.harvestBlock(w, fake_player, pos, bs, te);
             if (canDestroy) {
-                int xp = block.getExpDrop(w, md, 0);
+                int xp = block.getExpDrop(w, pos, 0);
                 block.dropXpOnBlockBreak(w, pos, xp);
             }
             if (FzConfig.blockundo_grab) {

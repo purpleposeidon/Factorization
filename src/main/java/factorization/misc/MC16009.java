@@ -5,6 +5,7 @@ import net.minecraft.command.CommandBase;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.util.BlockPos;
 import net.minecraft.util.ChatComponentText;
 import net.minecraft.world.World;
 
@@ -32,9 +33,9 @@ public class MC16009 extends CommandBase {
     public String getCommandUsage(ICommandSender sender) {
         return "/mc16009 " + markDupes + "|" + showUUIDs;
     }
-    
+
     @Override
-    public List addTabCompletionOptions(ICommandSender sender, String[] args) {
+    public List<String> addTabCompletionOptions(ICommandSender sender, String[] args, BlockPos pos) {
         return Arrays.asList(markDupes, showUUIDs);
     }
 
@@ -53,18 +54,18 @@ public class MC16009 extends CommandBase {
     
 
     void showEntityUUIDs(World world, EntityPlayer player) {
-        for (Entity ent : (Iterable<Entity>) world.loadedEntityList) {
-            new Notice(ent, ent.getUniqueID().toString()).send(player);
+        for (Entity ent : world.loadedEntityList) {
+            new Notice(ent, ent.getUniqueID().toString()).sendTo(player);
         }
     }
     
     void countDupeEntities(World world, EntityPlayer player) {
         int n = 0;
         int total = 0;
-        HashSet<UUID> found = new HashSet();
-        for (Entity ent : (Iterable<Entity>) world.loadedEntityList) {
+        HashSet<UUID> found = new HashSet<UUID>();
+        for (Entity ent : world.loadedEntityList) {
             if (!found.add(ent.getUniqueID())) {
-                new Notice(ent, "dupe!").send(player);
+                new Notice(ent, "dupe!").sendTo(player);
                 n++;
             }
             total++;

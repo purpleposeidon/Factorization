@@ -49,9 +49,4 @@ public class TileEntityColossalHeart extends TileEntity {
             e.printStackTrace();
         }
     }
-    
-    @Override
-    public boolean canUpdate() {
-        return false;
-    }
 }

@@ -2,6 +2,7 @@ package factorization.misc;
 
 import io.netty.buffer.ByteBufInputStream;
 import io.netty.buffer.Unpooled;
+import net.minecraft.network.PacketBuffer;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.network.FMLEventChannel;
 import net.minecraftforge.fml.common.network.FMLNetworkEvent.ClientCustomPacketEvent;
@@ -42,7 +43,7 @@ public class MiscNet {
             DataOutputStream output = new DataOutputStream(outputStream);
             output.writeFloat(tps);
             output.flush();
-            return new FMLProxyPacket(Unpooled.wrappedBuffer(outputStream.toByteArray()), tpsChannel);
+            return new FMLProxyPacket(new PacketBuffer(Unpooled.wrappedBuffer(outputStream.toByteArray())), tpsChannel);
         } catch (IOException e) {
             e.printStackTrace();
             return null;

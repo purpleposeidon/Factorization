@@ -21,11 +21,6 @@ public class SocketBareMotor extends TileEntitySocketBase {
     }
 
     @Override
-    public boolean canUpdate() {
-        return false;
-    }
-
-    @Override
     public ItemStack getCreatingItem() {
         return new ItemStack(Core.registry.motor);
     }

@@ -10,6 +10,7 @@ import factorization.servo.CpuBlocking;
 import factorization.servo.Instruction;
 import factorization.servo.ServoMotor;
 import factorization.servo.stepper.StepperEngine;
+import factorization.util.SpaceUtil;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
@@ -45,8 +46,9 @@ public class Spin extends Instruction {
 
     void hit(AbstractServoMachine motor) {
         EnumFacing newTop = motor.getOrientation().top;
+        EnumFacing facing = motor.getOrientation().facing;
         for (int i = cc ? 3 : 1; i > 0; i--) {
-            newTop = newTop.getRotation(motor.getOrientation().facing);
+            newTop = SpaceUtil.rotate(newTop, facing);
         }
         FzOrientation next = motor.getOrientation().pointTopTo(newTop);
         if (next != null) {

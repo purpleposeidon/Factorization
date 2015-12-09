@@ -190,7 +190,7 @@ public class TileEntityDayBarrelRenderer extends TileEntitySpecialRenderer {
         final int len = t.length();
         final double char_width = 1.0/10.0;
         final double char_height = 1.0/10.0;
-        final Tessellator tess = Tessellator.instance;
+        final Tessellator tess = Tessellator.getInstance();
         tess.setTranslation(-char_width * len / 2 + 0.25, -char_height - 1F/32F, 0);
         tess.startDrawingQuads();
         double du = (font.getMaxU() - font.getMinU()) / 4;
@@ -251,7 +251,7 @@ public class TileEntityDayBarrelRenderer extends TileEntitySpecialRenderer {
         
         public void bindTexture(ResourceLocation res) {
             if (RES_ITEM_GLINT.equals(res)) {
-                Tessellator.instance = voidTessellator;
+                Tessellator.getInstance() = voidTessellator;
             } else {
                 realGuy.bindTexture(res);
             }
@@ -297,9 +297,9 @@ public class TileEntityDayBarrelRenderer extends TileEntitySpecialRenderer {
                 if (interception == null) {
                     interception = new Intercepter(Minecraft.getMinecraft().getResourceManager());
                 }
-                Tessellator orig = Tessellator.instance;
+                Tessellator orig = Tessellator.getInstance();
                 renderItem.renderItemAndEffectIntoGUI(fr, interception, is, 0, 0);
-                Tessellator.instance = orig;
+                Tessellator.getInstance() = orig;
             } else {
                 renderItem.renderItemAndEffectIntoGUI(fr, re, is, 0, 0);
             }

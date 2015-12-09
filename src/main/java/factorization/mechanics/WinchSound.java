@@ -38,6 +38,6 @@ public class WinchSound extends MovingSound {
         volume = Math.max(0.25F, delta);
         float pitch = (float) Math.min(Math.max(0.05, delta), 8);
         source.soundActive = true;
-        this.field_147663_c = pitch;
+        this.pitch = pitch;
     }
 }

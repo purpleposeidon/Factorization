@@ -24,8 +24,8 @@ import java.util.ArrayList;
 import java.util.EnumSet;
 
 public class ColossusController extends EntityFz implements IBossDisplayData, IDCController {
-    static enum BodySide { LEFT, RIGHT, CENTER, UNKNOWN_BODY_SIDE };
-    static enum LimbType {
+    enum BodySide { LEFT, RIGHT, CENTER, UNKNOWN_BODY_SIDE };
+    enum LimbType {
         BODY, ARM, LEG, UNKNOWN_LIMB_TYPE;
         
         public boolean isArmOrLeg() { return this == ARM || this == LEG; }
@@ -484,8 +484,7 @@ public class ColossusController extends EntityFz implements IBossDisplayData, ID
     @Override
     public boolean breakBlock(IDeltaChunk idc, EntityPlayer player, Coord at, EnumFacing sideHit) {
         if (at.getBlock() != Core.registry.colossal_block) return false;
-        int md = at.getMd();
-        if (md == ColossalBlock.MD_MASK_CRACKED || md == ColossalBlock.MD_BODY_CRACKED) {
+        if (at.has(ColossalBlock.VARIANT, ColossalBlock.Md.BODY_CRACKED, ColossalBlock.Md.MASK_CRACKED)) {
             crackBroken();
         }
         return false;

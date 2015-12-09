@@ -5,21 +5,19 @@ import net.minecraft.util.BlockPos;
 import net.minecraft.world.World;
 
 public class SimpleCoord implements ISaneCoord {
-    World w;
-    int x, y, z;
-    
-    public SimpleCoord(World w, int x, int y, int z) {
+    final World w;
+    final BlockPos pos;
+
+    public SimpleCoord(World w, BlockPos pos) {
         this.w = w;
-        this.x = x;
-        this.y = y;
-        this.z = z;
+        this.pos = pos;
     }
     
     @Override public World w() { return w; }
 
     @Override
     public BlockPos toBlockPos() {
-        return new BlockPos(x, y, z);
+        return pos;
     }
 
 }

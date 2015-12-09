@@ -130,7 +130,7 @@ public class ItemGoo extends ItemFactorization {
                     final FzInv playerInv = InvUtil.openInventory(player, true);
                     DropCaptureHandler.startCapture(new ICaptureDrops() {
                         @Override
-                        public boolean captureDrops(ArrayList<ItemStack> stacks) {
+                        public boolean captureDrops(List<ItemStack> stacks) {
                             boolean any = false;
                             for (ItemStack is : stacks) {
                                 if (ItemUtil.normalize(is) == null) continue;

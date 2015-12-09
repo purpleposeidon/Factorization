@@ -79,11 +79,11 @@ public class TileEntityCompressionCrafterRenderer extends TileEntitySpecialRende
         
         block.rotateCenter(q);
         
-        Tessellator.instance.startDrawingQuads();
-        Tessellator.instance.setBrightness(block.getMixedBrightnessForBlock(cc.getWorld(), cc.getPos().getX(), cc.getPos().getY(), cc.getPos().getZ()));
+        Tessellator.getInstance().startDrawingQuads();
+        Tessellator.getInstance().setBrightness(block.getMixedBrightnessForBlock(cc.getWorld(), cc.getPos().getX(), cc.getPos().getY(), cc.getPos().getZ()));
         GL11.glDisable(GL11.GL_LIGHTING);
         block.renderForTileEntity();
-        Tessellator.instance.draw();
+        Tessellator.getInstance().draw();
         
         if (cc.isPrimaryCrafter() && cc.upperCorner != null && cc.lowerCorner != null
                 && Minecraft.getMinecraft().gameSettings.fancyGraphics) {
@@ -154,15 +154,15 @@ public class TileEntityCompressionCrafterRenderer extends TileEntitySpecialRende
         block.useTexture(BlockIcons.dark_iron_block);
         block.setBlockBounds(0, 0, 0, (float) contentSize.maxX, (float) contentSize.maxY, (float) contentSize.maxZ);
         block.beginWithMirroredUVs();
-        Tessellator.instance.startDrawingQuads();
+        Tessellator.getInstance().startDrawingQuads();
         block.renderForTileEntity();
-        Tessellator.instance.draw();
+        Tessellator.getInstance().draw();
     }
     
     private static Tessellator tess = new Tessellator();
     
     private void drawSquishingBlocks(Coord upperCorner, Coord lowerCorner, float partial) {
-        Tessellator real = Tessellator.instance;
+        Tessellator real = Tessellator.getInstance();
         if (real == tess) {
             return; //Oh boy!
         }
@@ -172,10 +172,10 @@ public class TileEntityCompressionCrafterRenderer extends TileEntitySpecialRende
         spz = TileEntityRendererDispatcher.staticPlayerZ;
         TileEntityRendererDispatcher.staticPlayerX = TileEntityRendererDispatcher.staticPlayerY = TileEntityRendererDispatcher.staticPlayerZ = 0;
         try {
-            Tessellator.instance = tess;
+            Tessellator.getInstance() = tess;
             _drawSquishingBlocks(upperCorner, lowerCorner, partial);
         } finally {
-            Tessellator.instance = real;
+            Tessellator.getInstance() = real;
             TileEntityRendererDispatcher.staticPlayerX = spx;
             TileEntityRendererDispatcher.staticPlayerY = spy;
             TileEntityRendererDispatcher.staticPlayerZ = spz;
@@ -187,14 +187,14 @@ public class TileEntityCompressionCrafterRenderer extends TileEntitySpecialRende
     private void _drawSquishingBlocks(Coord upperCorner, Coord lowerCorner, float partial) {
         contentSize = null;
         bindTexture(Core.blockAtlas);
-        Tessellator.instance.startDrawingQuads();
+        Tessellator.getInstance().startDrawingQuads();
         World w = upperCorner.w;
         RenderBlocks rb = new RenderBlocks(w);
         GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
         GL11.glEnable(GL11.GL_BLEND);
         for (int renderPass = 0; renderPass <= 3; renderPass++) {
             if (renderPass == 3) {
-                Tessellator.instance.draw();
+                Tessellator.getInstance().draw();
             }
             for (int x = lowerCorner.x; x <= upperCorner.x; x++) {
                 for (int y = lowerCorner.y; y <= upperCorner.y; y++) {
@@ -231,9 +231,9 @@ public class TileEntityCompressionCrafterRenderer extends TileEntitySpecialRende
                             }
                             TileEntity te;
                             if ((te = w.getTileEntity(pos)) != null) {
-                                Tessellator.instance = tesrator;
+                                Tessellator.getInstance() = tesrator;
                                 TileEntityRendererDispatcher.instance.renderTileEntity(te, partial);
-                                Tessellator.instance = tess;
+                                Tessellator.getInstance() = tess;
                             }
                             continue;
                         }

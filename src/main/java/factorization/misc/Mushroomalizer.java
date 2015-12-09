@@ -1,6 +1,7 @@
 package factorization.misc;
 
 import factorization.api.Coord;
+import factorization.util.SpaceUtil;
 import net.minecraft.block.Block;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.Item;
@@ -40,10 +41,10 @@ public class Mushroomalizer {
         EnumFacing[] HORIZONTALS = new EnumFacing[] { EnumFacing.NORTH, EnumFacing.SOUTH, EnumFacing.EAST, EnumFacing.WEST };
         for (PlayerInteractEvent event : shroomQueue) {
             if (event.isCanceled()) continue;
-            Coord at = new Coord(event.entityPlayer.worldObj, event.x, event.y, event.z).add(SpaceUtil.getOrientation(event.face));
+            Coord at = new Coord(event.entityPlayer.worldObj, event.pos).add(event.face);
             if (event.entityPlayer.isSneaking()) {
                 // Stalk
-                if (event.face > 1) {
+                if (event.face.getAxis() == EnumFacing.Axis.Y) {
                     at.setMd(15); // Vertical stalk
                 } else {
                     at.setMd(10); // All-sides stalk

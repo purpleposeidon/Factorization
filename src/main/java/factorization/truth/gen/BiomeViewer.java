@@ -3,11 +3,13 @@ package factorization.truth.gen;
 import factorization.truth.api.IDocGenerator;
 import factorization.truth.api.ITypesetter;
 import factorization.truth.api.TruthError;
+import factorization.util.DataUtil;
 import net.minecraft.block.Block;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.BlockPos;
 import net.minecraft.world.biome.BiomeDecorator;
 import net.minecraft.world.biome.BiomeGenBase;
 import net.minecraftforge.common.BiomeDictionary;
@@ -35,8 +37,8 @@ public class BiomeViewer implements IDocGenerator {
                 out.write(String.format("\\nl Water Tint: #%06X", biome.waterColorMultiplier));
             }
             out.write("\\nl Blocks: ");
-            out.write(new ItemStack(biome.topBlock));
-            out.write(new ItemStack(biome.fillerBlock));
+            out.write(DataUtil.fromState(biome.topBlock));
+            out.write(DataUtil.fromState(biome.fillerBlock));
             
             {
                 final BiomeDecorator dec = biome.theBiomeDecorator;
@@ -110,7 +112,7 @@ public class BiomeViewer implements IDocGenerator {
     void feature(ITypesetter out, int val, Block symbol) {
         if (val <= 0) return;
         if (val > 99) val = 99;
-        Item it = symbol.getItem(null, 0, 0, 0);
+        Item it = symbol.getItem(null, new BlockPos(0, 0, 0));
         ItemStack is = new ItemStack(it);
         if (symbol == Blocks.tallgrass) {
             is = new ItemStack(Blocks.tallgrass, 0, 1);

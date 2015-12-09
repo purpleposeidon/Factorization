@@ -1,82 +1,96 @@
 package factorization.colossi;
 
+import factorization.api.Coord;
 import factorization.coremodhooks.HookTargetsServer;
 import factorization.shared.Core;
+import factorization.util.SpaceUtil;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
+import net.minecraft.block.properties.IProperty;
+import net.minecraft.block.properties.PropertyBool;
+import net.minecraft.block.state.BlockState;
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.*;
 import net.minecraft.world.Explosion;
-import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
+import net.minecraft.world.WorldServer;
 
 import java.util.List;
 import java.util.Random;
 
 public class BlockBlast extends Block {
+    public static final IProperty<Boolean> EXPLODING = PropertyBool.create("exploding");
+
     public BlockBlast() {
         super(Material.tnt);
-        setBlockName("blastBlock");
-        setBlockTextureName("factorization:blastBlock");
+        setUnlocalizedName("factorization:blastBlock");
         setCreativeTab(Core.tabFactorization);
         setHardness(1.5F);
         setResistance(10F);
         setHarvestLevel("pickaxe", 1);
     }
 
-    int blast_radius = 1;
-
     @Override
-    public void onNeighborBlockChange(World world, BlockPos pos, Block block) {
-        world.scheduleBlockUpdate(pos, this, 6 + world.rand.nextInt(4));
+    protected BlockState createBlockState() {
+        return new BlockState(this, EXPLODING);
     }
 
     @Override
-    public void onNeighborChange(IBlockAccess world, BlockPos pos, int tileX, int tileY, int tileZ) {
-        /*if (world instanceof World) {
-            onNeighborBlockChange((World) world, pos, world.getBlock(tileX, tileY, tileZ));
-        }*/
+    public int getMetaFromState(IBlockState state) {
+        if (state.getValue(EXPLODING)) return 1;
+        return 0;
+    }
+
+    @Override
+    public IBlockState getStateFromMeta(int meta) {
+        if (meta > 0) return getDefaultState().withProperty(EXPLODING, true);
+        return getDefaultState().withProperty(EXPLODING, false);
+    }
+
+    int blast_radius = 1;
+
+    @Override
+    public void onNeighborBlockChange(World world, BlockPos pos, IBlockState state, Block neighborBlock) {
+        world.scheduleBlockUpdate(pos, this, 4 + world.rand.nextInt(4), 0);
     }
 
     @Override
     public void onBlockDestroyedByExplosion(World world, BlockPos pos, Explosion explosion) {
-        for (int dx = -blast_radius; dx <= +blast_radius; dx++) {
-            for (int dy = -blast_radius; dy <= +blast_radius; dy++) {
-                for (int dz = -blast_radius; dz <= +blast_radius; dz++) {
-                    if (world.getBlock(x + dx, y + dy, z + dz) == this) {
-                        world.setBlockMetadataWithNotify(x + dx, y + dy, z + dz, 1, 0);
-                        onNeighborBlockChange(world, x + dx, y + dy, z + dz, this);
-                    }
-                }
-            }
+        for (BlockPos hit : SpaceUtil.iteratePos(pos, blast_radius)) {
+            IBlockState bs = world.getBlockState(hit);
+            if (bs.getBlock() != this) continue;
+            if (hit.equals(pos)) continue;
+            new Coord(world, pos).set(EXPLODING, true);
+            onNeighborBlockChange(world, hit, bs, this);
         }
     }
 
     @Override
-    public float getExplosionResistance(Entity explosion, World world, BlockPos pos, double explosionX, double explosionY, double explosionZ) {
-        world.setBlockMetadataWithNotify(pos, 1, 0);
-        onNeighborBlockChange(world, pos, this);
-        return super.getExplosionResistance(explosion, world, pos, explosionX, explosionY, explosionZ);
+    public float getExplosionResistance(World world, BlockPos pos, Entity exploder, Explosion explosion) {
+        Coord coord = new Coord(world, pos);
+        coord.set(EXPLODING, true);
+        onNeighborBlockChange(world, pos, coord.getState(), this);
+        return super.getExplosionResistance(world, pos, exploder, explosion);
     }
 
     @Override
-    public void updateTick(World world, BlockPos pos, Random rand) {
-        boolean boom = world.getBlockMetadata(pos) == 1;
+    public void updateTick(World world, BlockPos pos, IBlockState state, Random rand) {
+        IBlockState ibs = world.getBlockState(pos);
+        boolean boom = ibs.getValue(EXPLODING);
         if (!boom) {
             for (EnumFacing dir : EnumFacing.VALUES) {
-                int atX = x + dir.getDirectionVec().getX();
-                int atY = y + dir.getDirectionVec().getY();
-                int atZ = z + dir.getDirectionVec().getZ();
-                Block b = world.getBlock(atX, atY, atZ);
+                BlockPos at = pos.offset(dir);
+                Block b = world.getBlock(at);
                 Material mat = b.getMaterial();
-                if (mat == Material.lava || mat == Material.fire || b.isBurning(world, atX, atY, atZ)) {
+                if (mat == Material.lava || mat == Material.fire || b.isBurning(world, at)) {
                     boom = true;
                     break;
                 }
             }
         }
         if (!boom) return;
-        boom(world, x + 0.5, y + 0.5, z + 0.5);
+        boom(world, pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5);
         world.setBlockToAir(pos);
         this.onBlockExploded(world, pos, null);
     }
@@ -85,7 +99,12 @@ public class BlockBlast extends Block {
     
     void boom(World world, double explosionX, double explosionY, double explosionZ) {
         world.playSoundEffect(explosionX, explosionY, explosionZ, "random.explode", 4.0F, (1.0F + (world.rand.nextFloat() - world.rand.nextFloat()) * 0.2F) * 0.7F);
-        world.spawnParticle("largeexplode", explosionX, explosionY, explosionZ, 1.0D, 0.0D, 0.0D);
+        if (world.isRemote) {
+            world.spawnParticle(EnumParticleTypes.EXPLOSION_LARGE, explosionX, explosionY, explosionZ, 4, 1, 0, 0);
+        } else {
+            WorldServer ws = (WorldServer) world;
+            ws.spawnParticle(EnumParticleTypes.EXPLOSION_LARGE, explosionX, explosionY, explosionZ, 4, 1, 0, 0);
+        }
         double r = 5;
         List list = world.getEntitiesWithinAABBExcludingEntity(null, new AxisAlignedBB(explosionX - r, explosionY - r, explosionZ - r, explosionX + r, explosionY + r, explosionZ + r));
 
@@ -104,9 +123,9 @@ public class BlockBlast extends Block {
             dx /= entDist;
             dy /= entDist;
             dz /= entDist;
-            double density = (double) world.getBlockDensity(vec3, entity.boundingBox);
+            double density = (double) world.getBlockDensity(vec3, entity.getEntityBoundingBox());
             double pain = (1.0D - dist) * density;
-            entity.attackEntityFrom(DamageSource.setExplosionSource(null), (float) ((int) ((pain * pain + pain) / 2.0D * 8.0D * (double) explosionSize + 1.0D)));
+            entity.attackEntityFrom(DamageSource.setExplosionSource(null), (float) ((int) ((pain * pain + pain) / 2.0D * 8.0D * explosionSize + 1.0D)));
             // Yeah, we're manually applying the coremod here, ahem.
             double blastbackResistance = HookTargetsServer.clipExplosionResistance(entity, pain);
             //EnchantmentProtection.func_92092_a(entity, pain);

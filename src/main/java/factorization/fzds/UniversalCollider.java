@@ -23,12 +23,12 @@ class UniversalCollider extends Entity implements IFzdsEntryControl {
 
     @Override
     protected void writeEntityToNBT(NBTTagCompound tag) { }
-    
+
     @Override
-    public AxisAlignedBB getBoundingBox() {
+    public AxisAlignedBB getEntityBoundingBox() {
         return this.dimensionSliceEntity.metaAABB;
     }
-    
+
     @Override
     public Entity[] getParts() {
         return this.dimensionSliceEntity.getRayParts();

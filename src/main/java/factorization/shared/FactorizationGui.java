@@ -2,7 +2,6 @@ package factorization.shared;
 
 import factorization.common.ContainerFactorization;
 import net.minecraft.client.gui.inventory.GuiContainer;
-import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.player.InventoryPlayer;
 
 public abstract class FactorizationGui extends GuiContainer {
@@ -15,9 +14,9 @@ public abstract class FactorizationGui extends GuiContainer {
     
     @Override
     protected void drawGuiContainerForegroundLayer(int foo, int bar) {
-        fontRendererObj.drawString(factContainer.factory.getInventoryName(), 8, 6, 0x404040);
+        fontRendererObj.drawString(factContainer.factory.getDisplayName().getFormattedText(), 8, 6, 0x404040);
         InventoryPlayer ip = factContainer.entityplayer.inventory;
-        this.fontRendererObj.drawString(ip.hasCustomInventoryName() ? ip.getInventoryName() : I18n.format(ip.getInventoryName()), 8, this.ySize - 96 + 2, 4210752);
+        this.fontRendererObj.drawString(ip.getDisplayName().getFormattedText(), 8, this.ySize - 96 + 2, 4210752);
     }
     
     

@@ -280,7 +280,7 @@ public class SocketLacerator extends TileEntitySocketBase implements IChargeCond
     }
     
     @Override
-    public boolean captureDrops(ArrayList<ItemStack> stacks) {
+    public boolean captureDrops(List<ItemStack> stacks) {
         for (int i = 0; i < stacks.size(); i++) {
             ItemStack is = stacks.get(i);
             processCollectedItem(is.copy());

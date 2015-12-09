@@ -62,11 +62,9 @@ public class ItemManSandwich extends ItemFood implements IManwich {
         }
         boolean spicy = stack.getItemDamage() > 0;
         int nomage = spicy ? 7 : 1;
-        StatisticsFile stats = StatUtil.getStatsFile(player);
-        if (stats != null) {
-            stats.func_150873_a(player, manwhichStatus, nomage);
-            syncStat(player);
-        }
+        StatUtil.FzStat stat = StatUtil.load(player, manwhichStatus);
+        stat.set(nomage);
+        stat.sync();
         int saturationTime;
         if (spicy) {
             player.setFire(7);
@@ -81,9 +79,8 @@ public class ItemManSandwich extends ItemFood implements IManwich {
 
     public int hasManual(EntityPlayer player) {
         if (PlayerUtil.isPlayerCreative(player)) return 1;
-        StatisticsFile stats = StatUtil.getStatsFile(player);
-        if (stats == null) return 0;
-        return stats.writeStat(manwhichStatus);
+        StatUtil.FzStat stat = StatUtil.load(player, manwhichStatus);
+        return stat.get();
     }
 
     @SubscribeEvent
@@ -92,16 +89,16 @@ public class ItemManSandwich extends ItemFood implements IManwich {
         EntityPlayer player = event.entityPlayer;
         StatisticsFile stats = StatUtil.getStatsFile(player);
         if (stats == null) return;
-        int sandwiches = stats.writeStat(manwhichStatus);
-        if (sandwiches > 0) {
-            stats.func_150873_a(player, manwhichStatus, sandwiches - 1);
-            syncStat(player);
+        StatUtil.FzStat stat = StatUtil.load(player, manwhichStatus);
+        if (stat.get() > 0) {
+            stat.add(-1);
+            stat.sync();
         }
     }
 
     @SubscribeEvent
     public void syncLoginManwhich(net.minecraftforge.fml.common.gameevent.PlayerEvent.PlayerLoggedInEvent event) {
-        syncStat(event.player);
+        StatUtil.load(event.player, manwhichStatus).sync();
     }
 
     @Override
@@ -120,17 +117,6 @@ public class ItemManSandwich extends ItemFood implements IManwich {
                 player.setCurrentItemOrArmor(0, null);
             }
         }
-    }
-
-    void syncStat(EntityPlayer _player) {
-        if (!(_player instanceof EntityPlayerMP)) return;
-        EntityPlayerMP player = (EntityPlayerMP) _player;
-        StatisticsFile stats = StatUtil.getStatsFile(player);
-        if (stats == null) return;
-        int sandwiches = stats.writeStat(manwhichStatus);
-        HashMap statInfo = new HashMap();
-        statInfo.put(manwhichStatus, sandwiches);
-        player.playerNetServerHandler.sendPacket(new S37PacketStatistics(statInfo));
     }
 
     @Override

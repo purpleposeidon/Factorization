@@ -4,6 +4,7 @@ import net.minecraft.command.CommandException;
 import net.minecraft.command.CommandHelp;
 import net.minecraft.command.ICommand;
 import net.minecraft.command.ICommandSender;
+import net.minecraft.util.BlockPos;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -48,7 +49,7 @@ public class SafeCommandHelp extends CommandHelp {
     }
 
     @Override
-    public void processCommand(ICommandSender player, String[] args) {
+    public void processCommand(ICommandSender player, String[] args) throws CommandException{
         try {
             super.processCommand(player, args);
         } catch (CommandException t) {
@@ -98,7 +99,7 @@ public class SafeCommandHelp extends CommandHelp {
         }
 
         @Override
-        public void processCommand(ICommandSender sender, String[] args) {
+        public void processCommand(ICommandSender sender, String[] args) throws CommandException {
             // Doesn't happen.
             // Even if it did happen, it isn't reasonable to catch & ignore any exceptiosn it might throw.
             base.processCommand(sender, args);
@@ -115,9 +116,9 @@ public class SafeCommandHelp extends CommandHelp {
         }
 
         @Override
-        public List addTabCompletionOptions(ICommandSender player, String[] args) {
+        public List<String> addTabCompletionOptions(ICommandSender sender, String[] args, BlockPos pos) {
             try {
-                return base.addTabCompletionOptions(player, args);
+                return base.addTabCompletionOptions(sender, args, pos);
             } catch (Throwable t) {
                 // Uh. Yeah, not sure.
                 t.printStackTrace();
@@ -136,7 +137,7 @@ public class SafeCommandHelp extends CommandHelp {
         }
 
         @Override
-        public int compareTo(@SuppressWarnings("NullableProblems") Object obj) {
+        public int compareTo(ICommand obj) {
             try {
                 return base.getClass().getName().compareTo(obj.getClass().getName());
             } catch (Throwable t) {

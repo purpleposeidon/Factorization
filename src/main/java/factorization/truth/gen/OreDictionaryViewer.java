@@ -9,6 +9,7 @@ import net.minecraftforge.oredict.OreDictionary;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.List;
 
 public class OreDictionaryViewer implements IDocGenerator {
 
@@ -22,7 +23,7 @@ public class OreDictionaryViewer implements IDocGenerator {
         ArrayList<String> empties = new ArrayList<String>();
         ArrayList<String> singles = new ArrayList<String>();
         for (String name : names) {
-            ArrayList<ItemStack> ores = OreDictionary.getOres(name);
+            List<ItemStack> ores = OreDictionary.getOres(name);
             if (ores == null || ores.isEmpty()) {
                 empties.add(name);
             } else if (ores.size() == 1) {
@@ -60,7 +61,7 @@ public class OreDictionaryViewer implements IDocGenerator {
     }
     
     void show(ITypesetter out, String name) throws TruthError {
-        ArrayList<ItemStack> ores = OreDictionary.getOres(name);
+        List<ItemStack> ores = OreDictionary.getOres(name);
         out.write("\\seg");
         out.write(String.format("\\nl %s: ", name));
         for (ItemStack is : ores) {

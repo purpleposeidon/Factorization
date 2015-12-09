@@ -3,6 +3,7 @@ package factorization.common;
 import factorization.colossi.WorldGenColossus;
 import factorization.shared.Core;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.util.BlockPos;
 import net.minecraft.world.World;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.chunk.IChunkProvider;
@@ -24,9 +25,10 @@ public class WorldgenManager {
     IWorldGenerator silverGen, darkIronGen; 
     
     void setupWorldGenerators() {
+        // NORELEASE: Apparently we should only generate in particular side of chunks? Like [-8, +8] instead of [0, 16]
         if (FzConfig.gen_silver_ore) {
             silverGen = new IWorldGenerator() {
-                WorldGenMinable gen = new WorldGenMinable(Core.registry.resource_block, FzConfig.silver_ore_node_new_size);
+                WorldGenMinable gen = new WorldGenMinable(Core.registry.resource_block.getDefaultState(), FzConfig.silver_ore_node_new_size);
                 @Override
                 public void generate(Random rand, int chunkX, int chunkZ, World world, IChunkProvider chunkGenerator, IChunkProvider chunkProvider) {
                     if (!FzConfig.gen_silver_ore) {
@@ -40,7 +42,7 @@ public class WorldgenManager {
                         int x = chunkX*16 + rand.nextInt(16);
                         int z = chunkZ*16 + rand.nextInt(16);
                         int y = 4 + rand.nextInt(42);
-                        gen.generate(world, rand, pos);
+                        gen.generate(world, rand, new BlockPos(x, y, z));
                     }
                 }
             };
@@ -82,7 +84,7 @@ public class WorldgenManager {
     void doRetrogen(boolean test, Chunk chunk, String genType, IWorldGenerator gen) {
         if (!test) return;
         final int chunkX = chunk.xPosition, chunkZ = chunk.zPosition;
-        final World world = chunk.worldObj;
+        final World world = chunk.getWorld();
         //log("Retrogenning %s in dimension %s at chunk coordinates (%s, %s)", genType, world.provider.getDimensionId(), chunkX, chunkZ);
         
         //Thanks, FML!

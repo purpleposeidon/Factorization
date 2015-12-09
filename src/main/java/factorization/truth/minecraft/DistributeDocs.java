@@ -37,17 +37,14 @@ public class DistributeDocs {
     
     static boolean givenBook(EntityPlayer player) {
         if (!FzConfig.players_discover_colossus_guides) return true;
-        StatisticsFile statsFile = StatUtil.getStatsFile(player);
-        return (statsFile != null && statsFile.writeStat(guideGet) > 0) || player.getEntityData().hasKey(guideKey);
+        StatUtil.FzStat stat = StatUtil.load(player, guideGet);
+        return stat.get() > 0 || player.getEntityData().hasKey(guideKey);
     }
     
     static void setGivenBook(EntityPlayer player) {
         if (!FzConfig.players_discover_colossus_guides) return;
         needyPlayers.remove(player.getCommandSenderName());
-        StatisticsFile statsFile = StatUtil.getStatsFile(player);
-        if (statsFile != null) {
-            statsFile.func_150873_a(player, guideGet, 1);
-        }
+        StatUtil.load(player, guideGet).add(1);
         player.getEntityData().setBoolean(guideKey, true);
     }
     
@@ -91,7 +88,7 @@ public class DistributeDocs {
                 return;
             }
         }
-        Coord broke = new Coord(event.world, event.x, event.y, event.z);
+        Coord broke = new Coord(event.world, event.pos);
         if (!safeArea(broke)) return;
         broke.spawnItem(new ItemStack(toGive));
         setGivenBook(player);

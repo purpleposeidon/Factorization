@@ -3,6 +3,7 @@ package factorization.fzds;
 import factorization.fzds.interfaces.IDeltaChunk;
 import factorization.util.SpaceUtil;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.Vec3;
 
 public class ShadowPlayerAligner {
@@ -19,13 +20,9 @@ public class ShadowPlayerAligner {
     public void apply() {
         // (Hmm, this could probably be done better)
         Vec3 realPos = SpaceUtil.fromPlayerEyePos(real);
-        Vec3 tmp = real.getLookVec();
-        SpaceUtil.incrAdd(tmp, realPos);
-        Vec3 realLookEnd = tmp;
+        Vec3 realLookEnd = real.getLookVec().add(realPos);
         Vec3 shadowPos = idc.real2shadow(realPos); // This used to be the raw ent pos, which isn't the same.
-        Vec3 tmp_shadowLookEnd = idc.real2shadow(realLookEnd);
-        SpaceUtil.incrSubtract(tmp_shadowLookEnd, shadowPos);
-        Vec3 shadowLook = tmp_shadowLookEnd;
+        Vec3 shadowLook = idc.real2shadow(realLookEnd).subtract(shadowPos);
         double xz_len = Math.hypot(shadowLook.xCoord, shadowLook.zCoord);
         double shadow_pitch = -Math.toDegrees(Math.atan2(shadowLook.yCoord, xz_len)); // erm, negative? Dunno.
         double shadow_yaw = Math.toDegrees(Math.atan2(-shadowLook.xCoord, shadowLook.zCoord)); // Another weird negative!
@@ -38,12 +35,14 @@ public class ShadowPlayerAligner {
         double hx = shadow.width / 2;
         double hy = shadow.height / 2;
         double hz = shadow.width / 2;
-        shadow.boundingBox.minX = shadow.posX - hx;
-        shadow.boundingBox.minY = shadow.posY - hx;
-        shadow.boundingBox.minZ = shadow.posZ - hy;
-        shadow.boundingBox.maxX = shadow.posX + hy;
-        shadow.boundingBox.maxY = shadow.posY + hz;
-        shadow.boundingBox.maxZ = shadow.posZ + hz;
+        shadow.setEntityBoundingBox(new AxisAlignedBB(
+                shadow.posX - hx,
+                shadow.posY - hx,
+                shadow.posZ - hy,
+                shadow.posX + hy,
+                shadow.posY + hz,
+                shadow.posZ + hz
+        ));
     }
 
     public void unapply() {

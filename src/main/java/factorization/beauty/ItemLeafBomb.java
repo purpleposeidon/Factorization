@@ -122,7 +122,7 @@ public class ItemLeafBomb extends ItemFactorization {
 
     @Override
     public boolean isBookEnchantable(ItemStack stack, ItemStack book) {
-        NBTTagList enchants = Items.enchanted_book.func_92110_g(book);
+        NBTTagList enchants = Items.enchanted_book.getEnchantments(book);
         for (int i = 0; i < enchants.tagCount(); i++) {
             NBTTagCompound tag = enchants.getCompoundTagAt(i);
             int enchantId = tag.getInteger("id");

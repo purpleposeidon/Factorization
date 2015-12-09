@@ -53,8 +53,19 @@ public class IndexDocumentation {
             public IResource getResource(final ResourceLocation location) {
                 return new IResource() {
                     @Override public boolean hasMetadata() { return false; }
+
+                    @Override
+                    public String getResourcePackName() {
+                        return "DocumentationIndexer";
+                    }
+
                     @Override public IMetadataSection getMetadata(String var1) { return null; }
-                    
+
+                    @Override
+                    public ResourceLocation getResourceLocation() {
+                        return location;
+                    }
+
                     @Override
                     public InputStream getInputStream() {
                         File domainFile = domains.get(location.getResourceDomain());

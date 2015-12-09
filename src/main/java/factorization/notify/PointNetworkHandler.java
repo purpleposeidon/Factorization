@@ -8,6 +8,8 @@ import io.netty.buffer.Unpooled;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.network.NetHandlerPlayServer;
+import net.minecraft.network.PacketBuffer;
+import net.minecraft.util.BlockPos;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.network.FMLEventChannel;
 import net.minecraftforge.fml.common.network.FMLNetworkEvent.ServerCustomPacketEvent;
@@ -43,15 +45,12 @@ public enum PointNetworkHandler {
     static final byte COORD = 1, ENTITY = 2;
     
     void handlePoint(DataInput input, EntityPlayer player) throws IOException {
-        Notice notice = null;
         switch (input.readByte()) {
             default: return;
             case COORD: {
-                int x = input.readInt();
-                int y = input.readInt();
-                int z = input.readInt();
+                BlockPos pos = new BlockPos(input.readInt(), input.readInt(), input.readInt());
                 String msg = buildMessage(player, input);
-                Coord at = new Coord(player.world, pos);
+                Coord at = new Coord(player.worldObj, pos);
                 notice = new Notice(at, msg);
                 break;
             }
@@ -108,6 +107,6 @@ public enum PointNetworkHandler {
     
     @SideOnly(Side.CLIENT)
     void send(ByteBuf out) {
-        channel.sendToServer(new FMLProxyPacket(out, channelName));
+        channel.sendToServer(new FMLProxyPacket(new PacketBuffer(out), channelName));
     }
 }

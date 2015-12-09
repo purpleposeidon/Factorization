@@ -8,6 +8,7 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.network.Packet;
+import net.minecraft.network.PacketBuffer;
 import net.minecraft.server.management.PlayerManager;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.MathHelper;
@@ -33,7 +34,7 @@ public class FzNetDispatch {
     }
 
     public static FMLProxyPacket generate(ByteBuf buf) {
-        return new FMLProxyPacket(buf, FzNetEventHandler.channelName);
+        return new FMLProxyPacket(new PacketBuffer(buf), FzNetEventHandler.channelName);
     }
     
     public static void addPacket(FMLProxyPacket packet, EntityPlayer player) {
@@ -45,10 +46,10 @@ public class FzNetDispatch {
     }
     
     public static void addPacketFrom(Packet packet, Chunk chunk) {
-        if (chunk.worldObj.isRemote) return;
-        final WorldServer world = (WorldServer) chunk.worldObj;
+        if (chunk.getWorld().isRemote) return;
+        final WorldServer world = (WorldServer) chunk.getWorld();
         final PlayerManager pm = world.getPlayerManager();
-        PlayerManager.PlayerInstance watcher = pm.getOrCreateChunkWatcher(chunk.xPosition, chunk.zPosition, false);
+        PlayerManager.PlayerInstance watcher = pm.getPlayerInstance(chunk.xPosition, chunk.zPosition, false);
         if (watcher == null) return;
         watcher.sendToAllPlayersWatchingChunk(packet);
 
@@ -87,7 +88,7 @@ public class FzNetDispatch {
     
     public static void addPacketFrom(Packet packet, TileEntity ent) {
         World w = ent.getWorld();
-        addPacketFrom(packet, w.getChunkFromBlockCoords(ent.getPos().getX(), ent.getPos().getZ()));
+        addPacketFrom(packet, w.getChunkFromBlockCoords(ent.getPos()));
     }
     
     public static void addPacketFrom(Packet packet, Coord c) {

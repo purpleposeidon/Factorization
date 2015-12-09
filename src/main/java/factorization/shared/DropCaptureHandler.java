@@ -2,8 +2,10 @@ package factorization.shared;
 
 import factorization.api.Coord;
 import factorization.util.ItemUtil;
+import factorization.util.SpaceUtil;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.Vec3;
 import net.minecraft.world.World;
 import net.minecraftforge.event.entity.living.LivingDropsEvent;
 import net.minecraftforge.event.world.BlockEvent;
@@ -32,11 +34,11 @@ public enum DropCaptureHandler {
             this.distSq = distSq;
         }
 
-        boolean passes(World w, double x, double y, double z) {
+        boolean passes(World w, Vec3 vec) {
             if (w != src.w) return false;
-            double dx = x - src.x;
-            double dy = y - src.y;
-            double dz = z - src.z;
+            double dx = vec.xCoord - src.x;
+            double dy = vec.yCoord - src.y;
+            double dz = vec.zCoord - src.z;
 
             return dx + dy + dz <= distSq;
         }
@@ -64,7 +66,7 @@ public enum DropCaptureHandler {
     public void captureBlockDrops(BlockEvent.HarvestDropsEvent event) {
         Capturer capturer = catchers.get();
         if (capturer == null) return;
-        if (!capturer.passes(event.world, event.x, event.y, event.z)) return;
+        if (!capturer.passes(event.world, new Vec3(event.pos))) return;
         removeInvalids(event.drops);
         if (capturer.net.captureDrops(event.drops)) {
             removeInvalids(event.drops);
@@ -75,8 +77,8 @@ public enum DropCaptureHandler {
     public void captureMobDrops(LivingDropsEvent event) {
         Capturer capturer = catchers.get();
         if (capturer == null) return;
-        if (!capturer.passes(event.entity.worldObj, event.entity.posX, event.entity.posY, event.entity.posZ)) return;
-        ArrayList<ItemStack> drops = new ArrayList();
+        if (!capturer.passes(event.entity.worldObj, SpaceUtil.fromEntPos(event.entity))) return;
+        ArrayList<ItemStack> drops = new ArrayList<ItemStack>();
         for (EntityItem ent : event.drops) {
             drops.add(ent.getEntityItem());
         }

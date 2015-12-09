@@ -32,12 +32,12 @@ public class TileEntityHeaterRenderer extends TileEntitySpecialRenderer {
         block.useTexture(BlockIcons.heater_heat);
         block.beginWithMirroredUVs();
         int brightness = (int)(color*16) << 4;
-        Tessellator.instance.startDrawingQuads();
-        Tessellator.instance.setBrightness(brightness);
-        Tessellator.instance.setColorOpaque_F(color, color, color);
+        Tessellator.getInstance().startDrawingQuads();
+        Tessellator.getInstance().setBrightness(brightness);
+        Tessellator.getInstance().setColorOpaque_F(color, color, color);
         block.renderForTileEntity();
         GL11.glDisable(GL11.GL_BLEND);
-        Tessellator.instance.draw();
+        Tessellator.getInstance().draw();
         GL11.glPopMatrix();
         GL11.glColor4f(1, 1, 1, 1);
         GL11.glEnable(GL11.GL_LIGHTING);

@@ -65,7 +65,7 @@ public class TileEntityCrystallizerRender extends TileEntitySpecialRenderer {
             glAlphaFunc(GL_GREATER, 0.1F);
             glEnable(GL_BLEND);
             ItemStack sol = crys.solution;
-            Tessellator tess = Tessellator.instance;
+            Tessellator tess = Tessellator.getInstance();
             IIcon tex = Blocks.flowing_water.getBlockTextureFromSide(1);
             if (sol.getItem() == Core.registry.acid) {
                 if (sol.getItemDamage() > 0) {

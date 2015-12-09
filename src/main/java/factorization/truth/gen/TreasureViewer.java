@@ -35,12 +35,12 @@ public class TreasureViewer implements IDocGenerator {
             for (WeightedRandomChestContent item : content) {
                 if (!can_blob) out.write("\\p");
                 String descr = null;
-                if (item.theMinimumChanceToGenerateItem == item.theMaximumChanceToGenerateItem) {
-                    if (item.theMinimumChanceToGenerateItem != 1) {
-                        descr = " (" + item.theMinimumChanceToGenerateItem + ")";
+                if (item.minStackSize == item.maxStackSize) {
+                    if (item.minStackSize != 1) {
+                        descr = " (" + item.minStackSize + ")";
                     }
                 } else {
-                    descr = " (" + item.theMinimumChanceToGenerateItem + " to " + item.theMaximumChanceToGenerateItem + ")";
+                    descr = " (" + item.minStackSize + " to " + item.maxStackSize + ")";
                 }
                 if (descr == null) {
                     can_blob = true;

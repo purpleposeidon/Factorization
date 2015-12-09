@@ -8,6 +8,7 @@ import net.minecraft.client.multiplayer.WorldClient;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.culling.ICamera;
 import net.minecraft.util.AxisAlignedBB;
+import net.minecraft.util.BlockPos;
 import net.minecraft.util.Vec3;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
@@ -22,30 +23,30 @@ public class ChainLink {
             prevStart = SpaceUtil.copy(start = SpaceUtil.copy(newStart));
             prevEnd = SpaceUtil.copy(end = SpaceUtil.copy(newEnd));
         } else {
-            SpaceUtil.assignVecFrom(prevStart, start);
-            SpaceUtil.assignVecFrom(start, newStart);
-            SpaceUtil.assignVecFrom(prevEnd, end);
-            SpaceUtil.assignVecFrom(end, newEnd);
+            prevStart = start;
+            start = newStart;
+            prevEnd = end;
+            end = newEnd;
         }
     }
 
     @SideOnly(Side.CLIENT)
-    boolean cameraCheck(ICamera camera, float partial, AxisAlignedBB workBox, Vec3 workStart, Vec3 workEnd) {
+    AxisAlignedBB cameraCheck(ICamera camera, Vec3 workStart, Vec3 workEnd) {
         // This is far from efficient as it ought to be.
         // If the line is diagonal, then there will be huge amounts of
         // space where the line is drawn even tho it is far off-screen.
-        if (start == null) return false;
-        NumUtil.interp(prevStart, start, partial, workStart);
-        NumUtil.interp(prevEnd, end, partial, workEnd);
+        if (start == null) return null;
         Vec3 min = SpaceUtil.copy(workStart);
         Vec3 max = SpaceUtil.copy(workEnd);
         SpaceUtil.sort(min, max);
         // The lines are drawn fat, so make the box a bit fatter as well
-        SpaceUtil.setAABB(workBox, min, max);
-        final double d = -0.125;
-        SpaceUtil.incrContract(workBox, d, d, d);
+        final double d = 0.125;
+        AxisAlignedBB box = SpaceUtil.newBox(min, max).expand(d, d, d);
 
-        return camera.isBoundingBoxInFrustum(workBox);
+        if (camera.isBoundingBoxInFrustum(box)) {
+            return box;
+        }
+        return null;
     }
 
     @SideOnly(Side.CLIENT)
@@ -61,8 +62,8 @@ public class ChainLink {
         Vec3 side2 = forward.crossProduct(side1).normalize();
         final double d = 0.25;
         final double iconLength = 2 * d;
-        SpaceUtil.incrScale(side1, d);
-        SpaceUtil.incrScale(side2, d);
+        side1 = SpaceUtil.scale(side1, d);
+        side2 = SpaceUtil.scale(side2, d);
 
         double linkCount = length / 2 / iconLength;
         Vec3 normForward = forward.normalize();
@@ -70,7 +71,7 @@ public class ChainLink {
         double extraLinkage = length % iconLength;
         extraLinkage *= -1;
         extraLinkage += 0.5;
-        SpaceUtil.incrAdd(workStart, SpaceUtil.scale(normForward, extraLinkage));
+        workStart = workStart.add(SpaceUtil.scale(normForward, extraLinkage));
         linkCount += extraLinkage;
 
 
@@ -84,6 +85,7 @@ public class ChainLink {
         int x = (int) at.xCoord;
         int y = (int) at.yCoord;
         int z = (int) at.zCoord;
+        BlockPos pos = new BlockPos(x, y, z);
         Block b = world.getBlock(pos);
         int brightness = b.getMixedBrightnessForBlock(world, pos);
         tess.setBrightness(brightness);
@@ -126,5 +128,13 @@ public class ChainLink {
         if (bagIndex != -1) {
             Core.logWarning("ChainLink was not released! Its location: " + start + " to " + end);
         }
+    }
+
+    public Vec3 getStart(float partial) {
+        return NumUtil.interp(prevStart, start, partial);
+    }
+
+    public Vec3 getEnd(float partial) {
+        return NumUtil.interp(prevEnd, end, partial);
     }
 }

@@ -54,11 +54,6 @@ public class SocketPoweredCrank extends TileEntitySocketBase implements IChargeC
     }
 
     @Override
-    public boolean canUpdate() {
-        return true;
-    }
-
-    @Override
     public boolean onAttacked(IDeltaChunk idc, DamageSource damageSource, float damage) { return false; }
 
     @Override
@@ -98,7 +93,6 @@ public class SocketPoweredCrank extends TileEntitySocketBase implements IChargeC
     @Override
     public void update() {
         charge.update();
-        super.updateEntity();
     }
 
     void shareCharge() {
@@ -242,11 +236,11 @@ public class SocketPoweredCrank extends TileEntitySocketBase implements IChargeC
             Vec3 you = SpaceUtil.fromEntPos(idc);
             Vec3 me = new Coord(this).toMiddleVector();
             Vec3 vec = SpaceUtil.subtract(me, you);
-            Vec3 mask = SpaceUtil.copy(rotationAxis);
-            mask.xCoord = mask.xCoord == 0 ? 1 : 0;
-            mask.yCoord = mask.yCoord == 0 ? 1 : 0;
-            mask.zCoord = mask.zCoord == 0 ? 1 : 0;
-            SpaceUtil.incrComponentMultiply(vec, mask);
+            Vec3 mask = new Vec3(
+                    rotationAxis.xCoord == 0 ? 1 : 0,
+                    rotationAxis.yCoord == 0 ? 1 : 0,
+                    rotationAxis.zCoord == 0 ? 1 : 0);
+            vec = SpaceUtil.componentMultiply(vec, mask);
             minVec = vec.normalize();
         }
 
@@ -258,8 +252,7 @@ public class SocketPoweredCrank extends TileEntitySocketBase implements IChargeC
         Vec3 realHookLocation = idc.shadow2real(hookLocation);
         Vec3 selfPos = socket.getServoPos();
         Vec3 chainVec = SpaceUtil.subtract(realHookLocation, selfPos).normalize();
-        SpaceUtil.incrScale(chainVec, -targetSpeed);
-        return chainVec;
+        return SpaceUtil.scale(chainVec, -targetSpeed);
     }
 
     private Vec3 limitForce(IDeltaChunk idc, Vec3 force, double targetSpeed) {
@@ -371,7 +364,7 @@ public class SocketPoweredCrank extends TileEntitySocketBase implements IChargeC
         Vec3 point = SpaceUtil.fromDirection(facing);
         Vec3 right = SpaceUtil.scale(point.crossProduct(chainVec).normalize(), sprocketRadius);
         spinSign = (byte) (SpaceUtil.sum(right) > 0 ? +1 : -1);
-        SpaceUtil.incrAdd(selfPos, right);
+        selfPos = selfPos.add(right);
         float len = (float) SpaceUtil.lineDistance(selfPos, realHookLocation);
         if (worldObj.isRemote) {
             setChainDraw(realHookLocation, selfPos, len);

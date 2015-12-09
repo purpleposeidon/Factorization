@@ -131,7 +131,7 @@ public class RayTracer {
     boolean runPass(FzOrientation orientation, Coord coord, IDeltaChunk idc) {
         final EnumFacing top = orientation.top;
         final EnumFacing face = orientation.facing;
-        final EnumFacing right = face.getRotation(top);
+        final EnumFacing right = SpaceUtil.rotate(face, top);
 
         if (checkEnts) {
             if (entBox == null) {

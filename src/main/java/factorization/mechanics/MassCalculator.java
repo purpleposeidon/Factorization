@@ -26,7 +26,7 @@ class MassCalculator implements ICoordFunction {
             double x = tag.getDouble(comKey + ".x");
             double y = tag.getDouble(comKey + ".y");
             double z = tag.getDouble(comKey + ".z");
-            return new Vec3(pos);
+            return new Vec3(x, y, z);
         }
         MassCalculator mc = new MassCalculator(idc);
         return mc.com;
@@ -35,10 +35,7 @@ class MassCalculator implements ICoordFunction {
     static Coord getComCoord(IDeltaChunk idc) {
         Vec3 com = SpaceUtil.floor(MassCalculator.getCenterOfMass(idc));
         Coord min = idc.getCorner();
-        com.xCoord -= min.x;
-        com.yCoord -= min.y;
-        com.zCoord -= min.z;
-        return new Coord(idc.getCorner().w, com);
+        return new Coord(min.w, com.subtract(min.x, min.y, min.z));
     }
 
     static void dirty(IDeltaChunk idc) {
@@ -82,14 +79,13 @@ class MassCalculator implements ICoordFunction {
         tag.setDouble(comKey + ".z", com.zCoord);
     }
 
-    private Vec3 boxMid = SpaceUtil.newVec();
     protected void handle(Coord here, double mass) {
         final AxisAlignedBB box = here.getCollisionBoundingBox();
         if (box != null) {
             // Unlikely, my good sir!
-            SpaceUtil.setMiddle(box, boxMid);
+            Vec3 boxMid = SpaceUtil.getMiddle(box);
             double posRatio = mass / (mass + massTotal); // First iteration this will be 1, setting com = boxMid
-            NumUtil.interp(com, boxMid, (float) posRatio, com);
+            com = NumUtil.interp(com, boxMid, (float) posRatio);
         }
         massTotal += mass;
     }

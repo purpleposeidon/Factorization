@@ -8,6 +8,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraftforge.oredict.OreDictionary;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class TileEntityGrinder {
     // This is now just a recipe-holder class...
@@ -52,11 +53,10 @@ public class TileEntityGrinder {
             inputArray.add(itemstack);
         }
         
-        public ArrayList<ItemStack> getInput() {
+        public List<ItemStack> getInput() {
             if (oreName != null) {
                 return OreDictionary.getOres(oreName);
             }
-            ArrayList<ItemStack> ret = new ArrayList(1);
             return inputArray;
         }
         

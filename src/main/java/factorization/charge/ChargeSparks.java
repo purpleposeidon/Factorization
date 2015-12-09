@@ -72,7 +72,7 @@ public class ChargeSparks {
     
     @SideOnly(Side.CLIENT)
     public void render() {
-        Tessellator tess = Tessellator.instance;
+        Tessellator tess = Tessellator.getInstance();
         Core.profileStart("fz_spark");
         int last_color = -1;
         tess.setColorOpaque_I(0xFFFFFF);
@@ -172,8 +172,8 @@ public class ChargeSparks {
     }
     
     void drawLine(Vec3 start, Vec3 end) {
-        Tessellator.instance.addVertex(start.xCoord, start.yCoord, start.zCoord);
-        Tessellator.instance.addVertex(end.xCoord, end.yCoord, end.zCoord);
+        Tessellator.getInstance().addVertex(start.xCoord, start.yCoord, start.zCoord);
+        Tessellator.getInstance().addVertex(end.xCoord, end.yCoord, end.zCoord);
     }
     
 }

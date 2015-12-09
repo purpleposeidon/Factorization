@@ -208,7 +208,7 @@ public class RenderMessages extends RenderMessagesProxy {
         GL11.glTranslatef(0, -10 * lineCount, 0);
         
         {
-            Tessellator tess = Tessellator.instance;
+            Tessellator tess = Tessellator.getInstance();
             int var16 = (lineCount - 1) * 10;
 
             GL11.glDisable(GL11.GL_TEXTURE_2D);

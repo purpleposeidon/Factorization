@@ -2,6 +2,7 @@ package factorization.util;
 
 import io.netty.buffer.ByteBuf;
 import net.minecraft.block.Block;
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompressedStreamTools;
@@ -163,6 +164,10 @@ public final class DataUtil {
 
     public static Item getItemFromName(String itemName) {
         return Item.itemRegistry.getObject(new ResourceLocation(itemName));
+    }
+
+    public static ItemStack fromState(IBlockState bs) {
+        return new ItemStack(bs.getBlock());
     }
 
 }

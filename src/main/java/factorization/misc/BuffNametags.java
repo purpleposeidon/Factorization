@@ -11,6 +11,8 @@ import net.minecraft.entity.monster.IMob;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.util.EnumParticleTypes;
+import net.minecraft.world.WorldServer;
 import net.minecraftforge.event.entity.player.EntityInteractEvent;
 import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
@@ -43,14 +45,15 @@ public class BuffNametags {
                 float newMaxHealth = origHealth + delta;
                 ent.getEntityAttribute(SharedMonsterAttributes.maxHealth).setBaseValue(newMaxHealth);
                 ent.heal(delta);
-                
-                String particleType = "heart";
+
+                EnumParticleTypes particleType = EnumParticleTypes.HEART;
                 if (ent instanceof IMob) {
-                    particleType = "smoke";
+                    particleType = EnumParticleTypes.SMOKE_NORMAL;
                 }
-                FMLProxyPacket packet = Core.network.entityPacket(ent, MessageType.EntityParticles, (byte) 8, particleType);
-                Core.network.broadcastPacket(null, new Coord(ent), packet);
-                
+                if (ent.worldObj instanceof WorldServer) {
+                    WorldServer ws = (WorldServer) ent.worldObj;
+                    ws.spawnParticle(particleType, false, ent.posX, ent.posY, ent.posZ, 8, 0.0, 0.0, 0.0, 0.0);
+                }
                 return false;
             }
         });

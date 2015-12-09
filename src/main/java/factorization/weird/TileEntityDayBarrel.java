@@ -60,7 +60,7 @@ public class TileEntityDayBarrel extends TileEntityFactorization  {
     
     private static final int maxStackDrop = 64*64*2;
 
-    public static enum Type {
+    public enum Type {
         NORMAL, SILKY, HOPPING, LARGER, STICKY, CREATIVE;
         
         private static Type[] value_list = values();
@@ -536,6 +536,11 @@ public class TileEntityDayBarrel extends TileEntityFactorization  {
         return isTop(direction.getOpposite());
     }
 
+    @Override
+    public void clear() {
+        setItemCount(0);
+    }
+
 
     private static final int[] top_slot = new int[] {0}, bottom_slot = new int[] {1}, no_slots = new int[] {};
     @Override
@@ -700,7 +705,7 @@ public class TileEntityDayBarrel extends TileEntityFactorization  {
         boolean doRotation = dir.getDirectionVec().getY() == 0;
         EnumFacing rotationAxis = null;
         if (doRotation) {
-            rotationAxis = dir.getRotation(EnumFacing.UP);
+            rotationAxis = SpaceUtil.rotate(dir, EnumFacing.UP);
         }
         if (player.isSneaking() && distance > 1) {
             distance = 1;
@@ -741,8 +746,8 @@ public class TileEntityDayBarrel extends TileEntityFactorization  {
             }
             //When we roll a barrel, the side we punch should face up
             for (int r = rotateCount; r > 0; r--) {
-                EnumFacing nTop = newOrientation.top.getRotation(rotationAxis);
-                EnumFacing nFace = newOrientation.facing.getRotation(rotationAxis);
+                EnumFacing nTop = SpaceUtil.rotate(newOrientation.top, rotationAxis);
+                EnumFacing nFace = SpaceUtil.rotate(newOrientation.facing, rotationAxis);
                 newOrientation = FzOrientation.fromDirection(nFace).pointTopTo(nTop);
             }
         }
@@ -1172,7 +1177,7 @@ public class TileEntityDayBarrel extends TileEntityFactorization  {
             float bot_y = mid_y - orientation.top.getDirectionVec().getY()/2F;
             float bot_z = mid_z - orientation.top.getDirectionVec().getZ()/2F;
             
-            EnumFacing r = orientation.facing.getRotation(orientation.top);
+            EnumFacing r = SpaceUtil.rotate(orientation.facing, orientation.top);
             float right_x = r.getDirectionVec().getX()/2F;
             float right_y = r.getDirectionVec().getY()/2F;
             float right_z = r.getDirectionVec().getZ()/2F;

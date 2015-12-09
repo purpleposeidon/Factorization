@@ -7,6 +7,7 @@ import factorization.util.PlayerUtil;
 import net.minecraft.command.ICommand;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.util.BlockPos;
 
 import java.io.*;
 import java.util.ArrayList;
@@ -15,12 +16,9 @@ import java.util.List;
 
 public class ExportHtml implements ICommand {
     @Override
-    public int compareTo(Object arg0) {
-        if (arg0 instanceof ICommand) {
-            ICommand other = (ICommand) arg0;
-            return getCommandName().compareTo(other.getCommandName());
-        }
-        return 0;
+    public int compareTo(ICommand arg0) {
+        ICommand other = (ICommand) arg0;
+        return getCommandName().compareTo(other.getCommandName());
     }
 
     @Override
@@ -42,7 +40,9 @@ public class ExportHtml implements ICommand {
     }
 
     @Override
-    public List addTabCompletionOptions(ICommandSender icommandsender, String[] astring) { return null; }
+    public List<String> addTabCompletionOptions(ICommandSender sender, String[] args, BlockPos pos) {
+        return null;
+    }
 
     @Override
     public boolean isUsernameIndex(String[] astring, int i) { return false; }

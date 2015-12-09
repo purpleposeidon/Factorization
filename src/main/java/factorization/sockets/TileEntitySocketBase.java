@@ -448,7 +448,7 @@ public abstract class TileEntitySocketBase extends TileEntityCommon implements I
         renderTesr(motor, partial);
         GL11.glPopMatrix();
         
-        Tessellator tess = Tessellator.instance;
+        Tessellator tess = Tessellator.getInstance();
         tess.startDrawingQuads();
         renderStatic(motor, tess);
         tess.draw();

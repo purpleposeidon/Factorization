@@ -33,12 +33,12 @@ public class RenderMinecartDayBarrel extends RenderMinecart {
 
         GL11.glTranslatef(-render.x - 0.5F, -render.y - 0.5F, -render.z - 0.5F);
 
-        Tessellator.instance.startDrawingQuads();
+        Tessellator.getInstance().startDrawingQuads();
 
         render.render(RenderBlocks.getInstance());
         render.renderSecondPass(RenderBlocks.getInstance());
 
-        Tessellator.instance.draw();
+        Tessellator.getInstance().draw();
 
         tesr.renderTileEntityAt(render.te, render.x, render.y, render.z, 0.0F);
         GL11.glPopAttrib();

@@ -80,7 +80,7 @@ public class TileEntityGrinderRender {
         re.bindTexture(Core.blockAtlas);
         //XXX TODO FIXME Move to somewhere more efficient
         //(Move the vector stuff out too...)
-        Tessellator tess = Tessellator.instance;
+        Tessellator tess = Tessellator.getInstance();
         tess.startDrawingQuads();
         tess.setColorOpaque_F(1, 1, 1);
         
@@ -101,13 +101,13 @@ public class TileEntityGrinderRender {
         block.translate(-0.5F, -0.5F, -0.5F);
         block.renderForTileEntity();
         
-        Tessellator.instance.draw();
+        Tessellator.getInstance().draw();
 
         for (int i = 0; i < 8; i++) {
             glPushMatrix();
             glRotatef(i * 360 / 8, 0, 1, 0);
             glTranslatef(3.5F / 16F, -1F/32F, 0);
-            diamondModel.render(Tessellator.instance, 1F);
+            diamondModel.render(Tessellator.getInstance(), 1F);
             glPopMatrix();
         }
 

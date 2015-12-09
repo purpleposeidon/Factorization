@@ -33,12 +33,12 @@ public class Deglitch extends CommandBase {
     public void processCommand(ICommandSender sender, String[] args) {
         EntityPlayerMP player = (EntityPlayerMP) sender;
         player.addExhaustion(3);
-        Vec3 at = SpaceUtil.fromEntPos(player);
         double r = 0.1;
         Random rng = player.worldObj.rand;
-        at.xCoord += rng.nextDouble() * r;
-        at.yCoord += rng.nextDouble() * r;
-        at.zCoord += rng.nextDouble() * r;
+        Vec3 at = SpaceUtil.fromEntPos(player).addVector(
+                rng.nextDouble() * r,
+                rng.nextDouble() * r,
+                rng.nextDouble() * r);
         player.setPositionAndUpdate(at.xCoord, at.yCoord, at.zCoord);
     }
 }
