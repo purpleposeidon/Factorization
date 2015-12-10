@@ -6,7 +6,6 @@ import factorization.shared.Graylist;
 import net.minecraft.block.Block;
 import net.minecraftforge.common.config.Configuration;
 import net.minecraftforge.common.config.Property;
-import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.common.registry.EntityRegistry;
 
 import java.io.File;
@@ -19,8 +18,6 @@ public class FzConfig {
     public static boolean render_barrel_item = true;
     public static boolean render_barrel_text = true;
     public static boolean render_barrel_use_displaylists = true;
-    public static boolean render_barrel_force_entity_render = false;
-    public static boolean render_barrel_force_no_intercept = false;
     public static boolean render_barrel_close = false;
     public static int entity_relight_task_id = -1;
     public static boolean gen_silver_ore = true;
@@ -168,8 +165,6 @@ public class FzConfig {
             render_barrel_text = editMain().getBoolConfig("renderBarrelText", "client", render_barrel_text, null);
             render_barrel_close = editMain().getBoolConfig("renderBarrelClose", "client", render_barrel_close, "If true, render barrel info only when nearby");
             render_barrel_use_displaylists = editMain().getBoolConfig("renderBarrelUseDisplayLists", "client", render_barrel_use_displaylists, "If true, use OpenGL display lists for rendering barrels. Setting to false may fix some render issues, at the cost of making barrels render less efficiently");
-            render_barrel_force_no_intercept = editMain().getBoolConfig("renderBarrelForceNoIntercept", "client", render_barrel_force_no_intercept, "If true, don't use hacks to avoid enchantment effect rendering issues. Setting to false may fix some render issues, at the cost of making the enchantment effect from, eg, enchanted books visible through walls.");
-            render_barrel_force_entity_render = editMain().getBoolConfig("renderBarrelForceItemFrameStyle", "client", render_barrel_force_entity_render, "If true, render barrels the same way as item frames. Setting to false may fix some render issues, at the cost of looking lame.");
             renderTEs = editMain().getBoolConfig("renderOtherTileEntities", "client", renderTEs, "If false, most TEs won't draw, making everything look broken but possibly improving FPS");
             renderAO = editMain().getBoolConfig("renderAmbientOcclusion", "client", renderAO, "If false, never use smooth lighting for drawing sculptures");
             String attempt = getStringConfig("pocketCraftingActionKeys", "client", pocketActions, "4 keys for: removing (x), cycling (c), balancing (b), filling (f)");
@@ -191,7 +186,6 @@ public class FzConfig {
             large_servo_instructions = editMain().getBoolConfig("largeServoInstructions", "client", large_servo_instructions, "Render servo instructions extra-large. This can also be toggled on and off using '/f servoInstructionSize'.");
             show_time_on_fullscreen = editRun().getBoolConfig("showTimeOnFullscreen", "client", show_time_on_fullscreen, "If true, show the time every half hour");
             mirror_sunbeams = editRun().getBoolConfig("drawMirrorSunbeams", "client", mirror_sunbeams, "If false, mirrors won't draw sunbeams");
-            sort_renderers = getBoolConfig("sortRenderers", "client", sort_renderers, "Use advanced Entity & TileEntity sorting techniques to optimize rendering, particularly for FZ entities.");
         }
 
 

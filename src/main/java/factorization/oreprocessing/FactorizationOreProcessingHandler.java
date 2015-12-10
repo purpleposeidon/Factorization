@@ -30,7 +30,7 @@ public class FactorizationOreProcessingHandler {
     
     void smelt(ItemStack is, ItemStack ore, ItemStack ingot) {
         float xp = 0;
-        FurnaceRecipes smeltingRegistry = FurnaceRecipes.smelting();
+        FurnaceRecipes smeltingRegistry = FurnaceRecipes.instance();
         try {
             xp = smeltingRegistry.func_151398_b(ore);
         } catch (NullPointerException e) {
@@ -105,7 +105,7 @@ public class FactorizationOreProcessingHandler {
                 ingot = oreType.processingResult;
             }
             if (ingot == null) {
-                ingot = FurnaceRecipes.smelting().getSmeltingResult(ore);
+                ingot = FurnaceRecipes.instance().getSmeltingResult(ore);
             }
             if (ingot == null) return;
             addProcessingFront(oreType, ore, ingot);
@@ -157,7 +157,7 @@ public class FactorizationOreProcessingHandler {
                 continue;
             }
             for (ItemStack ore : oreList) {
-                ItemStack smeltsTo = FurnaceRecipes.smelting().getSmeltingResult(ore);
+                ItemStack smeltsTo = FurnaceRecipes.instance().getSmeltingResult(ore);
                 if (smeltsTo == null) {
                     if (ingotClass == null) {
                         break;

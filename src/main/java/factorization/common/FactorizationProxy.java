@@ -28,10 +28,10 @@ public class FactorizationProxy implements IGuiHandler {
             return new ContainerPocket(player);
         }
         if (ID == FactoryType.ARTIFACTFORGEGUI.gui) {
-            return new ContainerForge(new Coord(world, pos), player);
+            return new ContainerForge(new Coord(world, x, y, z), player);
         }
 
-        TileEntity te = world.getTileEntity(new BlockPos(pos));
+        TileEntity te = world.getTileEntity(new BlockPos(x, y, z));
         if (!(te instanceof TileEntityFactorization)) {
             return null;
         }
@@ -55,7 +55,7 @@ public class FactorizationProxy implements IGuiHandler {
 
     @Override
     public Object getServerGuiElement(int ID, EntityPlayer player, World world, int x, int y, int z) {
-        return getContainer(ID, player, world, pos);
+        return getContainer(ID, player, world, x, y, z);
     }
 
     /** Tell the pocket crafting table to update the result */

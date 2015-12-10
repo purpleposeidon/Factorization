@@ -11,6 +11,7 @@ import net.minecraft.entity.ai.attributes.AttributeModifier;
 import net.minecraft.entity.ai.attributes.BaseAttributeMap;
 import net.minecraft.entity.ai.attributes.IAttributeInstance;
 import net.minecraft.entity.ai.attributes.ServersideAttributeMap;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.BlockPos;
@@ -226,5 +227,13 @@ public class FzUtil {
 
     public static boolean sameState(IBlockState abs, IBlockState bbs) {
         return abs == bbs;
+    }
+
+
+
+
+    public static void initItem(Item it, String name, Core.TabType tabType) {
+        it.setUnlocalizedName("factorization:" + name.replace('.', '/'));
+        Core.tab(it, tabType);
     }
 }

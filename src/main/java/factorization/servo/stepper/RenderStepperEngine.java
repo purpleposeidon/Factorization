@@ -6,26 +6,29 @@ import factorization.api.Quaternion;
 import factorization.fzds.DeltaChunk;
 import factorization.fzds.Hammer;
 import factorization.fzds.HammerEnabled;
-import factorization.servo.BlockRenderServoRail;
-import factorization.shared.Block;
 import factorization.shared.Core;
+import factorization.shared.FzModel;
 import factorization.util.NumUtil;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.Tessellator;
+import net.minecraft.client.renderer.RenderGlobal;
 import net.minecraft.client.renderer.entity.RenderEntity;
+import net.minecraft.client.renderer.entity.RenderManager;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.AxisAlignedBB;
-import net.minecraft.util.IIcon;
 import net.minecraft.util.MovingObjectPosition;
 import net.minecraft.util.ResourceLocation;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL12;
 
 public class RenderStepperEngine extends RenderEntity {
-    ObjectModel sprocket = new ObjectModel(Core.getResource("models/servo/sprocket.obj"));
-    ObjectModel chasis = new ObjectModel(Core.getResource("models/servo/stepper.obj"));
+    FzModel sprocket = new FzModel("servo/sprocket");
+    FzModel chasis = new FzModel("servo/stepper");
+
+    public RenderStepperEngine(RenderManager renderManagerIn) {
+        super(renderManagerIn);
+    }
 
     float interp(double a, double b, double part) {
         double d = a - b;
@@ -74,8 +77,7 @@ public class RenderStepperEngine extends RenderEntity {
             GL11.glLineWidth(1.5F);
             float d = 1F/2F, h = 0.25F;
             AxisAlignedBB ab = new AxisAlignedBB(-d, -h, -d, d, h, d);
-            drawOutlinedBoundingBox(ab);
-            ab.offset(ab.minX, ab.minY, ab.minZ);
+            RenderGlobal.drawBox(ab);
             GL11.glPopAttrib();
             GL11.glEnable(GL11.GL_TEXTURE_2D);
 
@@ -98,33 +100,6 @@ public class RenderStepperEngine extends RenderEntity {
         Core.profileEndRender();
     }
 
-    void drawOutlinedBoundingBox(AxisAlignedBB par1AxisAlignedBB) {
-        Tessellator tessellator = Tessellator.getInstance();
-        tessellator.startDrawing(3);
-        tessellator.addVertex(par1AxisAlignedBB.minX, par1AxisAlignedBB.minY, par1AxisAlignedBB.minZ);
-        tessellator.addVertex(par1AxisAlignedBB.maxX, par1AxisAlignedBB.minY, par1AxisAlignedBB.minZ);
-        tessellator.addVertex(par1AxisAlignedBB.maxX, par1AxisAlignedBB.minY, par1AxisAlignedBB.maxZ);
-        tessellator.addVertex(par1AxisAlignedBB.minX, par1AxisAlignedBB.minY, par1AxisAlignedBB.maxZ);
-        tessellator.addVertex(par1AxisAlignedBB.minX, par1AxisAlignedBB.minY, par1AxisAlignedBB.minZ);
-        tessellator.draw();
-        tessellator.startDrawing(3);
-        tessellator.addVertex(par1AxisAlignedBB.minX, par1AxisAlignedBB.maxY, par1AxisAlignedBB.minZ);
-        tessellator.addVertex(par1AxisAlignedBB.maxX, par1AxisAlignedBB.maxY, par1AxisAlignedBB.minZ);
-        tessellator.addVertex(par1AxisAlignedBB.maxX, par1AxisAlignedBB.maxY, par1AxisAlignedBB.maxZ);
-        tessellator.addVertex(par1AxisAlignedBB.minX, par1AxisAlignedBB.maxY, par1AxisAlignedBB.maxZ);
-        tessellator.addVertex(par1AxisAlignedBB.minX, par1AxisAlignedBB.maxY, par1AxisAlignedBB.minZ);
-        tessellator.draw();
-        tessellator.startDrawing(1);
-        tessellator.addVertex(par1AxisAlignedBB.minX, par1AxisAlignedBB.minY, par1AxisAlignedBB.minZ);
-        tessellator.addVertex(par1AxisAlignedBB.minX, par1AxisAlignedBB.maxY, par1AxisAlignedBB.minZ);
-        tessellator.addVertex(par1AxisAlignedBB.maxX, par1AxisAlignedBB.minY, par1AxisAlignedBB.minZ);
-        tessellator.addVertex(par1AxisAlignedBB.maxX, par1AxisAlignedBB.maxY, par1AxisAlignedBB.minZ);
-        tessellator.addVertex(par1AxisAlignedBB.maxX, par1AxisAlignedBB.minY, par1AxisAlignedBB.maxZ);
-        tessellator.addVertex(par1AxisAlignedBB.maxX, par1AxisAlignedBB.maxY, par1AxisAlignedBB.maxZ);
-        tessellator.addVertex(par1AxisAlignedBB.minX, par1AxisAlignedBB.minY, par1AxisAlignedBB.maxZ);
-        tessellator.addVertex(par1AxisAlignedBB.minX, par1AxisAlignedBB.maxY, par1AxisAlignedBB.maxZ);
-        tessellator.draw();
-    }
 
     void orientMotor(StepperEngine motor, float partial, float reorientInterpolation) {
         final FzOrientation orientation = motor.motionHandler.orientation;
@@ -193,11 +168,7 @@ public class RenderStepperEngine extends RenderEntity {
     void renderMainModel(StepperEngine motor, float partial, double ro, boolean hilighting) {
         GL11.glPushMatrix();
         bindTexture(Core.blockAtlas);
-        chasis.render(BlockIcons.servo$model$stepper);
-
-        FzColor c = motor.motionHandler.color;
-        renderServoColor(c);
-        GL11.glColor3f(c.getRed(), c.getGreen(), c.getBlue());
+        chasis.draw();
 
         // Determine the sprocket location & rotation
         double radius = 0.5;
@@ -224,14 +195,14 @@ public class RenderStepperEngine extends RenderEntity {
             GL11.glPushMatrix();
             GL11.glTranslatef(o, height_d, rd);
             GL11.glRotatef((float) Math.toDegrees(angle), 0, 1, 0);
-            sprocket.render(BlockIcons.servo$model$sprocket);
+            sprocket.draw();
             GL11.glPopMatrix();
         }
         {
             GL11.glPushMatrix();
             GL11.glTranslatef(o, height_d, -rd);
             GL11.glRotatef((float) Math.toDegrees(-angle) + 360F / 9F, 0, 1, 0);
-            sprocket.render(BlockIcons.servo$model$sprocket);
+            sprocket.draw();
             GL11.glPopMatrix();
         }
 
@@ -239,31 +210,4 @@ public class RenderStepperEngine extends RenderEntity {
         GL11.glPopMatrix();
     }
 
-    void renderServoColor(FzColor color) {
-        if (color == FzColor.NO_COLOR) return;
-        IIcon colorIcon = BlockRenderServoRail.coloredRails[color.toVanillaColorIndex()];
-        Block block = Block.instance;
-        block.setBlockBoundsOffset(0, 0, 0);
-        block.useTexture(null);
-        block.setTexture(1 /* up */, colorIcon);
-        block.beginWithMirroredUVs();
-        GL11.glPushMatrix();
-        float d = -0.5F;
-        GL11.glTranslatef(d, d - 3F/8F + 0.0001F, d);
-        {
-            // We need to get 14/16ths transformed for 10/16ths.
-            float b = 14F/16F;
-            GL11.glScalef(1/b, 1, 1/b);
-            float s = 10F/16F;
-            GL11.glScalef(s, 1, s);
-            float t = 3.2F/16F;
-            GL11.glTranslatef(t, 0, t);
-        }
-        Tessellator.getInstance().startDrawingQuads();
-        block.renderForTileEntity();
-        //GL11.glDisable(GL11.GL_LIGHTING);
-        Tessellator.getInstance().draw();
-        //GL11.glEnable(GL11.GL_LIGHTING);
-        GL11.glPopMatrix();
-    }
 }

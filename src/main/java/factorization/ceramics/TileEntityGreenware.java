@@ -11,16 +11,15 @@ import factorization.common.FactoryType;
 import factorization.common.FzConfig;
 import factorization.common.ResourceType;
 import factorization.notify.Notice;
-import factorization.shared.BlockClass;
-import factorization.shared.Core;
+import factorization.shared.*;
 import factorization.shared.NetworkFactorization.MessageType;
-import factorization.shared.TileEntityCommon;
-import factorization.shared.TileEntityExtension;
 import factorization.util.DataUtil;
 import factorization.util.InvUtil;
 import factorization.util.SpaceUtil;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.block.Block;
+import net.minecraft.client.renderer.RenderGlobal;
+import net.minecraft.client.resources.model.IBakedModel;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
@@ -32,6 +31,7 @@ import net.minecraft.nbt.NBTTagList;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.*;
 import net.minecraftforge.client.event.DrawBlockHighlightEvent;
+import net.minecraftforge.client.model.IModel;
 import net.minecraftforge.common.util.Constants;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
@@ -207,17 +207,7 @@ public class TileEntityGreenware extends TileEntityCommon implements IFurnaceHea
 
         public void toRotatedBlockBounds(TileEntityGreenware gw, Block b) {
             toBlockBounds(b);
-            b.beginNoIIcons();
-            b.rotateMiddle(quat);
-            b.rotateCenter(gw.rotation_quat);
-            b.setBlockBoundsBasedOnRotation();
-            
-            // TODO: This doesn't work! Lame!
-            /*b.beginNoIIcons();
-            b.rotateMiddle(quat);
-            b.rotateCenter(gw.rotation_quat);
-            b.setBlockBoundsBasedOnRotation();
-            // */
+            NORELEASE.fixme("Implement block bounds...");
         }
 
         public ClayLump copy() {
@@ -313,6 +303,9 @@ public class TileEntityGreenware extends TileEntityCommon implements IFurnaceHea
             NBTTagCompound tag = new NBTTagCompound();
             putParts(data, tag);
             tag = data.as(Share.VISIBLE, "partList").putTag(tag);
+        }
+        if (data.isReader()) {
+            cache_dirty = true;
         }
     }
 
@@ -707,6 +700,7 @@ public class TileEntityGreenware extends TileEntityCommon implements IFurnaceHea
         default:
             return false;
         }
+        cache_dirty = true;
         if (renderEfficient()) {
             getCoord().redraw();
         }
@@ -847,7 +841,7 @@ public class TileEntityGreenware extends TileEntityCommon implements IFurnaceHea
         GL11.glLineWidth(2.0F);
         GL11.glColor4f(0, 0, 0, 0.4F);
         // GL11.glColor4f(0x4D/r, 0x34/r, 0x7C/r, 0.8F); //#4D347C
-        drawOutlinedBoundingBox(bb);
+        RenderGlobal.drawBox(bb);
         GL11.glDepthMask(true);
         GL11.glEnable(GL11.GL_TEXTURE_2D);
         GL11.glDisable(GL11.GL_BLEND);
@@ -911,5 +905,17 @@ public class TileEntityGreenware extends TileEntityCommon implements IFurnaceHea
         if (!worldObj.isRemote && parts.isEmpty()) {
             getCoord().setAir();
         }
+    }
+
+    boolean cache_dirty = true;
+    @SideOnly(Side.CLIENT)
+    IBakedModel modelCache;
+
+    @SideOnly(Side.CLIENT)
+    public IBakedModel buildModel() {
+        if (!cache_dirty) return modelCache;
+        cache_dirty = false;
+        // NORELEASE: Implement. See: TRSRTransformation, FaceBakery
+        return null;
     }
 }

@@ -9,6 +9,7 @@ import net.minecraft.item.crafting.CraftingManager;
 import net.minecraft.item.crafting.IRecipe;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.world.World;
+import net.minecraftforge.common.ForgeHooks;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -194,5 +195,13 @@ public final class CraftUtil {
             }
             return null;
         }
+    }
+
+    public static ItemStack[] getRemainingItems(InventoryCrafting inv) {
+        ItemStack[] ret = new ItemStack[inv.getSizeInventory()];
+        for (int i = 0; i < inv.getSizeInventory(); i++) {
+            ret[i] = ForgeHooks.getContainerItem(inv.getStackInSlot(i));
+        }
+        return ret;
     }
 }

@@ -1,43 +1,26 @@
 package factorization.charge;
 
-import factorization.shared.Block;
 import factorization.shared.Core;
-import net.minecraft.client.renderer.RenderBlocks;
-import net.minecraft.client.renderer.Tessellator;
+import factorization.shared.FzModel;
 import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
-import net.minecraft.tileentity.TileEntity;
 import org.lwjgl.opengl.GL11;
 
-public class TileEntityHeaterRenderer extends TileEntitySpecialRenderer {
-    static RenderBlocks rb = new RenderBlocks();
+public class TileEntityHeaterRenderer extends TileEntitySpecialRenderer<TileEntityHeater> {
+    FzModel heat = new FzModel("furnaceHeaterHeat");
 
     @Override
-    public void renderTileEntityAt(TileEntity te, double x, double y, double z, float partial, int breaking) {
+    public void renderTileEntityAt(TileEntityHeater heater, double x, double y, double z, float partial, int breaking) {
         GL11.glPushAttrib(GL11.GL_ENABLE_BIT);
         GL11.glDisable(GL11.GL_LIGHTING);
         GL11.glPushMatrix();
+        GL11.glTranslated(x, y, z);
         bindTexture(Core.blockAtlas);
-        //GL11.glEnable(GL12.GL_RESCALE_NORMAL);
         float color = 0.1F;
-        TileEntityHeater heater = (TileEntityHeater) te;
         color += (heater.heat / (float) TileEntityHeater.maxHeat) * (1 - color);
         color = Math.max(color, 0);
         color = Math.min(1, color);
         GL11.glColor4f(color, color, color, 1.0F);
-        float d = 0;
-        GL11.glTranslatef((float) x + d, (float) y + d, (float) z + d);
-        Block block = Block.instance;
-        float m = 1F/128F;
-        block.setBlockBoundsOffset(m, m, m);
-        block.useTexture(BlockIcons.heater_heat);
-        block.beginWithMirroredUVs();
-        int brightness = (int)(color*16) << 4;
-        Tessellator.getInstance().startDrawingQuads();
-        Tessellator.getInstance().setBrightness(brightness);
-        Tessellator.getInstance().setColorOpaque_F(color, color, color);
-        block.renderForTileEntity();
-        GL11.glDisable(GL11.GL_BLEND);
-        Tessellator.getInstance().draw();
+        heat.draw();
         GL11.glPopMatrix();
         GL11.glColor4f(1, 1, 1, 1);
         GL11.glEnable(GL11.GL_LIGHTING);

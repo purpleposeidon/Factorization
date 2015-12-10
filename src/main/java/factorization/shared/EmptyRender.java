@@ -5,9 +5,9 @@ import net.minecraft.client.renderer.entity.RenderManager;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.ResourceLocation;
 
-public class EmptyRender extends Render {
+public class EmptyRender extends Render<Entity> {
 
-    protected EmptyRender(RenderManager renderManager) {
+    public EmptyRender(RenderManager renderManager) {
         super(renderManager);
     }
 

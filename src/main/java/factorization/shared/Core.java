@@ -11,7 +11,6 @@ import factorization.common.FactorizationProxy;
 import factorization.common.FactoryType;
 import factorization.common.FzConfig;
 import factorization.common.Registry;
-import factorization.compat.CompatModuleLoader;
 import factorization.coremod.AtVerifier;
 import factorization.coremod.LoadingPlugin;
 import factorization.darkiron.BlockDarkIronOre;
@@ -82,7 +81,7 @@ public class Core {
         foph = new FactorizationOreProcessingHandler();
         network = new NetworkFactorization();
         netevent = new FzNetEventHandler();
-        compatLoader = new CompatModuleLoader();
+        //compatLoader = new CompatModuleLoader();
     }
     
     // runtime storage
@@ -94,7 +93,7 @@ public class Core {
     public static FactorizationProxy proxy;
     public static NetworkFactorization network;
     public static FzNetEventHandler netevent;
-    public static CompatModuleLoader compatLoader;
+    //public static CompatModuleLoader compatLoader;
     public static boolean finished_loading = false;
 
     public static final boolean dev_environ = Launch.blackboard != null ? (Boolean) Launch.blackboard.get("fml.deobfuscatedEnvironment") : false;
@@ -225,8 +224,8 @@ public class Core {
         FMLInterModComms.sendMessage(truth, "AddRecipeCategory", "Crystallizer|factorization.oreprocessing.TileEntityCrystallizer|recipes");
         FMLInterModComms.sendMessage(truth, "AddRecipeCategory", "Slag Furnace|factorization.oreprocessing.TileEntitySlagFurnace$SlagRecipes|smeltingResults");
         FMLInterModComms.sendMessage(truth, "DocVar", "fzverion=" + Core.version);
-        compatLoader.loadCompat();
-        compatLoader.preinit(event);
+        //compatLoader.loadCompat();
+        //compatLoader.preinit(event);
     }
     
     void registerSimpleTileEntities() {
@@ -254,7 +253,7 @@ public class Core {
         ColossusFeature.init();
         PatreonRewards.init();
         InspirationManager.init();
-        compatLoader.init(event);
+        //compatLoader.init(event);
     }
 
     @EventHandler
@@ -265,7 +264,7 @@ public class Core {
         registry.addOtherRecipes();
         for (FactoryType ft : FactoryType.values()) ft.getRepresentative(); // Make sure everyone's registered to the EVENT_BUS
         proxy.afterLoad();
-        compatLoader.postinit(event);
+        //compatLoader.postinit(event);
         finished_loading = true;
         Blocks.diamond_block.setHardness(5.0F).setResistance(10.0F);
         validateEnvironment();

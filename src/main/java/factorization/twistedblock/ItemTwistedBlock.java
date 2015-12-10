@@ -10,12 +10,14 @@ import factorization.fzds.interfaces.IDeltaChunk;
 import factorization.fzds.interfaces.Interpolation;
 import factorization.shared.Core;
 import factorization.shared.Core.TabType;
-import factorization.shared.ItemBlockProxy;
+import factorization.util.FzUtil;
 import factorization.util.SpaceUtil;
 import net.minecraft.block.Block;
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
+import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.BlockPos;
@@ -26,20 +28,20 @@ import net.minecraftforge.common.util.FakePlayer;
 
 import java.util.List;
 
-public class ItemTwistedBlock extends ItemBlockProxy {
+public class ItemTwistedBlock extends ItemBlock {
     static final Block darkIron = Core.registry.resource_block;
     static final int darkIronMd = Core.registry.dark_iron_block_item.getItemDamage();
 
     public ItemTwistedBlock() {
-        super(Core.registry.dark_iron_block_item.copy(), "twistedBlock", TabType.ART);
+        super(Core.registry.resource_block);
+        FzUtil.initItem(this, "twistedBlock", TabType.ART);
         DeltaChunk.assertEnabled();
     }
     
     final int channel = Hammer.instance.hammerInfo.makeChannelFor(Core.name, "twistedBlocks", 10, 64, "Allows placement of blocks at angles");
 
     @Override
-    public boolean placeBlockAt(ItemStack stack, EntityPlayer player, World world, BlockPos pos, EnumFacing side,
-            float hitX, float hitY, float hitZ, int metadata) {
+    public boolean placeBlockAt(ItemStack stack, EntityPlayer player, World world, BlockPos pos, EnumFacing side, float hitX, float hitY, float hitZ, IBlockState newState) {
         if (world.isRemote) return false;
         if (player instanceof FakePlayer) return false;
         Coord at = new Coord(world, pos);
@@ -74,7 +76,7 @@ public class ItemTwistedBlock extends ItemBlockProxy {
         tag.setInteger("placedSide", side.ordinal());
         tag.setInteger("turns", 0);
         for (DeltaCapability forbidden : new DeltaCapability[] {
-                
+
         }) {
             idc.forbid(forbidden);
         }
@@ -96,7 +98,7 @@ public class ItemTwistedBlock extends ItemBlockProxy {
         idc.posX = at.x + 0.5;
         idc.posY = at.y + 0.5;
         idc.posZ = at.z + 0.5;
-        
+
         Vec3 center = idc.getRotationalCenterOffset().addVector(0.5, 0.5, 0.5);
         idc.setRotationalCenterOffset(center);
         idc.worldObj.spawnEntityInWorld(idc);
@@ -109,7 +111,7 @@ public class ItemTwistedBlock extends ItemBlockProxy {
     }
 
     @Override
-    public void getSubItems(Item itemId, CreativeTabs tab, List list) {
+    public void getSubItems(Item itemId, CreativeTabs tab, List<ItemStack> list) {
         list.add(new ItemStack(this));
     }
 }

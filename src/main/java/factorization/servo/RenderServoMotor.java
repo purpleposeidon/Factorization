@@ -10,24 +10,18 @@ import factorization.shared.Core;
 import factorization.shared.FzModel;
 import factorization.sockets.TileEntitySocketBase;
 import factorization.util.NumUtil;
-import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
-import net.minecraft.client.renderer.RenderBlocks;
 import net.minecraft.client.renderer.RenderGlobal;
-import net.minecraft.client.renderer.Tessellator;
+import net.minecraft.client.renderer.block.model.ItemCameraTransforms;
 import net.minecraft.client.renderer.entity.RenderEntity;
 import net.minecraft.client.renderer.entity.RenderManager;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.monster.EntityEnderman;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.AxisAlignedBB;
-import net.minecraft.util.EnumFacing;
-import net.minecraft.util.MovingObjectPosition;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.*;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL12;
 
@@ -35,7 +29,17 @@ import java.util.Iterator;
 
 public class RenderServoMotor extends RenderEntity {
     FzModel sprocket = new FzModel("servo/sprocket");
-    FzModel chasis = new FzModel("servo/chasis.obj");
+    FzModel[] colorMarkings = new FzModel[FzColor.values().length];
+    {
+        for (FzColor color : FzColor.values()) {
+            String colorName = color.name() == null ? "" : ("_" + color.name());
+            colorMarkings[color.ordinal()] = new FzModel("servo/chasis" + colorName + ".obj");
+        }
+    }
+
+    public RenderServoMotor(RenderManager renderManagerIn) {
+        super(renderManagerIn);
+    }
 
     float interp(double a, double b, double part) {
         double d = a - b;
@@ -183,7 +187,7 @@ public class RenderServoMotor extends RenderEntity {
     }
     
     void renderSocketAttachment(ServoMotor motor, TileEntitySocketBase socket, float partial) {
-        socket.getPos().getX() = socket.getPos().getY() = socket.getPos().getZ() = 0;
+        socket.setPos(new BlockPos(0, 0, 0));
         socket.facing = EnumFacing.UP;
         socket.renderInServo(motor, partial);
     }
@@ -208,11 +212,9 @@ public class RenderServoMotor extends RenderEntity {
     void renderMainModel(ServoMotor motor, float partial, double ro, boolean hilighting) {
         GL11.glPushMatrix();
         bindTexture(Core.blockAtlas);
-        chasis.draw();
-        
+        colorMarkings[motor.motionHandler.color.ordinal()].draw();
+
         FzColor c = motor.motionHandler.color;
-        renderServoColor(c);
-        GL11.glColor3f(c.getRed(), c.getGreen(), c.getBlue());
 
         // Determine the sprocket location & rotation
         double rail_width = TileEntityServoRail.width;
@@ -254,7 +256,6 @@ public class RenderServoMotor extends RenderEntity {
             GL11.glPopMatrix();
         }
         
-        GL11.glColor3f(1, 1, 1);
         GL11.glPopMatrix();
     }
     
@@ -268,22 +269,7 @@ public class RenderServoMotor extends RenderEntity {
         float s = 1 / 4F;
         //s *= 0.75F;
         GL11.glScalef(s, s, s);
-        
-        // Pre-emptively undo transformations that the item renderer does so
-        // that we don't get a stupid angle. Minecraft render code is terrible.
-        boolean needRotationFix = true;
-        if (is.getItem() instanceof ItemBlock) {
-            Block block = Block.getBlockFromItem(is.getItem());
-            if (block != null && RenderBlocks.renderItemIn3d(block.getRenderType())) {
-                needRotationFix = false;
-            }
-        }
-        if (needRotationFix) {
-            GL11.glTranslatef(0.9375F, 0.0625F, -0.0F);
-            GL11.glRotatef(-335.0F, 0.0F, 0.0F, 1.0F);
-            GL11.glRotatef(-50.0F, 0.0F, 1.0F, 0.0F);
-        }
-        
+
         float scale = 1.5F;
         GL11.glScalef(scale, scale, scale);
         
@@ -292,14 +278,8 @@ public class RenderServoMotor extends RenderEntity {
         float cg = (float)(itemColor >> 8 & 255) / 255.0F;
         float cb = (float)(itemColor & 255) / 255.0F;
         GL11.glColor4f(cr, cg, cb, 1.0F);
-        
-        this.renderManager.itemRenderer.renderItem(dummy_entity, is, 0);
 
-        if (is.getItem().requiresMultipleRenderPasses()) {
-            for (int x = 1; x < is.getItem().getRenderPasses(is.getItemDamage()); x++) {
-                this.renderManager.itemRenderer.renderItem(dummy_entity, is, x);
-            }
-        }
+        Minecraft.getMinecraft().getItemRenderer().renderItem(dummy_entity, is, ItemCameraTransforms.TransformType.FIXED);
         GL11.glPopMatrix();
     }
     
@@ -371,32 +351,5 @@ public class RenderServoMotor extends RenderEntity {
         }
         GL11.glPopMatrix();
         return true;
-    }
-    
-    void renderServoColor(FzColor color) {
-        if (color == FzColor.NO_COLOR) return;
-        Block block = Block.instance;
-        block.setBlockBoundsOffset(0, 0, 0);
-        block.useTexture(null);
-        block.setTexture(1 /* up */, colorIcon);
-        block.beginWithMirroredUVs();
-        GL11.glPushMatrix();
-        float d = -0.5F;
-        GL11.glTranslatef(d, d - 3F/8F + 0.0001F, d);
-        {
-            // We need to get 14/16ths transformed for 10/16ths.
-            float b = 14F/16F;
-            GL11.glScalef(1/b, 1, 1/b);
-            float s = 10F/16F;
-            GL11.glScalef(s, 1, s);
-            float t = 3.2F/16F;
-            GL11.glTranslatef(t, 0, t);
-        }
-        Tessellator.getInstance().startDrawingQuads();
-        block.renderForTileEntity();
-        //GL11.glDisable(GL11.GL_LIGHTING);
-        Tessellator.getInstance().draw();
-        //GL11.glEnable(GL11.GL_LIGHTING);
-        GL11.glPopMatrix();
     }
 }

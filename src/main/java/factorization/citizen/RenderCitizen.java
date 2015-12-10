@@ -65,9 +65,7 @@ public class RenderCitizen extends RenderEntity {
             GameSettings gs = Minecraft.getMinecraft().gameSettings;
             boolean fancy = gs.fancyGraphics;
             gs.fancyGraphics = true;
-            RenderItem.renderInFrame = true;
-            RenderManager.instance.renderEntityWithPosYaw(entityitem, 1.0D, 0.0D, 0.0D, 0.0F, 0.0F);
-            RenderItem.renderInFrame = false;
+            Minecraft.getMinecraft().getRenderManager().renderEntityWithPosYaw(entityitem, 1, 0, 0, 0, 0);
             gs.fancyGraphics = fancy;
         }
         GL11.glPopMatrix();

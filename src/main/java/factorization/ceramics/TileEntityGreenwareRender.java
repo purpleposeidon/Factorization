@@ -1,20 +1,25 @@
 package factorization.ceramics;
 
 import factorization.shared.Core;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.BlockModelRenderer;
+import net.minecraft.client.renderer.Tessellator;
+import net.minecraft.client.renderer.WorldRenderer;
 import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
-import net.minecraft.tileentity.TileEntity;
+import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
+import net.minecraft.client.renderer.vertex.VertexFormat;
+import net.minecraft.util.BlockPos;
 import org.lwjgl.opengl.GL11;
 
 
-public class TileEntityGreenwareRender extends TileEntitySpecialRenderer {
+public class TileEntityGreenwareRender extends TileEntitySpecialRenderer<TileEntityGreenware> {
 
+    final BlockPos zero = new BlockPos(0, 0, 0);
     @Override
-    public void renderTileEntityAt(TileEntity te, double viewx, double viewy, double viewz, float partial) {
-        TileEntityGreenware gw = (TileEntityGreenware) te;
+    public void renderTileEntityAt(TileEntityGreenware gw, double x, double y, double z, float partialTicks, int destroyStage) {
         if (!gw.shouldRenderTesr) {
             return;
         }
-        Core.profileStartRender("ceramics");
         GL11.glPushAttrib(GL11.GL_LIGHTING_BIT);
         GL11.glDisable(GL11.GL_LIGHTING);
         //prevents AO flickering on & off
@@ -22,15 +27,15 @@ public class TileEntityGreenwareRender extends TileEntitySpecialRenderer {
         gw.lastTouched = 0;
         bindTexture(Core.blockAtlas);
         GL11.glPushMatrix();
-        GL11.glTranslated(viewx, viewy, viewz);
-        BlockRenderGreenware.instance.renderInInventory();
-        BlockRenderGreenware.instance.setTileEntity(gw);
-        BlockRenderGreenware.instance.renderDynamic(gw);
-        BlockRenderGreenware.instance.clearWorldReferences();
+        GL11.glTranslated(x, y, z);
+        BlockModelRenderer mr = Minecraft.getMinecraft().getBlockRendererDispatcher().getBlockModelRenderer();
+        Tessellator tessI = Tessellator.getInstance();
+        WorldRenderer tess = tessI.getWorldRenderer();
+        tess.startDrawing(GL11.GL_QUADS, DefaultVertexFormats.BLOCK);
+        mr.renderModel(gw.getWorld(), gw.buildModel(), Core.registry.factory_block.getDefaultState(), zero, tess, false);
+        tessI.draw();
         GL11.glPopMatrix();
         gw.lastTouched = lt;
         GL11.glPopAttrib();
-        Core.profileEndRender();
     }
-
 }

@@ -29,7 +29,7 @@ public class TileEntityGrinder {
     public static class GrinderRecipe {
         private String oreName = null;
         private ItemStack itemstack = null;
-        private ArrayList<ItemStack> inputArray = new ArrayList();
+        private ArrayList<ItemStack> inputArray = new ArrayList<ItemStack>();
         public ItemStack output;
         public float probability;
 

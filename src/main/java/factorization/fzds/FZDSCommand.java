@@ -40,6 +40,7 @@ import java.util.*;
 import java.util.Map.Entry;
 
 public class FZDSCommand extends CommandBase {
+    // NORELEASE: Add a system for selecting DSEs from the command-line, likely using UUIDs.
     //private static DimensionSliceEntity currentWE = null;
     @Override
     public String getCommandName() {

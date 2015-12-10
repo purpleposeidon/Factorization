@@ -1,6 +1,7 @@
 package factorization.shared;
 
 import factorization.shared.Core.TabType;
+import factorization.util.FzUtil;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -11,10 +12,9 @@ import java.util.List;
 
 public class ItemFactorization extends Item {
     public ItemFactorization(String name, TabType tabType) {
-        setUnlocalizedName("factorization:" + name.replace('.', '/'));
-        Core.tab(this, tabType);
+        FzUtil.initItem(this, name, tabType);
     }
-    
+
     String accessableUnlocalizedName;
     
     @Override

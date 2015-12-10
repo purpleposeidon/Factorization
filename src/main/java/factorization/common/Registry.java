@@ -57,6 +57,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.FurnaceRecipes;
 import net.minecraft.item.crafting.IRecipe;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.WeightedRandomFishable;
 import net.minecraft.world.World;
 import net.minecraftforge.common.FishingHooks;
@@ -107,12 +108,12 @@ public class Registry {
     public ItemStack empty_socket_item, socket_lacerator, socket_robot_hand, socket_shifter;
     public ItemStack hinge; //, anchor;
     
-    public ItemStack stamper_item, packager_item,
+    public ItemStack
             daybarrel_item_hidden,
             lamp_item, air_item,
-            slagfurnace_item, battery_item_hidden, leydenjar_item, leydenjar_item_full, heater_item, steamturbine_item, solarboiler_item, caliometric_burner_item,
+            slagfurnace_item, battery_item_hidden, leydenjar_item, leydenjar_item_full, heater_item, solarboiler_item, caliometric_burner_item,
             mirror_item_hidden,
-            leadwire_item, mixer_item, crystallizer_item,
+            crystallizer_item,
             greenware_item,
             rocket_engine_item_hidden,
             parasieve_item,
@@ -188,25 +189,23 @@ public class Registry {
     
     public void makeBlocks() {
         if (FMLCommonHandler.instance().getSide() == Side.CLIENT) {
-            //Theoretically, not necessary. I bet BUKKIT would flip its shit tho.
-            blockRender = new Block();
             factory_rendering_block = new BlockFactorization(materialMachine);
+            clientTraceHelper = new BlockFactorization(materialMachine);
         }
-        serverTraceHelper = new Block();
-        clientTraceHelper = new Block();
+        serverTraceHelper = new BlockFactorization(materialMachine);
         factory_block = new BlockFactorization(materialMachine);
         factory_block_barrel = new BlockFactorization(materialBarrel);
         lightair_block = new BlockLightAir();
         resource_block = new BlockResource();
-        dark_iron_ore = new BlockDarkIronOre().setBlockName("factorization:darkIronOre").setBlockTextureName("stone").setCreativeTab(Core.tabFactorization).setHardness(3.0F).setResistance(5.0F);
+        dark_iron_ore = new BlockDarkIronOre().setUnlocalizedName("factorization:darkIronOre").setCreativeTab(Core.tabFactorization).setHardness(3.0F).setResistance(5.0F);
         fractured_bedrock_block = new FracturedBedrock();
         blasted_bedrock_block = new BlastedBedrock();
         if (DeltaChunk.enabled()) {
             colossal_block = new ColossalBlock();
         }
         blastBlock = new BlockBlast();
-        gargantuan_block = new GargantuanBlock().setBlockName("factorization:gargantuanBrick").setCreativeTab(Core.tabFactorization);
-        mantlerock_block = new BlockNetherrack().setBlockName("factorization:mantlerock").setBlockTextureName("factorization:mantlerock").setHardness(1.25F).setResistance(7.0F).setStepSound(Block.soundTypeStone);
+        gargantuan_block = new GargantuanBlock().setUnlocalizedName("factorization:gargantuanBrick").setCreativeTab(Core.tabFactorization);
+        mantlerock_block = new BlockNetherrack().setUnlocalizedName("factorization:mantlerock").setHardness(1.25F).setResistance(7.0F).setStepSound(Block.soundTypeStone);
         matcher_block = new BlockMatcher();
         artifact_forge = new BlockForge();
         
@@ -284,7 +283,6 @@ public class Registry {
         Block invalid = DataUtil.getBlock((Item) null);
         for (Item it : foundItems) {
             if (DataUtil.getBlock(it) == invalid) {
-                it.setTextureName(it.getUnlocalizedName());
                 registerItem(it);
             }
         }
@@ -307,13 +305,10 @@ public class Registry {
         parasieve_item = FactoryType.PARASIEVE.itemStack();
         compression_crafter_item = FactoryType.COMPRESSIONCRAFTER.itemStack();
         daybarrel_item_hidden = FactoryType.DAYBARREL.itemStack();
-        stamper_item = FactoryType.STAMPER.itemStack();
         lamp_item = FactoryType.LAMP.itemStack();
-        packager_item = FactoryType.PACKAGER.itemStack();
         slagfurnace_item = FactoryType.SLAGFURNACE.itemStack();
         battery_item_hidden = FactoryType.BATTERY.itemStack();
         leydenjar_item = FactoryType.LEYDENJAR.itemStack();
-        steamturbine_item = FactoryType.STEAMTURBINE.itemStack();
         solarboiler_item = FactoryType.SOLARBOILER.itemStack();
         caliometric_burner_item = FactoryType.CALIOMETRIC_BURNER.itemStack();
         sap_generator_item = FactoryType.SAP_TAP.itemStack();
@@ -324,12 +319,10 @@ public class Registry {
         bibliogen = FactoryType.BIBLIO_GEN.itemStack();
         heater_item = FactoryType.HEATER.itemStack();
         mirror_item_hidden = FactoryType.MIRROR.itemStack();
-        leadwire_item = FactoryType.LEADWIRE.itemStack();
-        mixer_item = FactoryType.MIXER.itemStack();
         crystallizer_item = FactoryType.CRYSTALLIZER.itemStack();
         greenware_item = FactoryType.CERAMIC.itemStack();
         if (FzConfig.enable_rocketry) {
-            rocket_engine_item_hidden = FactoryType.ROCKETENGINE.itemStack();
+            //rocket_engine_item_hidden = FactoryType.ROCKETENGINE.itemStack();
         }
         if (DeltaChunk.enabled()) {
             hinge = FactoryType.HINGE.itemStack();
@@ -395,7 +388,8 @@ public class Registry {
 
         //Misc
         pocket_table = new ItemPocketTable();
-        steamFluid = new Fluid("steam").setDensity(-500).setGaseous(true).setViscosity(100).setUnlocalizedName("factorization:fluid/steam").setTemperature(273 + 110);
+        ResourceLocation steamy = new ResourceLocation("factorization:textures/blocks/steam");
+        steamFluid = new Fluid("steam", steamy, steamy).setDensity(-500).setGaseous(true).setViscosity(100).setUnlocalizedName("factorization:fluid/steam").setTemperature(273 + 110);
         FluidRegistry.registerFluid(steamFluid);
         
         //Rocketry
@@ -419,7 +413,6 @@ public class Registry {
         servo_motor = new ItemStack(new ItemCraftingComponent("servo/servo_motor"));
         socket_part = new ItemSocketPart("socket/", TabType.SERVOS);
         instruction_plate = new ItemCraftingComponent("servo/instruction_plate", TabType.SERVOS);
-        instruction_plate.setSpriteNumber(0);
         instruction_plate.setMaxStackSize(16);
         servo_rail_comment_editor = new ItemCommenter("servo/commenter");
         
@@ -588,8 +581,8 @@ public class Registry {
         oreRecipe(new ItemStack(silver_ingot, 9), "#", '#', silver_block_item);
         oreRecipe(lead_block_item, "###", "###", "###", '#', "ingotLead");
         oreRecipe(silver_block_item, "###", "###", "###", '#', "ingotSilver");
-        FurnaceRecipes.smelting().func_151394_a(new ItemStack(resource_block, 1, ResourceType.SILVERORE.md), new ItemStack(silver_ingot), 0.3F);
-        FurnaceRecipes.smelting().func_151394_a(new ItemStack(dark_iron_ore), new ItemStack(dark_iron), 0.5F);
+        FurnaceRecipes.instance().addSmeltingRecipe(new ItemStack(resource_block, 1, ResourceType.SILVERORE.md), new ItemStack(silver_ingot), 0.3F);
+        FurnaceRecipes.instance().addSmeltingRecipe(new ItemStack(dark_iron_ore), new ItemStack(dark_iron), 0.5F);
 
         //ceramics
         oreRecipe(new ItemStack(sculpt_tool),
@@ -677,7 +670,12 @@ public class Registry {
             public ItemStack getRecipeOutput() {
                 return greenware_item.copy();
             }
-            
+
+            @Override
+            public ItemStack[] getRemainingItems(InventoryCrafting inv) {
+                return CraftUtil.getRemainingItems(inv);
+            }
+
             @Override
             public ItemStack getCraftingResult(InventoryCrafting inventorycrafting) {
                 ArrayList<ItemStack> matching = merge(inventorycrafting);
@@ -729,7 +727,12 @@ public class Registry {
             public ItemStack getRecipeOutput() {
                 return glaze_base_mimicry;
             }
-            
+
+            @Override
+            public ItemStack[] getRemainingItems(InventoryCrafting inv) {
+                return CraftUtil.getRemainingItems(inv);
+            }
+
             final int[] side_map = new int[] {
                     1, 2, 1,
                     4, 0, 5,
@@ -845,33 +848,18 @@ public class Registry {
             public ItemStack getRecipeOutput() {
                 return new ItemStack(barrelCart);
             }
+
+            @Override
+            public ItemStack[] getRemainingItems(InventoryCrafting inv) {
+                return CraftUtil.getRemainingItems(inv);
+            }
         };
         GameRegistry.addRecipe(barrel_cart_recipe);
         RecipeSorter.register("factorization:barrel_cart", barrel_cart_recipe.getClass(), Category.SHAPELESS, "");
         vanillaShapelessRecipe(new ItemStack(Items.minecart), barrelCart);
 
         BarrelUpgradeRecipes.addUpgradeRecipes();
-        
-        // Craft stamper
-        oreRecipe(stamper_item,
-                "#p#",
-                "#S#",
-                "#C#",
-                '#', Blocks.cobblestone,
-                'p', Blocks.piston,
-                'S', Items.stick,
-                'C', Blocks.crafting_table);
 
-        //Packager
-        oreRecipe(packager_item,
-                "#p#",
-                "I I",
-                "#C#",
-                '#', Blocks.cobblestone,
-                'p', Blocks.piston,
-                'I', Items.iron_ingot,
-                'C', Blocks.crafting_table);
-        
         //Compression Crafter
         oreRecipe(compression_crafter_item,
                 "D",
@@ -1018,11 +1006,6 @@ public class Registry {
                     'S', "ingotSilver",
                     '#', Blocks.glass_pane);
         }
-        ItemStack with_8 = leadwire_item.copy();
-        with_8.stackSize = 8;
-        oreRecipe(with_8,
-                "LLL",
-                'L', "ingotLead");
         oreRecipe(new ItemStack(diamond_cutting_head),
                 "SSS",
                 "S-S",
@@ -1060,14 +1043,14 @@ public class Registry {
         TileEntityGrinder.addRecipe(Blocks.snow_layer, new ItemStack(Items.snowball), 0.5F);
         TileEntityGrinder.addRecipe(Blocks.snow, new ItemStack(Items.snowball), 4F);
         TileEntityGrinder.addRecipe(Blocks.clay, new ItemStack(Items.clay_ball), 4F);
-        TileEntityGrinder.addRecipe(Blocks.fence, new ItemStack(Items.stick), 2.5F);
+        TileEntityGrinder.addRecipe("fenceWood", new ItemStack(Items.stick), 2.5F);
         //Netherrack dust is handled elsewhere!
         TileEntityGrinder.addRecipe(Blocks.glowstone, new ItemStack(Items.glowstone_dust), 4F);
         TileEntityGrinder.addRecipe(Blocks.trapdoor, new ItemStack(Items.stick), 3.5F);
         TileEntityGrinder.addRecipe(Blocks.stonebrick, new ItemStack(Blocks.cobblestone), 0.75F);
         TileEntityGrinder.addRecipe(Blocks.glass_pane, new ItemStack(Blocks.sand), 0.1F/16F);
         TileEntityGrinder.addRecipe(Blocks.melon_block, new ItemStack(Items.melon), 7.75F);
-        TileEntityGrinder.addRecipe(Blocks.fence_gate, new ItemStack(Items.stick), 2.5F);
+        TileEntityGrinder.addRecipe("fenceGateWood", new ItemStack(Items.stick), 2.5F);
         TileEntityGrinder.addRecipe(Blocks.nether_brick, new ItemStack(Items.netherbrick), 3.5F);
         TileEntityGrinder.addRecipe(Blocks.nether_brick_fence, new ItemStack(Items.netherbrick), 2.5F);
         //TODO: Asbestos from endstone
@@ -1088,15 +1071,7 @@ public class Registry {
         
         
         
-        oreRecipe(mixer_item,
-                " X ",
-                " M ",
-                "LUL",
-                'X', fan,
-                'M', motor,
-                'L', "ingotLead",
-                'U', Items.cauldron);
-        FurnaceRecipes.smelting().func_151394_a(new ItemStack(sludge), new ItemStack(Items.clay_ball), 0.1F);
+        FurnaceRecipes.instance().addSmeltingRecipe(new ItemStack(sludge), new ItemStack(Items.clay_ball), 0.1F);
         oreRecipe(crystallizer_item,
                 "-",
                 "S",
@@ -1163,7 +1138,7 @@ public class Registry {
                 'B', Items.book,
                 '~', new ItemStack(Items.dye, 1, 0), // The book says "ink sac", so you'll have to use an actual ink sac.
                 '>', logicMatrixProgrammer);
-        for (Item meat : new Item[] { Items.cooked_beef, Items.cooked_porkchop, Items.cooked_chicken, Items.cooked_fished }) {
+        for (Item meat : new Item[] { Items.cooked_beef, Items.cooked_porkchop, Items.cooked_chicken, Items.cooked_fish }) {
             oreRecipe(new ItemStack(manSandwich, 1, 0),
                     "BMM",
                     "M#M",
@@ -1243,7 +1218,7 @@ public class Registry {
                 "WUW",
                 'L', "treeLeaves",
                 'Y', Blocks.hopper,
-                '+', Blocks.fence,
+                '+', "fenceWood",
                 'W', "logWood",
                 'U', Items.bucket);
         int red = 14;
@@ -1317,7 +1292,7 @@ public class Registry {
                 '*', Items.nether_star);
 
         if (Core.enable_test_content) {
-            TestContent.add();
+            //TestContent.add();
         }
     }
     
