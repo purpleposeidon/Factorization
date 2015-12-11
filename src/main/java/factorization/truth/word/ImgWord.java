@@ -1,10 +1,13 @@
 package factorization.truth.word;
 
+import factorization.shared.Core;
 import factorization.truth.api.IHtmlTypesetter;
 import factorization.util.FzUtil;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.renderer.Tessellator;
+import net.minecraft.client.renderer.WorldRenderer;
+import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.client.resources.IResource;
 import net.minecraft.client.resources.IResourceManager;
 import net.minecraft.util.ResourceLocation;
@@ -55,14 +58,20 @@ public class ImgWord extends Word {
     public int draw(int x, int y, boolean hover, FontRenderer font) {
         int z = 0;
         Minecraft.getMinecraft().renderEngine.bindTexture(resource); // memleak goes here! :|
-        Tessellator tess = new Tessellator();
+        double u0 = 0;
+        double v0 = 0;
+        double u1 = 1;
+        double v1 = 1;
+        Minecraft.getMinecraft().renderEngine.bindTexture(Core.blockAtlas);
+        Tessellator tessI = Tessellator.getInstance();
+        WorldRenderer tess = tessI.getWorldRenderer();
         GL11.glColor4f(1, 1, 1, 1);
-        tess.startDrawingQuads();
-        tess.addVertexWithUV(x + 0, y + 0, z, 0, 0);
-        tess.addVertexWithUV(x + 0, y + height, z, 0, 1);
-        tess.addVertexWithUV(x + width, y + height, z, 1, 1);
-        tess.addVertexWithUV(x + width, y + 0, z, 1, 0);
-        tess.draw();
+        tess.startDrawing(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX);
+        tess.tex(u0, v0).putPosition(x + 0, y + 0, z);
+        tess.tex(u0, v1).putPosition(x + 0, y + height, z);
+        tess.tex(u1, v1).putPosition(x + width, y + height, z);
+        tess.tex(u1, v0).putPosition(x + width, y + 0, z);
+        tessI.draw();
         return 16;
     }
 

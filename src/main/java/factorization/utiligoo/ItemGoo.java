@@ -103,7 +103,7 @@ public class ItemGoo extends ItemFactorization {
             }
         }
         data.coords = ArrayUtils.addAll(data.coords, pos.getX(), pos.getY(), pos.getZ());
-        data.getDimensionId() = FzUtil.getWorldDimension(world);
+        data.dimensionId = FzUtil.getWorldDimension(world);
         data.markDirty();
         is.stackSize--;
         return true;
@@ -451,40 +451,38 @@ public class ItemGoo extends ItemFactorization {
     
 
     @Override
-    protected void addExtraInformation(ItemStack is, EntityPlayer player, List list, boolean verbose) {
+    protected void addExtraInformation(ItemStack is, EntityPlayer player, List<String> list, boolean verbose) {
         super.addExtraInformation(is, player, list, verbose);
+        if (player == null || player.worldObj == null) return;
         GooData data = GooData.getNullGooData(is, player.worldObj);
-        if (data != null) {
-            list.add(I18n.format("item.factorization:utiligoo.placed", data.coords.length / 3));
-            if (player != null && player.worldObj != null) {
-                if (data.getDimensionId() != FzUtil.getWorldDimension(player.worldObj)) {
-                    list.add(I18n.format("item.factorization:utiligoo.wrongDimension"));
-                }
+        if (data == null) return;
+        list.add(I18n.format("item.factorization:utiligoo.placed", data.coords.length / 3));
+        if (data.dimensionId != FzUtil.getWorldDimension(player.worldObj)) {
+            list.add(I18n.format("item.factorization:utiligoo.wrongDimension"));
+        }
+        int minX = 0, minY = 0, minZ = 0;
+        int maxX = 0, maxY = 0, maxZ = 0;
+        for (int i = 0; i < data.coords.length; i += 3) {
+            int x = data.coords[i + 0];
+            int y = data.coords[i + 1];
+            int z = data.coords[i + 2];
+            if (i == 0) {
+                minX = maxX = x;
+                minY = maxY = y;
+                minZ = maxZ = z;
+            } else {
+                minX = Math.min(x, minX);
+                minY = Math.min(y, minY);
+                minZ = Math.min(z, minZ);
+                maxX = Math.max(x, maxX);
+                maxY = Math.max(y, maxY);
+                maxZ = Math.max(z, maxZ);
             }
-            int minX = 0, minY = 0, minZ = 0;
-            int maxX = 0, maxY = 0, maxZ = 0;
-            for (int i = 0; i < data.coords.length; i += 3) {
-                int x = data.coords[i + 0];
-                int y = data.coords[i + 1];
-                int z = data.coords[i + 2];
-                if (i == 0) {
-                    minX = maxX = x;
-                    minY = maxY = y;
-                    minZ = maxZ = z;
-                } else {
-                    minX = Math.min(x, minX);
-                    minY = Math.min(y, minY);
-                    minZ = Math.min(z, minZ);
-                    maxX = Math.max(x, maxX);
-                    maxY = Math.max(y, maxY);
-                    maxZ = Math.max(z, maxZ);
-                }
-            }
-            list.add(I18n.format("item.factorization:utiligoo.min", minX, minY, minZ));
-            list.add(I18n.format("item.factorization:utiligoo.max", maxX, maxY, maxZ));
-            if (Core.dev_environ) {
-                list.add("#" + data.mapName);
-            }
+        }
+        list.add(I18n.format("item.factorization:utiligoo.min", minX, minY, minZ));
+        list.add(I18n.format("item.factorization:utiligoo.max", maxX, maxY, maxZ));
+        if (Core.dev_environ) {
+            list.add("#" + data.mapName);
         }
     }
     

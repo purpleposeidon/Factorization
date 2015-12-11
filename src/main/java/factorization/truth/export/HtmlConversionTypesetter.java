@@ -3,9 +3,11 @@ package factorization.truth.export;
 import factorization.truth.AbstractTypesetter;
 import factorization.truth.api.*;
 import factorization.truth.word.Word;
-import net.minecraft.client.renderer.texture.TextureAtlasSprite;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.ItemModelMesher;
+import net.minecraft.client.resources.model.IBakedModel;
+import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.IIcon;
 
 import java.io.OutputStream;
 import java.io.PrintStream;
@@ -19,8 +21,6 @@ public class HtmlConversionTypesetter extends AbstractTypesetter implements IHtm
         this.out = new PrintStream(out);
         this.root = root;
     }
-    
-    static String found_icon = null;
 
     @Override
     public void html(String text) {
@@ -62,25 +62,22 @@ public class HtmlConversionTypesetter extends AbstractTypesetter implements IHtm
 
     @Override
     public void putItem(ItemStack theItem, String link) {
-        String imgType = null;
-        TextureAtlasSprite iconIndex = null;
-        if (theItem != null) {
-            imgType = theItem.getItemSpriteNumber() == 1 ? "items" : "blocks";
-            iconIndex = theItem.getIconIndex();
-        }
-        if (iconIndex == null) {
-            imgType = "items";
+        String imgType = "item";
+        String found_icon;
+        if (theItem == null) {
             found_icon = "factorization:transparent_item";
         } else {
-            found_icon = iconIndex.getIconName();
-            if (!found_icon.contains(":")) {
-                found_icon = "minecraft:" + found_icon;
+            ItemModelMesher mesher = Minecraft.getMinecraft().getRenderItem().getItemModelMesher();
+            IBakedModel ibm = mesher.getItemModel(theItem);
+            if (ibm == null) {
+                found_icon = "error";
+            } else {
+                found_icon = ibm.getTexture().getIconName();
+            }
+            if (theItem.getItem() instanceof ItemBlock) {
+                imgType = "block";
             }
         }
-        String[] parts = found_icon.split(":", 2);
-        String namespace = parts[0];
-        String path = parts[1];
-        found_icon = namespace + ":" + imgType + "/" + path;
         html("<img class=\"" + imgType + "\" src=\"" + img(found_icon) + "\" />");
         found_icon = null;
         // TODO (and this is crazy!) render the item to a texture

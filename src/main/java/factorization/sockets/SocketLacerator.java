@@ -9,7 +9,6 @@ import factorization.common.FzConfig;
 import factorization.notify.Notice;
 import factorization.oreprocessing.TileEntityGrinder;
 import factorization.oreprocessing.TileEntityGrinder.GrinderRecipe;
-import factorization.oreprocessing.TileEntityGrinderRender;
 import factorization.servo.RenderServoMotor;
 import factorization.servo.ServoMotor;
 import factorization.shared.BlockFactorization;

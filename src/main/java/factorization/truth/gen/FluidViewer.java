@@ -6,8 +6,9 @@ import factorization.truth.api.TruthError;
 import factorization.truth.word.IconWord;
 import factorization.truth.word.ItemWord;
 import factorization.truth.word.Word;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.IIcon;
 import net.minecraftforge.fluids.Fluid;
 import net.minecraftforge.fluids.FluidRegistry;
 
@@ -20,8 +21,9 @@ public class FluidViewer implements IDocGenerator {
             ItemStack is = new ItemStack(fluid.getBlock());
             return new ItemWord(is);
         } else {
-            IIcon icon = fluid.getIcon();
-            return new IconWord(icon, IconWord.BLOCK_TEXTURE);
+            Minecraft mc = Minecraft.getMinecraft();
+            TextureAtlasSprite icon = mc.getTextureMapBlocks().registerSprite(fluid.getStill());
+            return new IconWord(icon);
         }
     }
 

@@ -179,7 +179,6 @@ public class FactorizationClientProxy extends FactorizationProxy {
         // MinecraftForgeClient.registerItemRenderer(Core.registry.glaze_bucket, new ItemRenderGlazeBucket());
         // MinecraftForgeClient.registerItemRenderer(Core.registry.daybarrel, new DayBarrelItemRenderer(renderBarrel));
         // MinecraftForgeClient.registerItemRenderer(Core.registry.brokenTool, new RenderBrokenArtifact());
-        setTileEntityRendererDispatcher(BlockDarkIronOre.Glint.class, new GlintRenderer());
         Core.loadBus(GooRenderer.INSTANCE);
     }
 

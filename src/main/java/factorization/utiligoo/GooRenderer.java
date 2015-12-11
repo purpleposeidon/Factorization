@@ -1,17 +1,20 @@
 package factorization.utiligoo;
 
 import factorization.shared.Core;
-import factorization.util.RenderUtil;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.BlockRendererDispatcher;
 import net.minecraft.client.renderer.OpenGlHelper;
-import net.minecraft.client.renderer.RenderBlocks;
 import net.minecraft.client.renderer.Tessellator;
+import net.minecraft.client.renderer.WorldRenderer;
+import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.client.shader.ShaderManager;
-import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.BlockPos;
 import net.minecraftforge.client.event.RenderWorldLastEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.relauncher.Side;
@@ -40,6 +43,7 @@ public enum GooRenderer {
 
     
     private boolean useShaders() {
+        // Doesn't work. I need to render to a second buffer, apply sobel to the buffer, and then draw the buffer.
         return false;
 /*        if (loaded) return sobel != null;
         loaded = true;
@@ -63,11 +67,11 @@ public enum GooRenderer {
         //sobel.func_147984_b("InSize").func_148087_a((float)width, (float)height);
         //sobel.func_147984_b("OutSize").func_148087_a(width, height);
         //sobel.func_147984_b("Time").func_148090_a(0);
-        sobel.func_147995_c();
+        sobel.useShader();
     }
     
     private void endGlWithShaders() {
-        sobel.func_147993_b();
+        sobel.endShader();
     }
     
     private void beginGlNoShaders() {
@@ -99,11 +103,11 @@ public enum GooRenderer {
             if (is == null || is.getItem() != Core.registry.utiligoo) continue;
             GooData data = GooData.getNullGooData(is, mc.theWorld);
             if (data == null) continue; 
-            if (data.getDimensionId() != mc.theWorld.provider.getDimensionId()) continue;
+            if (data.dimensionId != mc.theWorld.provider.getDimensionId()) continue;
             if (data.coords.length == 0) continue;
             if (!rendered_something) {
                 rendered_something = true;
-                EntityLivingBase camera = Minecraft.getMinecraft().renderViewEntity;
+                Entity camera = Minecraft.getMinecraft().renderViewEntity;
                 double cx = camera.lastTickPosX + (camera.posX - camera.lastTickPosX) * event.partialTicks;
                 double cy = camera.lastTickPosY + (camera.posY - camera.lastTickPosY) * event.partialTicks;
                 double cz = camera.lastTickPosZ + (camera.posZ - camera.lastTickPosZ) * event.partialTicks;
@@ -132,50 +136,37 @@ public enum GooRenderer {
     void renderGooFor(RenderWorldLastEvent event, GooData data, EntityPlayer player) {
         boolean rendered_something = false;
         double render_dist_sq = 32*32;
-        Tessellator tess = Tessellator.getInstance();
-        Block block = Block.instance;
-        RenderBlocks rb = RenderUtil.getRB();
+        Tessellator tessI = Tessellator.getInstance();
+        WorldRenderer tess = tessI.getWorldRenderer();
+        BlockRendererDispatcher dispatcher = Minecraft.getMinecraft().getBlockRendererDispatcher();
         for (int i = 0; i < data.coords.length; i += 3) {
             int x = data.coords[i + 0];
             int y = data.coords[i + 1];
             int z = data.coords[i + 2];
-            if (player.getDistanceSq(pos) > render_dist_sq) continue;
+            if (player.getDistanceSq(x, y, z) > render_dist_sq) continue;
             if (!rendered_something) {
-                tess.startDrawingQuads();
-                tess.disableColor();
+                tess.startDrawing(GL11.GL_QUADS, DefaultVertexFormats.BLOCK);
                 rendered_something = true;
             }
+            BlockPos pos = new BlockPos(x, y, z);
             Block b = player.worldObj.getBlock(pos);
             Material mat = b.getMaterial();
-            int md = player.worldObj.getBlockMetadata(pos);
+            IBlockState bs = player.worldObj.getBlockState(pos);
             if (useShaders()) {
-                if (mat.blocksMovement() && !b.hasTileEntity(md)) {
+                /*if (mat.blocksMovement() && !b.hasTileEntity(bs)) {
                     rb.renderBlockByRenderType(b, pos);
                 } else {
                     b.setBlockBoundsBasedOnState(player.world, pos);
                     block.setBlockBounds((float)b.getBlockBoundsMinX(), (float)b.getBlockBoundsMinY(), (float)b.getBlockBoundsMinZ(), (float)b.getBlockBoundsMaxX(), (float)b.getBlockBoundsMaxY(), (float)b.getBlockBoundsMaxZ()); // Hello, Notch! 
                     block.useTexture(BlockIcons.utiligoo$invasion);
                     block.render(rb, pos);
-                }
+                }*/
             } else {
-                if (mat.blocksMovement() && !b.hasTileEntity(md)) {
-                    rb.renderBlockUsingTexture(b, pos, BlockIcons.utiligoo$invasion);
-                } else if (b.getRenderType() == 2 /* torches */) {
-                    // Torches stupidly don't support setBlockBoundsBasedOnState. #blamenotch
-                    float d = 0.25F;
-                    block.setBlockBoundsOffset(d, d, d);
-                    block.useTexture(BlockIcons.utiligoo$invasion);
-                    block.render(rb, pos);
-                } else {
-                    b.setBlockBoundsBasedOnState(player.world, pos);
-                    block.setBlockBounds((float)b.getBlockBoundsMinX(), (float)b.getBlockBoundsMinY(), (float)b.getBlockBoundsMinZ(), (float)b.getBlockBoundsMaxX(), (float)b.getBlockBoundsMaxY(), (float)b.getBlockBoundsMaxZ()); // Hello, Notch! 
-                    block.useTexture(BlockIcons.utiligoo$invasion);
-                    block.render(rb, pos);
-                }
+                dispatcher.renderBlock(bs, pos, player.worldObj, tess);
             }
         }
         if (rendered_something) {
-            tess.draw();
+            tessI.draw();
         }
     }
 }

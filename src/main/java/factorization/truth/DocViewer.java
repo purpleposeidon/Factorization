@@ -20,6 +20,7 @@ import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL12;
 
+import java.io.IOException;
 import java.util.ArrayDeque;
 import java.util.Deque;
 import java.util.HashMap;
@@ -160,7 +161,7 @@ public class DocViewer extends GuiScreen {
     }
     
     Document getDocument(String name) {
-        ClientTypesetter ts = new ClientTypesetter(domain, mc.fontRenderer, getPageWidth(0), getPageHeight(0) - 13*2 /* GuiButtonNextPage.height */);
+        ClientTypesetter ts = new ClientTypesetter(domain, mc.fontRendererObj, getPageWidth(0), getPageHeight(0) - 13*2 /* GuiButtonNextPage.height */);
         try {
             ts.write(DocumentationModule.readDocument(domain, name));
         } catch (TruthError truthError) {
@@ -283,11 +284,10 @@ public class DocViewer extends GuiScreen {
         }
     }
     
-    public static void drawItem(ItemStack is, int x, int y, FontRenderer font) {
+    public void drawItem(ItemStack is, int x, int y, FontRenderer font) {
         GL11.glEnable(GL11.GL_DEPTH_TEST);
-        TextureManager tm = Minecraft.getMinecraft().getTextureManager();
-        GuiContainer.itemRender.renderItemAndEffectIntoGUI(font, tm, is, x, y);
-        GuiContainer.itemRender.renderItemOverlayIntoGUI(font, tm, is, x, y);
+        itemRender.renderItemAndEffectIntoGUI(is, x, y);
+        itemRender.renderItemOverlayIntoGUI(font, is, x, y, null);
     }
 
     public static void drawItemTip(ItemStack is, int x, int y) {
@@ -300,7 +300,7 @@ public class DocViewer extends GuiScreen {
     boolean hot = true;
     
     @Override
-    protected void mouseClicked(int mouseX, int mouseY, int button) {
+    protected void mouseClicked(int mouseX, int mouseY, int button) throws IOException {
         if (hot) return;
         super.mouseClicked(mouseX, mouseY, button);
         if (button == 1) {
@@ -326,7 +326,7 @@ public class DocViewer extends GuiScreen {
     }
     
     @Override
-    public void handleMouseInput() {
+    public void handleMouseInput() throws IOException {
         int scroll = Mouse.getEventDWheel();
         if (scroll == 0) {
             super.handleMouseInput();
@@ -362,7 +362,7 @@ public class DocViewer extends GuiScreen {
     }
     
     @Override
-    protected void keyTyped(char chr, int keySym) {
+    protected void keyTyped(char chr, int keySym) throws IOException {
         if (keySym == Keyboard.KEY_BACK || chr == 'z') {
             actionPerformed(backButton);
         } else if (keySym == Keyboard.KEY_NEXT || chr == ' ') {

@@ -49,6 +49,7 @@ public class FigurePage extends AbstractPage {
     
     @Override
     public void draw(DocViewer doc, int ox, int oy, String hovered) {
+        /*
         RenderUtil.checkGLError("FigurePage -- before render");
         if (wr == null) {
             GL11.glPushAttrib(GL11.GL_ALL_ATTRIB_BITS);
@@ -122,6 +123,7 @@ public class FigurePage extends AbstractPage {
         GL11.glPopAttrib();
         GL11.glPopMatrix();
         RenderUtil.checkGLError("FigurePage -- after rendering everything");
+        */
     }
     
     int getRenderList() {

@@ -1,24 +1,23 @@
 package factorization.truth.word;
 
 import factorization.shared.Core;
+import factorization.shared.FzIcons;
 import factorization.truth.WordPage;
 import factorization.truth.api.IHtmlTypesetter;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.renderer.Tessellator;
+import net.minecraft.client.renderer.WorldRenderer;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
+import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import org.lwjgl.opengl.GL11;
 
 public class IconWord extends Word {
-    public static final int BLOCK_TEXTURE = 234, ITEM_TEXTURE = 567;
-    
     private final TextureAtlasSprite icon;
-    private final boolean isBlock;
-    
-    public IconWord(TextureAtlasSprite icon, int texture) {
-        if (icon == null) icon = BlockIcons.error;
+
+    public IconWord(TextureAtlasSprite icon) {
+        if (icon == null) icon = FzIcons.items$error;
         this.icon = icon;
-        isBlock = texture == BLOCK_TEXTURE;
     }
 
     @Override
@@ -31,15 +30,16 @@ public class IconWord extends Word {
         double v0 = icon.getMinV();
         double u1 = icon.getMaxU();
         double v1 = icon.getMaxV();
-        Minecraft.getMinecraft().renderEngine.bindTexture(isBlock ? Core.blockAtlas : Core.itemAtlas);
-        Tessellator tess = new Tessellator();
+        Minecraft.getMinecraft().renderEngine.bindTexture(Core.blockAtlas);
+        Tessellator tessI = Tessellator.getInstance();
+        WorldRenderer tess = tessI.getWorldRenderer();
         GL11.glColor4f(1, 1, 1, 1);
-        tess.startDrawingQuads();
-        tess.addVertexWithUV(x + 0, y + 0, z, u0, v0);
-        tess.addVertexWithUV(x + 0, y + height, z, u0, v1);
-        tess.addVertexWithUV(x + width, y + height, z, u1, v1);
-        tess.addVertexWithUV(x + width, y + 0, z, u1, v0);
-        tess.draw();
+        tess.startDrawing(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX);
+        tess.tex(u0, v0).putPosition(x + 0, y + 0, z);
+        tess.tex(u0, v1).putPosition(x + 0, y + height, z);
+        tess.tex(u1, v1).putPosition(x + width, y + height, z);
+        tess.tex(u1, v0).putPosition(x + width, y + 0, z);
+        tessI.draw();
         return 16;
     }
 
