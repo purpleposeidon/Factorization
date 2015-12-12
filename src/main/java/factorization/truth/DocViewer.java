@@ -11,8 +11,10 @@ import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.client.gui.inventory.GuiInventory;
+import net.minecraft.client.renderer.ItemRenderer;
 import net.minecraft.client.renderer.OpenGlHelper;
 import net.minecraft.client.renderer.RenderHelper;
+import net.minecraft.client.renderer.entity.RenderItem;
 import net.minecraft.client.renderer.texture.TextureManager;
 import net.minecraft.item.ItemStack;
 import org.lwjgl.input.Keyboard;
@@ -283,11 +285,12 @@ public class DocViewer extends GuiScreen {
             hovered.drawHover(mouseX, mouseY);
         }
     }
-    
-    public void drawItem(ItemStack is, int x, int y, FontRenderer font) {
+
+    static RenderItem ri = Minecraft.getMinecraft().getRenderItem();
+    public static void drawItem(ItemStack is, int x, int y, FontRenderer font) {
         GL11.glEnable(GL11.GL_DEPTH_TEST);
-        itemRender.renderItemAndEffectIntoGUI(is, x, y);
-        itemRender.renderItemOverlayIntoGUI(font, is, x, y, null);
+        ri.renderItemAndEffectIntoGUI(is, x, y);
+        ri.renderItemOverlayIntoGUI(font, is, x, y, null);
     }
 
     public static void drawItemTip(ItemStack is, int x, int y) {

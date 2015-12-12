@@ -11,7 +11,7 @@ import org.lwjgl.opengl.GL12;
 
 public class TileEntityBiblioGenRenderer extends TileEntitySpecialRenderer {
     private static final ResourceLocation bookTexture = new ResourceLocation("factorization", "textures/model/book.png");
-    private FzModel bookModel = new FzModel("beauty/book");
+    private static FzModel bookModel = new FzModel("beauty/book");
 
     @Override
     public void renderTileEntityAt(TileEntity te, double x, double y, double z, float partialTicks, int destroyStage) {

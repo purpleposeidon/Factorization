@@ -28,12 +28,12 @@ import org.lwjgl.opengl.GL12;
 import java.util.Iterator;
 
 public class RenderServoMotor extends RenderEntity {
-    FzModel sprocket = new FzModel("servo/sprocket");
-    FzModel[] colorMarkings = new FzModel[FzColor.values().length];
-    {
+    static FzModel sprocket = new FzModel("servo/sprocket");
+    static FzModel[] colorMarkings = new FzModel[FzColor.values().length];
+    static {
         for (FzColor color : FzColor.values()) {
             String colorName = color.name() == null ? "" : ("_" + color.name());
-            colorMarkings[color.ordinal()] = new FzModel("servo/chasis" + colorName + ".obj");
+            colorMarkings[color.ordinal()] = new FzModel("servo/chasis" + colorName + ".obj"); // static
         }
     }
 

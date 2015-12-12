@@ -5,7 +5,7 @@ import factorization.util.NumUtil;
 import factorization.util.SpaceUtil;
 import net.minecraft.block.Block;
 import net.minecraft.client.multiplayer.WorldClient;
-import net.minecraft.client.renderer.Tessellator;
+import net.minecraft.client.renderer.WorldRenderer;
 import net.minecraft.client.renderer.culling.ICamera;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.BlockPos;
@@ -30,87 +30,6 @@ public class ChainLink {
         }
     }
 
-    @SideOnly(Side.CLIENT)
-    AxisAlignedBB cameraCheck(ICamera camera, Vec3 workStart, Vec3 workEnd) {
-        // This is far from efficient as it ought to be.
-        // If the line is diagonal, then there will be huge amounts of
-        // space where the line is drawn even tho it is far off-screen.
-        if (start == null) return null;
-        Vec3 min = SpaceUtil.copy(workStart);
-        Vec3 max = SpaceUtil.copy(workEnd);
-        SpaceUtil.sort(min, max);
-        // The lines are drawn fat, so make the box a bit fatter as well
-        final double d = 0.125;
-        AxisAlignedBB box = SpaceUtil.newBox(min, max).expand(d, d, d);
-
-        if (camera.isBoundingBoxInFrustum(box)) {
-            return box;
-        }
-        return null;
-    }
-
-    @SideOnly(Side.CLIENT)
-    void draw(WorldClient world, Tessellator tess, ICamera camera, float partial,
-                     AxisAlignedBB workBox, Vec3 workStart, Vec3 workEnd) {
-        Vec3 forward = SpaceUtil.subtract(workStart, workEnd);
-        double length = forward.lengthVector();
-        Vec3 side1 = forward.crossProduct(new Vec3(1, 0, 1));
-        if (SpaceUtil.isZero(side1)) {
-            side1 = forward.crossProduct(new Vec3(-1, 0, -1));
-        }
-        side1 = side1.normalize();
-        Vec3 side2 = forward.crossProduct(side1).normalize();
-        final double d = 0.25;
-        final double iconLength = 2 * d;
-        side1 = SpaceUtil.scale(side1, d);
-        side2 = SpaceUtil.scale(side2, d);
-
-        double linkCount = length / 2 / iconLength;
-        Vec3 normForward = forward.normalize();
-
-        double extraLinkage = length % iconLength;
-        extraLinkage *= -1;
-        extraLinkage += 0.5;
-        workStart = workStart.add(SpaceUtil.scale(normForward, extraLinkage));
-        linkCount += extraLinkage;
-
-
-        double g = 9F/32F;
-        double h = g + 0.5;
-        drawPlane(world, tess, workStart, workEnd, side1, g - linkCount, 1 + g);
-        drawPlane(world, tess, workStart, workEnd, side2, h - linkCount, 1 + h);
-    }
-
-    void setupLight(WorldClient world, Tessellator tess, Vec3 at) {
-        int x = (int) at.xCoord;
-        int y = (int) at.yCoord;
-        int z = (int) at.zCoord;
-        BlockPos pos = new BlockPos(x, y, z);
-        Block b = world.getBlock(pos);
-        int brightness = b.getMixedBrightnessForBlock(world, pos);
-        tess.setBrightness(brightness);
-    }
-
-    void drawPlane(WorldClient world, Tessellator tess, Vec3 workStart, Vec3 workEnd, Vec3 right, double uStart, double uEnd) {
-        setupLight(world, tess, workStart);
-        tess.addVertexWithUV(workStart.xCoord + right.xCoord,
-                workStart.yCoord + right.yCoord,
-                workStart.zCoord + right.zCoord,
-                uStart, 1);
-        tess.addVertexWithUV(workStart.xCoord - right.xCoord,
-                workStart.yCoord - right.yCoord,
-                workStart.zCoord - right.zCoord,
-                uStart, 0);
-        setupLight(world, tess, workEnd);
-        tess.addVertexWithUV(workEnd.xCoord - right.xCoord,
-                workEnd.yCoord - right.yCoord,
-                workEnd.zCoord - right.zCoord,
-                uEnd, 0);
-        tess.addVertexWithUV(workEnd.xCoord + right.xCoord,
-                workEnd.yCoord + right.yCoord,
-                workEnd.zCoord + right.zCoord,
-                uEnd, 1);
-    }
 
     public void release() {
         if (bagIndex == -1) {
@@ -129,6 +48,25 @@ public class ChainLink {
             Core.logWarning("ChainLink was not released! Its location: " + start + " to " + end);
         }
     }
+
+
+    @SideOnly(Side.CLIENT)
+    void visitChain(ICamera camera, float partial, ChainRender cr) {
+        // This is far from efficient as it ought to be.
+        // If the line is diagonal, then there will be huge amounts of
+        // space where the line is drawn even tho it is far off-screen.
+        if (start == null) return;
+        Vec3 s = getStart(partial);
+        Vec3 e = getEnd(partial);
+        // The lines are drawn fat, so make the box a bit fatter as well
+        final double d = 0.125;
+        AxisAlignedBB box = SpaceUtil.newBoxSort(s, e).expand(d, d, d);
+
+        if (camera.isBoundingBoxInFrustum(box)) {
+            cr.drawChain(s, e, partial);
+        }
+    }
+
 
     public Vec3 getStart(float partial) {
         return NumUtil.interp(prevStart, start, partial);

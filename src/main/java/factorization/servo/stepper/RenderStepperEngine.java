@@ -23,8 +23,8 @@ import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL12;
 
 public class RenderStepperEngine extends RenderEntity {
-    FzModel sprocket = new FzModel("servo/sprocket");
-    FzModel chasis = new FzModel("servo/stepper");
+    static FzModel sprocket = new FzModel("servo/sprocket");
+    static FzModel chasis = new FzModel("servo/stepper");
 
     public RenderStepperEngine(RenderManager renderManagerIn) {
         super(renderManagerIn);

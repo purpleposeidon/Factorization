@@ -2,6 +2,7 @@ package factorization.shared;
 
 import factorization.api.Coord;
 import net.minecraft.block.Block;
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.util.IStringSerializable;
 
 import java.util.Locale;
@@ -92,7 +93,8 @@ public enum BlockClass implements IStringSerializable, Comparable<BlockClass> {
     }
 
     public BlockClass harvest(String tool, int level) {
-        this.block.setHarvestLevel(tool, level, this.md);
+        IBlockState ibs = this.block.getDefaultState().withProperty(BlockFactorization.BLOCK_CLASS, this);
+        this.block.setHarvestLevel(tool, level, ibs);
         return this;
     }
 

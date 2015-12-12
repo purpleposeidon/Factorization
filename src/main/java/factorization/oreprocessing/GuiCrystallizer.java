@@ -18,7 +18,7 @@ public class GuiCrystallizer extends FactorizationGui {
     
     @Override
     protected void drawGuiContainerForegroundLayer(int foo, int bar) {
-        fontRendererObj.drawString(factContainer.factory.getInventoryName(), 8, 6, 0x404040);
+        fontRendererObj.drawString(factContainer.factory.getDisplayName().getUnformattedText(), 8, 6, 0x404040);
         //"inventory" doesn't fit.
     }
 

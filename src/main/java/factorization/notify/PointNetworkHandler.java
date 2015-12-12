@@ -45,6 +45,7 @@ public enum PointNetworkHandler {
     static final byte COORD = 1, ENTITY = 2;
     
     void handlePoint(DataInput input, EntityPlayer player) throws IOException {
+        Notice notice;
         switch (input.readByte()) {
             default: return;
             case COORD: {
@@ -65,9 +66,9 @@ public enum PointNetworkHandler {
         }
         notice.withStyle(Style.DRAWFAR, Style.VERY_LONG, Style.SCALE_SIZE, Style.EXACTPOSITION);
         double maxDist = 0xFF * 0xFF;
-        for (EntityPlayer viewer : (Iterable<EntityPlayer>) player.worldObj.playerEntities) {
+        for (EntityPlayer viewer : player.worldObj.playerEntities) {
             if (player.getDistanceSqToEntity(viewer) > maxDist) continue;
-            notice.send(viewer);
+            notice.sendTo(viewer);
         }
     }
     

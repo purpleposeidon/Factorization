@@ -7,10 +7,13 @@ import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.renderer.Tessellator;
+import net.minecraft.client.renderer.WorldRenderer;
 import net.minecraft.client.renderer.entity.RenderItem;
 import net.minecraft.client.renderer.entity.RenderManager;
 import net.minecraft.client.renderer.texture.TextureManager;
+import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.client.resources.I18n;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
@@ -25,7 +28,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 
 public class RenderMessages extends RenderMessagesProxy {
-    static ArrayList<ClientMessage> messages = new ArrayList();
+    static ArrayList<ClientMessage> messages = new ArrayList<ClientMessage>();
     
     {
         NotifyImplementation.loadBus(this);
@@ -100,7 +103,7 @@ public class RenderMessages extends RenderMessagesProxy {
         }
         Iterator<ClientMessage> it = messages.iterator();
         long approximateNow = System.currentTimeMillis();
-        EntityLivingBase camera = Minecraft.getMinecraft().renderViewEntity;
+        Entity camera = Minecraft.getMinecraft().renderViewEntity;
         double cx = camera.lastTickPosX + (camera.posX - camera.lastTickPosX) * (double) event.partialTicks;
         double cy = camera.lastTickPosY + (camera.posY - camera.lastTickPosY) * (double) event.partialTicks;
         double cz = camera.lastTickPosZ + (camera.posZ - camera.lastTickPosZ) * (double) event.partialTicks;
@@ -146,12 +149,12 @@ public class RenderMessages extends RenderMessagesProxy {
         GL11.glPopAttrib();
     }
 
-    RenderItem renderItem = new RenderItem();
+    RenderItem renderItem = Minecraft.getMinecraft().getRenderItem();
 
     private void renderMessage(ClientMessage m, float partial, float opacity, double cx, double cy, double cz) {
         int width = 0;
         String[] lines = m.msg.split("\n");
-        FontRenderer fr = Minecraft.getMinecraft().fontRenderer;
+        FontRenderer fr = Minecraft.getMinecraft().fontRendererObj;
         for (String line : lines) {
             width = Math.max(width, fr.getStringWidth(line));
         }
@@ -196,9 +199,9 @@ public class RenderMessages extends RenderMessagesProxy {
             }
         }
         GL11.glTranslatef(x + 0.5F, y, z + 0.5F);
-        float pvx = RenderManager.instance.playerViewX;
-        float pvy = -RenderManager.instance.playerViewY;
         Minecraft mc = Minecraft.getMinecraft();
+        float pvx = mc.getRenderManager().playerViewX;
+        float pvy = mc.getRenderManager().playerViewY;
         if (mc.gameSettings.thirdPersonView == 2) {
             pvx = -pvx;
         }
@@ -208,22 +211,23 @@ public class RenderMessages extends RenderMessagesProxy {
         GL11.glTranslatef(0, -10 * lineCount, 0);
         
         {
-            Tessellator tess = Tessellator.getInstance();
+            Tessellator tessI = Tessellator.getInstance();
+            WorldRenderer tess = tessI.getWorldRenderer();
             int var16 = (lineCount - 1) * 10;
 
             GL11.glDisable(GL11.GL_TEXTURE_2D);
-            tess.startDrawingQuads();
+            tess.startDrawing(GL11.GL_QUADS, DefaultVertexFormats.BLOCK);
             double item_add = 0;
             if (m.show_item) {
                 item_add += 24;
             }
             float c = 0.0F;
-            tess.setColorRGBA_F(c, c, c, Math.min(opacity, 0.2F));
+            tess.setColor(c, c, c, Math.min(opacity, 0.2F));
             tess.addVertex((double) (-halfWidth - 1), (double) (-1), 0.0D);
             tess.addVertex((double) (-halfWidth - 1), (double) (8 + var16), 0.0D);
             tess.addVertex((double) (halfWidth + 1 + item_add), (double) (8 + var16), 0.0D);
             tess.addVertex((double) (halfWidth + 1 + item_add), (double) (-1), 0.0D);
-            tess.draw();
+            tessI.draw();
             GL11.glEnable(GL11.GL_TEXTURE_2D);
         }
 
@@ -247,7 +251,7 @@ public class RenderMessages extends RenderMessagesProxy {
                 GL11.glTranslatef((float) (halfWidth + 4), -lineCount/2, 0);
                 renderItem.zLevel -= 50;
                 GL11.glPushAttrib(GL11.GL_ENABLE_BIT);
-                renderItem.renderItemAndEffectIntoGUI(fr, re, m.item, 0, 0);
+                renderItem.renderItemAndEffectIntoGUI(m.item, 0, 0);
                 GL11.glPopAttrib();
                 renderItem.zLevel += 50;
             }
@@ -264,7 +268,7 @@ public class RenderMessages extends RenderMessagesProxy {
             targs[i] = StatCollector.translateToLocal(formatArgs[i]);
         }
         String msg = I18n.format(message, targs);
-        mc.ingameGUI.func_110326_a(msg, false);
+        mc.ingameGUI.setRecordPlaying(msg, false);
     }
     
     @Override

@@ -61,9 +61,9 @@ public class ItemBlockProxy extends ItemFactorization {
             return false;
         } else if (!player.canPlayerEdit(pos, side, stack)) {
             return false;
-        } else if (world.canBlockBePlaced(this.block, pos, false, side, null, stack)) {
+        } else if (world.canBlockBePlaced(theBlock, pos, false, side, null, stack)) {
             int i = this.getMetadata(stack.getMetadata());
-            IBlockState iblockstate1 = this.block.onBlockPlaced(world, pos, side, hitX, hitY, hitZ, i, player);
+            IBlockState iblockstate1 = theBlock.onBlockPlaced(world, pos, side, hitX, hitY, hitZ, i, player);
 
             if (placeBlockAt(stack, player, world, pos, side, hitX, hitY, hitZ, iblockstate1)) {
                 world.playSoundEffect((double) ((float) pos.getX() + 0.5F), (double) ((float) pos.getY() + 0.5F), (double) ((float) pos.getZ() + 0.5F), this.block.stepSound.getPlaceSound(), (this.block.stepSound.getVolume() + 1.0F) / 2.0F, this.block.stepSound.getFrequency() * 0.8F);

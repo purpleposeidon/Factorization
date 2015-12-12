@@ -30,7 +30,7 @@ import net.minecraftforge.fml.common.network.internal.FMLProxyPacket;
 import java.util.*;
 
 public class BlockFactorization extends BlockContainer {
-    IProperty<BlockClass> BLOCK_CLASS = PropertyEnum.create("class", BlockClass.class);
+    public static final IProperty<BlockClass> BLOCK_CLASS = PropertyEnum.create("class", BlockClass.class);
     public boolean fake_normal_render = false;
     public BlockFactorization(Material material) {
         super(material);
@@ -230,8 +230,6 @@ public class BlockFactorization extends BlockContainer {
         Registry reg = Core.registry;
         //common
         
-        put(itemList, reg.stamper_item);
-        put(itemList, reg.packager_item);
         put(itemList, reg.slagfurnace_item);
         put(itemList, reg.parasieve_item);
 
@@ -248,7 +246,6 @@ public class BlockFactorization extends BlockContainer {
         put(itemList, reg.sap_generator_item);
         put(itemList, reg.anthro_generator_item);
         put(itemList, reg.solarboiler_item);
-        put(itemList, reg.steamturbine_item);
         put(itemList, reg.wooden_shaft);
         put(itemList, reg.bibliogen);
         if (reg.mirror != null) {
@@ -259,8 +256,6 @@ public class BlockFactorization extends BlockContainer {
         put(itemList, reg.water_wheel);
         put(itemList, reg.steam_to_shaft);
         put(itemList, reg.heater_item);
-        put(itemList, reg.leadwire_item);
-        put(itemList, reg.mixer_item);
         put(itemList, reg.crystallizer_item);
 
         put(itemList, reg.greenware_item);

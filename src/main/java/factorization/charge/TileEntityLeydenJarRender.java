@@ -11,11 +11,9 @@ public class TileEntityLeydenJarRender extends TileEntitySpecialRenderer {
         TileEntityLeydenJar jar = (TileEntityLeydenJar) te;
         GL11.glPushMatrix();
         GL11.glTranslatef((float) x, (float) y, (float) z);
-        
-        if (jar.sparks != null) {
-            jar.sparks.render();
-        }
-        
+
+        // NORELEASE: Gonna need sparks!
+
         GL11.glPopMatrix();
     }
 

@@ -4,7 +4,10 @@ import com.google.common.collect.Multimap;
 import factorization.api.Coord;
 import factorization.shared.Core;
 import factorization.weird.TileEntityDayBarrel;
+import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.entity.ai.attributes.AttributeModifier;
@@ -235,5 +238,15 @@ public class FzUtil {
     public static void initItem(Item it, String name, Core.TabType tabType) {
         it.setUnlocalizedName("factorization:" + name.replace('.', '/'));
         Core.tab(it, tabType);
+    }
+
+    @SideOnly(Side.CLIENT)
+    public static TextureAtlasSprite getIcon(ItemStack it) {
+        return Minecraft.getMinecraft().getRenderItem().getItemModelMesher().getItemModel(it).getTexture();
+    }
+
+    @SideOnly(Side.CLIENT)
+    public static TextureAtlasSprite getIcon(Block b) {
+        return getIcon(new ItemStack(b));
     }
 }

@@ -5,16 +5,18 @@ import factorization.api.datahelpers.*;
 import factorization.shared.Core;
 import factorization.shared.FzNetDispatch;
 import factorization.shared.NetworkFactorization.MessageType;
+import factorization.util.FzUtil;
 import factorization.util.LangUtil;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiScreen;
+import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.renderer.texture.TextureManager;
 import net.minecraft.entity.Entity;
+import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.IIcon;
 import org.lwjgl.input.Keyboard;
 
 import java.io.IOException;
@@ -27,7 +29,7 @@ public class GuiDataConfig extends GuiScreen {
     TileEntity te;
     Entity containingEntity;
     
-    ArrayList<Field> fields = new ArrayList();
+    ArrayList<Field> fields = new ArrayList<Field>();
     int posLabel, posControl;
     boolean changed;
     boolean orig_f1_state;;
@@ -340,15 +342,15 @@ public class GuiDataConfig extends GuiScreen {
         
         TextureManager tex = Minecraft.getMinecraft().renderEngine;
         tex.bindTexture(Core.itemAtlas);
-        
-        IIcon lmp = Core.registry.logicMatrixProgrammer.getIconFromDamage(0);
-        
+
+        TextureAtlasSprite lmp = FzUtil.getIcon(new ItemStack(Core.registry.logicMatrixProgrammer));
+
         int w = 256;
         int xSize = w, ySize = xSize;
         int left = (width - 6) / 2;
         int top = (height - ySize) / 2;
         
-        drawTexturedModelRectFromIcon(left, top, lmp, xSize, ySize);
+        drawTexturedModalRect(left, top, lmp, xSize, ySize);
         
         for (Field field : fields) {
             field.render(mouseX, mouseY);

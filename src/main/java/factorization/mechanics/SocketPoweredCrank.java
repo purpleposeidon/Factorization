@@ -13,6 +13,7 @@ import factorization.fzds.interfaces.Interpolation;
 import factorization.servo.ServoMotor;
 import factorization.shared.Core;
 import factorization.shared.EntityReference;
+import factorization.shared.FzModel;
 import factorization.sockets.ISocketHolder;
 import factorization.sockets.TileEntitySocketBase;
 import factorization.util.NumUtil;
@@ -427,6 +428,8 @@ public class SocketPoweredCrank extends TileEntitySocketBase implements IChargeC
         }
     }
 
+    static FzModel socketModel = new FzModel("sprocket/socket");
+
     @Override
     @SideOnly(Side.CLIENT)
     public void renderTesr(ServoMotor motor, float partial) {
@@ -449,7 +452,7 @@ public class SocketPoweredCrank extends TileEntitySocketBase implements IChargeC
         //TileEntityGrinderRender.renderGrindHead();
         GL11.glRotatef(90, 1, 0, 0);
         GL11.glTranslatef(-0.5F, -0.5F, -0F);
-        FactorizationBlockRender.renderItemIIcon(getCreatingItem().getItem().getIconFromDamage(0));
+        socketModel.draw();
     }
 
     Coord getAnchorBlock() {

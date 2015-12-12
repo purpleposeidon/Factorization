@@ -8,6 +8,7 @@ import factorization.common.FactoryType;
 import factorization.servo.RenderServoMotor;
 import factorization.servo.ServoMotor;
 import factorization.shared.Core;
+import factorization.shared.FzModel;
 import factorization.shared.NetworkFactorization.MessageType;
 import factorization.sockets.ISocketHolder;
 import factorization.sockets.TileEntitySocketBase;
@@ -228,10 +229,12 @@ public abstract class SocketFanturpeller extends TileEntitySocketBase implements
             GL11.glPushMatrix();
             GL11.glRotatef(90, 1, 0, 0);
             GL11.glTranslatef(-0.5F, -0.5F, 0);
-            FactorizationBlockRender.renderItemIIcon(Core.registry.fan.getIconFromDamage(0));
+            fan.draw();
             GL11.glPopMatrix();
         }
     }
+
+    static FzModel fan = new FzModel("socket/fan");
     
     @Override
     @SideOnly(Side.CLIENT)

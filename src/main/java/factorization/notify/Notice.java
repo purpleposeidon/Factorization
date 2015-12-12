@@ -12,8 +12,8 @@ import net.minecraft.util.IChatComponent;
 import net.minecraft.util.Vec3;
 import net.minecraft.world.World;
 
-import java.util.EnumSet;
 import javax.annotation.CheckReturnValue;
+import java.util.EnumSet;
 
 public class Notice {
     final Object where;
@@ -30,14 +30,15 @@ public class Notice {
     private boolean addedToRecurList = false;
     EntityPlayer targetPlayer = null;
     World world;
+    // NORELEASE: Support for IChatComponent?
 
     private static final String[] emptyStringArray = new String[0];
 
     /**
      * Creates an in-world notification message, which is sent using
-     * {@link sendTo} or {@link sendToAll}. Additional options can be
-     * provided using {@link withItem}, {@link withStyle}, {@link withWorld},
-     * and {@link withUpdater}. <br>
+     * {@link #sendTo(EntityPlayer)} or {@link #sendToAll()}. Additional options can be
+     * provided using {@link #withItem(ItemStack)} m}, {@link #withStyle(Style...)}, {@link #withWorld(World)},
+     * and {@link #withUpdater(NoticeUpdater)}. <br>
      * <b>Remember to send the Notice!</b><br>
      * <code><pre>
      * Notice msg = new Notice(oldManEntity, "%s", "It's dangerous to go alone!\nTake this!");
@@ -53,7 +54,7 @@ public class Notice {
      *            <p>
      *            The message will be translated, and then the translated
      *            message and the messageParameters will be passed through
-     *            {@link String.format}. All translations happen client-side.
+     *            {@link String#format(String, Object...)}. All translations happen client-side.
      *            </p>
      *            <p>
      *            Newlines work as expected.
@@ -113,7 +114,7 @@ public class Notice {
      * </p>
      * 
      * <p>
-     * If {@link withStyle}({@link Style.DRAWITEM}) is used, then the item will
+     * If {@link #withStyle(Style...)} is used, then the item will
      * be drawn in the notification.
      * </p>
      * 
@@ -125,7 +126,7 @@ public class Notice {
      * <code>{ITEM_NAME}</code>
      * will be replaced with the name of the item, and is gotten by calling
      * {@link ItemStack.getDisplayName}. <code>{ITEM_INFOS}</code> and <code>{ITEM_INFOS_NEWLINE</code> are
-     * gotten via {@link Items.addInformation}. ITEM_INFOS_NEWLINE is prefixed
+     * gotten via Item.addInformation. ITEM_INFOS_NEWLINE is prefixed
      * with a newline, unless the information list is empty.
      * </p>
      */
@@ -295,7 +296,7 @@ public class Notice {
      * Erases all Notifications a player has.
      */
     public static void clear(EntityPlayer player) {
-        SimpleCoord at = new SimpleCoord(player.worldObj, (int) player.posX, (int) player.posY, (int) player.posZ);
+        SimpleCoord at = new SimpleCoord(player.worldObj, new BlockPos(player));
         NotifyImplementation.instance.doSend(player, at, player.worldObj, EnumSet.of(Style.CLEAR), null, "", emptyStringArray);
     }
 
@@ -357,11 +358,11 @@ public class Notice {
         if (changed) {
             if (changedItem) {
                 style.add(Style.UPDATE);
-                send(targetPlayer);
+                sendTo(targetPlayer);
                 style.remove(Style.UPDATE);
             } else {
                 style.add(Style.UPDATE_SAME_ITEM);
-                send(targetPlayer);
+                sendTo(targetPlayer);
                 style.remove(Style.UPDATE_SAME_ITEM);
             }
             changed = changedItem = false;

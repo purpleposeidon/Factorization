@@ -8,7 +8,6 @@ import factorization.util.InvUtil;
 import factorization.util.InvUtil.FzInv;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.IIcon;
 
 import java.io.IOException;
 

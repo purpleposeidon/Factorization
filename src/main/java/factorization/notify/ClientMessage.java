@@ -60,7 +60,7 @@ class ClientMessage {
         if (item != null) {
             item_name = item.getDisplayName();
             EntityPlayer player = Minecraft.getMinecraft().thePlayer;
-            ArrayList<String> bits = new ArrayList();
+            ArrayList<String> bits = new ArrayList<String>();
             try {
                 item.getItem().addInformation(item, player, bits, false);
             } catch (Throwable t) {
@@ -144,7 +144,7 @@ class ClientMessage {
         }
         if (locus instanceof TileEntity) {
             TileEntity te = (TileEntity) locus;
-            return new SimpleCoord(te.getWorld(), te.getPos().getX(), te.getPos().getY(), te.getPos().getZ());
+            return new SimpleCoord(te.getWorld(), te.getPos());
         }
         return null;
     }

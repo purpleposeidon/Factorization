@@ -6,7 +6,7 @@ import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
 import org.lwjgl.opengl.GL11;
 
 public class TileEntityHeaterRenderer extends TileEntitySpecialRenderer<TileEntityHeater> {
-    FzModel heat = new FzModel("furnaceHeaterHeat");
+    static FzModel heat = new FzModel("furnaceHeaterHeat");
 
     @Override
     public void renderTileEntityAt(TileEntityHeater heater, double x, double y, double z, float partial, int breaking) {

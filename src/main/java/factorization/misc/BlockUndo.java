@@ -18,6 +18,7 @@ import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.init.Items;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.network.PacketBuffer;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.BlockPos;
@@ -52,7 +53,7 @@ public class BlockUndo {
     private static void send(EntityPlayer player, PlacedBlock at) {
         ByteBuf payload = Unpooled.buffer();
         at.write(payload);
-        FMLProxyPacket packet = new FMLProxyPacket(payload, channelName);
+        FMLProxyPacket packet = new FMLProxyPacket(new PacketBuffer(payload), channelName);
         channel.sendTo(packet, (EntityPlayerMP) player);
     }
 

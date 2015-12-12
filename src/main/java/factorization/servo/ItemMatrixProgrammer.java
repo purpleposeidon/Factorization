@@ -195,16 +195,14 @@ public class ItemMatrixProgrammer extends ItemFactorization {
     public static boolean isUserAuthenticated(EntityPlayerMP player) {
         if (PlayerUtil.isPlayerCreative(player)) return true;
         if (Core.dev_environ) return false;
-        StatisticsFile statsFile = StatUtil.getStatsFile(player);
-        return (statsFile != null && statsFile.writeStat(authStat) > 0) || player.getEntityData().hasKey(authTagName);
+        StatUtil.FzStat stat = StatUtil.loadWithBackup(player, authStat, authTagName);
+        return stat.get() > 0;
     }
 
     public static void setUserAuthenticated(EntityPlayerMP player) {
-        StatisticsFile statsFile = StatUtil.getStatsFile(player);
-        if (statsFile != null) {
-            statsFile.func_150873_a(player, authStat, 1);
-        }
-        player.getEntityData().setBoolean(authTagName, true);
+        StatUtil.FzStat stat = StatUtil.loadWithBackup(player, authStat, authTagName);
+        stat.set(1);
+        stat.sync();
     }
 
     @SubscribeEvent

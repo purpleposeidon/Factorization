@@ -32,7 +32,7 @@ public class TileEntityLeydenJar extends TileEntityCommon implements IChargeCond
     public static final int max_storage = 6400*200;
     static final int max_discharge_per_tick = 50;
 
-    public ChargeSparks sparks = null;
+    // NORELEASE: Add ChargeSparks to the leyden jar.
     
     char last_light = (char) -1;
     
@@ -90,26 +90,11 @@ public class TileEntityLeydenJar extends TileEntityCommon implements IChargeCond
         return i*0.4 + 0.5;
     }
     
-    public void updateSparks(ChargeSparks the_sparks) {
-        double level = getLevel()*4/5;
-        if (level > rand.nextDouble()) {
-            Vec3 src = new Vec3(0.5, randomizeDirection(0)/2 + 0.2, 0.5);
-            EnumFacing fo = EnumFacing.Plane.HORIZONTAL.random(rand);
-            Vec3 dest = new Vec3(randomizeDirection(fo.getDirectionVec().getX()), randomizeDirection(fo.getDirectionVec().getY()), randomizeDirection(fo.getDirectionVec().getZ()));
-            the_sparks.spark(src, dest, 12, 1, 3, 2.0, 8.0, /*0xF0FF00*/ /*0xEEDB02*/ 0xEEE59D);
-        }
-        the_sparks.update();
-    }
-    
     @Override
     public void update() {
         charge.update();
         final Coord here = getCoord();
         if (worldObj.isRemote) {
-            if (sparks == null) {
-                sparks = new ChargeSparks(10);
-            }
-            updateSparks(sparks);
             char now_light = (char) getDynamicLight();
             if (last_light == -1) {
                 last_light = now_light;

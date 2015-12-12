@@ -1,24 +1,35 @@
 package factorization.oreprocessing;
 
 import factorization.shared.Core;
+import factorization.util.FzUtil;
+import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.Tessellator;
+import net.minecraft.client.renderer.WorldRenderer;
+import net.minecraft.client.renderer.block.model.ItemCameraTransforms;
+import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.renderer.texture.TextureManager;
 import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
+import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
+import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.IIcon;
 import org.lwjgl.opengl.GL11;
 
 import static org.lwjgl.opengl.GL11.*;
 
-public class TileEntityCrystallizerRender extends TileEntitySpecialRenderer {
+public class TileEntityCrystallizerRender extends TileEntitySpecialRenderer<TileEntityCrystallizer> {
 
+    EntityLivingBase nobody = new EntityLivingBase(null) {
+        @Override public ItemStack getHeldItem() { return null; }
+        @Override public ItemStack getEquipmentInSlot(int slotIn) { return null; }
+        @Override public ItemStack getCurrentArmor(int slotIn) { return null; }
+        @Override public void setCurrentItemOrArmor(int slotIn, ItemStack stack) { }
+        @Override public ItemStack[] getInventory() { return new ItemStack[0]; }
+    };
     @Override
-    public void renderTileEntityAt(TileEntity te, double x, double y, double z, float partial) {
-        TileEntityCrystallizer crys = (TileEntityCrystallizer) te;
+    public void renderTileEntityAt(TileEntityCrystallizer crys, double x, double y, double z, float partial, int damage) {
         glPushMatrix();
         glTranslatef((float) x, (float) y, (float) z);
 
@@ -55,7 +66,7 @@ public class TileEntityCrystallizerRender extends TileEntitySpecialRenderer {
             float g = (float) (var18 >> 8 & 255) / 255.0F;
             float b = (float) (var18 & 255) / 255.0F;
             GL11.glColor4f(r, g, b, 1.0F);
-            FactorizationBlockRender.renderItemIIcon(crys.growing_crystal.getIconIndex());
+            Minecraft.getMinecraft().getRenderItem().renderItemModelForEntity(crys.growing_crystal, nobody, ItemCameraTransforms.TransformType.NONE);
             glPopMatrix();
         }
 
@@ -65,11 +76,10 @@ public class TileEntityCrystallizerRender extends TileEntitySpecialRenderer {
             glAlphaFunc(GL_GREATER, 0.1F);
             glEnable(GL_BLEND);
             ItemStack sol = crys.solution;
-            Tessellator tess = Tessellator.getInstance();
-            IIcon tex = Blocks.flowing_water.getBlockTextureFromSide(1);
+            Block texSrc = Blocks.flowing_water;
             if (sol.getItem() == Core.registry.acid) {
                 if (sol.getItemDamage() > 0) {
-                    tex = Blocks.flowing_lava.getBlockTextureFromSide(0);
+                    texSrc = Blocks.flowing_lava;
                     glColor4f(0.5F, 0.7F, 0F, 0.25F);
                 } else {
                     glColor4f(1F, 0.7F, 0F, 0.5F);
@@ -78,27 +88,30 @@ public class TileEntityCrystallizerRender extends TileEntitySpecialRenderer {
             } else if (sol.getItem() == Items.milk_bucket) {
                 float f = 0.9F;
                 glColor4f(f, f, f, 0.9F);
-                tex = Blocks.quartz_block.getIcon(0, 0); // Or white stained clay
+                texSrc = Blocks.quartz_block;
             } else if (sol.getItem() == Items.lava_bucket) {
-                tex = Blocks.flowing_lava.getBlockTextureFromSide(1);
+                texSrc = Blocks.flowing_lava;
                 glColor4f(1, 1, 1, 0.5F);
             } else {
                 glColor4f(1F, 1F, 1F, 1);
                 glBlendFunc(GL_SRC_COLOR, GL_ONE_MINUS_SRC_ALPHA);
             }
+            TextureAtlasSprite tex = FzUtil.getIcon(texSrc);
             re.bindTexture(Core.blockAtlas);
             float u0 = tex.getMinU();
             float v0 = tex.getMinV();
             float u1 = tex.getMaxU();
             float v1 = tex.getMaxV();
-            tess.startDrawingQuads();
+            Tessellator tessI = Tessellator.getInstance();
+            WorldRenderer tess = tessI.getWorldRenderer();
+            tess.startDrawing(GL11.GL_QUADS, DefaultVertexFormats.BLOCK);
             tess.setTranslation(0, 9F/16F, 0);
-            tess.addVertexWithUV(0, 0, 0, u0, v0);
-            tess.addVertexWithUV(0, 0, 1, u0, v1);
-            tess.addVertexWithUV(1, 0, 1, u1, v1);
-            tess.addVertexWithUV(1, 0, 0, u1, v0);
+            tess.tex(u0, v0).putPosition(0, 0, 0);
+            tess.tex(u0, v1).putPosition(0, 0, 1);
+            tess.tex(u1, v1).putPosition(1, 0, 1);
+            tess.tex(u1, v0).putPosition(1, 0, 0);
             tess.setTranslation(0, 0, 0);
-            tess.draw();
+            tessI.draw();
             glPopAttrib();
         }
 

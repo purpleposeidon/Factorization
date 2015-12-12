@@ -72,7 +72,7 @@ public class RenderCitizen extends RenderEntity {
     }
 
     ResourceLocation skin = new ResourceLocation("factorization", "textures/entity/citizen.png");
-    FzModel model = new FzModel("citizen");
+    static FzModel model = new FzModel("citizen");
 
     @Override
     protected ResourceLocation getEntityTexture(Entity ent) {

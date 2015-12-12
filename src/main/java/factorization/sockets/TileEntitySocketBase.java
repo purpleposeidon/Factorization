@@ -17,6 +17,7 @@ import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.Tessellator;
+import net.minecraft.client.renderer.WorldRenderer;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
@@ -447,11 +448,8 @@ public abstract class TileEntitySocketBase extends TileEntityCommon implements I
         GL11.glPushMatrix();
         renderTesr(motor, partial);
         GL11.glPopMatrix();
-        
-        Tessellator tess = Tessellator.getInstance();
-        tess.startDrawingQuads();
-        renderStatic(motor, tess);
-        tess.draw();
+
+        // NORELEASE: Need a servo component registry...
         GL11.glTranslatef(-d, -y, -d);
         GL11.glEnable(GL_LIGHTING);
     }

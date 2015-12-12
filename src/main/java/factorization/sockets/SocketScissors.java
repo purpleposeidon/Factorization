@@ -41,10 +41,11 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.List;
 
 public class SocketScissors extends TileEntitySocketBase implements ICaptureDrops {
     private boolean wasPowered = false;
-    private ArrayList<ItemStack> buffer = new ArrayList();
+    private ArrayList<ItemStack> buffer = new ArrayList<ItemStack>();
     private byte openCount = 0;
     private static byte openTime = 6;
 
@@ -301,7 +302,7 @@ public class SocketScissors extends TileEntitySocketBase implements ICaptureDrop
         GL11.glTranslatef(-0.5F, -0.5F, 0);
         GL11.glRotatef(90, 0, 1, 0);
         GL11.glTranslatef(-1F + 8/16f, 0F, 0.5f);
-        FactorizationBlockRender.renderItemIIcon(ItemIcons.socket$half_scissors);
+        scissor_half.draw();
         GL11.glPopMatrix();
         GL11.glRotatef(-turn*2, 1, 0, 0);
         GL11.glPushMatrix();
@@ -310,7 +311,7 @@ public class SocketScissors extends TileEntitySocketBase implements ICaptureDrop
         GL11.glRotatef(90, 0, 1, 0);
         GL11.glRotatef(180, 1, 0, 0);
         GL11.glTranslatef(-1F + 8/16f, 0F, 0.5f);
-        FactorizationBlockRender.renderItemIIcon(ItemIcons.socket$half_scissors);
+        scissor_half.draw();
         GL11.glPopMatrix();
         GL11.glPushMatrix();
 
@@ -332,18 +333,9 @@ public class SocketScissors extends TileEntitySocketBase implements ICaptureDrop
         GL11.glPopMatrix();
     }
 
-    @SideOnly(Side.CLIENT)
-    private static FzModel piston_base;
-    @SideOnly(Side.CLIENT)
-    private static FzModel piston_head;
-    
-    @Override
-    @SideOnly(Side.CLIENT)
-    public void representYoSelf() {
-        super.representYoSelf();
-        piston_base = new FzModel("mini_piston/mini_piston_base");
-        piston_head = new FzModel("mini_piston/mini_piston_head");
-    }
+    private static FzModel piston_base = new FzModel("socket/scissors/piston_base");
+    private static FzModel piston_head = new FzModel("socket/scissors/piston_head");
+    private static FzModel scissor_half = new FzModel("socket/scissors/scossor_arm");
 
     @Override
     @SideOnly(Side.CLIENT)
@@ -358,5 +350,4 @@ public class SocketScissors extends TileEntitySocketBase implements ICaptureDrop
         }
         return false;
     }
-    
 }

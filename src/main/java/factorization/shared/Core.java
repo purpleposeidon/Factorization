@@ -17,7 +17,6 @@ import factorization.darkiron.BlockDarkIronOre;
 import factorization.fzds.Hammer;
 import factorization.fzds.HammerEnabled;
 import factorization.mechanics.MechanismsFeature;
-import factorization.oreprocessing.FactorizationOreProcessingHandler;
 import factorization.servo.ServoMotor;
 import factorization.servo.stepper.EntityGrabController;
 import factorization.servo.stepper.StepperEngine;
@@ -78,7 +77,6 @@ public class Core {
         instance = this;
         fzconfig = new FzConfig();
         registry = new Registry();
-        foph = new FactorizationOreProcessingHandler();
         network = new NetworkFactorization();
         netevent = new FzNetEventHandler();
         //compatLoader = new CompatModuleLoader();
@@ -88,7 +86,6 @@ public class Core {
     public static Core instance;
     public static FzConfig fzconfig;
     public static Registry registry;
-    public static FactorizationOreProcessingHandler foph;
     @SidedProxy(clientSide = "factorization.common.FactorizationClientProxy", serverSide = "factorization.common.FactorizationProxy")
     public static FactorizationProxy proxy;
     public static NetworkFactorization network;
@@ -231,7 +228,7 @@ public class Core {
     void registerSimpleTileEntities() {
         FactoryType.registerTileEntities();
         GameRegistry.registerTileEntity(TileEntityFzNull.class, TileEntityFzNull.mapName);
-        GameRegistry.registerTileEntity(BlockDarkIronOre.Glint.class, "fz.glint");
+        //GameRegistry.registerTileEntity(BlockDarkIronOre.Glint.class, "fz.glint");
         //TileEntity renderers are registered in the client proxy
 
         // See EntityTracker.addEntityToTracker for reference on what the three last values should be
@@ -259,7 +256,6 @@ public class Core {
     @EventHandler
     public void modsLoaded(FMLPostInitializationEvent event) {
         TileEntitySolarBoiler.setupSteam();
-        foph.addDictOres();
 
         registry.addOtherRecipes();
         for (FactoryType ft : FactoryType.values()) ft.getRepresentative(); // Make sure everyone's registered to the EVENT_BUS

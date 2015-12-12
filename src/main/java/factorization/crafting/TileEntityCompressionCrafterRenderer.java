@@ -94,15 +94,15 @@ public class TileEntityCompressionCrafterRenderer extends TileEntitySpecialRende
         drawObscurringBox();
     }
 
-    HashMap<String, FzModel> shrouds = new HashMap<String, FzModel>();
-    {
+    static HashMap<String, FzModel> shrouds = new HashMap<String, FzModel>();
+    static {
         for (int x = 1; x < 4; x++) {
             for (int z = 1; z < 4; z++) {
                 if (z > x) continue;
                 String a = x + "x" + z;
                 String b = z + "x" + x;
                 if (shrouds.containsKey(a) || shrouds.containsKey(b)) continue;
-                shrouds.put(a, new FzModel("compact/shroud_" + a));
+                shrouds.put(a, new FzModel("compact/shroud_" + a)); // static
             }
         }
     }

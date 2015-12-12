@@ -17,7 +17,7 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 import java.util.ArrayList;
 import java.util.List;
 
-@Deprecated
+@Deprecated // We want to work with all items.
 public class ItemSocketPart extends ItemFactorization {
 
     public ItemSocketPart(String name, TabType tabType) {

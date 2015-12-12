@@ -92,7 +92,7 @@ public class NeptuneCape {
     }
     
     static class LmpMaskRenderer extends ModelRenderer {
-        FzModel LMP = new FzModel("lmpMask");
+        static FzModel LMP = new FzModel("lmpMask");
         static AbstractClientPlayer rendering_player;
 
         public LmpMaskRenderer(ModelBase base) {

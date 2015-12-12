@@ -11,10 +11,7 @@ import factorization.oreprocessing.TileEntityGrinder;
 import factorization.oreprocessing.TileEntityGrinder.GrinderRecipe;
 import factorization.servo.RenderServoMotor;
 import factorization.servo.ServoMotor;
-import factorization.shared.BlockFactorization;
-import factorization.shared.Core;
-import factorization.shared.DropCaptureHandler;
-import factorization.shared.ICaptureDrops;
+import factorization.shared.*;
 import factorization.shared.NetworkFactorization.MessageType;
 import factorization.util.*;
 import factorization.weird.TileEntityDayBarrel;
@@ -43,6 +40,7 @@ import org.lwjgl.opengl.GL11;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 
 public class SocketLacerator extends TileEntitySocketBase implements IChargeConductor, ICaptureDrops, ITickable {
     Charge charge = new Charge(this);
@@ -73,7 +71,7 @@ public class SocketLacerator extends TileEntitySocketBase implements IChargeCond
     final static byte grind_time = 25;
     final static short max_speed = 200;
     final static short min_speed = max_speed/10;
-    ArrayList<ItemStack> buffer = new ArrayList();
+    ArrayList<ItemStack> buffer = new ArrayList<ItemStack>();
     
     private float rotation = 0, prev_rotation = 0;
     
@@ -468,7 +466,7 @@ public class SocketLacerator extends TileEntitySocketBase implements IChargeCond
         GL11.glRotatef(turn, 0, 1, 0);
         float sd = motor == null ? 1F/16F : 3F/16F;
         GL11.glTranslatef(0, -4F/16F + sd + (float) Math.abs(Math.sin(turn/800))/32F, 0);
-        TileEntityGrinderRender.renderGrindHead();
+        diamondCuttingHead.draw();
         if (ticked) {
             ticked = false;
             if (speed > max_speed/3) {
@@ -476,6 +474,8 @@ public class SocketLacerator extends TileEntitySocketBase implements IChargeCond
             }
         }
     }
+
+    static FzModel diamondCuttingHead = new FzModel("socket/diamondCuttingHead");
 
     @SideOnly(Side.CLIENT)
     static EffectRenderer particleTweaker, origER;
@@ -511,7 +511,7 @@ public class SocketLacerator extends TileEntitySocketBase implements IChargeCond
             mc.effectRenderer = origER;
         }
     }
-    
+
     static class ParticleWarper extends EffectRenderer {
 
         public ParticleWarper(World world, TextureManager textureManager) {
@@ -537,25 +537,12 @@ public class SocketLacerator extends TileEntitySocketBase implements IChargeCond
             
             Vec3 dir = new Vec3(0, dist, 0);
             
-            
-            if (fd.getDirectionVec().getX() != 0) {
-                dir.rotateAroundX(theta);
-            } else if (fd.getDirectionVec().getY() != 0) {
-                dir.rotateAroundY(theta);
-            } else if (fd.getDirectionVec().getZ() != 0) {
-                dir.rotateAroundZ(theta);
-            }
+            dir = Quaternion.getRotationQuaternionRadians(theta, fd).applyRotation(dir);
             particle.posX += dir.xCoord;
             particle.posY += dir.yCoord;
             particle.posZ += dir.zCoord;
             theta = (float) (Math.PI/2);
-            if (fd.getDirectionVec().getX() != 0) {
-                dir.rotateAroundX(theta);
-            } else if (fd.getDirectionVec().getY() != 0) {
-                dir.rotateAroundY(theta);
-            } else if (fd.getDirectionVec().getZ() != 0) {
-                dir.rotateAroundZ(theta);
-            }
+            dir = Quaternion.getRotationQuaternionRadians(theta, fd).applyRotation(dir);
             float speed = 0.8F*me.speed/max_speed;
             particle.motionX = dir.xCoord*speed;
             particle.motionY = dir.yCoord*speed;

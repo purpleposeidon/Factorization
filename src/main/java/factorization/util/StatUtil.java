@@ -31,8 +31,7 @@ public class StatUtil {
 
         public int get() {
             if (statsFile == null) return 0;
-            // NORELEASE: How do you read from stats files now?
-            return 0;
+            return statsFile.readStat(stat);
         }
 
         public void set(int val) {
@@ -60,6 +59,36 @@ public class StatUtil {
         return new FzStat(player, field);
     }
 
+    public static class FzStatBackup extends FzStat {
+        final String backupName;
+
+        public FzStatBackup(EntityPlayer player, StatBase stat, String backupName) {
+            super(player, stat);
+            this.backupName = backupName;
+        }
+
+        @Override
+        public int get() {
+            int ret = super.get();
+            if (ret == 0) {
+                if (player.getEntityData().hasKey(backupName)) {
+                    ret = player.getEntityData().getInteger(backupName);
+                    set(ret);
+                }
+            }
+            return ret;
+        }
+
+        @Override
+        public void set(int val) {
+            super.set(val);
+            player.getEntityData().setInteger(backupName, val);
+        }
+    }
+
+    public static FzStat loadWithBackup(EntityPlayer player, StatBase field, String backupKeyName) {
+        return new FzStatBackup(player, field, backupKeyName);
+    }
 
 
 }

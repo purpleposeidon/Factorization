@@ -7,7 +7,6 @@ import factorization.servo.Instruction;
 import factorization.servo.ServoMotor;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.IIcon;
 
 import java.io.IOException;
 

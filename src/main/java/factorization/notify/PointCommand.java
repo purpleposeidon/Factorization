@@ -69,7 +69,7 @@ public class PointCommand extends CommandBase {
         double d0 = reachDistance;
         MovingObjectPosition objectMouseOver = player.rayTrace(d0, par1);
         double d1 = d0;
-        Vec3 vec3 = player.getPosition(par1);
+        Vec3 vec3 = player.getPositionEyes(par1);
 
         if (objectMouseOver != null) {
             d1 = objectMouseOver.hitVec.distanceTo(vec3);
@@ -83,7 +83,7 @@ public class PointCommand extends CommandBase {
         float f1 = 1.0F;
         List list = player.worldObj.getEntitiesWithinAABBExcludingEntity(
                 player,
-                player.boundingBox.addCoord(vec31.xCoord * d0,
+                player.getEntityBoundingBox().addCoord(vec31.xCoord * d0,
                         vec31.yCoord * d0, vec31.zCoord * d0).expand(
                         (double) f1, (double) f1, (double) f1));
         double d2 = d1;
@@ -93,7 +93,7 @@ public class PointCommand extends CommandBase {
 
             if (entity.canBeCollidedWith()) {
                 float f2 = entity.getCollisionBorderSize();
-                AxisAlignedBB axisalignedbb = entity.boundingBox.expand(
+                AxisAlignedBB axisalignedbb = entity.getEntityBoundingBox().expand(
                         (double) f2, (double) f2, (double) f2);
                 MovingObjectPosition movingobjectposition = axisalignedbb
                         .calculateIntercept(vec3, vec32);
