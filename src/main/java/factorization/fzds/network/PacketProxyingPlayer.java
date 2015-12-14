@@ -218,7 +218,7 @@ public class PacketProxyingPlayer extends EntityPlayerMP implements
         // NOTE: This has the potential to go badly if there's a large amount of data in the chunks.
         if (!chunks.isEmpty()) {
             Packet toSend = new S26PacketMapChunkBulk(chunks);
-            addNettyMessageForPlayer(target, new WrappedPacketFromServer(toSend));
+            addNettyMessageForPlayer(target, toSend);
         }
         if (!tileEntities.isEmpty()) {
             for (TileEntity te : tileEntities) {
@@ -226,7 +226,7 @@ public class PacketProxyingPlayer extends EntityPlayerMP implements
                 if (description == null) {
                     continue;
                 }
-                addNettyMessageForPlayer(target, new WrappedPacketFromServer(description));
+                addNettyMessageForPlayer(target, description);
             }
         }
     }
@@ -253,34 +253,23 @@ public class PacketProxyingPlayer extends EntityPlayerMP implements
         return !listeningPlayers.isEmpty();
     }
 
-    private static final NettyPacketConverter wrapped_packet_channel = new NettyPacketConverter(Side.SERVER);
-    
-    public static Packet wrapMessage(Object msg) {
-        if (msg instanceof Packet) {
-            return new WrappedPacketFromServer((Packet) msg);
-        }
-        Packet pkt = wrapped_packet_channel.convert(msg);
-        return new WrappedPacketFromServer(pkt);
-    }
-    
     public void addNettyMessage(Object msg) {
         // Return a future?
         if (listeningPlayers.isEmpty()) {
             return;
         }
-        DimensionSliceEntity dse = dimensionSlice.get();
+        DimensionSliceEntity dse = dimensionSlice.get(); // NORELEASE: Is there a world leak here? Does the DSE clean us up?
         if (dse == null || dse.isDead) {
             endProxy();
             return;
         }
-        Object wrappedMsg = wrapMessage(msg);
         Iterator<EntityPlayerMP> it = listeningPlayers.iterator();
         while (it.hasNext()) {
             EntityPlayerMP player = it.next();
             if (player.isDead || player.worldObj != dse.worldObj) {
                 it.remove();
             } else {
-                addNettyMessageForPlayer(player, wrappedMsg);
+                addNettyMessageForPlayer(player, msg);
             }
         }
     }
@@ -290,7 +279,12 @@ public class PacketProxyingPlayer extends EntityPlayerMP implements
         if (player instanceof PacketProxyingPlayer) {
             throw new IllegalStateException("Sending a packet to myself!");
         }
-        player.playerNetServerHandler.sendPacket((Packet) packet);
+        PacketJunction.switchJunction(player.playerNetServerHandler, true);
+        try {
+            player.playerNetServerHandler.sendPacket((Packet) packet);
+        } finally {
+            PacketJunction.switchJunction(player.playerNetServerHandler, false);
+        }
     }
 
     /**

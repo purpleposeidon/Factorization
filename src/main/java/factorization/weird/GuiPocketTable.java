@@ -8,6 +8,7 @@ import net.minecraft.inventory.Slot;
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.GL11;
 
+import java.io.IOException;
 import java.util.Locale;
 
 public class GuiPocketTable extends GuiContainer {
@@ -61,7 +62,7 @@ public class GuiPocketTable extends GuiContainer {
     }
 
     @Override
-    protected void keyTyped(char key, int par2) {
+    protected void keyTyped(char key, int par2) throws IOException {
         if (open_time < 4) {
             super.keyTyped(key, par2);
             return;

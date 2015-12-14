@@ -3,7 +3,6 @@ package factorization.fzds;
 import factorization.fzds.network.FzdsPacketRegistry;
 import factorization.fzds.network.HammerNet;
 import factorization.fzds.network.PPPChunkLoader;
-import factorization.fzds.network.WrappedPacket;
 import factorization.shared.Core;
 import factorization.util.FzUtil;
 import net.minecraft.entity.Entity;
@@ -36,6 +35,7 @@ import java.io.File;
         version = Core.version
 )
 public class Hammer {
+    @SuppressWarnings("unused")
     final String[] Lore = new String[] {
             "At twilight's end, the shadow's crossed,",
             "A new world birthed, the elder lost.",
@@ -102,7 +102,6 @@ public class Hammer {
         if (FMLCommonHandler.instance().getSide() == Side.CLIENT) {
             Core.loadBus(new ClickHandler());
         }
-        WrappedPacket.registerPacket();
         ForgeChunkManager.setForcedChunkLoadingCallback(this, new PPPChunkLoader());
         if (log_client_chunking && FMLCommonHandler.instance().getSide() == Side.CLIENT) {
             Core.loadBus(new ChunkLogger());

@@ -8,7 +8,7 @@ import factorization.coremodhooks.IExtraChunkData;
 import factorization.fzds.gui.ProxiedGuiContainer;
 import factorization.fzds.gui.ProxiedGuiScreen;
 import factorization.fzds.interfaces.IDeltaChunk;
-import factorization.fzds.network.WrapperAdapter;
+import factorization.fzds.network.PacketJunction;
 import factorization.shared.Core;
 import factorization.util.NumUtil;
 import factorization.util.SpaceUtil;
@@ -27,6 +27,7 @@ import net.minecraft.client.renderer.tileentity.TileEntityRendererDispatcher;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
+import net.minecraft.network.Packet;
 import net.minecraft.profiler.Profiler;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.BlockPos;
@@ -45,11 +46,11 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent.ClientTickEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent.Phase;
-import net.minecraftforge.fml.common.network.FMLNetworkEvent;
 import net.minecraftforge.fml.common.network.FMLNetworkEvent.ClientDisconnectionFromServerEvent;
 import net.minecraftforge.fml.relauncher.Side;
 import org.lwjgl.opengl.GL11;
 
+import java.util.ArrayList;
 import java.util.WeakHashMap;
 
 public class HammerClientProxy extends HammerProxy {
@@ -284,7 +285,7 @@ public class HammerClientProxy extends HammerProxy {
         }
         real_renderglobal = mc.renderGlobal;
         setWorldAndPlayer(w, fake_player);
-        WrapperAdapter.setShadow(true);
+        PacketJunction.switchJunction(mc.getNetHandler(), true);
         fake_player.inventory = real_player.inventory;
     }
     
@@ -294,14 +295,31 @@ public class HammerClientProxy extends HammerProxy {
         real_world = null;
         real_player = null;
         real_renderglobal = null;
-        WrapperAdapter.setShadow(false);
+        PacketJunction.switchJunction(mc.getNetHandler(), false);
     }
     
     @Override
     public boolean isInShadowWorld() {
         return real_world != null;
     }
-    
+
+
+    final ArrayList<Packet> packetQueue = new ArrayList<Packet>(); // Does this need to be thread-safe?
+
+    @Override
+    public boolean queueUnwrappedPacket(EntityPlayer player, Object packet) {
+        if (super.queueUnwrappedPacket(player, packet)) return true;
+        if (packet instanceof Packet) {
+            synchronized (packetQueue) {
+                packetQueue.add((Packet) packet);
+                return true;
+            }
+        } else {
+            Core.logWarning("Tried to queue this weird non-packet: " + packet.getClass() + ": " + packet.toString());
+        }
+        return false;
+    }
+
     void runShadowTick() {
         final Minecraft mc = Minecraft.getMinecraft();
         if (mc.isGamePaused()) {
@@ -309,6 +327,9 @@ public class HammerClientProxy extends HammerProxy {
         }
         final WorldClient mcWorld = mc.theWorld;
         if (mcWorld == null) {
+            synchronized (packetQueue) {
+                packetQueue.clear();
+            }
             return;
         }
         final EntityPlayer mcPlayer = mc.thePlayer;
@@ -328,6 +349,12 @@ public class HammerClientProxy extends HammerProxy {
         setShadowWorld();
         Core.profileStart("FZDStick");
         try {
+            synchronized (packetQueue) {
+                for (Packet packet : packetQueue) {
+                    packet.processPacket(send_queue);
+                }
+                packetQueue.clear();
+            }
             //Inspired by Minecraft.runTick()
             w.updateEntities();
             Vec3 playerPos = new Vec3(mcPlayer.posX, mcPlayer.posY, mcPlayer.posZ);
@@ -541,11 +568,6 @@ public class HammerClientProxy extends HammerProxy {
         Entity[] objs = ed.getConstantColliders();
         if (objs == null) return;
         event.left.add("uc: " + objs.length);
-    }
-
-    @SubscribeEvent
-    public void addWrapperAdapter(FMLNetworkEvent.ClientConnectedToServerEvent event) {
-        WrapperAdapter.addToPipeline(event.manager);
     }
 
     @Override

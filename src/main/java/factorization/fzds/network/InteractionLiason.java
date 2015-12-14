@@ -9,10 +9,7 @@ import io.netty.channel.ChannelPromise;
 import io.netty.channel.embedded.EmbeddedChannel;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.entity.player.InventoryPlayer;
-import net.minecraft.network.EnumConnectionState;
-import net.minecraft.network.EnumPacketDirection;
-import net.minecraft.network.NetHandlerPlayServer;
-import net.minecraft.network.NetworkManager;
+import net.minecraft.network.*;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.management.ItemInWorldManager;
 import net.minecraft.world.WorldServer;
@@ -24,7 +21,7 @@ import java.util.Map;
 import java.util.WeakHashMap;
 
 public class InteractionLiason extends EntityPlayerMP implements IFzdsShenanigans {
-    static final WeakHashMap<EntityPlayerMP, InteractionLiason> activeLiasons = new WeakHashMap<EntityPlayerMP, InteractionLiason>();
+    public static final WeakHashMap<EntityPlayerMP, InteractionLiason> activeLiasons = new WeakHashMap<EntityPlayerMP, InteractionLiason>();
 
     //private static final GameProfile liasonGameProfile = new GameProfile(null /*UUID.fromString("69f64f91-665e-457d-ad32-f6082d0b8a71")*/ , "[FzdsInteractionLiason]");
     // Using the real player's GameProfile for things like permissions checks.
@@ -128,7 +125,12 @@ public class InteractionLiason extends EntityPlayerMP implements IFzdsShenanigan
     void bouncePacket(Object msg) {
         EntityPlayerMP realPlayer = realPlayerRef.get();
         if (realPlayer == null) return;
-        realPlayer.playerNetServerHandler.sendPacket(PacketProxyingPlayer.wrapMessage(msg));
+        PacketJunction.switchJunction(realPlayer.playerNetServerHandler, true);
+        try {
+            realPlayer.playerNetServerHandler.sendPacket((Packet) msg);
+        } finally {
+            PacketJunction.switchJunction(realPlayer.playerNetServerHandler, false);
+        }
     }
 
     public EntityPlayerMP getRealPlayer() {

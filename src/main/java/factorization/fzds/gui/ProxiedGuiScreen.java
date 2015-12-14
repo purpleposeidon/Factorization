@@ -5,6 +5,8 @@ import factorization.fzds.interfaces.IFzdsShenanigans;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiScreen;
 
+import java.io.IOException;
+
 public class ProxiedGuiScreen extends GuiScreen implements IFzdsShenanigans {
     final GuiScreen sub;
 
@@ -65,7 +67,7 @@ public class ProxiedGuiScreen extends GuiScreen implements IFzdsShenanigans {
     }
 
     @Override
-    public void handleInput() {
+    public void handleInput() throws IOException {
         boolean switched = enter();
         try {
             sub.handleInput();

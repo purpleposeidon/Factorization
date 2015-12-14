@@ -31,9 +31,11 @@ import net.minecraft.world.WorldServer;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.entity.player.PlayerDestroyItemEvent;
 import net.minecraftforge.event.world.BlockEvent.PlaceEvent;
+import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
 import net.minecraftforge.fml.common.network.FMLEventChannel;
+import net.minecraftforge.fml.common.network.FMLNetworkEvent;
 import net.minecraftforge.fml.common.network.FMLNetworkEvent.ClientCustomPacketEvent;
 import net.minecraftforge.fml.common.network.FMLNetworkEvent.ServerCustomPacketEvent;
 import net.minecraftforge.fml.common.network.NetworkRegistry;
@@ -45,14 +47,24 @@ import java.io.IOException;
 public class HammerNet {
     public static HammerNet instance;
     public static final String channelName = "FZDS|Interact"; //NORELEASE: There's another network thingie around here for DSE velocity & stuff!?
-    public static FMLEventChannel channel = NetworkRegistry.INSTANCE.newEventDrivenChannel(channelName);
-    
+    public static FMLEventChannel channel = NetworkRegistry.INSTANCE.newEventDrivenChannel(channelName); // NORELEASE: Ack that for the dupe
+
     public HammerNet() {
         instance = this;
         channel.register(this);
         Core.loadBus(this);
     }
-    
+
+    @SubscribeEvent(priority = EventPriority.LOWEST)
+    public void playerLoggedIn(FMLNetworkEvent.ServerConnectionFromClientEvent event) {
+        PacketJunction.setup(event, event.isLocal);
+    }
+
+    @SubscribeEvent(priority = EventPriority.LOWEST)
+    public void clientLoggedIn(FMLNetworkEvent.ClientConnectedToServerEvent event) {
+        PacketJunction.setup(event, event.isLocal);
+    }
+
     public static class HammerNetType {
         // Next time, make it an enum.
         public static final byte rotation = 0, rotationVelocity = 1, rotationBoth = 2, rotationCenterOffset = 10, exactPositionAndMotion = 11, orderedRotation = 12,

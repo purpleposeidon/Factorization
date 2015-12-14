@@ -6,6 +6,8 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.inventory.Container;
 
+import java.io.IOException;
+
 public class ProxiedGuiContainer extends GuiContainer implements IFzdsShenanigans {
     // Basically a copy of ProxiedGuiScreen.
     // This is here for "NEI support" to prevent whiny NEI-dependent n00bs from whining and/or flipping their shit
@@ -75,7 +77,7 @@ public class ProxiedGuiContainer extends GuiContainer implements IFzdsShenanigan
     }
 
     @Override
-    public void handleInput() {
+    public void handleInput() throws IOException {
         boolean switched = enter();
         try {
             sub.handleInput();
