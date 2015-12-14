@@ -20,6 +20,8 @@ public class BlockResource extends Block {
     enum ResourceTypes implements IStringSerializable, Comparable<ResourceTypes> {
         OLD_SILVER_ORE, SILVER_BLOCK, LEAD_BLOCK, DARK_IRON_BLOCK;
 
+        public static final ResourceTypes[] values = values();
+
         @Override
         public String getName() {
             return name();
@@ -43,6 +45,16 @@ public class BlockResource extends Block {
         return new BlockState(this, TYPE);
     }
 
+    @Override
+    public int getMetaFromState(IBlockState state) {
+        return state.getValue(TYPE).ordinal();
+    }
+
+    @Override
+    public IBlockState getStateFromMeta(int meta) {
+        return getDefaultState().withProperty(TYPE, ResourceTypes.values[meta]);
+    }
+
     public void addCreativeItems(List<ItemStack> itemList) {
         itemList.add(Core.registry.silver_ore_item);
         itemList.add(Core.registry.silver_block_item);
@@ -58,11 +70,6 @@ public class BlockResource extends Block {
     @Override
     public int damageDropped(IBlockState state) {
         return state.getValue(TYPE).ordinal();
-    }
-
-    @Override
-    public IBlockState getStateFromMeta(int meta) {
-        return getDefaultState().withProperty(TYPE, ResourceTypes.values()[meta]);
     }
 
     @Override

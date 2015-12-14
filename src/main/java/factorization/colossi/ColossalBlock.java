@@ -44,6 +44,8 @@ public class ColossalBlock extends Block {
         public String getName() {
             return this.toString();
         }
+
+        public static final Md[] values = values();
     }
     enum Capping implements IStringSerializable, Comparable<Capping> {
         NONE, UP, DOWN;
@@ -53,8 +55,8 @@ public class ColossalBlock extends Block {
             return this.toString();
         }
     }
-    public static final PropertyEnum VARIANT = PropertyEnum.create("variant", Md.class);
-    public static final PropertyEnum CAPPING = PropertyEnum.create("capping", Capping.class);
+    public static final PropertyEnum<Md> VARIANT = PropertyEnum.create("variant", Md.class);
+    public static final PropertyEnum<Capping> CAPPING = PropertyEnum.create("capping", Capping.class);
 
     static Material collosal_material = new Material(MapColor.purpleColor);
 
@@ -72,6 +74,16 @@ public class ColossalBlock extends Block {
     @Override
     protected BlockState createBlockState() {
         return new BlockState(this, VARIANT, CAPPING);
+    }
+
+    @Override
+    public IBlockState getStateFromMeta(int meta) {
+        return getDefaultState().withProperty(VARIANT, Md.values[meta]);
+    }
+
+    @Override
+    public int getMetaFromState(IBlockState state) {
+        return state.getValue(VARIANT).ordinal();
     }
 
     @Override

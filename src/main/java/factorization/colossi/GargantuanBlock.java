@@ -29,6 +29,16 @@ public class GargantuanBlock extends Block {
     }
 
     @Override
+    public int getMetaFromState(IBlockState state) {
+        return state.getValue(FACE).ordinal();
+    }
+
+    @Override
+    public IBlockState getStateFromMeta(int meta) {
+        return getDefaultState().withProperty(FACE, EnumFacing.VALUES[meta]);
+    }
+
+    @Override
     public IBlockState onBlockPlaced(World world, BlockPos pos, EnumFacing facing, float hitX, float hitY, float hitZ, int meta, EntityLivingBase placer) {
         return getDefaultState().withProperty(FACE, facing);
     }

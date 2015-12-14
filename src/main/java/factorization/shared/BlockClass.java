@@ -15,7 +15,7 @@ public enum BlockClass implements IStringSerializable, Comparable<BlockClass> {
 
     Default(0, true, 0, 0, 1F),
     DarkIron(1, true, 0, 0, 3.25F),
-    Barrel(Core.registry.factory_block_barrel, 2, true, 25, 0, 2F),
+    Barrel(2, true, 25, 0, 2F),
     //Cage(3, false, 0, 0, 5F),
     Socket(3, false, 0, 0, 3F),
     Lamp(4, false, 0, 15, 6F),
@@ -39,7 +39,7 @@ public enum BlockClass implements IStringSerializable, Comparable<BlockClass> {
         static BlockClass map[] = new BlockClass[16];
     }
 
-    public final Block block; //XXX This actually gets set to the block properly right now, but it might not in a dynamic-block-ids future or something...?
+    public Block block = null; // has to be set later unfortunately, due to a loop
     public final int md;
     final boolean normalCube;
     final int flamability;
@@ -49,9 +49,7 @@ public enum BlockClass implements IStringSerializable, Comparable<BlockClass> {
     boolean normal_cube = true;
     boolean passable = false;
 
-    BlockClass(Block block, int md, boolean normalCube, int flamability, int lightValue, float hardness) {
-        if (block == null) throw new NullPointerException("BlockClass loaded too early?");
-        this.block = block;
+    BlockClass(int md, boolean normalCube, int flamability, int lightValue, float hardness) {
         this.md = md;
         this.normalCube = normalCube;
         this.flamability = flamability;
@@ -63,10 +61,6 @@ public enum BlockClass implements IStringSerializable, Comparable<BlockClass> {
             throw new RuntimeException("Duplicate BlockProperty metadata ID");
         }
         Md.map[this.md] = this;
-    }
-
-    BlockClass(int md, boolean normalCube, int flamability, int lightValue, float hardness) {
-        this(Core.registry.factory_block, md, normalCube, flamability, lightValue, hardness);
     }
 
     BlockClass setAbnormal() {

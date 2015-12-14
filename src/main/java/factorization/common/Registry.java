@@ -188,13 +188,15 @@ public class Registry {
     }
     
     public void makeBlocks() {
-        if (FMLCommonHandler.instance().getSide() == Side.CLIENT) {
-            factory_rendering_block = new BlockFactorization(materialMachine);
-            clientTraceHelper = new BlockFactorization(materialMachine);
-        }
-        serverTraceHelper = new BlockFactorization(materialMachine);
         factory_block = new BlockFactorization(materialMachine);
         factory_block_barrel = new BlockFactorization(materialBarrel);
+        for (BlockClass bc : BlockClass.values()) {
+            if (bc == BlockClass.Barrel) {
+                bc.block = factory_block_barrel;
+            } else {
+                bc.block = factory_block;
+            }
+        }
         lightair_block = new BlockLightAir();
         resource_block = new BlockResource();
         dark_iron_ore = new BlockDarkIronOre().setUnlocalizedName("factorization:darkIronOre").setCreativeTab(Core.tabFactorization).setHardness(3.0F).setResistance(5.0F);
@@ -208,7 +210,12 @@ public class Registry {
         mantlerock_block = new BlockNetherrack().setUnlocalizedName("factorization:mantlerock").setHardness(1.25F).setResistance(7.0F).setStepSound(Block.soundTypeStone);
         matcher_block = new BlockMatcher();
         artifact_forge = new BlockForge();
-        
+        if (FMLCommonHandler.instance().getSide() == Side.CLIENT) {
+            factory_rendering_block = new BlockFactorization(materialMachine);
+            clientTraceHelper = new BlockFactorization(materialMachine);
+        }
+        serverTraceHelper = new BlockFactorization(materialMachine);
+
         GameRegistry.registerBlock(factory_block, ItemFactorizationBlock.class, "FzBlock");
         GameRegistry.registerBlock(factory_block_barrel, ItemFactorizationBlock.class, "FzBlockBarrel");
         GameRegistry.registerBlock(lightair_block, "Lightair");
