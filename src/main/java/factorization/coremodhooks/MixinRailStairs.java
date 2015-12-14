@@ -34,7 +34,7 @@ public abstract class MixinRailStairs extends BlockRailBase {
             double x = pos.getX();
             double y = pos.getY();
             double z = pos.getZ();
-            EnumRailDirection i = state.getValue(getShapeProperty());
+            EnumRailDirection i = state.getValue(me.getShapeProperty());
             if (i == EnumRailDirection.ASCENDING_EAST) {
                 box = new AxisAlignedBB(x + w, y, z + s, x + 1, y + h, z + 1 - s);
             } else if (i == EnumRailDirection.ASCENDING_WEST) {

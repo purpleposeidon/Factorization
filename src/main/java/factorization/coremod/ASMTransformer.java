@@ -28,7 +28,7 @@ public class ASMTransformer implements IClassTransformer {
         {
             // Why-isn't-this-in-Forge hooks stuff for unspecific FZ features
 
-            // Add an event for unhandled key presses
+            // NORELEASE: There's a forge event now. But does it work properly yet?
             if (transformedName.equals("net.minecraft.client.gui.inventory.GuiContainer")) {
                 return applyTransform(basicClass,
                         new AbstractAsmMethodTransform.Append(name, transformedName, "func_73869_a", "keyTyped")
@@ -38,7 +38,7 @@ public class ASMTransformer implements IClassTransformer {
             // Hack in a method to make diamond blocks explode into shards
             if (transformedName.equals("net.minecraft.block.Block")) {
                 return applyTransform(basicClass,
-                        new AbstractAsmMethodTransform.Append(name, transformedName, "func_149723_a", "onBlockDestroyedByExplosion"),
+                        new AbstractAsmMethodTransform.Append(name, transformedName, "func_180652_a", "onBlockDestroyedByExplosion"),
                         new AbstractAsmMethodTransform.Append(name, transformedName, "func_149659_a", "canDropFromExplosion")
                 );
             }
@@ -51,8 +51,8 @@ public class ASMTransformer implements IClassTransformer {
             // (Should go in Forge)
             if (transformedName.equals("net.minecraft.client.Minecraft") && HammerEnabled.ENABLED) {
                 return applyTransform(basicClass,
-                        new AbstractAsmMethodTransform.Prepend(name, transformedName, "func_147116_af", "func_147116_af"), // "attack key pressed" function (first handler), MCPBot name clickMouse
-                        new AbstractAsmMethodTransform.Prepend(name, transformedName, "func_147121_ag", "func_147121_ag") // "use key pressed" function, MCPBot name rightClickMouse
+                        new AbstractAsmMethodTransform.Prepend(name, transformedName, "func_147116_af", "clickMouse"), // "attack key pressed" function (first handler), MCPBot name clickMouse
+                        new AbstractAsmMethodTransform.Prepend(name, transformedName, "func_147121_ag", "rightClickMouse") // "use key pressed" function, MCPBot name rightClickMouse
                 );
             }
             // Make the camera take UCs into account in 3rd-person view
@@ -101,7 +101,7 @@ public class ASMTransformer implements IClassTransformer {
                         new AbstractAsmMethodTransform.MutateCall(name, transformedName, "<init>", "<init>")
                                 .setOwner("net.minecraftforge.fml.common.eventhandler.EventBus")
                                 .setName("post", "post", "post")
-                                .setDescr("(Lcpw/mods/fml/common/eventhandler/Event;)Z", "(Lcpw/mods/fml/common/eventhandler/Event;)Z")
+                                .setDescr("(Lnet/minecraftforge/fml/common/eventhandler/Event;)Z", "(Lnet/minecraftforge/fml/common/eventhandler/Event;)Z")
                 );
             }
         }

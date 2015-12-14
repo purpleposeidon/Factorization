@@ -34,13 +34,13 @@ public class MethodSplices {
     
     // GuiContainer.keyTyped
     public void func_73869_a(char chr, int keysym) {
-        // NORELEASE: Not needed; forge is here to save the day.
+        // FIXME: Maybe forge?
         HookTargetsClient.keyTyped(chr, keysym);
     }
     
     // Minecraft.func_147116_af "attack key pressed" function (first handler), MCPBot name clickMouse
     public void func_147116_af() {
-        // NORELEASE: Maybe forge?
+        // FIXME: Maybe forge?
         if (HookTargetsClient.attackButtonPressed()) {
             return;
         }
@@ -49,7 +49,7 @@ public class MethodSplices {
     
     // Minecraft.func_147121_ag "use key pressed" function, MCPBot name rightClickMouse
     public void func_147121_ag() {
-        // NORELEASE: Maybe forge?
+        // FIXME: Maybe forge?
         if (HookTargetsClient.useButtonPressed()) {
             return;
         }

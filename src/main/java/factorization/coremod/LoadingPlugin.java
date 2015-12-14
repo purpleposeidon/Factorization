@@ -12,7 +12,7 @@ import java.util.ArrayList;
 import java.util.Map;
 
 @SortingIndex(1)
-@MCVersion("1.7.10") // NORELEASE: Check that this matches our MC version! (Or just automate it...)
+@MCVersion("1.8.8") // NORELEASE: Check that this matches our MC version! (Or just automate it...)
 @TransformerExclusions("factorization.coremod.")
 @DependsOn("net.minecraftforge.fml.common.asm.transformers.DeobfuscationTransformer")
 public class LoadingPlugin implements IFMLLoadingPlugin {
@@ -32,7 +32,7 @@ public class LoadingPlugin implements IFMLLoadingPlugin {
 
     @Override
     public String[] getASMTransformerClass() {
-        ArrayList<String> plugins = new ArrayList();
+        ArrayList<String> plugins = new ArrayList<String>();
         plugins.add("factorization.coremod.ASMTransformer");
         if (inspect_air) {
             plugins.add("factorization.coremod.AirInspector");
@@ -53,7 +53,7 @@ public class LoadingPlugin implements IFMLLoadingPlugin {
     }
 
     public static File getMcLocation() {
-        if (mcLocation == null) throw new IllegalStateException("LoadingPlugin failed");
+        if (mcLocation == null) throw new IllegalStateException("LoadingPlugin failed; you may need: -Dfml.coreMods.load=factorization.coremod.LoadingPlugin");
         return mcLocation;
     }
 }
