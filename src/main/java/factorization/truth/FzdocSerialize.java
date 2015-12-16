@@ -19,6 +19,7 @@ import net.minecraft.util.BlockPos;
 import net.minecraft.util.ChatComponentText;
 import net.minecraft.util.EnumFacing;
 
+import java.util.ArrayList;
 import java.util.List;
 
 final class FzdocSerialize implements ICommand {
@@ -39,7 +40,7 @@ final class FzdocSerialize implements ICommand {
     }
 
     @Override
-    public List getCommandAliases() { return null; }
+    public List<String> getCommandAliases() { return new ArrayList<String>(); }
 
     @Override
     public boolean canCommandSenderUseCommand(ICommandSender icommandsender) {

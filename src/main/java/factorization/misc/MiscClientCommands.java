@@ -64,8 +64,8 @@ public class MiscClientCommands implements ICommand {
     }
 
     @Override
-    public List getCommandAliases() {
-        return null;
+    public List<String> getCommandAliases() {
+        return new ArrayList<String>();
     }
 
     @Override

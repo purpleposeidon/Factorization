@@ -30,7 +30,7 @@ import net.minecraftforge.fml.common.network.internal.FMLProxyPacket;
 import java.util.*;
 
 public class BlockFactorization extends BlockContainer {
-    public static final IProperty<BlockClass> BLOCK_CLASS = PropertyEnum.create("class", BlockClass.class);
+    public static final IProperty<BlockClass> BLOCK_CLASS = PropertyEnum.create("blockclass", BlockClass.class);
     public boolean fake_normal_render = false;
     public BlockFactorization(Material material) {
         super(material);
@@ -495,7 +495,9 @@ public class BlockFactorization extends BlockContainer {
 
     @Override
     public boolean shouldSideBeRendered(IBlockAccess world, BlockPos pos, EnumFacing side) {
-        BlockClass bc = world.getBlockState(pos).getValue(BLOCK_CLASS);
+        IBlockState blockState = world.getBlockState(pos);
+        if (blockState.getBlock()  != this) return false; // Uh
+        BlockClass bc = blockState.getValue(BLOCK_CLASS);
         return !bc.isNormal() || super.shouldSideBeRendered(world, pos, side);
     }
 

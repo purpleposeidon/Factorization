@@ -58,7 +58,6 @@ public class FzConfig {
     public static boolean blockundo = true;
     public static boolean blockundo_grab = true;
     public static boolean debug_fzds_collisions = false;
-    public static boolean enable_rocketry = /* Hey! If you're turning this on, remove stuff from factorization_dead_items */ Core.dev_environ;
     public static boolean sockets_ignore_front_redstone = true;
     public static boolean show_time_on_fullscreen = true;
     public static boolean require_book_for_manual = true;
@@ -242,7 +241,6 @@ public class FzConfig {
 
         if (!DeltaChunk.enabled()) {
             gen_colossi = false;
-            enable_rocketry = false;
         }
     }
 }

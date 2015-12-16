@@ -32,7 +32,7 @@ public class ExportHtml implements ICommand {
     }
 
     @Override
-    public List getCommandAliases() { return null; }
+    public List<String> getCommandAliases() { return new ArrayList<String>(); }
 
     @Override
     public boolean canCommandSenderUseCommand(ICommandSender icommandsender) {

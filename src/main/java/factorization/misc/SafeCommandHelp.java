@@ -24,8 +24,8 @@ public class SafeCommandHelp extends CommandHelp {
     }
 
     @Override
-    public List getCommandAliases() {
-        return null;
+    public List<String> getCommandAliases() {
+        return new ArrayList<String>();
     }
 
     @Override

@@ -4,6 +4,7 @@ import factorization.fzds.HammerEnabled;
 import net.minecraft.launchwrapper.IClassTransformer;
 import net.minecraft.launchwrapper.Launch;
 import net.minecraft.launchwrapper.LaunchClassLoader;
+import net.minecraft.world.chunk.Chunk;
 import net.minecraftforge.fml.relauncher.FMLRelaunchLog;
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.ClassWriter;
@@ -68,9 +69,10 @@ public class ASMTransformer implements IClassTransformer {
             // Add "Universal Colliders". Adds a list of entities to the chunk that are added to every collision query.
             // The alternative to this is setting World.MAX_ENTITY_RADIUS to a large value, and putting collodier-entities everywhere, which is slow & ugly
             if (transformedName.equals("net.minecraft.world.chunk.Chunk") && HammerEnabled.ENABLED) {
+                Chunk c = null;
                 return applyTransform(basicClass,
                         new AbstractAsmClassTransform.Mixin("factorization.coremodhooks.MixinExtraChunkData", "Lfactorization/coremodhooks/MixinExtraChunkData;"),
-                        new AbstractAsmMethodTransform.Append(name, transformedName, "func_76588_a", "getEntitiesWithinAABBForEntity")
+                        new AbstractAsmMethodTransform.Append(name, transformedName, "func_177414_a", "getEntitiesWithinAABBForEntity")
                 );
             }
             // Allow the player to stand on a UC without getting kicked from the server

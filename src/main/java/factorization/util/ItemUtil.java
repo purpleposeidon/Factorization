@@ -64,7 +64,10 @@ public final class ItemUtil {
     }
 
     public static boolean sameItemTags(ItemStack a, ItemStack b) {
-        return ItemUtil.sameItemTags(a, b);
+        if (a == null || b == null) return a == b;
+        NBTTagCompound tagA = a.getTagCompound(), tagB = b.getTagCompound();
+        if (tagA == null || tagB == null) return tagA == tagB;
+        return tagA.equals(tagB);
     }
 
     /**

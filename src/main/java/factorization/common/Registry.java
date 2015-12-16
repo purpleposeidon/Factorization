@@ -115,7 +115,6 @@ public class Registry {
             mirror_item_hidden,
             crystallizer_item,
             greenware_item,
-            rocket_engine_item_hidden,
             parasieve_item,
             compression_crafter_item,
             sap_generator_item, anthro_generator_item,
@@ -328,9 +327,6 @@ public class Registry {
         mirror_item_hidden = FactoryType.MIRROR.itemStack();
         crystallizer_item = FactoryType.CRYSTALLIZER.itemStack();
         greenware_item = FactoryType.CERAMIC.itemStack();
-        if (FzConfig.enable_rocketry) {
-            //rocket_engine_item_hidden = FactoryType.ROCKETENGINE.itemStack();
-        }
         if (DeltaChunk.enabled()) {
             hinge = FactoryType.HINGE.itemStack();
             wind_mill = FactoryType.WIND_MILL_GEN.itemStack();
@@ -401,12 +397,7 @@ public class Registry {
         
         //Rocketry
         nether_powder = new ItemCraftingComponent("nether_powder");
-        if (FzConfig.enable_rocketry && DeltaChunk.enabled()) {
-            rocket_fuel = new ItemCraftingComponent("rocket/rocket_fuel");
-            rocket_engine = new ItemBlockProxy(rocket_engine_item_hidden, "rocket/rocket_engine", TabType.ROCKETRY);
-            rocket_engine.setMaxStackSize(1);
-        }
-        
+
         //Servos
         servo_placer = new ItemServoMotor("servo");
         if (HammerEnabled.ENABLED && Core.dev_environ) {
@@ -1091,20 +1082,7 @@ public class Registry {
         
         //Rocketry
         TileEntityGrinder.addRecipe(new ItemStack(Blocks.netherrack), new ItemStack(nether_powder, 1), 1);
-        if (FzConfig.enable_rocketry) {
-            shapelessOreRecipe(new ItemStack(rocket_fuel, 9),
-                    nether_powder, nether_powder, nether_powder,
-                    nether_powder, Items.fire_charge, nether_powder,
-                    nether_powder, nether_powder, nether_powder);
-            oreRecipe(new ItemStack(rocket_engine),
-                    "#F#",
-                    "#I#",
-                    "I I",
-                    '#', Blocks.iron_block,
-                    'F', rocket_fuel,
-                    'I', Items.iron_ingot);
-        }
-        
+
         //Servos
         makeServoRecipes();
         oreRecipe(empty_socket_item,

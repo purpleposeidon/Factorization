@@ -98,12 +98,8 @@ public enum FactoryType {
         for (FactoryType ft : values()) {
             MAX_ID = Math.max(MAX_ID, ft.md);
         }
-        if (!FzConfig.enable_rocketry) {
-            //ROCKETENGINE.disable();
-        }
         if (!DeltaChunk.enabled()) {
             HINGE.disable();
-            //ROCKETENGINE.disable();
             WIND_MILL_GEN.disable();
             WATER_WHEEL_GEN.disable();
         }
