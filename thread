@@ -40,6 +40,7 @@ Factorization 1.7.10-0.8.100
 Built on 2015-12-01 against Minecraft Forge 1.7.10-10.13.2.1230
 [url="http://dl.dropbox.com/u/76265666/changelogs/Changelog-1.7.10-0.8.100.txt"]Changelog[/url]
 [url="http://dl.dropbox.com/u/76265666/old/Factorization-1.7.10-0.8.100-dev.jar"]Deobf for Mod Authors[/url]
+[b]If you get a NullPointerException at GameSettings.func_82879_c, set Factorization.cfg -> client -> B:fixPickBlock=false )[/b]
 
 [spoiler]
 Factorization 1.7.10-0.8.99d
