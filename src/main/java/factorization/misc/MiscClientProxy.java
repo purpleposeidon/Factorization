@@ -194,7 +194,8 @@ public class MiscClientProxy extends MiscProxy {
         GuiMainMenu menu = (GuiMainMenu) event.gui;
         ReservoirSampler<String> sampler = new ReservoirSampler<String>(1, new Random());
         sampler.give(menu.splashText);
-        sampler.preGive(321); // NORELEASE: Verify this number each MC version. (Or we could just count it. Hmm.)
+        sampler.preGive(359); // NORELEASE: Verify this number each MC version, including minor versions. (Or we could just count it. Hmm.)
+        // Err, should that be <number of lines> - 1? Or maybe even -2 for the hashCode thing?
         sampler.give(""); // !!!! The secret EMPTY splash text! :O
         try {
             @SuppressWarnings("unchecked")

@@ -48,41 +48,10 @@ It mines! It crafts!
 #FUTURE
 # Lines that start with a # are comments!
 # And empty lines are skipped!
-# NORELEASE: Remove the following from 1.8!
-# These guys are from vanilla 1.8!
-That's Numberwang!
-pls rt
-Do you want to join my server?
-Put a little fence around it!
-Throw a blanket over it!
-One day, somewhere in the future, my work will be quoted!
-Now with additional stuff!
-Extra things!
-Yay, puppies for everyone!
-So sweet, like a nice bon bon!
-Popping tags!
-Now With Multiplayer!
-Very influential in its circle!
-Rise from your grave!
-Warning! A huge battleship "STEVE" is approaching fast!
-Blue warrior shot the food!
-Run, coward! I hunger!
-Flavor with no seasoning!
-Strange, but not a stranger!
-Tougher than diamonds, rich like cream!
-Getting ready to show!
-Getting ready to know!
-Getting ready to drop!
-Getting ready to shock!
-Getting ready to freak!
-Getting ready to speak!
-It swings, it jives!
-Cruising streets for gold!
-Take an eggbeater and beat it against a skillet!
-Make me a table, a funky table!
-Take the elevator to the mezzanine!
-Stop being reasonable, this is the Internet!
-Any computer is a laptop if you're brave enough!
-
+# NORELEASE: Remove the following from 1.9!
 # This one is from 1.9!
+# They seem to be adding splashes with pretty much every release.
 More Digital!
+
+#Hey! You! If you want to add your own extra splashes, just add your own minecraft:texts/extra_splashes.txt
+#FZ'll take care of things!
