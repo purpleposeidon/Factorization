@@ -57,6 +57,10 @@ public class HammerProxy {
 
     public boolean queueUnwrappedPacket(EntityPlayer player, Object packetObj) {
         if (packetObj == null) return true;
+        if (player == null) {
+            NORELEASE.println("No player to handle: " + packetObj + " " + packetObj.getClass().getSimpleName());
+            return true;
+        }
         if (player.worldObj.isRemote) return false;
         Packet packet = (Packet) packetObj;
         // May possibly need to inject the liason into things up higher, during reading. Somehow. Hopefulloy won't be needed.
