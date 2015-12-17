@@ -25,6 +25,8 @@ src/main/Factorization.iml
 /resources
 /screenshots
 /minecraft_textures
+/forgesrc
+/mcsrc
 
 #Symlinked files
 at.cfg
