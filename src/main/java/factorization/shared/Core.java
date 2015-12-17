@@ -193,11 +193,12 @@ public class Core {
         Core.loadBus(registry);
         fzconfig.loadConfig(event.getSuggestedConfigurationFile());
         registry.makeBlocks();
-        
+
         NetworkRegistry.INSTANCE.registerGuiHandler(this, proxy);
 
         registerSimpleTileEntities();
         registry.makeItems();
+        registry.registerItemVariantNames();
         FzConfig.config.save();
         registry.makeRecipes();
         registry.setToolEffectiveness();

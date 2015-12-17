@@ -46,6 +46,10 @@ import net.minecraft.block.Block;
 import net.minecraft.block.BlockNetherrack;
 import net.minecraft.block.material.MapColor;
 import net.minecraft.block.material.Material;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.entity.RenderItem;
+import net.minecraft.client.resources.model.ModelBakery;
+import net.minecraft.client.resources.model.ModelResourceLocation;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
@@ -60,6 +64,7 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.WeightedRandomFishable;
 import net.minecraft.world.World;
+import net.minecraftforge.client.model.ModelLoader;
 import net.minecraftforge.common.FishingHooks;
 import net.minecraftforge.event.entity.player.EntityItemPickupEvent;
 import net.minecraftforge.fluids.Fluid;
@@ -1450,5 +1455,38 @@ public class Registry {
             TileEntityDayBarrel.makeRecipe(log, slab.copy());
         }
     }
-    
+
+    public void registerItemVariantNames() {
+        r(resource_block, "copper_ore", "silver_block", "lead_block", "dark_iron_block", "copper_block");
+    }
+
+    private static void n(Block block, String... names) {
+        ModelBakery.addVariantName(DataUtil.getItem(block), names);
+    }
+
+    private static void r(Block block, String... parts) {
+        Item item = DataUtil.getItem(block);
+        for (int md = 0; md < parts.length; md++) {
+            String name = parts[md];
+            name = "factorization:" + name;
+            parts[md] = name;
+            ModelResourceLocation modelName = new ModelResourceLocation(name, "inventory");
+            ModelLoader.setCustomModelResourceLocation(item, md, modelName);
+        }
+        ModelBakery.addVariantName(item, parts);
+    }
+    private static void r(Block block, Object... parts) {
+        ArrayList<String> found = new ArrayList<String>();
+        Item item = DataUtil.getItem(block);
+        if (parts.length % 2 != 0) throw new IllegalArgumentException("Invalid argument format");
+        for (int i = 0; i < parts.length; i += 2) {
+            int md = (int) parts[i];
+            String name = (String) parts[i + 1];
+            name = "factorization:" + name;
+            parts[i + 1] = name;
+            ModelLoader.setCustomModelResourceLocation(item, md, new ModelResourceLocation(name, "inventory"));
+            found.add(name);
+        }
+        ModelBakery.addVariantName(item, found.toArray(new String[found.size()]));
+    }
 }
