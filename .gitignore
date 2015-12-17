@@ -27,6 +27,8 @@ src/main/Factorization.iml
 /minecraft_textures
 /forgesrc
 /mcsrc
+/blockstates
+/json_block
 
 #Symlinked files
 at.cfg

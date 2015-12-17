@@ -15,20 +15,21 @@ import net.minecraft.util.IStringSerializable;
 import net.minecraft.world.IBlockAccess;
 
 import java.util.List;
+import java.util.Locale;
 
 public class BlockResource extends Block {
     enum ResourceTypes implements IStringSerializable, Comparable<ResourceTypes> {
-        OLD_SILVER_ORE, SILVER_BLOCK, LEAD_BLOCK, DARK_IRON_BLOCK;
+        COPPER_ORE, SILVER_BLOCK, LEAD_BLOCK, DARK_IRON_BLOCK, COPPER_BLOCK;
 
         public static final ResourceTypes[] values = values();
 
         @Override
         public String getName() {
-            return name();
+            return name().toLowerCase(Locale.ROOT);
         }
 
         public boolean isMetal() {
-            return this == SILVER_BLOCK || this == LEAD_BLOCK || this == DARK_IRON_BLOCK;
+            return this == SILVER_BLOCK || this == LEAD_BLOCK || this == DARK_IRON_BLOCK || this == COPPER_BLOCK;
         }
     }
 
