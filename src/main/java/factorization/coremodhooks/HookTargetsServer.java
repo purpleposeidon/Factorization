@@ -12,6 +12,7 @@ import net.minecraft.util.MathHelper;
 import net.minecraft.world.World;
 import net.minecraft.world.chunk.Chunk;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class HookTargetsServer {
@@ -46,7 +47,7 @@ public class HookTargetsServer {
         }
         return r;
     }
-    
+
     public static void addConstantColliders(Object me, Entity collider, AxisAlignedBB box, List found, IEntitySelector filter) {
         Entity[] constant_colliders = ((IExtraChunkData) me).getConstantColliders();
         if (constant_colliders == null) return;
@@ -67,6 +68,30 @@ public class HookTargetsServer {
                     // Swapped again
                     found.add(part);
                 }
+            }
+        }
+    }
+
+    public static void addConstantCollidersCOFH(Object me, Entity collider, AxisAlignedBB box, List found) {
+        Entity[] constant_colliders = ((IExtraChunkData) me).getConstantColliders();
+        if (constant_colliders == null) return;
+        for (Entity ent : constant_colliders) {
+            if (ent == collider) continue;
+            //AxisAlignedBB ebox = ent.getBoundingBox();
+            //if (ebox == null) continue;
+            //if (!box.intersectsWith(ebox)) continue;
+            // NOTE: The boxes are being compared backwards from the usual way so that the (presumably) vanilla box can get a crude check
+            AxisAlignedBB bb = ent.getBoundingBox();
+            if (bb != null && bb.intersectsWith(box)) found.add(bb);
+            Entity[] parts = ent.getParts();
+            if (parts == null) continue;
+            for (Entity part : parts) {
+                //AxisAlignedBB pbox = ent.getBoundingBox();
+                //if (pbox == null) continue;
+                //if (!pbox.intersectsWith(box)) continue;
+                // Swapped again
+                bb = part.getBoundingBox();
+                if (bb != null && bb.intersectsWith(box)) found.add(bb);
             }
         }
     }

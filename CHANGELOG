@@ -1,3 +1,8 @@
+0.8.101
+  Disabled the 'improved' middle click for 1.7.10 due to crashes & other unforseen difficulties. You may need to fix your pickblock keybindings.
+  Colossi/FZDS collisions were broken with CoFHTweaks. Skyboy & I have got them working together; however if you have CoFH, you will need to update it to 1.1.0B1-52 or later.
+  
+
 0.8.100
   IMPORTANT: Back up your world before applying this update! Visit all FZ machines in the world with this update before moving to 1.8!
     (Improvements have been made to serialization code, which may possibly break worlds. Please alert me to any issues so that I can fix them if needed.)

@@ -112,6 +112,15 @@ public class ASMTransformer implements IClassTransformer {
                         new AbstractAsmClassTransform.Mixin("factorization.coremodhooks.MixinRailStairs", "Lfactorization/coremodhooks/MixinRailStairs;"));
             }
         }
+        {
+            // Skyboy special request
+            // cofh/tweak/asmhooks/HooksCore#CoFHTweaks_FZ_Hook(chunk, entity, bb, collidingBoundingBoxes)
+            if (transformedName.equals("cofh.tweak.asmhooks.HooksCore")) {
+                String n = "CoFHTweaks_FZ_Hook";
+                return applyTransform(basicClass, new AbstractAsmMethodTransform.Append(name, transformedName, n, n));
+            }
+
+        }
         return basicClass;
     }
     

@@ -50,7 +50,7 @@ public class FzConfig {
     public static int max_rocket_height = 64;
     public static boolean stretchy_clay = true;
     public static boolean equal_opportunities_for_mobs = true;
-    public static boolean fix_middle_click = true;
+    public static boolean fix_middle_click = false;
     public static boolean embarken_wood = true;
     public static boolean mushroomalize = true;
     public static boolean proper_projectile_physics = true;
@@ -191,7 +191,7 @@ public class FzConfig {
             lagssie_watcher = getBoolConfig("enableLagWatchDog", "client", lagssie_watcher, "If true, enables a thread that dumps a stack trace of Minecraft if it is paused for longer than lagWatchDogInterval");
             lagssie_interval = getDoubleConfig("lagWatchDogInterval", "client", lagssie_interval, "If the game is stuck for longer than this amount of time (in seconds), dump a stacktrace of what it is doing.");
             limit_integrated_server = getBoolConfig("limitIntegratedServer", "client", limit_integrated_server, /*"Prevent the integrated server from ticking faster than the client. Probably won't cause a deadlocks."*/ "(Broken; don't use this. Attempts to limit integrated server tick speed to match the client's, but can cause deadlocks.)");
-            fix_middle_click = getBoolConfig("fixPickBlock", "client", fix_middle_click, "Make middle clicking more useful");
+            //fix_middle_click = getBoolConfig("fixPickBlock", "client", fix_middle_click, "Make middle clicking more useful");
             large_servo_instructions = editMain().getBoolConfig("largeServoInstructions", "client", large_servo_instructions, "Render servo instructions extra-large. This can also be toggled on and off using '/f servoInstructionSize'.");
             show_time_on_fullscreen = editRun().getBoolConfig("showTimeOnFullscreen", "client", show_time_on_fullscreen, "If true, show the time every half hour");
             mirror_sunbeams = editRun().getBoolConfig("drawMirrorSunbeams", "client", mirror_sunbeams, "If false, mirrors won't draw sunbeams");

@@ -11,6 +11,7 @@ import net.minecraft.util.MovingObjectPosition;
 import net.minecraft.util.Vec3;
 import net.minecraft.world.Explosion;
 import net.minecraft.world.World;
+import net.minecraft.world.chunk.Chunk;
 import net.minecraftforge.event.world.WorldEvent;
 
 import java.util.List;
@@ -79,5 +80,10 @@ public class MethodSplices {
     public static boolean bjf$init(EventBus bus, WorldEvent.Load event) {
         // This is me being lazy. Dealing with names is obnoxious. Hopefully we can get this gone when we port to 1.8?
         return HookTargetsClient.abortClientLoadEvent(bus, event);
+    }
+
+    // Method append
+    public static void CoFHTweaks_FZ_Hook(Chunk chunk, Entity entity, AxisAlignedBB box, List<AxisAlignedBB> boxes) {
+        HookTargetsServer.addConstantCollidersCOFH(chunk, entity, box, boxes);
     }
 }
