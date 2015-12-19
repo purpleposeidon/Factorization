@@ -1,4 +1,4 @@
-* A tab has a width of 4 spaces.
+* Indentation is 4 spaces. I blame society.
 * Opening braces go on the same line. I will cut you.
 * Do not use reflection to poke at Minecraft's privates; always use the AT.
 * Make use of Coord, ForgeDirection, and Vec3; avoid decomposing them. All world+pos operations are available via Coord, including handy things like "spawn this ItemStack as an Entity"
@@ -15,7 +15,6 @@
 * Small oft-repeated snippets of code, such as "interpolate between two values" or "convert 0-sized stack to null", can be found/should be put in FzUtil.
 * All inventory manipulation should be done through FzInv, via in FzUtil.openInventory(). Inventory manipulation has many corner-cases, and FzInv protects you from them.
 * Adding magic blocks is a syntax error.
-* neptune should probably write the rendering code.
 * If you're feeling compelled to comment what something is doing, then you've probably chosen bad names. The why's are cool for commenting tho.
 * Mind the @SideOnly's.
 * neptune doesn't check XXX/TODO. FIXME usually means Forge needs some feature or something. NORELEASE is where the beef is at, and means "don't do a release without looking at this first". The check_norelease script will list them.
