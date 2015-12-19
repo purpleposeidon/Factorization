@@ -4,6 +4,9 @@ import factorization.common.FactoryType;
 import factorization.shared.Core;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockAnvil;
+import net.minecraft.block.properties.IProperty;
+import net.minecraft.block.properties.PropertyInteger;
+import net.minecraft.block.state.BlockState;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.player.EntityPlayer;
@@ -24,10 +27,13 @@ public class BlockForge extends BlockAnvil {
         setUnlocalizedName("factorization:artifactForge");
         setHardness(5.0F).setResistance(2000.0F);
         setStepSound(new Block.SoundType("anvil", 1.0F, 0.125F) {
+            @Override
             public String getBreakSound() {
                 return "dig.stone";
             }
-            public String func_150496_b() {
+
+            @Override
+            public String getPlaceSound() {
                 return "random.anvil_land";
             }
         });
