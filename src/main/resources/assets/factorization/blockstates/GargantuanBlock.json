@@ -1,0 +1,22 @@
+{
+    "variants": {
+        "face=down": {
+            "model": "factorization:NORELEASE"
+        },
+        "face=up": {
+            "model": "factorization:NORELEASE"
+        },
+        "face=north": {
+            "model": "factorization:NORELEASE"
+        },
+        "face=south": {
+            "model": "factorization:NORELEASE"
+        },
+        "face=west": {
+            "model": "factorization:NORELEASE"
+        },
+        "face=east": {
+            "model": "factorization:NORELEASE"
+        }
+    }
+}
