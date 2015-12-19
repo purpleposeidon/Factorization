@@ -5,18 +5,13 @@
 *.blend1
 *.blend2
 .*
-DeSrg/fields.csv
-DeSrg/methods.csv
 build/
 fzversion
 last_fz
 build.log
-DeSrg/
 backup.sh
 fznei.zip
 apis/
-all_events.txt
-src/main/Factorization.iml
 
 #Symlinked directories
 /lang
@@ -27,16 +22,22 @@ src/main/Factorization.iml
 /minecraft_textures
 /forgesrc
 /mcsrc
-/blockstates
+/bs
 /json_block
+/json_item
+/mcasset
 
 #Symlinked files
 at.cfg
 QUICK_BUGS
-parables/
 
 
 #IDE files
+src/main/Factorization.iml
 src/main/FZ.iml
 eclipse/
 logs/
+
+#Personal
+parables/
+DeSrg/
