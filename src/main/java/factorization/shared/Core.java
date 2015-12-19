@@ -274,6 +274,9 @@ public class Core {
         if (HammerEnabled.ENABLED) {
             event.registerServerCommand(new BuildColossusCommand());
         }
+        if (Core.dev_environ) {
+            event.registerServerCommand(new GenBlockStates());
+        }
     }
     
     @EventHandler
