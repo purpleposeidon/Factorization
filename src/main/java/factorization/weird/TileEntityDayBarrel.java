@@ -684,6 +684,7 @@ public class TileEntityDayBarrel extends TileEntityFactorization  {
         if (event.entityPlayer.worldObj.isRemote) {
             return;
         }
+        if (event.face == null) return;
         last_hit_side = event.face.ordinal();
     }
 
