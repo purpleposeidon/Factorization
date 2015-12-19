@@ -9,6 +9,7 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.network.NetHandlerPlayServer;
 import net.minecraft.network.Packet;
 import net.minecraft.network.play.client.C00PacketKeepAlive;
+import net.minecraft.network.play.server.S00PacketKeepAlive;
 import net.minecraft.util.MovingObjectPosition;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.common.network.handshake.NetworkDispatcher;
@@ -58,6 +59,10 @@ public class HammerProxy {
     public boolean queueUnwrappedPacket(EntityPlayer player, Object packetObj) {
         if (packetObj == null) return true;
         if (player == null) {
+            if (packetObj instanceof C00PacketKeepAlive || packetObj instanceof S00PacketKeepAlive) {
+                NORELEASE.fixme("Shouldn't this, like, not happen?");
+                return true;
+            }
             NORELEASE.println("No player to handle: " + packetObj + " " + packetObj.getClass().getSimpleName());
             return true;
         }
