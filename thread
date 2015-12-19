@@ -35,14 +35,19 @@ Or [url=http://purpleposeidon.github.io/FzDocs/]here's an outside-of-Minecraft c
 You can encourage and guide further development of Factorization through my [url="http://www.patreon.com/neptunepink"][img]http://i.imgur.com/srYEtgV.png[/img]Patreon[/url].
 
 [spoiler]
+Factorization 1.7.10-0.8.101
+[url="http://dl.dropbox.com/u/76265666/old/Factorization-1.7.10-0.8.101.jar"]DropBox[/url]
+Built on 2015-12-17 against Minecraft Forge 1.7.10-10.13.2.1230
+[url="http://dl.dropbox.com/u/76265666/changelogs/Changelog-1.7.10-0.8.101.txt"]Changelog[/url]
+[url="http://dl.dropbox.com/u/76265666/old/Factorization-1.7.10-0.8.101-dev.jar"]Deobf for Mod Authors[/url]
+
+[spoiler]
 Factorization 1.7.10-0.8.100
 [url="http://dl.dropbox.com/u/76265666/old/Factorization-1.7.10-0.8.100.jar"]DropBox[/url]
 Built on 2015-12-01 against Minecraft Forge 1.7.10-10.13.2.1230
 [url="http://dl.dropbox.com/u/76265666/changelogs/Changelog-1.7.10-0.8.100.txt"]Changelog[/url]
 [url="http://dl.dropbox.com/u/76265666/old/Factorization-1.7.10-0.8.100-dev.jar"]Deobf for Mod Authors[/url]
-[b]If you get a NullPointerException at GameSettings.func_82879_c, set Factorization.cfg -> client -> B:fixPickBlock=false )[/b]
 
-[spoiler]
 Factorization 1.7.10-0.8.99d
 [url="https://www.mediafire.com/?86i43vc9ihgphep"]MediaFire[/url], or
 [url="http://dl.dropbox.com/u/76265666/old/Factorization-1.7.10-0.8.99d.jar"]DropBox[/url]
@@ -228,20 +233,20 @@ Factorization may be downloaded and copied as much as you like for personal use.
 A. It is being distributed as part of a mod pack for a specific private Minecraft server, and the mod pack is inaccessible to the public.
 B. It is being transferred privately between mod developers solely for the purposes of bug-fixing or compatibility.
 C. It is being distributed to a modpack from a modpack platform where:
-   1) the modpack is hosted on that platform
-   2) AND the modpack has permission to distribute Factorization
-   3) AND the modpack platform is not otherwise distributing Factorization.
+1) the modpack is hosted on that platform
+2) AND the modpack has permission to distribute Factorization
+3) AND the modpack platform is not otherwise distributing Factorization.
 D. It is being distributed as part of a public mod pack, where:
-   1) A post has been made to either: the Factorization Minecraft Forum thread, or the #factorization IRC channel on irc.esper.net
-   2) AND said post demonstrates a usage of Factorization, such that it is either:
-        • a novel and functional build where Factorization provides critical functionality
-        • OR a novel and aesthetic build dependent on a component added by Factorization
-        • OR a novel and an actionable bug report for Factorization that is reproducible with 8 or fewer other mods installed as counted by the number of primary entries in the mods list accessed from the Minecraft game main menu.
-   3) AND said post makes no mention, hint, or reference to this license, or to licensing, or to mod packs.
-   4) AND the mod pack has a publicly accessible list of the mods used in that pack, and that list must:
-        • include a link to the Factorization forum thread
-        • AND a link to said post if it is on MCF, or a link to the chat log of the post if it is on IRC.
-   5) AND said post is not shared with any other modpack.
+1) A post has been made to either: the Factorization Minecraft Forum thread, or the #factorization IRC channel on irc.esper.net
+2) AND said post demonstrates a usage of Factorization, such that it is either:
+• a novel and functional build where Factorization provides critical functionality
+• OR a novel and aesthetic build dependent on a component added by Factorization
+• OR a novel and an actionable bug report for Factorization that is reproducible with 8 or fewer other mods installed as counted by the number of primary entries in the mods list accessed from the Minecraft game main menu.
+3) AND said post makes no mention, hint, or reference to this license, or to licensing, or to mod packs.
+4) AND the mod pack has a publicly accessible list of the mods used in that pack, and that list must:
+• include a link to the Factorization forum thread
+• AND a link to said post if it is on MCF, or a link to the chat log of the post if it is on IRC.
+5) AND said post is not shared with any other modpack.
 E. It is being distributed as part of a source code repository for the purpose of mod development, where the Factorization being distributed is a deobf release.
 
 
@@ -252,47 +257,47 @@ End of license text.
 
 License hints:
 [list]
-  [*]The modpack distributor doesn't actually personally have to make the post. However, it would be Inadvisable to use some unrelated person's post.[/*]
-  [*]If your favorite modpack is removing or not updating FZ as a result of the license's cataclysmically onerous requirements, you can make a post for their behalf. (But a link to that post from the pack is still required.)[/*]
-  [*]"Novel" is more for "not the same thing being posted over and over" than "absolutely certain that it has never before been seen in the history of time". If you secretly suspect I might not think it's novel, then perhaps it isn't.[/*]
-  [*]If you're writing a script to download it through adfly with minimal intervention, fine, whatever, if you really want to try that hard, go ahead. But wouldn't it be easier & funner to just... post something interesting?[/*]
-  [*]The license doesn't apply retroactively if you've already downloaded the mod under a different license/permission. That would be absurd. However, if you downloaded Factorization after the PSIL has been posted, then the PSIL applies.[/*]
-  [*]Sending me PMs does not count as a posting to this thread.[/*]
-  [*]Note that "installers" are not allowed.[/*]
-  [*]Please do not tell me that you are using FZ in a mod pack, or ask if you can use FZ in a mod pack. This will indicate to me that you did not comprehend the license, and so I will yell at you.[/*]
-  [*]"hi i am using factorisation in my modpack kthxbai" is not a post that gives you license to distribute Factorization. Did you just make that post? I anticipate that there will be a great momentum of that. You do not have permission to use FZ in your mod pack. Read the license. Are you covered under condition A?[/*]
-  [*]A modpack with a password posted somewhere public counts as being accessible to the public.[/*]
-  [*]Clause D.3 is a thing. Did you read it? Read it again. Here's what it says: "Said post makes no mention, hint, or reference to this license, or to licensing, or to mod packs". If your post says "im posting this for my modpack" then you have not earned permission. And then you should feel embarrassed. And fall into a well of deep shame. But, like, don't go overboard with it, okay? You could probably edit your post if I haven't noticed it yet (but you can never [i]really[/i] be sure that I haven't). If I have noticed it, then you'd best make a new post.[/*]
-[/list]
-[/spoiler]
+[*]The modpack distributor doesn't actually personally have to make the post. However, it would be Inadvisable to use some unrelated person's post.[/*]
+                                                                                                                                                      [*]If your favorite modpack is removing or not updating FZ as a result of the license's cataclysmically onerous requirements, you can make a post for their behalf. (But a link to that post from the pack is still required.)[/*]
+                                                                                                                                                      [*]"Novel" is more for "not the same thing being posted over and over" than "absolutely certain that it has never before been seen in the history of time". If you secretly suspect I might not think it's novel, then perhaps it isn't.[/*]
+                                                                                                                                                      [*]If you're writing a script to download it through adfly with minimal intervention, fine, whatever, if you really want to try that hard, go ahead. But wouldn't it be easier & funner to just... post something interesting?[/*]
+                                                                                                                                                      [*]The license doesn't apply retroactively if you've already downloaded the mod under a different license/permission. That would be absurd. However, if you downloaded Factorization after the PSIL has been posted, then the PSIL applies.[/*]
+                                                                                                                                                      [*]Sending me PMs does not count as a posting to this thread.[/*]
+                                                                                                                                                      [*]Note that "installers" are not allowed.[/*]
+                                                                                                                                                      [*]Please do not tell me that you are using FZ in a mod pack, or ask if you can use FZ in a mod pack. This will indicate to me that you did not comprehend the license, and so I will yell at you.[/*]
+                                                                                                                                                      [*]"hi i am using factorisation in my modpack kthxbai" is not a post that gives you license to distribute Factorization. Did you just make that post? I anticipate that there will be a great momentum of that. You do not have permission to use FZ in your mod pack. Read the license. Are you covered under condition A?[/*]
+                                                                                                                                                      [*]A modpack with a password posted somewhere public counts as being accessible to the public.[/*]
+                                                                                                                                                      [*]Clause D.3 is a thing. Did you read it? Read it again. Here's what it says: "Said post makes no mention, hint, or reference to this license, or to licensing, or to mod packs". If your post says "im posting this for my modpack" then you have not earned permission. And then you should feel embarrassed. And fall into a well of deep shame. But, like, don't go overboard with it, okay? You could probably edit your post if I haven't noticed it yet (but you can never [i]really[/i] be sure that I haven't). If I have noticed it, then you'd best make a new post.[/*]
+                                                                                                                                                      [/list]
+                                                                                                                                                      [/spoiler]
 
-[header=2][anchor=LOCAL]Localizations & Translation[/anchor][/header]
-You can contribute localizations at the [url="https://github.com/purpleposeidon/FactorizationLocalizations"]Factorization Localizations Github Project[/url]. Special thanks to Vexatos and crafteverywhere for managing the repository for me! The following people have contributed:
-[list]
-[*][url="https://github.com/crafteverywhere"]crafteverywhere[/url], [url="https://github.com/SF_Chipan"]SF_Chipan[/url]: zh_CN
-[*][url="https://github.com/catmunyi"]catmunyi[/url]: zh_TW
-[*][url="https://github.com/Vexatos"]Vexatos[/url]: de_DE
-[*][url="https://github.com/Darkona"]Darkona[/url]: es_ES
-[*][url="https://github.com/WLCD"]WLCD[/url], [url="https://github.com/AegisLesha"]AegisLesha[/url]: fr_FR
-[*][url="https://github.com/DragonsLover"]DragonsLover[/url]: fr_CA
-[*][url="https://github.com/golyalpha"]golyalpha[/url]: cs_CZ
-[*][url="https://github.com/natiss88"]natiss88[/url]: it_IT
-[*][url="https://github.com/Anton"]Anton[/url]: ru_RU
-[*][url="https://github.com/Szewek"]Szewek[/url]: pl_PL
-[/list]
+                                                                                                                                                      [header=2][anchor=LOCAL]Localizations & Translation[/anchor][/header]
+                                                                                                                                                      You can contribute localizations at the [url="https://github.com/purpleposeidon/FactorizationLocalizations"]Factorization Localizations Github Project[/url]. Special thanks to Vexatos and crafteverywhere for managing the repository for me! The following people have contributed:
+                                                                                                                                                      [list]
+                                                                                                                                                      [*][url="https://github.com/crafteverywhere"]crafteverywhere[/url], [url="https://github.com/SF_Chipan"]SF_Chipan[/url]: zh_CN
+                                                                                                                                                      [*][url="https://github.com/catmunyi"]catmunyi[/url]: zh_TW
+                                                                                                                                                      [*][url="https://github.com/Vexatos"]Vexatos[/url]: de_DE
+                                                                                                                                                      [*][url="https://github.com/Darkona"]Darkona[/url]: es_ES
+                                                                                                                                                      [*][url="https://github.com/WLCD"]WLCD[/url], [url="https://github.com/AegisLesha"]AegisLesha[/url]: fr_FR
+                                                                                                                                                      [*][url="https://github.com/DragonsLover"]DragonsLover[/url]: fr_CA
+                                                                                                                                                      [*][url="https://github.com/golyalpha"]golyalpha[/url]: cs_CZ
+                                                                                                                                                      [*][url="https://github.com/natiss88"]natiss88[/url]: it_IT
+                                                                                                                                                      [*][url="https://github.com/Anton"]Anton[/url]: ru_RU
+                                                                                                                                                      [*][url="https://github.com/Szewek"]Szewek[/url]: pl_PL
+                                                                                                                                                      [/list]
 
-[header=2][anchor=CREDITS]Credits[/anchor][/header]
-FZ includes uses Creative Commons sound assets, including:
-[list]
-  [*][url=http://www.freesound.org/people/digifishmusic/sounds/66417/]"Old Metal", by digifishmusic[/url]. Unmodified. [url=http://creativecommons.org/licenses/by/3.0/]CC-BY[/url].[/*]
-  [*][url=http://www.freesound.org/people/sandyrb/sounds/95078/]"THE CRASH", by sandyrb[/url]. Cropped and combined with other work. [url=http://creativecommons.org/licenses/by/3.0/]CC-BY[/url][/*]
-  [*][url=http://www.freesound.org/people/mystiscool/sounds/7141/]"Avalanche", by mystiscool[/url]. Cropped and combined with other work. [url=http://creativecommons.org/licenses/by/3.0/]CC-BY[/url][/*]
-  [*][url=http://www.freesound.org/people/suonho/sounds/56364/]"Ambienta Soundtrack: Crystal Airlines", by suonho[/url]. Cropped and filtered. [url=http://creativecommons.org/licenses/by/3.0/]CC-BY[/url][/*]
-  [*][url=www.freesound.org/people/Noizemaker/sounds/23216/]"BMW 1150 GS Motorcycle: NZP BMW 1150GS Fuel pump", by Noizemaker[/url]. Cropped, equalized, and mixed with other work.[url=http://creativecommons.org/licenses/sampling+/1.0/]Sampling+[/url][/*]
-[/list]
+                                                                                                                                                      [header=2][anchor=CREDITS]Credits[/anchor][/header]
+                                                                                                                                                      FZ includes uses Creative Commons sound assets, including:
+                                                                                                                                                      [list]
+                                                                                                                                                      [*][url=http://www.freesound.org/people/digifishmusic/sounds/66417/]"Old Metal", by digifishmusic[/url]. Unmodified. [url=http://creativecommons.org/licenses/by/3.0/]CC-BY[/url].[/*]
+                                                                                                                                                      [*][url=http://www.freesound.org/people/sandyrb/sounds/95078/]"THE CRASH", by sandyrb[/url]. Cropped and combined with other work. [url=http://creativecommons.org/licenses/by/3.0/]CC-BY[/url][/*]
+                                                                                                                                                      [*][url=http://www.freesound.org/people/mystiscool/sounds/7141/]"Avalanche", by mystiscool[/url]. Cropped and combined with other work. [url=http://creativecommons.org/licenses/by/3.0/]CC-BY[/url][/*]
+                                                                                                                                                      [*][url=http://www.freesound.org/people/suonho/sounds/56364/]"Ambienta Soundtrack: Crystal Airlines", by suonho[/url]. Cropped and filtered. [url=http://creativecommons.org/licenses/by/3.0/]CC-BY[/url][/*]
+                                                                                                                                                      [*][url=www.freesound.org/people/Noizemaker/sounds/23216/]"BMW 1150 GS Motorcycle: NZP BMW 1150GS Fuel pump", by Noizemaker[/url]. Cropped, equalized, and mixed with other work.[url=http://creativecommons.org/licenses/sampling+/1.0/]Sampling+[/url][/*]
+                                                                                                                                                      [/list]
 
-[header=2][anchor=HAMMER]Hammer[/anchor][/header]
-Hammer (or FZDS, for FactoriZation Dimensional Slices) is a WIP engine upgrade for Minecraft that gives it the ability to move and rotate chunks arbitrarily. It is used to implement the Colossi and the Twisting Block, with more things to come. Unfortunately there are some bugs that happen with Optifine & bukkit/spigot/cauldron right now, and I'm not really able to fix them. However there will also be bugs with other mods, so please let me know about them.  Hammer can be disabled by editing hammerChannels.cfg.
+                                                                                                                                                      [header=2][anchor=HAMMER]Hammer[/anchor][/header]
+                                                                                                                                                      Hammer (or FZDS, for FactoriZation Dimensional Slices) is a WIP engine upgrade for Minecraft that gives it the ability to move and rotate chunks arbitrarily. It is used to implement the Colossi and the Twisting Block, with more things to come. Unfortunately there are some bugs that happen with Optifine & bukkit/spigot/cauldron right now, and I'm not really able to fix them. However there will also be bugs with other mods, so please let me know about them.  Hammer can be disabled by editing hammerChannels.cfg.
 
-If you're having problems with a colossus or anything else that uses Hammer, you can use the "/fzds +" select and "/fzds remove" to kill them. Or it can be disabled from hammerChannels.cfg.
+                                                                                                                                                      If you're having problems with a colossus or anything else that uses Hammer, you can use the "/fzds +" select and "/fzds remove" to kill them. Or it can be disabled from hammerChannels.cfg.
 
