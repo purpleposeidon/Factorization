@@ -225,7 +225,7 @@ public class MiscellaneousNonsense {
             if (stat.get() <= 0 && FMLCommonHandler.instance().getSide() == Side.CLIENT) {
                 stat.set(-1);
                 stat.set(300); // Literally, hundreds of times! :D
-                Core.logInfo("Achievement Get! %s, you've opened your inventory hundreds of times already! Yes! You're welcome!", event.player.getCommandSenderName());
+                Core.logInfo("Achievement Get! %s, you've opened your inventory hundreds of times already! Yes! You're welcome!", event.player.getName());
                 // NORELEASE: Verify this works.
             }
         }

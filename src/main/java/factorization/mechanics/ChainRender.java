@@ -1,8 +1,9 @@
 package factorization.mechanics;
 
-import factorization.algos.FastBag;
-import factorization.shared.Core;
-import factorization.util.SpaceUtil;
+import java.lang.ref.WeakReference;
+
+import org.lwjgl.opengl.GL11;
+
 import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.WorldClient;
@@ -17,14 +18,16 @@ import net.minecraft.entity.Entity;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.Vec3;
+
 import net.minecraftforge.client.event.RenderWorldLastEvent;
 import net.minecraftforge.event.world.WorldEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
-import org.lwjgl.opengl.GL11;
 
-import java.lang.ref.WeakReference;
+import factorization.algos.FastBag;
+import factorization.shared.Core;
+import factorization.util.SpaceUtil;
 
 public class ChainRender {
     public static final ChainRender instance = new ChainRender();
@@ -159,9 +162,9 @@ public class ChainRender {
             setup = true;
             tessI = Tessellator.getInstance();
             tess = tessI.getWorldRenderer();
-            tess.startDrawing(GL11.GL_QUADS, DefaultVertexFormats.BLOCK);
+            tess.begin(GL11.GL_QUADS, DefaultVertexFormats.BLOCK);
 
-            Entity eyePos = Minecraft.getMinecraft().renderViewEntity;
+            Entity eyePos = Minecraft.getMinecraft().getRenderViewEntity();
             double cx = eyePos.lastTickPosX + (eyePos.posX - eyePos.lastTickPosX) * partial;
             double cy = eyePos.lastTickPosY + (eyePos.posY - eyePos.lastTickPosY) * partial;
             double cz = eyePos.lastTickPosZ + (eyePos.posZ - eyePos.lastTickPosZ) * partial;
@@ -206,7 +209,7 @@ public class ChainRender {
         int y = (int) at.yCoord;
         int z = (int) at.zCoord;
         BlockPos pos = new BlockPos(x, y, z);
-        Block b = world.getBlock(pos);
+        Block b = world.getBlockState(pos).getBlock();
         int brightness = b.getMixedBrightnessForBlock(world, pos);
         int sky = brightness >> 16 & 65535;
         int block = brightness & 65535;

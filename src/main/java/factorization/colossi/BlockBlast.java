@@ -1,9 +1,8 @@
 package factorization.colossi;
 
-import factorization.api.Coord;
-import factorization.coremodhooks.HookTargetsServer;
-import factorization.shared.Core;
-import factorization.util.SpaceUtil;
+import java.util.List;
+import java.util.Random;
+
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.properties.IProperty;
@@ -11,13 +10,21 @@ import net.minecraft.block.properties.PropertyBool;
 import net.minecraft.block.state.BlockState;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.Entity;
-import net.minecraft.util.*;
+import net.minecraft.util.AxisAlignedBB;
+import net.minecraft.util.BlockPos;
+import net.minecraft.util.DamageSource;
+import net.minecraft.util.EnumFacing;
+import net.minecraft.util.EnumParticleTypes;
+import net.minecraft.util.MathHelper;
+import net.minecraft.util.Vec3;
 import net.minecraft.world.Explosion;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;
 
-import java.util.List;
-import java.util.Random;
+import factorization.api.Coord;
+import factorization.coremodhooks.HookTargetsServer;
+import factorization.shared.Core;
+import factorization.util.SpaceUtil;
 
 public class BlockBlast extends Block {
     public static final IProperty<Boolean> EXPLODING = PropertyBool.create("exploding");
@@ -81,7 +88,7 @@ public class BlockBlast extends Block {
         if (!boom) {
             for (EnumFacing dir : EnumFacing.VALUES) {
                 BlockPos at = pos.offset(dir);
-                Block b = world.getBlock(at);
+                Block b = world.getBlockState(at).getBlock();
                 Material mat = b.getMaterial();
                 if (mat == Material.lava || mat == Material.fire || b.isBurning(world, at)) {
                     boom = true;

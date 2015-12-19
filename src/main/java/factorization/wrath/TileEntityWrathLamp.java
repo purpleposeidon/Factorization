@@ -1,10 +1,10 @@
 package factorization.wrath;
 
-import factorization.api.datahelpers.DataHelper;
-import factorization.common.FactoryType;
-import factorization.shared.BlockClass;
-import factorization.shared.Core;
-import factorization.shared.TileEntityCommon;
+import java.io.IOException;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.PriorityQueue;
+
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.entity.Entity;
@@ -18,10 +18,11 @@ import net.minecraft.util.ITickable;
 import net.minecraft.world.World;
 import net.minecraft.world.chunk.Chunk;
 
-import java.io.IOException;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.PriorityQueue;
+import factorization.api.datahelpers.DataHelper;
+import factorization.common.FactoryType;
+import factorization.shared.BlockClass;
+import factorization.shared.Core;
+import factorization.shared.TileEntityCommon;
 
 public class TileEntityWrathLamp extends TileEntityCommon implements ITickable {
     static final int radius = 6;
@@ -126,7 +127,7 @@ public class TileEntityWrathLamp extends TileEntityCommon implements ITickable {
         int y = pos.getY();
         int z = pos.getZ();
         for (Chunk chunk : toVisit) {
-            for (Object o : chunk.chunkTileEntityMap.values()) {
+            for (Object o : chunk.getTileEntityMap().values()) {
                 if (!(o instanceof TileEntityWrathLamp)) {
                     continue;
                 }
@@ -176,7 +177,7 @@ public class TileEntityWrathLamp extends TileEntityCommon implements ITickable {
         try {
             Core.profileStart("WrathLamp");
             for (BlockPos bp : BlockPos.getAllInBoxMutable(pos.add(-radius, pos.getY(), -radius), pos.add(radius, pos.getY(), radius))) {
-                Block id = worldObj.getBlock(bp);
+                Block id = worldObj.getBlockState(bp).getBlock();
                 if (id == Core.registry.lightair_block) {
                     worldObj.setBlockToAir(bp);
                 }
@@ -210,8 +211,8 @@ public class TileEntityWrathLamp extends TileEntityCommon implements ITickable {
             if (x == pos.getX() && z == pos.getZ()) {
                 return true;
             }
-            probe.func_181079_c(x, Y, z);
-            Block id = worldObj.getBlock(probe);
+            probe.set(x, Y, z);
+            Block id = worldObj.getBlockState(probe).getBlock();
             if (id != null && id.isOpaqueCube() && id.getLightOpacity() != 0) {
                 return false;
             }
@@ -311,9 +312,9 @@ public class TileEntityWrathLamp extends TileEntityCommon implements ITickable {
                 if (beamDepths[index] != 0) {
                     continue;
                 }
-                Block block = worldObj.getBlock(pos);
-                belowPos.func_181079_c(pos.getX(), height - 3, pos.getZ());
-                Block belowBlock = worldObj.getBlock(belowPos);
+                Block block = worldObj.getBlockState(pos).getBlock();
+                belowPos.set(pos.getX(), height - 3, pos.getZ());
+                Block belowBlock = worldObj.getBlockState(belowPos).getBlock();
                 if (belowBlock != Core.registry.lightair_block && height != pos.getY()) {
                     beamDepths[index] = (short) height;
                     continue;

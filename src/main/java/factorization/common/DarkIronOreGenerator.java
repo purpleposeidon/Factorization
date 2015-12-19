@@ -1,10 +1,9 @@
 package factorization.common;
 
+import java.util.Random;
+
 import com.google.common.base.Predicate;
-import factorization.api.Coord;
-import factorization.api.ICoordFunction;
-import factorization.shared.Core;
-import factorization.util.SpaceUtil;
+
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.init.Blocks;
@@ -13,9 +12,13 @@ import net.minecraft.util.BlockPos;
 import net.minecraft.world.World;
 import net.minecraft.world.chunk.IChunkProvider;
 import net.minecraft.world.gen.NoiseGeneratorOctaves;
+
 import net.minecraftforge.fml.common.IWorldGenerator;
 
-import java.util.Random;
+import factorization.api.Coord;
+import factorization.api.ICoordFunction;
+import factorization.shared.Core;
+import factorization.util.SpaceUtil;
 
 public class DarkIronOreGenerator implements IWorldGenerator {
     static final int minMeteorR = 1, maxMeteorR = 2;
@@ -57,7 +60,7 @@ public class DarkIronOreGenerator implements IWorldGenerator {
         }
         int bedrockX = chunkX * 16 + 8;
         int bedrockZ = chunkZ * 16 + 8;
-        if (world.getBlock(new BlockPos(bedrockX, 0, bedrockZ)) != Blocks.bedrock) {
+        if (world.getBlockState(new BlockPos(bedrockX, 0, bedrockZ)).getBlock() != Blocks.bedrock) {
             return;
         }
         for (int dcx = -genRange; dcx <= genRange; dcx++) {

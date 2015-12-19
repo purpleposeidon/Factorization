@@ -73,7 +73,7 @@ public enum PointNetworkHandler {
     }
     
     private String buildMessage(EntityPlayer player, DataInput input) throws IOException {
-        String base = "<" + player.getCommandSenderName() + ">";
+        String base = "<" + player.getName() + ">";
         String msg = input.readUTF();
         if (msg == null || msg.length() == 0) {
             return base;

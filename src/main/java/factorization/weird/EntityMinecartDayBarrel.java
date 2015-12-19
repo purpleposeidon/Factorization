@@ -1,11 +1,7 @@
 package factorization.weird;
 
-import factorization.api.FzOrientation;
-import factorization.api.datahelpers.DataHelper;
-import factorization.api.datahelpers.DataInNBT;
-import factorization.api.datahelpers.DataOutNBT;
-import factorization.shared.Core;
-import factorization.util.SpaceUtil;
+import java.io.IOException;
+
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.item.EntityMinecart;
 import net.minecraft.entity.player.EntityPlayer;
@@ -17,7 +13,12 @@ import net.minecraft.util.DamageSource;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.world.World;
 
-import java.io.IOException;
+import factorization.api.FzOrientation;
+import factorization.api.datahelpers.DataHelper;
+import factorization.api.datahelpers.DataInNBT;
+import factorization.api.datahelpers.DataOutNBT;
+import factorization.shared.Core;
+import factorization.util.SpaceUtil;
 
 public class EntityMinecartDayBarrel extends EntityMinecart implements IInventory {
     protected TileEntityDayBarrel barrel;
@@ -221,8 +222,8 @@ public class EntityMinecartDayBarrel extends EntityMinecart implements IInventor
     }
 
     @Override
-    public ItemStack getStackInSlotOnClosing(int slot) {
-        return barrel.getStackInSlotOnClosing(slot);
+    public ItemStack removeStackFromSlot(int slot) {
+        return barrel.removeStackFromSlot(slot);
     }
 
     @Override

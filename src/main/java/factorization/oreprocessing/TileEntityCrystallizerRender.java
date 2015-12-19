@@ -104,7 +104,7 @@ public class TileEntityCrystallizerRender extends TileEntitySpecialRenderer<Tile
             float v1 = tex.getMaxV();
             Tessellator tessI = Tessellator.getInstance();
             WorldRenderer tess = tessI.getWorldRenderer();
-            tess.startDrawing(GL11.GL_QUADS, DefaultVertexFormats.BLOCK);
+            tess.begin(GL11.GL_QUADS, DefaultVertexFormats.BLOCK);
             tess.setTranslation(0, 9F/16F, 0);
             tess.tex(u0, v0).putPosition(0, 0, 0);
             tess.tex(u0, v1).putPosition(0, 0, 1);

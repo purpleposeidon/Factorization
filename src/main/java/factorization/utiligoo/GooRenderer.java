@@ -1,6 +1,7 @@
 package factorization.utiligoo;
 
-import factorization.shared.Core;
+import org.lwjgl.opengl.GL11;
+
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
@@ -15,11 +16,13 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.BlockPos;
+
 import net.minecraftforge.client.event.RenderWorldLastEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
-import org.lwjgl.opengl.GL11;
+
+import factorization.shared.Core;
 
 public enum GooRenderer {
     INSTANCE;
@@ -107,7 +110,7 @@ public enum GooRenderer {
             if (data.coords.length == 0) continue;
             if (!rendered_something) {
                 rendered_something = true;
-                Entity camera = Minecraft.getMinecraft().renderViewEntity;
+                Entity camera = Minecraft.getMinecraft().getRenderViewEntity();
                 double cx = camera.lastTickPosX + (camera.posX - camera.lastTickPosX) * event.partialTicks;
                 double cy = camera.lastTickPosY + (camera.posY - camera.lastTickPosY) * event.partialTicks;
                 double cz = camera.lastTickPosZ + (camera.posZ - camera.lastTickPosZ) * event.partialTicks;
@@ -145,13 +148,13 @@ public enum GooRenderer {
             int z = data.coords[i + 2];
             if (player.getDistanceSq(x, y, z) > render_dist_sq) continue;
             if (!rendered_something) {
-                tess.startDrawing(GL11.GL_QUADS, DefaultVertexFormats.BLOCK);
+                tess.begin(GL11.GL_QUADS, DefaultVertexFormats.BLOCK);
                 rendered_something = true;
             }
             BlockPos pos = new BlockPos(x, y, z);
-            Block b = player.worldObj.getBlock(pos);
+			IBlockState bs = player.worldObj.getBlockState(pos);
+            Block b = bs.getBlock();
             Material mat = b.getMaterial();
-            IBlockState bs = player.worldObj.getBlockState(pos);
             if (useShaders()) {
                 /*if (mat.blocksMovement() && !b.hasTileEntity(bs)) {
                     rb.renderBlockByRenderType(b, pos);

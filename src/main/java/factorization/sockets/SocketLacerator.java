@@ -1,21 +1,13 @@
 package factorization.sockets;
 
-import factorization.api.*;
-import factorization.api.datahelpers.DataHelper;
-import factorization.api.datahelpers.IDataSerializable;
-import factorization.api.datahelpers.Share;
-import factorization.common.FactoryType;
-import factorization.common.FzConfig;
-import factorization.notify.Notice;
-import factorization.oreprocessing.TileEntityGrinder;
-import factorization.oreprocessing.TileEntityGrinder.GrinderRecipe;
-import factorization.servo.RenderServoMotor;
-import factorization.servo.ServoMotor;
-import factorization.shared.*;
-import factorization.shared.NetworkFactorization.MessageType;
-import factorization.util.*;
-import factorization.weird.TileEntityDayBarrel;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+
+import org.lwjgl.opengl.GL11;
 import io.netty.buffer.ByteBuf;
+
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
@@ -29,18 +21,49 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.*;
+import net.minecraft.util.BlockPos;
+import net.minecraft.util.ChatComponentTranslation;
+import net.minecraft.util.DamageSource;
+import net.minecraft.util.EnumFacing;
+import net.minecraft.util.IChatComponent;
+import net.minecraft.util.ITickable;
+import net.minecraft.util.MovingObjectPosition;
+import net.minecraft.util.StatCollector;
+import net.minecraft.util.Vec3;
 import net.minecraft.world.World;
+
 import net.minecraftforge.event.world.WorldEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
-import org.lwjgl.opengl.GL11;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
+import factorization.api.Charge;
+import factorization.api.Coord;
+import factorization.api.FzOrientation;
+import factorization.api.IChargeConductor;
+import factorization.api.Quaternion;
+import factorization.api.datahelpers.DataHelper;
+import factorization.api.datahelpers.IDataSerializable;
+import factorization.api.datahelpers.Share;
+import factorization.common.FactoryType;
+import factorization.common.FzConfig;
+import factorization.notify.Notice;
+import factorization.oreprocessing.TileEntityGrinder;
+import factorization.oreprocessing.TileEntityGrinder.GrinderRecipe;
+import factorization.servo.RenderServoMotor;
+import factorization.servo.ServoMotor;
+import factorization.shared.BlockFactorization;
+import factorization.shared.Core;
+import factorization.shared.DropCaptureHandler;
+import factorization.shared.FzModel;
+import factorization.shared.ICaptureDrops;
+import factorization.shared.NetworkFactorization.MessageType;
+import factorization.util.InvUtil;
+import factorization.util.ItemUtil;
+import factorization.util.NumUtil;
+import factorization.util.PlayerUtil;
+import factorization.util.SpaceUtil;
+import factorization.weird.TileEntityDayBarrel;
 
 public class SocketLacerator extends TileEntitySocketBase implements IChargeConductor, ICaptureDrops, ITickable {
     Charge charge = new Charge(this);
@@ -311,11 +334,11 @@ public class SocketLacerator extends TileEntitySocketBase implements IChargeCond
             progress = 0;
             return true;
         } else if (mop.typeOfHit == MovingObjectPosition.MovingObjectType.BLOCK) {
-            Block block = mopWorld.getBlock(mop.getBlockPos());
+			IBlockState bs = mopWorld.getBlockState(mop.getBlockPos());
+            Block block = bs.getBlock();
             if (block == null || block.isAir(mopWorld, mop.getBlockPos())) {
                 return false;
             }
-            IBlockState bs = mopWorld.getBlockState(mop.getBlockPos());
             if (!block.canCollideCheck(bs, false)) {
                 return false;
             }
@@ -495,7 +518,7 @@ public class SocketLacerator extends TileEntitySocketBase implements IChargeCond
         EnumFacing op = facing.getOpposite();
         Vec3 face = new Vec3(forward.add(0.5, 0.5, 0.5)).add(SpaceUtil.scale(new Vec3(op.getDirectionVec()), 0.5));
 
-        Block b = worldObj.getBlock(forward);
+        Block b = worldObj.getBlockState(forward).getBlock();
         if (b == null) {
             return;
         }

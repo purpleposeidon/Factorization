@@ -1,6 +1,37 @@
 package factorization.fzds.network;
 
+import java.lang.ref.WeakReference;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Set;
+import java.util.UUID;
+
 import com.mojang.authlib.GameProfile;
+import io.netty.channel.ChannelHandlerContext;
+import io.netty.channel.ChannelOutboundHandlerAdapter;
+import io.netty.channel.ChannelPromise;
+import io.netty.channel.embedded.EmbeddedChannel;
+
+import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.network.EnumConnectionState;
+import net.minecraft.network.EnumPacketDirection;
+import net.minecraft.network.NetHandlerPlayServer;
+import net.minecraft.network.NetworkManager;
+import net.minecraft.network.Packet;
+import net.minecraft.network.play.server.S26PacketMapChunkBulk;
+import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.management.ItemInWorldManager;
+import net.minecraft.server.management.ServerConfigurationManager;
+import net.minecraft.tileentity.TileEntity;
+import net.minecraft.world.World;
+import net.minecraft.world.WorldServer;
+import net.minecraft.world.chunk.Chunk;
+
+import net.minecraftforge.common.ForgeChunkManager;
+import net.minecraftforge.fml.common.network.handshake.NetworkDispatcher;
+
 import factorization.api.Coord;
 import factorization.api.DeltaCoord;
 import factorization.api.ICoordFunction;
@@ -11,26 +42,6 @@ import factorization.fzds.interfaces.IDeltaChunk;
 import factorization.fzds.interfaces.IFzdsEntryControl;
 import factorization.fzds.interfaces.IFzdsShenanigans;
 import factorization.shared.Core;
-import io.netty.channel.ChannelHandlerContext;
-import io.netty.channel.ChannelOutboundHandlerAdapter;
-import io.netty.channel.ChannelPromise;
-import io.netty.channel.embedded.EmbeddedChannel;
-import net.minecraft.entity.player.EntityPlayerMP;
-import net.minecraft.network.*;
-import net.minecraft.network.play.server.S26PacketMapChunkBulk;
-import net.minecraft.server.MinecraftServer;
-import net.minecraft.server.management.ItemInWorldManager;
-import net.minecraft.server.management.ServerConfigurationManager;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.world.World;
-import net.minecraft.world.WorldServer;
-import net.minecraft.world.chunk.Chunk;
-import net.minecraftforge.common.ForgeChunkManager;
-import net.minecraftforge.fml.common.network.handshake.NetworkDispatcher;
-import net.minecraftforge.fml.relauncher.Side;
-
-import java.lang.ref.WeakReference;
-import java.util.*;
 
 public class PacketProxyingPlayer extends EntityPlayerMP implements
         IFzdsEntryControl, IFzdsShenanigans {
@@ -211,7 +222,7 @@ public class PacketProxyingPlayer extends EntityPlayerMP implements
                 if (!here.blockExists()) return;
                 Chunk chunk = here.getChunk();
                 chunks.add(chunk);
-                tileEntities.addAll(chunk.chunkTileEntityMap.values());
+                tileEntities.addAll(chunk.getTileEntityMap().values());
             }
         });
 

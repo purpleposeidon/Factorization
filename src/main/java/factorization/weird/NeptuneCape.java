@@ -58,7 +58,7 @@ public class NeptuneCape {
             dirty = false;
             injectModel(player);
         }
-        should_render_mask = !hideMask(player) && isNameWhitelisted(player.getCommandSenderName());
+        should_render_mask = !hideMask(player) && isNameWhitelisted(player.getName());
         if (should_render_mask) {
             LmpMaskRenderer.rendering_player = (AbstractClientPlayer) player;
         }

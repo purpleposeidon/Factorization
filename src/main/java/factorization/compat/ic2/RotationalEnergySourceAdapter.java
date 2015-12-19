@@ -1,13 +1,28 @@
 package factorization.compat.ic2;
 
+import net.minecraft.tileentity.TileEntity;
+
 import factorization.api.IRotationalEnergySource;
 import factorization.api.adapter.Adapter;
-import ic2.api.energy.tile.IKineticSource;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.EnumFacing;
+
+//import ic2.api.energy.tile.IKineticSource;
 
 public class RotationalEnergySourceAdapter implements Adapter<TileEntity, IRotationalEnergySource> {
-    @Override
+	@Override
+	public IRotationalEnergySource adapt(TileEntity val) {
+		return null;
+	}
+
+	@Override
+	public boolean canAdapt(Class<?> valClass) {
+		return false;
+	}
+
+	@Override
+	public int priority() {
+		return 0;
+	}
+/*    @Override
     public IRotationalEnergySource adapt(TileEntity val) {
         return new Kinetic2Rotational(val, (IKineticSource) val);
     }
@@ -64,5 +79,5 @@ public class RotationalEnergySourceAdapter implements Adapter<TileEntity, IRotat
         public boolean isTileEntityInvalid() {
             return baseTe.isInvalid();
         }
-    }
+    } */
 }

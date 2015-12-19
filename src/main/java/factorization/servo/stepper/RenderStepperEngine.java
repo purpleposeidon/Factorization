@@ -1,14 +1,8 @@
 package factorization.servo.stepper;
 
-import factorization.api.FzColor;
-import factorization.api.FzOrientation;
-import factorization.api.Quaternion;
-import factorization.fzds.DeltaChunk;
-import factorization.fzds.Hammer;
-import factorization.fzds.HammerEnabled;
-import factorization.shared.Core;
-import factorization.shared.FzModel;
-import factorization.util.NumUtil;
+import org.lwjgl.opengl.GL11;
+import org.lwjgl.opengl.GL12;
+
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.RenderGlobal;
 import net.minecraft.client.renderer.entity.RenderEntity;
@@ -19,8 +13,15 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.MovingObjectPosition;
 import net.minecraft.util.ResourceLocation;
-import org.lwjgl.opengl.GL11;
-import org.lwjgl.opengl.GL12;
+
+import factorization.api.FzOrientation;
+import factorization.api.Quaternion;
+import factorization.fzds.DeltaChunk;
+import factorization.fzds.Hammer;
+import factorization.fzds.HammerEnabled;
+import factorization.shared.Core;
+import factorization.shared.FzModel;
+import factorization.util.NumUtil;
 
 public class RenderStepperEngine extends RenderEntity {
     static FzModel sprocket = new FzModel("servo/sprocket");
@@ -77,7 +78,7 @@ public class RenderStepperEngine extends RenderEntity {
             GL11.glLineWidth(1.5F);
             float d = 1F/2F, h = 0.25F;
             AxisAlignedBB ab = new AxisAlignedBB(-d, -h, -d, d, h, d);
-            RenderGlobal.drawBox(ab);
+            RenderGlobal.func_181561_a(ab);
             GL11.glPopAttrib();
             GL11.glEnable(GL11.GL_TEXTURE_2D);
 

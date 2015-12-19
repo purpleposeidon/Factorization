@@ -1,9 +1,7 @@
 package factorization.truth;
 
-import factorization.api.Coord;
-import factorization.api.DeltaCoord;
-import factorization.shared.Core;
-import factorization.util.DataUtil;
+import java.util.ArrayList;
+
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
@@ -18,9 +16,13 @@ import net.minecraft.util.BlockPos;
 import net.minecraft.world.EnumSkyBlock;
 import net.minecraft.world.WorldSettings;
 import net.minecraft.world.chunk.Chunk;
+
 import net.minecraftforge.common.util.Constants;
 
-import java.util.ArrayList;
+import factorization.api.Coord;
+import factorization.api.DeltaCoord;
+import factorization.shared.Core;
+import factorization.util.DataUtil;
 
 public class DocWorld extends WorldClient {
     static final Minecraft mc = Minecraft.getMinecraft();
@@ -105,18 +107,18 @@ public class DocWorld extends WorldClient {
     }
     
     @Override
-    public Block getBlock(BlockPos pos) {
+    public IBlockState getBlockState(BlockPos pos) {
         int i = getIndex(pos);
-        if (i == -1) return Blocks.air;
+        if (i == -1) return Blocks.air.getDefaultState();
         int id = blockIds[i];
         if (id == -10) {
-            return Core.registry.factory_block;
+            return Core.registry.factory_block.getDefaultState();
         } else if (id == -11) {
-            return Core.registry.resource_block;
+            return Core.registry.resource_block.getDefaultState();
         } else if (id == -12) {
-            return Core.registry.dark_iron_ore;
+            return Core.registry.dark_iron_ore.getDefaultState();
         } else {
-            return DataUtil.getBlock(id);
+            return DataUtil.getBlock(id).getDefaultState();
         }
     }
 
@@ -179,7 +181,7 @@ public class DocWorld extends WorldClient {
     Chunk myChunk = new Chunk(this, 0, 0) {
         @Override
         public Block getBlock(BlockPos pos) {
-            return DocWorld.this.getBlock(pos);
+            return DocWorld.this.getBlockState(pos).getBlock();
         }
 
         @Override

@@ -1,5 +1,21 @@
 package factorization.colossi;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Set;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
+import net.minecraft.block.Block;
+import net.minecraft.block.material.Material;
+import net.minecraft.item.ItemStack;
+import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.EnumFacing;
+import net.minecraft.util.Vec3;
+
 import factorization.api.Coord;
 import factorization.api.DeltaCoord;
 import factorization.colossi.ColossusController.BodySide;
@@ -14,16 +30,6 @@ import factorization.notify.Style;
 import factorization.shared.Core;
 import factorization.util.FzUtil;
 import factorization.util.SpaceUtil;
-import net.minecraft.block.Block;
-import net.minecraft.block.material.Material;
-import net.minecraft.item.ItemStack;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.EnumFacing;
-import net.minecraft.util.Vec3;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-
-import java.util.*;
 
 public class Awakener {
     int arm_size = 0, arm_length = 0;
@@ -79,7 +85,7 @@ public class Awakener {
             for (int dzChunk = -chunkSearchRadius; dzChunk <= chunkSearchRadius; dzChunk++) {
                 at.set(src);
                 at.adjust(dxChunk * 16, 0, dzChunk * 16);
-                Iterable<TileEntity> tes = (Iterable<TileEntity>) at.getChunk().chunkTileEntityMap.values();
+                Iterable<TileEntity> tes = at.getChunk().getTileEntityMap().values();
                 for (TileEntity te : tes) {
                     if (!(te instanceof TileEntityColossalHeart)) continue;
                     TileEntityColossalHeart heart = (TileEntityColossalHeart) te;

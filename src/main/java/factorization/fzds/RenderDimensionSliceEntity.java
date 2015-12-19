@@ -137,7 +137,7 @@ public class RenderDimensionSliceEntity extends Render implements IFzdsShenaniga
         int render_skips = 0;
         
         void updateRelativeEyePosition() {
-            final Entity player = Minecraft.getMinecraft().renderViewEntity;
+            final Entity player = Minecraft.getMinecraft().getRenderViewEntity();
             Vec3 eyepos = dse.real2shadow(SpaceUtil.fromEntPos(player));
             shadowEye.posX = eyepos.xCoord;
             shadowEye.posY = eyepos.yCoord;
@@ -247,7 +247,7 @@ public class RenderDimensionSliceEntity extends Render implements IFzdsShenaniga
                         }
                         Core.profileEnd();
                         Core.profileStart("tesr");
-                        for (TileEntity te : here.chunkTileEntityMap.values()) {
+                        for (TileEntity te : here.getTileEntityMap().values()) {
                             //I warned you about comods, bro! I told you, dawg! (Shouldn't actually be a problem if we're rendering properly)
                             
                             //Since we don't know the actual distance from the player to the TE, we need to cheat.
@@ -334,7 +334,7 @@ public class RenderDimensionSliceEntity extends Render implements IFzdsShenaniga
             GL11.glEnable(GL11.GL_ALPHA_TEST);
             Tessellator tessI = Tessellator.getInstance();
             WorldRenderer tess = tessI.getWorldRenderer();
-            tess.startDrawing(GL11.GL_QUADS, DefaultVertexFormats.BLOCK);
+            tess.begin(GL11.GL_QUADS, DefaultVertexFormats.BLOCK);
             double dx = NumUtil.interp(player.prevPosX, player.posX, partial);
             double dy = NumUtil.interp(player.prevPosY, player.posY, partial);
             double dz = NumUtil.interp(player.prevPosZ, player.posZ, partial);

@@ -6,9 +6,6 @@ import factorization.compat.CompatBase;
 import factorization.truth.DocumentationModule;
 import factorization.truth.api.IObjectWriter;
 import factorization.truth.word.ItemWord;
-import ic2.api.recipe.Recipes;
-import ic2.core.AdvRecipe;
-import ic2.core.AdvShapelessRecipe;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
@@ -38,7 +35,7 @@ public class Compat_IC2 extends CompatBase {
             imc(tag);
         }
 
-        Class cl = Recipes.class;
+        /* Class cl = Recipes.class;
         for (Field field : cl.getFields()) {
             final int modifiers = field.getModifiers();
             if ((modifiers & Modifier.PUBLIC) == 0) continue;
@@ -49,7 +46,7 @@ public class Compat_IC2 extends CompatBase {
             FMLInterModComms.sendMessage(DocumentationModule.modid, "AddRecipeCategory", "fzdoc.ic2.recipe." + name + "|ic2.api.recipe.Recipes|" + name);
         }
         IObjectWriter.adapter.register(AdvRecipe.class, new WriteShapedRecipe());
-        IObjectWriter.adapter.register(AdvShapelessRecipe.class, new WriteShapelessRecipe());
+        IObjectWriter.adapter.register(AdvShapelessRecipe.class, new WriteShapelessRecipe()); */
     }
 
     NBTTagCompound standardIc2Recipe(String name) {
@@ -65,7 +62,7 @@ public class Compat_IC2 extends CompatBase {
         FMLInterModComms.sendMessage(DocumentationModule.modid, "AddRecipeCategoryGuided", tag);
     }
 
-    private static class WriteShapedRecipe implements IObjectWriter<AdvRecipe> {
+    /* private static class WriteShapedRecipe implements IObjectWriter<AdvRecipe> {
         @Override
         public void writeObject(List out, AdvRecipe val, IObjectWriter<Object> generic) {
             int mask = val.masks[0];
@@ -91,5 +88,5 @@ public class Compat_IC2 extends CompatBase {
                 out.add(new ItemWord(AdvRecipe.expand(obj)));
             }
         }
-    }
+    } */
 }

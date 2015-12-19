@@ -1,17 +1,10 @@
 package factorization.colossi;
 
-import factorization.api.Coord;
-import factorization.citizen.EntityCitizen;
-import factorization.fzds.DeltaChunk;
-import factorization.fzds.TransferLib;
-import factorization.fzds.interfaces.IDeltaChunk;
-import factorization.oreprocessing.ItemOreProcessing;
-import factorization.servo.ItemMatrixProgrammer;
-import factorization.shared.Core;
-import factorization.shared.Core.TabType;
-import factorization.util.PlayerUtil;
-import factorization.weird.poster.EntityPoster;
-import factorization.weird.poster.ItemSpawnPoster;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
+import java.util.UUID;
+
 import net.minecraft.block.Block;
 import net.minecraft.block.material.MapColor;
 import net.minecraft.block.material.Material;
@@ -24,17 +17,38 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.*;
+import net.minecraft.util.BlockPos;
+import net.minecraft.util.EnumFacing;
+import net.minecraft.util.EnumParticleTypes;
+import net.minecraft.util.IStringSerializable;
+import net.minecraft.util.WeightedRandomChestContent;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
+
 import net.minecraftforge.common.ChestGenHooks;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
-import java.util.UUID;
-
-import static factorization.colossi.ColossalBlock.Md.*;
+import factorization.api.Coord;
+import factorization.citizen.EntityCitizen;
+import factorization.fzds.DeltaChunk;
+import factorization.fzds.TransferLib;
+import factorization.fzds.interfaces.IDeltaChunk;
+import factorization.oreprocessing.ItemOreProcessing;
+import factorization.servo.ItemMatrixProgrammer;
+import factorization.shared.Core;
+import factorization.shared.Core.TabType;
+import factorization.util.PlayerUtil;
+import factorization.weird.poster.EntityPoster;
+import factorization.weird.poster.ItemSpawnPoster;
+import static factorization.colossi.ColossalBlock.Md.ARM;
+import static factorization.colossi.ColossalBlock.Md.BODY;
+import static factorization.colossi.ColossalBlock.Md.BODY_COVERED;
+import static factorization.colossi.ColossalBlock.Md.BODY_CRACKED;
+import static factorization.colossi.ColossalBlock.Md.CORE;
+import static factorization.colossi.ColossalBlock.Md.EYE;
+import static factorization.colossi.ColossalBlock.Md.EYE_OPEN;
+import static factorization.colossi.ColossalBlock.Md.MASK;
+import static factorization.colossi.ColossalBlock.Md.MASK_CRACKED;
+import static factorization.colossi.ColossalBlock.Md.values;
 
 public class ColossalBlock extends Block {
     public enum Md implements IStringSerializable, Comparable<Md> {
@@ -118,8 +132,9 @@ public class ColossalBlock extends Block {
     }
     
     boolean isSupportive(World world, BlockPos pos) {
-        if (world.getBlock(pos) != this) return false;
-        IBlockState bs = world.getBlockState(pos);
+		IBlockState bs = world.getBlockState(pos);
+        if (bs.getBlock() != this) return false;
+
         Md md = bs.<Md>getValue(VARIANT);
         return md == BODY || md == BODY_COVERED || md == EYE || md == EYE_OPEN || md == CORE;
     }

@@ -36,7 +36,7 @@ public class ItemPotency extends ItemCraftingComponent {
         EntityPlayerMP player = (EntityPlayerMP) _player;
         NBTTagCompound tag = ItemUtil.getTag(stack);
         String ownerId = player.getGameProfile().getId().toString();
-        String ownerName = player.getCommandSenderName();
+        String ownerName = player.getName();
         StatisticsFile stats = StatUtil.getStatsFile(player);
         if (stats == null) return;
         int deaths = getDeaths(player);
@@ -57,7 +57,7 @@ public class ItemPotency extends ItemCraftingComponent {
         if (stack.getItemDamage() == 1) return 1; // It'll never change back! (Even for other players.)
         NBTTagCompound tag = ItemUtil.getTag(stack);
         String ownerId = player.getGameProfile().getId().toString();
-        String ownerName = player.getCommandSenderName();
+        String ownerName = player.getName();
         int deaths = StatUtil.load(player, StatList.deathsStat).get();
         if (!ownerId.equals(tag.getString("ownerId")) && !ownerName.equals(tag.getString("ownerName"))) return 2;
         if (deaths != tag.getInteger("deathId")) return 1;

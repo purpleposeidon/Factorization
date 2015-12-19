@@ -1,5 +1,23 @@
 package factorization.shared;
 
+import java.io.IOException;
+
+import io.netty.buffer.ByteBuf;
+
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.inventory.IInventory;
+import net.minecraft.inventory.ISidedInventory;
+import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.NBTTagList;
+import net.minecraft.util.ChatComponentText;
+import net.minecraft.util.ChatComponentTranslation;
+import net.minecraft.util.EnumFacing;
+import net.minecraft.util.IChatComponent;
+import net.minecraft.util.ITickable;
+
+import net.minecraftforge.common.util.Constants;
+
 import factorization.api.Coord;
 import factorization.api.ICoord;
 import factorization.api.IFactoryType;
@@ -9,17 +27,6 @@ import factorization.common.FactoryType;
 import factorization.shared.NetworkFactorization.MessageType;
 import factorization.util.InvUtil;
 import factorization.util.ItemUtil;
-import io.netty.buffer.ByteBuf;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.inventory.IInventory;
-import net.minecraft.inventory.ISidedInventory;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.nbt.NBTTagList;
-import net.minecraft.util.*;
-import net.minecraftforge.common.util.Constants;
-
-import java.io.IOException;
 
 public abstract class TileEntityFactorization extends TileEntityCommon
         implements IInventory, ISidedInventory, ICoord, IFactoryType, ITickable {
@@ -162,8 +169,10 @@ public abstract class TileEntityFactorization extends TileEntityCommon
     }
 
     @Override
-    public ItemStack getStackInSlotOnClosing(int slot) {
-        return null;
+    public ItemStack removeStackFromSlot(int slot) {
+		ItemStack stack = getStackInSlot(slot);
+		setInventorySlotContents(slot, null);
+        return stack;
     }
     
     public void drawActive(int add_time) {
@@ -213,7 +222,7 @@ public abstract class TileEntityFactorization extends TileEntityCommon
     }
 
     @Override
-    public final String getCommandSenderName() {
+    public final String getName() {
         return "factorization." + getFactoryType().toString();
     }
 

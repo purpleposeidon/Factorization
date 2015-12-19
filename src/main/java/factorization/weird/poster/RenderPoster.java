@@ -1,5 +1,8 @@
 package factorization.weird.poster;
 
+import org.lwjgl.opengl.GL11;
+import org.lwjgl.opengl.GL12;
+
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.RenderGlobal;
 import net.minecraft.client.renderer.block.model.ItemCameraTransforms;
@@ -11,8 +14,6 @@ import net.minecraft.entity.monster.EntityEnderman;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.MovingObjectPosition;
-import org.lwjgl.opengl.GL11;
-import org.lwjgl.opengl.GL12;
 
 public class RenderPoster extends RenderEntity {
 
@@ -33,7 +34,7 @@ public class RenderPoster extends RenderEntity {
             // They ordinarily don't move, so no need to bother w/ interpolation
             GL11.glTranslated(-ent.posX, -ent.posY, -ent.posZ);
             GL11.glDisable(GL11.GL_TEXTURE_2D);
-            RenderGlobal.drawBox(ent.getEntityBoundingBox());
+            RenderGlobal.func_181561_a(ent.getEntityBoundingBox());
             GL11.glEnable(GL11.GL_TEXTURE_2D);
             GL11.glPopMatrix();
         }

@@ -1,8 +1,10 @@
 package factorization.artifact;
 
-import factorization.shared.Core;
-import factorization.util.ItemUtil;
-import factorization.util.NumUtil;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.regex.Pattern;
+
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.player.EntityPlayer;
@@ -11,16 +13,15 @@ import net.minecraft.inventory.ContainerRepair;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.util.ChatComponentText;
 import net.minecraft.util.ChatComponentTranslation;
 import net.minecraft.util.IChatComponent;
 import net.minecraft.util.StringUtils;
+
 import net.minecraftforge.oredict.OreDictionary;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.regex.Pattern;
+import factorization.shared.Core;
+import factorization.util.ItemUtil;
+import factorization.util.NumUtil;
 
 public class InventoryForge implements IInventory {
     final EntityPlayer player;
@@ -67,7 +68,8 @@ public class InventoryForge implements IInventory {
     }
 
     @Override
-    public ItemStack getStackInSlotOnClosing(int slot) {
+    public ItemStack removeStackFromSlot(int slot) {
+		// NORELEASE: Fix me! Come on!
         return null;
     }
 
@@ -189,7 +191,7 @@ public class InventoryForge implements IInventory {
     }
 
     @Override
-    public String getCommandSenderName() {
+    public String getName() {
         return "factorization.inventory.forge";
     }
 
@@ -200,7 +202,7 @@ public class InventoryForge implements IInventory {
 
     @Override
     public IChatComponent getDisplayName() {
-        return new ChatComponentTranslation(getCommandSenderName());
+        return new ChatComponentTranslation(getName());
     }
 
     class ArtifactBuilder {

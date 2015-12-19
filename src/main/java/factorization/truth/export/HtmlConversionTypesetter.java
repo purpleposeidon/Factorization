@@ -1,17 +1,22 @@
 package factorization.truth.export;
 
-import factorization.truth.AbstractTypesetter;
-import factorization.truth.api.*;
-import factorization.truth.word.Word;
+import java.io.OutputStream;
+import java.io.PrintStream;
+import java.util.Collection;
+
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.ItemModelMesher;
 import net.minecraft.client.resources.model.IBakedModel;
 import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
 
-import java.io.OutputStream;
-import java.io.PrintStream;
-import java.util.Collection;
+import factorization.truth.AbstractTypesetter;
+import factorization.truth.api.IHtmlTypesetter;
+import factorization.truth.api.ITokenizer;
+import factorization.truth.api.ITypesetCommand;
+import factorization.truth.api.IWord;
+import factorization.truth.api.TruthError;
+import factorization.truth.word.Word;
 
 public class HtmlConversionTypesetter extends AbstractTypesetter implements IHtmlTypesetter {
     PrintStream out;
@@ -72,7 +77,7 @@ public class HtmlConversionTypesetter extends AbstractTypesetter implements IHtm
             if (ibm == null) {
                 found_icon = "error";
             } else {
-                found_icon = ibm.getTexture().getIconName();
+                found_icon = ibm.getParticleTexture().getIconName();
             }
             if (theItem.getItem() instanceof ItemBlock) {
                 imgType = "block";

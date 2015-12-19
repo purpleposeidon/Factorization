@@ -1,8 +1,11 @@
 package factorization.aabbdebug;
 
-import factorization.api.Coord;
-import factorization.shared.Core;
-import factorization.util.SpaceUtil;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
+import org.lwjgl.opengl.GL11;
+
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.RenderGlobal;
 import net.minecraft.command.ICommand;
@@ -13,16 +16,16 @@ import net.minecraft.util.BlockPos;
 import net.minecraft.util.ChatComponentText;
 import net.minecraft.util.Vec3;
 import net.minecraft.world.World;
+
 import net.minecraftforge.client.ClientCommandHandler;
 import net.minecraftforge.client.event.RenderWorldLastEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent.ClientTickEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent.Phase;
-import org.lwjgl.opengl.GL11;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import factorization.api.Coord;
+import factorization.shared.Core;
+import factorization.util.SpaceUtil;
 
 public enum AabbDebugger {
     INSTANCE;
@@ -150,12 +153,12 @@ public enum AabbDebugger {
         GL11.glLineWidth(4);
         synchronized (boxes) {
             for (AxisAlignedBB box : boxes) {
-                RenderGlobal.drawBoxColored(box, 0x80, 0, 0, 0xFF);
+                RenderGlobal.drawOutlinedBoundingBox(box, 0x80, 0, 0, 0xFF);
             }
         }
         synchronized (frozen) {
             for (AxisAlignedBB box : frozen) {
-                RenderGlobal.drawBoxColored(box, 0x40, 0x40, 0xb0, 0xFF);
+                RenderGlobal.drawOutlinedBoundingBox(box, 0x40, 0x40, 0xb0, 0xFF);
             }
         }
         GL11.glLineWidth(2);

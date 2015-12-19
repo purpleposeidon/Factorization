@@ -43,7 +43,7 @@ public class BuildColossusCommand extends CommandBase {
             return;
         }
         Coord at = new Coord(sender.getEntityWorld(), sender.getPosition());
-        if (sender.getCommandSenderName().startsWith("@")) {
+        if (sender.getName().startsWith("@")) {
             at = at.add(0, 6, 0);		    
         }
         if (args[0].equalsIgnoreCase("spam") || args[0].equals("$")) {

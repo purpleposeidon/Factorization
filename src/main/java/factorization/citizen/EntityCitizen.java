@@ -1,5 +1,31 @@
 package factorization.citizen;
 
+import java.io.IOException;
+import java.util.Random;
+
+import net.minecraft.block.Block;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.settings.GameSettings;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.monster.IMob;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.init.Blocks;
+import net.minecraft.item.ItemStack;
+import net.minecraft.potion.Potion;
+import net.minecraft.potion.PotionEffect;
+import net.minecraft.util.AxisAlignedBB;
+import net.minecraft.util.BlockPos;
+import net.minecraft.util.ChatComponentText;
+import net.minecraft.util.ChatComponentTranslation;
+import net.minecraft.util.ChatStyle;
+import net.minecraft.util.EnumChatFormatting;
+import net.minecraft.util.EnumParticleTypes;
+import net.minecraft.util.IChatComponent;
+import net.minecraft.util.MathHelper;
+import net.minecraft.util.Vec3;
+import net.minecraft.world.World;
+
 import factorization.api.Coord;
 import factorization.api.FzOrientation;
 import factorization.api.Quaternion;
@@ -15,24 +41,15 @@ import factorization.util.InvUtil;
 import factorization.util.ItemUtil;
 import factorization.util.LangUtil;
 import factorization.util.SpaceUtil;
-import net.minecraft.block.Block;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.settings.GameSettings;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.monster.IMob;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.entity.player.EntityPlayerMP;
-import net.minecraft.init.Blocks;
-import net.minecraft.item.ItemStack;
-import net.minecraft.potion.Potion;
-import net.minecraft.potion.PotionEffect;
-import net.minecraft.util.*;
-import net.minecraft.world.World;
-
-import java.io.IOException;
-import java.util.Random;
-
-import static factorization.citizen.EntityCitizen.ScriptKinds.*;
+import static factorization.citizen.EntityCitizen.ScriptKinds.authenticate;
+import static factorization.citizen.EntityCitizen.ScriptKinds.give;
+import static factorization.citizen.EntityCitizen.ScriptKinds.leave;
+import static factorization.citizen.EntityCitizen.ScriptKinds.potions;
+import static factorization.citizen.EntityCitizen.ScriptKinds.reveal;
+import static factorization.citizen.EntityCitizen.ScriptKinds.say;
+import static factorization.citizen.EntityCitizen.ScriptKinds.spin;
+import static factorization.citizen.EntityCitizen.ScriptKinds.unspin;
+import static factorization.citizen.EntityCitizen.ScriptKinds.wait;
 
 public class EntityCitizen extends EntityFz {
 
@@ -409,7 +426,7 @@ public class EntityCitizen extends EntityFz {
             boolean flag1 = false;
 
             while (!flag1 && j > 0) {
-                Block block = ent.worldObj.getBlock(pos.down());
+                Block block = ent.worldObj.getBlockState(pos.down()).getBlock();
 
                 if (block.getMaterial().blocksMovement()) {
                     flag1 = true;

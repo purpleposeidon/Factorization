@@ -1,15 +1,7 @@
 package factorization.weird;
 
-import factorization.api.Coord;
-import factorization.api.FzOrientation;
-import factorization.api.Quaternion;
-import factorization.common.FactoryType;
-import factorization.common.FzConfig;
-import factorization.shared.Core;
-import factorization.shared.FzIcons;
-import factorization.util.RenderUtil;
-import factorization.util.SpaceUtil;
-import factorization.weird.TileEntityDayBarrel.Type;
+import org.lwjgl.opengl.GL11;
+
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.GLAllocation;
 import net.minecraft.client.renderer.Tessellator;
@@ -20,7 +12,17 @@ import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ResourceLocation;
-import org.lwjgl.opengl.GL11;
+
+import factorization.api.Coord;
+import factorization.api.FzOrientation;
+import factorization.api.Quaternion;
+import factorization.common.FactoryType;
+import factorization.common.FzConfig;
+import factorization.shared.Core;
+import factorization.shared.FzIcons;
+import factorization.util.RenderUtil;
+import factorization.util.SpaceUtil;
+import factorization.weird.TileEntityDayBarrel.Type;
 
 public class TileEntityDayBarrelRenderer extends TileEntitySpecialRenderer<TileEntityDayBarrel> {
 
@@ -154,7 +156,7 @@ public class TileEntityDayBarrelRenderer extends TileEntitySpecialRenderer<TileE
         final Tessellator tessI = Tessellator.getInstance();
         WorldRenderer tess = tessI.getWorldRenderer();
         tess.setTranslation(-char_width * len / 2 + 0.25, -char_height - 1F/32F, 0);
-        tess.startDrawing(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX); // 3 double vertex positions + 2 double UV positions
+        tess.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX); // 3 double vertex positions + 2 double UV positions
         double du = (font.getMaxU() - font.getMinU()) / 4;
         double dv = (font.getMaxV() - font.getMinV()) / 4;
         double u = font.getMinU();

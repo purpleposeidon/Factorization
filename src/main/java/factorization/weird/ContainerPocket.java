@@ -1,21 +1,27 @@
 package factorization.weird;
 
-import factorization.common.Command;
-import factorization.shared.Core;
-import factorization.util.CraftUtil;
-import factorization.util.InvUtil;
-import factorization.util.ItemUtil;
+import java.lang.reflect.Field;
+import java.util.ArrayList;
+
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.entity.player.InventoryPlayer;
-import net.minecraft.inventory.*;
+import net.minecraft.inventory.Container;
+import net.minecraft.inventory.IInventory;
+import net.minecraft.inventory.InventoryCraftResult;
+import net.minecraft.inventory.InventoryCrafting;
+import net.minecraft.inventory.Slot;
+import net.minecraft.inventory.SlotCrafting;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.IRecipe;
 import net.minecraft.util.IChatComponent;
 import net.minecraft.world.World;
 
-import java.lang.reflect.Field;
-import java.util.ArrayList;
+import factorization.common.Command;
+import factorization.shared.Core;
+import factorization.util.CraftUtil;
+import factorization.util.InvUtil;
+import factorization.util.ItemUtil;
 
 public class ContainerPocket extends Container {
     final EntityPlayer player;
@@ -141,8 +147,8 @@ public class ContainerPocket extends Container {
         }
 
         @Override
-        public ItemStack getStackInSlotOnClosing(int var1) {
-            return src.getStackInSlotOnClosing(remapSlotId(var1));
+        public ItemStack removeStackFromSlot(int var1) {
+            return src.removeStackFromSlot(remapSlotId(var1));
         }
 
         @Override
@@ -159,8 +165,8 @@ public class ContainerPocket extends Container {
         }
 
         @Override
-        public String getCommandSenderName() {
-            return src.getCommandSenderName();
+        public String getName() {
+            return src.getName();
         }
 
         @Override

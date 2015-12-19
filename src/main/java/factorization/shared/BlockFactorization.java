@@ -1,13 +1,12 @@
 package factorization.shared;
 
-import factorization.algos.ReservoirSampler;
-import factorization.api.Coord;
-import factorization.api.FzColor;
-import factorization.common.FactoryType;
-import factorization.common.Registry;
-import factorization.notify.Notice;
-import factorization.shared.NetworkFactorization.MessageType;
-import factorization.weird.TileEntityDayBarrel;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Random;
+
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockContainer;
 import net.minecraft.block.material.Material;
@@ -22,12 +21,26 @@ import net.minecraft.item.EnumDyeColor;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.*;
+import net.minecraft.util.AxisAlignedBB;
+import net.minecraft.util.BlockPos;
+import net.minecraft.util.ChatComponentText;
+import net.minecraft.util.EnumFacing;
+import net.minecraft.util.EnumWorldBlockLayer;
+import net.minecraft.util.MovingObjectPosition;
+import net.minecraft.util.Vec3;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
+
 import net.minecraftforge.fml.common.network.internal.FMLProxyPacket;
 
-import java.util.*;
+import factorization.algos.ReservoirSampler;
+import factorization.api.Coord;
+import factorization.api.FzColor;
+import factorization.common.FactoryType;
+import factorization.common.Registry;
+import factorization.notify.Notice;
+import factorization.shared.NetworkFactorization.MessageType;
+import factorization.weird.TileEntityDayBarrel;
 
 public class BlockFactorization extends BlockContainer {
     public static final IProperty<BlockClass> BLOCK_CLASS = PropertyEnum.create("blockclass", BlockClass.class);
@@ -451,12 +464,12 @@ public class BlockFactorization extends BlockContainer {
 
 
     @Override
-    public int isProvidingStrongPower(IBlockAccess worldIn, BlockPos pos, IBlockState state, EnumFacing side) {
+    public int getStrongPower(IBlockAccess worldIn, BlockPos pos, IBlockState state, EnumFacing side) {
         return 0;
     }
 
     @Override
-    public int isProvidingWeakPower(IBlockAccess world, BlockPos pos, IBlockState state, EnumFacing side) {
+    public int getWeakPower(IBlockAccess world, BlockPos pos, IBlockState state, EnumFacing side) {
         TileEntityCommon tec = get(world, pos);
         if (tec != null) {
             return tec.power() ? 15 : 0;

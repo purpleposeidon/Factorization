@@ -1,10 +1,20 @@
 package factorization.util;
 
+import java.awt.Toolkit;
+import java.awt.datatransfer.StringSelection;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Map;
+
+import com.google.common.base.Function;
+import com.google.common.base.Joiner;
+import com.google.common.collect.Iterables;
 import com.google.common.collect.Multimap;
-import factorization.api.Coord;
-import factorization.shared.Core;
-import factorization.weird.TileEntityDayBarrel;
+
 import net.minecraft.block.Block;
+import net.minecraft.block.properties.IProperty;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
@@ -20,21 +30,34 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.BlockPos;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
+
 import net.minecraftforge.common.DimensionManager;
 import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
-import java.awt.*;
-import java.awt.datatransfer.StringSelection;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.Collection;
+import factorization.api.Coord;
+import factorization.shared.Core;
+import factorization.weird.TileEntityDayBarrel;
 
 public class FzUtil {
-
+    private static final Joiner COMMA_JOINER = Joiner.on(',');
+    private static final Function<Map.Entry<IProperty, Comparable>, String> MAP_ENTRY_TO_STRING = new Function<Map.Entry<IProperty, Comparable>, String>()
+    {
+        public String apply(Map.Entry<IProperty, Comparable> p_apply_1_)
+        {
+            if (p_apply_1_ == null)
+            {
+                return "<NULL>";
+            }
+            else
+            {
+                IProperty iproperty = p_apply_1_.getKey();
+                return iproperty.getName() + "=" + iproperty.getName(p_apply_1_.getValue());
+            }
+        }
+    };
 
     public static <E extends Enum> E shiftEnum(E current, E values[], int delta) { // 'cycleEnum'
         int next = current.ordinal() + delta;
@@ -232,8 +255,13 @@ public class FzUtil {
         return abs == bbs;
     }
 
-
-
+    public static String getStatePropertyString(IBlockState state) {
+        if (!state.getProperties().isEmpty()) {
+            return COMMA_JOINER.join(Iterables.transform(state.getProperties().entrySet(), MAP_ENTRY_TO_STRING));
+        } else {
+            return "normal";
+        }
+    }
 
     public static void initItem(Item it, String name, Core.TabType tabType) {
         it.setUnlocalizedName("factorization:" + name.replace('.', '/'));
@@ -242,7 +270,7 @@ public class FzUtil {
 
     @SideOnly(Side.CLIENT)
     public static TextureAtlasSprite getIcon(ItemStack it) {
-        return Minecraft.getMinecraft().getRenderItem().getItemModelMesher().getItemModel(it).getTexture();
+        return Minecraft.getMinecraft().getRenderItem().getItemModelMesher().getItemModel(it).getParticleTexture();
     }
 
     @SideOnly(Side.CLIENT)

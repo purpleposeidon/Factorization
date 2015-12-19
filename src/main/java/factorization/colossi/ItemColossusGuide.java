@@ -1,13 +1,7 @@
 package factorization.colossi;
 
-import factorization.api.Coord;
-import factorization.api.DeltaCoord;
-import factorization.common.FzConfig;
-import factorization.notify.Notice;
-import factorization.shared.Core;
-import factorization.shared.Core.TabType;
-import factorization.shared.ItemFactorization;
-import factorization.util.PlayerUtil;
+import java.util.ArrayList;
+
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.server.MinecraftServer;
@@ -16,9 +10,17 @@ import net.minecraft.util.ChatComponentTranslation;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.IChatComponent;
 import net.minecraft.world.World;
+
 import net.minecraftforge.common.util.FakePlayer;
 
-import java.util.ArrayList;
+import factorization.api.Coord;
+import factorization.api.DeltaCoord;
+import factorization.common.FzConfig;
+import factorization.notify.Notice;
+import factorization.shared.Core;
+import factorization.shared.Core.TabType;
+import factorization.shared.ItemFactorization;
+import factorization.util.PlayerUtil;
 
 public class ItemColossusGuide extends ItemFactorization {
 
@@ -60,7 +62,7 @@ public class ItemColossusGuide extends ItemFactorization {
             int limit = 4;
             for (Coord at : nearby) {
                 String t = at.toString();
-                t = at.getChunk().isTerrainPopulated + " " + t;
+                t = at.getChunk().isTerrainPopulated() + " " + t;
                 player.addChatComponentMessage(new ChatComponentText(t));
                 if (limit-- <= 0) break;
             }

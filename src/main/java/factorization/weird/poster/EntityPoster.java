@@ -1,5 +1,24 @@
 package factorization.weird.poster;
 
+import java.io.IOException;
+
+import net.minecraft.client.Minecraft;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.item.EntityItem;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
+import net.minecraft.util.AxisAlignedBB;
+import net.minecraft.util.BlockPos;
+import net.minecraft.util.EnumFacing;
+import net.minecraft.util.MathHelper;
+import net.minecraft.util.MovingObjectPosition;
+import net.minecraft.util.Vec3;
+import net.minecraft.world.World;
+
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
+
 import factorization.api.Coord;
 import factorization.api.Quaternion;
 import factorization.api.datahelpers.DataHelper;
@@ -10,18 +29,6 @@ import factorization.util.ItemUtil;
 import factorization.util.NumUtil;
 import factorization.util.PlayerUtil;
 import factorization.util.SpaceUtil;
-import net.minecraft.client.Minecraft;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.item.EntityItem;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.*;
-import net.minecraft.world.World;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
-
-import java.io.IOException;
 
 public class EntityPoster extends EntityFz  {
     public ItemStack inv = new ItemStack(Core.registry.spawnPoster);
@@ -144,7 +151,7 @@ public class EntityPoster extends EntityFz  {
             Entity newItem = at.spawnItem(droppedItem);
             if (newItem instanceof EntityItem) {
                 EntityItem ei = (EntityItem) newItem;
-                ei.delayBeforeCanPickup = 0;
+                ei.setNoPickupDelay();
             }
             newItem.onCollideWithPlayer(player);
             return true;

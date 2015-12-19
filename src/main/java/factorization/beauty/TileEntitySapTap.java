@@ -1,5 +1,21 @@
 package factorization.beauty;
 
+import java.io.IOException;
+import java.util.HashSet;
+
+import net.minecraft.block.Block;
+import net.minecraft.block.BlockLog;
+import net.minecraft.block.material.Material;
+import net.minecraft.client.renderer.texture.ITickable;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.inventory.ISidedInventory;
+import net.minecraft.item.ItemStack;
+import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.ChatComponentTranslation;
+import net.minecraft.util.EnumFacing;
+import net.minecraft.util.IChatComponent;
+import net.minecraft.world.chunk.Chunk;
+
 import factorization.algos.FastBag;
 import factorization.api.Coord;
 import factorization.api.ICoordFunction;
@@ -15,21 +31,6 @@ import factorization.shared.TileEntityCommon;
 import factorization.util.FzUtil;
 import factorization.util.InvUtil;
 import factorization.util.ItemUtil;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockLog;
-import net.minecraft.block.material.Material;
-import net.minecraft.client.renderer.texture.ITickable;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.inventory.ISidedInventory;
-import net.minecraft.item.ItemStack;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.ChatComponentTranslation;
-import net.minecraft.util.EnumFacing;
-import net.minecraft.util.IChatComponent;
-import net.minecraft.world.chunk.Chunk;
-
-import java.io.IOException;
-import java.util.HashSet;
 
 public class TileEntitySapTap extends TileEntityCommon implements ISidedInventory, ITickable {
     ItemStack sap = new ItemStack(Core.registry.sap, 0, 0);
@@ -67,7 +68,12 @@ public class TileEntitySapTap extends TileEntityCommon implements ISidedInventor
     }
 
     @Override
-    public ItemStack getStackInSlotOnClosing(int slot) {
+    public ItemStack removeStackFromSlot(int slot) {
+		if (slot == 0) {
+			ItemStack stack = sap;
+			sap = null;
+			return stack;
+		}
         return null;
     }
 
@@ -87,7 +93,7 @@ public class TileEntitySapTap extends TileEntityCommon implements ISidedInventor
     }
 
     @Override
-    public String getCommandSenderName() {
+    public String getName() {
         return null;
     }
 
@@ -255,7 +261,7 @@ public class TileEntitySapTap extends TileEntityCommon implements ISidedInventor
         @Override
         public void handle(Coord here) {
             Chunk chunk = here.getChunk();
-            for (TileEntity te : chunk.chunkTileEntityMap.values()) {
+            for (TileEntity te : chunk.getTileEntityMap().values()) {
                 if (te.isInvalid()) continue;
                 if (!(te instanceof TileEntitySapTap)) continue;
                 Coord tec = new Coord(te);

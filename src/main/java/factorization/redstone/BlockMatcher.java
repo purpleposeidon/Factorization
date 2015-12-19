@@ -1,9 +1,7 @@
 package factorization.redstone;
 
-import factorization.api.Coord;
-import factorization.shared.Core;
-import factorization.util.FzUtil;
-import factorization.util.SpaceUtil;
+import java.util.Random;
+
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.properties.IProperty;
@@ -17,7 +15,10 @@ import net.minecraft.util.IStringSerializable;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 
-import java.util.Random;
+import factorization.api.Coord;
+import factorization.shared.Core;
+import factorization.util.FzUtil;
+import factorization.util.SpaceUtil;
 
 public class BlockMatcher extends Block {
     public static final IProperty<EnumFacing.Axis> AXIS = PropertyEnum.create("axis", EnumFacing.Axis.class);
@@ -168,7 +169,7 @@ public class BlockMatcher extends Block {
     }
 
     @Override
-    public int isProvidingWeakPower(IBlockAccess world, BlockPos pos, IBlockState bs, EnumFacing side) {
+    public int getWeakPower(IBlockAccess world, BlockPos pos, IBlockState bs, EnumFacing side) {
         FiringState state = bs.getValue(FIRING);
         if (state != FiringState.FIRING) return 0;
         EnumFacing.Axis axis = bs.getValue(AXIS);

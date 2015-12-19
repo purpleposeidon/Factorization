@@ -1,13 +1,12 @@
 package factorization.misc;
 
-import factorization.api.Coord;
-import factorization.common.FzConfig;
-import factorization.util.DataUtil;
-import factorization.util.FzUtil;
-import factorization.util.ItemUtil;
-import factorization.util.PlayerUtil;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
+
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
@@ -23,6 +22,7 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.BlockPos;
 import net.minecraft.world.World;
+
 import net.minecraftforge.common.DimensionManager;
 import net.minecraftforge.common.ForgeHooks;
 import net.minecraftforge.common.util.FakePlayer;
@@ -38,9 +38,12 @@ import net.minecraftforge.fml.common.network.internal.FMLProxyPacket;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
+import factorization.api.Coord;
+import factorization.common.FzConfig;
+import factorization.util.DataUtil;
+import factorization.util.FzUtil;
+import factorization.util.ItemUtil;
+import factorization.util.PlayerUtil;
 
 public class BlockUndo {
     public static final String channelName = "FZ|blockundo";
@@ -105,7 +108,7 @@ public class BlockUndo {
     HashMap<String, ArrayList<PlacedBlock>> recentlyPlaced = new HashMap<String, ArrayList<PlacedBlock>>();
 
     private static String getName(EntityPlayer player) {
-        return player.getCommandSenderName() + " #" + player.worldObj.isRemote;
+        return player.getName() + " #" + player.worldObj.isRemote;
     }
 
     private static ItemStack toItem(Block b, World w, BlockPos pos, IBlockState bs) {
@@ -313,10 +316,12 @@ public class BlockUndo {
             if (FzConfig.blockundo_grab) {
                 for (Object o : w.getEntitiesWithinAABB(EntityItem.class, box)) {
                     EntityItem ei = (EntityItem) o;
-                    int orig_delay = ei.delayBeforeCanPickup;
-                    ei.delayBeforeCanPickup = 0;
+					// NORELEASE: Add delayBeforeCanPickup to AT
+                    //int orig_delay = ei.delayBeforeCanPickup;
+                    ei.setNoPickupDelay();
                     ei.onCollideWithPlayer(real_player);
-                    ei.delayBeforeCanPickup = orig_delay;
+					ei.setDefaultPickupDelay();
+                    //ei.delayBeforeCanPickup = orig_delay;
                 }
             }
         }

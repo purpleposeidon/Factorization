@@ -1,17 +1,7 @@
 package factorization.twistedblock;
 
-import factorization.api.Coord;
-import factorization.api.DeltaCoord;
-import factorization.api.Quaternion;
-import factorization.fzds.DeltaChunk;
-import factorization.fzds.Hammer;
-import factorization.fzds.interfaces.DeltaCapability;
-import factorization.fzds.interfaces.IDeltaChunk;
-import factorization.fzds.interfaces.Interpolation;
-import factorization.shared.Core;
-import factorization.shared.Core.TabType;
-import factorization.util.FzUtil;
-import factorization.util.SpaceUtil;
+import java.util.List;
+
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.creativetab.CreativeTabs;
@@ -24,9 +14,21 @@ import net.minecraft.util.BlockPos;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.Vec3;
 import net.minecraft.world.World;
+
 import net.minecraftforge.common.util.FakePlayer;
 
-import java.util.List;
+import factorization.api.Coord;
+import factorization.api.DeltaCoord;
+import factorization.api.Quaternion;
+import factorization.fzds.DeltaChunk;
+import factorization.fzds.Hammer;
+import factorization.fzds.interfaces.DeltaCapability;
+import factorization.fzds.interfaces.IDeltaChunk;
+import factorization.fzds.interfaces.Interpolation;
+import factorization.shared.Core;
+import factorization.shared.Core.TabType;
+import factorization.util.FzUtil;
+import factorization.util.SpaceUtil;
 
 public class ItemTwistedBlock extends ItemBlock {
     static final Block darkIron = Core.registry.resource_block;
@@ -67,11 +69,11 @@ public class ItemTwistedBlock extends ItemBlock {
         }
         DeltaCoord size = new DeltaCoord(16, 16, 16);
         IDeltaChunk idc = DeltaChunk.allocateSlice(world, channel, size);
-        idc.setPartName("TwistedBlock placed by " + player.getCommandSenderName());
+        idc.setPartName("TwistedBlock placed by " + player.getName());
         NBTTagCompound tag = idc.getEntityData();
         at.writeToNBT("placedAgainst", tag);
         tag.setBoolean("isTwistedBlockIDC", true);
-        tag.setString("placedByName", player.getCommandSenderName());
+        tag.setString("placedByName", player.getName());
         tag.setString("playerByUUID", player.getUniqueID().toString());
         tag.setInteger("placedSide", side.ordinal());
         tag.setInteger("turns", 0);

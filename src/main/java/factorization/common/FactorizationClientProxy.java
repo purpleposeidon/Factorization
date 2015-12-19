@@ -1,9 +1,41 @@
 package factorization.common;
 
+import net.minecraft.block.Block;
+import net.minecraft.block.state.IBlockState;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.audio.ISound;
+import net.minecraft.client.audio.PositionedSoundRecord;
+import net.minecraft.client.gui.GuiScreen;
+import net.minecraft.client.renderer.entity.RenderManager;
+import net.minecraft.client.renderer.entity.RenderSnowball;
+import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
+import net.minecraft.client.resources.model.ModelResourceLocation;
+import net.minecraft.client.settings.GameSettings;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.item.Item;
+import net.minecraft.network.play.client.C07PacketPlayerDigging;
+import net.minecraft.profiler.Profiler;
+import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.MovingObjectPosition;
+import net.minecraft.util.ResourceLocation;
+import net.minecraft.world.World;
+
+import net.minecraftforge.client.model.ModelLoader;
+import net.minecraftforge.fml.client.registry.ClientRegistry;
+import net.minecraftforge.fml.client.registry.RenderingRegistry;
+import net.minecraftforge.fml.common.FMLCommonHandler;
+import net.minecraftforge.fml.relauncher.Side;
+
 import factorization.api.Coord;
 import factorization.artifact.ContainerForge;
 import factorization.artifact.GuiArtifactForge;
-import factorization.beauty.*;
+import factorization.beauty.EntityLeafBomb;
+import factorization.beauty.TileEntityBiblioGen;
+import factorization.beauty.TileEntityBiblioGenRenderer;
+import factorization.beauty.TileEntityShaft;
+import factorization.beauty.TileEntityShaftRenderer;
+import factorization.beauty.TileEntitySteamShaft;
+import factorization.beauty.TileEntitySteamShaftRenderer;
 import factorization.ceramics.TileEntityGreenware;
 import factorization.ceramics.TileEntityGreenwareRender;
 import factorization.charge.TileEntityHeater;
@@ -16,11 +48,15 @@ import factorization.colossi.ColossusController;
 import factorization.colossi.ColossusControllerRenderer;
 import factorization.crafting.TileEntityCompressionCrafter;
 import factorization.crafting.TileEntityCompressionCrafterRenderer;
-import factorization.darkiron.BlockDarkIronOre;
 import factorization.mechanics.SocketPoweredCrank;
 import factorization.mechanics.TileEntityHinge;
 import factorization.mechanics.TileEntityHingeRenderer;
-import factorization.oreprocessing.*;
+import factorization.oreprocessing.ContainerCrystallizer;
+import factorization.oreprocessing.ContainerSlagFurnace;
+import factorization.oreprocessing.GuiCrystallizer;
+import factorization.oreprocessing.GuiSlag;
+import factorization.oreprocessing.TileEntityCrystallizer;
+import factorization.oreprocessing.TileEntityCrystallizerRender;
 import factorization.redstone.GuiParasieve;
 import factorization.servo.RenderServoMotor;
 import factorization.servo.ServoMotor;
@@ -34,30 +70,17 @@ import factorization.sockets.SocketLacerator;
 import factorization.sockets.SocketScissors;
 import factorization.sockets.TileEntitySocketRenderer;
 import factorization.sockets.fanturpeller.SocketFanturpeller;
+import factorization.util.FzUtil;
 import factorization.utiligoo.GooRenderer;
-import factorization.weird.*;
+import factorization.weird.ContainerPocket;
+import factorization.weird.EntityMinecartDayBarrel;
+import factorization.weird.GuiPocketTable;
+import factorization.weird.RenderMinecartDayBarrel;
+import factorization.weird.TileEntityDayBarrel;
+import factorization.weird.TileEntityDayBarrelRenderer;
 import factorization.weird.poster.EntityPoster;
 import factorization.weird.poster.RenderPoster;
 import factorization.wrath.TileEntityWrathLamp;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.audio.ISound;
-import net.minecraft.client.audio.PositionedSoundRecord;
-import net.minecraft.client.gui.GuiScreen;
-import net.minecraft.client.renderer.entity.RenderManager;
-import net.minecraft.client.renderer.entity.RenderSnowball;
-import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
-import net.minecraft.client.settings.GameSettings;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.network.play.client.C07PacketPlayerDigging;
-import net.minecraft.profiler.Profiler;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.MovingObjectPosition;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.world.World;
-import net.minecraftforge.fml.client.registry.ClientRegistry;
-import net.minecraftforge.fml.client.registry.RenderingRegistry;
-import net.minecraftforge.fml.common.FMLCommonHandler;
-import net.minecraftforge.fml.relauncher.Side;
 
 public class FactorizationClientProxy extends FactorizationProxy {
     public FactorizationKeyHandler keyHandler = new FactorizationKeyHandler();
@@ -142,9 +165,23 @@ public class FactorizationClientProxy extends FactorizationProxy {
         ClientRegistry.bindTileEntitySpecialRenderer(clazz, r);
     }
 
+    private void setItemBlockModel(Block block, int meta, String variant) {
+        ModelLoader.setCustomModelResourceLocation(Item.getItemFromBlock(block), meta,
+                new ModelResourceLocation(Block.blockRegistry.getNameForObject(block), variant));
+    }
+
+    private void setItemBlockModelFromState(Block block) {
+        for (IBlockState i : block.getBlockState().getValidStates()) {
+            setItemBlockModel(block, block.getMetaFromState(i), FzUtil.getStatePropertyString(i));
+        }
+    }
+
     @SuppressWarnings("ResultOfObjectAllocationIgnored")
     @Override
     public void registerRenderers() {
+        setItemBlockModel(Core.registry.artifact_forge, 0, "inventory");
+        setItemBlockModelFromState(Core.registry.resource_block);
+
         setTileEntityRendererDispatcher(TileEntityDayBarrel.class, new TileEntityDayBarrelRenderer());
         setTileEntityRendererDispatcher(TileEntityGreenware.class, new TileEntityGreenwareRender());
         if (FzConfig.renderTEs) {

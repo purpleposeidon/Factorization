@@ -64,7 +64,7 @@ public class TransferLib {
 
             final int origColumHeight = chunk.heightMap[xzIndex];
             final Block origBlock = chunk.getBlock(blockXChunk, c.y, blockZChunk);
-            final int origMd = chunk.getBlockMetadata(blockXChunk, c.y, blockZChunk);
+            final int origMd = chunk.getBlockMetadata(new BlockPos(blockXChunk, c.y, blockZChunk));
 
             if (origBlock == id && origMd == md) {
                 return;
@@ -125,7 +125,7 @@ public class TransferLib {
     }
 
     public static void rawRemoveTE(Coord c) {
-        c.getChunk().chunkTileEntityMap.remove(c.toBlockPos());
+        c.getChunk().getTileEntityMap().remove(c.toBlockPos());
     }
     
     public static TileEntity move(Coord src, Coord dest, boolean wipeSrc, boolean overwriteDestination) {

@@ -43,7 +43,7 @@ public class DistributeDocs {
     
     static void setGivenBook(EntityPlayer player) {
         if (!FzConfig.players_discover_colossus_guides) return;
-        needyPlayers.remove(player.getCommandSenderName());
+        needyPlayers.remove(player.getName());
         StatUtil.load(player, guideGet).add(1);
         player.getEntityData().setBoolean(guideKey, true);
     }
@@ -56,7 +56,7 @@ public class DistributeDocs {
         }
         if (!(event.player instanceof EntityPlayerMP)) return;
         EntityPlayerMP player = (EntityPlayerMP) event.player;
-        needyPlayers.add(player.getCommandSenderName());
+        needyPlayers.add(player.getName());
     }
     
     @SubscribeEvent
@@ -68,7 +68,7 @@ public class DistributeDocs {
         }
         EntityPlayerMP player = (EntityPlayerMP) ply;
         if (player.theItemInWorldManager.getGameType() == WorldSettings.GameType.CREATIVE) return;
-        String name = player.getCommandSenderName();
+        String name = player.getName();
         if (!needyPlayers.contains(name)) {
             return;
         }

@@ -1,5 +1,25 @@
 package factorization.beauty;
 
+import java.io.IOException;
+
+import io.netty.buffer.ByteBuf;
+
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.INpc;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.inventory.IInventory;
+import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.util.ChatComponentTranslation;
+import net.minecraft.util.ClassInheritanceMultiMap;
+import net.minecraft.util.EnumFacing;
+import net.minecraft.util.EnumParticleTypes;
+import net.minecraft.util.IChatComponent;
+import net.minecraft.util.ITickable;
+
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
+
 import factorization.api.Coord;
 import factorization.api.ICoordFunction;
 import factorization.api.datahelpers.DataHelper;
@@ -12,18 +32,6 @@ import factorization.shared.NetworkFactorization;
 import factorization.shared.TileEntityCommon;
 import factorization.util.InvUtil;
 import factorization.util.ItemUtil;
-import io.netty.buffer.ByteBuf;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.INpc;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.inventory.IInventory;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.util.*;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
-
-import java.io.IOException;
 
 public class TileEntityAnthroGen extends TileEntityCommon implements IInventory, ICoordFunction, ITickable {
     public static int UPDATE_RATE = 20 * 60 * 7;
@@ -176,7 +184,8 @@ public class TileEntityAnthroGen extends TileEntityCommon implements IInventory,
     }
 
     @Override
-    public ItemStack getStackInSlotOnClosing(int slot) {
+    public ItemStack removeStackFromSlot(int slot) {
+		// NORELEASE: Fix me! Come on!
         return null;
     }
 
@@ -196,7 +205,7 @@ public class TileEntityAnthroGen extends TileEntityCommon implements IInventory,
     }
 
     @Override
-    public String getCommandSenderName() {
+    public String getName() {
         return null;
     }
 

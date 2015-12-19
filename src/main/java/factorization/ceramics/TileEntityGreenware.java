@@ -1,22 +1,14 @@
 package factorization.ceramics;
 
-import factorization.api.Coord;
-import factorization.api.IFurnaceHeatable;
-import factorization.api.Quaternion;
-import factorization.api.datahelpers.DataHelper;
-import factorization.api.datahelpers.DataInNBT;
-import factorization.api.datahelpers.DataOutNBT;
-import factorization.api.datahelpers.Share;
-import factorization.common.FactoryType;
-import factorization.common.FzConfig;
-import factorization.common.ResourceType;
-import factorization.notify.Notice;
-import factorization.shared.*;
-import factorization.shared.NetworkFactorization.MessageType;
-import factorization.util.DataUtil;
-import factorization.util.InvUtil;
-import factorization.util.SpaceUtil;
+import java.io.DataInput;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+
+import org.lwjgl.opengl.GL11;
 import io.netty.buffer.ByteBuf;
+
 import net.minecraft.block.Block;
 import net.minecraft.client.renderer.RenderGlobal;
 import net.minecraft.client.resources.model.IBakedModel;
@@ -29,21 +21,39 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.*;
+import net.minecraft.util.AxisAlignedBB;
+import net.minecraft.util.EnumFacing;
+import net.minecraft.util.ITickable;
+import net.minecraft.util.MovingObjectPosition;
+import net.minecraft.util.Vec3;
+
 import net.minecraftforge.client.event.DrawBlockHighlightEvent;
-import net.minecraftforge.client.model.IModel;
 import net.minecraftforge.common.util.Constants;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
-import org.lwjgl.opengl.GL11;
 
-import java.io.DataInput;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
+import factorization.api.Coord;
+import factorization.api.IFurnaceHeatable;
+import factorization.api.Quaternion;
+import factorization.api.datahelpers.DataHelper;
+import factorization.api.datahelpers.DataInNBT;
+import factorization.api.datahelpers.DataOutNBT;
+import factorization.api.datahelpers.Share;
+import factorization.common.FactoryType;
+import factorization.common.FzConfig;
+import factorization.common.ResourceType;
+import factorization.notify.Notice;
+import factorization.shared.BlockClass;
+import factorization.shared.Core;
+import factorization.shared.NORELEASE;
+import factorization.shared.NetworkFactorization.MessageType;
+import factorization.shared.TileEntityCommon;
+import factorization.shared.TileEntityExtension;
+import factorization.util.DataUtil;
+import factorization.util.InvUtil;
+import factorization.util.SpaceUtil;
 
 public class TileEntityGreenware extends TileEntityCommon implements IFurnaceHeatable, ITickable {
     public static int MAX_PARTS = 32;
@@ -841,7 +851,7 @@ public class TileEntityGreenware extends TileEntityCommon implements IFurnaceHea
         GL11.glLineWidth(2.0F);
         GL11.glColor4f(0, 0, 0, 0.4F);
         // GL11.glColor4f(0x4D/r, 0x34/r, 0x7C/r, 0.8F); //#4D347C
-        RenderGlobal.drawBox(bb);
+        RenderGlobal.func_181561_a(bb);
         GL11.glDepthMask(true);
         GL11.glEnable(GL11.GL_TEXTURE_2D);
         GL11.glDisable(GL11.GL_BLEND);

@@ -220,7 +220,7 @@ public class TileEntityLegendarium extends TileEntityCommon {
 
         void setOccupied(Coord src, EntityPlayer user, boolean v) {
             String who = "someone"; // TODO: Who? Top. Men.
-            if (user != null) who = user.getCommandSenderName();
+            if (user != null) who = user.getName();
             String worldName = getName(src.w);
             if (v) {
                 data.setString(worldName, src.toShortString());

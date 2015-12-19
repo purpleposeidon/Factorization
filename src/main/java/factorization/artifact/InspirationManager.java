@@ -1,10 +1,8 @@
 package factorization.artifact;
 
-import factorization.api.Coord;
-import factorization.shared.Core;
-import factorization.shared.Sound;
-import factorization.util.PlayerUtil;
-import factorization.util.StatUtil;
+import java.util.Calendar;
+import java.util.Locale;
+
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.server.MinecraftServer;
@@ -14,12 +12,16 @@ import net.minecraft.util.ChatComponentTranslation;
 import net.minecraft.util.ChatStyle;
 import net.minecraft.util.EnumChatFormatting;
 import net.minecraft.util.IChatComponent;
+
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.PlayerEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
 
-import java.util.Calendar;
-import java.util.Locale;
+import factorization.api.Coord;
+import factorization.shared.Core;
+import factorization.shared.Sound;
+import factorization.util.PlayerUtil;
+import factorization.util.StatUtil;
 
 public class InspirationManager {
     static InspirationManager instance;
@@ -102,7 +104,7 @@ public class InspirationManager {
     }
 
     public static void makeArtifact(EntityPlayer player, ItemStack artifact) {
-        String name = player.getCommandSenderName();
+        String name = player.getName();
         String key = "factorization.artifact.announce";
         if (name.toLowerCase(Locale.ROOT).startsWith("urist")) {
             key += ".urist";

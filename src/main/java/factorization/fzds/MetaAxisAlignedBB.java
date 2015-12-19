@@ -1,9 +1,8 @@
 package factorization.fzds;
 
-import factorization.fzds.interfaces.IFzdsShenanigans;
-import factorization.shared.Core;
-import factorization.util.NumUtil;
-import factorization.util.SpaceUtil;
+import java.util.ArrayList;
+import java.util.List;
+
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.BlockPos;
@@ -12,8 +11,10 @@ import net.minecraft.util.Vec3;
 import net.minecraft.world.World;
 import net.minecraft.world.chunk.Chunk;
 
-import java.util.ArrayList;
-import java.util.List;
+import factorization.fzds.interfaces.IFzdsShenanigans;
+import factorization.shared.Core;
+import factorization.util.NumUtil;
+import factorization.util.SpaceUtil;
 
 public class MetaAxisAlignedBB extends AxisAlignedBB implements IFzdsShenanigans {
     /*
@@ -112,7 +113,7 @@ public class MetaAxisAlignedBB extends AxisAlignedBB implements IFzdsShenanigans
                                 continue;
                             }
 
-                            IBlockState bs = chunk.getBlockState(pos.func_181079_c(x, y, z));
+                            IBlockState bs = chunk.getBlockState(pos.set(x, y, z));
                             bs.getBlock().addCollisionBoxesToList(shadowWorld, pos, bs, box, ret, idc);
                         }
                     }

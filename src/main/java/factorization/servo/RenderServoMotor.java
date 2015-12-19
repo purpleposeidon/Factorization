@@ -1,15 +1,10 @@
 package factorization.servo;
 
-import factorization.api.FzColor;
-import factorization.api.FzOrientation;
-import factorization.api.Quaternion;
-import factorization.fzds.DeltaChunk;
-import factorization.fzds.Hammer;
-import factorization.fzds.HammerEnabled;
-import factorization.shared.Core;
-import factorization.shared.FzModel;
-import factorization.sockets.TileEntitySocketBase;
-import factorization.util.NumUtil;
+import java.util.Iterator;
+
+import org.lwjgl.opengl.GL11;
+import org.lwjgl.opengl.GL12;
+
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.renderer.RenderGlobal;
@@ -21,11 +16,22 @@ import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.monster.EntityEnderman;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.*;
-import org.lwjgl.opengl.GL11;
-import org.lwjgl.opengl.GL12;
+import net.minecraft.util.AxisAlignedBB;
+import net.minecraft.util.BlockPos;
+import net.minecraft.util.EnumFacing;
+import net.minecraft.util.MovingObjectPosition;
+import net.minecraft.util.ResourceLocation;
 
-import java.util.Iterator;
+import factorization.api.FzColor;
+import factorization.api.FzOrientation;
+import factorization.api.Quaternion;
+import factorization.fzds.DeltaChunk;
+import factorization.fzds.Hammer;
+import factorization.fzds.HammerEnabled;
+import factorization.shared.Core;
+import factorization.shared.FzModel;
+import factorization.sockets.TileEntitySocketBase;
+import factorization.util.NumUtil;
 
 public class RenderServoMotor extends RenderEntity {
     static FzModel sprocket = new FzModel("servo/sprocket");
@@ -125,7 +131,7 @@ public class RenderServoMotor extends RenderEntity {
     }
     
     void drawOutlinedBoundingBox(AxisAlignedBB box) {
-        RenderGlobal.drawBox(box);
+        RenderGlobal.func_181561_a(box);
     }
     
     void orientMotor(ServoMotor motor, float partial, float reorientInterpolation) {

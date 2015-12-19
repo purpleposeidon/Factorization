@@ -1,20 +1,14 @@
 package factorization.fzds.network;
 
+import java.io.IOException;
+
 import com.google.common.io.ByteArrayDataOutput;
 import com.google.common.io.ByteStreams;
-import factorization.api.Coord;
-import factorization.api.Quaternion;
-import factorization.fzds.DeltaChunk;
-import factorization.fzds.DimensionSliceEntity;
-import factorization.fzds.interfaces.DeltaCapability;
-import factorization.fzds.interfaces.IDeltaChunk;
-import factorization.fzds.interfaces.Interpolation;
-import factorization.shared.Core;
-import factorization.util.PlayerUtil;
-import factorization.util.SpaceUtil;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
+
 import net.minecraft.block.Block;
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
@@ -28,6 +22,7 @@ import net.minecraft.util.MovingObjectPosition;
 import net.minecraft.util.Vec3;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;
+
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.entity.player.PlayerDestroyItemEvent;
 import net.minecraftforge.event.world.BlockEvent.PlaceEvent;
@@ -41,7 +36,16 @@ import net.minecraftforge.fml.common.network.FMLNetworkEvent.ServerCustomPacketE
 import net.minecraftforge.fml.common.network.NetworkRegistry;
 import net.minecraftforge.fml.common.network.internal.FMLProxyPacket;
 
-import java.io.IOException;
+import factorization.api.Coord;
+import factorization.api.Quaternion;
+import factorization.fzds.DeltaChunk;
+import factorization.fzds.DimensionSliceEntity;
+import factorization.fzds.interfaces.DeltaCapability;
+import factorization.fzds.interfaces.IDeltaChunk;
+import factorization.fzds.interfaces.Interpolation;
+import factorization.shared.Core;
+import factorization.util.PlayerUtil;
+import factorization.util.SpaceUtil;
 
 
 public class HammerNet {
@@ -353,7 +357,8 @@ public class HammerNet {
 
         if (!player.isSneaking() || player.getHeldItem() == null
                 || player.getHeldItem().getItem().doesSneakBypassUse(world, pos, player)) {
-            ret = world.getBlock(pos).onBlockActivated(world, pos, world.getBlockState(pos), player, sideHit, vecX, vecY, vecZ);
+			IBlockState state = world.getBlockState(pos);
+            ret = state.getBlock().onBlockActivated(world, pos, state, player, sideHit, vecX, vecY, vecZ);
         }
 
         if (ret) {

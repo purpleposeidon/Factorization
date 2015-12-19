@@ -34,7 +34,7 @@ public class IconWord extends Word {
         Tessellator tessI = Tessellator.getInstance();
         WorldRenderer tess = tessI.getWorldRenderer();
         GL11.glColor4f(1, 1, 1, 1);
-        tess.startDrawing(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX);
+        tess.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX);
         tess.tex(u0, v0).putPosition(x + 0, y + 0, z);
         tess.tex(u0, v1).putPosition(x + 0, y + height, z);
         tess.tex(u1, v1).putPosition(x + width, y + height, z);

@@ -1,6 +1,8 @@
 package factorization.util;
 
-import factorization.api.Coord;
+import java.util.ArrayList;
+import java.util.List;
+
 import net.minecraft.block.Block;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.item.EntityItem;
@@ -13,10 +15,10 @@ import net.minecraft.nbt.NBTTagString;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.Vec3;
 import net.minecraft.world.World;
+
 import net.minecraftforge.oredict.OreDictionary;
 
-import java.util.ArrayList;
-import java.util.List;
+import factorization.api.Coord;
 
 /**
  * Operations on ItemStack.
@@ -269,7 +271,7 @@ public final class ItemUtil {
             return null;
         }
         if (ent instanceof EntityItem) {
-            ((EntityItem) ent).delayBeforeCanPickup = 0;
+            ((EntityItem) ent).setNoPickupDelay();
         }
         if (player != null) {
             ent.onCollideWithPlayer(player);

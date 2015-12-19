@@ -1,11 +1,12 @@
 package factorization.colossi;
 
-import factorization.api.Coord;
-import factorization.common.FzConfig;
-import factorization.fzds.DeltaChunk;
-import factorization.shared.Core;
-import factorization.util.NumUtil;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Random;
+
 import gnu.trove.map.hash.TIntByteHashMap;
+
 import net.minecraft.block.material.Material;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.BlockPos;
@@ -17,6 +18,7 @@ import net.minecraft.world.chunk.IChunkProvider;
 import net.minecraft.world.gen.ChunkProviderServer;
 import net.minecraft.world.gen.NoiseGenerator;
 import net.minecraft.world.gen.NoiseGeneratorOctaves;
+
 import net.minecraftforge.common.BiomeDictionary;
 import net.minecraftforge.common.BiomeDictionary.Type;
 import net.minecraftforge.common.MinecraftForge;
@@ -28,13 +30,23 @@ import net.minecraftforge.fml.common.IWorldGenerator;
 import net.minecraftforge.fml.common.eventhandler.Event.Result;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.Random;
-
-import static net.minecraftforge.common.BiomeDictionary.Type.*;
-import static net.minecraftforge.event.terraingen.PopulateChunkEvent.Populate.EventType.*;
+import factorization.api.Coord;
+import factorization.common.FzConfig;
+import factorization.fzds.DeltaChunk;
+import factorization.shared.Core;
+import factorization.util.NumUtil;
+import static net.minecraftforge.common.BiomeDictionary.Type.BEACH;
+import static net.minecraftforge.common.BiomeDictionary.Type.END;
+import static net.minecraftforge.common.BiomeDictionary.Type.MAGICAL;
+import static net.minecraftforge.common.BiomeDictionary.Type.NETHER;
+import static net.minecraftforge.common.BiomeDictionary.Type.OCEAN;
+import static net.minecraftforge.common.BiomeDictionary.Type.RIVER;
+import static net.minecraftforge.common.BiomeDictionary.Type.SPOOKY;
+import static net.minecraftforge.common.BiomeDictionary.Type.WATER;
+import static net.minecraftforge.event.terraingen.PopulateChunkEvent.Populate.EventType.ANIMALS;
+import static net.minecraftforge.event.terraingen.PopulateChunkEvent.Populate.EventType.CUSTOM;
+import static net.minecraftforge.event.terraingen.PopulateChunkEvent.Populate.EventType.LAKE;
+import static net.minecraftforge.event.terraingen.PopulateChunkEvent.Populate.EventType.LAVA;
 
 public class WorldGenColossus implements IWorldGenerator {
     {
@@ -120,7 +132,7 @@ public class WorldGenColossus implements IWorldGenerator {
                     }
                     Coord at = new Coord(chunk);
                     at.getBlock();
-                    for (TileEntity te : (Iterable<TileEntity>)chunk.chunkTileEntityMap.values()) {
+                    for (TileEntity te : (Iterable<TileEntity>)chunk.getTileEntityMap().values()) {
                         if (te instanceof TileEntityColossalHeart) {
                             ret.add(new Coord(te));
                             break;

@@ -1,9 +1,11 @@
 package factorization.crafting;
 
-import factorization.api.Coord;
-import factorization.shared.Core;
-import factorization.shared.FzModel;
-import factorization.shared.NORELEASE;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Random;
+
+import org.lwjgl.opengl.GL11;
+
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
@@ -20,11 +22,11 @@ import net.minecraft.util.BlockPos;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumWorldBlockLayer;
 import net.minecraft.world.World;
-import org.lwjgl.opengl.GL11;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Random;
+import factorization.api.Coord;
+import factorization.shared.Core;
+import factorization.shared.FzModel;
+import factorization.shared.NORELEASE;
 
 public class TileEntityCompressionCrafterRenderer extends TileEntitySpecialRenderer<TileEntityCompressionCrafter> {
     Random rand = new Random();
@@ -150,7 +152,7 @@ public class TileEntityCompressionCrafterRenderer extends TileEntitySpecialRende
     private void _drawSquishingBlocks(Coord upperCorner, Coord lowerCorner, float partial) {
         Tessellator tessI = Tessellator.getInstance();
         WorldRenderer tess = tessI.getWorldRenderer();
-        tess.startDrawing(GL11.GL_QUADS, DefaultVertexFormats.BLOCK);
+        tess.begin(GL11.GL_QUADS, DefaultVertexFormats.BLOCK);
         contentSize = null;
         bindTexture(Core.blockAtlas);
         World w = upperCorner.w;

@@ -1,6 +1,7 @@
 package factorization.util;
 
-import factorization.api.Coord;
+import java.util.Random;
+
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.EntityLivingBase;
@@ -13,7 +14,7 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.MathHelper;
 import net.minecraft.world.World;
 
-import java.util.Random;
+import factorization.api.Coord;
 
 public class EvilUtil {
 
@@ -97,7 +98,7 @@ public class EvilUtil {
         if (stack.stackSize == 0) return null;
         Random rand = player.worldObj.rand;
         EntityItem entityitem = new EntityItem(player.worldObj, player.posX, player.posY - 0.30000001192092896D + (double) player.getEyeHeight(), player.posZ, stack);
-        entityitem.delayBeforeCanPickup = 40;
+        entityitem.setPickupDelay(40);
 
         float f = 0.1F;
         float f1;

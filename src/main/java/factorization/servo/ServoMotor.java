@@ -1,24 +1,12 @@
 package factorization.servo;
 
-import factorization.api.Coord;
-import factorization.api.FzColor;
-import factorization.api.datahelpers.DataHelper;
-import factorization.api.datahelpers.DataInByteBuf;
-import factorization.api.datahelpers.DataInByteBufClientEdited;
-import factorization.api.datahelpers.Share;
-import factorization.common.FactoryType;
-import factorization.shared.*;
-import factorization.shared.NetworkFactorization.MessageType;
-import factorization.sockets.GuiDataConfig;
-import factorization.sockets.ISocketHolder;
-import factorization.sockets.SocketEmpty;
-import factorization.sockets.TileEntitySocketBase;
-import factorization.util.DataUtil;
-import factorization.util.InvUtil;
-import factorization.util.InvUtil.FzInv;
-import factorization.util.ItemUtil;
-import factorization.util.SpaceUtil;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 import io.netty.buffer.ByteBuf;
+
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
@@ -28,17 +16,41 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.Packet;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.*;
+import net.minecraft.util.AxisAlignedBB;
+import net.minecraft.util.ChatComponentTranslation;
+import net.minecraft.util.EnumFacing;
+import net.minecraft.util.IChatComponent;
+import net.minecraft.util.MovingObjectPosition;
+import net.minecraft.util.Vec3;
 import net.minecraft.world.World;
+
 import net.minecraftforge.fml.common.network.internal.FMLNetworkHandler;
 import net.minecraftforge.fml.common.network.internal.FMLProxyPacket;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import factorization.api.Coord;
+import factorization.api.FzColor;
+import factorization.api.datahelpers.DataHelper;
+import factorization.api.datahelpers.DataInByteBuf;
+import factorization.api.datahelpers.DataInByteBufClientEdited;
+import factorization.api.datahelpers.Share;
+import factorization.common.FactoryType;
+import factorization.shared.Core;
+import factorization.shared.FzNetDispatch;
+import factorization.shared.NetworkFactorization;
+import factorization.shared.NetworkFactorization.MessageType;
+import factorization.shared.Sound;
+import factorization.shared.TileEntityCommon;
+import factorization.sockets.GuiDataConfig;
+import factorization.sockets.ISocketHolder;
+import factorization.sockets.SocketEmpty;
+import factorization.sockets.TileEntitySocketBase;
+import factorization.util.DataUtil;
+import factorization.util.InvUtil;
+import factorization.util.InvUtil.FzInv;
+import factorization.util.ItemUtil;
+import factorization.util.SpaceUtil;
 
 public class ServoMotor extends AbstractServoMachine implements IInventory, ISocketHolder {
     public Executioner executioner = new Executioner(this);
@@ -353,8 +365,10 @@ public class ServoMotor extends AbstractServoMachine implements IInventory, ISoc
     }
 
     @Override
-    public ItemStack getStackInSlotOnClosing(int i) {
-        return null;
+    public ItemStack removeStackFromSlot(int i) {
+		ItemStack stack = inv[i];
+		inv[i] = null;
+        return stack;
     }
 
     @Override

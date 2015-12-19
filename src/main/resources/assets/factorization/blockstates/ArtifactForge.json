@@ -1,16 +1,22 @@
 {
+    "forge_marker": 1,
+    "defaults": {
+        "model": "factorization:artifact_forge",
+        "transform": "forge:default-block"
+    },
     "variants": {
-        "damage=0,facing=south": { "model": "factorization:artifact_forge" },
-        "damage=0,facing=west":  { "model": "factorization:artifact_forge", "y": 90 },
-        "damage=0,facing=north": { "model": "factorization:artifact_forge", "y": 180 },
-        "damage=0,facing=east":  { "model": "factorization:artifact_forge", "y": 270 },
-        "damage=1,facing=south": { "model": "factorization:artifact_forge" },
-        "damage=1,facing=west":  { "model": "factorization:artifact_forge", "y": 90 },
-        "damage=1,facing=north": { "model": "factorization:artifact_forge", "y": 180 },
-        "damage=1,facing=east":  { "model": "factorization:artifact_forge", "y": 270 },
-        "damage=2,facing=south": { "model": "factorization:artifact_forge" },
-        "damage=2,facing=west":  { "model": "factorization:artifact_forge", "y": 90 },
-        "damage=2,facing=north": { "model": "factorization:artifact_forge", "y": 180 },
-        "damage=2,facing=east":  { "model": "factorization:artifact_forge", "y": 270 }
+        "normal": [{}],
+        "inventory": [{}],
+        "damage": {
+            "0": {},
+            "1": {},
+            "2": {}
+        },
+        "facing": {
+            "south": {"y": 0},
+            "west": {"y": 90},
+            "north": {"y": 180},
+            "east": {"y": 270}
+        }
     }
 }

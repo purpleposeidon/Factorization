@@ -1,17 +1,11 @@
 package factorization.weird;
 
-import factorization.api.Coord;
-import factorization.api.FzOrientation;
-import factorization.api.datahelpers.DataHelper;
-import factorization.api.datahelpers.Share;
-import factorization.common.FactoryType;
-import factorization.notify.Notice;
-import factorization.notify.NoticeUpdater;
-import factorization.shared.*;
-import factorization.shared.NetworkFactorization.MessageType;
-import factorization.util.*;
-import factorization.util.InvUtil.FzInv;
+import java.io.IOException;
+import java.util.ArrayList;
+
+import org.lwjgl.opengl.GL11;
 import io.netty.buffer.ByteBuf;
+
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockRailBase;
 import net.minecraft.block.material.Material;
@@ -26,7 +20,12 @@ import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.*;
+import net.minecraft.util.AxisAlignedBB;
+import net.minecraft.util.BlockPos;
+import net.minecraft.util.EnumFacing;
+import net.minecraft.util.MovingObjectPosition;
+import net.minecraft.util.Vec3;
+
 import net.minecraftforge.client.event.RenderWorldLastEvent;
 import net.minecraftforge.common.ForgeHooks;
 import net.minecraftforge.common.util.FakePlayer;
@@ -38,10 +37,27 @@ import net.minecraftforge.fml.common.gameevent.TickEvent.ClientTickEvent;
 import net.minecraftforge.fml.common.network.internal.FMLProxyPacket;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
-import org.lwjgl.opengl.GL11;
 
-import java.io.IOException;
-import java.util.ArrayList;
+import factorization.api.Coord;
+import factorization.api.FzOrientation;
+import factorization.api.datahelpers.DataHelper;
+import factorization.api.datahelpers.Share;
+import factorization.common.FactoryType;
+import factorization.notify.Notice;
+import factorization.notify.NoticeUpdater;
+import factorization.shared.BlockClass;
+import factorization.shared.Core;
+import factorization.shared.NetworkFactorization;
+import factorization.shared.NetworkFactorization.MessageType;
+import factorization.shared.Sound;
+import factorization.shared.TileEntityFactorization;
+import factorization.util.DataUtil;
+import factorization.util.InvUtil;
+import factorization.util.InvUtil.FzInv;
+import factorization.util.ItemUtil;
+import factorization.util.LangUtil;
+import factorization.util.PlayerUtil;
+import factorization.util.SpaceUtil;
 
 public class TileEntityDayBarrel extends TileEntityFactorization  {
     public ItemStack item;
@@ -1085,7 +1101,7 @@ public class TileEntityDayBarrel extends TileEntityFactorization  {
     @SideOnly(Side.CLIENT)
     public void removeUnloadedDisplayLists(ChunkEvent.Unload event) {
         if (!event.world.isRemote) return;
-        for (TileEntity te : (Iterable<TileEntity>)event.getChunk().chunkTileEntityMap.values()) {
+        for (TileEntity te : event.getChunk().getTileEntityMap().values()) {
             if (te instanceof TileEntityDayBarrel) {
                 TileEntityDayBarrel me = (TileEntityDayBarrel) te;
                 me.freeDisplayList();

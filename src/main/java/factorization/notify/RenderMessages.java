@@ -1,31 +1,34 @@
 package factorization.notify;
 
-import factorization.api.ISaneCoord;
-import net.minecraft.block.Block;
-import net.minecraft.block.state.BlockState;
+import java.util.ArrayList;
+import java.util.Iterator;
+
+import org.lwjgl.opengl.GL11;
+
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.WorldRenderer;
 import net.minecraft.client.renderer.entity.RenderItem;
-import net.minecraft.client.renderer.entity.RenderManager;
 import net.minecraft.client.renderer.texture.TextureManager;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.*;
+import net.minecraft.util.AxisAlignedBB;
+import net.minecraft.util.BlockPos;
+import net.minecraft.util.IChatComponent;
+import net.minecraft.util.StatCollector;
+import net.minecraft.util.Vec3;
 import net.minecraft.world.World;
+
 import net.minecraftforge.client.ClientCommandHandler;
 import net.minecraftforge.client.event.RenderWorldLastEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
-import org.lwjgl.opengl.GL11;
 
-import java.util.ArrayList;
-import java.util.Iterator;
+import factorization.api.ISaneCoord;
 
 public class RenderMessages extends RenderMessagesProxy {
     static ArrayList<ClientMessage> messages = new ArrayList<ClientMessage>();
@@ -103,7 +106,7 @@ public class RenderMessages extends RenderMessagesProxy {
         }
         Iterator<ClientMessage> it = messages.iterator();
         long approximateNow = System.currentTimeMillis();
-        Entity camera = Minecraft.getMinecraft().renderViewEntity;
+        Entity camera = Minecraft.getMinecraft().getRenderViewEntity();
         double cx = camera.lastTickPosX + (camera.posX - camera.lastTickPosX) * (double) event.partialTicks;
         double cy = camera.lastTickPosY + (camera.posY - camera.lastTickPosY) * (double) event.partialTicks;
         double cz = camera.lastTickPosZ + (camera.posZ - camera.lastTickPosZ) * (double) event.partialTicks;
@@ -216,17 +219,17 @@ public class RenderMessages extends RenderMessagesProxy {
             int var16 = (lineCount - 1) * 10;
 
             GL11.glDisable(GL11.GL_TEXTURE_2D);
-            tess.startDrawing(GL11.GL_QUADS, DefaultVertexFormats.BLOCK);
+            tess.begin(GL11.GL_QUADS, DefaultVertexFormats.BLOCK);
             double item_add = 0;
             if (m.show_item) {
                 item_add += 24;
             }
             float c = 0.0F;
-            tess.setColor(c, c, c, Math.min(opacity, 0.2F));
-            tess.addVertex((double) (-halfWidth - 1), (double) (-1), 0.0D);
-            tess.addVertex((double) (-halfWidth - 1), (double) (8 + var16), 0.0D);
-            tess.addVertex((double) (halfWidth + 1 + item_add), (double) (8 + var16), 0.0D);
-            tess.addVertex((double) (halfWidth + 1 + item_add), (double) (-1), 0.0D);
+            tess.color(c, c, c, Math.min(opacity, 0.2F));
+            tess.pos((double) (-halfWidth - 1), (double) (-1), 0.0D);
+            tess.pos((double) (-halfWidth - 1), (double) (8 + var16), 0.0D);
+            tess.pos((double) (halfWidth + 1 + item_add), (double) (8 + var16), 0.0D);
+            tess.pos((double) (halfWidth + 1 + item_add), (double) (-1), 0.0D);
             tessI.draw();
             GL11.glEnable(GL11.GL_TEXTURE_2D);
         }
