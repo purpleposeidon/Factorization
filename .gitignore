@@ -36,3 +36,7 @@ QUICK_BUGS
 parables/
 
 
+#IDE files
+src/main/FZ.iml
+eclipse/
+logs/
