@@ -36,8 +36,16 @@ QUICK_BUGS
 src/main/Factorization.iml
 src/main/FZ.iml
 eclipse/
+eclipse.1.7.10/
+intellij-1.7.10/
+*.iml
+*.ipr
+*.iws
 logs/
+out/
+run/
 
 #Personal
 parables/
 DeSrg/
+rungradle
