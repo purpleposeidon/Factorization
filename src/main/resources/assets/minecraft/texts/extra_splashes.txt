@@ -13,7 +13,7 @@ Contains itself!
 Exclamations!
 Proclamations!
 Crenelations!
-Ugly unicode rendering!
+Ugly Unicode rendering!
 May contain mods!
 Sneaky endermen!
 Scary spiders!
@@ -22,6 +22,7 @@ Snouted pigs!
 Angry pigmen!
 Nasty witches!
 Hacky coremods!
+Squeaky bunnies!
 Whoo, Patreon!
 Buggy!
 BEEEES!
