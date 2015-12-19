@@ -44,7 +44,7 @@ public class BuildColossusCommand extends CommandBase {
         }
         Coord at = new Coord(sender.getEntityWorld(), sender.getPosition());
         if (sender.getName().startsWith("@")) {
-            at = at.add(0, 6, 0);		    
+            at = at.add(0, 6, 0);
         }
         if (args[0].equalsIgnoreCase("spam") || args[0].equals("$")) {
             int randSeed;

@@ -366,8 +366,8 @@ public class ServoMotor extends AbstractServoMachine implements IInventory, ISoc
 
     @Override
     public ItemStack removeStackFromSlot(int i) {
-		ItemStack stack = inv[i];
-		inv[i] = null;
+        ItemStack stack = inv[i];
+        inv[i] = null;
         return stack;
     }
 

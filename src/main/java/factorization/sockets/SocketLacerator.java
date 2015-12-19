@@ -334,7 +334,7 @@ public class SocketLacerator extends TileEntitySocketBase implements IChargeCond
             progress = 0;
             return true;
         } else if (mop.typeOfHit == MovingObjectPosition.MovingObjectType.BLOCK) {
-			IBlockState bs = mopWorld.getBlockState(mop.getBlockPos());
+            IBlockState bs = mopWorld.getBlockState(mop.getBlockPos());
             Block block = bs.getBlock();
             if (block == null || block.isAir(mopWorld, mop.getBlockPos())) {
                 return false;

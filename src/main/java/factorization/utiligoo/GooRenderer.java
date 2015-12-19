@@ -152,7 +152,7 @@ public enum GooRenderer {
                 rendered_something = true;
             }
             BlockPos pos = new BlockPos(x, y, z);
-			IBlockState bs = player.worldObj.getBlockState(pos);
+            IBlockState bs = player.worldObj.getBlockState(pos);
             Block b = bs.getBlock();
             Material mat = b.getMaterial();
             if (useShaders()) {

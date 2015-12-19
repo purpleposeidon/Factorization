@@ -132,7 +132,7 @@ public class ColossalBlock extends Block {
     }
     
     boolean isSupportive(World world, BlockPos pos) {
-		IBlockState bs = world.getBlockState(pos);
+        IBlockState bs = world.getBlockState(pos);
         if (bs.getBlock() != this) return false;
 
         Md md = bs.<Md>getValue(VARIANT);

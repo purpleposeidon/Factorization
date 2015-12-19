@@ -316,11 +316,11 @@ public class BlockUndo {
             if (FzConfig.blockundo_grab) {
                 for (Object o : w.getEntitiesWithinAABB(EntityItem.class, box)) {
                     EntityItem ei = (EntityItem) o;
-					// NORELEASE: Add delayBeforeCanPickup to AT
+                    // NORELEASE: Add delayBeforeCanPickup to AT
                     //int orig_delay = ei.delayBeforeCanPickup;
                     ei.setNoPickupDelay();
                     ei.onCollideWithPlayer(real_player);
-					ei.setDefaultPickupDelay();
+                    ei.setDefaultPickupDelay();
                     //ei.delayBeforeCanPickup = orig_delay;
                 }
             }

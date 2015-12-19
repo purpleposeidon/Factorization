@@ -357,7 +357,7 @@ public class HammerNet {
 
         if (!player.isSneaking() || player.getHeldItem() == null
                 || player.getHeldItem().getItem().doesSneakBypassUse(world, pos, player)) {
-			IBlockState state = world.getBlockState(pos);
+            IBlockState state = world.getBlockState(pos);
             ret = state.getBlock().onBlockActivated(world, pos, state, player, sideHit, vecX, vecY, vecZ);
         }
 

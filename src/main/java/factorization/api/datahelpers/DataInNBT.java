@@ -9,7 +9,7 @@ import net.minecraftforge.common.util.Constants;
 import java.io.IOException;
 import java.util.ArrayList;
 
-public class DataInNBT extends DataHelperNBT {	
+public class DataInNBT extends DataHelperNBT {
     public DataInNBT(NBTTagCompound theTag) {
         tag = theTag;
     }

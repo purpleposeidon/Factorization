@@ -69,11 +69,12 @@ public class TileEntitySapTap extends TileEntityCommon implements ISidedInventor
 
     @Override
     public ItemStack removeStackFromSlot(int slot) {
-		if (slot == 0) {
-			ItemStack stack = sap;
-			sap = null;
-			return stack;
-		}
+        if (slot == 0) {
+            ItemStack stack = sap;
+            sap = null;
+            return stack;
+
+        }
         return null;
     }
 

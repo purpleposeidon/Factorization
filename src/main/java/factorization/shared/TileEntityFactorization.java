@@ -170,8 +170,8 @@ public abstract class TileEntityFactorization extends TileEntityCommon
 
     @Override
     public ItemStack removeStackFromSlot(int slot) {
-		ItemStack stack = getStackInSlot(slot);
-		setInventorySlotContents(slot, null);
+        ItemStack stack = getStackInSlot(slot);
+        setInventorySlotContents(slot, null);
         return stack;
     }
     

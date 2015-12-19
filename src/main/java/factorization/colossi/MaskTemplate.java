@@ -32,7 +32,7 @@ public class MaskTemplate {
                 } else {
                     if (anchor != fd) {
                         if (anchor != null) {
-                            throw new IllegalArgumentException("Mixed anchor types");							
+                            throw new IllegalArgumentException("Mixed anchor types");
                         }
                         anchor = fd;
                         anchor_x = i;

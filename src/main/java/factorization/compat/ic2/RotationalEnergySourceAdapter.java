@@ -8,20 +8,20 @@ import factorization.api.adapter.Adapter;
 //import ic2.api.energy.tile.IKineticSource;
 
 public class RotationalEnergySourceAdapter implements Adapter<TileEntity, IRotationalEnergySource> {
-	@Override
-	public IRotationalEnergySource adapt(TileEntity val) {
-		return null;
-	}
+    @Override
+    public IRotationalEnergySource adapt(TileEntity val) {
+        return null;
+    }
 
-	@Override
-	public boolean canAdapt(Class<?> valClass) {
-		return false;
-	}
+    @Override
+    public boolean canAdapt(Class<?> valClass) {
+        return false;
+    }
 
-	@Override
-	public int priority() {
-		return 0;
-	}
+    @Override
+    public int priority() {
+        return 0;
+    }
 /*    @Override
     public IRotationalEnergySource adapt(TileEntity val) {
         return new Kinetic2Rotational(val, (IKineticSource) val);
