@@ -1,5 +1,6 @@
 package factorization.common;
 
+import factorization.util.DataUtil;
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
@@ -70,7 +71,6 @@ import factorization.sockets.SocketLacerator;
 import factorization.sockets.SocketScissors;
 import factorization.sockets.TileEntitySocketRenderer;
 import factorization.sockets.fanturpeller.SocketFanturpeller;
-import factorization.util.FzUtil;
 import factorization.utiligoo.GooRenderer;
 import factorization.weird.ContainerPocket;
 import factorization.weird.EntityMinecartDayBarrel;
@@ -172,15 +172,29 @@ public class FactorizationClientProxy extends FactorizationProxy {
 
     private void setItemBlockModelFromState(Block block) {
         for (IBlockState i : block.getBlockState().getValidStates()) {
-            setItemBlockModel(block, block.getMetaFromState(i), FzUtil.getStatePropertyString(i));
+            setItemBlockModel(block, block.getMetaFromState(i), DataUtil.getStatePropertyString(i));
         }
     }
 
-    @SuppressWarnings("ResultOfObjectAllocationIgnored")
     @Override
     public void registerRenderers() {
-        setItemBlockModel(Core.registry.artifact_forge, 0, "inventory");
-        setItemBlockModelFromState(Core.registry.resource_block);
+        for (Block b : new Block[] {
+                Core.registry.artifact_forge,
+                Core.registry.dark_iron_ore,
+                Core.registry.fractured_bedrock_block,
+                Core.registry.blasted_bedrock_block,
+                Core.registry.gargantuan_block,
+                Core.registry.matcher_block,
+                Core.registry.blastBlock,
+        }) {
+            setItemBlockModel(b, 0, "inventory");
+        }
+        for (Block b : new Block[] {
+                Core.registry.resource_block,
+                Core.registry.colossal_block,
+        }) {
+            setItemBlockModelFromState(b);
+        }
 
         setTileEntityRendererDispatcher(TileEntityDayBarrel.class, new TileEntityDayBarrelRenderer());
         setTileEntityRendererDispatcher(TileEntityGreenware.class, new TileEntityGreenwareRender());

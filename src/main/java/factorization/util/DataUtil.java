@@ -1,7 +1,11 @@
 package factorization.util;
 
+import com.google.common.base.Function;
+import com.google.common.base.Joiner;
+import com.google.common.collect.Iterables;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.block.Block;
+import net.minecraft.block.properties.IProperty;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -19,9 +23,21 @@ import net.minecraftforge.fml.common.registry.GameData;
 
 import java.io.DataInput;
 import java.io.IOException;
+import java.util.Map;
 
 public final class DataUtil {
     public static final ItemStack NULL_ITEM = new ItemStack((Item) null, 0, 0); // Forge may throw a huge hissy fit over this at some point.
+    private static final Joiner COMMA_JOINER = Joiner.on(',');
+    private static final Function<Map.Entry<IProperty, Comparable>, String> MAP_ENTRY_TO_STRING = new Function<Map.Entry<IProperty, Comparable>, String>() {
+        public String apply(Map.Entry<IProperty, Comparable> entry) {
+            if (entry == null) {
+                return "<NULL>";
+            } else {
+                IProperty iproperty = entry.getKey();
+                return iproperty.getName() + "=" + iproperty.getName(entry.getValue());
+            }
+        }
+    };
 
     public static void writeTank(NBTTagCompound tag, FluidTank tank, String name) {
         FluidStack ls = tank.getFluid();
@@ -170,4 +186,17 @@ public final class DataUtil {
         return new ItemStack(bs.getBlock());
     }
 
+    public static String getStatePropertyString(IBlockState state) {
+        if (!state.getProperties().isEmpty()) {
+            return COMMA_JOINER.join(Iterables.transform(state.getProperties().entrySet(), MAP_ENTRY_TO_STRING));
+        } else {
+            return "normal";
+        }
+    }
+
+    public static <T extends Comparable<T>> T getOr(IBlockState bs, IProperty<T> property, T or) {
+        Comparable got = bs.getProperties().get(property);
+        if (got == null) return or;
+        return (T) got;
+    }
 }
