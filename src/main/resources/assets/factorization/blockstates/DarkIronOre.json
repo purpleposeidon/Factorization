@@ -1,7 +1,12 @@
 {
+    "forge_marker": 1,
+    "defaults": {
+        "model": "factorization:dark_iron_ore",
+        "transform": "forge:default-block"
+    },
     "variants": {
-        "normal": {
-            "model": "factorization:NORELEASE"
-        }
+        "normal": [{}],
+        "inventory": [{}]
     }
 }
+

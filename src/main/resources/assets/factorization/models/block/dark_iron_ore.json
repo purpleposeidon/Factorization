@@ -1,0 +1,7 @@
+{
+    "parent": "block/cube_all", 
+    "textures": {
+        "particle": "factorization:blocks/resource/ore_dark_iron",
+        "all": "factorization:blocks/resource/ore_dark_iron"
+    }
+}
