@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Random;
 import java.util.UUID;
 
+import factorization.util.DataUtil;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.MapColor;
 import net.minecraft.block.material.Material;
@@ -103,10 +104,10 @@ public class ColossalBlock extends Block {
     @Override
     public IBlockState getActualState(IBlockState bs, IBlockAccess w, BlockPos pos) {
         if (bs.getValue(VARIANT) == ARM) {
-            if (w.getBlockState(pos.down()).getValue(VARIANT) == ARM) {
+            if (DataUtil.getOr(w.getBlockState(pos.down()), VARIANT, null) == ARM) {
                 return bs.withProperty(CAPPING, Capping.DOWN);
             }
-            if (w.getBlockState(pos.up()).getValue(VARIANT) == ARM) {
+            if (DataUtil.getOr(w.getBlockState(pos.up()), VARIANT, null) == ARM) {
                 return bs.withProperty(CAPPING, Capping.UP);
             }
         }
