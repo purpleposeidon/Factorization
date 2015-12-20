@@ -1,0 +1,7 @@
+{
+    "parent": "block/cube_all", 
+    "textures": {
+        "particle": "factorization:blocks/fractured_bedrock",
+        "all": "factorization:blocks/fractured_bedrock"
+    }
+}

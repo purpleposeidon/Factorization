@@ -1,94 +1,49 @@
 {
+    "forge_marker": 1,
+    "defaults": {
+        "model": "cube_all",
+        "transform": "forge:default-block"
+    },
     "variants": {
-        "capping=NONE,variant=MASK": {
-            "model": "factorization:NORELEASE"
+        "capping": {
+            "none": {},
+            "up": {},
+            "down": {}
         },
-        "capping=NONE,variant=BODY": {
-            "model": "factorization:NORELEASE"
-        },
-        "capping=NONE,variant=BODY_CRACKED": {
-            "model": "factorization:NORELEASE"
-        },
-        "capping=NONE,variant=ARM": {
-            "model": "factorization:NORELEASE"
-        },
-        "capping=NONE,variant=LEG": {
-            "model": "factorization:NORELEASE"
-        },
-        "capping=NONE,variant=EYE": {
-            "model": "factorization:NORELEASE"
-        },
-        "capping=NONE,variant=CORE": {
-            "model": "factorization:NORELEASE"
-        },
-        "capping=NONE,variant=EYE_OPEN": {
-            "model": "factorization:NORELEASE"
-        },
-        "capping=NONE,variant=BODY_COVERED": {
-            "model": "factorization:NORELEASE"
-        },
-        "capping=NONE,variant=MASK_CRACKED": {
-            "model": "factorization:NORELEASE"
-        },
-        "capping=UP,variant=MASK": {
-            "model": "factorization:NORELEASE"
-        },
-        "capping=UP,variant=BODY": {
-            "model": "factorization:NORELEASE"
-        },
-        "capping=UP,variant=BODY_CRACKED": {
-            "model": "factorization:NORELEASE"
-        },
-        "capping=UP,variant=ARM": {
-            "model": "factorization:NORELEASE"
-        },
-        "capping=UP,variant=LEG": {
-            "model": "factorization:NORELEASE"
-        },
-        "capping=UP,variant=EYE": {
-            "model": "factorization:NORELEASE"
-        },
-        "capping=UP,variant=CORE": {
-            "model": "factorization:NORELEASE"
-        },
-        "capping=UP,variant=EYE_OPEN": {
-            "model": "factorization:NORELEASE"
-        },
-        "capping=UP,variant=BODY_COVERED": {
-            "model": "factorization:NORELEASE"
-        },
-        "capping=UP,variant=MASK_CRACKED": {
-            "model": "factorization:NORELEASE"
-        },
-        "capping=DOWN,variant=MASK": {
-            "model": "factorization:NORELEASE"
-        },
-        "capping=DOWN,variant=BODY": {
-            "model": "factorization:NORELEASE"
-        },
-        "capping=DOWN,variant=BODY_CRACKED": {
-            "model": "factorization:NORELEASE"
-        },
-        "capping=DOWN,variant=ARM": {
-            "model": "factorization:NORELEASE"
-        },
-        "capping=DOWN,variant=LEG": {
-            "model": "factorization:NORELEASE"
-        },
-        "capping=DOWN,variant=EYE": {
-            "model": "factorization:NORELEASE"
-        },
-        "capping=DOWN,variant=CORE": {
-            "model": "factorization:NORELEASE"
-        },
-        "capping=DOWN,variant=EYE_OPEN": {
-            "model": "factorization:NORELEASE"
-        },
-        "capping=DOWN,variant=BODY_COVERED": {
-            "model": "factorization:NORELEASE"
-        },
-        "capping=DOWN,variant=MASK_CRACKED": {
-            "model": "factorization:NORELEASE"
+        "variant": {
+            "mask": {
+                "textures": {
+                    "all": "factorization:blocks/colossi/mask"
+                }
+            },
+            "mask_cracked": {
+                "textures": {
+                    "all": "factorization:blocks/colossi/mask_cracked"
+                }
+            },
+            "body": {
+                "textures": {
+                    "all": "factorization:blocks/colossi/body"
+                }
+            },
+            "body_covered": {
+                "textures": {
+                    "all": "factorization:blocks/colossi/body"
+                }
+            },
+            "body_cracked": {
+                "textures": {
+                    "all": "factorization:blocks/colossi/body_cracked"
+                }
+            },
+            "leg": {
+                "textures": {
+                    "all": "factorization:blocks/colossi/mask"
+                }
+            },
+            "core": {
+                "model": "factorization:colossal_core"
+            }
         }
     }
 }

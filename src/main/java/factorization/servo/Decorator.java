@@ -1,9 +1,10 @@
 package factorization.servo;
 
-import factorization.servo.stepper.StepperEngine;
-import factorization.shared.Core;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
+
+import factorization.servo.stepper.StepperEngine;
+import factorization.shared.Core;
 
 
 public abstract class Decorator extends ServoComponent {
@@ -13,13 +14,10 @@ public abstract class Decorator extends ServoComponent {
     }
 
     public void stepperHit(StepperEngine engine) { }
-    
+
     public float getSize() {
         return TileEntityServoRail.width - 1F/2048F;
         //return 6F/16F;
-    }
-    public boolean stretchIIcon() {
-        return true;
     }
     
     public static boolean playerHasProgrammer(EntityPlayer player) {

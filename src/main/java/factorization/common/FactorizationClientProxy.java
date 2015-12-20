@@ -1,12 +1,15 @@
 package factorization.common;
 
-import factorization.util.DataUtil;
+import java.util.ArrayList;
+import java.util.List;
+
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.audio.ISound;
 import net.minecraft.client.audio.PositionedSoundRecord;
 import net.minecraft.client.gui.GuiScreen;
+import net.minecraft.client.renderer.ItemMeshDefinition;
 import net.minecraft.client.renderer.entity.RenderManager;
 import net.minecraft.client.renderer.entity.RenderSnowball;
 import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
@@ -14,6 +17,7 @@ import net.minecraft.client.resources.model.ModelResourceLocation;
 import net.minecraft.client.settings.GameSettings;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
 import net.minecraft.network.play.client.C07PacketPlayerDigging;
 import net.minecraft.profiler.Profiler;
 import net.minecraft.tileentity.TileEntity;
@@ -71,6 +75,7 @@ import factorization.sockets.SocketLacerator;
 import factorization.sockets.SocketScissors;
 import factorization.sockets.TileEntitySocketRenderer;
 import factorization.sockets.fanturpeller.SocketFanturpeller;
+import factorization.util.DataUtil;
 import factorization.utiligoo.GooRenderer;
 import factorization.weird.ContainerPocket;
 import factorization.weird.EntityMinecartDayBarrel;
@@ -107,7 +112,7 @@ public class FactorizationClientProxy extends FactorizationProxy {
         if (ID == FactoryType.ARTIFACTFORGEGUI.gui) {
             return new GuiArtifactForge(new ContainerForge(at, player));
         }
-        
+
         TileEntity te = world.getTileEntity(at.toBlockPos());
         if (!(te instanceof TileEntityFactorization)) {
             return null;
@@ -135,7 +140,7 @@ public class FactorizationClientProxy extends FactorizationProxy {
         cont.addSlotsForGui(fac, player.inventory);
         return gui;
     }
-    
+
     @Override
     public void pokePocketCrafting() {
         // If the player has a pocket crafting table open, have it update
@@ -157,13 +162,32 @@ public class FactorizationClientProxy extends FactorizationProxy {
         return Minecraft.getMinecraft().thePlayer;
     }
 
-
-
-
-
     private void setTileEntityRendererDispatcher(Class clazz, TileEntitySpecialRenderer r) {
         ClientRegistry.bindTileEntitySpecialRenderer(clazz, r);
     }
+
+	private void setItemModel(Item item, int meta, String variant) {
+		ModelLoader.setCustomModelResourceLocation(item, meta,
+				new ModelResourceLocation(Item.itemRegistry.getNameForObject(item), variant));
+	}
+
+	// @neptunepink: This is an example implementation of a mass item model setup
+	// which gets the model names via Minecraft's ItemMeshDefinition, which
+	// gives a model based on the passed ItemStack.
+	// addVariantName is used to give MC the names of models to be loaded.
+	// Feel free to make a custom implementation getting the list of all models
+	// in a different way.
+	// Also, note that you can actually use BlockStates to define item model variants,
+	// in which case you would use the variant name in ModelResourceLocation.
+	private void setItemModelFromSubItems(Item item, ItemMeshDefinition definition) {
+		ModelLoader.setCustomMeshDefinition(item, definition);
+
+		List<ItemStack> subItems = new ArrayList<ItemStack>();
+		item.getSubItems(item, Core.tabFactorization, subItems);
+		for (ItemStack is : subItems) {
+			ModelLoader.addVariantName(item, definition.getModelLocation(is).toString().split("#")[0]);
+		}
+	}
 
     private void setItemBlockModel(Block block, int meta, String variant) {
         ModelLoader.setCustomModelResourceLocation(Item.getItemFromBlock(block), meta,
@@ -183,18 +207,30 @@ public class FactorizationClientProxy extends FactorizationProxy {
                 Core.registry.dark_iron_ore,
                 Core.registry.fractured_bedrock_block,
                 Core.registry.blasted_bedrock_block,
-                Core.registry.gargantuan_block,
                 Core.registry.matcher_block,
+				Core.registry.gargantuan_block,
                 Core.registry.blastBlock,
         }) {
             setItemBlockModel(b, 0, "inventory");
         }
+
         for (Block b : new Block[] {
                 Core.registry.resource_block,
                 Core.registry.colossal_block,
         }) {
             setItemBlockModelFromState(b);
         }
+
+		for (Item i : new Item[] {
+				Core.registry.dark_iron,
+				Core.registry.lead_ingot,
+				Core.registry.silver_ingot,
+				Core.registry.charge_meter,
+				Core.registry.logicMatrixProgrammer,
+				Core.registry.pocket_table,
+		}) {
+			setItemModel(i, 0, "inventory");
+		}
 
         setTileEntityRendererDispatcher(TileEntityDayBarrel.class, new TileEntityDayBarrelRenderer());
         setTileEntityRendererDispatcher(TileEntityGreenware.class, new TileEntityGreenwareRender());
@@ -237,7 +273,7 @@ public class FactorizationClientProxy extends FactorizationProxy {
     public String getPocketCraftingTableKey() {
         return GameSettings.getKeyDisplayString(FactorizationKeyHandler.pocket_key.getKeyCode());
     }
-    
+
     @Override
     public boolean isClientHoldingShift() {
         if (FMLCommonHandler.instance().getEffectiveSide() != Side.CLIENT) {
@@ -247,13 +283,13 @@ public class FactorizationClientProxy extends FactorizationProxy {
         return org.lwjgl.input.Keyboard.isKeyDown(42 /* sneak */);
         //return !mc.gameSettings.keyBindSneak.pressed;
     }
-    
+
     @Override
     public void afterLoad() {
         Core.logInfo("Reloading game settings");
         Minecraft.getMinecraft().gameSettings.loadOptions();
     }
-    
+
     @Override
     public void sendBlockClickPacket() {
         Minecraft mc = Minecraft.getMinecraft();

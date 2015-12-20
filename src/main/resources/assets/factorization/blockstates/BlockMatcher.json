@@ -1,31 +1,43 @@
 {
+    "forge_marker": 1,
+    "defaults": {
+        "model": "factorization:block_matcher",
+        "transform": "forge:default-block",
+        "textures": {
+            "particle": "factorization:blocks/redstone/matcher_side",
+            "x": "factorization:blocks/redstone/matcher_side",
+            "y": "factorization:blocks/redstone/matcher_side",
+            "z": "factorization:blocks/redstone/matcher_side"
+        }
+    },
     "variants": {
-        "axis=x,firing=READY": {
-            "model": "factorization:NORELEASE"
+        "normal": [{}],
+        "inventory": [{
+            "textures": {
+                "x": "factorization:blocks/redstone/matcher_face"
+            }
+        }],
+        "axis": {
+            "x": {
+                "textures": {
+                    "x": "factorization:blocks/redstone/matcher_face"
+                }
+            },
+            "y": {
+                "textures": {
+                    "y": "factorization:blocks/redstone/matcher_face"
+                }
+            },
+            "z": {
+                "textures": {
+                    "z": "factorization:blocks/redstone/matcher_face"
+                }
+            }
         },
-        "axis=x,firing=FIRING": {
-            "model": "factorization:NORELEASE"
-        },
-        "axis=x,firing=MATCHED": {
-            "model": "factorization:NORELEASE"
-        },
-        "axis=y,firing=READY": {
-            "model": "factorization:NORELEASE"
-        },
-        "axis=y,firing=FIRING": {
-            "model": "factorization:NORELEASE"
-        },
-        "axis=y,firing=MATCHED": {
-            "model": "factorization:NORELEASE"
-        },
-        "axis=z,firing=READY": {
-            "model": "factorization:NORELEASE"
-        },
-        "axis=z,firing=FIRING": {
-            "model": "factorization:NORELEASE"
-        },
-        "axis=z,firing=MATCHED": {
-            "model": "factorization:NORELEASE"
+        "firing": {
+            "ready": {},
+            "firing": {},
+            "matched": {}
         }
     }
 }

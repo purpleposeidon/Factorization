@@ -1,0 +1,13 @@
+{
+    "parent": "factorization:item/base",
+    "textures": {
+        "layer0": "factorization:items/tool/matrix_programmer"
+    },
+    "display": {
+        "thirdperson": {
+            "rotation": [ 0, 90, 160 ],
+            "translation": [ 0, 0.85, -3.5 ],
+            "scale": [ 0.75, 0.75, 0.75 ]
+        }
+    }
+}

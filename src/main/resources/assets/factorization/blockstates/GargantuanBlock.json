@@ -1,22 +1,69 @@
 {
+    "forge_marker": 1,
+    "defaults": {
+        "model": "cube",
+        "transform": "forge:default-block",
+        "textures": {
+            "particle": "factorization:blocks/colossi/gargantuan_end",
+            "down": "factorization:blocks/colossi/gargantuan_end",
+            "up": "factorization:blocks/colossi/gargantuan_end",
+            "north": "factorization:blocks/colossi/gargantuan_end",
+            "south": "factorization:blocks/colossi/gargantuan_end",
+            "west": "factorization:blocks/colossi/gargantuan_end",
+            "east": "factorization:blocks/colossi/gargantuan_end"
+        }
+    },
     "variants": {
-        "face=down": {
-            "model": "factorization:NORELEASE"
-        },
-        "face=up": {
-            "model": "factorization:NORELEASE"
-        },
-        "face=north": {
-            "model": "factorization:NORELEASE"
-        },
-        "face=south": {
-            "model": "factorization:NORELEASE"
-        },
-        "face=west": {
-            "model": "factorization:NORELEASE"
-        },
-        "face=east": {
-            "model": "factorization:NORELEASE"
+        "inventory": [{}],
+        "face": {
+            "down": {
+                "textures": {
+                    "north": "factorization:blocks/colossi/gargantuan_high_fu",
+                    "south": "factorization:blocks/colossi/gargantuan_high_fu",
+                    "west": "factorization:blocks/colossi/gargantuan_high_fu",
+                    "east": "factorization:blocks/colossi/gargantuan_high_fu"
+                }
+            },
+            "up": {
+                "textures": {
+                    "north": "factorization:blocks/colossi/gargantuan_low_fu",
+                    "south": "factorization:blocks/colossi/gargantuan_low_fu",
+                    "west": "factorization:blocks/colossi/gargantuan_low_fu",
+                    "east": "factorization:blocks/colossi/gargantuan_low_fu"
+                }
+            },
+            "north": {
+                "textures": {
+                    "down": "factorization:blocks/colossi/gargantuan_low_fu",
+                    "up": "factorization:blocks/colossi/gargantuan_low_fu",
+                    "west": "factorization:blocks/colossi/gargantuan_low",
+                    "east": "factorization:blocks/colossi/gargantuan_high"
+                }
+            },
+            "south": {
+                "textures": {
+                    "down": "factorization:blocks/colossi/gargantuan_high_fu",
+                    "up": "factorization:blocks/colossi/gargantuan_high_fu",
+                    "west": "factorization:blocks/colossi/gargantuan_high",
+                    "east": "factorization:blocks/colossi/gargantuan_low"
+                }
+            },
+            "west": {
+                "textures": {
+                    "down": "factorization:blocks/colossi/gargantuan_low",
+                    "up": "factorization:blocks/colossi/gargantuan_low",
+                    "north": "factorization:blocks/colossi/gargantuan_high",
+                    "south": "factorization:blocks/colossi/gargantuan_low"
+                }
+            },
+            "east": {
+                "textures": {
+                    "down": "factorization:blocks/colossi/gargantuan_high",
+                    "up": "factorization:blocks/colossi/gargantuan_high",
+                    "north": "factorization:blocks/colossi/gargantuan_low",
+                    "south": "factorization:blocks/colossi/gargantuan_high"
+                }
+            }
         }
     }
 }
