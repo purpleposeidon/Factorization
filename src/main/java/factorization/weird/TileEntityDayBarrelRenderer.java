@@ -177,10 +177,10 @@ public class TileEntityDayBarrelRenderer extends TileEntitySpecialRenderer<TileE
             if (!found) continue;
             double IX = i*char_width;
             final double dy = 1.0 - (1.0/256.0);
-            tess.tex(u + (x + 1) * du, v + y * dv).putPosition(IX + char_width, 0, 0);
-            tess.tex(u + x * du, v + y * dv).putPosition(IX, 0, 0);
-            tess.tex(u + x * du, v + (y + dy) * dv).putPosition(IX, char_height, 0);
-            tess.tex(u + (x + 1) * du, v + (y + dy) * dv).putPosition(IX + char_width, char_height, 0);
+            tess.tex(u + (x + 1) * du, v + y * dv).pos(IX + char_width, 0, 0);
+            tess.tex(u + x * du, v + y * dv).pos(IX, 0, 0);
+            tess.tex(u + x * du, v + (y + dy) * dv).pos(IX, char_height, 0);
+            tess.tex(u + (x + 1) * du, v + (y + dy) * dv).pos(IX + char_width, char_height, 0);
         }
         tessI.draw();
         tess.setTranslation(0, 0, 0);

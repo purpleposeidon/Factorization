@@ -1,11 +1,5 @@
 package factorization.common;
 
-import factorization.api.Coord;
-import factorization.artifact.ContainerForge;
-import factorization.oreprocessing.ContainerCrystallizer;
-import factorization.oreprocessing.ContainerSlagFurnace;
-import factorization.shared.TileEntityFactorization;
-import factorization.weird.ContainerPocket;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.inventory.Container;
@@ -14,8 +8,16 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.BlockPos;
 import net.minecraft.world.World;
+
 import net.minecraftforge.common.util.FakePlayer;
 import net.minecraftforge.fml.common.network.IGuiHandler;
+
+import factorization.api.Coord;
+import factorization.artifact.ContainerForge;
+import factorization.oreprocessing.ContainerCrystallizer;
+import factorization.oreprocessing.ContainerSlagFurnace;
+import factorization.shared.TileEntityFactorization;
+import factorization.weird.ContainerPocket;
 
 public class FactorizationProxy implements IGuiHandler {
 
@@ -63,6 +65,14 @@ public class FactorizationProxy implements IGuiHandler {
     }
 
     public void playSoundFX(String src, float volume, float pitch) {
+    }
+
+    public boolean isClientThread() {
+        return false;
+    }
+
+    public void addScheduledClientTask(Runnable runnable) {
+
     }
 
     public EntityPlayer getClientPlayer() {

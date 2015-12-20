@@ -25,10 +25,12 @@ import net.minecraft.util.MovingObjectPosition;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
 
+import net.minecraftforge.client.event.TextureStitchEvent;
 import net.minecraftforge.client.model.ModelLoader;
 import net.minecraftforge.fml.client.registry.ClientRegistry;
 import net.minecraftforge.fml.client.registry.RenderingRegistry;
 import net.minecraftforge.fml.common.FMLCommonHandler;
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.relauncher.Side;
 
 import factorization.api.Coord;
@@ -69,6 +71,7 @@ import factorization.servo.stepper.RenderStepperEngine;
 import factorization.servo.stepper.StepperEngine;
 import factorization.shared.Core;
 import factorization.shared.EmptyRender;
+import factorization.shared.FzIcons;
 import factorization.shared.NORELEASE;
 import factorization.shared.TileEntityFactorization;
 import factorization.sockets.SocketLacerator;
@@ -155,6 +158,16 @@ public class FactorizationClientProxy extends FactorizationProxy {
     public void playSoundFX(String src, float volume, float pitch) {
         ISound sound = new PositionedSoundRecord(new ResourceLocation(src), volume, pitch, 0, 0, 0);
         Minecraft.getMinecraft().getSoundHandler().playSound(sound);
+    }
+
+    @Override
+    public void addScheduledClientTask(Runnable runnable) {
+        Minecraft.getMinecraft().addScheduledTask(runnable);
+    }
+
+    @Override
+    public boolean isClientThread() {
+        return Minecraft.getMinecraft().isCallingFromMinecraftThread();
     }
 
     @Override
@@ -267,6 +280,11 @@ public class FactorizationClientProxy extends FactorizationProxy {
         // MinecraftForgeClient.registerItemRenderer(Core.registry.daybarrel, new DayBarrelItemRenderer(renderBarrel));
         // MinecraftForgeClient.registerItemRenderer(Core.registry.brokenTool, new RenderBrokenArtifact());
         Core.loadBus(GooRenderer.INSTANCE);
+    }
+
+    @SubscribeEvent
+    public void onTextureStitch(TextureStitchEvent.Pre event) {
+        FzIcons.items$barrel_font = event.map.registerSprite(new ResourceLocation("factorization:items/barrel_font"));
     }
 
     @Override

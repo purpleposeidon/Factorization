@@ -1,10 +1,14 @@
 package factorization.shared;
 
-import factorization.shared.NetworkFactorization.MessageType;
+import java.io.IOException;
+
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufInputStream;
+
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.network.NetHandlerPlayServer;
+import net.minecraft.world.WorldServer;
+
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.network.FMLEventChannel;
 import net.minecraftforge.fml.common.network.FMLNetworkEvent.ClientCustomPacketEvent;
@@ -12,26 +16,42 @@ import net.minecraftforge.fml.common.network.FMLNetworkEvent.CustomPacketEvent;
 import net.minecraftforge.fml.common.network.FMLNetworkEvent.ServerCustomPacketEvent;
 import net.minecraftforge.fml.common.network.NetworkRegistry;
 
-import java.io.IOException;
+import factorization.shared.NetworkFactorization.MessageType;
 
 public class FzNetEventHandler {
     static final String channelName = "FZ";
     static FMLEventChannel channel;
-    
-    
+
     FzNetEventHandler() {
         channel = NetworkRegistry.INSTANCE.newEventDrivenChannel(channelName);
         channel.register(this);
     }
-    
+
     @SubscribeEvent
-    public void onPacket(ServerCustomPacketEvent event) {
-        handlePacket(event, true, ((NetHandlerPlayServer) event.handler).playerEntity);
+    public void onPacket(final ServerCustomPacketEvent event) {
+        WorldServer world = ((NetHandlerPlayServer) event.handler).playerEntity.getServerForPlayer();
+        if (!world.isCallingFromMinecraftThread()) {
+            world.addScheduledTask(new Runnable() {
+                public void run() {
+                    handlePacket(event, true, ((NetHandlerPlayServer) event.handler).playerEntity);
+                }
+            });
+        } else {
+            handlePacket(event, true, ((NetHandlerPlayServer) event.handler).playerEntity);
+        }
     }
     
     @SubscribeEvent
-    public void onPacket(ClientCustomPacketEvent event) {
-        handlePacket(event, false, Core.proxy.getClientPlayer());
+    public void onPacket(final ClientCustomPacketEvent event) {
+        if (!Core.proxy.isClientThread()) {
+            Core.proxy.addScheduledClientTask(new Runnable() {
+                public void run() {
+                    handlePacket(event, false, Core.proxy.getClientPlayer());
+                }
+            });
+        } else {
+            handlePacket(event, false, Core.proxy.getClientPlayer());
+        }
     }
     
     private void handlePacket(CustomPacketEvent event, boolean isServer, EntityPlayer player) {
