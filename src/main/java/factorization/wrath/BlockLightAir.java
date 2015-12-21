@@ -27,7 +27,7 @@ public class BlockLightAir extends BlockAir {
         TileEntityWrathLamp.doAirCheck(world, pos);
         BlockPos below = pos.down();
         if (world.getBlockState(below).getBlock() == this) {
-            world.scheduleBlockUpdate(below, this, 1, 0);
+            world.updateBlockTick(below, this, 1, 0);
         }
     }
 

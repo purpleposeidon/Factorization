@@ -835,7 +835,7 @@ public final class Coord implements IDataSerializable, ISaneCoord, Comparable<Co
     }
 
     public void scheduleUpdate(int delay, int priority) {
-        w.scheduleBlockUpdate(toBlockPos(), getBlock(), delay, priority);
+        w.updateBlockTick(toBlockPos(), getBlock(), delay, priority);
     }
 
     @Deprecated

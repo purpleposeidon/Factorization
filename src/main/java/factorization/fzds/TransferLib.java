@@ -186,7 +186,7 @@ public class TransferLib {
             dest.setTE(ret);
         }
         if (block_tick_time > -1) {
-            dest.w.scheduleBlockUpdate(dest.toBlockPos(), id, (int) block_tick_time, block_tick_priority);
+            dest.w.updateBlockTick(dest.toBlockPos(), id, (int) block_tick_time, block_tick_priority);
         }
         return ret;
     }

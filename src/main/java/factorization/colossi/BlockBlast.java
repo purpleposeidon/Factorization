@@ -3,6 +3,7 @@ package factorization.colossi;
 import java.util.List;
 import java.util.Random;
 
+import factorization.shared.NORELEASE;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.properties.IProperty;
@@ -18,6 +19,7 @@ import net.minecraft.util.EnumParticleTypes;
 import net.minecraft.util.MathHelper;
 import net.minecraft.util.Vec3;
 import net.minecraft.world.Explosion;
+import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;
 
@@ -59,7 +61,12 @@ public class BlockBlast extends Block {
 
     @Override
     public void onNeighborBlockChange(World world, BlockPos pos, IBlockState state, Block neighborBlock) {
-        world.scheduleBlockUpdate(pos, this, 4 + world.rand.nextInt(4), 0);
+        Material material = neighborBlock.getMaterial();
+        if (material == Material.fire || material == Material.lava) {
+            Coord at = new Coord(world, pos);
+            at.trySet(EXPLODING, true);
+            at.scheduleUpdate(8 + world.rand.nextInt(8), 8);
+        }
     }
 
     @Override
@@ -68,8 +75,9 @@ public class BlockBlast extends Block {
             IBlockState bs = world.getBlockState(hit);
             if (bs.getBlock() != this) continue;
             if (hit.equals(pos)) continue;
-            new Coord(world, pos).trySet(EXPLODING, true);
-            onNeighborBlockChange(world, hit, bs, this);
+            Coord coord = new Coord(world, hit);
+            coord.trySet(EXPLODING, true);
+            coord.scheduleUpdate(8 + world.rand.nextInt(8), 8);
         }
     }
 
@@ -145,6 +153,15 @@ public class BlockBlast extends Block {
             entity.motionY += dy * blastbackResistance;
             entity.motionZ += dz * blastbackResistance;
         }
+    }
 
+    @Override
+    public boolean isFireSource(World world, BlockPos pos, EnumFacing side) {
+        return true;
+    }
+
+    @Override
+    public boolean isFlammable(IBlockAccess world, BlockPos pos, EnumFacing face) {
+        return true;
     }
 }

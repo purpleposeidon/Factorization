@@ -148,7 +148,7 @@ public class BlockMatcher extends Block {
         if (FzUtil.sameState(bs, nbs)) return;
         //println("neighbor changed", block.getLocalizedName(), state, "-->", next_state);
         world.setBlockState(pos, nbs, notify);
-        world.scheduleBlockUpdate(pos, this, 4, 0);
+        world.updateBlockTick(pos, this, 4, 0);
     }
 
     @Override
