@@ -153,28 +153,13 @@ public final class SpaceUtil {
      * @return A new box, with a volume of 0. Returns null if face is invalid.
      */
     public static AxisAlignedBB flatten(AxisAlignedBB box, EnumFacing face) {
-        byte[] lows = new byte[] { 0b000, 0b010, 0b000, 0b001, 0b000, 0b100 };
-        byte[] hghs = new byte[] { 0b101, 0b111, 0b110, 0b111, 0b011, 0b111 };
+        byte[] lows = new byte[] { 0b010, 0b000, 0b100, 0b000, 0b001, 0b000 };
+        byte[] hghs = new byte[] { 0b111, 0b101, 0b111, 0b011, 0b111, 0b110 };
         byte low = lows[face.ordinal()];
         byte high = hghs[face.ordinal()];
         assert low != high;
         assert (~low & 0b111) != high;
         return newBox(getVertex(box, low), getVertex(box, high));
-
-        /*Vec3 min = getMin(box), max = getMax(box);
-        Vec3 mv = sign(face) == +1 ? min : max;
-        Vec3 base = mv == min ? max : min;
-        assert mv != base;
-        if (face.getDirectionVec().getX() != 0) {
-            mv.xCoord = base.xCoord;
-        }
-        if (face.getDirectionVec().getY() != 0) {
-            mv.yCoord = base.yCoord;
-        }
-        if (face.getDirectionVec().getZ() != 0) {
-            mv.zCoord = base.zCoord;
-        }
-        return createAABB(min, max);*/
     }
 
     public static double getDiagonalLength(AxisAlignedBB ab) {
@@ -268,11 +253,18 @@ public final class SpaceUtil {
 
     public static Vec3 getLowest(Vec3[] vs) {
         double x, y, z;
-        x = vs[0].xCoord;
-        y = vs[0].yCoord;
-        z = vs[0].zCoord;
+        x = y = z = 0;
+        boolean first = true;
         for (int i = 1; i < vs.length; i++) {
             Vec3 v = vs[i];
+            if (v == null) continue;
+            if (first) {
+                first = false;
+                x = v.xCoord;
+                y = v.yCoord;
+                z = v.zCoord;
+                continue;
+            }
             if (v.xCoord < x) x = v.xCoord;
             if (v.yCoord < y) y = v.yCoord;
             if (v.zCoord < z) z = v.zCoord;
@@ -282,11 +274,18 @@ public final class SpaceUtil {
 
     public static Vec3 getHighest(Vec3[] vs) {
         double x, y, z;
-        x = vs[0].xCoord;
-        y = vs[0].yCoord;
-        z = vs[0].zCoord;
+        x = y = z = 0;
+        boolean first = true;
         for (int i = 1; i < vs.length; i++) {
             Vec3 v = vs[i];
+            if (v == null) continue;
+            if (first) {
+                first = false;
+                x = v.xCoord;
+                y = v.yCoord;
+                z = v.zCoord;
+                continue;
+            }
             if (v.xCoord > x) x = v.xCoord;
             if (v.yCoord > y) y = v.yCoord;
             if (v.zCoord > z) z = v.zCoord;
