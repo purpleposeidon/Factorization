@@ -1,9 +1,6 @@
 package factorization.colossi;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
-import java.util.UUID;
+import java.util.*;
 
 import factorization.util.DataUtil;
 import net.minecraft.block.Block;
@@ -57,7 +54,7 @@ public class ColossalBlock extends Block {
 
         @Override
         public String getName() {
-            return this.toString();
+            return this.toString().toLowerCase(Locale.ROOT);
         }
 
         public static final Md[] values = values();
@@ -67,7 +64,7 @@ public class ColossalBlock extends Block {
 
         @Override
         public String getName() {
-            return this.toString();
+            return this.toString().toLowerCase(Locale.ROOT);
         }
     }
     public static final PropertyEnum<Md> VARIANT = PropertyEnum.create("variant", Md.class);
@@ -104,14 +101,13 @@ public class ColossalBlock extends Block {
     @Override
     public IBlockState getActualState(IBlockState bs, IBlockAccess w, BlockPos pos) {
         if (bs.getValue(VARIANT) == ARM) {
-            if (DataUtil.getOr(w.getBlockState(pos.down()), VARIANT, null) == ARM) {
-                return bs.withProperty(CAPPING, Capping.DOWN);
-            }
-            if (DataUtil.getOr(w.getBlockState(pos.up()), VARIANT, null) == ARM) {
-                return bs.withProperty(CAPPING, Capping.UP);
+            boolean goesDown = DataUtil.getOr(w.getBlockState(pos.down()), VARIANT, null) == ARM;
+            boolean goesUp = DataUtil.getOr(w.getBlockState(pos.up()), VARIANT, null) == ARM;
+            if (goesUp != goesDown) {
+                return bs.withProperty(CAPPING, goesDown ? Capping.UP : Capping.DOWN);
             }
         }
-        return super.getActualState(bs, w, pos);
+        return bs.withProperty(CAPPING, Capping.NONE);
     }
 
     @Override
@@ -350,6 +346,6 @@ public class ColossalBlock extends Block {
 
     @Override
     public int getLightValue(IBlockAccess world, BlockPos pos) {
-        return 8;
+        return 8; // FZDS has lighting glitches :(
     }
 }

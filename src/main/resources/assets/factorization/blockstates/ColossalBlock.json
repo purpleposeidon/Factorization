@@ -27,6 +27,7 @@
                 }
             },
             "body_covered": {
+                "__comment": "This is a copy of 'body'",
                 "textures": {
                     "all": "factorization:blocks/colossi/body"
                 }
@@ -38,11 +39,53 @@
             },
             "leg": {
                 "textures": {
-                    "all": "factorization:blocks/colossi/mask"
+                    "all": "factorization:blocks/colossi/leg"
                 }
             },
             "core": {
-                "model": "factorization:colossal_core"
+                "model": "factorization:oriented_colossal",
+                "textures": {
+                    "front": "factorization:blocks/colossi/core",
+                    "side": "factorization:blocks/colossi/core_back"
+                }
+            },
+            "eye": {
+                "model": "factorization:oriented_colossal",
+                "textures": {
+                    "front": "factorization:blocks/colossi/eye",
+                    "side": "factorization:blocks/colossi/mask"
+                }
+            },
+            "eye_open": {
+                "model": "factorization:oriented_colossal",
+                "textures": {
+                    "front": "factorization:blocks/colossi/eye_open",
+                    "side": "factorization:blocks/colossi/mask"
+                }
+            }
+        },
+        "capping=up,variant=arm": {
+            "model": "factorization:vertical_colossal",
+            "textures": {
+                "side": "factorization:blocks/colossi/arm_side_top",
+                "down": "factorization:blocks/colossi/arm_bottom",
+                "up":   "factorization:blocks/colossi/arm_top"
+            }
+        },
+        "capping=none,variant=arm": {
+            "model": "factorization:vertical_colossal",
+            "textures": {
+                "side": "factorization:blocks/colossi/arm_side",
+                "down": "factorization:blocks/colossi/arm_bottom",
+                "up":   "factorization:blocks/colossi/arm_top"
+            }
+        },
+        "capping=down,variant=arm": {
+            "model": "factorization:vertical_colossal",
+            "textures": {
+                "side": "factorization:blocks/colossi/arm_side_bottom",
+                "down": "factorization:blocks/colossi/arm_bottom",
+                "up":   "factorization:blocks/colossi/arm_top"
             }
         }
     }
