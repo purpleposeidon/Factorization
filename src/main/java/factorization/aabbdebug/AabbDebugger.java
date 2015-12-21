@@ -49,7 +49,7 @@ public enum AabbDebugger {
 
             @Override
             public List<String> getCommandAliases() {
-                return null;
+                return new ArrayList<String>();
             }
 
             @Override
