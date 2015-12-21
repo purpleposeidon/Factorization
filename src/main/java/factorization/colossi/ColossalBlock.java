@@ -15,11 +15,7 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.BlockPos;
-import net.minecraft.util.EnumFacing;
-import net.minecraft.util.EnumParticleTypes;
-import net.minecraft.util.IStringSerializable;
-import net.minecraft.util.WeightedRandomChestContent;
+import net.minecraft.util.*;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 
@@ -347,5 +343,14 @@ public class ColossalBlock extends Block {
     @Override
     public int getLightValue(IBlockAccess world, BlockPos pos) {
         return 8; // FZDS has lighting glitches :(
+    }
+
+    @Override
+    public ItemStack getPickBlock(MovingObjectPosition target, World world, BlockPos pos, EntityPlayer player) {
+        IBlockState bs = world.getBlockState(pos);
+        Md variant = bs.getValue(VARIANT);
+        if (variant == null) variant = BODY;
+        if (variant == BODY_COVERED) variant = BODY;
+        return new ItemStack(this, 1, variant.ordinal());
     }
 }
