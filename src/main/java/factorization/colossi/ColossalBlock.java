@@ -275,7 +275,7 @@ public class ColossalBlock extends Block {
 
     private void placePoster(ItemStack held, EntityPlayer player, Coord at) {
         ItemSpawnPoster.PosterPlacer placer = new ItemSpawnPoster.PosterPlacer(new ItemStack(Core.registry.spawnPoster), player, at.w, at.toBlockPos(), EnumFacing.EAST);
-        placer.invoke();
+        placer.calculate();
         final EntityPoster poster = placer.result;
         poster.locked = true;
         poster.inv = held.copy();

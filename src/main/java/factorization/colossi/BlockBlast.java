@@ -68,7 +68,7 @@ public class BlockBlast extends Block {
             IBlockState bs = world.getBlockState(hit);
             if (bs.getBlock() != this) continue;
             if (hit.equals(pos)) continue;
-            new Coord(world, pos).set(EXPLODING, true);
+            new Coord(world, pos).trySet(EXPLODING, true);
             onNeighborBlockChange(world, hit, bs, this);
         }
     }
@@ -76,13 +76,14 @@ public class BlockBlast extends Block {
     @Override
     public float getExplosionResistance(World world, BlockPos pos, Entity exploder, Explosion explosion) {
         Coord coord = new Coord(world, pos);
-        coord.set(EXPLODING, true);
+        coord.trySet(EXPLODING, true);
         onNeighborBlockChange(world, pos, coord.getState(), this);
         return super.getExplosionResistance(world, pos, exploder, explosion);
     }
 
     @Override
     public void updateTick(World world, BlockPos pos, IBlockState state, Random rand) {
+        if (world.isRemote) return;
         IBlockState ibs = world.getBlockState(pos);
         boolean boom = ibs.getValue(EXPLODING);
         if (!boom) {
@@ -132,6 +133,10 @@ public class BlockBlast extends Block {
             dz /= entDist;
             double density = (double) world.getBlockDensity(vec3, entity.getEntityBoundingBox());
             double pain = (1.0D - dist) * density;
+            // TODO: Blast Blocks should do some actual damage.
+            // (Especially now that they're no longer "used" in the colossus fight...)
+            // Presence/ratios of sand/sandstone/blastblocks should influence the explosion behavior
+            // Perlin noise stuff!
             entity.attackEntityFrom(DamageSource.setExplosionSource(null), (float) ((int) ((pain * pain + pain) / 2.0D * 8.0D * explosionSize + 1.0D)));
             // Yeah, we're manually applying the coremod here, ahem.
             double blastbackResistance = HookTargetsServer.clipExplosionResistance(entity, pain);

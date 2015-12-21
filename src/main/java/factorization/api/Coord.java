@@ -1110,6 +1110,13 @@ public final class Coord implements IDataSerializable, ISaneCoord, Comparable<Co
         set(getState().withProperty(PROPERTY, value), true);
     }
 
+    public <T extends Comparable<T>> boolean trySet(IProperty<T> PROPERTY, T value) {
+        IBlockState bs = getState();
+        if (bs.getProperties().get(PROPERTY) == null) return false;
+        bs = bs.withProperty(PROPERTY, value);
+        return set(bs, true);
+    }
+
     public <T extends Comparable<T>> boolean has(IProperty<T> PROPERTY, T... values) {
         T actual = getPropertyOr(PROPERTY, null);
         for (T v : values) {
