@@ -32,7 +32,7 @@ public class RenderPoster extends RenderEntity {
         if (selected && !mc.gameSettings.hideGUI) {
             GL11.glPushMatrix();
             // They ordinarily don't move, so no need to bother w/ interpolation
-            GL11.glTranslated(-ent.posX, -ent.posY, -ent.posZ);
+            GL11.glTranslated(-ent.posX, -ent.posY, -ent.posZ + 1 / 16.0);
             GL11.glDisable(GL11.GL_TEXTURE_2D);
             RenderGlobal.func_181561_a(ent.getEntityBoundingBox());
             GL11.glEnable(GL11.GL_TEXTURE_2D);
@@ -66,7 +66,7 @@ public class RenderPoster extends RenderEntity {
 
         // Pre-emptively undo transformations that the item renderer does so
         // that we don't get a stupid angle. Minecraft render code is terrible.
-        GL11.glTranslatef(0, 0, 0.5F/16F);
+        GL11.glTranslatef(0, 0, -0.5F/16F);
 
         int itemColor = is.getItem().getColorFromItemStack(is, 0);
         float cr = (float)(itemColor >> 16 & 255) / 255.0F;

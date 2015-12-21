@@ -6,6 +6,7 @@ import factorization.shared.Core;
 import factorization.shared.ItemFactorization;
 import factorization.util.ItemUtil;
 import factorization.util.SpaceUtil;
+import net.minecraft.entity.item.EntityItemFrame;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.*;
@@ -22,19 +23,15 @@ public class ItemSpawnPoster extends ItemFactorization {
     public boolean onItemUse(ItemStack is, EntityPlayer player, World w, BlockPos pos, EnumFacing side, float hitX, float hitY, float hitZ) {
         if (w.isRemote) return false;
         final PosterPlacer placer = new PosterPlacer(is, player, w, pos, side);
-        if (placer.invoke()) return false;
+        if (placer.calculate()) return false;
         placer.spawn();
         return true;
     }
 
     public static class PosterPlacer {
-        private boolean myResult;
         private ItemStack is;
         private EntityPlayer player;
         private World w;
-        private int x;
-        private int y;
-        private int z;
         private EnumFacing dir;
 
         final Coord at;
@@ -55,11 +52,7 @@ public class ItemSpawnPoster extends ItemFactorization {
             this.at = new Coord(w, pos);
         }
 
-        boolean is() {
-            return myResult;
-        }
-
-        public boolean invoke() {
+        public boolean calculate() {
             if (determineBoundingBox()) return true;
             if (determineSize()) return true;
             determineOrientation();
@@ -96,13 +89,16 @@ public class ItemSpawnPoster extends ItemFactorization {
             plane = SpaceUtil.flatten(blockBox, dir);
 
             final double pix = 1.0 / 16.0;
-            bounds = plane.addCoord(dir.getDirectionVec().getX() * pix, dir.getDirectionVec().getY() * pix, dir.getDirectionVec().getZ() * pix);
+            bounds = SpaceUtil.addCoord(plane, SpaceUtil.scale(new Vec3(dir.getDirectionVec()), pix));
 
             for (Object ent : w.getEntitiesWithinAABB(EntityPoster.class, bounds)) {
                 if (ent instanceof EntityPoster) {
                     EntityPoster poster = (EntityPoster) ent;
                     if (ItemUtil.is(poster.inv, Core.registry.spawnPoster)) return true;
                     // Allow multiple posters if there are no empty ones
+                } else if (ent instanceof EntityItemFrame) {
+                    // There may be a reasonable use for this
+                    continue;
                 } else {
                     return true;
                 }
