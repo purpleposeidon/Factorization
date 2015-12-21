@@ -179,28 +179,28 @@ public class FactorizationClientProxy extends FactorizationProxy {
         ClientRegistry.bindTileEntitySpecialRenderer(clazz, r);
     }
 
-	private void setItemModel(Item item, int meta, String variant) {
-		ModelLoader.setCustomModelResourceLocation(item, meta,
-				new ModelResourceLocation(Item.itemRegistry.getNameForObject(item), variant));
-	}
+    private void setItemModel(Item item, int meta, String variant) {
+        ModelLoader.setCustomModelResourceLocation(item, meta,
+                new ModelResourceLocation(Item.itemRegistry.getNameForObject(item), variant));
+    }
 
-	// @neptunepink: This is an example implementation of a mass item model setup
-	// which gets the model names via Minecraft's ItemMeshDefinition, which
-	// gives a model based on the passed ItemStack.
-	// addVariantName is used to give MC the names of models to be loaded.
-	// Feel free to make a custom implementation getting the list of all models
-	// in a different way.
-	// Also, note that you can actually use BlockStates to define item model variants,
-	// in which case you would use the variant name in ModelResourceLocation.
-	private void setItemModelFromSubItems(Item item, ItemMeshDefinition definition) {
-		ModelLoader.setCustomMeshDefinition(item, definition);
+    // @neptunepink: This is an example implementation of a mass item model setup
+    // which gets the model names via Minecraft's ItemMeshDefinition, which
+    // gives a model based on the passed ItemStack.
+    // addVariantName is used to give MC the names of models to be loaded.
+    // Feel free to make a custom implementation getting the list of all models
+    // in a different way.
+    // Also, note that you can actually use BlockStates to define item model variants,
+    // in which case you would use the variant name in ModelResourceLocation.
+    private void setItemModelFromSubItems(Item item, ItemMeshDefinition definition) {
+        ModelLoader.setCustomMeshDefinition(item, definition);
 
-		List<ItemStack> subItems = new ArrayList<ItemStack>();
-		item.getSubItems(item, Core.tabFactorization, subItems);
-		for (ItemStack is : subItems) {
-			ModelLoader.addVariantName(item, definition.getModelLocation(is).toString().split("#")[0]);
-		}
-	}
+        List<ItemStack> subItems = new ArrayList<ItemStack>();
+        item.getSubItems(item, Core.tabFactorization, subItems);
+        for (ItemStack is : subItems) {
+            ModelLoader.addVariantName(item, definition.getModelLocation(is).toString().split("#")[0]);
+        }
+    }
 
     private void setItemBlockModel(Block block, int meta, String variant) {
         ModelLoader.setCustomModelResourceLocation(Item.getItemFromBlock(block), meta,
@@ -215,36 +215,35 @@ public class FactorizationClientProxy extends FactorizationProxy {
 
     @Override
     public void registerRenderers() {
-        for (Block b : new Block[] {
+        for (Block b : new Block[]{
                 Core.registry.artifact_forge,
                 Core.registry.dark_iron_ore,
                 Core.registry.fractured_bedrock_block,
                 Core.registry.blasted_bedrock_block,
                 Core.registry.matcher_block,
-				Core.registry.gargantuan_block,
+                Core.registry.gargantuan_block,
                 Core.registry.blastBlock,
         }) {
             setItemBlockModel(b, 0, "inventory");
         }
 
-        for (Block b : new Block[] {
+        for (Block b : new Block[]{
                 Core.registry.resource_block,
                 Core.registry.colossal_block,
         }) {
             setItemBlockModelFromState(b);
         }
 
-		for (Item i : new Item[] {
-				Core.registry.dark_iron,
-				Core.registry.lead_ingot,
-				Core.registry.silver_ingot,
-				Core.registry.charge_meter,
-				Core.registry.logicMatrixProgrammer,
-				Core.registry.pocket_table,
-		}) {
-			setItemModel(i, 0, "inventory");
-		}
-
+        for (Item i : new Item[]{
+                Core.registry.dark_iron,
+                Core.registry.lead_ingot,
+                Core.registry.silver_ingot,
+                Core.registry.charge_meter,
+                Core.registry.logicMatrixProgrammer,
+                Core.registry.pocket_table,
+        }) {
+            setItemModel(i, 0, "inventory");
+        }
 
 
         NORELEASE.fixme("Glaze bucket");

@@ -185,7 +185,7 @@ public class TileEntityAnthroGen extends TileEntityCommon implements IInventory,
 
     @Override
     public ItemStack removeStackFromSlot(int slot) {
-		// NORELEASE: Fix me! Come on!
+        // NORELEASE: Fix me! Come on!
         return null;
     }
 

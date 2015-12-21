@@ -324,7 +324,7 @@ public class Registry {
         ore_reduced = new ItemOreProcessing("reduced");
         ore_crystal = new ItemOreProcessing("crystal");
         sludge = new ItemCraftingComponent("sludge");
-		OreDictionary.registerOre("sludge", sludge);
+        OreDictionary.registerOre("sludge", sludge);
         //ItemBlocks
         item_factorization = (ItemFactorizationBlock) Item.getItemFromBlock(factory_block);
         item_resource = (ItemBlockResource) Item.getItemFromBlock(resource_block);
