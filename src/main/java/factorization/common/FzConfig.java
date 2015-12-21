@@ -27,7 +27,6 @@ public class FzConfig {
     public static int colossus_spacing = 48;
     public static boolean pocket_craft_anywhere = true;
     public static String pocketActions = "xcbf";
-    public static boolean renderTEs = true;
     public static boolean renderAO = true;
     public static boolean add_branding = false;
     public static boolean dimension_slice_allow_smooth = true;
@@ -164,7 +163,6 @@ public class FzConfig {
             render_barrel_text = editMain().getBoolConfig("renderBarrelText", "client", render_barrel_text, null);
             render_barrel_close = editMain().getBoolConfig("renderBarrelClose", "client", render_barrel_close, "If true, render barrel info only when nearby");
             render_barrel_use_displaylists = editMain().getBoolConfig("renderBarrelUseDisplayLists", "client", render_barrel_use_displaylists, "If true, use OpenGL display lists for rendering barrels. Setting to false may fix some render issues, at the cost of making barrels render less efficiently");
-            renderTEs = editMain().getBoolConfig("renderOtherTileEntities", "client", renderTEs, "If false, most TEs won't draw, making everything look broken but possibly improving FPS");
             renderAO = editMain().getBoolConfig("renderAmbientOcclusion", "client", renderAO, "If false, never use smooth lighting for drawing sculptures");
             String attempt = getStringConfig("pocketCraftingActionKeys", "client", pocketActions, "4 keys for: removing (x), cycling (c), balancing (b), filling (f)");
             if (attempt.length() == pocketActions.length()) {

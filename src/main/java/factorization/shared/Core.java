@@ -220,7 +220,7 @@ public class Core {
         registry.makeRecipes();
         registry.setToolEffectiveness();
         proxy.registerRenderers();
-        
+
         if (FzConfig.players_discover_colossus_guides) {
             DistributeDocs dd = new DistributeDocs();
             MinecraftForge.EVENT_BUS.register(dd);
@@ -282,6 +282,7 @@ public class Core {
         finished_loading = true;
         Blocks.diamond_block.setHardness(5.0F).setResistance(10.0F);
         validateEnvironment();
+        proxy.registerTesrs();
     }
     
     @EventHandler

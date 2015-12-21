@@ -6,7 +6,7 @@ import factorization.truth.api.*;
 import java.util.Locale;
 
 public abstract class AbstractTypesetter implements ITypesetter {
-    // Super-awesome typesetter version π², by neptunepin
+    // Super-awesome typesetter version π², by neptunepink
     public final String domain;
     
     public AbstractTypesetter(String domain) {

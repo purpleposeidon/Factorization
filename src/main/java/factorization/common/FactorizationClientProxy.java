@@ -245,22 +245,34 @@ public class FactorizationClientProxy extends FactorizationProxy {
 			setItemModel(i, 0, "inventory");
 		}
 
+
+
+        NORELEASE.fixme("Glaze bucket");
+        NORELEASE.fixme("Barrel");
+        NORELEASE.fixme("Artifacts");
+        // MinecraftForgeClient.registerItemRenderer(Core.registry.glaze_bucket, new ItemRenderGlazeBucket());
+        // MinecraftForgeClient.registerItemRenderer(Core.registry.daybarrel, new DayBarrelItemRenderer(renderBarrel));
+        // MinecraftForgeClient.registerItemRenderer(Core.registry.brokenTool, new RenderBrokenArtifact());
+        Core.loadBus(GooRenderer.INSTANCE);
+    }
+
+    @Override
+    public void registerTesrs() {
         setTileEntityRendererDispatcher(TileEntityDayBarrel.class, new TileEntityDayBarrelRenderer());
         setTileEntityRendererDispatcher(TileEntityGreenware.class, new TileEntityGreenwareRender());
-        if (FzConfig.renderTEs) {
-            setTileEntityRendererDispatcher(TileEntityHeater.class, new TileEntityHeaterRenderer());
-            setTileEntityRendererDispatcher(TileEntityCrystallizer.class, new TileEntityCrystallizerRender());
-            setTileEntityRendererDispatcher(TileEntityLeydenJar.class, new TileEntityLeydenJarRender());
-            setTileEntityRendererDispatcher(TileEntityCompressionCrafter.class, new TileEntityCompressionCrafterRenderer());
-            setTileEntityRendererDispatcher(SocketScissors.class, new TileEntitySocketRenderer());
-            setTileEntityRendererDispatcher(SocketLacerator.class, new TileEntitySocketRenderer());
-            setTileEntityRendererDispatcher(SocketFanturpeller.class, new TileEntitySocketRenderer());
-            setTileEntityRendererDispatcher(TileEntityHinge.class, new TileEntityHingeRenderer());
-            setTileEntityRendererDispatcher(SocketPoweredCrank.class, new TileEntitySocketRenderer());
-            setTileEntityRendererDispatcher(TileEntitySteamShaft.class, new TileEntitySteamShaftRenderer());
-            setTileEntityRendererDispatcher(TileEntityShaft.class, new TileEntityShaftRenderer());
-            setTileEntityRendererDispatcher(TileEntityBiblioGen.class, new TileEntityBiblioGenRenderer());
-        }
+        setTileEntityRendererDispatcher(TileEntityHeater.class, new TileEntityHeaterRenderer());
+        setTileEntityRendererDispatcher(TileEntityCrystallizer.class, new TileEntityCrystallizerRender());
+        setTileEntityRendererDispatcher(TileEntityLeydenJar.class, new TileEntityLeydenJarRender());
+        setTileEntityRendererDispatcher(TileEntityCompressionCrafter.class, new TileEntityCompressionCrafterRenderer());
+        setTileEntityRendererDispatcher(SocketScissors.class, new TileEntitySocketRenderer());
+        setTileEntityRendererDispatcher(SocketLacerator.class, new TileEntitySocketRenderer());
+        setTileEntityRendererDispatcher(SocketFanturpeller.class, new TileEntitySocketRenderer());
+        setTileEntityRendererDispatcher(TileEntityHinge.class, new TileEntityHingeRenderer());
+        setTileEntityRendererDispatcher(SocketPoweredCrank.class, new TileEntitySocketRenderer());
+        setTileEntityRendererDispatcher(TileEntitySteamShaft.class, new TileEntitySteamShaftRenderer());
+        setTileEntityRendererDispatcher(TileEntityShaft.class, new TileEntityShaftRenderer());
+        setTileEntityRendererDispatcher(TileEntityBiblioGen.class, new TileEntityBiblioGenRenderer());
+
 
         RenderManager rm = Minecraft.getMinecraft().getRenderManager();
 
@@ -272,14 +284,6 @@ public class FactorizationClientProxy extends FactorizationProxy {
         RenderingRegistry.registerEntityRenderingHandler(EntityCitizen.class, new RenderCitizen(rm));
         RenderingRegistry.registerEntityRenderingHandler(EntityMinecartDayBarrel.class, new RenderMinecartDayBarrel(rm));
         RenderingRegistry.registerEntityRenderingHandler(EntityLeafBomb.class, new RenderSnowball<EntityLeafBomb>(rm, Core.registry.leafBomb, Minecraft.getMinecraft().getRenderItem()));
-
-        NORELEASE.fixme("Glaze bucket");
-        NORELEASE.fixme("Barrel");
-        NORELEASE.fixme("Artifacts");
-        // MinecraftForgeClient.registerItemRenderer(Core.registry.glaze_bucket, new ItemRenderGlazeBucket());
-        // MinecraftForgeClient.registerItemRenderer(Core.registry.daybarrel, new DayBarrelItemRenderer(renderBarrel));
-        // MinecraftForgeClient.registerItemRenderer(Core.registry.brokenTool, new RenderBrokenArtifact());
-        Core.loadBus(GooRenderer.INSTANCE);
     }
 
     @SubscribeEvent
