@@ -1096,6 +1096,12 @@ public final class Coord implements IDataSerializable, ISaneCoord, Comparable<Co
         return getState().getValue(PROPERTY);
     }
 
+    public <T extends Comparable<T>> T getPropertyOr(IProperty<T> PROPERTY, T or) {
+        Comparable ret = getState().getProperties().get(PROPERTY);
+        if (ret == null) return or;
+        return (T) ret;
+    }
+
     public <T extends Comparable<T>> void set(IProperty<T> PROPERTY, T value, boolean notify) {
         set(getState().withProperty(PROPERTY, value), notify);
     }
@@ -1105,7 +1111,7 @@ public final class Coord implements IDataSerializable, ISaneCoord, Comparable<Co
     }
 
     public <T extends Comparable<T>> boolean has(IProperty<T> PROPERTY, T... values) {
-        T actual = getProperty(PROPERTY);
+        T actual = getPropertyOr(PROPERTY, null);
         for (T v : values) {
             if (v == actual) return true;
         }
