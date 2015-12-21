@@ -134,7 +134,7 @@ public class Registry {
     
     public ItemStack
             daybarrel_item_hidden,
-            lamp_item, air_item,
+            lamp_item,
             slagfurnace_item, battery_item_hidden, leydenjar_item, leydenjar_item_full, heater_item, solarboiler_item, caliometric_burner_item,
             mirror_item_hidden,
             crystallizer_item,
@@ -145,7 +145,7 @@ public class Registry {
             shaft_generator_item, steam_to_shaft, wooden_shaft, bibliogen, wind_mill, water_wheel;
     public ItemStack silver_ore_item, silver_block_item, lead_block_item,
             dark_iron_block_item;
-    public ItemStack is_factory, is_lamp, is_lightair;
+    public ItemStack is_factory, is_lightair;
     public ItemPocketTable pocket_table;
     public ItemCraftingComponent diamond_shard;
     public ItemCraftingComponent silver_ingot, lead_ingot;

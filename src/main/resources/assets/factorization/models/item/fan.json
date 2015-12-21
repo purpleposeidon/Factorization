@@ -1,0 +1,6 @@
+{
+    "parent": "factorization:item/base",
+    "textures": {
+        "layer0": "factorization:items/fan"
+    }
+}

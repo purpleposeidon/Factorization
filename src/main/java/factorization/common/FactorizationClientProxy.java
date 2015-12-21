@@ -3,6 +3,7 @@ package factorization.common;
 import java.util.ArrayList;
 import java.util.List;
 
+import factorization.shared.*;
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
@@ -69,11 +70,6 @@ import factorization.servo.RenderServoMotor;
 import factorization.servo.ServoMotor;
 import factorization.servo.stepper.RenderStepperEngine;
 import factorization.servo.stepper.StepperEngine;
-import factorization.shared.Core;
-import factorization.shared.EmptyRender;
-import factorization.shared.FzIcons;
-import factorization.shared.NORELEASE;
-import factorization.shared.TileEntityFactorization;
 import factorization.sockets.SocketLacerator;
 import factorization.sockets.SocketScissors;
 import factorization.sockets.TileEntitySocketRenderer;
@@ -179,7 +175,8 @@ public class FactorizationClientProxy extends FactorizationProxy {
         ClientRegistry.bindTileEntitySpecialRenderer(clazz, r);
     }
 
-    private void setItemModel(Item item, int meta, String variant) {
+    @Override
+    public void setItemModel(Item item, int meta, String variant) {
         ModelLoader.setCustomModelResourceLocation(item, meta,
                 new ModelResourceLocation(Item.itemRegistry.getNameForObject(item), variant));
     }
@@ -200,6 +197,13 @@ public class FactorizationClientProxy extends FactorizationProxy {
         for (ItemStack is : subItems) {
             ModelLoader.addVariantName(item, definition.getModelLocation(is).toString().split("#")[0]);
         }
+    }
+
+    ArrayList<Item> standardItems = new ArrayList<>();
+    @Override
+    public void standardItemModel(ItemFactorization item) {
+        if (item.getHasSubtypes()) return;
+        standardItems.add(item);
     }
 
     private void setItemBlockModel(Block block, int meta, String variant) {
@@ -234,17 +238,10 @@ public class FactorizationClientProxy extends FactorizationProxy {
             setItemBlockModelFromState(b);
         }
 
-        for (Item i : new Item[]{
-                Core.registry.dark_iron,
-                Core.registry.lead_ingot,
-                Core.registry.silver_ingot,
-                Core.registry.charge_meter,
-                Core.registry.logicMatrixProgrammer,
-                Core.registry.pocket_table,
-        }) {
-            setItemModel(i, 0, "inventory");
+        for (Item it : standardItems) {
+            setItemModel(it, 0, "inventory");
         }
-
+        standardItems = null;
 
         NORELEASE.fixme("Glaze bucket");
         NORELEASE.fixme("Barrel");

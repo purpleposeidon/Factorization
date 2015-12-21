@@ -1,8 +1,10 @@
 package factorization.common;
 
+import factorization.shared.ItemFactorization;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.inventory.Container;
+import net.minecraft.item.Item;
 import net.minecraft.profiler.Profiler;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.tileentity.TileEntity;
@@ -19,7 +21,7 @@ import factorization.oreprocessing.ContainerSlagFurnace;
 import factorization.shared.TileEntityFactorization;
 import factorization.weird.ContainerPocket;
 
-public class FactorizationProxy implements IGuiHandler {
+public abstract class FactorizationProxy implements IGuiHandler {
 
     public Profiler getProfiler() {
         return MinecraftServer.getServer().theProfiler;
@@ -79,6 +81,10 @@ public class FactorizationProxy implements IGuiHandler {
         return null;
     }
 
+    public void setItemModel(Item item, int meta, String variant) {
+
+    }
+
     public void registerRenderers() {
     }
 
@@ -107,4 +113,8 @@ public class FactorizationProxy implements IGuiHandler {
     public void afterLoad() { }
     
     public void sendBlockClickPacket() { }
+
+    public void standardItemModel(ItemFactorization itemFactorization) {
+
+    }
 }
