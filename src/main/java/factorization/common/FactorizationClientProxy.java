@@ -205,7 +205,7 @@ public class FactorizationClientProxy extends FactorizationProxy {
     ArrayList<Item> standardItems = new ArrayList<>();
     @Override
     public void standardItemModel(ItemFactorization item) {
-        if (item.getHasSubtypes()) return;
+        if (item.getHasSubtypes() && !(item instanceof ISameModelForAllItems)) return;
         if (item instanceof ISensitiveMesh) return;
         standardItems.add(item);
     }

@@ -2,6 +2,7 @@ package factorization.beauty;
 
 import factorization.algos.ReservoirSampler;
 import factorization.shared.Core;
+import factorization.shared.ISameModelForAllItems;
 import factorization.shared.ItemFactorization;
 import factorization.util.DataUtil;
 import factorization.util.ItemUtil;
@@ -23,7 +24,7 @@ import java.util.Calendar;
 import java.util.List;
 import java.util.Random;
 
-public class ItemLeafBomb extends ItemFactorization {
+public class ItemLeafBomb extends ItemFactorization implements ISameModelForAllItems {
     public ItemLeafBomb() {
         super("leafBomb", Core.TabType.TOOLS);
     }

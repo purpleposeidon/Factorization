@@ -1,6 +1,8 @@
 package factorization.artifact;
 
+import factorization.api.annotation.Nonnull;
 import factorization.shared.Core;
+import factorization.shared.ISensitiveMesh;
 import factorization.shared.ItemCraftingComponent;
 import factorization.util.ItemUtil;
 import factorization.util.StatUtil;
@@ -19,7 +21,11 @@ import net.minecraftforge.event.AnvilUpdateEvent;
 import net.minecraftforge.event.entity.player.AnvilRepairEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
-public class ItemPotency extends ItemCraftingComponent {
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
+public class ItemPotency extends ItemCraftingComponent implements ISensitiveMesh {
     public ItemPotency() {
         super("potencyBottle");
         setMaxStackSize(3);
@@ -122,5 +128,17 @@ public class ItemPotency extends ItemCraftingComponent {
             return ret + ".wasted";
         }
         return ret;
+    }
+
+    @Override
+    public String getMeshName(@Nonnull ItemStack is) {
+        // We've lost player-sensitivity. :/
+        return is.getItemDamage() == 0 ? "potencyBottle" : "potencyBottleWasted";
+    }
+
+    @Nonnull
+    @Override
+    public List<ItemStack> getMeshSamples() {
+        return Arrays.asList(new ItemStack(this, 1, 0), new ItemStack(this, 1, 1));
     }
 }

@@ -221,12 +221,6 @@ public final class ItemUtil {
         return is;
     }
 
-    public static List<ItemStack> getSubItems(ItemStack is) {
-        ArrayList<ItemStack> out = new ArrayList();
-        is.getItem().getSubItems(is.getItem(), is.getItem().getCreativeTab(), out);
-        return out;
-    }
-
     public static ItemStack parseBlock(String name) {
         short md = WILDCARD_DAMAGE;
         if (name.contains("#")) {
@@ -312,6 +306,11 @@ public final class ItemUtil {
         if (me == null) return ret;
         me.getSubItems(me, me.getCreativeTab(), ret);
         return ret;
+    }
+
+    public static List<ItemStack> getSubItems(ItemStack is) {
+        if (is == null) return new ArrayList<ItemStack>();
+        return getSubItems(is.getItem());
     }
 }
 

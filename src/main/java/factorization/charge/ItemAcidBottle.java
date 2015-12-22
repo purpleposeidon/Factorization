@@ -1,7 +1,9 @@
 package factorization.charge;
 
+import factorization.api.annotation.Nonnull;
 import factorization.shared.Core;
 import factorization.shared.Core.TabType;
+import factorization.shared.ISensitiveMesh;
 import factorization.shared.ItemFactorization;
 import factorization.shared.Sound;
 import factorization.util.InvUtil;
@@ -17,7 +19,7 @@ import net.minecraft.world.World;
 
 import java.util.List;
 
-public class ItemAcidBottle extends ItemFactorization {
+public class ItemAcidBottle extends ItemFactorization implements ISensitiveMesh {
 
     public ItemAcidBottle() {
         super("acid", TabType.CHARGE);
@@ -62,7 +64,18 @@ public class ItemAcidBottle extends ItemFactorization {
     }
 
     static public DamageSource acidDrinker = new AcidDamage();
-    
+
+    @Override
+    public String getMeshName(@Nonnull ItemStack is) {
+        return is.getItemDamage() > 0 ? "aquaRegia" : "sulfuricAcid";
+    }
+
+    @Nonnull
+    @Override
+    public List<ItemStack> getMeshSamples() {
+        return ItemUtil.getSubItems(this);
+    }
+
     static class AcidDamage extends DamageSource {
 
         protected AcidDamage() {

@@ -1,6 +1,8 @@
 package factorization.truth.minecraft;
 
+import factorization.api.annotation.Nonnull;
 import factorization.shared.Core;
+import factorization.shared.ISensitiveMesh;
 import factorization.truth.api.DocReg;
 import factorization.truth.api.IManwich;
 import factorization.util.*;
@@ -27,7 +29,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 
-public class ItemManSandwich extends ItemFood implements IManwich {
+public class ItemManSandwich extends ItemFood implements IManwich, ISensitiveMesh {
     StatBase manwhichStatus;
 
     public ItemManSandwich(int healAmount, float saturationModifier, String itemName) {
@@ -151,7 +153,7 @@ public class ItemManSandwich extends ItemFood implements IManwich {
     }
 
     @Override
-    public void getSubItems(Item item, CreativeTabs tab, List list) {
+    public void getSubItems(Item item, CreativeTabs tab, List<ItemStack> list) {
         super.getSubItems(item, tab, list);
         list.add(new ItemStack(this, 1, 1));
     }
@@ -174,5 +176,17 @@ public class ItemManSandwich extends ItemFood implements IManwich {
         }
         player.addChatMessage(new ChatComponentTranslation("item.factorization:mansandwich.hungry"));
         given_recommendation = true;
+    }
+
+    @Override
+    public String getMeshName(@Nonnull ItemStack is) {
+        boolean spicy = is.getItemDamage() > 0;
+        return spicy ? "mansandwich_spicy" : "mansandwich";
+    }
+
+    @Nonnull
+    @Override
+    public List<ItemStack> getMeshSamples() {
+        return ItemUtil.getSubItems(this);
     }
 }
