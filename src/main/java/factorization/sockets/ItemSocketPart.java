@@ -1,8 +1,11 @@
 package factorization.sockets;
 
+import factorization.api.annotation.Nonnull;
 import factorization.common.FactoryType;
 import factorization.shared.Core.TabType;
+import factorization.shared.ISensitiveMesh;
 import factorization.shared.ItemFactorization;
+import factorization.util.ItemUtil;
 import factorization.util.LangUtil;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.player.EntityPlayer;
@@ -17,8 +20,14 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 import java.util.ArrayList;
 import java.util.List;
 
-@Deprecated // We want to work with all items.
-public class ItemSocketPart extends ItemFactorization {
+/**
+ * This class is sort-of-deprecated. Some sockets require multiple items
+ * to be constructed, and it'd be reasonable to construct sockets multiple ways
+ * (using, say, different motors from different mods, rendering with different models)
+ * This is being kept just for the sake of world compatibility;
+ * it'd be better to have separate items for each part.
+ */
+public class ItemSocketPart extends ItemFactorization implements ISensitiveMesh {
 
     public ItemSocketPart(String name, TabType tabType) {
         super(name, tabType);
@@ -28,7 +37,7 @@ public class ItemSocketPart extends ItemFactorization {
     
     
     ArrayList<FactoryType> loadSockets() {
-        ArrayList<FactoryType> ret = new ArrayList();
+        ArrayList<FactoryType> ret = new ArrayList<FactoryType>();
         for (FactoryType ft : FactoryType.values()) {
             if (ft == FactoryType.SOCKET_EMPTY) {
                 continue;
@@ -67,16 +76,13 @@ public class ItemSocketPart extends ItemFactorization {
     @Override
     public String getUnlocalizedName(ItemStack is) {
         int md = is.getItemDamage();
-        String ret = getUnlocalizedName() + FactoryType.fromMd((byte) md);
-        return ret;
+        return getUnlocalizedName() + FactoryType.fromMd((byte) md);
     }
     
     @Override
-    @SideOnly(Side.CLIENT)
-    public void getSubItems(Item itemId, CreativeTabs tab, List list) {
+    public void getSubItems(Item itemId, CreativeTabs tab, List<ItemStack> list) {
         FactoryType[] ss = getSockets();
-        for (int i = 0; i < ss.length; i++) {
-            FactoryType ft = ss[i];
+        for (FactoryType ft : ss) {
             list.add(ft.asSocketItem());
         }
     }
@@ -87,7 +93,21 @@ public class ItemSocketPart extends ItemFactorization {
     }
 
     @Override
-    protected void addExtraInformation(ItemStack is, EntityPlayer player, List list, boolean verbose) {
+    protected void addExtraInformation(ItemStack is, EntityPlayer player, List<String> list, boolean verbose) {
         list.add(LangUtil.translate("item.factorization:socket_info"));
+    }
+
+    @Override
+    public String getMeshName(@Nonnull ItemStack is) {
+        int md = is.getItemDamage();
+        FactoryType ft = FactoryType.fromMd((short) md);
+        if (ft == null) return "invalid";
+        return "socket/" + ft.name().toLowerCase();
+    }
+
+    @Nonnull
+    @Override
+    public List<ItemStack> getMeshSamples() {
+        return ItemUtil.getSubItems(this);
     }
 }
