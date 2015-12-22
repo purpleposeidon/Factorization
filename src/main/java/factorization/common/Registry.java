@@ -316,6 +316,7 @@ public class Registry {
                 registerItem(it);
             }
         }
+        Core.proxy.registerISensitiveMeshes(foundItems);
     }
 
     public void makeItems() {

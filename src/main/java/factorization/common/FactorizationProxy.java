@@ -21,6 +21,8 @@ import factorization.oreprocessing.ContainerSlagFurnace;
 import factorization.shared.TileEntityFactorization;
 import factorization.weird.ContainerPocket;
 
+import java.util.Collection;
+
 public abstract class FactorizationProxy implements IGuiHandler {
 
     public Profiler getProfiler() {
@@ -115,6 +117,10 @@ public abstract class FactorizationProxy implements IGuiHandler {
     public void sendBlockClickPacket() { }
 
     public void standardItemModel(ItemFactorization itemFactorization) {
+
+    }
+
+    public void registerISensitiveMeshes(Collection<Item> items) {
 
     }
 }

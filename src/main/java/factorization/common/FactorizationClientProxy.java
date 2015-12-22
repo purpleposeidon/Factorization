@@ -1,6 +1,7 @@
 package factorization.common;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import factorization.shared.*;
@@ -181,21 +182,23 @@ public class FactorizationClientProxy extends FactorizationProxy {
                 new ModelResourceLocation(Item.itemRegistry.getNameForObject(item), variant));
     }
 
-    // @neptunepink: This is an example implementation of a mass item model setup
-    // which gets the model names via Minecraft's ItemMeshDefinition, which
-    // gives a model based on the passed ItemStack.
-    // addVariantName is used to give MC the names of models to be loaded.
-    // Feel free to make a custom implementation getting the list of all models
-    // in a different way.
-    // Also, note that you can actually use BlockStates to define item model variants,
-    // in which case you would use the variant name in ModelResourceLocation.
-    private void setItemModelFromSubItems(Item item, ItemMeshDefinition definition) {
-        ModelLoader.setCustomMeshDefinition(item, definition);
-
-        List<ItemStack> subItems = new ArrayList<ItemStack>();
-        item.getSubItems(item, Core.tabFactorization, subItems);
-        for (ItemStack is : subItems) {
-            ModelLoader.addVariantName(item, definition.getModelLocation(is).toString().split("#")[0]);
+    @Override
+    public void registerISensitiveMeshes(Collection<Item> items) {
+        for (Item it : items) {
+            if (!(it instanceof ISensitiveMesh)) {
+                continue;
+            }
+            final ISensitiveMesh ism = (ISensitiveMesh) it;
+            ModelLoader.setCustomMeshDefinition(it, new ItemMeshDefinition() {
+                @Override
+                public ModelResourceLocation getModelLocation(ItemStack stack) {
+                    String meshName = ism.getMeshName(stack);
+                    return new ModelResourceLocation("factorization:" + meshName + "#inventory");
+                }
+            });
+            for (ItemStack is : ism.getMeshSamples()) {
+                ModelLoader.addVariantName(it, "factorization:" + ism.getMeshName(is));
+            }
         }
     }
 
@@ -203,6 +206,7 @@ public class FactorizationClientProxy extends FactorizationProxy {
     @Override
     public void standardItemModel(ItemFactorization item) {
         if (item.getHasSubtypes()) return;
+        if (item instanceof ISensitiveMesh) return;
         standardItems.add(item);
     }
 

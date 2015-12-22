@@ -1,15 +1,18 @@
 package factorization.utiligoo;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Random;
-
-import org.apache.commons.lang3.ArrayUtils;
+import factorization.api.Coord;
+import factorization.api.annotation.Nonnull;
+import factorization.common.Command;
+import factorization.coremodhooks.HandleAttackKeyEvent;
+import factorization.coremodhooks.HandleUseKeyEvent;
+import factorization.shared.*;
+import factorization.shared.Core.TabType;
+import factorization.shared.NetworkFactorization.MessageType;
+import factorization.util.FzUtil;
+import factorization.util.InvUtil;
+import factorization.util.InvUtil.FzInv;
+import factorization.util.ItemUtil;
 import io.netty.buffer.ByteBuf;
-
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockSlab;
 import net.minecraft.block.BlockStairs;
@@ -29,30 +32,18 @@ import net.minecraft.util.EnumFacing;
 import net.minecraft.util.MovingObjectPosition;
 import net.minecraft.util.MovingObjectPosition.MovingObjectType;
 import net.minecraft.world.World;
-
 import net.minecraftforge.event.world.BlockEvent.BreakEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.network.ByteBufUtils;
 import net.minecraftforge.fml.common.network.internal.FMLProxyPacket;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+import org.apache.commons.lang3.ArrayUtils;
 
-import factorization.api.Coord;
-import factorization.common.Command;
-import factorization.coremodhooks.HandleAttackKeyEvent;
-import factorization.coremodhooks.HandleUseKeyEvent;
-import factorization.shared.Core;
-import factorization.shared.Core.TabType;
-import factorization.shared.DropCaptureHandler;
-import factorization.shared.ICaptureDrops;
-import factorization.shared.ItemFactorization;
-import factorization.shared.NetworkFactorization.MessageType;
-import factorization.util.FzUtil;
-import factorization.util.InvUtil;
-import factorization.util.InvUtil.FzInv;
-import factorization.util.ItemUtil;
+import java.io.IOException;
+import java.util.*;
 
-public class ItemGoo extends ItemFactorization {
+public class ItemGoo extends ItemFactorization implements ISensitiveMesh {
     public ItemGoo(String name, TabType tabType) {
         super(name, tabType);
         setMaxStackSize(32);
@@ -375,7 +366,9 @@ public class ItemGoo extends ItemFactorization {
         for (int i = 0; i < data.coords.length; i += 3) {
             if (eq(data.coords, i, pos)) {
                 data.coords = ArrayUtils.removeAll(data.coords, i, i + 1, i + 2);
-                is.stackSize++;
+                if (is.stackSize < maxStackSize) {
+                    is.stackSize++;
+                }
                 if (data.coords.length == 0) {
                     data.wipe(is, world);
                 } else if (!bulkAction) {
@@ -617,5 +610,19 @@ public class ItemGoo extends ItemFactorization {
 
     static boolean eq(int[] coords, int i, BlockPos pos) {
         return coords[i] == pos.getX() && coords[i + 1] == pos.getY() && coords[i + 2] == pos.getZ();
+    }
+
+    @Override
+    public String getMeshName(@Nonnull ItemStack is) {
+        int third = maxStackSize / 3;
+        if (is.stackSize > third * 2) return "utiligoo/high";
+        if (is.stackSize > third) return "utiligoo/medium";
+        return "utiligoo/low";
+    }
+
+    @Nonnull
+    @Override
+    public List<ItemStack> getMeshSamples() {
+        return Arrays.asList(new ItemStack(this, maxStackSize), new ItemStack(this, maxStackSize / 2), new ItemStack(this, 1));
     }
 }
