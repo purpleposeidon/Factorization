@@ -250,10 +250,10 @@ public class Registry {
         GameRegistry.registerBlock(mantlerock_block, "MantleRock");
         GameRegistry.registerBlock(matcher_block, "BlockMatcher");
         GameRegistry.registerBlock(artifact_forge, "ArtifactForge");
+        GameRegistry.registerBlock(blastBlock, "BlastBlock");
         if (DeltaChunk.enabled()) {
             GameRegistry.registerBlock(colossal_block, ColossalBlockItem.class, "ColossalBlock");
             GameRegistry.registerTileEntity(TileEntityColossalHeart.class, "fz_colossal_heart");
-            GameRegistry.registerBlock(blastBlock, "BlastBlock");
         }
         
         
