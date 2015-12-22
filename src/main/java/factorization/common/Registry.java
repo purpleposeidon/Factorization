@@ -7,6 +7,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.regex.Matcher;
 
+import factorization.shared.*;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockNetherrack;
 import net.minecraft.block.material.MapColor;
@@ -86,13 +87,7 @@ import factorization.servo.ItemServoMotor;
 import factorization.servo.ItemServoRailWidget;
 import factorization.servo.ServoComponent;
 import factorization.servo.stepper.ItemStepperEngine;
-import factorization.shared.BlockClass;
-import factorization.shared.BlockFactorization;
-import factorization.shared.Core;
 import factorization.shared.Core.TabType;
-import factorization.shared.ItemBlockProxy;
-import factorization.shared.ItemCraftingComponent;
-import factorization.shared.ItemFactorizationBlock;
 import factorization.sockets.ItemSocketPart;
 import factorization.truth.minecraft.ItemDocBook;
 import factorization.truth.minecraft.ItemManSandwich;
@@ -1477,6 +1472,7 @@ public class Registry {
     }
 
     public void registerItemVariantNames() {
+        NORELEASE.fixme("Move to proxy"):
         r(resource_block, "copper_ore", "silver_block", "lead_block", "dark_iron_block", "copper_block");
     }
 

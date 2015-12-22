@@ -43,13 +43,13 @@ minecraft {
 
 
 
-ext.apiRailcraft = "./apis/railcraft"
+// ext.apiRailcraft = "./apis/railcraft"
 
 
 sourceSets {
     main {
         java {
-            srcDir project.apiRailcraft
+            // srcDir project.apiRailcraft
         }
     }
 }
