@@ -2,7 +2,6 @@ package factorization.common;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
 
 import factorization.shared.*;
 import net.minecraft.block.Block;
@@ -15,6 +14,7 @@ import net.minecraft.client.renderer.ItemMeshDefinition;
 import net.minecraft.client.renderer.entity.RenderManager;
 import net.minecraft.client.renderer.entity.RenderSnowball;
 import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
+import net.minecraft.client.resources.model.ModelBakery;
 import net.minecraft.client.resources.model.ModelResourceLocation;
 import net.minecraft.client.settings.GameSettings;
 import net.minecraft.entity.player.EntityPlayer;
@@ -235,6 +235,7 @@ public class FactorizationClientProxy extends FactorizationProxy {
         }) {
             setItemBlockModel(b, 0, "inventory");
         }
+        modelForMetadata(Core.registry.resource_block, "copper_ore", "silver_block", "lead_block", "dark_iron_block", "copper_block");
 
         for (Block b : new Block[]{
                 Core.registry.resource_block,
@@ -317,6 +318,39 @@ public class FactorizationClientProxy extends FactorizationProxy {
     public void sendBlockClickPacket() {
         Minecraft mc = Minecraft.getMinecraft();
         MovingObjectPosition mop = mc.objectMouseOver;
-        new C07PacketPlayerDigging(C07PacketPlayerDigging.Action.START_DESTROY_BLOCK /* NORELEASE: was 0, is this correct? This is for barrels. */, mop.getBlockPos(), mop.sideHit);
+        new C07PacketPlayerDigging(C07PacketPlayerDigging.Action.START_DESTROY_BLOCK /* NORELEASE: was 0, is this correct? This is for barrels: punch w/ empty fist so that an item goes into that fist; prevents a second click from happening. */, mop.getBlockPos(), mop.sideHit);
     }
+
+    private static void modelItem(Block block, String... names) {
+        ModelBakery.addVariantName(DataUtil.getItem(block), names);
+    }
+
+    private static void modelForMetadata(Block block, String... parts) {
+        Item item = DataUtil.getItem(block);
+        for (int md = 0; md < parts.length; md++) {
+            String name = parts[md];
+            name = "factorization:" + name;
+            parts[md] = name;
+            ModelResourceLocation modelName = new ModelResourceLocation(name, "inventory");
+            ModelLoader.setCustomModelResourceLocation(item, md, modelName);
+        }
+        ModelBakery.addVariantName(item, parts);
+    }
+
+    private static void modelForMetadataExplicit(Block block, Object... parts) {
+        ArrayList<String> found = new ArrayList<String>();
+        Item item = DataUtil.getItem(block);
+        if (parts.length % 2 != 0) throw new IllegalArgumentException("Invalid argument format");
+        for (int i = 0; i < parts.length; i += 2) {
+            int md = (Integer) parts[i];
+            String name = (String) parts[i + 1];
+            name = "factorization:" + name;
+            parts[i + 1] = name;
+            ModelLoader.setCustomModelResourceLocation(item, md, new ModelResourceLocation(name, "inventory"));
+            found.add(name);
+        }
+        ModelBakery.addVariantName(item, found.toArray(new String[found.size()]));
+    }
+
+
 }
