@@ -75,7 +75,7 @@ public class BlockMatcher extends Block {
                 break;
             }
         }
-        int fd = meta & 0b11;
+        int fd = meta & 3;
         EnumFacing.Axis a = EnumFacing.Axis.Y;
         if (fd == 0)  a = EnumFacing.Axis.Y;
         if (fd == 1) a = EnumFacing.Axis.Z;

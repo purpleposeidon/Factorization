@@ -1500,7 +1500,7 @@ public class Registry {
         Item item = DataUtil.getItem(block);
         if (parts.length % 2 != 0) throw new IllegalArgumentException("Invalid argument format");
         for (int i = 0; i < parts.length; i += 2) {
-            int md = (int) parts[i];
+            int md = (Integer) parts[i];
             String name = (String) parts[i + 1];
             name = "factorization:" + name;
             parts[i + 1] = name;

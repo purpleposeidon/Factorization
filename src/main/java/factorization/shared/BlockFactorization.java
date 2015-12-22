@@ -497,7 +497,7 @@ public class BlockFactorization extends BlockContainer {
         }
     }
 
-    final ThreadLocal<EnumWorldBlockLayer> CURRENT_PASS = new ThreadLocal<>(); // NORELEASE: This might be available in forge. Or maybe not. May not even be necessary!?
+    final ThreadLocal<EnumWorldBlockLayer> CURRENT_PASS = new ThreadLocal<EnumWorldBlockLayer>(); // NORELEASE: This might be available in forge. Or maybe not. May not even be necessary!?
     // TODO: This is a bit lame. A bit of overhead just for barrels and mixers...
 
     @Override

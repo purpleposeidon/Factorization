@@ -127,7 +127,7 @@ public final class SpaceUtil {
         double maxY = Math.max(left.yCoord, right.yCoord);
         double minZ = Math.min(left.zCoord, right.zCoord);
         double maxZ = Math.max(left.zCoord, right.zCoord);
-        return new SortedPair<>(new Vec3(minX, minY, minZ), new Vec3(maxX, maxY, maxZ));
+        return new SortedPair<Vec3>(new Vec3(minX, minY, minZ), new Vec3(maxX, maxY, maxZ));
     }
 
     /**
@@ -153,12 +153,12 @@ public final class SpaceUtil {
      * @return A new box, with a volume of 0. Returns null if face is invalid.
      */
     public static AxisAlignedBB flatten(AxisAlignedBB box, EnumFacing face) {
-        byte[] lows = new byte[] { 0b010, 0b000, 0b100, 0b000, 0b001, 0b000 };
-        byte[] hghs = new byte[] { 0b111, 0b101, 0b111, 0b011, 0b111, 0b110 };
+        byte[] lows = new byte[] { 0x2, 0x0, 0x4, 0x0, 0x1, 0x0 };
+        byte[] hghs = new byte[] { 0x7, 0x5, 0x7, 0x3, 0x7, 0x6 };
         byte low = lows[face.ordinal()];
         byte high = hghs[face.ordinal()];
         assert low != high;
-        assert (~low & 0b111) != high;
+        assert (~low & 0x7) != high;
         return newBox(getVertex(box, low), getVertex(box, high));
     }
 

@@ -78,7 +78,7 @@ public class GenBlockStates extends CommandBase {
         out.beginObject();
         out.name("variants");
         out.beginObject();
-        ArrayList<IProperty> propertyCopy = new ArrayList<>(bs.getProperties().keySet());
+        ArrayList<IProperty> propertyCopy = new ArrayList<IProperty>(bs.getProperties().keySet());
         visit(out, propertyCopy, null);
         out.endObject();
         out.endObject();
@@ -98,7 +98,7 @@ public class GenBlockStates extends CommandBase {
             out.endObject();
             return;
         }
-        remainders = new ArrayList<>(remainders);
+        remainders = new ArrayList<IProperty>(remainders);
         IProperty prop = remainders.remove(0);
         if (prefix != null) {
             prefix += "," + prop.getName() + "=";

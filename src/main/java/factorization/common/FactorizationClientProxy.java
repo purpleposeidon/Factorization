@@ -202,7 +202,7 @@ public class FactorizationClientProxy extends FactorizationProxy {
         }
     }
 
-    ArrayList<Item> standardItems = new ArrayList<>();
+    ArrayList<Item> standardItems = new ArrayList<Item>();
     @Override
     public void standardItemModel(ItemFactorization item) {
         if (item.getHasSubtypes() && !(item instanceof ISameModelForAllItems)) return;
