@@ -223,7 +223,7 @@ public class FactorizationClientProxy extends FactorizationProxy {
 
     @Override
     public void registerRenderers() {
-        for (Block b : new Block[]{
+        for (Block b : new Block[] {
                 Core.registry.artifact_forge,
                 Core.registry.dark_iron_ore,
                 Core.registry.fractured_bedrock_block,
@@ -231,6 +231,7 @@ public class FactorizationClientProxy extends FactorizationProxy {
                 Core.registry.matcher_block,
                 Core.registry.gargantuan_block,
                 Core.registry.blastBlock,
+                Core.registry.mantlerock_block,
         }) {
             setItemBlockModel(b, 0, "inventory");
         }

@@ -230,7 +230,7 @@ public class Registry {
         }
         blastBlock = new BlockBlast();
         gargantuan_block = new GargantuanBlock().setUnlocalizedName("factorization:gargantuanBrick").setCreativeTab(Core.tabFactorization);
-        mantlerock_block = new BlockNetherrack().setUnlocalizedName("factorization:mantlerock").setHardness(1.25F).setResistance(7.0F).setStepSound(Block.soundTypeStone);
+        mantlerock_block = new BlockNetherrack().setUnlocalizedName("factorization:mantlerock").setHardness(1.25F).setResistance(7.0F).setStepSound(Block.soundTypeStone).setCreativeTab(Core.tabFactorization);
         matcher_block = new BlockMatcher();
         artifact_forge = new BlockForge();
         if (FMLCommonHandler.instance().getSide() == Side.CLIENT) {
