@@ -2,18 +2,22 @@ package factorization.ceramics;
 
 import factorization.api.Coord;
 import factorization.api.Quaternion;
+import factorization.api.annotation.Nonnull;
 import factorization.api.datahelpers.DataInNBT;
 import factorization.ceramics.TileEntityGreenware.ClayLump;
 import factorization.ceramics.TileEntityGreenware.ClayState;
 import factorization.notify.Notice;
 import factorization.shared.Core;
 import factorization.shared.Core.TabType;
+import factorization.shared.ISensitiveMesh;
 import factorization.shared.ItemFactorization;
 import factorization.util.InvUtil;
 import factorization.util.InvUtil.FzInv;
 import factorization.util.ItemUtil;
+import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Items;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.*;
@@ -22,7 +26,7 @@ import net.minecraft.world.World;
 import java.io.IOException;
 import java.util.List;
 
-public class ItemSculptingTool extends ItemFactorization {
+public class ItemSculptingTool extends ItemFactorization implements ISensitiveMesh {
 
     public ItemSculptingTool() {
         super("sculptTool", TabType.ART);
@@ -47,6 +51,24 @@ public class ItemSculptingTool extends ItemFactorization {
                 j = 0;
             }
             Core.registry.shapelessOreRecipe(fromMode(mode[j]), fromMode(mode[i]));
+        }
+    }
+
+    @Override
+    public String getMeshName(@Nonnull ItemStack is) {
+        return "ceramics/tool_" + getMode(is.getItemDamage()).name;
+    }
+
+    @Nonnull
+    @Override
+    public List<ItemStack> getMeshSamples() {
+        return ItemUtil.getSubItems(this);
+    }
+
+    @Override
+    public void getSubItems(Item itemIn, CreativeTabs tab, List<ItemStack> subItems) {
+        for (ToolMode tm : ToolMode.values()) {
+            subItems.add(fromMode(tm));
         }
     }
 

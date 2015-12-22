@@ -306,4 +306,12 @@ public final class ItemUtil {
         //SpaceUtil.toEntVel(ent, dir);
         return ent;
     }
+
+    public static List<ItemStack> getSubItems(Item me) {
+        ArrayList<ItemStack> ret = new ArrayList<ItemStack>();
+        if (me == null) return ret;
+        me.getSubItems(me, me.getCreativeTab(), ret);
+        return ret;
+    }
 }
+
