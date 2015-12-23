@@ -33,7 +33,7 @@ public class TileEntityGreenwareRender extends TileEntitySpecialRenderer<TileEnt
         Tessellator tessI = Tessellator.getInstance();
         WorldRenderer tess = tessI.getWorldRenderer();
         tess.begin(GL11.GL_QUADS, DefaultVertexFormats.BLOCK);
-        mr.renderModel(gw.getWorld(), gw.buildModel(), Core.registry.factory_block.getDefaultState(), zero, tess, false);
+        mr.renderModel(gw.getWorld(), gw.buildModel(), Core.registry.legacy_factory_block.getDefaultState(), zero, tess, false);
         tessI.draw();
         GL11.glPopMatrix();
         gw.lastTouched = lt;

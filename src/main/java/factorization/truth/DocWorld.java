@@ -112,7 +112,7 @@ public class DocWorld extends WorldClient {
         if (i == -1) return Blocks.air.getDefaultState();
         int id = blockIds[i];
         if (id == -10) {
-            return Core.registry.factory_block.getDefaultState();
+            return Core.registry.legacy_factory_block.getDefaultState();
         } else if (id == -11) {
             return Core.registry.resource_block.getDefaultState();
         } else if (id == -12) {
@@ -157,7 +157,7 @@ public class DocWorld extends WorldClient {
         int i = getIndex(dc.toBlockPos());
         if (i == -1) return;
         int useId = DataUtil.getId(block);
-        if (block == Core.registry.factory_block || block == Core.registry.factory_block_barrel) {
+        if (block == Core.registry.legacy_factory_block || block == Core.registry.factory_block_barrel) {
             useId = -10;
         } else if (block == Core.registry.resource_block) {
             useId = -11;

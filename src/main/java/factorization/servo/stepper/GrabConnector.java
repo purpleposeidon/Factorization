@@ -46,7 +46,7 @@ public class GrabConnector {
         // Temporary. Counts as glued if it's the primary block, or two identical not-worldgen blocks
         Coord neighbor = at.add(dir);
         Block neighborBlock = neighbor.getBlock();
-        if (neighborBlock == Core.registry.factory_block && at.getMd() == BlockClass.Wire.md) return null;
+        if (neighborBlock == Core.registry.legacy_factory_block && at.getMd() == BlockClass.Wire.md) return null;
         if (neighborBlock == primary) return neighbor;
         for (Block n : natch) if (n == neighborBlock) return null;
         if (neighbor.isAir()) return null;

@@ -114,7 +114,6 @@ public class Core {
     public static final boolean cheat = dev_only(false);
     public static final boolean cheat_servo_energy = dev_only(false);
     public static final boolean debug_network = false;
-    public static final boolean show_fine_logging = false;
     public static final boolean enable_test_content = dev_environ || Boolean.parseBoolean(System.getProperty("fz.enableTestContent"));
 
     private static boolean dev_only(boolean a) {
@@ -360,8 +359,8 @@ public class Core {
     public void replaceDerpyNames(FMLMissingMappingsEvent event) {
         // NORELEASE: Can remove in 1.8
         Object[][] corrections = new Object[][] {
-                {"factorization:tile.null", Core.registry.factory_block},
-                {"factorization:FZ factory", Core.registry.factory_block},
+                {"factorization:tile.null", Core.registry.legacy_factory_block},
+                {"factorization:FZ factory", Core.registry.legacy_factory_block},
                 {"factorization:tile.factorization.ResourceBlock", Core.registry.resource_block},
                 {"factorization:FZ resource", Core.registry.resource_block},
                 {"factorization:tile.lightair", Core.registry.lightair_block},

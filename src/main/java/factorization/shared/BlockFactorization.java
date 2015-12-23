@@ -44,7 +44,7 @@ import factorization.weird.TileEntityDayBarrel;
 
 public class BlockFactorization extends BlockContainer {
     public static final IProperty<BlockClass> BLOCK_CLASS = PropertyEnum.create("blockclass", BlockClass.class);
-    public boolean fake_normal_render = false;
+
     public BlockFactorization(Material material) {
         super(material);
         setHardness(2.0F);
@@ -237,7 +237,7 @@ public class BlockFactorization extends BlockContainer {
     
     @Override
     public void getSubBlocks(Item me, CreativeTabs tab, List<ItemStack> itemList) {
-        if (this != Core.registry.factory_block) {
+        if (this != Core.registry.legacy_factory_block) {
             return;
         }
         Registry reg = Core.registry;

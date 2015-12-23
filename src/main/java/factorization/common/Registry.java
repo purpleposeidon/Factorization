@@ -12,8 +12,6 @@ import net.minecraft.block.Block;
 import net.minecraft.block.BlockNetherrack;
 import net.minecraft.block.material.MapColor;
 import net.minecraft.block.material.Material;
-import net.minecraft.client.resources.model.ModelBakery;
-import net.minecraft.client.resources.model.ModelResourceLocation;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
@@ -29,7 +27,6 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.WeightedRandomFishable;
 import net.minecraft.world.World;
 
-import net.minecraftforge.client.model.ModelLoader;
 import net.minecraftforge.common.FishingHooks;
 import net.minecraftforge.event.entity.player.EntityItemPickupEvent;
 import net.minecraftforge.fluids.Fluid;
@@ -109,7 +106,9 @@ import factorization.wrath.TileEntityWrathLamp;
 public class Registry {
     public ItemFactorizationBlock item_factorization;
     public ItemBlockResource item_resource;
-    public BlockFactorization factory_block, factory_block_barrel;
+    @Deprecated // Each TE has its own block now. This block continues to exist for converting blocks & items.
+    public BlockFactorization legacy_factory_block;
+    public BlockFactorization factory_block_barrel;
     public BlockFactorization factory_rendering_block;
     public Block serverTraceHelper = null, clientTraceHelper = null;
     public BlockLightAir lightair_block;
@@ -206,13 +205,13 @@ public class Registry {
     }
     
     public void makeBlocks() {
-        factory_block = new BlockFactorization(materialMachine);
+        legacy_factory_block = new BlockFactorization(materialMachine);
         factory_block_barrel = new BlockFactorization(materialBarrel);
         for (BlockClass bc : BlockClass.values()) {
             if (bc == BlockClass.Barrel) {
                 bc.block = factory_block_barrel;
             } else {
-                bc.block = factory_block;
+                bc.block = legacy_factory_block;
             }
         }
         lightair_block = new BlockLightAir();
@@ -234,7 +233,7 @@ public class Registry {
         }
         serverTraceHelper = new BlockFactorization(materialMachine);
 
-        GameRegistry.registerBlock(factory_block, ItemFactorizationBlock.class, "FzBlock");
+        GameRegistry.registerBlock(legacy_factory_block, ItemFactorizationBlock.class, "FzBlock");
         GameRegistry.registerBlock(factory_block_barrel, ItemFactorizationBlock.class, "FzBlockBarrel");
         GameRegistry.registerBlock(lightair_block, "Lightair");
         GameRegistry.registerBlock(resource_block, ItemBlockResource.class, "ResourceBlock");
@@ -252,11 +251,11 @@ public class Registry {
         }
         
         
-        is_factory = new ItemStack(factory_block);
+        is_factory = new ItemStack(legacy_factory_block);
         is_lightair = new ItemStack(lightair_block);
         
         
-        Core.tab(factory_block, Core.TabType.BLOCKS);
+        Core.tab(legacy_factory_block, Core.TabType.BLOCKS);
         Core.tab(resource_block, TabType.BLOCKS);
         
         worldgenManager = new WorldgenManager();
@@ -322,7 +321,7 @@ public class Registry {
         sludge = new ItemCraftingComponent("sludge");
         OreDictionary.registerOre("sludge", sludge);
         //ItemBlocks
-        item_factorization = (ItemFactorizationBlock) Item.getItemFromBlock(factory_block);
+        item_factorization = (ItemFactorizationBlock) Item.getItemFromBlock(legacy_factory_block);
         item_resource = (ItemBlockResource) Item.getItemFromBlock(resource_block);
 
         //BlockFactorization stuff

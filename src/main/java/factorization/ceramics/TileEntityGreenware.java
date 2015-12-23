@@ -598,7 +598,7 @@ public class TileEntityGreenware extends TileEntityCommon implements IFurnaceHea
                     if (ab.intersectsWith(in)) {
                         // This block needs to be an Extension, or this
                         if (c.isAir() || c.isReplacable()) {
-                            c.setId(Core.registry.factory_block);
+                            c.setId(Core.registry.legacy_factory_block);
                             TileEntityExtension tex = new TileEntityExtension(this);
                             c.setTE(tex);
                             tex.getBlockClass().enforce(c);
