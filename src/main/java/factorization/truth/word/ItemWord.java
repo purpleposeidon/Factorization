@@ -5,6 +5,7 @@ import factorization.truth.WordPage;
 import factorization.truth.api.IHtmlTypesetter;
 import factorization.util.ItemUtil;
 import net.minecraft.client.gui.FontRenderer;
+import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemStack;
@@ -158,13 +159,13 @@ public class ItemWord extends Word {
         y -= 4;
         
         {
-            GL11.glDisable(GL11.GL_TEXTURE_2D);
+            GlStateManager.disableTexture2D();
             float gray = DocViewer.dark() ? 0.2F : 139F/0xFF;
-            GL11.glColor3f(gray, gray, gray);
-            
+            GlStateManager.color(gray, gray, gray);
+
             float z = 0;
             float d = 16;
-            
+
             GL11.glBegin(GL11.GL_QUADS);
             GL11.glVertex3f(x + 0, y + 0, z);
             GL11.glVertex3f(x + 0, y + d, z);
@@ -177,7 +178,7 @@ public class ItemWord extends Word {
                 byte r = (byte) ((color >> 16) & 0xFF);
                 byte g = (byte) ((color >> 8) & 0xFF);
                 byte b = (byte) ((color >> 0) & 0xFF);
-                GL11.glColor3b(r, g, b);
+                GlStateManager.color(r / 255F, g / 255F, b / 255F);
                 GL11.glLineWidth(1);
                 
                 GL11.glBegin(GL11.GL_LINE_LOOP);
@@ -188,8 +189,8 @@ public class ItemWord extends Word {
                 GL11.glEnd();
             }
             
-            GL11.glColor3f(1, 1, 1);
-            GL11.glEnable(GL11.GL_TEXTURE_2D);
+            GlStateManager.color(1, 1, 1);
+            GlStateManager.enableTexture2D();
         }
         
         try {
