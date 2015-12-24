@@ -6,17 +6,18 @@ import factorization.util.RenderUtil;
 import factorization.weird.TileEntityDayBarrel;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.GLAllocation;
-import net.minecraft.client.renderer.WorldRenderer;
+import net.minecraft.client.renderer.chunk.CompiledChunk;
+import net.minecraft.client.renderer.chunk.ListedRenderChunk;
 import net.minecraft.client.renderer.entity.RenderManager;
 import net.minecraft.client.renderer.tileentity.TileEntityRendererDispatcher;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.BlockPos;
+import net.minecraft.util.EnumWorldBlockLayer;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL12;
-
-import java.util.ArrayList;
 
 public class FigurePage extends AbstractPage {
     DocWorld figure;
@@ -43,23 +44,22 @@ public class FigurePage extends AbstractPage {
     }
     
     
-    WorldRenderer wr = null;
-    
+    ListedRenderChunk wr = null;
+
     EntityLivingBase eyeball;
     
     @Override
     public void draw(DocViewer doc, int ox, int oy, String hovered) {
-        /*
         RenderUtil.checkGLError("FigurePage -- before render");
         if (wr == null) {
             GL11.glPushAttrib(GL11.GL_ALL_ATTRIB_BITS);
-            wr = new WorldRenderer(figure, new ArrayList(), 0, 0, 0, getRenderList());
-            wr.needsUpdate = true;
-            wr.updateRenderer(eyeball);
-            GL11.glPopAttrib();
+
+            Minecraft mc = Minecraft.getMinecraft();
+            wr = new ListedRenderChunk(figure, mc.renderGlobal, new BlockPos(0, 0, 0), -1);
+            wr.setNeedsUpdate(true);
+            mc.renderGlobal.renderDispatcher.updateChunkNow(wr);
             RenderUtil.checkGLError("FigurePage -- update worldrenderer");
         }
-        wr.isInFrustum = true;
         doc.mc.renderEngine.bindTexture(Core.blockAtlas);
         GL11.glColor4f(1, 1, 1, 1);
         GL11.glPushMatrix();
@@ -89,12 +89,13 @@ public class FigurePage extends AbstractPage {
         GL11.glPushAttrib(GL11.GL_ALL_ATTRIB_BITS);
         GL11.glEnable(GL12.GL_RESCALE_NORMAL);
         GL11.glDisable(GL11.GL_LIGHTING);
-        for (int i = 0; i < 2; i++) {
-            if (i == 1) {
+        CompiledChunk compiled = wr.getCompiledChunk();
+        for (EnumWorldBlockLayer pass : EnumWorldBlockLayer.values()) {
+            if (pass == EnumWorldBlockLayer.TRANSLUCENT) {
                 GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
                 GL11.glEnable(GL11.GL_BLEND);
             }
-            GL11.glCallList(wr.getGLCallListForPass(i));
+            GL11.glCallList(wr.getDisplayList(pass, compiled));
         }
         GL11.glPopAttrib();
         GL11.glPushAttrib(GL11.GL_ALL_ATTRIB_BITS);
@@ -105,17 +106,16 @@ public class FigurePage extends AbstractPage {
         }
         GL11.glPopAttrib();
         GL11.glPushAttrib(GL11.GL_ALL_ATTRIB_BITS);
-        RenderManager rm = RenderManager.instance;
+        Minecraft mc = Minecraft.getMinecraft();
+        RenderManager rm = mc.getRenderManager();
         //rm.renderPosX = rm.renderPosY = rm.renderPosZ = 0;
         for (Entity ent : figure.entities) {
             double x = ent.posX - figure.orig.x;
             double y = ent.posY - figure.orig.y;
             double z = ent.posZ - figure.orig.z;
-            rm.renderPosX = ent.posX;
-            rm.renderPosY = ent.posY;
-            rm.renderPosZ = ent.posZ;
+            rm.setRenderPosition(ent.posX, ent.posY, ent.posZ);
             GL11.glPushMatrix();
-            GL11.glTranslated(pos);
+            GL11.glTranslated(x, y, z);
             //GL11.glTranslated(ent.posX, ent.posY, ent.posZ);
             rm.renderEntitySimple(ent, 0);
             GL11.glPopMatrix();
@@ -123,7 +123,6 @@ public class FigurePage extends AbstractPage {
         GL11.glPopAttrib();
         GL11.glPopMatrix();
         RenderUtil.checkGLError("FigurePage -- after rendering everything");
-        */
     }
     
     int getRenderList() {
