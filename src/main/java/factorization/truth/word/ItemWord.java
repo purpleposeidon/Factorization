@@ -192,7 +192,6 @@ public class ItemWord extends Word {
             GL11.glEnable(GL11.GL_TEXTURE_2D);
         }
         
-        GL11.glPushAttrib(GL11.GL_ALL_ATTRIB_BITS);
         try {
             DocViewer.drawItem(toDraw, x, y, font);
         } catch (Throwable t) {
@@ -205,7 +204,6 @@ public class ItemWord extends Word {
                 // Ignore it.
             }
         }
-        GL11.glPopAttrib();
         return 16;
     }
     
