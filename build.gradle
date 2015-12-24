@@ -30,7 +30,7 @@ archivesBaseName = "Factorization"
 
 minecraft {
     version = "1.8.8-11.15.0.1636-1.8.8"
-    runDir = "run"
+    runDir = "Run"
     
     // the mappings can be changed at any time, and must be in the following format.
     // snapshot_YYYYMMDD   snapshot are built nightly.

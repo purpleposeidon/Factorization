@@ -43,7 +43,7 @@ intellij-1.7.10/
 *.iws
 logs/
 out/
-run/
+Run/
 
 #Personal
 parables/
