@@ -1,9 +1,40 @@
 package factorization.common;
 
-import java.util.ArrayList;
-import java.util.Collection;
-
+import factorization.api.Coord;
+import factorization.artifact.ContainerForge;
+import factorization.artifact.GuiArtifactForge;
+import factorization.beauty.*;
+import factorization.ceramics.TileEntityGreenware;
+import factorization.ceramics.TileEntityGreenwareRender;
+import factorization.charge.TileEntityHeater;
+import factorization.charge.TileEntityHeaterRenderer;
+import factorization.charge.TileEntityLeydenJar;
+import factorization.charge.TileEntityLeydenJarRender;
+import factorization.citizen.EntityCitizen;
+import factorization.citizen.RenderCitizen;
+import factorization.colossi.ColossusController;
+import factorization.colossi.ColossusControllerRenderer;
+import factorization.crafting.TileEntityCompressionCrafter;
+import factorization.crafting.TileEntityCompressionCrafterRenderer;
+import factorization.mechanics.SocketPoweredCrank;
+import factorization.mechanics.TileEntityHinge;
+import factorization.mechanics.TileEntityHingeRenderer;
+import factorization.redstone.GuiParasieve;
+import factorization.servo.RenderServoMotor;
+import factorization.servo.ServoMotor;
+import factorization.servo.stepper.RenderStepperEngine;
+import factorization.servo.stepper.StepperEngine;
 import factorization.shared.*;
+import factorization.sockets.SocketLacerator;
+import factorization.sockets.SocketScissors;
+import factorization.sockets.TileEntitySocketRenderer;
+import factorization.sockets.fanturpeller.SocketFanturpeller;
+import factorization.util.DataUtil;
+import factorization.utiligoo.GooRenderer;
+import factorization.weird.*;
+import factorization.weird.poster.EntityPoster;
+import factorization.weird.poster.RenderPoster;
+import factorization.wrath.TileEntityWrathLamp;
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
@@ -26,7 +57,6 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.MovingObjectPosition;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
-
 import net.minecraftforge.client.event.TextureStitchEvent;
 import net.minecraftforge.client.model.ModelLoader;
 import net.minecraftforge.fml.client.registry.ClientRegistry;
@@ -35,57 +65,8 @@ import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.relauncher.Side;
 
-import factorization.api.Coord;
-import factorization.artifact.ContainerForge;
-import factorization.artifact.GuiArtifactForge;
-import factorization.beauty.EntityLeafBomb;
-import factorization.beauty.TileEntityBiblioGen;
-import factorization.beauty.TileEntityBiblioGenRenderer;
-import factorization.beauty.TileEntityShaft;
-import factorization.beauty.TileEntityShaftRenderer;
-import factorization.beauty.TileEntitySteamShaft;
-import factorization.beauty.TileEntitySteamShaftRenderer;
-import factorization.ceramics.TileEntityGreenware;
-import factorization.ceramics.TileEntityGreenwareRender;
-import factorization.charge.TileEntityHeater;
-import factorization.charge.TileEntityHeaterRenderer;
-import factorization.charge.TileEntityLeydenJar;
-import factorization.charge.TileEntityLeydenJarRender;
-import factorization.citizen.EntityCitizen;
-import factorization.citizen.RenderCitizen;
-import factorization.colossi.ColossusController;
-import factorization.colossi.ColossusControllerRenderer;
-import factorization.crafting.TileEntityCompressionCrafter;
-import factorization.crafting.TileEntityCompressionCrafterRenderer;
-import factorization.mechanics.SocketPoweredCrank;
-import factorization.mechanics.TileEntityHinge;
-import factorization.mechanics.TileEntityHingeRenderer;
-import factorization.oreprocessing.ContainerCrystallizer;
-import factorization.oreprocessing.ContainerSlagFurnace;
-import factorization.oreprocessing.GuiCrystallizer;
-import factorization.oreprocessing.GuiSlag;
-import factorization.oreprocessing.TileEntityCrystallizer;
-import factorization.oreprocessing.TileEntityCrystallizerRender;
-import factorization.redstone.GuiParasieve;
-import factorization.servo.RenderServoMotor;
-import factorization.servo.ServoMotor;
-import factorization.servo.stepper.RenderStepperEngine;
-import factorization.servo.stepper.StepperEngine;
-import factorization.sockets.SocketLacerator;
-import factorization.sockets.SocketScissors;
-import factorization.sockets.TileEntitySocketRenderer;
-import factorization.sockets.fanturpeller.SocketFanturpeller;
-import factorization.util.DataUtil;
-import factorization.utiligoo.GooRenderer;
-import factorization.weird.ContainerPocket;
-import factorization.weird.EntityMinecartDayBarrel;
-import factorization.weird.GuiPocketTable;
-import factorization.weird.RenderMinecartDayBarrel;
-import factorization.weird.TileEntityDayBarrel;
-import factorization.weird.TileEntityDayBarrelRenderer;
-import factorization.weird.poster.EntityPoster;
-import factorization.weird.poster.RenderPoster;
-import factorization.wrath.TileEntityWrathLamp;
+import java.util.ArrayList;
+import java.util.Collection;
 
 public class FactorizationClientProxy extends FactorizationProxy {
     public FactorizationKeyHandler keyHandler = new FactorizationKeyHandler();
@@ -118,21 +99,8 @@ public class FactorizationClientProxy extends FactorizationProxy {
             return null;
         }
         TileEntityFactorization fac = (TileEntityFactorization) te;
-        ContainerFactorization cont;
-        if (ID == FactoryType.SLAGFURNACE.gui) {
-            cont = new ContainerSlagFurnace(player, fac);
-        } else if (ID == FactoryType.CRYSTALLIZER.gui) {
-            cont = new ContainerCrystallizer(player, fac);
-        } else {
-            cont = new ContainerFactorization(player, fac);
-        }
+        ContainerFactorization cont = new ContainerFactorization(player, fac);
         GuiScreen gui = null;
-        if (ID == FactoryType.SLAGFURNACE.gui) {
-            gui = new GuiSlag(cont);
-        }
-        if (ID == FactoryType.CRYSTALLIZER.gui) {
-            gui = new GuiCrystallizer(cont);
-        }
         if (ID == FactoryType.PARASIEVE.gui) {
             gui = new GuiParasieve(cont);
         }
@@ -263,7 +231,6 @@ public class FactorizationClientProxy extends FactorizationProxy {
         setTileEntityRendererDispatcher(TileEntityDayBarrel.class, new TileEntityDayBarrelRenderer());
         setTileEntityRendererDispatcher(TileEntityGreenware.class, new TileEntityGreenwareRender());
         setTileEntityRendererDispatcher(TileEntityHeater.class, new TileEntityHeaterRenderer());
-        setTileEntityRendererDispatcher(TileEntityCrystallizer.class, new TileEntityCrystallizerRender());
         setTileEntityRendererDispatcher(TileEntityLeydenJar.class, new TileEntityLeydenJarRender());
         setTileEntityRendererDispatcher(TileEntityCompressionCrafter.class, new TileEntityCompressionCrafterRenderer());
         setTileEntityRendererDispatcher(SocketScissors.class, new TileEntitySocketRenderer());

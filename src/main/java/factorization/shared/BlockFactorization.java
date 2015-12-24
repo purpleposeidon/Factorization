@@ -243,7 +243,6 @@ public class BlockFactorization extends BlockContainer {
         Registry reg = Core.registry;
         //common
         
-        put(itemList, reg.slagfurnace_item);
         put(itemList, reg.parasieve_item);
 
         //electric
@@ -269,7 +268,6 @@ public class BlockFactorization extends BlockContainer {
         put(itemList, reg.water_wheel);
         put(itemList, reg.steam_to_shaft);
         put(itemList, reg.heater_item);
-        put(itemList, reg.crystallizer_item);
 
         put(itemList, reg.greenware_item);
 

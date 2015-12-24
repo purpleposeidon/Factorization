@@ -8,8 +8,6 @@ import factorization.crafting.TileEntityCompressionCrafter;
 import factorization.fzds.DeltaChunk;
 import factorization.mechanics.SocketPoweredCrank;
 import factorization.mechanics.TileEntityHinge;
-import factorization.oreprocessing.TileEntityCrystallizer;
-import factorization.oreprocessing.TileEntitySlagFurnace;
 import factorization.redstone.TileEntityParaSieve;
 import factorization.servo.TileEntityServoRail;
 import factorization.shared.Core;
@@ -27,7 +25,7 @@ import net.minecraftforge.fml.common.registry.GameRegistry;
 public enum FactoryType {
     //Traced here is the history of Factorization.
     //0 -- This used to be ROUTER, which is now servos
-    //1 -- This used to be CUTTER, which only existed for routers
+    //1 -- This used to be CUTTER, which only existed briefly for routers
     //2 -- This used to be MAKER
     //3 -- This used to be STAMPER
     //4 -- This used to be QUEUE
@@ -37,15 +35,15 @@ public enum FactoryType {
     //8 -- This used to be PACKAGER
     //9 -- This used to be SENTRYDEMON
     //10 -- This used to be WRATHFIRE
-    SLAGFURNACE(11, true, TileEntitySlagFurnace.class, "factory_slag"), //get extra ore output
+    //11 - This used to be SLAGFURNACE
     BATTERY(12, false, TileEntityBattery.class, "factory_battery"),
     //13 -- This used to be SOLARTURBINE
     //14 -- This used to be LEADWIRE (factory_solder)
     HEATER(15, false, TileEntityHeater.class, "factory_heater"), //work furnaces without fuel
     MIRROR(16, false, TileEntityMirror.class, "factory_mirror"), //reflect sunlight onto IReflectionTargets
     //17 -- This used to be GRINDER
-    //18 -- THis used to be MIXER
-    CRYSTALLIZER(19, true, TileEntityCrystallizer.class, "factory_crystal"), //grow metallic crystals
+    //18 -- This used to be MIXER
+    //19 -- This used to be CRYSTALLIZER
     //20 -- Used to be GREENWARE
     //21 -- Used to be STEAMTURBINE (factory_steamturbine)
     SOLARBOILER(22, false, TileEntitySolarBoiler.class, "factory_solarfurnace"), //Produces steam from sunlight

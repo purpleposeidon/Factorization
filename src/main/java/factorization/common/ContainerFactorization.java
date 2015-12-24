@@ -1,20 +1,12 @@
 package factorization.common;
 
-import factorization.oreprocessing.TileEntityCrystallizer;
-import factorization.oreprocessing.TileEntitySlagFurnace;
 import factorization.redstone.TileEntityParaSieve;
 import factorization.shared.TileEntityFactorization;
-import factorization.util.InvUtil;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.inventory.Container;
 import net.minecraft.inventory.Slot;
-import net.minecraft.inventory.SlotFurnaceOutput;
 import net.minecraft.item.ItemStack;
-import net.minecraft.tileentity.TileEntityFurnace;
-
-import java.util.ArrayList;
-import java.util.Collections;
 
 public class ContainerFactorization extends Container {
     public TileEntityFactorization factory;
@@ -35,25 +27,6 @@ public class ContainerFactorization extends Container {
         FactoryType type = ent.getFactoryType();
         EntityPlayer player = inventoryplayer.player;
         switch (type) {
-        case SLAGFURNACE:
-            TileEntitySlagFurnace furnace = (TileEntitySlagFurnace) ent;
-            addSlotToContainer(new Slot(furnace, 0, 56, 17));
-            addSlotToContainer(new Slot(furnace, 1, 56, 53));
-            addSlotToContainer(new SlotFurnaceOutput(player, furnace, 2, 114, 22));
-            addSlotToContainer(new SlotFurnaceOutput(player, furnace, 3, 114, 48));
-            break;
-        case CRYSTALLIZER:
-            TileEntityCrystallizer crys = (TileEntityCrystallizer) ent;
-            //surounding inputs
-            addSlotToContainer(new Slot(crys, 0, 80, 13));
-            addSlotToContainer(new Slot(crys, 1, 108, 29));
-            addSlotToContainer(new Slot(crys, 2, 108, 55));
-            addSlotToContainer(new Slot(crys, 3, 80, 69));
-            addSlotToContainer(new Slot(crys, 4, 52, 55));
-            addSlotToContainer(new Slot(crys, 5, 52, 29));
-            //central output
-            addSlotToContainer(new SlotFurnaceOutput(player, crys, 6, 80, 40));
-            break;
         case PARASIEVE:
             TileEntityParaSieve proto = (TileEntityParaSieve) ent;
             for (int i = 0; i < proto.filters.length/2; i++) {
@@ -63,8 +36,6 @@ public class ContainerFactorization extends Container {
             invdy -= 18;
             break;
         default:
-            //Fun Fact: progress is done by subclassing; see ContainerSlagFurnace
-            //Additional Fun Fact: use SlotFurnace for output slots!
             break;
         }
         addPlayerSlots(inventoryplayer);
@@ -103,29 +74,7 @@ public class ContainerFactorization extends Container {
         if (itemstack == null) {
             return null;
         }
-        
-        switch (type) {
-        //inventory shift click, need special logic
-        case SLAGFURNACE:
-            if (i >= 4) {
-                if (TileEntityFurnace.getItemBurnTime(itemstack) > 0) {
-                    return InvUtil.transferSlotToSlots(player, slot, Collections.singletonList((Slot) inventorySlots.get(1)));
-                } else {
-                    return InvUtil.transferSlotToSlots(player, slot, Collections.singletonList((Slot) inventorySlots.get(0)));
-                }
-            }
-            break;
-        case CRYSTALLIZER:
-            if (i >= 8) {
-                ArrayList<Slot> av = new ArrayList<Slot>(6);
-                for (int j = 0; j < 6; j++) {
-                    av.add(inventorySlots.get(j));
-                }
-                return InvUtil.transferSlotToSlots(player, slot, av);
-            }
-            break;
-        }
-        
+
         ItemStack itemstack1 = slot.getStack();
         itemstack = itemstack1.copy();
         if (i < slot_end) {

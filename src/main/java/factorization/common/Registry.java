@@ -1,13 +1,45 @@
 package factorization.common;
 
-import java.lang.reflect.Field;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.regex.Matcher;
-
+import factorization.api.IActOnCraft;
+import factorization.artifact.BlockForge;
+import factorization.artifact.ItemBrokenArtifact;
+import factorization.artifact.ItemPotency;
+import factorization.beauty.ItemGrossFood;
+import factorization.beauty.ItemLeafBomb;
+import factorization.ceramics.ItemGlazeBucket;
+import factorization.ceramics.ItemSculptingTool;
+import factorization.ceramics.TileEntityGreenware;
+import factorization.ceramics.TileEntityGreenware.ClayState;
+import factorization.charge.ItemAcidBottle;
+import factorization.charge.ItemBattery;
+import factorization.charge.ItemChargeMeter;
+import factorization.charge.TileEntityLeydenJar;
+import factorization.colossi.*;
+import factorization.darkiron.BlockDarkIronOre;
+import factorization.fzds.DeltaChunk;
+import factorization.fzds.HammerEnabled;
+import factorization.mechanics.ItemDarkIronChain;
+import factorization.oreprocessing.ItemOreProcessing;
+import factorization.oreprocessing.ItemOreProcessing.OreType;
+import factorization.oreprocessing.TileEntityGrinder;
+import factorization.redstone.BlockMatcher;
+import factorization.servo.*;
+import factorization.servo.stepper.ItemStepperEngine;
 import factorization.shared.*;
+import factorization.shared.Core.TabType;
+import factorization.sockets.ItemSocketPart;
+import factorization.truth.minecraft.ItemDocBook;
+import factorization.truth.minecraft.ItemManSandwich;
+import factorization.twistedblock.ItemTwistedBlock;
+import factorization.util.CraftUtil;
+import factorization.util.DataUtil;
+import factorization.util.FzUtil;
+import factorization.util.ItemUtil;
+import factorization.utiligoo.ItemGoo;
+import factorization.weird.*;
+import factorization.weird.poster.ItemSpawnPoster;
+import factorization.wrath.BlockLightAir;
+import factorization.wrath.TileEntityWrathLamp;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockNetherrack;
 import net.minecraft.block.material.MapColor;
@@ -26,7 +58,6 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.WeightedRandomFishable;
 import net.minecraft.world.World;
-
 import net.minecraftforge.common.FishingHooks;
 import net.minecraftforge.event.entity.player.EntityItemPickupEvent;
 import net.minecraftforge.fluids.Fluid;
@@ -47,61 +78,12 @@ import net.minecraftforge.oredict.RecipeSorter.Category;
 import net.minecraftforge.oredict.ShapedOreRecipe;
 import net.minecraftforge.oredict.ShapelessOreRecipe;
 
-import factorization.api.IActOnCraft;
-import factorization.artifact.BlockForge;
-import factorization.artifact.ItemBrokenArtifact;
-import factorization.artifact.ItemPotency;
-import factorization.beauty.ItemGrossFood;
-import factorization.beauty.ItemLeafBomb;
-import factorization.ceramics.ItemGlazeBucket;
-import factorization.ceramics.ItemSculptingTool;
-import factorization.ceramics.TileEntityGreenware;
-import factorization.ceramics.TileEntityGreenware.ClayState;
-import factorization.charge.ItemAcidBottle;
-import factorization.charge.ItemBattery;
-import factorization.charge.ItemChargeMeter;
-import factorization.charge.TileEntityLeydenJar;
-import factorization.colossi.BlockBlast;
-import factorization.colossi.ColossalBlock;
-import factorization.colossi.ColossalBlockItem;
-import factorization.colossi.GargantuanBlock;
-import factorization.colossi.ItemColossusGuide;
-import factorization.colossi.ItemGargantuanBlock;
-import factorization.colossi.TileEntityColossalHeart;
-import factorization.darkiron.BlockDarkIronOre;
-import factorization.fzds.DeltaChunk;
-import factorization.fzds.HammerEnabled;
-import factorization.mechanics.ItemDarkIronChain;
-import factorization.oreprocessing.ItemOreProcessing;
-import factorization.oreprocessing.ItemOreProcessing.OreType;
-import factorization.oreprocessing.TileEntityCrystallizer;
-import factorization.oreprocessing.TileEntityGrinder;
-import factorization.oreprocessing.TileEntitySlagFurnace;
-import factorization.redstone.BlockMatcher;
-import factorization.servo.ItemCommenter;
-import factorization.servo.ItemMatrixProgrammer;
-import factorization.servo.ItemServoMotor;
-import factorization.servo.ItemServoRailWidget;
-import factorization.servo.ServoComponent;
-import factorization.servo.stepper.ItemStepperEngine;
-import factorization.shared.Core.TabType;
-import factorization.sockets.ItemSocketPart;
-import factorization.truth.minecraft.ItemDocBook;
-import factorization.truth.minecraft.ItemManSandwich;
-import factorization.twistedblock.ItemTwistedBlock;
-import factorization.util.CraftUtil;
-import factorization.util.DataUtil;
-import factorization.util.FzUtil;
-import factorization.util.ItemUtil;
-import factorization.utiligoo.ItemGoo;
-import factorization.weird.BarrelUpgradeRecipes;
-import factorization.weird.ItemDayBarrel;
-import factorization.weird.ItemMinecartDayBarrel;
-import factorization.weird.ItemPocketTable;
-import factorization.weird.TileEntityDayBarrel;
-import factorization.weird.poster.ItemSpawnPoster;
-import factorization.wrath.BlockLightAir;
-import factorization.wrath.TileEntityWrathLamp;
+import java.lang.reflect.Field;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.regex.Matcher;
 
 public class Registry {
     public ItemFactorizationBlock item_factorization;
@@ -129,9 +111,8 @@ public class Registry {
     public ItemStack
             daybarrel_item_hidden,
             lamp_item,
-            slagfurnace_item, battery_item_hidden, leydenjar_item, leydenjar_item_full, heater_item, solarboiler_item, caliometric_burner_item,
+            battery_item_hidden, leydenjar_item, leydenjar_item_full, heater_item, solarboiler_item, caliometric_burner_item,
             mirror_item_hidden,
-            crystallizer_item,
             greenware_item,
             parasieve_item,
             compression_crafter_item,
@@ -331,7 +312,6 @@ public class Registry {
         compression_crafter_item = FactoryType.COMPRESSIONCRAFTER.itemStack();
         daybarrel_item_hidden = FactoryType.DAYBARREL.itemStack();
         lamp_item = FactoryType.LAMP.itemStack();
-        slagfurnace_item = FactoryType.SLAGFURNACE.itemStack();
         battery_item_hidden = FactoryType.BATTERY.itemStack();
         leydenjar_item = FactoryType.LEYDENJAR.itemStack();
         solarboiler_item = FactoryType.SOLARBOILER.itemStack();
@@ -344,7 +324,6 @@ public class Registry {
         bibliogen = FactoryType.BIBLIO_GEN.itemStack();
         heater_item = FactoryType.HEATER.itemStack();
         mirror_item_hidden = FactoryType.MIRROR.itemStack();
-        crystallizer_item = FactoryType.CRYSTALLIZER.itemStack();
         greenware_item = FactoryType.CERAMIC.itemStack();
         if (DeltaChunk.enabled()) {
             hinge = FactoryType.HINGE.itemStack();
@@ -588,10 +567,6 @@ public class Registry {
                 'I', dark_iron,
                 '#', logicMatrix,
                 '>', Items.comparator);
-        TileEntitySlagFurnace.SlagRecipes.register(new ItemStack(logicMatrixProgrammer), 2F / 3F, new ItemStack(dark_iron), 0.85F, new ItemStack(logicMatrix));
-        TileEntitySlagFurnace.SlagRecipes.register(dark_iron_sprocket.copy(), 3.5F, new ItemStack(dark_iron), 0.5F, new ItemStack(silver_ingot));
-        
-        TileEntityCrystallizer.addRecipe(new ItemStack(Blocks.redstone_block), new ItemStack(logicMatrix), 1, Core.registry.aqua_regia);
 
         //Resources
         oreRecipe(new ItemStack(lead_ingot, 9), "#", '#', lead_block_item);
@@ -896,19 +871,6 @@ public class Registry {
                 'G', Blocks.glass_pane,
                 'W', diamond_shard);
 
-        //Slag furnace
-        oreRecipe(slagfurnace_item,
-                "CFC",
-                "C C",
-                "CFC",
-                'C', Blocks.cobblestone,
-                'F', Blocks.furnace);
-        
-        //most ores give 0.4F stone, but redstone is dense.
-        //mining redstone normally gives 4 to 6 ore. 5.8F should get you a slightly better yield.
-        TileEntitySlagFurnace.SlagRecipes.register(Blocks.redstone_ore, 5.8F, Items.redstone, 0.2F, Blocks.stone);
-        
-        
         oreRecipe(greenware_item,
                 "c",
                 "-",
@@ -1089,16 +1051,8 @@ public class Registry {
         
         
         FurnaceRecipes.instance().addSmeltingRecipe(new ItemStack(sludge), new ItemStack(Items.clay_ball), 0.1F);
-        oreRecipe(crystallizer_item,
-                "-",
-                "S",
-                "U",
-                '-', Items.stick,
-                'S', Items.string,
-                'U', Items.cauldron);
         ItemStack lime = new ItemStack(Items.dye, 1, 10);
-        TileEntityCrystallizer.addRecipe(lime, new ItemStack(Items.slime_ball), 1, new ItemStack(Items.milk_bucket));
-        
+
         //Rocketry
         TileEntityGrinder.addRecipe(new ItemStack(Blocks.netherrack), new ItemStack(nether_powder, 1), 1);
 

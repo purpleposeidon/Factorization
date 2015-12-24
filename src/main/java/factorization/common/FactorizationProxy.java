@@ -1,6 +1,10 @@
 package factorization.common;
 
+import factorization.api.Coord;
+import factorization.artifact.ContainerForge;
 import factorization.shared.ItemFactorization;
+import factorization.shared.TileEntityFactorization;
+import factorization.weird.ContainerPocket;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.inventory.Container;
@@ -10,16 +14,8 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.BlockPos;
 import net.minecraft.world.World;
-
 import net.minecraftforge.common.util.FakePlayer;
 import net.minecraftforge.fml.common.network.IGuiHandler;
-
-import factorization.api.Coord;
-import factorization.artifact.ContainerForge;
-import factorization.oreprocessing.ContainerCrystallizer;
-import factorization.oreprocessing.ContainerSlagFurnace;
-import factorization.shared.TileEntityFactorization;
-import factorization.weird.ContainerPocket;
 
 import java.util.Collection;
 
@@ -42,14 +38,7 @@ public abstract class FactorizationProxy implements IGuiHandler {
             return null;
         }
         TileEntityFactorization fac = (TileEntityFactorization) te;
-        ContainerFactorization cont;
-        if (ID == FactoryType.SLAGFURNACE.gui) {
-            cont = new ContainerSlagFurnace(player, fac);
-        } else if (ID == FactoryType.CRYSTALLIZER.gui) {
-            cont = new ContainerCrystallizer(player, fac);
-        } else {
-            cont = new ContainerFactorization(player, fac);
-        }
+        ContainerFactorization cont = new ContainerFactorization(player, fac);
         cont.addSlotsForGui(fac, player.inventory);
         return cont;
     }
