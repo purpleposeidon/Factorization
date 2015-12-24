@@ -34,10 +34,12 @@ public class InspirationManager {
     }
 
     static void set(StatisticsFile statsFile, EntityPlayer player, StatBase field, int val) {
+        if (statsFile == null) return;
         statsFile.func_150873_a(player, field, val);
     }
 
     static int get(StatisticsFile statsFile, EntityPlayer player, StatBase field) {
+        if (statsFile == null) return -1;
         return statsFile.writeStat(field);
     }
 
@@ -50,6 +52,7 @@ public class InspirationManager {
     }
 
     static boolean canMakeArtifact(StatisticsFile statsFile, EntityPlayer player) {
+        if (statsFile == null) return false;
         int lastArtifactDay = get(statsFile, player, lastArtifact);
         if (lastArtifactDay + days_per_artifact > today()) return false;
         return true;
@@ -109,8 +112,9 @@ public class InspirationManager {
     }
 
     public static boolean canMakeArtifact(EntityPlayer player) {
+        if (PlayerUtil.isPlayerCreative(player)) return true;
         StatisticsFile statsFile = PlayerUtil.getStatsFile(player);
-        return canMakeArtifact(statsFile, player) || PlayerUtil.isPlayerCreative(player);
+        return canMakeArtifact(statsFile, player);
     }
 
     public static void makeArtifact(EntityPlayer player, ItemStack artifact) {
