@@ -79,19 +79,25 @@ except Exception as e:
     print(e)
 
 if mediafire_url == "":
-  print("Mediafire upload failed! Lameness! Enter the URL to use:")
-  mediafire_url = raw_input()
+  print("Mediafire upload failed!")
 
 #Don't add non-trivial tasks here unless we can get mediafire behaving properly.
 
 print("\n"*4)
 LOG  = "Factorization " + version + "\n"
-LOG += '''
-[url="{0}"]MediaFire[/url], or\n[url="{1}"]DropBox[/url]
-'''.format(
-  adfly(mediafire_url),
-  adfly(dropbox_url)
-).strip() + "\n"
+if mediafire_url:
+    LOG += '''
+    [url="{0}"]MediaFire[/url], or\n[url="{1}"]DropBox[/url]
+    '''.format(
+      adfly(mediafire_url),
+      adfly(dropbox_url)
+    ).strip() + "\n"
+else:
+    LOG += '''
+    [url="{1}"]DropBox[/url]
+    '''.format(
+      adfly(dropbox_url)
+    ).strip() + "\n"
 LOG += "Built on " + time.strftime("%F") + " against " + (getForgeVersion() + "\n")
 LOG += '[url="{0}"]Changelog[/url]\n'.format(changelog_url)
 LOG += '[url="{0}"]Deobf for Mod Authors[/url]\n'.format(devify(dropbox_url))
