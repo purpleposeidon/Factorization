@@ -4,34 +4,30 @@ import factorization.shared.NORELEASE;
 import io.netty.buffer.ByteBuf;
 
 public enum StandardMessageType {
-    factorizeCmdChannel,
+    UnusedZeroDummy,
     PlaySound,
-
-    DrawActive, FactoryType, DescriptionRequest, DataHelperEdit, RedrawOnClient, DataHelperEditOnEntity(true), OpenDataHelperGui, OpenDataHelperGuiOnEntity(true),
+    DrawActive,
+    FactoryType,
+    DescriptionRequest,
+    DataHelperEdit,
+    RedrawOnClient,
+    DataHelperEditOnEntity(true),
+    OpenDataHelperGui,
+    OpenDataHelperGuiOnEntity(true),
     TileEntityMessageOnEntity(true),
-    BarrelDescription, BarrelItem, BarrelCount, BarrelDoubleClickHack,
-    BatteryLevel, LeydenjarLevel,
-    MirrorDescription,
-    TurbineWater, TurbineSpeed,
-    HeaterHeat,
-    LaceratorSpeed,
-    MixerSpeed, FanturpellerSpeed,
-    CrystallizerInfo,
-    WireFace,
-    SculptDescription, SculptNew, SculptMove, SculptRemove, SculptState,
-    ExtensionInfo, RocketState,
+    entity_sync(true),
+
+    // Some generic messages
+    Description, DoAction, SetSpeed, SetAmount, SetHeat, ParticleInfo, SetWorking,
+
+
+    BarrelItem, BarrelCount, BarrelDoubleClickHack,
+    SculptNew, SculptMove, SculptRemove, SculptState,
     ServoRailDecor, ServoRailEditComment,
-    CompressionCrafter, CompressionCrafterBeginCrafting, CompressionCrafterBounds,
-    ScissorState,
-    GeneratorParticles,
-    BoilerHeat,
-    ShaftGenState,
-    MillVelocity,
-    MisanthropicSpawn, MisanthropicCharge,
+    CompressionCrafterBounds,
 
     // Messages to entities; (true) marks that they are entity messages.
     servo_brief(true), servo_item(true), servo_complete(true), servo_stopped(true),
-    entity_sync(true),
     UtilityGooState(true),
 
     // Messages to/from the player

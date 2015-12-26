@@ -96,7 +96,7 @@ public class TileEntityBattery extends TileEntityCommon implements IChargeConduc
     }
 
     void updateMeter() {
-        Core.network.broadcastMessage(null, getCoord(), StandardMessageType.BatteryLevel, storage);
+        Core.network.broadcastMessage(null, getCoord(), StandardMessageType.SetAmount, storage);
     }
 
     @Override
@@ -104,7 +104,7 @@ public class TileEntityBattery extends TileEntityCommon implements IChargeConduc
         if (super.handleMessageFromServer(messageType, input)) {
             return true;
         }
-        if (messageType == StandardMessageType.BatteryLevel) {
+        if (messageType == StandardMessageType.SetAmount) {
             storage = input.readInt();
             getCoord().redraw();
             return true;

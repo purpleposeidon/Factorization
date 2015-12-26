@@ -394,16 +394,6 @@ public class TileEntityDayBarrel extends TileEntityFactorization  {
         if (super.handleMessageFromServer(messageType, input)) {
             return true;
         }
-        if (messageType == StandardMessageType.BarrelDescription) {
-            item = DataUtil.readStack(input);
-            setItemCount(input.readInt());
-            woodLog = DataUtil.readStack(input);
-            woodSlab = DataUtil.readStack(input);
-            orientation = FzOrientation.getOrientation(input.readByte());
-            type = Type.valueOf(input.readByte());
-            freeDisplayList();
-            return true;
-        }
         if (messageType == StandardMessageType.BarrelCount) {
             setItemCount(input.readInt());
             freeDisplayList();

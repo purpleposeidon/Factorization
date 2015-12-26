@@ -194,7 +194,7 @@ public class TileEntitySteamShaft extends TileEntityCommon implements IFluidHand
         if (last_sent_velocity == velocity) return;
         if (NumUtil.significantChange(last_sent_velocity, velocity, 0.10)) {
             last_sent_velocity = velocity;
-            broadcastMessage(null, StandardMessageType.TurbineSpeed, (float) velocity);
+            broadcastMessage(null, StandardMessageType.SetSpeed, (float) velocity);
         }
     }
 
@@ -203,7 +203,7 @@ public class TileEntitySteamShaft extends TileEntityCommon implements IFluidHand
         if (super.handleMessageFromServer(messageType, input)) {
             return true;
         }
-        if (messageType == StandardMessageType.TurbineSpeed) {
+        if (messageType == StandardMessageType.SetSpeed) {
             velocity = input.readFloat();
             return true;
         }

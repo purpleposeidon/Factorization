@@ -155,7 +155,7 @@ public class SocketLacerator extends TileEntitySocketBase implements IChargeCond
         isPowered = powered;
         genericUpdate_implementation(socket, coord, powered);
         if (NumUtil.significantChange(last_shared_speed, speed)) {
-            socket.sendMessage(StandardMessageType.LaceratorSpeed, speed);
+            socket.sendMessage(StandardMessageType.SetSpeed, speed);
             last_shared_speed = speed;
         }
         
@@ -218,7 +218,7 @@ public class SocketLacerator extends TileEntitySocketBase implements IChargeCond
         if (super.handleMessageFromServer(messageType, input)) {
             return true;
         }
-        if (messageType == StandardMessageType.LaceratorSpeed) {
+        if (messageType == StandardMessageType.SetSpeed) {
             speed = input.readShort();
             return true;
         }

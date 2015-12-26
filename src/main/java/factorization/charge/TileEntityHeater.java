@@ -58,7 +58,7 @@ public class TileEntityHeater extends TileEntityCommon implements IChargeConduct
     void updateClient() {
         int delta = Math.abs(heat - last_heat);
         if (delta > 2) {
-            broadcastMessage(null, StandardMessageType.HeaterHeat, heat);
+            broadcastMessage(null, StandardMessageType.SetHeat, heat);
             last_heat = heat;
         }
     }
@@ -68,7 +68,7 @@ public class TileEntityHeater extends TileEntityCommon implements IChargeConduct
         if (super.handleMessageFromServer(messageType, input)) {
             return true;
         }
-        if (messageType == StandardMessageType.HeaterHeat) {
+        if (messageType == StandardMessageType.SetHeat) {
             heat = input.readByte();
             return true;
         }

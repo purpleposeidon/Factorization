@@ -115,18 +115,6 @@ public class TileEntityExtension extends TileEntityCommon implements IFurnaceHea
     }
 
     @Override
-    public boolean handleMessageFromServer(StandardMessageType messageType, ByteBuf input) throws IOException {
-        if (super.handleMessageFromServer(messageType, input)) {
-            return true;
-        }
-        if (messageType == StandardMessageType.ExtensionInfo) {
-            pc = DeltaCoord.read(input);
-            return true;
-        }
-        return false;
-    }
-
-    @Override
     public boolean activate(EntityPlayer entityplayer, EnumFacing side) {
         TileEntityCommon p = getParent();
         if (p != null) {

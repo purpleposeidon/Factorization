@@ -170,7 +170,7 @@ public class TileEntitySolarBoiler extends TileEntityCommon implements IReflecti
             given_heat = 0;
             if (m != last_synced_heat) {
                 last_synced_heat = m;
-                broadcastMessage(null, StandardMessageType.BoilerHeat, last_synced_heat);
+                broadcastMessage(null, StandardMessageType.SetHeat, last_synced_heat);
             }
         }
         IFluidHandler aboveTank = getAbove();
@@ -258,7 +258,7 @@ public class TileEntitySolarBoiler extends TileEntityCommon implements IReflecti
 
     @Override
     public boolean handleMessageFromServer(StandardMessageType messageType, ByteBuf input) throws IOException {
-        if (messageType == StandardMessageType.BoilerHeat) {
+        if (messageType == StandardMessageType.SetHeat) {
             given_heat = last_synced_heat = input.readShort();
             return true;
         }

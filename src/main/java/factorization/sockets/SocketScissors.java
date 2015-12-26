@@ -130,7 +130,7 @@ public class SocketScissors extends TileEntitySocketBase implements ICaptureDrop
             }
         }
         if (dirty) {
-            socket.sendMessage(StandardMessageType.ScissorState, openCount, sound);
+            socket.sendMessage(StandardMessageType.Description, openCount, sound);
             dirty = false;
         }
     }
@@ -343,7 +343,7 @@ public class SocketScissors extends TileEntitySocketBase implements ICaptureDrop
         if (super.handleMessageFromServer(messageType, input)) {
             return true;
         }
-        if (messageType == StandardMessageType.ScissorState) {
+        if (messageType == StandardMessageType.Description) {
             openCount = input.readByte();
             sound = input.readBoolean();
             return true;

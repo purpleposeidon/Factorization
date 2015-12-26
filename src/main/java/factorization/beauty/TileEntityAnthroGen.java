@@ -73,7 +73,7 @@ public class TileEntityAnthroGen extends TileEntityCommon implements IInventory,
                 now /= max_particle_rate;
                 final int entheasRate = 1 + entheas.getMaxStackSize() - entheas.stackSize;
                 if (entheasRate > 0 && now % entheasRate == 0) {
-                    broadcastMessage(null, StandardMessageType.GeneratorParticles);
+                    broadcastMessage(null, StandardMessageType.ParticleInfo);
                 }
             }
             return;
@@ -103,7 +103,7 @@ public class TileEntityAnthroGen extends TileEntityCommon implements IInventory,
     @SideOnly(Side.CLIENT)
     @Override
     public boolean handleMessageFromServer(StandardMessageType messageType, ByteBuf input) throws IOException {
-        if (messageType == StandardMessageType.GeneratorParticles) {
+        if (messageType == StandardMessageType.ParticleInfo) {
             worldObj.spawnParticle(EnumParticleTypes.FLAME, pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5, 0, 0, 0);
             return true;
         }

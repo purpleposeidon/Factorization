@@ -122,7 +122,7 @@ public class TileEntityMirror extends TileEntityCommon implements ITickable {
     void broadcastTargetInfoIfChanged(boolean force) {
         if (force || getTargetInfo() != last_shared) {
             Coord target = reflection_target == null ? new Coord(this) : reflection_target;
-            broadcastMessage(null, StandardMessageType.MirrorDescription, getTargetInfo(), target.x, target.y, target.z, silver);
+            broadcastMessage(null, StandardMessageType.Description, getTargetInfo(), target.x, target.y, target.z, silver);
             last_shared = getTargetInfo();
         }
     }
@@ -142,7 +142,7 @@ public class TileEntityMirror extends TileEntityCommon implements ITickable {
         if (super.handleMessageFromServer(messageType, input)) {
             return true;
         }
-        if (messageType == StandardMessageType.MirrorDescription) {
+        if (messageType == StandardMessageType.Description) {
             target_rotation = input.readInt();
             reflection_target = new Coord(this);
             reflection_target.x = input.readInt();

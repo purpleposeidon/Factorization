@@ -130,13 +130,13 @@ public class TileEntityShaftGen extends TileEntityCommon implements IChargeCondu
         boolean is_on = line > 0;
         if (is_on != on) {
             on = is_on;
-            broadcastMessage(null, StandardMessageType.ShaftGenState, on);
+            broadcastMessage(null, StandardMessageType.SetWorking, on);
         }
     }
 
     @Override
     public boolean handleMessageFromServer(StandardMessageType messageType, ByteBuf input) throws IOException {
-        if (messageType == StandardMessageType.ShaftGenState) {
+        if (messageType == StandardMessageType.SetWorking) {
             on = input.readBoolean();
             getCoord().redraw();
             // ask for a redraw? Nah; things are getting redrawn constantly anyways

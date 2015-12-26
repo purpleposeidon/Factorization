@@ -169,12 +169,7 @@ public class TileEntityCompressionCrafter extends TileEntityCommon implements IT
         if (super.handleMessageFromServer(messageType, input)) {
             return true;
         }
-        if (messageType == StandardMessageType.CompressionCrafter) {
-            facing = EnumFacing.getFront(input.readByte());
-            progress = input.readByte();
-            return true;
-        }
-        if (messageType == StandardMessageType.CompressionCrafterBeginCrafting) {
+        if (messageType == StandardMessageType.DoAction) {
             progress = 1;
             return true;
         }
@@ -195,7 +190,7 @@ public class TileEntityCompressionCrafter extends TileEntityCommon implements IT
     }
     
     void informClient() {
-        broadcastMessage(null, StandardMessageType.CompressionCrafterBeginCrafting);
+        broadcastMessage(null, StandardMessageType.DoAction);
         progress = 1;
         powered = true;
     }

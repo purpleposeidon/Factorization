@@ -142,7 +142,7 @@ public class TileEntityLeydenJar extends TileEntityCommon implements IChargeCond
     void updateClients() {
         if (storage != last_storage) {
             if (NumUtil.significantChange(storage, last_storage, 0.05F)) {
-                broadcastMessage(null, StandardMessageType.LeydenjarLevel, storage);
+                broadcastMessage(null, StandardMessageType.SetAmount, storage);
                 last_storage = storage;
             }
         }
@@ -153,7 +153,7 @@ public class TileEntityLeydenJar extends TileEntityCommon implements IChargeCond
         if (super.handleMessageFromServer(messageType, input)) {
             return true;
         }
-        if (messageType == StandardMessageType.LeydenjarLevel) {
+        if (messageType == StandardMessageType.SetAmount) {
             storage = input.readInt();
             return true;
         }

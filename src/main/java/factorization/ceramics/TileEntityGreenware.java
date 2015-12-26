@@ -680,7 +680,7 @@ public class TileEntityGreenware extends TileEntityCommon implements IFurnaceHea
             return true;
         }
         switch (messageType) {
-        case SculptDescription:
+        case Description:
             readStateChange(input);
             front = SpaceUtil.getOrientation(input.readByte());
             setRotation(input.readByte());

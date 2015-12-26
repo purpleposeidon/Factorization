@@ -171,7 +171,7 @@ public abstract class SocketFanturpeller extends TileEntitySocketBase implements
                 }
             }
             if (dirty || orig_speed != fanω) {
-                socket.sendMessage(StandardMessageType.FanturpellerSpeed, fanω, isSucking, target_speed);
+                socket.sendMessage(StandardMessageType.SetSpeed, fanω, isSucking, target_speed);
                 dirty = false;
             }
         }
@@ -242,7 +242,7 @@ public abstract class SocketFanturpeller extends TileEntitySocketBase implements
         if (super.handleMessageFromServer(messageType, input)) {
             return true;
         }
-        if (messageType == StandardMessageType.FanturpellerSpeed) {
+        if (messageType == StandardMessageType.SetSpeed) {
             fanω = input.readFloat();
             isSucking = input.readBoolean();
             target_speed = input.readByte();

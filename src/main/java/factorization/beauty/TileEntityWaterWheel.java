@@ -171,14 +171,14 @@ public class TileEntityWaterWheel extends TileEntityCommon implements IRotationa
         if (super.handleMessageFromServer(messageType, input)) {
             return true;
         }
-        if (messageType == StandardMessageType.MillVelocity) {
+        if (messageType == StandardMessageType.SetSpeed) {
             velocity = input.readDouble();
         }
         return false;
     }
 
     void sendVelocity() {
-        broadcastMessage(null, StandardMessageType.MillVelocity, velocity);
+        broadcastMessage(null, StandardMessageType.SetSpeed, velocity);
     }
 
     private boolean trySpawnMill() {
