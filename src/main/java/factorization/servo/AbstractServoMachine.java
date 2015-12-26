@@ -11,6 +11,7 @@ import factorization.api.IEntityMessage;
 import factorization.api.datahelpers.*;
 import factorization.shared.Core;
 import factorization.shared.NetworkFactorization;
+import factorization.util.FzUtil;
 import factorization.util.PlayerUtil;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufInputStream;
@@ -291,6 +292,7 @@ public abstract class AbstractServoMachine extends Entity implements IEntityAddi
         }
         EntityPlayer player = (EntityPlayer) src;
         if (worldObj.isRemote) return true;
+        if (!player.capabilities.allowEdit) return false;
         setDead();
         if (!PlayerUtil.isPlayerCreative(player)) dropItemsOnBreak();
         return true;
