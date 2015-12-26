@@ -635,9 +635,13 @@ public class MiscClientCommands implements ICommand {
             if (hash == active_world_hash) {
                 w.removeWorldAccess(debugger);
                 active_world_hash = 0;
+                if (!Core.dev_environ) {
+                    AabbDebugger.freeze = false;
+                }
             } else {
                 w.addWorldAccess(debugger);
                 active_world_hash = hash;
+                player.addChatComponentMessage(new ChatComponentText("Run the command again to disable."));
             }
         }
 
