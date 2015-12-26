@@ -80,6 +80,7 @@ public class FzConfig {
     public static boolean retrogen_silver = false;
     public static boolean retrogen_dark_iron = false;
     public static boolean sort_renderers = !Loader.isModLoaded("optifine"); // Just as a guess.
+    public static boolean enableRecipeReflection = true;
 
     public ArrayList<Property> editable_main = new ArrayList<Property>();
     public ArrayList<Property> editable_runtime = new ArrayList<Property>();
@@ -196,6 +197,7 @@ public class FzConfig {
             show_time_on_fullscreen = editRun().getBoolConfig("showTimeOnFullscreen", "client", show_time_on_fullscreen, "If true, show the time every half hour");
             mirror_sunbeams = editRun().getBoolConfig("drawMirrorSunbeams", "client", mirror_sunbeams, "If false, mirrors won't draw sunbeams");
             sort_renderers = getBoolConfig("sortRenderers", "client", sort_renderers, "Use advanced Entity & TileEntity sorting techniques to optimize rendering, particularly for FZ entities.");
+            enableRecipeReflection = getBoolConfig("enableRecipeReflection", "client", enableRecipeReflection, "If true, java reflection will be used as an (ugly) fallback for getting recipe information from unknown recipes");
         }
 
 

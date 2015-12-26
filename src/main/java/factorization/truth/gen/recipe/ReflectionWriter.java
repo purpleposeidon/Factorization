@@ -4,10 +4,7 @@ import factorization.truth.api.IObjectWriter;
 import factorization.truth.word.TextWord;
 import net.minecraft.item.crafting.IRecipe;
 
-import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
+import java.lang.reflect.*;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -71,6 +68,8 @@ public class ReflectionWriter implements IObjectWriter<Object> {
             if (name.startsWith("get")) {
                 properties.add(name = name.replaceFirst("get", "").toLowerCase(Locale.ROOT));
             }
+            Type[] canThrow = method.getGenericExceptionTypes();
+            if (canThrow != null && canThrow.length != 0) continue;
             Object v = method.invoke(val);
             if (v == recipeOutput || v == null) continue;
             if (seen.add(v)) {

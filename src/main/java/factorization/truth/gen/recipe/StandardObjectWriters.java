@@ -3,6 +3,7 @@ package factorization.truth.gen.recipe;
 import cpw.mods.fml.relauncher.ReflectionHelper;
 import factorization.api.adapter.Adapter;
 import factorization.api.adapter.GenericAdapter;
+import factorization.common.FzConfig;
 import factorization.truth.api.IObjectWriter;
 import factorization.truth.gen.FluidViewer;
 import factorization.truth.word.ItemWord;
@@ -49,7 +50,9 @@ class StandardObjectWriters {
         reg(Map.Entry.class, new WriteEntry());
 
         IObjectWriter.adapter.register(new ArrayAdapter());
-        IObjectWriter.adapter.setFallbackAdapter(new GenericAdapter<Object, IObjectWriter>(Object.class, new ReflectionWriter()));
+        if (FzConfig.enableRecipeReflection) {
+            IObjectWriter.adapter.setFallbackAdapter(new GenericAdapter<Object, IObjectWriter>(Object.class, new ReflectionWriter()));
+        }
     }
 
     private static class WriteItemStack implements IObjectWriter<ItemStack> {
