@@ -78,10 +78,11 @@ public abstract class ServoComponent implements IDataSerializable {
     public final IDataSerializable serialize(String prefix, DataHelper data) throws IOException {
         if (data.isReader()) {
             String componentName;
-            if (data.hasLegacy(componentTagKey)) {
-                componentName = data.asSameShare(componentTagKey).putString(getName());
-            } else {
+            if (data.hasLegacy(prefix + componentTagKey)) {
+                // This is actually the opposite of legacy!
                 componentName = data.asSameShare(prefix + componentTagKey).putString(getName());
+            } else {
+                componentName = data.asSameShare(componentTagKey).putString(getName());
             }
             Class<? extends ServoComponent> componentClass = getComponent(componentName);
             ServoComponent sc;

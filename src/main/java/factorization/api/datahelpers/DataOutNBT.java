@@ -17,7 +17,29 @@ public class DataOutNBT extends DataHelperNBT {
     public DataOutNBT() {
         this(new NBTTagCompound());
     }
-    
+
+    @Override
+    public DataHelper as(Share share, String set_name) {
+        DataHelper ret = super.as(share, set_name);
+        if (ret == this) {
+            if (tag.hasKey(set_name)) {
+                throw new IllegalStateException("Writing name twice!");
+            }
+        }
+        return ret;
+    }
+
+    @Override
+    public DataHelper asSameShare(String set_name) {
+        DataHelper ret = super.asSameShare(set_name);
+        if (ret == this) {
+            if (tag.hasKey(set_name)) {
+                throw new IllegalStateException("Writing name twice!");
+            }
+        }
+        return ret;
+    }
+
     @Override
     public NBTTagCompound getTag() {
         return tag;
