@@ -48,8 +48,8 @@ public class RenderPoster extends RenderEntity {
             poster.inv = new ItemStack(Blocks.fire); // Hopefully fire doesn't also somehow error out.
         } finally {
             GL11.glPopAttrib();
+            GL11.glPopMatrix();
         }
-        GL11.glPopMatrix();
     }
 
     static EntityLiving dummy_entity = new EntityEnderman(null);
