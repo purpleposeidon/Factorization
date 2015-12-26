@@ -304,12 +304,6 @@ public class TileEntityDayBarrel extends TileEntityFactorization implements ISor
             markDirty();
             return;
         }
-        if (middleCount > getMaxSize() && !spammed && worldObj != null) {
-            Core.logSevere("Factorization barrel size, " + middleCount + ", is larger than the maximum, " + getMaxSize() + ". Contents: " + item + " " + (item != null ? item.getItem() : "<null>") + " At: " + getCoord() + " BarrelType = " + type);
-            Core.logSevere("Did the max stack size go down, or is someone doing something bad?");
-            Thread.dumpStack();
-            spammed = true;
-        }
         if (topStack == null) {
             topStack = item.copy();
         }
@@ -469,13 +463,14 @@ public class TileEntityDayBarrel extends TileEntityFactorization implements ISor
             bottomStack = item.copy();
             bottomStack.stackSize = 0;
         }
+        int upperLine = getMaxSize() - item.getMaxStackSize();
         if (type == Type.STICKY) {
             count--;
             if (count < 0) {
                 return;
             }
+            upperLine--;
         }
-        int upperLine = getMaxSize() - item.getMaxStackSize();
         if (topStack == null) {
             topStack = item.copy();
         }
