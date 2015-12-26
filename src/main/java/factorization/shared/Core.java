@@ -15,6 +15,7 @@ import java.util.Set;
 
 import factorization.net.FzNetEventHandler;
 import factorization.net.NetworkFactorization;
+import net.minecraft.tileentity.TileEntity;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 

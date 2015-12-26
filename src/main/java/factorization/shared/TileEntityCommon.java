@@ -8,6 +8,7 @@ import factorization.api.datahelpers.DataOutNBT;
 import factorization.common.FactoryType;
 import factorization.migration.MigrationHelper;
 import factorization.net.FzNetDispatch;
+import factorization.net.INet;
 import factorization.net.StandardMessageType;
 import factorization.util.ItemUtil;
 import factorization.util.SpaceUtil;
@@ -37,7 +38,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-public abstract class TileEntityCommon extends TileEntity implements ICoord, IFactoryType {
+public abstract class TileEntityCommon extends TileEntity implements ICoord, IFactoryType, INet {
     public static final byte serialization_version = 2;
     public static final String serialization_version_key = ".";
 
@@ -160,17 +161,19 @@ public abstract class TileEntityCommon extends TileEntity implements ICoord, IFa
         }
     }
 
-    public boolean handleMessageFromServer(StandardMessageType messageType, ByteBuf input) throws IOException {
+    @Override
+    public boolean handleMessageFromServer(Enum messageType, ByteBuf input) throws IOException {
         return false;
     }
 
-    public boolean handleMessageFromClient(StandardMessageType messageType, ByteBuf input) throws IOException {
+    @Override
+    public boolean handleMessageFromClient(Enum messageType, ByteBuf input) throws IOException {
         // There are no base attributes a client can edit
         return false;
     }
 
     public void broadcastMessage(EntityPlayer who, StandardMessageType messageType, Object... msg) {
-        Core.network.broadcastMessage(who, getCoord(), messageType, msg);
+        Core.network.broadcastMessage(who, this, messageType, msg);
     }
 
     public void broadcastMessage(EntityPlayer who, FMLProxyPacket toSend) {

@@ -21,7 +21,7 @@ public class FzNetEventHandler {
     static final String channelName = "FZ";
     static FMLEventChannel channel;
 
-    FzNetEventHandler() {
+    public FzNetEventHandler() {
         channel = NetworkRegistry.INSTANCE.newEventDrivenChannel(channelName);
         channel.register(this);
     }

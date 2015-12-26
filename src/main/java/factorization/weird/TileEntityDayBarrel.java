@@ -1,11 +1,21 @@
 package factorization.weird;
 
-import java.io.IOException;
-import java.util.ArrayList;
-
-import org.lwjgl.opengl.GL11;
+import factorization.api.Coord;
+import factorization.api.FzOrientation;
+import factorization.api.datahelpers.DataHelper;
+import factorization.api.datahelpers.Share;
+import factorization.common.FactoryType;
+import factorization.net.NetworkFactorization;
+import factorization.net.StandardMessageType;
+import factorization.notify.Notice;
+import factorization.notify.NoticeUpdater;
+import factorization.shared.BlockClass;
+import factorization.shared.Core;
+import factorization.shared.Sound;
+import factorization.shared.TileEntityFactorization;
+import factorization.util.*;
+import factorization.util.InvUtil.FzInv;
 import io.netty.buffer.ByteBuf;
-
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockRailBase;
 import net.minecraft.block.material.Material;
@@ -20,12 +30,7 @@ import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.AxisAlignedBB;
-import net.minecraft.util.BlockPos;
-import net.minecraft.util.EnumFacing;
-import net.minecraft.util.MovingObjectPosition;
-import net.minecraft.util.Vec3;
-
+import net.minecraft.util.*;
 import net.minecraftforge.client.event.RenderWorldLastEvent;
 import net.minecraftforge.common.ForgeHooks;
 import net.minecraftforge.common.util.FakePlayer;
@@ -37,27 +42,10 @@ import net.minecraftforge.fml.common.gameevent.TickEvent.ClientTickEvent;
 import net.minecraftforge.fml.common.network.internal.FMLProxyPacket;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+import org.lwjgl.opengl.GL11;
 
-import factorization.api.Coord;
-import factorization.api.FzOrientation;
-import factorization.api.datahelpers.DataHelper;
-import factorization.api.datahelpers.Share;
-import factorization.common.FactoryType;
-import factorization.notify.Notice;
-import factorization.notify.NoticeUpdater;
-import factorization.shared.BlockClass;
-import factorization.shared.Core;
-import factorization.net.NetworkFactorization;
-import factorization.net.StandardMessageType;
-import factorization.shared.Sound;
-import factorization.shared.TileEntityFactorization;
-import factorization.util.DataUtil;
-import factorization.util.InvUtil;
-import factorization.util.InvUtil.FzInv;
-import factorization.util.ItemUtil;
-import factorization.util.LangUtil;
-import factorization.util.PlayerUtil;
-import factorization.util.SpaceUtil;
+import java.io.IOException;
+import java.util.ArrayList;
 
 public class TileEntityDayBarrel extends TileEntityFactorization  {
     public ItemStack item;
@@ -304,7 +292,7 @@ public class TileEntityDayBarrel extends TileEntityFactorization  {
         }
         if (middleCount == 0) {
             topStack = bottomStack = item = null;
-            updateClients(StandardMessageType.BarrelCount);
+            updateClients(BarrelMessage.BarrelCount);
             markDirty();
             return;
         }
@@ -322,7 +310,7 @@ public class TileEntityDayBarrel extends TileEntityFactorization  {
         }
         topStack.stackSize = bottomStack.stackSize = 0;
         updateStacks();
-        updateClients(StandardMessageType.BarrelCount);
+        updateClients(BarrelMessage.BarrelCount);
         markDirty();
     }
     
@@ -370,10 +358,10 @@ public class TileEntityDayBarrel extends TileEntityFactorization  {
     
     //Network stuff
     
-    FMLProxyPacket getPacket(StandardMessageType messageType) {
-        if (messageType == StandardMessageType.BarrelItem) {
+    FMLProxyPacket getPacket(BarrelMessage messageType) {
+        if (messageType == BarrelMessage.BarrelItem) {
             return Core.network.TEmessagePacket(getCoord(), messageType, NetworkFactorization.nullItem(item), getItemCount());
-        } else if (messageType == StandardMessageType.BarrelCount) {
+        } else if (messageType == BarrelMessage.BarrelCount) {
             return Core.network.TEmessagePacket(getCoord(), messageType, getItemCount());
         } else {
             new IllegalArgumentException("bad MessageType: " + messageType).printStackTrace();
@@ -381,7 +369,7 @@ public class TileEntityDayBarrel extends TileEntityFactorization  {
         }
     }
     
-    void updateClients(StandardMessageType messageType) {
+    void updateClients(BarrelMessage messageType) {
         if (worldObj == null || worldObj.isRemote) {
             return;
         }
@@ -394,18 +382,18 @@ public class TileEntityDayBarrel extends TileEntityFactorization  {
         if (super.handleMessageFromServer(messageType, input)) {
             return true;
         }
-        if (messageType == StandardMessageType.BarrelCount) {
+        if (messageType == BarrelMessage.BarrelCount) {
             setItemCount(input.readInt());
             freeDisplayList();
             return true;
         }
-        if (messageType == StandardMessageType.BarrelItem) {
+        if (messageType == BarrelMessage.BarrelItem) {
             item = DataUtil.readStack(input);
             setItemCount(input.readInt());
             freeDisplayList();
             return true;
         }
-        if (messageType == StandardMessageType.BarrelDoubleClickHack) {
+        if (messageType == BarrelMessage.BarrelDoubleClickHack) {
             Minecraft mc = Minecraft.getMinecraft();
             mc.playerController.currentItemHittingBlock = mc.thePlayer.getHeldItem();
             return true;
@@ -431,9 +419,9 @@ public class TileEntityDayBarrel extends TileEntityFactorization  {
         if (c != last_mentioned_count) {
             if (last_mentioned_count*c <= 0) {
                 //One of them was 0
-                updateClients(StandardMessageType.BarrelItem);
+                updateClients(BarrelMessage.BarrelItem);
             } else {
-                updateClients(StandardMessageType.BarrelCount);
+                updateClients(BarrelMessage.BarrelCount);
             }
             last_mentioned_count = c;
         }
@@ -616,7 +604,7 @@ public class TileEntityDayBarrel extends TileEntityFactorization  {
         held.stackSize -= take;
         changeItemCount(take);
         if (veryNew) {
-            updateClients(StandardMessageType.BarrelItem);
+            updateClients(BarrelMessage.BarrelItem);
         }
         if (held.stackSize == 0) {
             entityplayer.setCurrentItemOrArmor(0, null);
@@ -819,7 +807,7 @@ public class TileEntityDayBarrel extends TileEntityFactorization  {
         if (ent != null && ent.isDead && !(entityplayer instanceof FakePlayer)) {
             ItemStack newHeld = entityplayer.getHeldItem();
             if (newHeld != origHeldItem) {
-                broadcastMessage(entityplayer, StandardMessageType.BarrelDoubleClickHack);
+                broadcastMessage(entityplayer, BarrelMessage.BarrelDoubleClickHack);
             }
         }
         changeItemCount(-to_remove);
@@ -1217,5 +1205,10 @@ public class TileEntityDayBarrel extends TileEntityFactorization  {
     public int getFlamability() {
         // The creative barrel I give you can't burn, so won't check for CREATIVE.
         return isWooden() ? 20 : 0;
+    }
+
+    enum BarrelMessage {
+        BarrelItem, BarrelCount, BarrelDoubleClickHack;
+        static final BarrelMessage[] VALUES = values();
     }
 }

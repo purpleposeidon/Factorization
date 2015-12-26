@@ -30,7 +30,7 @@ import net.minecraftforge.fml.relauncher.Side;
 
 import java.io.IOException;
 
-public class NetworkFactorization {
+public class NetworkFactorization<TE extends TileEntity & INet> {
     public static final ItemStack EMPTY_ITEMSTACK = new ItemStack(Blocks.air);
     
     private void writeObjects(ByteBuf output, Object... items) throws IOException {
@@ -94,14 +94,15 @@ public class NetworkFactorization {
         return custom[index];
     }
     
-    public void prefixTePacket(ByteBuf output, Coord src, StandardMessageType messageType) throws IOException {
+    public void prefixTePacket(ByteBuf output, TE src, StandardMessageType messageType) throws IOException {
         messageType.write(output);
-        output.writeInt(src.x);
-        output.writeInt(src.y);
-        output.writeInt(src.z);
+        BlockPos at = src.getPos();
+        output.writeInt(at.getX());
+        output.writeInt(at.getY());
+        output.writeInt(at.getZ());
     }
     
-    public FMLProxyPacket TEmessagePacket(Coord src, StandardMessageType messageType, Object... items) {
+    public FMLProxyPacket TEmessagePacket(TE src, StandardMessageType messageType, Object... items) {
         try {
             ByteBuf output = Unpooled.buffer();
             prefixTePacket(output, src, messageType);
@@ -158,7 +159,7 @@ public class NetworkFactorization {
         FzNetDispatch.addPacket(playerMessagePacket(messageType, msg), player);
     }
 
-    public void broadcastMessage(EntityPlayer who, Coord src, StandardMessageType messageType, Object... msg) {
+    public void broadcastMessage(EntityPlayer who, TE src, StandardMessageType messageType, Object... msg) {
         if (who != null) {
             FMLProxyPacket toSend = TEmessagePacket(src, messageType, msg);
             FzNetDispatch.addPacket(toSend, who);

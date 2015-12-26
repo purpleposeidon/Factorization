@@ -16,12 +16,12 @@ public enum StandardMessageType {
     OpenDataHelperGuiOnEntity(true),
     TileEntityMessageOnEntity(true),
     entity_sync(true),
+    factorizeCmdChannel,
 
     // Some generic messages
     Description, DoAction, SetSpeed, SetAmount, SetHeat, ParticleInfo, SetWorking,
 
 
-    BarrelItem, BarrelCount, BarrelDoubleClickHack,
     SculptNew, SculptMove, SculptRemove, SculptState,
     ServoRailDecor, ServoRailEditComment,
     CompressionCrafterBounds,
