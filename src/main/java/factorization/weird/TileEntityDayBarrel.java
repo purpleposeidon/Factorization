@@ -59,7 +59,7 @@ public class TileEntityDayBarrel extends TileEntityFactorization implements ISor
     private static final ItemStack DEFAULT_LOG = new ItemStack(Blocks.log);
     private static final ItemStack DEFAULT_SLAB = new ItemStack(Blocks.planks);
     public ItemStack woodLog = DEFAULT_LOG.copy(), woodSlab = DEFAULT_SLAB.copy();
-    int display_list = -1;
+    int display_list = -100;
     boolean should_use_display_list = true;
     
     public FzOrientation orientation = FzOrientation.FACE_UP_POINT_NORTH;

@@ -1,3 +1,13 @@
+0.8.103
+  Made barrel & poster renderers more robust
+  FZ's fake player UUID is: f979c78a-f80d-46b1-9c49-0121ea8850e6. The usernames used can vary:
+    [FZ]
+    [FZ:LeafBomb]
+    [FZ:Crafting]
+    [FZ:BlockUndo]
+    [FZ:socket]
+    [FZ:Mixer]
+
 0.8.101
   Disabled the 'improved' middle click for 1.7.10 due to crashes & other unforseen difficulties. You may need to fix your pickblock keybindings.
   Colossi/FZDS collisions were broken with CoFHTweaks. Skyboy & I have got them working together; however if you have CoFH, you will need to update it to 1.1.0B1-52 or later.

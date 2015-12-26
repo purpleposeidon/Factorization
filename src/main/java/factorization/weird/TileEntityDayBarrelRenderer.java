@@ -9,9 +9,11 @@ import factorization.common.FzConfig;
 import factorization.common.ItemIcons;
 import factorization.shared.Core;
 import factorization.shared.NetworkFactorization;
+import factorization.util.DataUtil;
 import factorization.util.RenderUtil;
 import factorization.util.SpaceUtil;
 import factorization.weird.TileEntityDayBarrel.Type;
+import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.renderer.GLAllocation;
@@ -67,10 +69,12 @@ public class TileEntityDayBarrelRenderer extends TileEntitySpecialRenderer {
         GL11.glAlphaFunc(GL11.GL_GREATER, 0.0F);
         
         boolean hasLabel = renderItemCount(is, barrel);
-        handleRenderItem(is, barrel, hasLabel);
-        
-        GL11.glPopAttrib();
-        GL11.glEnable(GL11.GL_LIGHTING);
+        try {
+            handleRenderItem(is, barrel, hasLabel);
+        } finally {
+            GL11.glPopAttrib();
+            GL11.glEnable(GL11.GL_LIGHTING);
+        }
         
         
     }
@@ -87,53 +91,68 @@ public class TileEntityDayBarrelRenderer extends TileEntitySpecialRenderer {
         if (is == null || barrel.getItemCount() <= 0) {
             return;
         }
+        Item item = is.getItem();
+        if (item == null) return;
+        RenderUtil.checkGLError("A previous renderer is broken.");
         Core.profileStart("barrel");
         GL11.glPushMatrix();
         GL11.glTranslated(x, y, z);
+        try {
 
-        if (FzConfig.render_barrel_use_displaylists && barrel.type != Type.HOPPING && barrel.should_use_display_list && barrel != FactoryType.DAYBARREL.getRepresentative()) {
-            if (barrel.display_list == -1) {
-                Item item = is.getItem();
-                boolean crazyItem = item.hasEffect(is, 0) && item.requiresMultipleRenderPasses();
-                if (!crazyItem) {
-                    crazyItem = itemHasCustomRender(is);
-                }
-                if (crazyItem) {
-                    // FIXME: If a potion-barrel draws before a nether-star barrel, shit goes wonky
-                    // There may be other situations where it pops up.
-                    barrel.should_use_display_list = false;
+            if (FzConfig.render_barrel_use_displaylists && barrel.type != Type.HOPPING && barrel.should_use_display_list && barrel != FactoryType.DAYBARREL.getRepresentative()) {
+                if (barrel.display_list < -1) {
                     doDraw(barrel, is);
-                    return;
-                }
-                RenderUtil.checkGLError("FZ -- before barrel display list update. Someone left us a mess!");
-                if (barrel.display_list == -1) {
-                    barrel.display_list = GLAllocation.generateDisplayLists(1);
-                }
-                // https://www.opengl.org/archives/resources/faq/technical/displaylist.htm 16.070
-                GL11.glNewList(barrel.display_list, GL11.GL_COMPILE);
-                doDraw(barrel, is);
-                GL11.glEndList();
-                if (RenderUtil.checkGLError("FZ -- after barrel display list; does the item have an advanced renderer?")) {
-                    Core.logSevere("The item is: " + is);
-                    Core.logSevere("At: " + new Coord(barrel));
-                    barrel.should_use_display_list = false;
+                    barrel.display_list++;
+                    if (RenderUtil.checkGLError("FZ -- Item found to have broken renderer during warmup period")) {
+                        Core.logSevere("The item is: " + is);
+                        Core.logSevere("At: " + new Coord(barrel));
+                        barrel.should_use_display_list = false;
+                    }
+                } else if (barrel.display_list == -1) {
+                    boolean crazyItem = itemHasCustomRender(is);
+                    if (crazyItem) {
+                        // FIXME: If a potion-barrel draws before a nether-star barrel, shit goes wonky
+                        // There may be other situations where it pops up.
+                        barrel.should_use_display_list = false;
+                        doDraw(barrel, is);
+                        return;
+                    }
+                    RenderUtil.checkGLError("FZ -- before barrel display list update.");
+                    if (barrel.display_list == -1) {
+                        barrel.display_list = GLAllocation.generateDisplayLists(1);
+                    }
+                    // https://www.opengl.org/archives/resources/faq/technical/displaylist.htm 16.070
+                    GL11.glNewList(barrel.display_list, GL11.GL_COMPILE);
                     doDraw(barrel, is);
+                    GL11.glEndList();
+                    if (RenderUtil.checkGLError("FZ -- after barrel display list; does the item have an advanced renderer?")) {
+                        Core.logSevere("The item is: " + is);
+                        Core.logSevere("At: " + new Coord(barrel));
+                        barrel.should_use_display_list = false;
+                        doDraw(barrel, is);
+                    } else {
+                        GL11.glCallList(barrel.display_list);
+                    }
                 } else {
                     GL11.glCallList(barrel.display_list);
                 }
             } else {
-                GL11.glCallList(barrel.display_list);
+                doDraw(barrel, is);
             }
-        } else {
-            doDraw(barrel, is);
+        } finally {
+            GL11.glPopMatrix();
+            Core.profileEnd();
         }
-        
-        GL11.glPopMatrix();
-        Core.profileEnd();
     }
 
-    private boolean itemHasCustomRender(ItemStack item) {
-        return MinecraftForgeClient.getItemRenderer(item, INVENTORY) != null;
+    private boolean itemHasCustomRender(ItemStack is) {
+        Item item = is.getItem();
+        if (item == null) return true;
+        if (item.hasEffect(is, 0) && item.requiresMultipleRenderPasses()) return true;
+        if (MinecraftForgeClient.getItemRenderer(is, INVENTORY) != null) return true;
+        Block block = DataUtil.getBlock(is.getItem());
+        if (block.getRenderType() > 38 /* Maximum vanilla block render ID */) return true;
+        return false;
     }
 
     String getCountLabel(ItemStack item, TileEntityDayBarrel barrel) {
