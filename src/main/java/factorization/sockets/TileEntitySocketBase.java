@@ -5,19 +5,18 @@ import factorization.api.IChargeConductor;
 import factorization.api.datahelpers.*;
 import factorization.common.FactoryType;
 import factorization.common.FzConfig;
+import factorization.net.FzNetDispatch;
 import factorization.notify.Notice;
 import factorization.servo.LoggerDataHelper;
 import factorization.servo.RenderServoMotor;
 import factorization.servo.ServoMotor;
 import factorization.shared.*;
-import factorization.shared.NetworkFactorization.MessageType;
+import factorization.net.StandardMessageType;
 import factorization.util.*;
 import factorization.util.InvUtil.FzInv;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.Tessellator;
-import net.minecraft.client.renderer.WorldRenderer;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
@@ -129,7 +128,7 @@ public abstract class TileEntitySocketBase extends TileEntityCommon implements I
     }
     
     @Override
-    public final void sendMessage(MessageType msgType, Object ...msg) {
+    public final void sendMessage(StandardMessageType msgType, Object ...msg) {
         broadcastMessage(null, msgType, msg);
     }
 
@@ -274,11 +273,11 @@ public abstract class TileEntitySocketBase extends TileEntityCommon implements I
     
     @SideOnly(Side.CLIENT)
     @Override
-    public boolean handleMessageFromServer(MessageType messageType, ByteBuf input) throws IOException {
+    public boolean handleMessageFromServer(StandardMessageType messageType, ByteBuf input) throws IOException {
         if (super.handleMessageFromServer(messageType, input)) {
             return true;
         }
-        if (messageType == MessageType.OpenDataHelperGui) {
+        if (messageType == StandardMessageType.OpenDataHelperGui) {
             if (!worldObj.isRemote) {
                 return false;
             }
@@ -291,11 +290,11 @@ public abstract class TileEntitySocketBase extends TileEntityCommon implements I
     }
     
     @Override
-    public boolean handleMessageFromClient(MessageType messageType, ByteBuf input) throws IOException {
+    public boolean handleMessageFromClient(StandardMessageType messageType, ByteBuf input) throws IOException {
         if (super.handleMessageFromClient(messageType, input)) {
             return true;
         }
-        if (messageType == MessageType.DataHelperEdit) {
+        if (messageType == StandardMessageType.DataHelperEdit) {
             DataInByteBufClientEdited di = new DataInByteBufClientEdited(input);
             this.serialize("", di);
             markDirty();
@@ -337,7 +336,7 @@ public abstract class TileEntitySocketBase extends TileEntityCommon implements I
             DataOutByteBuf dop = new DataOutByteBuf(buf, Side.SERVER);
             try {
                 Coord coord = getCoord();
-                Core.network.prefixTePacket(buf, coord, MessageType.OpenDataHelperGui);
+                Core.network.prefixTePacket(buf, coord, StandardMessageType.OpenDataHelperGui);
                 serialize("", dop);
                 Core.network.broadcastPacket(player, coord, FzNetDispatch.generate(buf));
             } catch (IOException e) {
@@ -422,7 +421,7 @@ public abstract class TileEntitySocketBase extends TileEntityCommon implements I
         DataOutByteBuf dop = new DataOutByteBuf(buf, Side.SERVER);
         try {
             Coord coord = getCoord();
-            Core.network.prefixEntityPacket(buf, motor, MessageType.OpenDataHelperGuiOnEntity);
+            Core.network.prefixEntityPacket(buf, motor, StandardMessageType.OpenDataHelperGuiOnEntity);
             serialize("", dop);
             Core.network.broadcastPacket(player, coord, Core.network.entityPacket(buf));
         } catch (IOException e) {

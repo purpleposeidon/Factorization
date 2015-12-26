@@ -7,7 +7,7 @@ import factorization.api.datahelpers.Share;
 import factorization.common.FactoryType;
 import factorization.shared.BlockClass;
 import factorization.shared.Core;
-import factorization.shared.NetworkFactorization.MessageType;
+import factorization.net.StandardMessageType;
 import factorization.shared.TileEntityCommon;
 import factorization.util.ItemUtil;
 import io.netty.buffer.ByteBuf;
@@ -96,15 +96,15 @@ public class TileEntityBattery extends TileEntityCommon implements IChargeConduc
     }
 
     void updateMeter() {
-        Core.network.broadcastMessage(null, getCoord(), MessageType.BatteryLevel, storage);
+        Core.network.broadcastMessage(null, getCoord(), StandardMessageType.BatteryLevel, storage);
     }
 
     @Override
-    public boolean handleMessageFromServer(MessageType messageType, ByteBuf input) throws IOException {
+    public boolean handleMessageFromServer(StandardMessageType messageType, ByteBuf input) throws IOException {
         if (super.handleMessageFromServer(messageType, input)) {
             return true;
         }
-        if (messageType == MessageType.BatteryLevel) {
+        if (messageType == StandardMessageType.BatteryLevel) {
             storage = input.readInt();
             getCoord().redraw();
             return true;

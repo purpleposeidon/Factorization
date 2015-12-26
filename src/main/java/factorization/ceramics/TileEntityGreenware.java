@@ -48,7 +48,7 @@ import factorization.notify.Notice;
 import factorization.shared.BlockClass;
 import factorization.shared.Core;
 import factorization.shared.NORELEASE;
-import factorization.shared.NetworkFactorization.MessageType;
+import factorization.net.StandardMessageType;
 import factorization.shared.TileEntityCommon;
 import factorization.shared.TileEntityExtension;
 import factorization.util.DataUtil;
@@ -450,7 +450,7 @@ public class TileEntityGreenware extends TileEntityCommon implements IFurnaceHea
         }
         if (getState() != lastState) {
             lastState = getState();
-            broadcastMessage(null, MessageType.SculptState, lastState.ordinal());
+            broadcastMessage(null, StandardMessageType.SculptState, lastState.ordinal());
         }
     }
 
@@ -519,7 +519,7 @@ public class TileEntityGreenware extends TileEntityCommon implements IFurnaceHea
         ClayLump ret = new ClayLump().asDefault();
         parts.add(ret);
         if (!worldObj.isRemote) {
-            broadcastMessage(null, MessageType.SculptNew);
+            broadcastMessage(null, StandardMessageType.SculptNew);
             touch();
         }
         return ret;
@@ -531,7 +531,7 @@ public class TileEntityGreenware extends TileEntityCommon implements IFurnaceHea
         }
         parts.remove(id);
         if (!worldObj.isRemote) {
-            broadcastMessage(null, MessageType.SculptRemove, id);
+            broadcastMessage(null, StandardMessageType.SculptRemove, id);
             touch();
         }
     }
@@ -660,7 +660,7 @@ public class TileEntityGreenware extends TileEntityCommon implements IFurnaceHea
         ArrayList<Object> toSend = new ArrayList();
         toSend.add(id);
         selection.write(toSend);
-        broadcastMessage(null, MessageType.SculptMove, toSend.toArray());
+        broadcastMessage(null, StandardMessageType.SculptMove, toSend.toArray());
     }
 
     void changeLump(int id, ClayLump newValue) {
@@ -675,7 +675,7 @@ public class TileEntityGreenware extends TileEntityCommon implements IFurnaceHea
     }
 
     @Override
-    public boolean handleMessageFromServer(MessageType messageType, ByteBuf input) throws IOException {
+    public boolean handleMessageFromServer(StandardMessageType messageType, ByteBuf input) throws IOException {
         if (super.handleMessageFromServer(messageType, input)) {
             return true;
         }

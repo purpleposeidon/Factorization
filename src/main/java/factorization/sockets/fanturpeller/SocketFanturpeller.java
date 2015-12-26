@@ -9,7 +9,7 @@ import factorization.servo.RenderServoMotor;
 import factorization.servo.ServoMotor;
 import factorization.shared.Core;
 import factorization.shared.FzModel;
-import factorization.shared.NetworkFactorization.MessageType;
+import factorization.net.StandardMessageType;
 import factorization.sockets.ISocketHolder;
 import factorization.sockets.TileEntitySocketBase;
 import factorization.util.NumUtil;
@@ -171,7 +171,7 @@ public abstract class SocketFanturpeller extends TileEntitySocketBase implements
                 }
             }
             if (dirty || orig_speed != fanω) {
-                socket.sendMessage(MessageType.FanturpellerSpeed, fanω, isSucking, target_speed);
+                socket.sendMessage(StandardMessageType.FanturpellerSpeed, fanω, isSucking, target_speed);
                 dirty = false;
             }
         }
@@ -238,11 +238,11 @@ public abstract class SocketFanturpeller extends TileEntitySocketBase implements
     
     @Override
     @SideOnly(Side.CLIENT)
-    public boolean handleMessageFromServer(MessageType messageType, ByteBuf input) throws IOException {
+    public boolean handleMessageFromServer(StandardMessageType messageType, ByteBuf input) throws IOException {
         if (super.handleMessageFromServer(messageType, input)) {
             return true;
         }
-        if (messageType == MessageType.FanturpellerSpeed) {
+        if (messageType == StandardMessageType.FanturpellerSpeed) {
             fanω = input.readFloat();
             isSucking = input.readBoolean();
             target_speed = input.readByte();

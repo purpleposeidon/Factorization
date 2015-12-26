@@ -6,12 +6,12 @@ import factorization.api.datahelpers.Share;
 import factorization.fzds.DeltaChunk;
 import factorization.fzds.interfaces.DeltaCapability;
 import factorization.fzds.interfaces.IDeltaChunk;
+import factorization.net.StandardMessageType;
 import factorization.servo.AbstractServoMachine;
 import factorization.servo.MotionHandler;
 import factorization.servo.TileEntityServoRail;
 import factorization.shared.Core;
 import factorization.shared.EntityReference;
-import factorization.shared.NetworkFactorization;
 import factorization.util.SpaceUtil;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.entity.Entity;
@@ -44,12 +44,12 @@ public class StepperEngine extends AbstractServoMachine {
     }
 
     @Override
-    public boolean handleMessageFromClient(NetworkFactorization.MessageType messageType, ByteBuf input) throws IOException {
+    public boolean handleMessageFromClient(StandardMessageType messageType, ByteBuf input) throws IOException {
         return super.handleMessageFromClient(messageType, input);
     }
 
     @Override
-    public boolean handleMessageFromServer(NetworkFactorization.MessageType messageType, ByteBuf input) throws IOException {
+    public boolean handleMessageFromServer(StandardMessageType messageType, ByteBuf input) throws IOException {
         return super.handleMessageFromServer(messageType, input);
     }
 

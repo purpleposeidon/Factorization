@@ -7,8 +7,8 @@ import factorization.api.IRotationalEnergySource;
 import factorization.api.datahelpers.DataHelper;
 import factorization.api.datahelpers.Share;
 import factorization.common.FactoryType;
+import factorization.net.StandardMessageType;
 import factorization.shared.BlockClass;
-import factorization.shared.NetworkFactorization;
 import factorization.shared.TileEntityCommon;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.entity.player.EntityPlayer;
@@ -130,13 +130,13 @@ public class TileEntityShaftGen extends TileEntityCommon implements IChargeCondu
         boolean is_on = line > 0;
         if (is_on != on) {
             on = is_on;
-            broadcastMessage(null, NetworkFactorization.MessageType.ShaftGenState, on);
+            broadcastMessage(null, StandardMessageType.ShaftGenState, on);
         }
     }
 
     @Override
-    public boolean handleMessageFromServer(NetworkFactorization.MessageType messageType, ByteBuf input) throws IOException {
-        if (messageType == NetworkFactorization.MessageType.ShaftGenState) {
+    public boolean handleMessageFromServer(StandardMessageType messageType, ByteBuf input) throws IOException {
+        if (messageType == StandardMessageType.ShaftGenState) {
             on = input.readBoolean();
             getCoord().redraw();
             // ask for a redraw? Nah; things are getting redrawn constantly anyways

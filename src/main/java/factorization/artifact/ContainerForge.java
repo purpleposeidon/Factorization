@@ -1,8 +1,8 @@
 package factorization.artifact;
 
 import factorization.api.Coord;
+import factorization.net.StandardMessageType;
 import factorization.shared.Core;
-import factorization.shared.NetworkFactorization;
 import factorization.util.InvUtil;
 import factorization.util.ItemUtil;
 import net.minecraft.entity.player.EntityPlayer;
@@ -132,7 +132,7 @@ public class ContainerForge extends Container {
         super.detectAndSendChanges();
         if (player.worldObj.isRemote) return;
         String new_err = forge.error_message == null ? "" : forge.error_message;
-        Core.network.sendPlayerMessage(player, NetworkFactorization.MessageType.ArtifactForgeError, new_err, forge.warnings);
+        Core.network.sendPlayerMessage(player, StandardMessageType.ArtifactForgeError, new_err, forge.warnings);
     }
 
     @Override

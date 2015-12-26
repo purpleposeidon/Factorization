@@ -7,9 +7,9 @@ import factorization.api.datahelpers.DataHelper;
 import factorization.api.datahelpers.Share;
 import factorization.charge.TileEntitySolarBoiler;
 import factorization.common.FactoryType;
+import factorization.net.StandardMessageType;
 import factorization.shared.BlockClass;
 import factorization.shared.Core;
-import factorization.shared.NetworkFactorization;
 import factorization.shared.TileEntityCommon;
 import factorization.util.FzUtil;
 import factorization.util.NumUtil;
@@ -194,16 +194,16 @@ public class TileEntitySteamShaft extends TileEntityCommon implements IFluidHand
         if (last_sent_velocity == velocity) return;
         if (NumUtil.significantChange(last_sent_velocity, velocity, 0.10)) {
             last_sent_velocity = velocity;
-            broadcastMessage(null, NetworkFactorization.MessageType.TurbineSpeed, (float) velocity);
+            broadcastMessage(null, StandardMessageType.TurbineSpeed, (float) velocity);
         }
     }
 
     @Override
-    public boolean handleMessageFromServer(NetworkFactorization.MessageType messageType, ByteBuf input) throws IOException {
+    public boolean handleMessageFromServer(StandardMessageType messageType, ByteBuf input) throws IOException {
         if (super.handleMessageFromServer(messageType, input)) {
             return true;
         }
-        if (messageType == NetworkFactorization.MessageType.TurbineSpeed) {
+        if (messageType == StandardMessageType.TurbineSpeed) {
             velocity = input.readFloat();
             return true;
         }

@@ -7,7 +7,7 @@ import factorization.api.datahelpers.DataHelper;
 import factorization.api.datahelpers.Share;
 import factorization.ceramics.TileEntityGreenware;
 import factorization.common.FactoryType;
-import factorization.shared.NetworkFactorization.MessageType;
+import factorization.net.StandardMessageType;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.block.Block;
 import net.minecraft.entity.Entity;
@@ -115,11 +115,11 @@ public class TileEntityExtension extends TileEntityCommon implements IFurnaceHea
     }
 
     @Override
-    public boolean handleMessageFromServer(MessageType messageType, ByteBuf input) throws IOException {
+    public boolean handleMessageFromServer(StandardMessageType messageType, ByteBuf input) throws IOException {
         if (super.handleMessageFromServer(messageType, input)) {
             return true;
         }
-        if (messageType == MessageType.ExtensionInfo) {
+        if (messageType == StandardMessageType.ExtensionInfo) {
             pc = DeltaCoord.read(input);
             return true;
         }

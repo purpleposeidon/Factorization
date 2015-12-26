@@ -1,7 +1,7 @@
 package factorization.artifact;
 
+import factorization.net.StandardMessageType;
 import factorization.shared.Core;
-import factorization.shared.NetworkFactorization;
 import factorization.util.LangUtil;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiTextField;
@@ -73,7 +73,7 @@ public class GuiArtifactForge extends GuiContainer {
 
     void syncFields() {
         EntityPlayer player = Minecraft.getMinecraft().thePlayer;
-        Core.network.sendPlayerMessage(player, NetworkFactorization.MessageType.ArtifactForgeName, name_field.getText(), lore_field.getText());
+        Core.network.sendPlayerMessage(player, StandardMessageType.ArtifactForgeName, name_field.getText(), lore_field.getText());
     }
 
     private static final ResourceLocation bgTexture = Core.getResource("textures/gui/artifactforge.png");

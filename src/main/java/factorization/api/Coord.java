@@ -48,8 +48,8 @@ import factorization.api.datahelpers.DataHelper;
 import factorization.api.datahelpers.IDataSerializable;
 import factorization.shared.BlockHelper;
 import factorization.shared.Core;
-import factorization.shared.FzNetDispatch;
-import factorization.shared.NetworkFactorization.MessageType;
+import factorization.net.FzNetDispatch;
+import factorization.net.StandardMessageType;
 import factorization.shared.TileEntityCommon;
 import factorization.util.FzUtil;
 import factorization.util.ItemUtil;
@@ -465,7 +465,7 @@ public final class Coord implements IDataSerializable, ISaneCoord, Comparable<Co
         if (w.isRemote) {
             redraw();
         } else {
-            Core.network.broadcastMessage(null, this, MessageType.RedrawOnClient);
+            Core.network.broadcastMessage(null, this, StandardMessageType.RedrawOnClient);
         }
     }
     

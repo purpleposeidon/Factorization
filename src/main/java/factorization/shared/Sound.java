@@ -1,7 +1,7 @@
 package factorization.shared;
 
 import factorization.api.Coord;
-import factorization.shared.NetworkFactorization.MessageType;
+import factorization.net.StandardMessageType;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
@@ -68,7 +68,7 @@ public enum Sound {
         if (w.isRemote) {
             return;
         }
-        Core.network.broadcastMessage(null, new Coord(w, pos), MessageType.PlaySound, index);
+        Core.network.broadcastMessage(null, new Coord(w, pos), StandardMessageType.PlaySound, index);
     }
 
     public static void receive(Coord coord, ByteBuf input) {

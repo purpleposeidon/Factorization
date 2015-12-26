@@ -24,7 +24,7 @@ import factorization.api.IFactoryType;
 import factorization.api.datahelpers.DataHelper;
 import factorization.api.datahelpers.Share;
 import factorization.common.FactoryType;
-import factorization.shared.NetworkFactorization.MessageType;
+import factorization.net.StandardMessageType;
 import factorization.util.InvUtil;
 import factorization.util.ItemUtil;
 
@@ -186,7 +186,7 @@ public abstract class TileEntityFactorization extends TileEntityCommon
         if (draw_active != new_active) {
             draw_active = (byte) new_active;
             if (!worldObj.isRemote) {
-                broadcastMessage(null, MessageType.DrawActive, draw_active);
+                broadcastMessage(null, StandardMessageType.DrawActive, draw_active);
             }
         }
     }
@@ -209,11 +209,11 @@ public abstract class TileEntityFactorization extends TileEntityCommon
     }
 
     @Override
-    public boolean handleMessageFromServer(MessageType messageType, ByteBuf input) throws IOException {
+    public boolean handleMessageFromServer(StandardMessageType messageType, ByteBuf input) throws IOException {
         if (super.handleMessageFromServer(messageType, input)) {
             return true;
         }
-        if (messageType == MessageType.DrawActive) {
+        if (messageType == StandardMessageType.DrawActive) {
             draw_active = input.readByte();
             getCoord().redraw();
             return true;

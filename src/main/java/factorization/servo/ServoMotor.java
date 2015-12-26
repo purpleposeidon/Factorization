@@ -37,9 +37,9 @@ import factorization.api.datahelpers.DataInByteBufClientEdited;
 import factorization.api.datahelpers.Share;
 import factorization.common.FactoryType;
 import factorization.shared.Core;
-import factorization.shared.FzNetDispatch;
-import factorization.shared.NetworkFactorization;
-import factorization.shared.NetworkFactorization.MessageType;
+import factorization.net.FzNetDispatch;
+import factorization.net.NetworkFactorization;
+import factorization.net.StandardMessageType;
 import factorization.shared.Sound;
 import factorization.shared.TileEntityCommon;
 import factorization.sockets.GuiDataConfig;
@@ -116,8 +116,8 @@ public class ServoMotor extends AbstractServoMachine implements IInventory, ISoc
     // Networking
 
     @Override
-    public boolean handleMessageFromClient(MessageType messageType, ByteBuf input) throws IOException {
-        if (messageType == MessageType.DataHelperEditOnEntity) {
+    public boolean handleMessageFromClient(StandardMessageType messageType, ByteBuf input) throws IOException {
+        if (messageType == StandardMessageType.DataHelperEditOnEntity) {
             DataInByteBufClientEdited di = new DataInByteBufClientEdited(input);
             socket.serialize("", di);
             markDirty();
@@ -128,7 +128,7 @@ public class ServoMotor extends AbstractServoMachine implements IInventory, ISoc
     
     @Override
     @SideOnly(Side.CLIENT)
-    public boolean handleMessageFromServer(MessageType messageType, ByteBuf input) throws IOException {
+    public boolean handleMessageFromServer(StandardMessageType messageType, ByteBuf input) throws IOException {
         if (super.handleMessageFromServer(messageType, input)) {
             return true;
         }
@@ -152,7 +152,7 @@ public class ServoMotor extends AbstractServoMachine implements IInventory, ISoc
             }
             return true;
         case TileEntityMessageOnEntity:
-            MessageType subMsg = MessageType.read(input);
+            StandardMessageType subMsg = StandardMessageType.read(input);
             return socket.handleMessageFromServer(subMsg, input);
         default:
             return socket.handleMessageFromServer(messageType, input);
@@ -406,7 +406,7 @@ public class ServoMotor extends AbstractServoMachine implements IInventory, ISoc
             return;
         }
         toSend.add(-1);
-        broadcast(MessageType.servo_item, toSend.toArray());
+        broadcast(StandardMessageType.servo_item, toSend.toArray());
         getCurrentPos().getChunk().setChunkModified();
         getNextPos().getChunk().setChunkModified();
     }
@@ -495,11 +495,11 @@ public class ServoMotor extends AbstractServoMachine implements IInventory, ISoc
     }
     
     @Override
-    public void sendMessage(MessageType msgType, Object... msg) {
+    public void sendMessage(StandardMessageType msgType, Object... msg) {
         Object[] buff = new Object[msg.length + 1];
         System.arraycopy(msg, 0, buff, 1, msg.length);
         buff[0] = msgType;
-        FMLProxyPacket toSend = Core.network.entityPacket(this, MessageType.TileEntityMessageOnEntity, buff);
+        FMLProxyPacket toSend = Core.network.entityPacket(this, StandardMessageType.TileEntityMessageOnEntity, buff);
         Core.network.broadcastPacket(null, getCurrentPos(), toSend); 
     }
 

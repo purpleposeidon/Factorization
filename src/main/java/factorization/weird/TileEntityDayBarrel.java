@@ -47,8 +47,8 @@ import factorization.notify.Notice;
 import factorization.notify.NoticeUpdater;
 import factorization.shared.BlockClass;
 import factorization.shared.Core;
-import factorization.shared.NetworkFactorization;
-import factorization.shared.NetworkFactorization.MessageType;
+import factorization.net.NetworkFactorization;
+import factorization.net.StandardMessageType;
 import factorization.shared.Sound;
 import factorization.shared.TileEntityFactorization;
 import factorization.util.DataUtil;
@@ -304,7 +304,7 @@ public class TileEntityDayBarrel extends TileEntityFactorization  {
         }
         if (middleCount == 0) {
             topStack = bottomStack = item = null;
-            updateClients(MessageType.BarrelCount);
+            updateClients(StandardMessageType.BarrelCount);
             markDirty();
             return;
         }
@@ -322,7 +322,7 @@ public class TileEntityDayBarrel extends TileEntityFactorization  {
         }
         topStack.stackSize = bottomStack.stackSize = 0;
         updateStacks();
-        updateClients(MessageType.BarrelCount);
+        updateClients(StandardMessageType.BarrelCount);
         markDirty();
     }
     
@@ -370,10 +370,10 @@ public class TileEntityDayBarrel extends TileEntityFactorization  {
     
     //Network stuff
     
-    FMLProxyPacket getPacket(MessageType messageType) {
-        if (messageType == NetworkFactorization.MessageType.BarrelItem) {
+    FMLProxyPacket getPacket(StandardMessageType messageType) {
+        if (messageType == StandardMessageType.BarrelItem) {
             return Core.network.TEmessagePacket(getCoord(), messageType, NetworkFactorization.nullItem(item), getItemCount());
-        } else if (messageType == NetworkFactorization.MessageType.BarrelCount) {
+        } else if (messageType == StandardMessageType.BarrelCount) {
             return Core.network.TEmessagePacket(getCoord(), messageType, getItemCount());
         } else {
             new IllegalArgumentException("bad MessageType: " + messageType).printStackTrace();
@@ -381,7 +381,7 @@ public class TileEntityDayBarrel extends TileEntityFactorization  {
         }
     }
     
-    void updateClients(MessageType messageType) {
+    void updateClients(StandardMessageType messageType) {
         if (worldObj == null || worldObj.isRemote) {
             return;
         }
@@ -390,11 +390,11 @@ public class TileEntityDayBarrel extends TileEntityFactorization  {
     
     @Override
     @SideOnly(Side.CLIENT)
-    public boolean handleMessageFromServer(MessageType messageType, ByteBuf input) throws IOException {
+    public boolean handleMessageFromServer(StandardMessageType messageType, ByteBuf input) throws IOException {
         if (super.handleMessageFromServer(messageType, input)) {
             return true;
         }
-        if (messageType == MessageType.BarrelDescription) {
+        if (messageType == StandardMessageType.BarrelDescription) {
             item = DataUtil.readStack(input);
             setItemCount(input.readInt());
             woodLog = DataUtil.readStack(input);
@@ -404,18 +404,18 @@ public class TileEntityDayBarrel extends TileEntityFactorization  {
             freeDisplayList();
             return true;
         }
-        if (messageType == MessageType.BarrelCount) {
+        if (messageType == StandardMessageType.BarrelCount) {
             setItemCount(input.readInt());
             freeDisplayList();
             return true;
         }
-        if (messageType == MessageType.BarrelItem) {
+        if (messageType == StandardMessageType.BarrelItem) {
             item = DataUtil.readStack(input);
             setItemCount(input.readInt());
             freeDisplayList();
             return true;
         }
-        if (messageType == MessageType.BarrelDoubleClickHack) {
+        if (messageType == StandardMessageType.BarrelDoubleClickHack) {
             Minecraft mc = Minecraft.getMinecraft();
             mc.playerController.currentItemHittingBlock = mc.thePlayer.getHeldItem();
             return true;
@@ -441,9 +441,9 @@ public class TileEntityDayBarrel extends TileEntityFactorization  {
         if (c != last_mentioned_count) {
             if (last_mentioned_count*c <= 0) {
                 //One of them was 0
-                updateClients(MessageType.BarrelItem);
+                updateClients(StandardMessageType.BarrelItem);
             } else {
-                updateClients(MessageType.BarrelCount);
+                updateClients(StandardMessageType.BarrelCount);
             }
             last_mentioned_count = c;
         }
@@ -626,7 +626,7 @@ public class TileEntityDayBarrel extends TileEntityFactorization  {
         held.stackSize -= take;
         changeItemCount(take);
         if (veryNew) {
-            updateClients(MessageType.BarrelItem);
+            updateClients(StandardMessageType.BarrelItem);
         }
         if (held.stackSize == 0) {
             entityplayer.setCurrentItemOrArmor(0, null);
@@ -829,7 +829,7 @@ public class TileEntityDayBarrel extends TileEntityFactorization  {
         if (ent != null && ent.isDead && !(entityplayer instanceof FakePlayer)) {
             ItemStack newHeld = entityplayer.getHeldItem();
             if (newHeld != origHeldItem) {
-                broadcastMessage(entityplayer, MessageType.BarrelDoubleClickHack);
+                broadcastMessage(entityplayer, StandardMessageType.BarrelDoubleClickHack);
             }
         }
         changeItemCount(-to_remove);

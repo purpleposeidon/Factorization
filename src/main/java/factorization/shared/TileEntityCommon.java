@@ -7,7 +7,8 @@ import factorization.api.datahelpers.DataOutByteBuf;
 import factorization.api.datahelpers.DataOutNBT;
 import factorization.common.FactoryType;
 import factorization.migration.MigrationHelper;
-import factorization.shared.NetworkFactorization.MessageType;
+import factorization.net.FzNetDispatch;
+import factorization.net.StandardMessageType;
 import factorization.util.ItemUtil;
 import factorization.util.SpaceUtil;
 import io.netty.buffer.ByteBuf;
@@ -69,7 +70,7 @@ public abstract class TileEntityCommon extends TileEntity implements ICoord, IFa
         ByteBuf buf = Unpooled.buffer();
         DataOutByteBuf data = new DataOutByteBuf(buf, Side.SERVER);
         try {
-            MessageType.FactoryType.write(buf);
+            StandardMessageType.FactoryType.write(buf);
             buf.writeInt(pos.getX());
             buf.writeInt(pos.getY());
             buf.writeInt(pos.getZ());
@@ -159,16 +160,16 @@ public abstract class TileEntityCommon extends TileEntity implements ICoord, IFa
         }
     }
 
-    public boolean handleMessageFromServer(MessageType messageType, ByteBuf input) throws IOException {
+    public boolean handleMessageFromServer(StandardMessageType messageType, ByteBuf input) throws IOException {
         return false;
     }
 
-    public boolean handleMessageFromClient(MessageType messageType, ByteBuf input) throws IOException {
+    public boolean handleMessageFromClient(StandardMessageType messageType, ByteBuf input) throws IOException {
         // There are no base attributes a client can edit
         return false;
     }
 
-    public void broadcastMessage(EntityPlayer who, MessageType messageType, Object... msg) {
+    public void broadcastMessage(EntityPlayer who, StandardMessageType messageType, Object... msg) {
         Core.network.broadcastMessage(who, getCoord(), messageType, msg);
     }
 

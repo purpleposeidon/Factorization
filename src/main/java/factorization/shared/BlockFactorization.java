@@ -39,7 +39,7 @@ import factorization.api.FzColor;
 import factorization.common.FactoryType;
 import factorization.common.Registry;
 import factorization.notify.Notice;
-import factorization.shared.NetworkFactorization.MessageType;
+import factorization.net.StandardMessageType;
 import factorization.weird.TileEntityDayBarrel;
 
 public class BlockFactorization extends BlockContainer {
@@ -133,7 +133,7 @@ public class BlockFactorization extends BlockContainer {
         Coord here = new Coord(w, pos);
         TileEntityCommon t = here.getTE(TileEntityCommon.class);
         if (t == null && w.isRemote) {
-            Core.network.broadcastMessage(null, here, MessageType.DescriptionRequest);
+            Core.network.broadcastMessage(null, here, StandardMessageType.DescriptionRequest);
             return false;
         }
         if (player.isSneaking()) {

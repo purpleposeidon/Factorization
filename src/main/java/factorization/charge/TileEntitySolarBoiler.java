@@ -7,8 +7,8 @@ import factorization.api.datahelpers.DataHelper;
 import factorization.api.datahelpers.Share;
 import factorization.common.FactoryType;
 import factorization.common.FzConfig;
+import factorization.net.StandardMessageType;
 import factorization.shared.BlockClass;
-import factorization.shared.NetworkFactorization;
 import factorization.shared.TileEntityCommon;
 import factorization.util.FluidUtil;
 import io.netty.buffer.ByteBuf;
@@ -170,7 +170,7 @@ public class TileEntitySolarBoiler extends TileEntityCommon implements IReflecti
             given_heat = 0;
             if (m != last_synced_heat) {
                 last_synced_heat = m;
-                broadcastMessage(null, NetworkFactorization.MessageType.BoilerHeat, last_synced_heat);
+                broadcastMessage(null, StandardMessageType.BoilerHeat, last_synced_heat);
             }
         }
         IFluidHandler aboveTank = getAbove();
@@ -257,8 +257,8 @@ public class TileEntitySolarBoiler extends TileEntityCommon implements IReflecti
     }
 
     @Override
-    public boolean handleMessageFromServer(NetworkFactorization.MessageType messageType, ByteBuf input) throws IOException {
-        if (messageType == NetworkFactorization.MessageType.BoilerHeat) {
+    public boolean handleMessageFromServer(StandardMessageType messageType, ByteBuf input) throws IOException {
+        if (messageType == StandardMessageType.BoilerHeat) {
             given_heat = last_synced_heat = input.readShort();
             return true;
         }

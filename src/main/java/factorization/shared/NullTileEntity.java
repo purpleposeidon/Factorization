@@ -1,7 +1,7 @@
 package factorization.shared;
 
 import factorization.api.Coord;
-import factorization.shared.NetworkFactorization.MessageType;
+import factorization.net.StandardMessageType;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ITickable;
 import net.minecraftforge.fml.common.FMLCommonHandler;
@@ -20,7 +20,7 @@ public class NullTileEntity extends TileEntity implements ITickable {
             Coord here = new Coord(this);
             Core.logFine("%s: asking for description packet", here);
             description_request_delay = 20*fails;
-            Core.network.broadcastMessage(null, here, MessageType.DescriptionRequest);
+            Core.network.broadcastMessage(null, here, StandardMessageType.DescriptionRequest);
             fails++;
         }
     }

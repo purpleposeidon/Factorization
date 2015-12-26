@@ -5,8 +5,8 @@ import factorization.api.FzOrientation;
 import factorization.api.IChargeConductor;
 import factorization.api.IEntityMessage;
 import factorization.api.datahelpers.*;
+import factorization.net.StandardMessageType;
 import factorization.shared.Core;
-import factorization.shared.NetworkFactorization;
 import factorization.util.PlayerUtil;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufInputStream;
@@ -88,7 +88,7 @@ public abstract class AbstractServoMachine extends Entity implements IEntityAddi
         motionHandler.putData(data);
     }
 
-    void broadcast(NetworkFactorization.MessageType message_type, Object... msg) {
+    void broadcast(StandardMessageType message_type, Object... msg) {
         FMLProxyPacket p = Core.network.entityPacket(this, message_type, msg);
         Core.network.broadcastPacket(null, getCurrentPos(), p);
     }
@@ -96,7 +96,7 @@ public abstract class AbstractServoMachine extends Entity implements IEntityAddi
     public void broadcastBriefUpdate() {
         Coord a = getCurrentPos();
         Coord b = getNextPos();
-        broadcast(NetworkFactorization.MessageType.servo_brief, (byte) motionHandler.orientation.ordinal(), motionHandler.speed_b,
+        broadcast(StandardMessageType.servo_brief, (byte) motionHandler.orientation.ordinal(), motionHandler.speed_b,
                 a.x, a.y, a.z,
                 b.x, b.y, b.z,
                 motionHandler.pos_progress);
@@ -105,7 +105,7 @@ public abstract class AbstractServoMachine extends Entity implements IEntityAddi
     public void broadcastFullUpdate() {
         try {
             ByteBuf buf = Unpooled.buffer();
-            Core.network.prefixEntityPacket(buf, this, NetworkFactorization.MessageType.servo_complete);
+            Core.network.prefixEntityPacket(buf, this, StandardMessageType.servo_complete);
             DataHelper data = new DataOutByteBuf(buf, Side.SERVER);
             putData(data);
             FMLProxyPacket toSend = Core.network.entityPacket(buf);
@@ -116,18 +116,18 @@ public abstract class AbstractServoMachine extends Entity implements IEntityAddi
     }
 
     @Override
-    public boolean handleMessageFromClient(NetworkFactorization.MessageType messageType, ByteBuf input) throws IOException {
+    public boolean handleMessageFromClient(StandardMessageType messageType, ByteBuf input) throws IOException {
         return false;
     }
 
     @Override
     @SideOnly(Side.CLIENT)
-    public boolean handleMessageFromServer(NetworkFactorization.MessageType messageType, ByteBuf input) throws IOException {
-        if (messageType == NetworkFactorization.MessageType.servo_stopped) {
+    public boolean handleMessageFromServer(StandardMessageType messageType, ByteBuf input) throws IOException {
+        if (messageType == StandardMessageType.servo_stopped) {
             motionHandler.stopped = input.readBoolean();
             return true;
         }
-        if (messageType == NetworkFactorization.MessageType.servo_brief) {
+        if (messageType == StandardMessageType.servo_brief) {
             Coord a = getCurrentPos();
             Coord b = getNextPos();
             FzOrientation no = FzOrientation.getOrientation(input.readByte());
@@ -145,7 +145,7 @@ public abstract class AbstractServoMachine extends Entity implements IEntityAddi
             }
             return true;
         }
-        if (messageType == NetworkFactorization.MessageType.servo_complete) {
+        if (messageType == StandardMessageType.servo_complete) {
             try {
                 DataHelper data = new DataInByteBuf(input, Side.CLIENT);
                 putData(data);

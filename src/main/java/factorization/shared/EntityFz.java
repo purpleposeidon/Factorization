@@ -2,6 +2,8 @@ package factorization.shared;
 
 import factorization.api.IEntityMessage;
 import factorization.api.datahelpers.*;
+import factorization.net.FzNetDispatch;
+import factorization.net.StandardMessageType;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import net.minecraft.entity.Entity;
@@ -65,7 +67,7 @@ public abstract class EntityFz extends Entity implements IEntityAdditionalSpawnD
         // Rember 'syncWithSpawnPacket'? Broken. In a subtle-ish way. Don't use it. Use this.
         ByteBuf output = Unpooled.buffer();
         try {
-            Core.network.prefixEntityPacket(output, this, NetworkFactorization.MessageType.entity_sync);
+            Core.network.prefixEntityPacket(output, this, StandardMessageType.entity_sync);
             writeSpawnData(output);
             Packet p = Core.network.entityPacket(output);
             FzNetDispatch.addPacketFrom(p, this);
@@ -77,13 +79,13 @@ public abstract class EntityFz extends Entity implements IEntityAdditionalSpawnD
     protected abstract void putData(DataHelper data) throws IOException;
 
     @Override
-    public boolean handleMessageFromClient(NetworkFactorization.MessageType messageType, ByteBuf input) throws IOException {
+    public boolean handleMessageFromClient(StandardMessageType messageType, ByteBuf input) throws IOException {
         return false;
     }
 
     @Override
-    public boolean handleMessageFromServer(NetworkFactorization.MessageType messageType, ByteBuf input) throws IOException {
-        if (messageType == NetworkFactorization.MessageType.entity_sync) {
+    public boolean handleMessageFromServer(StandardMessageType messageType, ByteBuf input) throws IOException {
+        if (messageType == StandardMessageType.entity_sync) {
             putData(new DataInByteBuf(input, Side.CLIENT));
             return true;
         }

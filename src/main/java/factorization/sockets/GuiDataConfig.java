@@ -3,8 +3,8 @@ package factorization.sockets;
 import factorization.api.Coord;
 import factorization.api.datahelpers.*;
 import factorization.shared.Core;
-import factorization.shared.FzNetDispatch;
-import factorization.shared.NetworkFactorization.MessageType;
+import factorization.net.FzNetDispatch;
+import factorization.net.StandardMessageType;
 import factorization.util.FzUtil;
 import factorization.util.LangUtil;
 import io.netty.buffer.ByteBuf;
@@ -433,11 +433,11 @@ public class GuiDataConfig extends GuiScreen {
         DataHelper dop = new DataOutByteBufEdited(buf);
         Coord here = new Coord((TileEntity) ids);
         if (containingEntity == null) {
-            Core.network.prefixTePacket(buf, here, MessageType.DataHelperEdit);
+            Core.network.prefixTePacket(buf, here, StandardMessageType.DataHelperEdit);
             ids.serialize("", dop);
             Core.network.broadcastPacket(mc.thePlayer, here, FzNetDispatch.generate(buf));
         } else {
-            Core.network.prefixEntityPacket(buf, containingEntity, MessageType.DataHelperEditOnEntity);
+            Core.network.prefixEntityPacket(buf, containingEntity, StandardMessageType.DataHelperEditOnEntity);
             ids.serialize("", dop);
             Core.network.broadcastPacket(mc.thePlayer, here, Core.network.entityPacket(buf));
         }

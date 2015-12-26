@@ -8,9 +8,9 @@ import factorization.fzds.DeltaChunk;
 import factorization.fzds.TransferLib;
 import factorization.fzds.interfaces.DeltaCapability;
 import factorization.fzds.interfaces.IDeltaChunk;
+import factorization.net.StandardMessageType;
 import factorization.shared.BlockClass;
 import factorization.shared.EntityReference;
-import factorization.shared.NetworkFactorization;
 import factorization.shared.TileEntityCommon;
 import factorization.util.FzUtil;
 import factorization.util.NumUtil;
@@ -167,18 +167,18 @@ public class TileEntityWaterWheel extends TileEntityCommon implements IRotationa
     }
 
     @Override
-    public boolean handleMessageFromServer(NetworkFactorization.MessageType messageType, ByteBuf input) throws IOException {
+    public boolean handleMessageFromServer(StandardMessageType messageType, ByteBuf input) throws IOException {
         if (super.handleMessageFromServer(messageType, input)) {
             return true;
         }
-        if (messageType == NetworkFactorization.MessageType.MillVelocity) {
+        if (messageType == StandardMessageType.MillVelocity) {
             velocity = input.readDouble();
         }
         return false;
     }
 
     void sendVelocity() {
-        broadcastMessage(null, NetworkFactorization.MessageType.MillVelocity, velocity);
+        broadcastMessage(null, StandardMessageType.MillVelocity, velocity);
     }
 
     private boolean trySpawnMill() {

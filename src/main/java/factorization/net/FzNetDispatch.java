@@ -1,4 +1,4 @@
-package factorization.shared;
+package factorization.net;
 
 import factorization.api.Coord;
 import io.netty.buffer.ByteBuf;
@@ -64,7 +64,7 @@ public class FzNetDispatch {
         final int superlativelyFar = (far*16)*(far*16);
         final int chunkBlockX = chunk.xPosition*16 + 8;
         final int chunkBlockZ = chunk.zPosition*16 + 8;
-        for (EntityPlayerMP player : (Iterable<EntityPlayerMP>) world.playerEntities) {
+        for (EntityPlayerMP player : world.playerEntities) {
             double dx = player.posX - chunkBlockX;
             double dz = player.posZ - chunkBlockZ;
             double dist = dx*dx + dz*dz;

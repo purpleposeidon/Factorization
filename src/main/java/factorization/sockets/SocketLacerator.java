@@ -57,7 +57,7 @@ import factorization.shared.Core;
 import factorization.shared.DropCaptureHandler;
 import factorization.shared.FzModel;
 import factorization.shared.ICaptureDrops;
-import factorization.shared.NetworkFactorization.MessageType;
+import factorization.net.StandardMessageType;
 import factorization.util.InvUtil;
 import factorization.util.ItemUtil;
 import factorization.util.NumUtil;
@@ -155,7 +155,7 @@ public class SocketLacerator extends TileEntitySocketBase implements IChargeCond
         isPowered = powered;
         genericUpdate_implementation(socket, coord, powered);
         if (NumUtil.significantChange(last_shared_speed, speed)) {
-            socket.sendMessage(MessageType.LaceratorSpeed, speed);
+            socket.sendMessage(StandardMessageType.LaceratorSpeed, speed);
             last_shared_speed = speed;
         }
         
@@ -214,11 +214,11 @@ public class SocketLacerator extends TileEntitySocketBase implements IChargeCond
     }
     
     @Override
-    public boolean handleMessageFromServer(MessageType messageType, ByteBuf input) throws IOException {
+    public boolean handleMessageFromServer(StandardMessageType messageType, ByteBuf input) throws IOException {
         if (super.handleMessageFromServer(messageType, input)) {
             return true;
         }
-        if (messageType == MessageType.LaceratorSpeed) {
+        if (messageType == StandardMessageType.LaceratorSpeed) {
             speed = input.readShort();
             return true;
         }

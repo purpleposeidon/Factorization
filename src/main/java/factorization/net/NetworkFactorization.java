@@ -1,4 +1,4 @@
-package factorization.shared;
+package factorization.net;
 
 import factorization.api.Coord;
 import factorization.api.DeltaCoord;
@@ -9,6 +9,9 @@ import factorization.artifact.ContainerForge;
 import factorization.common.Command;
 import factorization.common.FactoryType;
 import factorization.notify.Notice;
+import factorization.shared.Core;
+import factorization.shared.Sound;
+import factorization.shared.TileEntityCommon;
 import factorization.util.DataUtil;
 import factorization.utiligoo.ItemGoo;
 import io.netty.buffer.ByteBuf;
@@ -62,8 +65,8 @@ public class NetworkFactorization {
             } else if (item instanceof byte[]) {
                 byte[] b = (byte[]) item;
                 output.writeBytes(b);
-            } else if (item instanceof MessageType) {
-                MessageType mt = (MessageType) item;
+            } else if (item instanceof StandardMessageType) {
+                StandardMessageType mt = (StandardMessageType) item;
                 mt.write(output);
             } else if (item instanceof NBTTagCompound) {
                 NBTTagCompound tag = (NBTTagCompound) item;
@@ -73,15 +76,32 @@ public class NetworkFactorization {
             }
         }
     }
+
+    public static byte getMessageIndex(Enum msg) {
+        if (msg instanceof StandardMessageType) {
+            return (byte) -msg.ordinal();
+        }
+        return (byte) msg.ordinal();
+    }
+
+    public static Enum getMessage(byte index, Enum[] custom) throws IOException {
+        if (index < 0) {
+            int i = -index;
+            if (i >= StandardMessageType.VALUES.length) throw new IOException("Invalid standard message index " + i);
+            return StandardMessageType.VALUES[i];
+        }
+        if (index >= custom.length) throw new IOException("Invalid custom message index " + index + " for " + custom);
+        return custom[index];
+    }
     
-    public void prefixTePacket(ByteBuf output, Coord src, MessageType messageType) throws IOException {
+    public void prefixTePacket(ByteBuf output, Coord src, StandardMessageType messageType) throws IOException {
         messageType.write(output);
         output.writeInt(src.x);
         output.writeInt(src.y);
         output.writeInt(src.z);
     }
     
-    public FMLProxyPacket TEmessagePacket(Coord src, MessageType messageType, Object... items) {
+    public FMLProxyPacket TEmessagePacket(Coord src, StandardMessageType messageType, Object... items) {
         try {
             ByteBuf output = Unpooled.buffer();
             prefixTePacket(output, src, messageType);
@@ -93,7 +113,7 @@ public class NetworkFactorization {
         }
     }
 
-    public FMLProxyPacket playerMessagePacket(MessageType messageType, Object... items) {
+    public FMLProxyPacket playerMessagePacket(StandardMessageType messageType, Object... items) {
         try {
             ByteBuf output = Unpooled.buffer();
             messageType.write(output);
@@ -105,7 +125,7 @@ public class NetworkFactorization {
         }
     }
     
-    public void prefixEntityPacket(ByteBuf output, Entity to, MessageType messageType) throws IOException {
+    public void prefixEntityPacket(ByteBuf output, Entity to, StandardMessageType messageType) throws IOException {
         messageType.write(output);
         output.writeInt(to.getEntityId());
     }
@@ -114,7 +134,7 @@ public class NetworkFactorization {
         return FzNetDispatch.generate(output);
     }
     
-    public FMLProxyPacket entityPacket(Entity to, MessageType messageType, Object ...items) {
+    public FMLProxyPacket entityPacket(Entity to, StandardMessageType messageType, Object ...items) {
         try {
             ByteBuf output = Unpooled.buffer();
             prefixEntityPacket(output, to, messageType);
@@ -128,17 +148,17 @@ public class NetworkFactorization {
     
     public void sendCommand(EntityPlayer player, Command cmd, int arg) {
         ByteBuf out = Unpooled.buffer();
-        MessageType.factorizeCmdChannel.write(out);
+        StandardMessageType.factorizeCmdChannel.write(out);
         out.writeByte(cmd.id);
         out.writeInt(arg);
         FzNetDispatch.addPacket(FzNetDispatch.generate(out), player);
     }
 
-    public void sendPlayerMessage(EntityPlayer player, MessageType messageType, Object... msg) {
+    public void sendPlayerMessage(EntityPlayer player, StandardMessageType messageType, Object... msg) {
         FzNetDispatch.addPacket(playerMessagePacket(messageType, msg), player);
     }
 
-    public void broadcastMessage(EntityPlayer who, Coord src, MessageType messageType, Object... msg) {
+    public void broadcastMessage(EntityPlayer who, Coord src, StandardMessageType messageType, Object... msg) {
         if (who != null) {
             FMLProxyPacket toSend = TEmessagePacket(src, messageType, msg);
             FzNetDispatch.addPacket(toSend, who);
@@ -156,7 +176,7 @@ public class NetworkFactorization {
         }
     }
 
-    void handleTE(ByteBuf input, MessageType messageType, EntityPlayer player) {
+    void handleTE(ByteBuf input, StandardMessageType messageType, EntityPlayer player) {
         try {
             World world = player.worldObj;
             int x = input.readInt();
@@ -179,7 +199,7 @@ public class NetworkFactorization {
                 return;
             }
             
-            if (messageType == MessageType.DescriptionRequest && !world.isRemote) {
+            if (messageType == StandardMessageType.DescriptionRequest && !world.isRemote) {
                 TileEntityCommon tec = here.getTE(TileEntityCommon.class);
                 if (tec != null) {
                     FzNetDispatch.addPacket(tec.getDescriptionPacket(), player);
@@ -187,12 +207,12 @@ public class NetworkFactorization {
                 return;
             }
             
-            if (messageType == MessageType.RedrawOnClient && world.isRemote) {
+            if (messageType == StandardMessageType.RedrawOnClient && world.isRemote) {
                 world.markBlockForUpdate(pos);
                 return;
             }
 
-            if (messageType == MessageType.FactoryType && world.isRemote) {
+            if (messageType == StandardMessageType.FactoryType && world.isRemote) {
                 //create a Tile Entity of that type there.
 
                 byte ftId = input.readByte();
@@ -248,7 +268,7 @@ public class NetworkFactorization {
         }
     }
 
-    void handleForeignMessage(World world, BlockPos pos, TileEntity ent, MessageType messageType, ByteBuf input) throws IOException {
+    void handleForeignMessage(World world, BlockPos pos, TileEntity ent, StandardMessageType messageType, ByteBuf input) throws IOException {
         if (!world.isRemote) {
             //Nothing for the server to deal with
         } else {
@@ -270,8 +290,8 @@ public class NetworkFactorization {
 
     }
     
-    boolean handleForeignEntityMessage(Entity ent, MessageType messageType, ByteBuf input) throws IOException {
-        if (messageType == MessageType.UtilityGooState) {
+    boolean handleForeignEntityMessage(Entity ent, StandardMessageType messageType, ByteBuf input) throws IOException {
+        if (messageType == StandardMessageType.UtilityGooState) {
             ItemGoo.handlePacket(input);
             return true;
         }
@@ -284,7 +304,7 @@ public class NetworkFactorization {
         Command.fromNetwork(player, s, arg);
     }
     
-    void handleEntity(MessageType messageType, ByteBuf input, EntityPlayer player) {
+    void handleEntity(StandardMessageType messageType, ByteBuf input, EntityPlayer player) {
         try {
             World world = player.worldObj;
             int entityId = input.readInt();
@@ -329,10 +349,8 @@ public class NetworkFactorization {
     }
     
     
-    private static byte message_type_count = 0;
-
-    public void handlePlayer(MessageType mt, ByteBuf input, EntityPlayer player) {
-        if (mt == MessageType.ArtifactForgeName) {
+    public void handlePlayer(StandardMessageType mt, ByteBuf input, EntityPlayer player) {
+        if (mt == StandardMessageType.ArtifactForgeName) {
             String name = ByteBufUtils.readUTF8String(input);
             String lore = ByteBufUtils.readUTF8String(input);
             if (player.openContainer instanceof ContainerForge) {
@@ -342,7 +360,7 @@ public class NetworkFactorization {
                 forge.forge.markDirty();
                 forge.detectAndSendChanges();
             }
-        } else if (mt == MessageType.ArtifactForgeError) {
+        } else if (mt == StandardMessageType.ArtifactForgeError) {
             String err = ByteBufUtils.readUTF8String(input);
             if (player.openContainer instanceof ContainerForge) {
                 ContainerForge forge = (ContainerForge) player.openContainer;
@@ -352,79 +370,6 @@ public class NetworkFactorization {
         }
     }
 
-    public enum MessageType {
-        factorizeCmdChannel,
-        PlaySound,
-        
-        DrawActive, FactoryType, DescriptionRequest, DataHelperEdit, RedrawOnClient, DataHelperEditOnEntity(true), OpenDataHelperGui, OpenDataHelperGuiOnEntity(true),
-        TileEntityMessageOnEntity(true),
-        BarrelDescription, BarrelItem, BarrelCount, BarrelDoubleClickHack,
-        BatteryLevel, LeydenjarLevel,
-        MirrorDescription,
-        TurbineWater, TurbineSpeed,
-        HeaterHeat,
-        LaceratorSpeed,
-        MixerSpeed, FanturpellerSpeed,
-        CrystallizerInfo,
-        WireFace,
-        SculptDescription, SculptNew, SculptMove, SculptRemove, SculptState,
-        ExtensionInfo, RocketState,
-        ServoRailDecor, ServoRailEditComment,
-        CompressionCrafter, CompressionCrafterBeginCrafting, CompressionCrafterBounds,
-        ScissorState,
-        GeneratorParticles,
-        BoilerHeat,
-        ShaftGenState,
-        MillVelocity,
-        MisanthropicSpawn, MisanthropicCharge,
-        
-        // Messages to entities; (true) marks that they are entity messages.
-        servo_brief(true), servo_item(true), servo_complete(true), servo_stopped(true),
-        entity_sync(true),
-        UtilityGooState(true),
-
-        // Messages to/from the player
-        ArtifactForgeName(false, true), ArtifactForgeError(false, true);
-        
-        public boolean isEntityMessage, isPlayerMessage;
-        private static final MessageType[] valuesCache = values();
-        
-        private final byte id;
-        MessageType() {
-            this(false, false);
-        }
-        
-        MessageType(boolean isEntity, boolean isPlayer) {
-            id = message_type_count++;
-            if (id < 0) {
-                throw new IllegalArgumentException("Too many message types!");
-            }
-            isEntityMessage = isEntity;
-            isPlayerMessage = isPlayer;
-        }
-
-        MessageType(boolean isEntity) {
-            this(true, false);
-        }
-        
-        private static MessageType fromId(byte id) {
-            if (id < 0 || id >= valuesCache.length) {
-                return null;
-            }
-            return valuesCache[id];
-        }
-        
-        public static MessageType read(ByteBuf in) {
-            byte b = in.readByte();
-            return fromId(b);
-        }
-
-        public void write(ByteBuf out) {
-            out.writeByte(id);
-        }
-        
-    }
-    
     public static ItemStack nullItem(ItemStack is) {
         return is == null ? EMPTY_ITEMSTACK : is;
     }

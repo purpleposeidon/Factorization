@@ -7,7 +7,7 @@ import factorization.coremodhooks.HandleAttackKeyEvent;
 import factorization.coremodhooks.HandleUseKeyEvent;
 import factorization.shared.*;
 import factorization.shared.Core.TabType;
-import factorization.shared.NetworkFactorization.MessageType;
+import factorization.net.StandardMessageType;
 import factorization.util.FzUtil;
 import factorization.util.InvUtil;
 import factorization.util.InvUtil.FzInv;
@@ -436,7 +436,7 @@ public class ItemGoo extends ItemFactorization implements ISensitiveMesh {
         if (!data.isPlayerOutOfDate(player)) return;
         NBTTagCompound dataTag = new NBTTagCompound();
         data.writeToNBT(dataTag);
-        FMLProxyPacket toSend = Core.network.entityPacket(player, MessageType.UtilityGooState, dataTag);
+        FMLProxyPacket toSend = Core.network.entityPacket(player, StandardMessageType.UtilityGooState, dataTag);
         Core.network.broadcastPacket((EntityPlayer) player, new Coord(player), toSend);
     }
     

@@ -7,7 +7,7 @@ import factorization.common.FactoryType;
 import factorization.notify.Notice;
 import factorization.shared.BlockClass;
 import factorization.shared.Core;
-import factorization.shared.NetworkFactorization.MessageType;
+import factorization.net.StandardMessageType;
 import factorization.shared.TileEntityCommon;
 import factorization.util.InvUtil;
 import factorization.util.InvUtil.FzInv;
@@ -165,20 +165,20 @@ public class TileEntityCompressionCrafter extends TileEntityCommon implements IT
     
     
     @Override
-    public boolean handleMessageFromServer(MessageType messageType, ByteBuf input) throws IOException {
+    public boolean handleMessageFromServer(StandardMessageType messageType, ByteBuf input) throws IOException {
         if (super.handleMessageFromServer(messageType, input)) {
             return true;
         }
-        if (messageType == MessageType.CompressionCrafter) {
+        if (messageType == StandardMessageType.CompressionCrafter) {
             facing = EnumFacing.getFront(input.readByte());
             progress = input.readByte();
             return true;
         }
-        if (messageType == MessageType.CompressionCrafterBeginCrafting) {
+        if (messageType == StandardMessageType.CompressionCrafterBeginCrafting) {
             progress = 1;
             return true;
         }
-        if (messageType == MessageType.CompressionCrafterBounds) {
+        if (messageType == StandardMessageType.CompressionCrafterBounds) {
             upperCorner = new Coord(worldObj, input.readInt(), input.readInt(), input.readInt());
             lowerCorner = new Coord(worldObj, input.readInt(), input.readInt(), input.readInt());
             craftingAxis = SpaceUtil.getOrientation(input.readByte());
@@ -195,7 +195,7 @@ public class TileEntityCompressionCrafter extends TileEntityCommon implements IT
     }
     
     void informClient() {
-        broadcastMessage(null, MessageType.CompressionCrafterBeginCrafting);
+        broadcastMessage(null, StandardMessageType.CompressionCrafterBeginCrafting);
         progress = 1;
         powered = true;
     }

@@ -8,7 +8,7 @@ import factorization.api.datahelpers.Share;
 import factorization.common.FactoryType;
 import factorization.shared.BlockClass;
 import factorization.shared.Core;
-import factorization.shared.NetworkFactorization.MessageType;
+import factorization.net.StandardMessageType;
 import factorization.shared.TileEntityCommon;
 import factorization.util.ItemUtil;
 import factorization.util.NumUtil;
@@ -17,7 +17,6 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ITickable;
-import net.minecraft.util.Vec3;
 
 import java.io.IOException;
 import java.util.Random;
@@ -143,18 +142,18 @@ public class TileEntityLeydenJar extends TileEntityCommon implements IChargeCond
     void updateClients() {
         if (storage != last_storage) {
             if (NumUtil.significantChange(storage, last_storage, 0.05F)) {
-                broadcastMessage(null, MessageType.LeydenjarLevel, storage);
+                broadcastMessage(null, StandardMessageType.LeydenjarLevel, storage);
                 last_storage = storage;
             }
         }
     }
     
     @Override
-    public boolean handleMessageFromServer(MessageType messageType, ByteBuf input) throws IOException {
+    public boolean handleMessageFromServer(StandardMessageType messageType, ByteBuf input) throws IOException {
         if (super.handleMessageFromServer(messageType, input)) {
             return true;
         }
-        if (messageType == MessageType.LeydenjarLevel) {
+        if (messageType == StandardMessageType.LeydenjarLevel) {
             storage = input.readInt();
             return true;
         }

@@ -4,7 +4,7 @@ import factorization.api.Coord;
 import factorization.notify.Notice;
 import factorization.notify.Style;
 import factorization.shared.Core;
-import factorization.shared.NetworkFactorization.MessageType;
+import factorization.net.StandardMessageType;
 import factorization.util.CraftUtil;
 import factorization.util.InvUtil;
 import factorization.util.InvUtil.FzInv;
@@ -586,7 +586,7 @@ public class CompressionState {
             maxZ = Math.max(c.z, maxZ);
         }
         EnumFacing axis = SpaceUtil.rotate(right, up);
-        start.broadcastMessage(null, MessageType.CompressionCrafterBounds, minX, minY, minZ, maxX, maxY, maxZ, (byte) axis.ordinal());
+        start.broadcastMessage(null, StandardMessageType.CompressionCrafterBounds, minX, minY, minZ, maxX, maxY, maxZ, (byte) axis.ordinal());
     }
     
     

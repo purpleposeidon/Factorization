@@ -1,7 +1,8 @@
-package factorization.shared;
+package factorization.net;
 
 import java.io.IOException;
 
+import factorization.shared.Core;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufInputStream;
 
@@ -15,8 +16,6 @@ import net.minecraftforge.fml.common.network.FMLNetworkEvent.ClientCustomPacketE
 import net.minecraftforge.fml.common.network.FMLNetworkEvent.CustomPacketEvent;
 import net.minecraftforge.fml.common.network.FMLNetworkEvent.ServerCustomPacketEvent;
 import net.minecraftforge.fml.common.network.NetworkRegistry;
-
-import factorization.shared.NetworkFactorization.MessageType;
 
 public class FzNetEventHandler {
     static final String channelName = "FZ";
@@ -56,7 +55,7 @@ public class FzNetEventHandler {
     
     private void handlePacket(CustomPacketEvent event, boolean isServer, EntityPlayer player) {
         ByteBuf input = event.packet.payload();
-        MessageType mt = MessageType.read(input);
+        StandardMessageType mt = StandardMessageType.read(input);
         if (mt.isPlayerMessage) {
             Core.network.handlePlayer(mt, input, player);
         } else if (mt.isEntityMessage) {

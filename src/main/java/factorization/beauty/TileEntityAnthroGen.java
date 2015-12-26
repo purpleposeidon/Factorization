@@ -2,6 +2,7 @@ package factorization.beauty;
 
 import java.io.IOException;
 
+import factorization.net.StandardMessageType;
 import io.netty.buffer.ByteBuf;
 
 import net.minecraft.entity.Entity;
@@ -28,7 +29,6 @@ import factorization.charge.TileEntityCaliometricBurner;
 import factorization.common.FactoryType;
 import factorization.shared.BlockClass;
 import factorization.shared.Core;
-import factorization.shared.NetworkFactorization;
 import factorization.shared.TileEntityCommon;
 import factorization.util.InvUtil;
 import factorization.util.ItemUtil;
@@ -73,7 +73,7 @@ public class TileEntityAnthroGen extends TileEntityCommon implements IInventory,
                 now /= max_particle_rate;
                 final int entheasRate = 1 + entheas.getMaxStackSize() - entheas.stackSize;
                 if (entheasRate > 0 && now % entheasRate == 0) {
-                    broadcastMessage(null, NetworkFactorization.MessageType.GeneratorParticles);
+                    broadcastMessage(null, StandardMessageType.GeneratorParticles);
                 }
             }
             return;
@@ -102,8 +102,8 @@ public class TileEntityAnthroGen extends TileEntityCommon implements IInventory,
 
     @SideOnly(Side.CLIENT)
     @Override
-    public boolean handleMessageFromServer(NetworkFactorization.MessageType messageType, ByteBuf input) throws IOException {
-        if (messageType == NetworkFactorization.MessageType.GeneratorParticles) {
+    public boolean handleMessageFromServer(StandardMessageType messageType, ByteBuf input) throws IOException {
+        if (messageType == StandardMessageType.GeneratorParticles) {
             worldObj.spawnParticle(EnumParticleTypes.FLAME, pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5, 0, 0, 0);
             return true;
         }

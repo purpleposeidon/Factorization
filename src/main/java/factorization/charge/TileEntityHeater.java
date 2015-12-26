@@ -5,7 +5,7 @@ import factorization.api.datahelpers.DataHelper;
 import factorization.api.datahelpers.Share;
 import factorization.common.FactoryType;
 import factorization.shared.BlockClass;
-import factorization.shared.NetworkFactorization.MessageType;
+import factorization.net.StandardMessageType;
 import factorization.shared.TileEntityCommon;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.block.Block;
@@ -58,17 +58,17 @@ public class TileEntityHeater extends TileEntityCommon implements IChargeConduct
     void updateClient() {
         int delta = Math.abs(heat - last_heat);
         if (delta > 2) {
-            broadcastMessage(null, MessageType.HeaterHeat, heat);
+            broadcastMessage(null, StandardMessageType.HeaterHeat, heat);
             last_heat = heat;
         }
     }
 
     @Override
-    public boolean handleMessageFromServer(MessageType messageType, ByteBuf input) throws IOException {
+    public boolean handleMessageFromServer(StandardMessageType messageType, ByteBuf input) throws IOException {
         if (super.handleMessageFromServer(messageType, input)) {
             return true;
         }
-        if (messageType == MessageType.HeaterHeat) {
+        if (messageType == StandardMessageType.HeaterHeat) {
             heat = input.readByte();
             return true;
         }

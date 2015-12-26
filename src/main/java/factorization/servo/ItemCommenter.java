@@ -3,7 +3,7 @@ package factorization.servo;
 import factorization.api.Coord;
 import factorization.shared.Core.TabType;
 import factorization.shared.ItemFactorization;
-import factorization.shared.NetworkFactorization.MessageType;
+import factorization.net.StandardMessageType;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.BlockPos;
@@ -29,7 +29,7 @@ public class ItemCommenter extends ItemFactorization {
             return false;
         }
         if (!world.isRemote) {
-            rail.broadcastMessage(player, MessageType.ServoRailEditComment, rail.comment == null ? "" : rail.comment);
+            rail.broadcastMessage(player, StandardMessageType.ServoRailEditComment, rail.comment == null ? "" : rail.comment);
         }
         return true;
     }

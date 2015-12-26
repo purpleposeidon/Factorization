@@ -1,6 +1,6 @@
 package factorization.sockets;
 
-import factorization.shared.NetworkFactorization.MessageType;
+import factorization.net.StandardMessageType;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.Vec3;
 
@@ -8,7 +8,7 @@ import java.util.List;
 
 
 public interface ISocketHolder {
-    public void sendMessage(MessageType msgType, Object ...msg);
+    public void sendMessage(StandardMessageType msgType, Object ...msg);
     public boolean extractCharge(int amount);
     /**
      * @return true if the buffer is not empty

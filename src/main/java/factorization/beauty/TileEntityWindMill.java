@@ -11,6 +11,7 @@ import factorization.fzds.TransferLib;
 import factorization.fzds.interfaces.DeltaCapability;
 import factorization.fzds.interfaces.IDCController;
 import factorization.fzds.interfaces.IDeltaChunk;
+import factorization.net.StandardMessageType;
 import factorization.shared.*;
 import factorization.util.FzUtil;
 import factorization.util.NumUtil;
@@ -174,18 +175,18 @@ public class TileEntityWindMill extends TileEntityCommon implements IRotationalE
     }
 
     @Override
-    public boolean handleMessageFromServer(NetworkFactorization.MessageType messageType, ByteBuf input) throws IOException {
+    public boolean handleMessageFromServer(StandardMessageType messageType, ByteBuf input) throws IOException {
         if (super.handleMessageFromServer(messageType, input)) {
             return true;
         }
-        if (messageType == NetworkFactorization.MessageType.MillVelocity) {
+        if (messageType == StandardMessageType.MillVelocity) {
             velocity = input.readDouble();
         }
         return false;
     }
 
     void sendVelocity() {
-        broadcastMessage(null, NetworkFactorization.MessageType.MillVelocity, velocity);
+        broadcastMessage(null, StandardMessageType.MillVelocity, velocity);
     }
 
     private boolean trySpawnMill() {

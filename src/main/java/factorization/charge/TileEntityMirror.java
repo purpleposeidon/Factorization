@@ -10,7 +10,7 @@ import factorization.common.FzConfig;
 import factorization.shared.BlockClass;
 import factorization.shared.BlockFactorization;
 import factorization.shared.Core;
-import factorization.shared.NetworkFactorization.MessageType;
+import factorization.net.StandardMessageType;
 import factorization.shared.TileEntityCommon;
 import factorization.util.DataUtil;
 import factorization.util.ItemUtil;
@@ -122,7 +122,7 @@ public class TileEntityMirror extends TileEntityCommon implements ITickable {
     void broadcastTargetInfoIfChanged(boolean force) {
         if (force || getTargetInfo() != last_shared) {
             Coord target = reflection_target == null ? new Coord(this) : reflection_target;
-            broadcastMessage(null, MessageType.MirrorDescription, getTargetInfo(), target.x, target.y, target.z, silver);
+            broadcastMessage(null, StandardMessageType.MirrorDescription, getTargetInfo(), target.x, target.y, target.z, silver);
             last_shared = getTargetInfo();
         }
     }
@@ -138,11 +138,11 @@ public class TileEntityMirror extends TileEntityCommon implements ITickable {
     }
 
     @Override
-    public boolean handleMessageFromServer(MessageType messageType, ByteBuf input) throws IOException {
+    public boolean handleMessageFromServer(StandardMessageType messageType, ByteBuf input) throws IOException {
         if (super.handleMessageFromServer(messageType, input)) {
             return true;
         }
-        if (messageType == MessageType.MirrorDescription) {
+        if (messageType == StandardMessageType.MirrorDescription) {
             target_rotation = input.readInt();
             reflection_target = new Coord(this);
             reflection_target.x = input.readInt();

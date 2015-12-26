@@ -13,7 +13,7 @@ import factorization.shared.Core;
 import factorization.shared.DropCaptureHandler;
 import factorization.shared.FzModel;
 import factorization.shared.ICaptureDrops;
-import factorization.shared.NetworkFactorization.MessageType;
+import factorization.net.StandardMessageType;
 import factorization.util.InvUtil;
 import factorization.util.ItemUtil;
 import factorization.util.PlayerUtil;
@@ -130,7 +130,7 @@ public class SocketScissors extends TileEntitySocketBase implements ICaptureDrop
             }
         }
         if (dirty) {
-            socket.sendMessage(MessageType.ScissorState, openCount, sound);
+            socket.sendMessage(StandardMessageType.ScissorState, openCount, sound);
             dirty = false;
         }
     }
@@ -339,11 +339,11 @@ public class SocketScissors extends TileEntitySocketBase implements ICaptureDrop
 
     @Override
     @SideOnly(Side.CLIENT)
-    public boolean handleMessageFromServer(MessageType messageType, ByteBuf input) throws IOException {
+    public boolean handleMessageFromServer(StandardMessageType messageType, ByteBuf input) throws IOException {
         if (super.handleMessageFromServer(messageType, input)) {
             return true;
         }
-        if (messageType == MessageType.ScissorState) {
+        if (messageType == StandardMessageType.ScissorState) {
             openCount = input.readByte();
             sound = input.readBoolean();
             return true;
