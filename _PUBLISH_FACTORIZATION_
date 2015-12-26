@@ -94,7 +94,7 @@ if mediafire_url:
     ).strip() + "\n"
 else:
     LOG += '''
-    [url="{1}"]DropBox[/url]
+    [url="{0}"]DropBox[/url]
     '''.format(
       adfly(dropbox_url)
     ).strip() + "\n"
