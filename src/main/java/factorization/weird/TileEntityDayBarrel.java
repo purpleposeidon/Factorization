@@ -1100,7 +1100,7 @@ public class TileEntityDayBarrel extends TileEntityFactorization implements ISor
     
     @SideOnly(Side.CLIENT)
     final void freeDisplayList() {
-        if (display_list == -1) {
+        if (display_list <= 0) {
             return;
         }
         GLAllocation.deleteDisplayLists(display_list);
