@@ -32,12 +32,10 @@ public class GuiDataConfig extends GuiScreen {
     ArrayList<Field> fields = new ArrayList<Field>();
     int posLabel, posControl;
     boolean changed;
-    boolean orig_f1_state;;
-    
-    static class UsefulButton extends GuiButton {
-        public UsefulButton(int id, int xPos, int yPos, String text) {
-            super(id, xPos, yPos - 4, Minecraft.getMinecraft().fontRendererObj.getStringWidth(text) + 8, 20, text);
-        }
+    boolean orig_f1_state;
+
+    static GuiButton usefulButton(int id, int xPos, int yPos, String text) {
+        return new GuiButton(id, xPos, yPos - 4, Minecraft.getMinecraft().fontRendererObj.getStringWidth(text) + 8, 20, text);
     }
     
     class Field {
@@ -48,7 +46,7 @@ public class GuiDataConfig extends GuiScreen {
         String label;
         int color = 0xFFFFFF;
         
-        ArrayList<UsefulButton> buttons = new ArrayList();
+        ArrayList<GuiButton> buttons = new ArrayList<GuiButton>();
         int buttonPos = 0;
         
         public Field(String name, Object object, int posY) {
@@ -71,8 +69,8 @@ public class GuiDataConfig extends GuiScreen {
             buttons.clear();
         }
         
-        UsefulButton button(int delta, String text) {
-            UsefulButton button = new UsefulButton(delta, buttonPos, posY - 2, text);
+        GuiButton button(int delta, String text) {
+            GuiButton button = usefulButton(delta, buttonPos, posY - 2, text);
             buttons.add(button);
             buttonPos += fontRendererObj.getStringWidth(button.displayString + 10);
             return button;
@@ -81,7 +79,7 @@ public class GuiDataConfig extends GuiScreen {
         void render(int mouseX, int mouseY) {
             renderLabel();
             renderControl(mouseX, mouseY);
-            for (UsefulButton button : buttons) {
+            for (GuiButton button : buttons) {
                 button.drawButton(mc, mouseX, mouseY);
             }
         }
@@ -97,7 +95,7 @@ public class GuiDataConfig extends GuiScreen {
         }
         
         void mouseClick(int mouseX, int mouseY, boolean rightClick) {
-            for (UsefulButton button : buttons) {
+            for (GuiButton button : buttons) {
                 if (button.isMouseOver()) {
                     buttonPressed(button, rightClick);
                     break;
@@ -110,12 +108,12 @@ public class GuiDataConfig extends GuiScreen {
         }
         
         void keyTyped(int keysym, char ch) {}
-        void buttonPressed(UsefulButton button, boolean rightClick) {}
+        void buttonPressed(GuiButton button, boolean rightClick) {}
     }
     
     class BooleanField extends Field {
         boolean val;
-        UsefulButton button;
+        GuiButton button;
         public BooleanField(String name, Object object, int posY) {
             super(name, object, posY);
             val = (Boolean) object;
@@ -128,7 +126,7 @@ public class GuiDataConfig extends GuiScreen {
         }
         
         @Override
-        void buttonPressed(UsefulButton button, boolean rightClick) {
+        void buttonPressed(GuiButton button, boolean rightClick) {
             val = !val;
             object = val;
             initGui();
@@ -180,7 +178,7 @@ public class GuiDataConfig extends GuiScreen {
         }
         
         @Override
-        void buttonPressed(UsefulButton button, boolean rightClick) {
+        void buttonPressed(GuiButton button, boolean rightClick) {
             val += button.id;
             object = val;
             initGui();
@@ -204,7 +202,7 @@ public class GuiDataConfig extends GuiScreen {
     
     class EnumField<E extends Enum> extends Field {
         E val;
-        UsefulButton button;
+        GuiButton button;
         public EnumField(String name, E object, int posY) {
             super(name, object, posY);
             val = object;
@@ -217,7 +215,7 @@ public class GuiDataConfig extends GuiScreen {
         }
         
         @Override
-        void buttonPressed(UsefulButton button, boolean rightClick) {
+        void buttonPressed(GuiButton button, boolean rightClick) {
             int ord = val.ordinal();
             E[] family = (E[]) val.getClass().getEnumConstants();
             if (rightClick) {
@@ -431,9 +429,9 @@ public class GuiDataConfig extends GuiScreen {
     void sendPacket() throws IOException {
         ByteBuf buf = Unpooled.buffer();
         DataHelper dop = new DataOutByteBufEdited(buf);
-        Coord here = new Coord((TileEntity) ids);
+        Coord here = new Coord(te);
         if (containingEntity == null) {
-            Core.network.prefixTePacket(buf, here, StandardMessageType.DataHelperEdit);
+            Core.network.prefixTePacket(buf, te, StandardMessageType.DataHelperEdit);
             ids.serialize("", dop);
             Core.network.broadcastPacket(mc.thePlayer, here, FzNetDispatch.generate(buf));
         } else {

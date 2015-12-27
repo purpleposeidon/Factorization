@@ -7,13 +7,12 @@ import factorization.api.datahelpers.DataOutByteBuf;
 import factorization.api.datahelpers.DataOutNBT;
 import factorization.common.FactoryType;
 import factorization.migration.MigrationHelper;
-import factorization.net.FzNetDispatch;
-import factorization.net.INet;
-import factorization.net.StandardMessageType;
+import factorization.net.*;
 import factorization.util.ItemUtil;
 import factorization.util.SpaceUtil;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
+import io.netty.handler.codec.socks.SocksMessageType;
 import net.minecraft.block.Block;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
@@ -71,7 +70,7 @@ public abstract class TileEntityCommon extends TileEntity implements ICoord, IFa
         ByteBuf buf = Unpooled.buffer();
         DataOutByteBuf data = new DataOutByteBuf(buf, Side.SERVER);
         try {
-            StandardMessageType.FactoryType.write(buf);
+            NetworkFactorization.writeMessage(buf, FzNetEventHandler.TO_TILEENTITY, StandardMessageType.TileFzType);
             buf.writeInt(pos.getX());
             buf.writeInt(pos.getY());
             buf.writeInt(pos.getZ());
@@ -172,7 +171,7 @@ public abstract class TileEntityCommon extends TileEntity implements ICoord, IFa
         return false;
     }
 
-    public void broadcastMessage(EntityPlayer who, StandardMessageType messageType, Object... msg) {
+    public void broadcastMessage(EntityPlayer who, Enum messageType, Object... msg) {
         Core.network.broadcastMessage(who, this, messageType, msg);
     }
 
@@ -334,5 +333,10 @@ public abstract class TileEntityCommon extends TileEntity implements ICoord, IFa
 
     public void blockUpdateTick(Block myself) {
         worldObj.notifyBlockOfStateChange(pos, myself);
+    }
+
+    @Override
+    public Enum[] getMessages() {
+        return null;
     }
 }

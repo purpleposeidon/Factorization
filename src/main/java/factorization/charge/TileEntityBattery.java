@@ -96,11 +96,11 @@ public class TileEntityBattery extends TileEntityCommon implements IChargeConduc
     }
 
     void updateMeter() {
-        Core.network.broadcastMessage(null, getCoord(), StandardMessageType.SetAmount, storage);
+        Core.network.broadcastMessage(null, this, StandardMessageType.SetAmount, storage);
     }
 
     @Override
-    public boolean handleMessageFromServer(StandardMessageType messageType, ByteBuf input) throws IOException {
+    public boolean handleMessageFromServer(Enum messageType, ByteBuf input) throws IOException {
         if (super.handleMessageFromServer(messageType, input)) {
             return true;
         }

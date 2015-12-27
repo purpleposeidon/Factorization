@@ -102,7 +102,7 @@ public class TileEntityAnthroGen extends TileEntityCommon implements IInventory,
 
     @SideOnly(Side.CLIENT)
     @Override
-    public boolean handleMessageFromServer(StandardMessageType messageType, ByteBuf input) throws IOException {
+    public boolean handleMessageFromServer(Enum messageType, ByteBuf input) throws IOException {
         if (messageType == StandardMessageType.ParticleInfo) {
             worldObj.spawnParticle(EnumParticleTypes.FLAME, pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5, 0, 0, 0);
             return true;

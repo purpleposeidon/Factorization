@@ -133,7 +133,7 @@ public class BlockFactorization extends BlockContainer {
         Coord here = new Coord(w, pos);
         TileEntityCommon t = here.getTE(TileEntityCommon.class);
         if (t == null && w.isRemote) {
-            Core.network.broadcastMessage(null, here, StandardMessageType.DescriptionRequest);
+            Core.network.broadcastMessageToBlock(null, here, StandardMessageType.DescriptionRequest);
             return false;
         }
         if (player.isSneaking()) {

@@ -20,7 +20,7 @@ public class NullTileEntity extends TileEntity implements ITickable {
             Coord here = new Coord(this);
             Core.logFine("%s: asking for description packet", here);
             description_request_delay = 20*fails;
-            Core.network.broadcastMessage(null, here, StandardMessageType.DescriptionRequest);
+            Core.network.broadcastMessage(null, this, StandardMessageType.DescriptionRequest);
             fails++;
         }
     }

@@ -3,9 +3,8 @@ package factorization.servo;
 import factorization.api.Coord;
 import factorization.api.FzOrientation;
 import factorization.api.IChargeConductor;
-import factorization.api.IEntityMessage;
 import factorization.api.datahelpers.*;
-import factorization.net.StandardMessageType;
+import factorization.net.INet;
 import factorization.shared.Core;
 import factorization.util.PlayerUtil;
 import io.netty.buffer.ByteBuf;
@@ -27,7 +26,7 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 
 import java.io.IOException;
 
-public abstract class AbstractServoMachine extends Entity implements IEntityAdditionalSpawnData, IEntityMessage {
+public abstract class AbstractServoMachine extends Entity implements IEntityAdditionalSpawnData, INet {
     // Hey,. why doesn't this extend EntityFZ!?
     public final MotionHandler motionHandler = newMotionHandler();
 
@@ -88,7 +87,18 @@ public abstract class AbstractServoMachine extends Entity implements IEntityAddi
         motionHandler.putData(data);
     }
 
-    void broadcast(StandardMessageType message_type, Object... msg) {
+    public enum ServoMessages {
+        servo_brief, servo_item, servo_complete, servo_stopped;
+        public static final ServoMessages[] VALUES = values();
+    }
+
+    @Override
+    public Enum[] getMessages() {
+        return ServoMessages.VALUES;
+    }
+
+
+    void broadcast(Enum message_type, Object... msg) {
         FMLProxyPacket p = Core.network.entityPacket(this, message_type, msg);
         Core.network.broadcastPacket(null, getCurrentPos(), p);
     }
@@ -96,7 +106,7 @@ public abstract class AbstractServoMachine extends Entity implements IEntityAddi
     public void broadcastBriefUpdate() {
         Coord a = getCurrentPos();
         Coord b = getNextPos();
-        broadcast(StandardMessageType.servo_brief, (byte) motionHandler.orientation.ordinal(), motionHandler.speed_b,
+        broadcast(ServoMessages.servo_brief, (byte) motionHandler.orientation.ordinal(), motionHandler.speed_b,
                 a.x, a.y, a.z,
                 b.x, b.y, b.z,
                 motionHandler.pos_progress);
@@ -105,7 +115,7 @@ public abstract class AbstractServoMachine extends Entity implements IEntityAddi
     public void broadcastFullUpdate() {
         try {
             ByteBuf buf = Unpooled.buffer();
-            Core.network.prefixEntityPacket(buf, this, StandardMessageType.servo_complete);
+            Core.network.prefixEntityPacket(buf, this, ServoMessages.servo_complete);
             DataHelper data = new DataOutByteBuf(buf, Side.SERVER);
             putData(data);
             FMLProxyPacket toSend = Core.network.entityPacket(buf);
@@ -116,18 +126,18 @@ public abstract class AbstractServoMachine extends Entity implements IEntityAddi
     }
 
     @Override
-    public boolean handleMessageFromClient(StandardMessageType messageType, ByteBuf input) throws IOException {
+    public boolean handleMessageFromClient(Enum messageType, ByteBuf input) throws IOException {
         return false;
     }
 
     @Override
     @SideOnly(Side.CLIENT)
-    public boolean handleMessageFromServer(StandardMessageType messageType, ByteBuf input) throws IOException {
-        if (messageType == StandardMessageType.servo_stopped) {
+    public boolean handleMessageFromServer(Enum messageType, ByteBuf input) throws IOException {
+        if (messageType == ServoMessages.servo_stopped) {
             motionHandler.stopped = input.readBoolean();
             return true;
         }
-        if (messageType == StandardMessageType.servo_brief) {
+        if (messageType == ServoMessages.servo_brief) {
             Coord a = getCurrentPos();
             Coord b = getNextPos();
             FzOrientation no = FzOrientation.getOrientation(input.readByte());
@@ -145,7 +155,7 @@ public abstract class AbstractServoMachine extends Entity implements IEntityAddi
             }
             return true;
         }
-        if (messageType == StandardMessageType.servo_complete) {
+        if (messageType == ServoMessages.servo_complete) {
             try {
                 DataHelper data = new DataInByteBuf(input, Side.CLIENT);
                 putData(data);

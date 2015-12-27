@@ -465,7 +465,7 @@ public final class Coord implements IDataSerializable, ISaneCoord, Comparable<Co
         if (w.isRemote) {
             redraw();
         } else {
-            Core.network.broadcastMessage(null, this, StandardMessageType.RedrawOnClient);
+            Core.network.broadcastMessageToBlock(null, this, StandardMessageType.RedrawOnClient);
         }
     }
     

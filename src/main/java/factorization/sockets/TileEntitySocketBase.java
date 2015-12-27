@@ -273,7 +273,7 @@ public abstract class TileEntitySocketBase extends TileEntityCommon implements I
     
     @SideOnly(Side.CLIENT)
     @Override
-    public boolean handleMessageFromServer(StandardMessageType messageType, ByteBuf input) throws IOException {
+    public boolean handleMessageFromServer(Enum messageType, ByteBuf input) throws IOException {
         if (super.handleMessageFromServer(messageType, input)) {
             return true;
         }
@@ -290,7 +290,7 @@ public abstract class TileEntitySocketBase extends TileEntityCommon implements I
     }
     
     @Override
-    public boolean handleMessageFromClient(StandardMessageType messageType, ByteBuf input) throws IOException {
+    public boolean handleMessageFromClient(Enum messageType, ByteBuf input) throws IOException {
         if (super.handleMessageFromClient(messageType, input)) {
             return true;
         }
@@ -335,9 +335,9 @@ public abstract class TileEntitySocketBase extends TileEntityCommon implements I
             ByteBuf buf = Unpooled.buffer();
             DataOutByteBuf dop = new DataOutByteBuf(buf, Side.SERVER);
             try {
-                Coord coord = getCoord();
-                Core.network.prefixTePacket(buf, coord, StandardMessageType.OpenDataHelperGui);
+                Core.network.prefixTePacket(buf, this, StandardMessageType.OpenDataHelperGui);
                 serialize("", dop);
+                Coord coord = getCoord();
                 Core.network.broadcastPacket(player, coord, FzNetDispatch.generate(buf));
             } catch (IOException e) {
                 e.printStackTrace();
@@ -385,7 +385,7 @@ public abstract class TileEntitySocketBase extends TileEntityCommon implements I
         ItemStack is = ((TileEntitySocketBase) tec).getCreatingItem();
         if (is == null) return;
         String msg = "Needs {ITEM_NAME}";
-        new Notice(holder, msg).withItem(is).send(player);
+        new Notice(holder, msg).withItem(is).sendTo(player);
     }
     
     protected void replaceWith(TileEntitySocketBase replacement, ISocketHolder socket) {

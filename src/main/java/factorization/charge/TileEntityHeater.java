@@ -64,7 +64,7 @@ public class TileEntityHeater extends TileEntityCommon implements IChargeConduct
     }
 
     @Override
-    public boolean handleMessageFromServer(StandardMessageType messageType, ByteBuf input) throws IOException {
+    public boolean handleMessageFromServer(Enum messageType, ByteBuf input) throws IOException {
         if (super.handleMessageFromServer(messageType, input)) {
             return true;
         }

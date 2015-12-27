@@ -1,6 +1,5 @@
 package factorization.servo;
 
-import factorization.net.StandardMessageType;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiScreen;
@@ -35,7 +34,7 @@ public class GuiCommentEditor extends GuiScreen {
     @Override
     protected void actionPerformed(GuiButton button) {
         rail.comment = rem.getText();
-        rail.broadcastMessage(Minecraft.getMinecraft().thePlayer, StandardMessageType.ServoRailEditComment, rem.getText());
+        rail.broadcastMessage(Minecraft.getMinecraft().thePlayer, TileEntityServoRail.ServoRailMessage.ServoRailEditComment, rem.getText());
         mc.displayGuiScreen(null);
     }
 

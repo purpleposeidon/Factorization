@@ -1,6 +1,7 @@
 package factorization.notify;
 
 import factorization.api.ISaneCoord;
+import factorization.shared.NORELEASE;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Items;
@@ -260,6 +261,7 @@ public class Notice {
     @Deprecated
     public void send(EntityPlayer player) {
         sendTo(player);
+        NORELEASE.fixme("Delete");
     }
     
     /**

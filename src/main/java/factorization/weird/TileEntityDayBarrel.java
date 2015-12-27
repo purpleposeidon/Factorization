@@ -6,7 +6,6 @@ import factorization.api.datahelpers.DataHelper;
 import factorization.api.datahelpers.Share;
 import factorization.common.FactoryType;
 import factorization.net.NetworkFactorization;
-import factorization.net.StandardMessageType;
 import factorization.notify.Notice;
 import factorization.notify.NoticeUpdater;
 import factorization.shared.BlockClass;
@@ -360,9 +359,9 @@ public class TileEntityDayBarrel extends TileEntityFactorization  {
     
     FMLProxyPacket getPacket(BarrelMessage messageType) {
         if (messageType == BarrelMessage.BarrelItem) {
-            return Core.network.TEmessagePacket(getCoord(), messageType, NetworkFactorization.nullItem(item), getItemCount());
+            return Core.network.TEmessagePacket(this, messageType, NetworkFactorization.nullItem(item), getItemCount());
         } else if (messageType == BarrelMessage.BarrelCount) {
-            return Core.network.TEmessagePacket(getCoord(), messageType, getItemCount());
+            return Core.network.TEmessagePacket(this, messageType, getItemCount());
         } else {
             new IllegalArgumentException("bad MessageType: " + messageType).printStackTrace();
             return null;
@@ -378,7 +377,7 @@ public class TileEntityDayBarrel extends TileEntityFactorization  {
     
     @Override
     @SideOnly(Side.CLIENT)
-    public boolean handleMessageFromServer(StandardMessageType messageType, ByteBuf input) throws IOException {
+    public boolean handleMessageFromServer(Enum messageType, ByteBuf input) throws IOException {
         if (super.handleMessageFromServer(messageType, input)) {
             return true;
         }
@@ -819,8 +818,6 @@ public class TileEntityDayBarrel extends TileEntityFactorization  {
         new Notice(notice_target, new NoticeUpdater() {
             @Override
             public void update(Notice msg) {
-                int itemCount = getItemCount();
-                
                 if (item == null && getItemCount() == 0) {
                     msg.setMessage("Empty");
                 } else if (getItemCount() >= getMaxSize()) {
@@ -833,7 +830,7 @@ public class TileEntityDayBarrel extends TileEntityFactorization  {
                     msg.withItem(item).setMessage("%s {ITEM_NAME}{ITEM_INFOS_NEWLINE}", count);
                 }
             }
-        }).send(entityplayer);
+        }).sendTo(entityplayer);
     }
 
     private ItemStack makeStack(int count) {
@@ -904,7 +901,7 @@ public class TileEntityDayBarrel extends TileEntityFactorization  {
         return barrel_item;
     }
     
-    public static ArrayList<ItemStack> barrel_items = new ArrayList();
+    public static ArrayList<ItemStack> barrel_items = new ArrayList<ItemStack>();
     private static ItemStack make(Type type, ItemStack log, ItemStack slab) {
         ItemStack ret = makeBarrel(type, log, slab);
         barrel_items.add(ret);
@@ -1045,7 +1042,7 @@ public class TileEntityDayBarrel extends TileEntityFactorization  {
         return true;
     }
     
-    static final ArrayList<Integer> finalizedDisplayLists = new ArrayList();
+    static final ArrayList<Integer> finalizedDisplayLists = new ArrayList<Integer>();
     
     public static void addFinalizedDisplayList(int display_list) {
         if (display_list <= 0) return;
@@ -1210,5 +1207,10 @@ public class TileEntityDayBarrel extends TileEntityFactorization  {
     enum BarrelMessage {
         BarrelItem, BarrelCount, BarrelDoubleClickHack;
         static final BarrelMessage[] VALUES = values();
+    }
+
+    @Override
+    public Enum[] getMessages() {
+        return BarrelMessage.VALUES;
     }
 }

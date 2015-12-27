@@ -135,7 +135,7 @@ public class TileEntityShaftGen extends TileEntityCommon implements IChargeCondu
     }
 
     @Override
-    public boolean handleMessageFromServer(StandardMessageType messageType, ByteBuf input) throws IOException {
+    public boolean handleMessageFromServer(Enum messageType, ByteBuf input) throws IOException {
         if (messageType == StandardMessageType.SetWorking) {
             on = input.readBoolean();
             getCoord().redraw();

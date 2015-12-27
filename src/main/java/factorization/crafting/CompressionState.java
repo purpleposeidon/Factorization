@@ -14,6 +14,7 @@ import factorization.weird.TileEntityDayBarrel;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.tileentity.TileEntityComparator;
 import net.minecraft.util.EnumFacing;
 
 import java.util.*;
@@ -586,7 +587,7 @@ public class CompressionState {
             maxZ = Math.max(c.z, maxZ);
         }
         EnumFacing axis = SpaceUtil.rotate(right, up);
-        start.broadcastMessage(null, StandardMessageType.CompressionCrafterBounds, minX, minY, minZ, maxX, maxY, maxZ, (byte) axis.ordinal());
+        start.broadcastMessage(null, TileEntityCompressionCrafter.CompactMessage.CompressionCrafterBounds, minX, minY, minZ, maxX, maxY, maxZ, (byte) axis.ordinal());
     }
     
     

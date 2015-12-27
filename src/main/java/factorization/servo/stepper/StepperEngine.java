@@ -44,12 +44,12 @@ public class StepperEngine extends AbstractServoMachine {
     }
 
     @Override
-    public boolean handleMessageFromClient(StandardMessageType messageType, ByteBuf input) throws IOException {
+    public boolean handleMessageFromClient(Enum messageType, ByteBuf input) throws IOException {
         return super.handleMessageFromClient(messageType, input);
     }
 
     @Override
-    public boolean handleMessageFromServer(StandardMessageType messageType, ByteBuf input) throws IOException {
+    public boolean handleMessageFromServer(Enum messageType, ByteBuf input) throws IOException {
         return super.handleMessageFromServer(messageType, input);
     }
 

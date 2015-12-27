@@ -68,7 +68,7 @@ public enum Sound {
         if (w.isRemote) {
             return;
         }
-        Core.network.broadcastMessage(null, new Coord(w, pos), StandardMessageType.PlaySound, index);
+        Core.network.broadcastMessageToBlock(null, new Coord(w, pos), StandardMessageType.PlaySound, index);
     }
 
     public static void receive(Coord coord, ByteBuf input) {

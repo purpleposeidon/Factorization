@@ -1,34 +1,5 @@
 package factorization.servo;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
-import io.netty.buffer.ByteBuf;
-
-import net.minecraft.client.Minecraft;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.inventory.IInventory;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.network.Packet;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.AxisAlignedBB;
-import net.minecraft.util.ChatComponentTranslation;
-import net.minecraft.util.EnumFacing;
-import net.minecraft.util.IChatComponent;
-import net.minecraft.util.MovingObjectPosition;
-import net.minecraft.util.Vec3;
-import net.minecraft.world.World;
-
-import net.minecraftforge.fml.common.network.internal.FMLNetworkHandler;
-import net.minecraftforge.fml.common.network.internal.FMLProxyPacket;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
-
 import factorization.api.Coord;
 import factorization.api.FzColor;
 import factorization.api.datahelpers.DataHelper;
@@ -36,10 +7,10 @@ import factorization.api.datahelpers.DataInByteBuf;
 import factorization.api.datahelpers.DataInByteBufClientEdited;
 import factorization.api.datahelpers.Share;
 import factorization.common.FactoryType;
-import factorization.shared.Core;
 import factorization.net.FzNetDispatch;
 import factorization.net.NetworkFactorization;
 import factorization.net.StandardMessageType;
+import factorization.shared.Core;
 import factorization.shared.Sound;
 import factorization.shared.TileEntityCommon;
 import factorization.sockets.GuiDataConfig;
@@ -51,6 +22,30 @@ import factorization.util.InvUtil;
 import factorization.util.InvUtil.FzInv;
 import factorization.util.ItemUtil;
 import factorization.util.SpaceUtil;
+import io.netty.buffer.ByteBuf;
+import net.minecraft.client.Minecraft;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.inventory.IInventory;
+import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.network.Packet;
+import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.*;
+import net.minecraft.world.World;
+import net.minecraftforge.fml.common.network.internal.FMLNetworkHandler;
+import net.minecraftforge.fml.common.network.internal.FMLProxyPacket;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
+import static factorization.net.StandardMessageType.DataHelperEditOnEntity;
+import static factorization.net.StandardMessageType.TileEntityMessageOnEntity;
 
 public class ServoMotor extends AbstractServoMachine implements IInventory, ISocketHolder {
     public Executioner executioner = new Executioner(this);
@@ -116,8 +111,8 @@ public class ServoMotor extends AbstractServoMachine implements IInventory, ISoc
     // Networking
 
     @Override
-    public boolean handleMessageFromClient(StandardMessageType messageType, ByteBuf input) throws IOException {
-        if (messageType == StandardMessageType.DataHelperEditOnEntity) {
+    public boolean handleMessageFromClient(Enum messageType, ByteBuf input) throws IOException {
+        if (messageType == DataHelperEditOnEntity) {
             DataInByteBufClientEdited di = new DataInByteBufClientEdited(input);
             socket.serialize("", di);
             markDirty();
@@ -128,12 +123,11 @@ public class ServoMotor extends AbstractServoMachine implements IInventory, ISoc
     
     @Override
     @SideOnly(Side.CLIENT)
-    public boolean handleMessageFromServer(StandardMessageType messageType, ByteBuf input) throws IOException {
+    public boolean handleMessageFromServer(Enum messageType, ByteBuf input) throws IOException {
         if (super.handleMessageFromServer(messageType, input)) {
             return true;
         }
-        switch (messageType) {
-        case OpenDataHelperGuiOnEntity:
+        if (messageType.equals(StandardMessageType.OpenDataHelperGuiOnEntity)) {
             if (!worldObj.isRemote) {
                 return false;
             } else {
@@ -142,7 +136,7 @@ public class ServoMotor extends AbstractServoMachine implements IInventory, ISoc
                 Minecraft.getMinecraft().displayGuiScreen(new GuiDataConfig(socket, this));
             }
             return true;
-        case servo_item:
+        } else if (messageType.equals(ServoMessages.servo_item)) {
             while (true) {
                 byte index = input.readByte();
                 if (index < 0) {
@@ -151,19 +145,14 @@ public class ServoMotor extends AbstractServoMachine implements IInventory, ISoc
                 inv[index] = DataUtil.readStack(input);
             }
             return true;
-        case TileEntityMessageOnEntity:
-            StandardMessageType subMsg = StandardMessageType.read(input);
+        } else if (messageType.equals(StandardMessageType.TileEntityMessageOnEntity)) {
+            Enum subMsg = NetworkFactorization.readMessage(input, socket);
             return socket.handleMessageFromServer(subMsg, input);
-        default:
+        } else {
             return socket.handleMessageFromServer(messageType, input);
         }
     }
-    
-    
-    
-    
-    
-    
+
     // Main logic
 
     @Override
@@ -246,7 +235,9 @@ public class ServoMotor extends AbstractServoMachine implements IInventory, ISoc
         Item item = is.getItem();
         if (item instanceof ItemServoRailWidget) {
             ServoComponent sc = ServoComponent.fromItem(is);
-            if (player.isSneaking()) {
+            if (sc == null) {
+                // Frowney face
+            } else if (player.isSneaking()) {
                 if (!sc.onClick(player, this)) {
                     return false;
                 }
@@ -393,7 +384,7 @@ public class ServoMotor extends AbstractServoMachine implements IInventory, ISoc
     
     @Override
     public void markDirty() {
-        ArrayList<Object> toSend = new ArrayList(inv.length*2);
+        ArrayList<Object> toSend = new ArrayList<Object>(inv.length*2);
         for (byte i = 0; i < inv.length; i++) {
             if (ItemUtil.identical(inv[i], inv_last_sent[i])) {
                 continue;
@@ -406,7 +397,7 @@ public class ServoMotor extends AbstractServoMachine implements IInventory, ISoc
             return;
         }
         toSend.add(-1);
-        broadcast(StandardMessageType.servo_item, toSend.toArray());
+        broadcast(ServoMessages.servo_item, toSend.toArray());
         getCurrentPos().getChunk().setChunkModified();
         getNextPos().getChunk().setChunkModified();
     }
@@ -499,7 +490,7 @@ public class ServoMotor extends AbstractServoMachine implements IInventory, ISoc
         Object[] buff = new Object[msg.length + 1];
         System.arraycopy(msg, 0, buff, 1, msg.length);
         buff[0] = msgType;
-        FMLProxyPacket toSend = Core.network.entityPacket(this, StandardMessageType.TileEntityMessageOnEntity, buff);
+        FMLProxyPacket toSend = Core.network.entityPacket(this, TileEntityMessageOnEntity, buff);
         Core.network.broadcastPacket(null, getCurrentPos(), toSend); 
     }
 

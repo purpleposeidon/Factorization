@@ -1,14 +1,21 @@
 package factorization.ceramics;
 
-import java.io.DataInput;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-
-import org.lwjgl.opengl.GL11;
+import factorization.api.Coord;
+import factorization.api.IFurnaceHeatable;
+import factorization.api.Quaternion;
+import factorization.api.datahelpers.DataHelper;
+import factorization.api.datahelpers.DataInNBT;
+import factorization.api.datahelpers.DataOutNBT;
+import factorization.api.datahelpers.Share;
+import factorization.common.FactoryType;
+import factorization.common.FzConfig;
+import factorization.common.ResourceType;
+import factorization.notify.Notice;
+import factorization.shared.*;
+import factorization.util.DataUtil;
+import factorization.util.InvUtil;
+import factorization.util.SpaceUtil;
 import io.netty.buffer.ByteBuf;
-
 import net.minecraft.block.Block;
 import net.minecraft.client.renderer.RenderGlobal;
 import net.minecraft.client.resources.model.IBakedModel;
@@ -21,39 +28,22 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.AxisAlignedBB;
-import net.minecraft.util.EnumFacing;
-import net.minecraft.util.ITickable;
-import net.minecraft.util.MovingObjectPosition;
-import net.minecraft.util.Vec3;
-
+import net.minecraft.util.*;
 import net.minecraftforge.client.event.DrawBlockHighlightEvent;
 import net.minecraftforge.common.util.Constants;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+import org.lwjgl.opengl.GL11;
 
-import factorization.api.Coord;
-import factorization.api.IFurnaceHeatable;
-import factorization.api.Quaternion;
-import factorization.api.datahelpers.DataHelper;
-import factorization.api.datahelpers.DataInNBT;
-import factorization.api.datahelpers.DataOutNBT;
-import factorization.api.datahelpers.Share;
-import factorization.common.FactoryType;
-import factorization.common.FzConfig;
-import factorization.common.ResourceType;
-import factorization.notify.Notice;
-import factorization.shared.BlockClass;
-import factorization.shared.Core;
-import factorization.shared.NORELEASE;
-import factorization.net.StandardMessageType;
-import factorization.shared.TileEntityCommon;
-import factorization.shared.TileEntityExtension;
-import factorization.util.DataUtil;
-import factorization.util.InvUtil;
-import factorization.util.SpaceUtil;
+import java.io.DataInput;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+
+import static factorization.ceramics.TileEntityGreenware.GreenwareMessage.*;
 
 public class TileEntityGreenware extends TileEntityCommon implements IFurnaceHeatable, ITickable {
     public static int MAX_PARTS = 32;
@@ -450,7 +440,7 @@ public class TileEntityGreenware extends TileEntityCommon implements IFurnaceHea
         }
         if (getState() != lastState) {
             lastState = getState();
-            broadcastMessage(null, StandardMessageType.SculptState, lastState.ordinal());
+            broadcastMessage(null, SculptState, lastState.ordinal());
         }
     }
 
@@ -519,7 +509,7 @@ public class TileEntityGreenware extends TileEntityCommon implements IFurnaceHea
         ClayLump ret = new ClayLump().asDefault();
         parts.add(ret);
         if (!worldObj.isRemote) {
-            broadcastMessage(null, StandardMessageType.SculptNew);
+            broadcastMessage(null, SculptNew);
             touch();
         }
         return ret;
@@ -531,7 +521,7 @@ public class TileEntityGreenware extends TileEntityCommon implements IFurnaceHea
         }
         parts.remove(id);
         if (!worldObj.isRemote) {
-            broadcastMessage(null, StandardMessageType.SculptRemove, id);
+            broadcastMessage(null, SculptRemove, id);
             touch();
         }
     }
@@ -660,7 +650,7 @@ public class TileEntityGreenware extends TileEntityCommon implements IFurnaceHea
         ArrayList<Object> toSend = new ArrayList();
         toSend.add(id);
         selection.write(toSend);
-        broadcastMessage(null, StandardMessageType.SculptMove, toSend.toArray());
+        broadcastMessage(null, SculptMove, toSend.toArray());
     }
 
     void changeLump(int id, ClayLump newValue) {
@@ -675,12 +665,11 @@ public class TileEntityGreenware extends TileEntityCommon implements IFurnaceHea
     }
 
     @Override
-    public boolean handleMessageFromServer(StandardMessageType messageType, ByteBuf input) throws IOException {
+    public boolean handleMessageFromServer(Enum messageType, ByteBuf input) throws IOException {
         if (super.handleMessageFromServer(messageType, input)) {
             return true;
         }
-        switch (messageType) {
-        case Description:
+        if (messageType.equals(factorization.net.StandardMessageType.Description)) {
             readStateChange(input);
             front = SpaceUtil.getOrientation(input.readByte());
             setRotation(input.readByte());
@@ -694,20 +683,15 @@ public class TileEntityGreenware extends TileEntityCommon implements IFurnaceHea
                 }
             }
             shouldRenderTesr = getState() == ClayState.WET;
-            break;
-        case SculptMove:
+        } else if (messageType.equals(GreenwareMessage.SculptMove)) {
             updateLump(input.readInt(), new ClayLump().read(input));
-            break;
-        case SculptNew:
+        } else if (messageType.equals(GreenwareMessage.SculptNew)) {
             addLump();
-            break;
-        case SculptRemove:
+        } else if (messageType.equals(GreenwareMessage.SculptRemove)) {
             removeLump(input.readInt());
-            break;
-        case SculptState:
+        } else if (messageType.equals(GreenwareMessage.SculptState)) {
             readStateChange(input);
-            break;
-        default:
+        } else {
             return false;
         }
         cache_dirty = true;
@@ -738,8 +722,6 @@ public class TileEntityGreenware extends TileEntityCommon implements IFurnaceHea
         }
         getCoord().redraw();
     }
-
-    private static final Vec3 zeroVec = new Vec3(0, 0, 0);
 
     @Override
     protected boolean removedByPlayer(EntityPlayer player, boolean willHarvest) {
@@ -823,7 +805,7 @@ public class TileEntityGreenware extends TileEntityCommon implements IFurnaceHea
         if (event.target.subHit == -1) {
             return;
         }
-        Coord c = new Coord(event.player.worldObj, event.target);
+        Coord c = Coord.fromMop(event.player.worldObj, event.target);
         TileEntityGreenware clay = c.getTE(TileEntityGreenware.class);
         if (clay == null) {
             return;
@@ -927,5 +909,15 @@ public class TileEntityGreenware extends TileEntityCommon implements IFurnaceHea
         cache_dirty = false;
         // NORELEASE: Implement. See: TRSRTransformation, FaceBakery
         return null;
+    }
+
+    public enum GreenwareMessage {
+        SculptNew, SculptMove, SculptRemove, SculptState;
+        public static final GreenwareMessage[] VALUES = values();
+    }
+
+    @Override
+    public Enum[] getMessages() {
+        return GreenwareMessage.VALUES;
     }
 }

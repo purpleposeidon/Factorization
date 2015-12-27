@@ -4,55 +4,41 @@ import factorization.shared.NORELEASE;
 import io.netty.buffer.ByteBuf;
 
 public enum StandardMessageType {
+    @Deprecated // 0 refers to a custom value
     UnusedZeroDummy,
     PlaySound,
     DrawActive,
-    FactoryType,
+    TileFzType,
     DescriptionRequest,
     DataHelperEdit,
     RedrawOnClient,
-    DataHelperEditOnEntity(true),
+    DataHelperEditOnEntity,
     OpenDataHelperGui,
-    OpenDataHelperGuiOnEntity(true),
-    TileEntityMessageOnEntity(true),
-    entity_sync(true),
+    OpenDataHelperGuiOnEntity,
+    TileEntityMessageOnEntity,
+    entity_sync,
     factorizeCmdChannel,
+    playerCommand,
 
     // Some generic messages
     Description, DoAction, SetSpeed, SetAmount, SetHeat, ParticleInfo, SetWorking,
 
 
-    SculptNew, SculptMove, SculptRemove, SculptState,
-    ServoRailDecor, ServoRailEditComment,
-    CompressionCrafterBounds,
 
-    // Messages to entities; (true) marks that they are entity messages.
-    servo_brief(true), servo_item(true), servo_complete(true), servo_stopped(true),
-    UtilityGooState(true),
-
-    // Messages to/from the player
-    ArtifactForgeName(false, true), ArtifactForgeError(false, true);
+    // I don't have any where to put these ones
+    UtilityGooState,
+    ArtifactForgeName, ArtifactForgeError;
 
     public static final StandardMessageType[] VALUES = values();
-    public final boolean isEntityMessage, isPlayerMessage;
-
-    private final byte id;
-    StandardMessageType() {
-        this(false, false);
+    static {
         NORELEASE.fixme("TE-specific methods should be moved into the TEs");
     }
 
-    StandardMessageType(boolean isEntity, boolean isPlayer) {
-        id = (byte) ordinal();
+    private final byte id = (byte) ordinal();
+    {
         if (id < 0) {
             throw new IllegalArgumentException("Too many message types!");
         }
-        isEntityMessage = isEntity;
-        isPlayerMessage = isPlayer;
-    }
-
-    StandardMessageType(boolean isEntity) {
-        this(true, false);
     }
 
     private static StandardMessageType fromId(byte id) {
@@ -61,14 +47,4 @@ public enum StandardMessageType {
         }
         return VALUES[id];
     }
-
-    public static StandardMessageType read(ByteBuf in) {
-        byte b = in.readByte();
-        return fromId(b);
-    }
-
-    public void write(ByteBuf out) {
-        out.writeByte(id);
-    }
-
 }

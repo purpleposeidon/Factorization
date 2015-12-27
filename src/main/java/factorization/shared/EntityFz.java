@@ -1,8 +1,8 @@
 package factorization.shared;
 
-import factorization.api.IEntityMessage;
 import factorization.api.datahelpers.*;
 import factorization.net.FzNetDispatch;
+import factorization.net.INet;
 import factorization.net.StandardMessageType;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
@@ -15,7 +15,7 @@ import net.minecraftforge.fml.relauncher.Side;
 
 import java.io.IOException;
 
-public abstract class EntityFz extends Entity implements IEntityAdditionalSpawnData, IEntityMessage {
+public abstract class EntityFz extends Entity implements IEntityAdditionalSpawnData, INet {
 
     public EntityFz(World w) {
         super(w);
@@ -79,16 +79,21 @@ public abstract class EntityFz extends Entity implements IEntityAdditionalSpawnD
     protected abstract void putData(DataHelper data) throws IOException;
 
     @Override
-    public boolean handleMessageFromClient(StandardMessageType messageType, ByteBuf input) throws IOException {
+    public boolean handleMessageFromClient(Enum messageType, ByteBuf input) throws IOException {
         return false;
     }
 
     @Override
-    public boolean handleMessageFromServer(StandardMessageType messageType, ByteBuf input) throws IOException {
+    public boolean handleMessageFromServer(Enum messageType, ByteBuf input) throws IOException {
         if (messageType == StandardMessageType.entity_sync) {
             putData(new DataInByteBuf(input, Side.CLIENT));
             return true;
         }
         return false;
+    }
+
+    @Override
+    public Enum[] getMessages() {
+        return null;
     }
 }

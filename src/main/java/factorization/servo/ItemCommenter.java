@@ -29,7 +29,7 @@ public class ItemCommenter extends ItemFactorization {
             return false;
         }
         if (!world.isRemote) {
-            rail.broadcastMessage(player, StandardMessageType.ServoRailEditComment, rail.comment == null ? "" : rail.comment);
+            rail.broadcastMessage(player, TileEntityServoRail.ServoRailMessage.ServoRailEditComment, rail.comment == null ? "" : rail.comment);
         }
         return true;
     }

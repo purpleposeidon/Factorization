@@ -4,10 +4,10 @@ import factorization.api.Coord;
 import factorization.api.datahelpers.DataHelper;
 import factorization.api.datahelpers.Share;
 import factorization.common.FactoryType;
+import factorization.net.StandardMessageType;
 import factorization.notify.Notice;
 import factorization.shared.BlockClass;
 import factorization.shared.Core;
-import factorization.net.StandardMessageType;
 import factorization.shared.TileEntityCommon;
 import factorization.util.InvUtil;
 import factorization.util.InvUtil.FzInv;
@@ -165,7 +165,7 @@ public class TileEntityCompressionCrafter extends TileEntityCommon implements IT
     
     
     @Override
-    public boolean handleMessageFromServer(StandardMessageType messageType, ByteBuf input) throws IOException {
+    public boolean handleMessageFromServer(Enum messageType, ByteBuf input) throws IOException {
         if (super.handleMessageFromServer(messageType, input)) {
             return true;
         }
@@ -173,7 +173,7 @@ public class TileEntityCompressionCrafter extends TileEntityCommon implements IT
             progress = 1;
             return true;
         }
-        if (messageType == StandardMessageType.CompressionCrafterBounds) {
+        if (messageType == CompactMessage.CompressionCrafterBounds) {
             upperCorner = new Coord(worldObj, input.readInt(), input.readInt(), input.readInt());
             lowerCorner = new Coord(worldObj, input.readInt(), input.readInt(), input.readInt());
             craftingAxis = SpaceUtil.getOrientation(input.readByte());
@@ -266,5 +266,15 @@ public class TileEntityCompressionCrafter extends TileEntityCommon implements IT
     @Override
     public void click(EntityPlayer entityplayer) {
         InvUtil.emptyBuffer(entityplayer, buffer, this);
+    }
+
+    public enum CompactMessage {
+        CompressionCrafterBounds;
+        public static final CompactMessage[] VALUES = values();
+    }
+
+    @Override
+    public Enum[] getMessages() {
+        return CompactMessage.VALUES;
     }
 }

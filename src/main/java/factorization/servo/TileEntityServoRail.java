@@ -11,7 +11,6 @@ import factorization.notify.Notice;
 import factorization.notify.Style;
 import factorization.shared.BlockClass;
 import factorization.shared.Core;
-import factorization.net.StandardMessageType;
 import factorization.shared.TileEntityCommon;
 import factorization.util.ItemUtil;
 import factorization.util.SpaceUtil;
@@ -275,11 +274,11 @@ public class TileEntityServoRail extends TileEntityCommon implements IChargeCond
     
     @Override
     @SideOnly(Side.CLIENT)
-    public boolean handleMessageFromServer(StandardMessageType messageType, ByteBuf input) throws IOException {
+    public boolean handleMessageFromServer(Enum messageType, ByteBuf input) throws IOException {
         if (super.handleMessageFromServer(messageType, input)) {
             return true;
         }
-        if (messageType == StandardMessageType.ServoRailDecor) {
+        if (messageType == ServoRailMessage.ServoRailDecor) {
             color = FzColor.fromOrdinal(input.readByte());
             comment = input.readBoolean() ? "x" : null;
             boolean has_decor = input.readBoolean();
@@ -294,7 +293,7 @@ public class TileEntityServoRail extends TileEntityCommon implements IChargeCond
             }
             return true;
         }
-        if (messageType == StandardMessageType.ServoRailEditComment) {
+        if (messageType == ServoRailMessage.ServoRailEditComment) {
             comment = ByteBufUtils.readUTF8String(input);
             FMLCommonHandler.instance().showGuiScreen(new GuiCommentEditor(this));
             return true;
@@ -303,8 +302,8 @@ public class TileEntityServoRail extends TileEntityCommon implements IChargeCond
     }
     
     @Override
-    public boolean handleMessageFromClient(StandardMessageType messageType, ByteBuf input) throws IOException {
-        if (messageType == StandardMessageType.ServoRailEditComment) {
+    public boolean handleMessageFromClient(Enum messageType, ByteBuf input) throws IOException {
+        if (messageType == ServoRailMessage.ServoRailEditComment) {
             comment = ByteBufUtils.readUTF8String(input);
             return true;
         }
@@ -344,5 +343,15 @@ public class TileEntityServoRail extends TileEntityCommon implements IChargeCond
             return true;
         }
         return false;
+    }
+
+    enum ServoRailMessage {
+        ServoRailDecor, ServoRailEditComment;
+        public static final ServoRailMessage[] VALUES = values();
+    }
+
+    @Override
+    public Enum[] getMessages() {
+        return ServoRailMessage.VALUES;
     }
 }
