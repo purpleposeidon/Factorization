@@ -284,41 +284,8 @@ public class BlockFactorization extends BlockContainer {
         //mechanics
         put(itemList, reg.hinge);
 
-        //Barrels
-        if (todaysBarrels != null) {
-            itemList.addAll(todaysBarrels);
-        } else if (reg.daybarrel != null) {
-            Calendar cal = Calendar.getInstance();
-            int doy = cal.get(Calendar.DAY_OF_YEAR) - 1 /* start at 0, not 1 */;
-
-            ReservoirSampler<ItemStack> barrelPool = new ReservoirSampler<ItemStack>(1, new Random(doy));
-            todaysBarrels = new ArrayList<ItemStack>();
-
-            for (ItemStack barrel : TileEntityDayBarrel.barrel_items) {
-                TileEntityDayBarrel.Type type = TileEntityDayBarrel.getUpgrade(barrel);
-                if (type == TileEntityDayBarrel.Type.NORMAL) {
-                    barrelPool.give(barrel);
-                } else if (type == TileEntityDayBarrel.Type.CREATIVE) {
-                    todaysBarrels.add(barrel);
-                }
-            }
-
-            TileEntityDayBarrel rep = new TileEntityDayBarrel();
-            for (ItemStack barrel : barrelPool.getSamples()) {
-                rep.loadFromStack(barrel);
-                for (TileEntityDayBarrel.Type type : TileEntityDayBarrel.Type.values()) {
-                    if (type == TileEntityDayBarrel.Type.CREATIVE) continue;
-                    if (type == TileEntityDayBarrel.Type.LARGER) continue;
-                    rep.type = type;
-                    todaysBarrels.add(rep.getPickedBlock());
-                }
-            }
-        }
-
         put(itemList, reg.legendarium);
     }
-
-    ArrayList<ItemStack> todaysBarrels = null;
 
 
     @Override

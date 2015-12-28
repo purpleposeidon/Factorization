@@ -36,11 +36,8 @@ import factorization.util.DataUtil;
 import factorization.util.FzUtil;
 import factorization.util.ItemUtil;
 import factorization.utiligoo.ItemGoo;
-import factorization.weird.*;
-import factorization.weird.barrel.BarrelUpgradeRecipes;
-import factorization.weird.barrel.ItemDayBarrel;
-import factorization.weird.barrel.ItemMinecartDayBarrel;
-import factorization.weird.barrel.TileEntityDayBarrel;
+import factorization.weird.ItemPocketTable;
+import factorization.weird.barrel.*;
 import factorization.weird.poster.ItemSpawnPoster;
 import factorization.wrath.BlockLightAir;
 import factorization.wrath.TileEntityWrathLamp;
@@ -173,9 +170,6 @@ public class Registry {
     public ItemManSandwich manSandwich;
 
     public Material materialMachine = new Material(MapColor.ironColor);
-    public Material materialBarrel = new Material(MapColor.woodColor) {{
-        setAdventureModeExempt();
-    }};
 
     WorldgenManager worldgenManager;
 
@@ -191,7 +185,7 @@ public class Registry {
     
     public void makeBlocks() {
         legacy_factory_block = new BlockFactorization(materialMachine);
-        factory_block_barrel = new BlockFactorization(materialBarrel);
+        factory_block_barrel = new BlockBarrel();
         for (BlockClass bc : BlockClass.values()) {
             if (bc == BlockClass.Barrel) {
                 bc.block = factory_block_barrel;
