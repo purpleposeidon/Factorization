@@ -39,7 +39,7 @@ public class RenderMessages extends RenderMessagesProxy {
     }
     
     @Override
-    public void addMessage(Object locus, ItemStack item, String format, String... args) {
+    synchronized public void addMessage(Object locus, ItemStack item, String format, String... args) {
         EntityPlayer player = Minecraft.getMinecraft().thePlayer;
         if (player == null || player.worldObj == null) {
             return;
@@ -76,7 +76,7 @@ public class RenderMessages extends RenderMessagesProxy {
         messages.add(msg);
     }
     
-    void updateMessage(ClientMessage update) {
+    private void updateMessage(ClientMessage update) {
         for (ClientMessage msg : messages) {
             if (!msg.locus.equals(update.locus)) {
                 continue;
@@ -96,7 +96,7 @@ public class RenderMessages extends RenderMessagesProxy {
         doRenderMessages(event); // Forge events are too hard for eclipse to hot-swap?
     }
     
-    void doRenderMessages(RenderWorldLastEvent event) {
+    synchronized void doRenderMessages(RenderWorldLastEvent event) {
         World w = Minecraft.getMinecraft().theWorld;
         if (w == null) {
             return;
