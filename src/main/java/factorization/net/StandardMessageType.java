@@ -17,7 +17,6 @@ public enum StandardMessageType {
     OpenDataHelperGuiOnEntity,
     TileEntityMessageOnEntity,
     entity_sync,
-    factorizeCmdChannel,
     playerCommand,
 
     // Some generic messages

@@ -27,7 +27,7 @@ public class InspirationManager {
     static InspirationManager instance;
     static final StatBase lastArtifact = new StatBase("factorization.artifact.last", new ChatComponentTranslation("factorization.artifact.last.name")).registerStat();
     static final StatBase beenNotified = new StatBase("factorization.artifact.notified", new ChatComponentTranslation("factorization.artifact.notify.name")).registerStat();
-    static final boolean DEBUG = Core.dev_environ;
+    static final boolean DEBUG = false;
     private static final int days_per_artifact = DEBUG ? 1 : 30;
     private static final int check_tick_rate = DEBUG ? 20 : 20 * 60 * 15;
 

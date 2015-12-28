@@ -168,7 +168,7 @@ public class NetworkFactorization {
     
     public void sendCommand(EntityPlayer player, Command cmd, int arg) {
         ByteBuf out = Unpooled.buffer();
-        writeMessage(out, FzNetEventHandler.TO_PLAYER, StandardMessageType.factorizeCmdChannel);
+        writeMessage(out, FzNetEventHandler.TO_PLAYER, StandardMessageType.playerCommand);
         out.writeByte(cmd.id);
         out.writeInt(arg);
         FzNetDispatch.addPacket(FzNetDispatch.generate(out), player);

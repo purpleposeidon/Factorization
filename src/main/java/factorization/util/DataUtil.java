@@ -163,7 +163,10 @@ public final class DataUtil {
     }
 
     public static String getName(Item it) {
-        return GameData.getItemRegistry().getNameForObject(it).toString();
+        if (it == null) return null;
+        ResourceLocation nameForObject = GameData.getItemRegistry().getNameForObject(it);
+        if (nameForObject == null) return null;
+        return nameForObject.toString();
     }
 
     public static String getName(ItemStack is) {
