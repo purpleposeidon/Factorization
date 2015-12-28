@@ -234,7 +234,8 @@ public class Registry {
         is_lightair = new ItemStack(lightair_block);
         
         
-        Core.tab(legacy_factory_block, Core.TabType.BLOCKS);
+        Core.tab(legacy_factory_block, TabType.BLOCKS);
+        Core.tab(factory_block_barrel, TabType.TOOLS);
         Core.tab(resource_block, TabType.BLOCKS);
         
         worldgenManager = new WorldgenManager();

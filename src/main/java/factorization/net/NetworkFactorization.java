@@ -98,11 +98,12 @@ public class NetworkFactorization {
     }
     
     public void prefixTePacket(ByteBuf output, TileEntity src, Enum messageType) throws IOException {
-        output.writeByte(getMessageIndex(messageType));
+        output.writeByte(FzNetEventHandler.TO_TILEENTITY);
         BlockPos at = src.getPos();
         output.writeInt(at.getX());
         output.writeInt(at.getY());
         output.writeInt(at.getZ());
+        output.writeByte(getMessageIndex(messageType));
     }
     
     public FMLProxyPacket TEmessagePacket(TileEntity src, Enum messageType, Object... items) {
