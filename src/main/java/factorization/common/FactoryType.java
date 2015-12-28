@@ -17,7 +17,7 @@ import factorization.shared.TileEntityFactorization;
 import factorization.sockets.*;
 import factorization.sockets.fanturpeller.BlowEntities;
 import factorization.sockets.fanturpeller.PumpLiquids;
-import factorization.weird.TileEntityDayBarrel;
+import factorization.weird.barrel.TileEntityDayBarrel;
 import factorization.wrath.TileEntityWrathLamp;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.fml.common.registry.GameRegistry;

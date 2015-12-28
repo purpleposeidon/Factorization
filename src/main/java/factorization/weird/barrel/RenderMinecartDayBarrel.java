@@ -1,4 +1,4 @@
-package factorization.weird;
+package factorization.weird.barrel;
 
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.renderer.entity.RenderManager;

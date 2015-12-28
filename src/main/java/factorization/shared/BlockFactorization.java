@@ -40,7 +40,7 @@ import factorization.common.FactoryType;
 import factorization.common.Registry;
 import factorization.notify.Notice;
 import factorization.net.StandardMessageType;
-import factorization.weird.TileEntityDayBarrel;
+import factorization.weird.barrel.TileEntityDayBarrel;
 
 public class BlockFactorization extends BlockContainer {
     public static final IProperty<BlockClass> BLOCK_CLASS = PropertyEnum.create("blockclass", BlockClass.class);

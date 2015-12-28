@@ -15,7 +15,6 @@ import java.util.Set;
 
 import factorization.net.FzNetEventHandler;
 import factorization.net.NetworkFactorization;
-import net.minecraft.tileentity.TileEntity;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -76,7 +75,7 @@ import factorization.servo.stepper.StepperEngine;
 import factorization.truth.minecraft.DistributeDocs;
 import factorization.util.DataUtil;
 import factorization.util.FzUtil;
-import factorization.weird.EntityMinecartDayBarrel;
+import factorization.weird.barrel.EntityMinecartDayBarrel;
 import factorization.weird.poster.EntityPoster;
 import factorization.wrath.TileEntityWrathLamp;
 

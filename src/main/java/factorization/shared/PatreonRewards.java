@@ -1,7 +1,7 @@
 package factorization.shared;
 
 import factorization.util.ItemUtil;
-import factorization.weird.TileEntityDayBarrel;
+import factorization.weird.barrel.TileEntityDayBarrel;
 import net.minecraft.item.ItemStack;
 
 import java.util.ArrayList;

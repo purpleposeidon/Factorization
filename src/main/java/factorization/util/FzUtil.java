@@ -6,15 +6,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Map;
 
-import com.google.common.base.Function;
-import com.google.common.base.Joiner;
-import com.google.common.collect.Iterables;
 import com.google.common.collect.Multimap;
 
 import net.minecraft.block.Block;
-import net.minecraft.block.properties.IProperty;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
@@ -39,7 +34,7 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 
 import factorization.api.Coord;
 import factorization.shared.Core;
-import factorization.weird.TileEntityDayBarrel;
+import factorization.weird.barrel.TileEntityDayBarrel;
 
 public class FzUtil {
 

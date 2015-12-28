@@ -1,4 +1,4 @@
-package factorization.weird;
+package factorization.weird.barrel;
 
 import com.mojang.authlib.GameProfile;
 import factorization.common.FactoryType;

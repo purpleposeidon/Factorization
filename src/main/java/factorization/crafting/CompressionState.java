@@ -4,17 +4,15 @@ import factorization.api.Coord;
 import factorization.notify.Notice;
 import factorization.notify.Style;
 import factorization.shared.Core;
-import factorization.net.StandardMessageType;
 import factorization.util.CraftUtil;
 import factorization.util.InvUtil;
 import factorization.util.InvUtil.FzInv;
 import factorization.util.ItemUtil;
 import factorization.util.SpaceUtil;
-import factorization.weird.TileEntityDayBarrel;
+import factorization.weird.barrel.TileEntityDayBarrel;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.tileentity.TileEntityComparator;
 import net.minecraft.util.EnumFacing;
 
 import java.util.*;

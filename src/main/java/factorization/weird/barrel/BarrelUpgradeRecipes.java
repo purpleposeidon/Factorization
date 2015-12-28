@@ -1,4 +1,4 @@
-package factorization.weird;
+package factorization.weird.barrel;
 
 import factorization.shared.Core;
 import net.minecraft.init.Blocks;
@@ -11,7 +11,7 @@ import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.oredict.OreDictionary;
 import net.minecraftforge.oredict.RecipeSorter;
 
-import static factorization.weird.TileEntityDayBarrel.Type.*;
+import static factorization.weird.barrel.TileEntityDayBarrel.Type.*;
 
 public class BarrelUpgradeRecipes {
     private static final ItemStack oakLog = new ItemStack(Blocks.log);

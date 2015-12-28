@@ -1,4 +1,4 @@
-package factorization.weird;
+package factorization.weird.barrel;
 
 import org.lwjgl.opengl.GL11;
 
@@ -22,7 +22,6 @@ import factorization.shared.Core;
 import factorization.shared.FzIcons;
 import factorization.util.RenderUtil;
 import factorization.util.SpaceUtil;
-import factorization.weird.TileEntityDayBarrel.Type;
 
 public class TileEntityDayBarrelRenderer extends TileEntitySpecialRenderer<TileEntityDayBarrel> {
 
@@ -42,7 +41,7 @@ public class TileEntityDayBarrelRenderer extends TileEntitySpecialRenderer<TileE
         quat.glRotate();
         GL11.glRotatef(90, 0, 1, 0);
         GL11.glTranslated(0.25, 0.25 - 1.0/16.0, -1.0/128.0);
-        if (barrel.type == Type.HOPPING) {
+        if (barrel.type == TileEntityDayBarrel.Type.HOPPING) {
             double time = barrel.getWorld().getTotalWorldTime();
             if (Math.sin(time/20) > 0) {
                 double delta = Math.max(0, Math.sin(time/2)/16);
@@ -77,7 +76,7 @@ public class TileEntityDayBarrelRenderer extends TileEntitySpecialRenderer<TileE
         GL11.glPushMatrix();
         GL11.glTranslated(x, y, z);
 
-        if (FzConfig.render_barrel_use_displaylists && barrel.type != Type.HOPPING && barrel.should_use_display_list && barrel != FactoryType.DAYBARREL.getRepresentative()) {
+        if (FzConfig.render_barrel_use_displaylists && barrel.type != TileEntityDayBarrel.Type.HOPPING && barrel.should_use_display_list && barrel != FactoryType.DAYBARREL.getRepresentative()) {
             if (barrel.display_list == -1) {
                 RenderUtil.checkGLError("FZ -- before barrel display list update. Someone left us a mess!");
                 if (barrel.display_list == -1) {
@@ -129,7 +128,7 @@ public class TileEntityDayBarrelRenderer extends TileEntitySpecialRenderer<TileE
         if (barrel.canLose()) {
             t = "!" + t + "!";
         }
-        if (barrel.type == Type.CREATIVE) {
+        if (barrel.type == TileEntityDayBarrel.Type.CREATIVE) {
             t = "i";
         }
         return t;

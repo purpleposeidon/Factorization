@@ -1,4 +1,4 @@
-package factorization.weird;
+package factorization.weird.barrel;
 
 import factorization.api.Coord;
 import factorization.api.FzOrientation;
@@ -551,10 +551,10 @@ public class TileEntityDayBarrel extends TileEntityFactorization  {
     
     long lastClick = -1000; //NOTE: This really should be player-specific!
 
-    //* 			Left-Click		Right-Click
-    //* No Shift:	Remove stack	Add item
-    //* Shift:		Remove 1 item	Use item
-    //* Double:						Add all but 1 item
+    //*             Left-Click         Right-Click
+    //* No Shift:   Remove stack       Add item
+    //* Shift:      Remove 1 item      Use item
+    //* Double:                        Add all but 1 item
 
     @Override
     public boolean activate(EntityPlayer entityplayer, EnumFacing side) {
@@ -1121,8 +1121,8 @@ public class TileEntityDayBarrel extends TileEntityFactorization  {
         if (orientation.top.getDirectionVec().getY() == 1) {
             /*
              * The purpose of this is two-fold:
-             * 		- It renders at the wrong spot when pointing upwards on a vertical face
-             * 		- You totally don't really need it in this case
+             *     - It renders at the wrong spot when pointing upwards on a vertical face
+             *     - You totally don't really need it in this case
              */
             return;
         }

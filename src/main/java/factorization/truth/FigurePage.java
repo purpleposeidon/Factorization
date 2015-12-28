@@ -3,7 +3,7 @@ package factorization.truth;
 import factorization.shared.Core;
 import factorization.truth.api.AbstractPage;
 import factorization.util.RenderUtil;
-import factorization.weird.TileEntityDayBarrel;
+import factorization.weird.barrel.TileEntityDayBarrel;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.GLAllocation;
 import net.minecraft.client.renderer.chunk.CompiledChunk;

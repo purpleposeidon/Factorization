@@ -63,7 +63,7 @@ import factorization.util.ItemUtil;
 import factorization.util.NumUtil;
 import factorization.util.PlayerUtil;
 import factorization.util.SpaceUtil;
-import factorization.weird.TileEntityDayBarrel;
+import factorization.weird.barrel.TileEntityDayBarrel;
 
 public class SocketLacerator extends TileEntitySocketBase implements IChargeConductor, ICaptureDrops, ITickable {
     Charge charge = new Charge(this);
