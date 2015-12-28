@@ -237,8 +237,6 @@ public class Core {
 
         String truth = "factorization.truth";
         FMLInterModComms.sendMessage(truth, "AddRecipeCategory", "Lacerator|factorization.oreprocessing.TileEntityGrinder|recipes");
-        FMLInterModComms.sendMessage(truth, "AddRecipeCategory", "Crystallizer|factorization.oreprocessing.TileEntityCrystallizer|recipes");
-        FMLInterModComms.sendMessage(truth, "AddRecipeCategory", "Slag Furnace|factorization.oreprocessing.TileEntitySlagFurnace$SlagRecipes|smeltingResults");
         FMLInterModComms.sendMessage(truth, "DocVar", "fzverion=" + Core.version);
         //compatLoader.loadCompat();
         //compatLoader.preinit(event);

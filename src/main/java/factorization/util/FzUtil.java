@@ -1,15 +1,11 @@
 package factorization.util;
 
-import java.awt.Toolkit;
-import java.awt.datatransfer.StringSelection;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.Collection;
-
 import com.google.common.collect.Multimap;
-
+import factorization.api.Coord;
+import factorization.shared.Core;
+import factorization.weird.barrel.TileEntityDayBarrel;
 import net.minecraft.block.Block;
+import net.minecraft.block.properties.IProperty;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
@@ -25,16 +21,19 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.BlockPos;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
-
 import net.minecraftforge.common.DimensionManager;
+import net.minecraftforge.common.property.IUnlistedProperty;
 import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
-import factorization.api.Coord;
-import factorization.shared.Core;
-import factorization.weird.barrel.TileEntityDayBarrel;
+import java.awt.*;
+import java.awt.datatransfer.StringSelection;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.Collection;
 
 public class FzUtil {
 
@@ -247,5 +246,13 @@ public class FzUtil {
     @SideOnly(Side.CLIENT)
     public static TextureAtlasSprite getIcon(Block b) {
         return getIcon(new ItemStack(b));
+    }
+
+    public static IProperty[] props(IProperty... ret) {
+        return ret;
+    }
+
+    public static IUnlistedProperty[] uprops(IUnlistedProperty... ret) {
+        return ret;
     }
 }

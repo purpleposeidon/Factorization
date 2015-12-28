@@ -87,8 +87,11 @@ public enum BlockClass implements IStringSerializable, Comparable<BlockClass> {
     }
 
     public BlockClass harvest(String tool, int level) {
-        IBlockState ibs = this.block.getDefaultState().withProperty(BlockFactorization.BLOCK_CLASS, this);
-        this.block.setHarvestLevel(tool, level, ibs);
+        IBlockState defaultState = this.block.getDefaultState();
+        if (defaultState.getProperties().containsKey(BlockFactorization.BLOCK_CLASS)) {
+            IBlockState ibs = defaultState.withProperty(BlockFactorization.BLOCK_CLASS, this);
+            this.block.setHarvestLevel(tool, level, ibs);
+        }
         return this;
     }
 

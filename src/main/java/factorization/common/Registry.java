@@ -91,7 +91,7 @@ public class Registry {
     public ItemBlockResource item_resource;
     @Deprecated // Each TE has its own block now. This block continues to exist for converting blocks & items.
     public BlockFactorization legacy_factory_block;
-    public BlockFactorization factory_block_barrel;
+    public BlockBarrel factory_block_barrel;
     public BlockFactorization factory_rendering_block;
     public Block serverTraceHelper = null, clientTraceHelper = null;
     public BlockLightAir lightair_block;

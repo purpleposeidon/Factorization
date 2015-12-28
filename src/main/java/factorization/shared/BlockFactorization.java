@@ -1,12 +1,12 @@
 package factorization.shared;
 
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Random;
-
+import factorization.api.Coord;
+import factorization.api.FzColor;
+import factorization.common.FactoryType;
+import factorization.common.Registry;
+import factorization.net.StandardMessageType;
+import factorization.notify.Notice;
+import factorization.weird.barrel.TileEntityDayBarrel;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockContainer;
 import net.minecraft.block.material.Material;
@@ -21,26 +21,12 @@ import net.minecraft.item.EnumDyeColor;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.AxisAlignedBB;
-import net.minecraft.util.BlockPos;
-import net.minecraft.util.ChatComponentText;
-import net.minecraft.util.EnumFacing;
-import net.minecraft.util.EnumWorldBlockLayer;
-import net.minecraft.util.MovingObjectPosition;
-import net.minecraft.util.Vec3;
+import net.minecraft.util.*;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
-
 import net.minecraftforge.fml.common.network.internal.FMLProxyPacket;
 
-import factorization.algos.ReservoirSampler;
-import factorization.api.Coord;
-import factorization.api.FzColor;
-import factorization.common.FactoryType;
-import factorization.common.Registry;
-import factorization.notify.Notice;
-import factorization.net.StandardMessageType;
-import factorization.weird.barrel.TileEntityDayBarrel;
+import java.util.*;
 
 public class BlockFactorization extends BlockContainer {
     public static final IProperty<BlockClass> BLOCK_CLASS = PropertyEnum.create("blockclass", BlockClass.class);
@@ -300,10 +286,13 @@ public class BlockFactorization extends BlockContainer {
         return world.getBlockState(pos).getValue(BLOCK_CLASS).isNormal();
     }
 
+    public BlockClass getClass(IBlockAccess world, BlockPos pos) {
+        return world.getBlockState(pos).getValue(BLOCK_CLASS);
+    }
+
     @Override
     public int getFlammability(IBlockAccess world, BlockPos pos, EnumFacing face) {
-        BlockClass bc = world.getBlockState(pos).getValue(BLOCK_CLASS);
-        if (BlockClass.Barrel == bc) {
+        if (BlockClass.Barrel == getClass(world, pos)) {
             TileEntityCommon te = get(world, pos);
             if (te instanceof TileEntityDayBarrel) {
                 return ((TileEntityDayBarrel) te).getFlamability();
@@ -320,8 +309,7 @@ public class BlockFactorization extends BlockContainer {
 
     @Override
     public int getLightValue(IBlockAccess world, BlockPos pos) {
-        IBlockState bs = world.getBlockState(pos);
-        BlockClass c = bs.getValue(BLOCK_CLASS);
+        BlockClass c = getClass(world, pos);
         if (c == null) return 0;
         if (c == BlockClass.MachineDynamicLightable || c == BlockClass.MachineLightable) {
             TileEntityCommon tec = get(world, pos);
@@ -332,8 +320,7 @@ public class BlockFactorization extends BlockContainer {
 
     @Override
     public float getBlockHardness(World world, BlockPos pos) {
-        BlockClass bc = world.getBlockState(pos).getValue(BLOCK_CLASS);
-        return bc.hardness;
+        return getClass(world, pos).hardness;
     }
 
 
@@ -408,8 +395,7 @@ public class BlockFactorization extends BlockContainer {
 
     @Override
     public int getRenderType() {
-        // "The type of render function called. 3 for standard block models, 2 for TESR's, 1 for liquids, -1 is no render"
-        return 3; // Well, this is what enchanting tables return.
+        return 3;
     }
 
     public static final float lamp_pad = 1F / 16F;
@@ -475,7 +461,7 @@ public class BlockFactorization extends BlockContainer {
     public boolean shouldSideBeRendered(IBlockAccess world, BlockPos pos, EnumFacing side) {
         IBlockState blockState = world.getBlockState(pos);
         if (blockState.getBlock()  != this) return false; // Uh
-        BlockClass bc = blockState.getValue(BLOCK_CLASS);
+        BlockClass bc = getClass(world, pos);
         return !bc.isNormal() || super.shouldSideBeRendered(world, pos, side);
     }
 

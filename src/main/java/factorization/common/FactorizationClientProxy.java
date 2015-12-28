@@ -204,12 +204,13 @@ public class FactorizationClientProxy extends FactorizationProxy {
                 Core.registry.gargantuan_block,
                 Core.registry.blastBlock,
                 Core.registry.mantlerock_block,
+                Core.registry.factory_block_barrel
         }) {
             setItemBlockModel(b, 0, "inventory");
         }
         modelForMetadata(Core.registry.resource_block, "copper_ore", "silver_block", "lead_block", "dark_iron_block", "copper_block");
 
-        for (Block b : new Block[]{
+        for (Block b : new Block[] {
                 Core.registry.resource_block,
                 Core.registry.colossal_block,
         }) {

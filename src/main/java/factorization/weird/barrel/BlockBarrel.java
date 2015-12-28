@@ -1,11 +1,15 @@
 package factorization.weird.barrel;
 
 import factorization.algos.ReservoirSampler;
+import factorization.idiocy.StupidExtendedProperty;
+import factorization.idiocy.WrappedItemStack;
 import factorization.shared.BlockClass;
 import factorization.shared.BlockFactorization;
 import factorization.shared.Core;
+import factorization.util.FzUtil;
 import net.minecraft.block.material.MapColor;
 import net.minecraft.block.material.Material;
+import net.minecraft.block.state.BlockState;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.item.Item;
@@ -14,6 +18,8 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.BlockPos;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
+import net.minecraftforge.common.property.ExtendedBlockState;
+import net.minecraftforge.common.property.IExtendedBlockState;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -29,13 +35,40 @@ public class BlockBarrel extends BlockFactorization {
     }
 
     @Override
+    public BlockClass getClass(IBlockAccess world, BlockPos pos) {
+        return BlockClass.Barrel;
+    }
+
+    @Override
+    public int getMetaFromState(IBlockState state) {
+        return 0;
+    }
+
+    @Override
+    public IBlockState getStateFromMeta(int meta) {
+        return getDefaultState();
+    }
+
+    @Override
     public TileEntity createNewTileEntity(World worldIn, int meta) {
         return new TileEntityDayBarrel();
     }
 
+    public static final StupidExtendedProperty<WrappedItemStack> BARREL_SLAB = new StupidExtendedProperty<WrappedItemStack>("slab", WrappedItemStack.class);
+    public static final StupidExtendedProperty<WrappedItemStack> BARREL_LOG = new StupidExtendedProperty<WrappedItemStack>("log", WrappedItemStack.class);
+
     @Override
-    public IBlockState getActualState(IBlockState state, IBlockAccess worldIn, BlockPos pos) {
-        return state.withProperty(BLOCK_CLASS, BlockClass.Barrel);
+    protected BlockState createBlockState() {
+        return new ExtendedBlockState(this, FzUtil.props(), FzUtil.uprops(BARREL_SLAB, BARREL_LOG));
+    }
+
+    @Override
+    public IBlockState getExtendedState(IBlockState state, IBlockAccess world, BlockPos pos) {
+        TileEntityDayBarrel barrel = (TileEntityDayBarrel) world.getTileEntity(pos);
+        IExtendedBlockState extendedBS = (IExtendedBlockState) super.getExtendedState(state, world, pos);
+        return extendedBS
+                .withProperty(BARREL_LOG, new WrappedItemStack(barrel.woodLog))
+                .withProperty(BARREL_SLAB, new WrappedItemStack(barrel.woodSlab));
     }
 
     @Override
@@ -75,4 +108,9 @@ public class BlockBarrel extends BlockFactorization {
     }
 
     ArrayList<ItemStack> todaysBarrels = null;
+
+    @Override
+    public int getRenderType() {
+        return 3;
+    }
 }
