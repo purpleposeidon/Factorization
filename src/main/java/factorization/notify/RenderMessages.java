@@ -1,34 +1,26 @@
 package factorization.notify;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-
-import org.lwjgl.opengl.GL11;
-
+import factorization.api.ISaneCoord;
+import factorization.shared.NORELEASE;
+import factorization.util.RenderUtil;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
-import net.minecraft.client.renderer.Tessellator;
-import net.minecraft.client.renderer.WorldRenderer;
+import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.entity.RenderItem;
-import net.minecraft.client.renderer.texture.TextureManager;
-import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.AxisAlignedBB;
-import net.minecraft.util.BlockPos;
-import net.minecraft.util.IChatComponent;
-import net.minecraft.util.StatCollector;
-import net.minecraft.util.Vec3;
+import net.minecraft.util.*;
 import net.minecraft.world.World;
-
 import net.minecraftforge.client.ClientCommandHandler;
 import net.minecraftforge.client.event.RenderWorldLastEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import org.lwjgl.opengl.GL11;
 
-import factorization.api.ISaneCoord;
+import java.util.ArrayList;
+import java.util.Iterator;
 
 public class RenderMessages extends RenderMessagesProxy {
     static ArrayList<ClientMessage> messages = new ArrayList<ClientMessage>();
@@ -104,22 +96,23 @@ public class RenderMessages extends RenderMessagesProxy {
         if (messages.size() == 0) {
             return;
         }
+        RenderUtil.checkGLError("A mod has a rendering error");
         Iterator<ClientMessage> it = messages.iterator();
         long approximateNow = System.currentTimeMillis();
         Entity camera = Minecraft.getMinecraft().getRenderViewEntity();
         double cx = camera.lastTickPosX + (camera.posX - camera.lastTickPosX) * (double) event.partialTicks;
         double cy = camera.lastTickPosY + (camera.posY - camera.lastTickPosY) * (double) event.partialTicks;
         double cz = camera.lastTickPosZ + (camera.posZ - camera.lastTickPosZ) * (double) event.partialTicks;
-        GL11.glPushMatrix();
-        GL11.glTranslated(-cx, -cy, -cz);
+        GlStateManager.pushMatrix();
         GL11.glPushAttrib(GL11.GL_BLEND);
-        
-        GL11.glDepthMask(false);
+        GlStateManager.translate(-cx, -cy, -cz);
+
+        GlStateManager.depthMask(false);
         GL11.glDisable(GL11.GL_DEPTH_TEST);
-        GL11.glEnable(GL11.GL_BLEND);
-        GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
-        GL11.glColor4f(1, 1, 1, 1);
-        
+        GlStateManager.enableBlend();
+        GlStateManager.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
+        GlStateManager.color(1, 1, 1, 1);
+
         while (it.hasNext()) {
             ClientMessage m = it.next();
             long timeExisted = approximateNow - m.creationTime;
@@ -134,7 +127,7 @@ public class RenderMessages extends RenderMessagesProxy {
                     continue;
                 }
             }
-            GL11.glDisable(GL11.GL_LIGHTING);
+            GlStateManager.disableLighting();
             float lifeLeft = (m.lifeTime - timeExisted)/1000F;
             float opacity = 1F;
             if (lifeLeft < 1) {
@@ -145,11 +138,12 @@ public class RenderMessages extends RenderMessagesProxy {
                 renderMessage(m, event.partialTicks, opacity, cx, cy, cz);
             }
         }
-        GL11.glEnable(GL11.GL_LIGHTING);
-        GL11.glColor4f(1, 1, 1, 1);
+        GlStateManager.enableLighting();
+        GlStateManager.color(1, 1, 1, 1);
 
-        GL11.glPopMatrix();
-        GL11.glPopAttrib();
+        GlStateManager.popMatrix();
+        GlStateManager.popAttrib();
+        RenderUtil.checkGLError("Notification render error!");
     }
 
     RenderItem renderItem = Minecraft.getMinecraft().getRenderItem();
@@ -166,8 +160,8 @@ public class RenderMessages extends RenderMessagesProxy {
 
         float scaling = 1.6F / 60F;
         scaling *= 2F / 3F;
-        GL11.glPushMatrix();
-        
+        GlStateManager.pushMatrix();
+
         int lineCount = lines.length;
         float centeringOffset = 0;
         if (m.show_item) {
@@ -201,44 +195,45 @@ public class RenderMessages extends RenderMessagesProxy {
                 y += 0.5F;
             }
         }
-        GL11.glTranslatef(x + 0.5F, y, z + 0.5F);
+        GlStateManager.translate(x + 0.5F, y, z + 0.5F);
         Minecraft mc = Minecraft.getMinecraft();
         float pvx = mc.getRenderManager().playerViewX;
-        float pvy = mc.getRenderManager().playerViewY;
+        float pvy = -mc.getRenderManager().playerViewY;
         if (mc.gameSettings.thirdPersonView == 2) {
             pvx = -pvx;
         }
-        GL11.glRotatef(pvy, 0.0F, 1.0F, 0.0F);
-        GL11.glRotatef(pvx, 1.0F, 0.0F, 0.0F);
-        GL11.glScalef(-scaling, -scaling, scaling);
-        GL11.glTranslatef(0, -10 * lineCount, 0);
+        GlStateManager.rotate(pvy, 0.0F, 1.0F, 0.0F);
+        GlStateManager.rotate(pvx, 1.0F, 0.0F, 0.0F);
+        GlStateManager.scale(-scaling, -scaling, scaling);
+        GlStateManager.translate(0, -10 * lineCount, 0);
         
         {
-            Tessellator tessI = Tessellator.getInstance();
-            WorldRenderer tess = tessI.getWorldRenderer();
-            int var16 = (lineCount - 1) * 10;
+            int lineHeight = (lineCount - 1) * 10;
 
-            GL11.glDisable(GL11.GL_TEXTURE_2D);
-            tess.begin(GL11.GL_QUADS, DefaultVertexFormats.BLOCK);
             double item_add = 0;
             if (m.show_item) {
                 item_add += 24;
             }
             float c = 0.0F;
-            tess.color(c, c, c, Math.min(opacity, 0.2F));
-            tess.pos((double) (-halfWidth - 1), (double) (-1), 0.0D);
-            tess.pos((double) (-halfWidth - 1), (double) (8 + var16), 0.0D);
-            tess.pos((double) (halfWidth + 1 + item_add), (double) (8 + var16), 0.0D);
-            tess.pos((double) (halfWidth + 1 + item_add), (double) (-1), 0.0D);
-            tessI.draw();
-            GL11.glEnable(GL11.GL_TEXTURE_2D);
+            GlStateManager.disableTexture2D();
+            GlStateManager.color(c, c, c, Math.min(opacity, 0.2F));
+            double Z = 0.001D;
+            // TODO: Why didn't the tessellator work?
+            // TODO: Use 2 tessellator + 2 draw calls to do all notice rendering
+            GL11.glBegin(GL11.GL_QUADS);
+            GL11.glVertex3d(-halfWidth - 1, -1, Z);
+            GL11.glVertex3d(-halfWidth - 1, 8 + lineHeight, Z);
+            GL11.glVertex3d(halfWidth + 1 + item_add, 8 + lineHeight, Z);
+            GL11.glVertex3d(halfWidth + 1 + item_add, -1, Z);
+            GL11.glEnd();
+            GlStateManager.enableTexture2D();
         }
 
         {
             int i = 0;
             int B = (int) (0xFF * Math.min(1, 0.5F + opacity));
             int color = (B << 16) + (B << 8) + B + ((int) (0xFF*opacity) << 24);
-            GL11.glTranslatef(0, centeringOffset, 0);
+            GlStateManager.translate(0, centeringOffset, 0);
             for (String line : lines) {
                 fr.drawString(line, -fr.getStringWidth(line) / 2, 10 * i, color);
                 i++;
@@ -248,10 +243,9 @@ public class RenderMessages extends RenderMessagesProxy {
             if (m.show_item) {
                 //GL11.glColor4f(opacity, opacity, opacity, opacity);
                 // :| Friggin' resets the transparency don't it...
-                GL11.glTranslatef(0, -centeringOffset, 0);
-                TextureManager re = mc.renderEngine;
-                
-                GL11.glTranslatef((float) (halfWidth + 4), -lineCount/2, 0);
+                GlStateManager.translate(0, -centeringOffset, 0);
+
+                GlStateManager.translate((float) (halfWidth + 4), -lineCount/2, 0);
                 renderItem.zLevel -= 50;
                 GL11.glPushAttrib(GL11.GL_ENABLE_BIT);
                 renderItem.renderItemAndEffectIntoGUI(m.item, 0, 0);
@@ -259,7 +253,7 @@ public class RenderMessages extends RenderMessagesProxy {
                 renderItem.zLevel += 50;
             }
         }
-        GL11.glPopMatrix();
+        GlStateManager.popMatrix();
 
     }
     
