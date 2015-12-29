@@ -32,10 +32,7 @@ import factorization.sockets.fanturpeller.SocketFanturpeller;
 import factorization.util.DataUtil;
 import factorization.utiligoo.GooRenderer;
 import factorization.weird.*;
-import factorization.weird.barrel.EntityMinecartDayBarrel;
-import factorization.weird.barrel.RenderMinecartDayBarrel;
-import factorization.weird.barrel.TileEntityDayBarrel;
-import factorization.weird.barrel.TileEntityDayBarrelRenderer;
+import factorization.weird.barrel.*;
 import factorization.weird.poster.EntityPoster;
 import factorization.weird.poster.RenderPoster;
 import factorization.wrath.TileEntityWrathLamp;
@@ -61,6 +58,7 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.MovingObjectPosition;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
+import net.minecraftforge.client.event.ModelBakeEvent;
 import net.minecraftforge.client.event.TextureStitchEvent;
 import net.minecraftforge.client.model.ModelLoader;
 import net.minecraftforge.fml.client.registry.ClientRegistry;
@@ -204,7 +202,6 @@ public class FactorizationClientProxy extends FactorizationProxy {
                 Core.registry.gargantuan_block,
                 Core.registry.blastBlock,
                 Core.registry.mantlerock_block,
-                Core.registry.factory_block_barrel
         }) {
             setItemBlockModel(b, 0, "inventory");
         }
@@ -229,6 +226,13 @@ public class FactorizationClientProxy extends FactorizationProxy {
         // MinecraftForgeClient.registerItemRenderer(Core.registry.daybarrel, new DayBarrelItemRenderer(renderBarrel));
         // MinecraftForgeClient.registerItemRenderer(Core.registry.brokenTool, new RenderBrokenArtifact());
         Core.loadBus(GooRenderer.INSTANCE);
+    }
+
+    @SubscribeEvent
+    public void registerComplicatedModels(ModelBakeEvent event) {
+        BarrelModel model = new BarrelModel();
+        event.modelRegistry.putObject(new ModelResourceLocation("factorization:FzBlockBarrel#normal"), model);
+        event.modelRegistry.putObject(new ModelResourceLocation("factorization:FzBlockBarrel#inventory"), model);
     }
 
     @Override

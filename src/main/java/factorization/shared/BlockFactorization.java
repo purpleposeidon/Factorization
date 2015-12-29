@@ -23,6 +23,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.*;
 import net.minecraft.world.IBlockAccess;
+import net.minecraft.world.IWorldAccess;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.common.network.internal.FMLProxyPacket;
 
@@ -283,11 +284,13 @@ public class BlockFactorization extends BlockContainer {
 
     @Override
     public boolean isNormalCube(IBlockAccess world, BlockPos pos) {
-        return world.getBlockState(pos).getValue(BLOCK_CLASS).isNormal();
+        return getClass(world, pos).isNormal();
     }
 
     public BlockClass getClass(IBlockAccess world, BlockPos pos) {
-        return world.getBlockState(pos).getValue(BLOCK_CLASS);
+        IBlockState bs = world.getBlockState(pos);
+        if (bs.getBlock() != this) return BlockClass.Default;
+        return bs.getValue(BLOCK_CLASS);
     }
 
     @Override
@@ -389,8 +392,7 @@ public class BlockFactorization extends BlockContainer {
 
     @Override
     public boolean isPassable(IBlockAccess world, BlockPos pos) {
-        BlockClass bc = world.getBlockState(pos).getValue(BLOCK_CLASS);
-        return bc.passable;
+        return getClass(world, pos).passable;
     }
 
     @Override
@@ -459,9 +461,7 @@ public class BlockFactorization extends BlockContainer {
 
     @Override
     public boolean shouldSideBeRendered(IBlockAccess world, BlockPos pos, EnumFacing side) {
-        IBlockState blockState = world.getBlockState(pos);
-        if (blockState.getBlock()  != this) return false; // Uh
-        BlockClass bc = getClass(world, pos);
+        BlockClass bc = getClass(world, pos.offset(side.getOpposite()));
         return !bc.isNormal() || super.shouldSideBeRendered(world, pos, side);
     }
 
