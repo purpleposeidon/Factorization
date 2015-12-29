@@ -16,6 +16,7 @@ import net.minecraft.block.state.BlockState;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.EnumDyeColor;
 import net.minecraft.item.Item;
@@ -501,5 +502,12 @@ public class BlockFactorization extends BlockContainer {
             return 0;
         }
         return super.getPlayerRelativeBlockHardness(player, world, pos);
+    }
+
+    @Override
+    public void onBlockPlacedBy(World world, BlockPos pos, IBlockState state, EntityLivingBase player, ItemStack stack) {
+        TileEntityCommon tec = get(world, pos);
+        if (tec == null) return;
+        tec.loadFromStack(stack);
     }
 }

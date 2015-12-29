@@ -1,11 +1,13 @@
 package factorization.weird.barrel;
 
 import factorization.algos.ReservoirSampler;
+import factorization.common.FactoryType;
 import factorization.idiocy.StupidExtendedProperty;
 import factorization.idiocy.WrappedItemStack;
 import factorization.shared.BlockClass;
 import factorization.shared.BlockFactorization;
 import factorization.shared.Core;
+import factorization.shared.NORELEASE;
 import factorization.util.FzUtil;
 import net.minecraft.block.material.MapColor;
 import net.minecraft.block.material.Material;
@@ -66,6 +68,12 @@ public class BlockBarrel extends BlockFactorization {
     public IBlockState getExtendedState(IBlockState state, IBlockAccess world, BlockPos pos) {
         TileEntityDayBarrel barrel = (TileEntityDayBarrel) world.getTileEntity(pos);
         IExtendedBlockState extendedBS = (IExtendedBlockState) super.getExtendedState(state, world, pos);
+        if (barrel == null) {
+            barrel = (TileEntityDayBarrel) FactoryType.DAYBARREL.getRepresentative();
+        }
+        if (extendedBS == null) {
+            NORELEASE.breakpoint();
+        }
         return extendedBS
                 .withProperty(BARREL_LOG, new WrappedItemStack(barrel.woodLog))
                 .withProperty(BARREL_SLAB, new WrappedItemStack(barrel.woodSlab));

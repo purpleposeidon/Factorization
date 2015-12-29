@@ -110,7 +110,6 @@ public class Registry {
     public ItemStack hinge; //, anchor;
     
     public ItemStack
-            daybarrel_item_hidden,
             lamp_item,
             battery_item_hidden, leydenjar_item, leydenjar_item_full, heater_item, solarboiler_item, caliometric_burner_item,
             mirror_item_hidden,
@@ -182,7 +181,7 @@ public class Registry {
         GameRegistry.registerItem(item, useName, Core.modId);
         nameCleanup.put("factorization:" + unlocalizedName, item);
     }
-    
+
     public void makeBlocks() {
         legacy_factory_block = new BlockFactorization(materialMachine);
         factory_block_barrel = new BlockBarrel();
@@ -213,7 +212,7 @@ public class Registry {
         serverTraceHelper = new BlockFactorization(materialMachine);
 
         GameRegistry.registerBlock(legacy_factory_block, ItemFactorizationBlock.class, "FzBlock");
-        GameRegistry.registerBlock(factory_block_barrel, ItemFactorizationBlock.class, "FzBlockBarrel");
+        GameRegistry.registerBlock(factory_block_barrel, ItemDayBarrel.class, "FzBlockBarrel");
         GameRegistry.registerBlock(lightair_block, "Lightair");
         GameRegistry.registerBlock(resource_block, ItemBlockResource.class, "ResourceBlock");
         GameRegistry.registerBlock(dark_iron_ore, "DarkIronOre");
@@ -228,19 +227,19 @@ public class Registry {
             GameRegistry.registerBlock(colossal_block, ColossalBlockItem.class, "ColossalBlock");
             GameRegistry.registerTileEntity(TileEntityColossalHeart.class, "fz_colossal_heart");
         }
-        
-        
+
+
         is_factory = new ItemStack(legacy_factory_block);
         is_lightair = new ItemStack(lightair_block);
-        
-        
+
+
         Core.tab(legacy_factory_block, TabType.BLOCKS);
         Core.tab(factory_block_barrel, TabType.TOOLS);
         Core.tab(resource_block, TabType.BLOCKS);
-        
+
         worldgenManager = new WorldgenManager();
     }
-    
+
     public void registerDerpyAliases() {
         String[][] aliases = new String[][] {
                 {"factorization:tile.null", "factorization:FZ factory"},
@@ -283,7 +282,7 @@ public class Registry {
                 foundItems.add((Item) obj);
             }
         }
-        
+
         Block invalid = DataUtil.getBlock((Item) null);
         for (Item it : foundItems) {
             if (DataUtil.getBlock(it) == invalid) {
@@ -309,7 +308,6 @@ public class Registry {
         empty_socket_item = FactoryType.SOCKET_EMPTY.itemStack();
         parasieve_item = FactoryType.PARASIEVE.itemStack();
         compression_crafter_item = FactoryType.COMPRESSIONCRAFTER.itemStack();
-        daybarrel_item_hidden = FactoryType.DAYBARREL.itemStack();
         lamp_item = FactoryType.LAMP.itemStack();
         battery_item_hidden = FactoryType.BATTERY.itemStack();
         leydenjar_item = FactoryType.LEYDENJAR.itemStack();
@@ -341,7 +339,7 @@ public class Registry {
 
         diamond_shard = new ItemCraftingComponent("diamond_shard");
         dark_iron = new ItemCraftingComponent("dark_iron_ingot");
-        
+
         lead_ingot = new ItemCraftingComponent("lead_ingot");
         silver_ingot = new ItemCraftingComponent("silver_ingot");
         OreDictionary.registerOre("oreSilver", silver_ore_item);
@@ -353,7 +351,7 @@ public class Registry {
         OreDictionary.registerOre("ingotFzDarkIron", dark_iron);
         OreDictionary.registerOre("blockFzDarkIron", dark_iron_block_item);
 
-        
+
         logicMatrixProgrammer = new ItemMatrixProgrammer();
         logicMatrix = new ItemCraftingComponent("logic_matrix");
         logicMatrixIdentifier = new ItemCraftingComponent("logic_matrix_identifier");
@@ -379,7 +377,7 @@ public class Registry {
         NBTTagCompound tag = new NBTTagCompound();
         tag.setInteger("storage", TileEntityLeydenJar.max_storage);
         leydenjar_item_full.setTagCompound(tag);
-        
+
         //ceramics
         sculpt_tool = new ItemSculptingTool();
         glaze_bucket = new ItemGlazeBucket();
@@ -391,7 +389,7 @@ public class Registry {
         ResourceLocation steamy = new ResourceLocation("factorization:textures/blocks/steam");
         steamFluid = new Fluid("steam", steamy, steamy).setDensity(-500).setGaseous(true).setViscosity(100).setUnlocalizedName("factorization:fluid/steam").setTemperature(273 + 110);
         FluidRegistry.registerFluid(steamFluid);
-        
+
         //Rocketry
         nether_powder = new ItemCraftingComponent("nether_powder");
 
@@ -410,13 +408,13 @@ public class Registry {
         instruction_plate = new ItemCraftingComponent("servo/instruction_plate", TabType.SERVOS);
         instruction_plate.setMaxStackSize(16);
         servo_rail_comment_editor = new ItemCommenter("servo/commenter");
-        
+
         socket_lacerator = FactoryType.SOCKET_LACERATOR.asSocketItem();
         socket_robot_hand = FactoryType.SOCKET_ROBOTHAND.asSocketItem();
         socket_shifter = FactoryType.SOCKET_SHIFTER.asSocketItem();
-        
+
         //Barrels
-        daybarrel = new ItemDayBarrel("daybarrel");
+        daybarrel = (ItemDayBarrel) DataUtil.getItem(factory_block_barrel);
         barrelCart = new ItemMinecartDayBarrel();
 
         docbook = new ItemDocBook("docbook", TabType.TOOLS);
