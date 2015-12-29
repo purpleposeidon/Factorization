@@ -3,37 +3,29 @@ package factorization.weird.barrel;
 import com.google.common.base.Charsets;
 import com.google.common.base.Function;
 import com.google.common.collect.ImmutableMap;
-import factorization.idiocy.WrappedItemStack;
+import factorization.api.Quaternion;
 import factorization.shared.FzIcons;
 import factorization.shared.NORELEASE;
-import factorization.util.DataUtil;
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.ItemModelMesher;
 import net.minecraft.client.renderer.block.model.BakedQuad;
 import net.minecraft.client.renderer.block.model.ItemCameraTransforms;
 import net.minecraft.client.renderer.block.model.ModelBlock;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
-import net.minecraft.client.renderer.vertex.VertexBuffer;
-import net.minecraft.client.renderer.vertex.VertexFormat;
 import net.minecraft.client.resources.IResource;
 import net.minecraft.client.resources.IResourceManager;
 import net.minecraft.client.resources.model.IBakedModel;
 import net.minecraft.client.resources.model.ModelResourceLocation;
-import net.minecraft.client.resources.model.ModelRotation;
 import net.minecraft.init.Blocks;
-import net.minecraft.item.ItemBlock;
-import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.client.model.IModelState;
 import net.minecraftforge.client.model.IRetexturableModel;
 import net.minecraftforge.client.model.ISmartBlockModel;
-import net.minecraftforge.client.model.ModelStateComposition;
+import net.minecraftforge.client.model.TRSRTransformation;
 import net.minecraftforge.common.property.IExtendedBlockState;
-import org.apache.commons.lang3.tuple.Pair;
 
 import javax.annotation.Nullable;
 import java.io.InputStreamReader;
@@ -42,26 +34,26 @@ import java.util.HashMap;
 import java.util.List;
 
 public class BarrelModel implements ISmartBlockModel {
-    HashMap<Pair<ItemStack, ItemStack>, IBakedModel> modelCache = new HashMap<Pair<ItemStack, ItemStack>, IBakedModel>();
+
+    private final HashMap<CacheInfo, IBakedModel> modelCache = new HashMap<CacheInfo, IBakedModel>();
     public static IRetexturableModel template;
 
-    IBakedModel get(ItemStack log, ItemStack slab) {
-        Pair<ItemStack, ItemStack> p = Pair.of(log, slab);
-        IBakedModel ret = modelCache.get(p);
+    IBakedModel get(CacheInfo info) {
+        IBakedModel ret = modelCache.get(info);
         if (ret != null) return ret;
-        ret = build(log, slab);
+        ret = build(info);
+        if (NORELEASE.off) { // delete this if statement
+            modelCache.put(info, ret);
+        }
         return ret;
     }
 
-    IBakedModel build(ItemStack logItem, ItemStack slabItem) {
-        TextureAtlasSprite log = getSprite(logItem);
-        TextureAtlasSprite plank = getSprite(slabItem);
-        TextureAtlasSprite top = isMetal(slabItem) ? FzIcons.block$storage$normal$top_metal : FzIcons.block$storage$normal$top;
-        TextureAtlasSprite front = FzIcons.block$storage$normal$front;
-        TextureAtlasSprite side = FzIcons.block$storage$normal$side;
-        TextureAtlasSprite glass = getSprite(new ItemStack(Blocks.glass));
-        NORELEASE.println(logItem, log);
-        top = front = side = glass;
+    IBakedModel build(CacheInfo info) {
+        TextureAtlasSprite log = info.log;
+        TextureAtlasSprite plank = info.plank;
+        TextureAtlasSprite top = info.isMetal ? FzIcons.blocks$storage$normal$top_metal : FzIcons.blocks$storage$normal$top;
+        TextureAtlasSprite front = FzIcons.blocks$storage$normal$front;
+        TextureAtlasSprite side = FzIcons.blocks$storage$normal$side;
         HashMap<String, String> textures = new HashMap<String, String>();
         textures.put("log", log.getIconName());
         textures.put("plank", plank.getIconName());
@@ -81,7 +73,10 @@ public class BarrelModel implements ISmartBlockModel {
                 return map.get(input);
             }
         };
-        IModelState state = ModelRotation.X0_Y0;
+        Quaternion fzq = Quaternion.fromOrientation(info.orientation);
+        NORELEASE.println(info.orientation);
+        javax.vecmath.Matrix4f mat = TRSRTransformation.mul(null, null, null, fzq.toJavax());
+        IModelState state = new TRSRTransformation(mat);
         return template.retexture(ImmutableMap.copyOf(textures)).bake(state, DefaultVertexFormats.BLOCK, lookup);
     }
 
@@ -97,35 +92,17 @@ public class BarrelModel implements ISmartBlockModel {
         }
     }
 
-    private boolean isMetal(ItemStack it) {
-        if (it == null) return true;
-        Block block = DataUtil.getBlock(it);
-        return block == null || !block.getMaterial().getCanBurn();
-    }
-
-    private TextureAtlasSprite getSprite(ItemStack log) {
-        Minecraft mc = Minecraft.getMinecraft();
-        Block b = DataUtil.getBlock(log);
-        if (b == null) {
-            ItemModelMesher itemModelMesher = mc.getRenderItem().getItemModelMesher();
-            if (log == null) return itemModelMesher.getItemModel(null).getParticleTexture();
-            return itemModelMesher.getParticleIcon(log.getItem());
-        }
-        IBlockState bs = b.getStateFromMeta(log.getItemDamage());
-        return mc.getBlockRendererDispatcher().getBlockModelShapes().getTexture(bs);
-    }
 
     @Override
     public IBakedModel handleBlockState(IBlockState state) {
         Minecraft mc = Minecraft.getMinecraft();
-        Block use = null;
         if (state instanceof IExtendedBlockState) {
             IExtendedBlockState bs = (IExtendedBlockState) state;
-            WrappedItemStack log = bs.getValue(BlockBarrel.BARREL_LOG);
-            WrappedItemStack slab = bs.getValue(BlockBarrel.BARREL_SLAB);
-            return get(log.stack, slab.stack);
+            CacheInfo info = bs.getValue(BlockBarrel.BARREL_INFO);
+            return get(info);
         }
-        if (use == null) use = Blocks.stone;
+
+        Block use = Blocks.stone;
         return mc.getBlockRendererDispatcher().getBlockModelShapes().getModelForState(use.getDefaultState());
     }
 

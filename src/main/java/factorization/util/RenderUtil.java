@@ -1,6 +1,12 @@
 package factorization.util;
 
 import factorization.shared.Core;
+import net.minecraft.block.Block;
+import net.minecraft.block.state.IBlockState;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.ItemModelMesher;
+import net.minecraft.client.renderer.texture.TextureAtlasSprite;
+import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumFacing;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
@@ -43,5 +49,17 @@ public final class RenderUtil {
             return true;
         }
         return false;
+    }
+
+    public static TextureAtlasSprite getSprite(ItemStack log) {
+        Minecraft mc = Minecraft.getMinecraft();
+        Block b = DataUtil.getBlock(log);
+        if (b == null) {
+            ItemModelMesher itemModelMesher = mc.getRenderItem().getItemModelMesher();
+            if (log == null) return itemModelMesher.getItemModel(null).getParticleTexture();
+            return itemModelMesher.getParticleIcon(log.getItem());
+        }
+        IBlockState bs = b.getStateFromMeta(log.getItemDamage());
+        return mc.getBlockRendererDispatcher().getBlockModelShapes().getTexture(bs);
     }
 }

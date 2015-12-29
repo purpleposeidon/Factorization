@@ -12,6 +12,7 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import org.lwjgl.opengl.GL11;
 
+import javax.vecmath.Quat4f;
 import java.io.DataInput;
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -571,5 +572,8 @@ public class Quaternion implements IDataSerializable {
         if (hasNaN() || hasInf()) return new Quaternion();
         return this;
     }
-    
+
+    public Quat4f toJavax() {
+        return new Quat4f((float) x, (float) y, (float) z, (float) w);
+    }
 }

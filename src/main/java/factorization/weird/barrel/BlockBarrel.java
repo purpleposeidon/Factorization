@@ -2,12 +2,10 @@ package factorization.weird.barrel;
 
 import factorization.algos.ReservoirSampler;
 import factorization.common.FactoryType;
-import factorization.idiocy.StupidExtendedProperty;
-import factorization.idiocy.WrappedItemStack;
+import factorization.idiocy.DumbExtendedProperty;
 import factorization.shared.BlockClass;
 import factorization.shared.BlockFactorization;
 import factorization.shared.Core;
-import factorization.shared.NORELEASE;
 import factorization.util.FzUtil;
 import net.minecraft.block.material.MapColor;
 import net.minecraft.block.material.Material;
@@ -23,6 +21,7 @@ import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import net.minecraftforge.common.property.ExtendedBlockState;
 import net.minecraftforge.common.property.IExtendedBlockState;
+import net.minecraftforge.common.property.IUnlistedProperty;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -57,12 +56,11 @@ public class BlockBarrel extends BlockFactorization {
         return new TileEntityDayBarrel();
     }
 
-    public static final StupidExtendedProperty<WrappedItemStack> BARREL_SLAB = new StupidExtendedProperty<WrappedItemStack>("slab", WrappedItemStack.class);
-    public static final StupidExtendedProperty<WrappedItemStack> BARREL_LOG = new StupidExtendedProperty<WrappedItemStack>("log", WrappedItemStack.class);
+    public static final IUnlistedProperty<CacheInfo> BARREL_INFO = new DumbExtendedProperty<CacheInfo>("info", CacheInfo.class);
 
     @Override
     protected BlockState createBlockState() {
-        return new ExtendedBlockState(this, FzUtil.props(), FzUtil.uprops(BARREL_SLAB, BARREL_LOG));
+        return new ExtendedBlockState(this, FzUtil.props(), FzUtil.uprops(BARREL_INFO));
     }
 
     @Override
@@ -71,13 +69,10 @@ public class BlockBarrel extends BlockFactorization {
         IExtendedBlockState extendedBS = (IExtendedBlockState) super.getExtendedState(state, world, pos);
         if (barrel == null) {
             barrel = (TileEntityDayBarrel) FactoryType.DAYBARREL.getRepresentative();
+            assert barrel != null;
+            barrel.cleanBarrel();
         }
-        if (extendedBS == null) {
-            NORELEASE.breakpoint();
-        }
-        return extendedBS
-                .withProperty(BARREL_LOG, new WrappedItemStack(barrel.woodLog))
-                .withProperty(BARREL_SLAB, new WrappedItemStack(barrel.woodSlab));
+        return extendedBS.withProperty(BARREL_INFO, CacheInfo.from(barrel));
     }
 
     @Override
@@ -125,6 +120,6 @@ public class BlockBarrel extends BlockFactorization {
 
     @Override
     public boolean canRenderInLayer(EnumWorldBlockLayer layer) {
-        return layer == EnumWorldBlockLayer.CUTOUT;
+        return layer == EnumWorldBlockLayer.TRANSLUCENT;
     }
 }

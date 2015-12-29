@@ -2,11 +2,11 @@ package factorization.idiocy;
 
 import net.minecraftforge.common.property.IUnlistedProperty;
 
-public class StupidExtendedProperty<V> implements IUnlistedProperty<V> {
+public class DumbExtendedProperty<K> implements IUnlistedProperty<K> {
     public final String name;
-    public final Class<V> klass;
+    public final Class<K> klass;
 
-    public StupidExtendedProperty(String name, Class<V> klass) {
+    public DumbExtendedProperty(String name, Class<K> klass) {
         this.name = name;
         this.klass = klass;
     }
@@ -17,17 +17,17 @@ public class StupidExtendedProperty<V> implements IUnlistedProperty<V> {
     }
 
     @Override
-    public boolean isValid(V value) {
+    public boolean isValid(K value) {
         return true;
     }
 
     @Override
-    public Class<V> getType() {
+    public Class<K> getType() {
         return klass;
     }
 
     @Override
-    public String valueToString(V value) {
-        return "<" + name + ">";
+    public String valueToString(K value) {
+        return value.toString();
     }
 }
