@@ -1,8 +1,8 @@
 package factorization.weird.barrel;
 
-import com.google.common.base.Charsets;
 import com.google.common.base.Function;
 import com.google.common.collect.ImmutableMap;
+import factorization.api.FzOrientation;
 import factorization.api.Quaternion;
 import factorization.shared.FzIcons;
 import factorization.shared.NORELEASE;
@@ -11,13 +11,9 @@ import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.block.model.BakedQuad;
 import net.minecraft.client.renderer.block.model.ItemCameraTransforms;
-import net.minecraft.client.renderer.block.model.ModelBlock;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
-import net.minecraft.client.resources.IResource;
-import net.minecraft.client.resources.IResourceManager;
 import net.minecraft.client.resources.model.IBakedModel;
-import net.minecraft.client.resources.model.ModelResourceLocation;
 import net.minecraft.init.Blocks;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ResourceLocation;
@@ -28,7 +24,7 @@ import net.minecraftforge.client.model.TRSRTransformation;
 import net.minecraftforge.common.property.IExtendedBlockState;
 
 import javax.annotation.Nullable;
-import java.io.InputStreamReader;
+import javax.vecmath.AxisAngle4f;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -73,25 +69,36 @@ public class BarrelModel implements ISmartBlockModel {
                 return map.get(input);
             }
         };
-        Quaternion fzq = Quaternion.fromOrientation(info.orientation);
-        NORELEASE.println(info.orientation);
-        javax.vecmath.Matrix4f mat = TRSRTransformation.mul(null, null, null, fzq.toJavax());
-        IModelState state = new TRSRTransformation(mat);
+
+        IModelState state = getMatrix(info.orientation);
         return template.retexture(ImmutableMap.copyOf(textures)).bake(state, DefaultVertexFormats.BLOCK, lookup);
     }
 
-    ModelBlock loadTemplate() {
-        try {
-            Minecraft mc = Minecraft.getMinecraft();
-            IResourceManager rm = mc.getResourceManager();
-            IResource iresource = rm.getResource(new ModelResourceLocation("factorization:block/barrel_template"));
-            InputStreamReader reader = new InputStreamReader(iresource.getInputStream(), Charsets.UTF_8);
-            return ModelBlock.deserialize(reader);
-        } catch (Throwable t) {
-            throw new RuntimeException(t);
-        }
+    private IModelState getMatrix(FzOrientation fzo) {
+        Quaternion fzq = Quaternion.fromOrientation(fzo.getSwapped());
+        javax.vecmath.Matrix4f trans = newMat();
+        javax.vecmath.Matrix4f rot = newMat();
+        javax.vecmath.Matrix4f r90 = newMat();
+
+        r90.setRotation(new AxisAngle4f(0, 1, 0, (float) Math.PI / 2));
+
+        trans.setTranslation(new javax.vecmath.Vector3f(0.5F, 0.5F, 0.5F));
+        javax.vecmath.Matrix4f iTrans = new javax.vecmath.Matrix4f(trans);
+        iTrans.invert();
+        rot.setRotation(fzq.toJavax());
+        rot.mul(r90);
+
+        trans.mul(rot);
+        trans.mul(iTrans);
+
+        return new TRSRTransformation(trans);
     }
 
+    private static javax.vecmath.Matrix4f newMat() {
+        javax.vecmath.Matrix4f ret = new javax.vecmath.Matrix4f();
+        ret.setIdentity();
+        return ret;
+    }
 
     @Override
     public IBakedModel handleBlockState(IBlockState state) {

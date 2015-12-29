@@ -224,7 +224,7 @@ public class Quaternion implements IDataSerializable {
     private static Quaternion[] quat_cache = new Quaternion[25 /*FzOrientation.values().length recursive reference, bleh*/];
     /***
      * @param orient An {@link FzOrientation}
-     * @return A {@link Quaternion} that should not be mutated. It 
+     * @return A {@link Quaternion} that should not be mutated.
      */
     public static Quaternion fromOrientation(final FzOrientation orient) {
         final int ord = orient.ordinal();
