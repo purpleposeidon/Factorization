@@ -118,7 +118,7 @@ public class TileEntityDayBarrelRenderer extends TileEntitySpecialRenderer<TileE
             return false;
         }
         GlStateManager.rotate(180, 0, 0, 1);
-        final TextureAtlasSprite font = FzIcons.items$barrel_font;
+        final TextureAtlasSprite font = BarrelModel.font;
         final int len = t.length();
         final double char_width = 1.0/10.0;
         final double char_height = 1.0/10.0;

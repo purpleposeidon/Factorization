@@ -4,8 +4,8 @@ import com.google.common.base.Function;
 import com.google.common.collect.ImmutableMap;
 import factorization.api.FzOrientation;
 import factorization.api.Quaternion;
-import factorization.shared.FzIcons;
 import factorization.shared.NORELEASE;
+import factorization.util.RenderUtil;
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
@@ -29,6 +29,13 @@ import java.util.HashMap;
 import java.util.List;
 
 public class BarrelModel implements ISmartBlockModel {
+    public static BarrelGroup normal, hopping, silky, sticky;
+    public static TextureAtlasSprite font;
+
+    @RenderUtil.LoadSprite
+    public static class BarrelGroup {
+        public TextureAtlasSprite front, top, side, top_metal;
+    }
 
     private final HashMap<CacheInfo, IBakedModel> modelCache = new HashMap<CacheInfo, IBakedModel>();
     public static IRetexturableModel template;
@@ -46,9 +53,18 @@ public class BarrelModel implements ISmartBlockModel {
     IBakedModel build(CacheInfo info) {
         TextureAtlasSprite log = info.log;
         TextureAtlasSprite plank = info.plank;
-        TextureAtlasSprite top = info.isMetal ? FzIcons.blocks$storage$normal$top_metal : FzIcons.blocks$storage$normal$top;
-        TextureAtlasSprite front = FzIcons.blocks$storage$normal$front;
-        TextureAtlasSprite side = FzIcons.blocks$storage$normal$side;
+        BarrelGroup group = normal;
+        TileEntityDayBarrel.Type type = info.type;
+        if (type == TileEntityDayBarrel.Type.HOPPING) {
+            group = hopping;
+        } else if (type == TileEntityDayBarrel.Type.SILKY) {
+            group = silky;
+        } else if (type == TileEntityDayBarrel.Type.STICKY) {
+            group = sticky;
+        }
+        TextureAtlasSprite top = info.isMetal ? group.top_metal : group.top;
+        TextureAtlasSprite front = group.front;
+        TextureAtlasSprite side = group.side;
         HashMap<String, String> textures = new HashMap<String, String>();
         final HashMap<ResourceLocation, TextureAtlasSprite> map = new HashMap<ResourceLocation, TextureAtlasSprite>();
         EnumWorldBlockLayer layer = MinecraftForgeClient.getRenderLayer();

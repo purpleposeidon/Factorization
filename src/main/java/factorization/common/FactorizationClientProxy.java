@@ -30,8 +30,10 @@ import factorization.sockets.SocketScissors;
 import factorization.sockets.TileEntitySocketRenderer;
 import factorization.sockets.fanturpeller.SocketFanturpeller;
 import factorization.util.DataUtil;
+import factorization.util.RenderUtil;
 import factorization.utiligoo.GooRenderer;
-import factorization.weird.*;
+import factorization.weird.ContainerPocket;
+import factorization.weird.GuiPocketTable;
 import factorization.weird.barrel.*;
 import factorization.weird.poster.EntityPoster;
 import factorization.weird.poster.RenderPoster;
@@ -45,7 +47,6 @@ import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.renderer.ItemMeshDefinition;
 import net.minecraft.client.renderer.entity.RenderManager;
 import net.minecraft.client.renderer.entity.RenderSnowball;
-import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
 import net.minecraft.client.resources.model.ModelBakery;
 import net.minecraft.client.resources.model.ModelResourceLocation;
@@ -71,7 +72,6 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.relauncher.Side;
 
 import java.io.IOException;
-import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Collection;
 
@@ -271,17 +271,8 @@ public class FactorizationClientProxy extends FactorizationProxy {
 
     @SubscribeEvent
     public void onTextureStitch(TextureStitchEvent.Pre event) {
-        // TODO: FzIcons should get split up
-        for (Field field : FzIcons.class.getFields()) {
-            String name = field.getName().replace("$", "/");
-            ResourceLocation location = new ResourceLocation("factorization", name);
-            TextureAtlasSprite sprite = event.map.registerSprite(location);
-            try {
-                field.set(null, sprite);
-            } catch (IllegalAccessException e) {
-                e.printStackTrace();
-            }
-        }
+        RenderUtil.loadSprites("factorization", FzIcons.class, "", event);
+        RenderUtil.loadSprites("factorization", BarrelModel.class, "barrel/storage/", event);
         try {
             BarrelModel.template = (IRetexturableModel) ModelLoaderRegistry.getModel(new ResourceLocation("factorization:block/barrel_template"));
         } catch (IOException e) {
