@@ -63,7 +63,7 @@ public class ASMTransformer implements IClassTransformer {
                         new AbstractAsmMethodTransform.MutateCall(name, transformedName, "func_78467_g", "orientCamera")
                                 .setOwner("net.minecraft.client.multiplayer.WorldClient")
                                 .setName("rayTraceBlocks", "func_72933_a", "a")
-                                .setDescr("(Lnet/minecraft/util/Vec3;Lnet/minecraft/util/Vec3;)Lnet/minecraft/util/MovingObjectPosition;", "(Lazw;Lazw;)Lazu;")
+                                .setDescr("(Lnet/minecraft/util/Vec3;Lnet/minecraft/util/Vec3;)Lnet/minecraft/util/MovingObjectPosition;", "(Laui;Laui;)Lauh;")
                 );
             }
             // Add "Universal Colliders". Adds a list of entities to the chunk that are added to every collision query.
@@ -94,7 +94,7 @@ public class ASMTransformer implements IClassTransformer {
                                 // find(String owner, String srg_name, String mcp_name, String notch_name, String find_notch_desc)
                                 .setOwner("net.minecraft.enchantment.EnchantmentProtection")
                                 .setName("func_92092_a", "func_92092_a", "a")
-                                .setDescr("(Lnet/minecraft/entity/Entity;D)D", "(Lsa;D)D")
+                                .setDescr("(Lnet/minecraft/entity/Entity;D)D", "(Lpk;D)D")
                 );
             }
             // Sigh. :/ needed to keep minimap mods happy...
