@@ -12,7 +12,7 @@ import java.util.ArrayList;
 import java.util.Map;
 
 @SortingIndex(1)
-@MCVersion("1.8.8") // NORELEASE: Check that this matches our MC version! (Or just automate it...)
+@MCVersion("1.8.9") // NORELEASE: Check that this matches our MC version! (Or just automate it...)
 @TransformerExclusions("factorization.coremod.")
 @DependsOn("net.minecraftforge.fml.common.asm.transformers.DeobfuscationTransformer")
 public class LoadingPlugin implements IFMLLoadingPlugin {
