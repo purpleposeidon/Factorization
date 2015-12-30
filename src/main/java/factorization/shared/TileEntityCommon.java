@@ -70,7 +70,7 @@ public abstract class TileEntityCommon extends TileEntity implements ICoord, IFa
         ByteBuf buf = Unpooled.buffer();
         DataOutByteBuf data = new DataOutByteBuf(buf, Side.SERVER);
         try {
-            NetworkFactorization.writeMessage(buf, FzNetEventHandler.TO_TILEENTITY, StandardMessageType.TileFzType);
+            NetworkFactorization.writeMessage(buf, FzNetEventHandler.TO_BLOCK, StandardMessageType.TileFzType);
             buf.writeInt(pos.getX());
             buf.writeInt(pos.getY());
             buf.writeInt(pos.getZ());

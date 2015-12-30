@@ -1,10 +1,13 @@
 package factorization.net;
 
 import factorization.api.Coord;
+import factorization.api.datahelpers.DataInByteBuf;
 import factorization.artifact.ContainerForge;
 import factorization.common.Command;
+import factorization.common.FactoryType;
 import factorization.shared.Core;
 import factorization.shared.Sound;
+import factorization.shared.TileEntityCommon;
 import factorization.utiligoo.ItemGoo;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufInputStream;
@@ -13,6 +16,7 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.network.NetHandlerPlayServer;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.BlockPos;
+import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.network.ByteBufUtils;
@@ -21,6 +25,7 @@ import net.minecraftforge.fml.common.network.FMLNetworkEvent.ClientCustomPacketE
 import net.minecraftforge.fml.common.network.FMLNetworkEvent.CustomPacketEvent;
 import net.minecraftforge.fml.common.network.FMLNetworkEvent.ServerCustomPacketEvent;
 import net.minecraftforge.fml.common.network.NetworkRegistry;
+import net.minecraftforge.fml.relauncher.Side;
 
 import java.io.IOException;
 
@@ -73,9 +78,15 @@ public class FzNetEventHandler {
     private void handlePacket0(CustomPacketEvent event, boolean isServer, EntityPlayer player) throws IOException {
         ByteBuf input = event.packet.payload();
         byte target = input.readByte();
+        byte messageIndex = input.readByte();
         if (target == TO_TILEENTITY) {
             BlockPos at = new BlockPos(input.readInt(), input.readInt(), input.readInt());
-            if (!player.worldObj.isBlockLoaded(at)) return;
+            if (!player.worldObj.isBlockLoaded(at)) {
+                if (at.getY() < 8000 || at.getY() > 8000) {
+                    Core.logWarning("Received presumably garbage packet to " + at);
+                }
+                return;
+            }
             TileEntity te = player.worldObj.getTileEntity(at);
             if (te == null) {
                 Core.logWarning("Tried to send packet to TileEntity that is not located at " + new Coord(player.worldObj, at));
@@ -86,7 +97,7 @@ public class FzNetEventHandler {
                 return;
             }
             INet it = (INet) te;
-            process(isServer, it, input);
+            process(isServer, it, messageIndex, input);
         } else if (target == TO_ENTITY) {
             int entityId = input.readInt();
             Entity ent = player.worldObj.getEntityByID(entityId);
@@ -99,9 +110,9 @@ public class FzNetEventHandler {
                 return;
             }
             INet it = (INet) ent;
-            process(isServer, it, input);
+            process(isServer, it, messageIndex, input);
         } else if (target == TO_PLAYER) {
-            Enum mt = NetworkFactorization.readMessage(input, null);
+            Enum mt = NetworkFactorization.getMessage(messageIndex, null);
             if (mt == StandardMessageType.UtilityGooState) {
                 ItemGoo.handlePacket(input);
             } else if (mt == StandardMessageType.ArtifactForgeName) {
@@ -131,8 +142,45 @@ public class FzNetEventHandler {
         } else if (target == TO_BLOCK) {
             Coord at = new Coord(player.worldObj, input.readInt(), input.readInt(), input.readInt());
             if (!at.blockExists()) return;
-            Enum mt = NetworkFactorization.readMessage(input, null);
-            if (mt == StandardMessageType.RedrawOnClient) {
+            Enum mt = NetworkFactorization.getMessage(messageIndex, null);
+            if (mt == StandardMessageType.TileFzType) {
+                World world = player.worldObj;
+                if (!world.isRemote) {
+                    // Extremely dangerous foolishness
+                    Core.logSevere("Player tried to send us a TileEntity!?? " + player + " to " + at);
+                    return;
+                }
+                //create a Tile Entity of that type there.
+
+                byte ftId = input.readByte();
+                FactoryType ft = FactoryType.fromMd(ftId);
+                if (ft == null) {
+                    Core.logSevere("Got invalid FactoryType ID %s", ftId);
+                    return;
+                }
+                TileEntityCommon spawn = at.getTE(TileEntityCommon.class);
+                BlockPos pos = at.toBlockPos();
+                if (spawn != null && spawn.getFactoryType() != ft) {
+                    world.removeTileEntity(pos);
+                    spawn = null;
+                }
+                if (spawn == null) {
+                    spawn = ft.makeTileEntity();
+                    if (spawn == null) {
+                        Core.logSevere("Tried to spawn FactoryType with no associated TE %s", ft);
+                        return;
+                    }
+                    spawn.setWorldObj(world);
+                    world.setTileEntity(pos, spawn);
+                }
+
+                DataInByteBuf data = new DataInByteBuf(input, Side.CLIENT);
+                spawn.putData(data);
+                spawn.spawnPacketReceived();
+                if (spawn.redrawOnSync()) {
+                    at.redraw();
+                }
+            } else if (mt == StandardMessageType.RedrawOnClient) {
                 at.redraw();
             } else if (mt == StandardMessageType.PlaySound) {
                 Sound.receive(at, input);
@@ -144,8 +192,8 @@ public class FzNetEventHandler {
         }
     }
 
-    private static void process(boolean isServer, INet it, ByteBuf input) throws IOException {
-        Enum messageType = NetworkFactorization.readMessage(input, it);
+    private static void process(boolean isServer, INet it, byte messageIndex, ByteBuf input) throws IOException {
+        Enum messageType = NetworkFactorization.getMessage(messageIndex, it);
         if (isServer) {
             it.handleMessageFromClient(messageType, input);
         } else {

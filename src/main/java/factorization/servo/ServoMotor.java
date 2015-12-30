@@ -146,7 +146,8 @@ public class ServoMotor extends AbstractServoMachine implements IInventory, ISoc
             }
             return true;
         } else if (messageType.equals(StandardMessageType.TileEntityMessageOnEntity)) {
-            Enum subMsg = NetworkFactorization.readMessage(input, socket);
+            byte messageIndex = input.readByte();
+            Enum subMsg = NetworkFactorization.getMessage(messageIndex, socket);
             return socket.handleMessageFromServer(subMsg, input);
         } else {
             return socket.handleMessageFromServer(messageType, input);

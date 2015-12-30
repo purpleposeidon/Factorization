@@ -82,10 +82,6 @@ public class NetworkFactorization {
         return (byte) msg.ordinal();
     }
 
-    public static Enum readMessage(ByteBuf input, INet holder) throws IOException {
-        return getMessage(input.readByte(), holder);
-    }
-
     public static Enum getMessage(byte index, INet holder) throws IOException {
         if (index < 0) {
             int i = -index;
@@ -99,11 +95,11 @@ public class NetworkFactorization {
     
     public void prefixTePacket(ByteBuf output, TileEntity src, Enum messageType) throws IOException {
         output.writeByte(FzNetEventHandler.TO_TILEENTITY);
+        output.writeByte(getMessageIndex(messageType));
         BlockPos at = src.getPos();
         output.writeInt(at.getX());
         output.writeInt(at.getY());
         output.writeInt(at.getZ());
-        output.writeByte(getMessageIndex(messageType));
     }
     
     public FMLProxyPacket TEmessagePacket(TileEntity src, Enum messageType, Object... items) {
@@ -231,44 +227,6 @@ public class NetworkFactorization {
         if (messageType == StandardMessageType.RedrawOnClient) {
             if (!world.isRemote) return true; // Foolishness
             world.markBlockForUpdate(pos);
-            return true;
-        }
-
-        if (messageType == StandardMessageType.TileFzType) {
-            if (!world.isRemote) {
-                // Extremely dangerous foolishness
-                Core.logSevere("Player tried to send us a TileEntity!?? " + player + " to " + here);
-                return true;
-            }
-            //create a Tile Entity of that type there.
-
-            byte ftId = input.readByte();
-            FactoryType ft = FactoryType.fromMd(ftId);
-            if (ft == null) {
-                Core.logSevere("Got invalid FactoryType ID %s", ftId);
-                return true;
-            }
-            TileEntityCommon spawn = here.getTE(TileEntityCommon.class);
-            if (spawn != null && spawn.getFactoryType() != ft) {
-                world.removeTileEntity(pos);
-                spawn = null;
-            }
-            if (spawn == null) {
-                spawn = ft.makeTileEntity();
-                if (spawn == null) {
-                    Core.logSevere("Tried to spawn FactoryType with no associated TE %s", ft);
-                    return true;
-                }
-                spawn.setWorldObj(world);
-                world.setTileEntity(pos, spawn);
-            }
-
-            DataInByteBuf data = new DataInByteBuf(input, Side.CLIENT);
-            spawn.putData(data);
-            spawn.spawnPacketReceived();
-            if (spawn.redrawOnSync()) {
-                here.redraw();
-            }
             return true;
         }
 
