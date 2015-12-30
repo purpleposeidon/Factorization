@@ -16,11 +16,10 @@ import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.client.resources.model.IBakedModel;
 import net.minecraft.init.Blocks;
 import net.minecraft.util.EnumFacing;
+import net.minecraft.util.EnumWorldBlockLayer;
 import net.minecraft.util.ResourceLocation;
-import net.minecraftforge.client.model.IModelState;
-import net.minecraftforge.client.model.IRetexturableModel;
-import net.minecraftforge.client.model.ISmartBlockModel;
-import net.minecraftforge.client.model.TRSRTransformation;
+import net.minecraftforge.client.MinecraftForgeClient;
+import net.minecraftforge.client.model.*;
 import net.minecraftforge.common.property.IExtendedBlockState;
 
 import javax.annotation.Nullable;
@@ -51,12 +50,24 @@ public class BarrelModel implements ISmartBlockModel {
         TextureAtlasSprite front = FzIcons.blocks$storage$normal$front;
         TextureAtlasSprite side = FzIcons.blocks$storage$normal$side;
         HashMap<String, String> textures = new HashMap<String, String>();
-        textures.put("log", log.getIconName());
-        textures.put("plank", plank.getIconName());
-        textures.put("top", top.getIconName());
-        textures.put("front", front.getIconName());
-        textures.put("side", side.getIconName());
         final HashMap<ResourceLocation, TextureAtlasSprite> map = new HashMap<ResourceLocation, TextureAtlasSprite>();
+        EnumWorldBlockLayer layer = MinecraftForgeClient.getRenderLayer();
+        if (layer == EnumWorldBlockLayer.SOLID) {
+            textures.put("log", log.getIconName());
+            textures.put("plank", plank.getIconName());
+        } else if (layer == EnumWorldBlockLayer.CUTOUT) {
+            textures.put("top", top.getIconName());
+        } else if (layer == EnumWorldBlockLayer.TRANSLUCENT) {
+            textures.put("front", front.getIconName());
+            textures.put("side", side.getIconName());
+        }
+        for (String s : new String[] { "log", "plank", "top", "front", "side"}) {
+            if (textures.get(s) == null) {
+                textures.put(s, "");
+                textures.put("#" + s, "");
+            }
+        }
+        textures.put("particle", log.getIconName());
         map.put(new ResourceLocation(log.getIconName()), log);
         map.put(new ResourceLocation(plank.getIconName()), plank);
         map.put(new ResourceLocation(top.getIconName()), top);
@@ -71,7 +82,9 @@ public class BarrelModel implements ISmartBlockModel {
         };
 
         IModelState state = getMatrix(info.orientation);
-        return template.retexture(ImmutableMap.copyOf(textures)).bake(state, DefaultVertexFormats.BLOCK, lookup);
+        ImmutableMap<String, String> textureMap = ImmutableMap.copyOf(textures);
+        IModel retexture = template.retexture(textureMap);
+        return retexture.bake(state, DefaultVertexFormats.BLOCK, lookup);
     }
 
     private IModelState getMatrix(FzOrientation fzo) {

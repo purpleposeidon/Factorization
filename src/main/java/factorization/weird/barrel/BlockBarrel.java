@@ -120,6 +120,6 @@ public class BlockBarrel extends BlockFactorization {
 
     @Override
     public boolean canRenderInLayer(EnumWorldBlockLayer layer) {
-        return layer == EnumWorldBlockLayer.TRANSLUCENT;
+        return layer == EnumWorldBlockLayer.TRANSLUCENT || layer == EnumWorldBlockLayer.CUTOUT || layer == EnumWorldBlockLayer.SOLID;
     }
 }
