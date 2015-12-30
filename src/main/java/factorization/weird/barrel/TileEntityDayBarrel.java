@@ -55,8 +55,7 @@ public class TileEntityDayBarrel extends TileEntityFactorization  {
     private static final ItemStack DEFAULT_SLAB = new ItemStack(Blocks.planks);
     public ItemStack woodLog = DEFAULT_LOG.copy(), woodSlab = DEFAULT_SLAB.copy();
     int display_list = -1;
-    boolean should_use_display_list = true;
-    
+
     public FzOrientation orientation = FzOrientation.FACE_UP_POINT_NORTH;
     public Type type = Type.NORMAL;
     Object notice_target = this;
@@ -383,13 +382,11 @@ public class TileEntityDayBarrel extends TileEntityFactorization  {
         }
         if (messageType == BarrelMessage.BarrelCount) {
             setItemCount(input.readInt());
-            freeDisplayList();
             return true;
         }
         if (messageType == BarrelMessage.BarrelItem) {
             item = DataUtil.readStack(input);
             setItemCount(input.readInt());
-            freeDisplayList();
             return true;
         }
         if (messageType == BarrelMessage.BarrelDoubleClickHack) {
@@ -1041,69 +1038,7 @@ public class TileEntityDayBarrel extends TileEntityFactorization  {
         }
         return true;
     }
-    
-    static final ArrayList<Integer> finalizedDisplayLists = new ArrayList<Integer>();
-    
-    public static void addFinalizedDisplayList(int display_list) {
-        if (display_list <= 0) return;
-        synchronized (finalizedDisplayLists) {
-            finalizedDisplayLists.add(display_list);
-        }
-    }
-    
-    @Override
-    @SideOnly(Side.CLIENT)
-    protected void finalize() throws Throwable {
-        super.finalize();
-        if (display_list != -1) {
-            if (Core.dev_environ) {
-                Core.logFine("Barrel display list released via finalization"); // dev environ, it's fine!
-            }
-            addFinalizedDisplayList(display_list);
-            display_list = -1;
-        }
-    }
-    
-    @SideOnly(Side.CLIENT)
-    final void freeDisplayList() {
-        if (display_list == -1) {
-            return;
-        }
-        GLAllocation.deleteDisplayLists(display_list);
-        display_list = -1;
-    }
-    
-    @SubscribeEvent
-    @SideOnly(Side.CLIENT)
-    public void removeUnloadedDisplayLists(ChunkEvent.Unload event) {
-        if (!event.world.isRemote) return;
-        for (TileEntity te : event.getChunk().getTileEntityMap().values()) {
-            if (te instanceof TileEntityDayBarrel) {
-                TileEntityDayBarrel me = (TileEntityDayBarrel) te;
-                me.freeDisplayList();
-            }
-        }
-    }
-    
-    private static int iterateDelay = 0;
-    @SubscribeEvent
-    @SideOnly(Side.CLIENT)
-    public void iterateForFinalizedBarrels(ClientTickEvent event) {
-        if (event.phase != TickEvent.Phase.END) return;
-        if (iterateDelay > 0) {
-            iterateDelay--;
-            return;
-        }
-        iterateDelay = 60*20;
-        synchronized (finalizedDisplayLists) {
-            for (Integer i : finalizedDisplayLists) {
-                if (i == null) continue;
-                GLAllocation.deleteDisplayLists(i);
-            }
-            finalizedDisplayLists.clear();
-        }
-    }
-    
+
     @SubscribeEvent
     @SideOnly(Side.CLIENT)
     public void renderHilightArrow(RenderWorldLastEvent event) {

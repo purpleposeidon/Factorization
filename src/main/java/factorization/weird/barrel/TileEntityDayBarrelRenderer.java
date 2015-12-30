@@ -1,9 +1,13 @@
 package factorization.weird.barrel;
 
-import org.lwjgl.opengl.GL11;
-
+import factorization.api.FzOrientation;
+import factorization.api.Quaternion;
+import factorization.common.FzConfig;
+import factorization.shared.Core;
+import factorization.shared.FzIcons;
+import factorization.util.SpaceUtil;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.GLAllocation;
+import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.WorldRenderer;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
@@ -12,16 +16,7 @@ import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ResourceLocation;
-
-import factorization.api.Coord;
-import factorization.api.FzOrientation;
-import factorization.api.Quaternion;
-import factorization.common.FactoryType;
-import factorization.common.FzConfig;
-import factorization.shared.Core;
-import factorization.shared.FzIcons;
-import factorization.util.RenderUtil;
-import factorization.util.SpaceUtil;
+import org.lwjgl.opengl.GL11;
 
 public class TileEntityDayBarrelRenderer extends TileEntitySpecialRenderer<TileEntityDayBarrel> {
 
@@ -29,9 +24,9 @@ public class TileEntityDayBarrelRenderer extends TileEntitySpecialRenderer<TileE
         FzOrientation bo = barrel.orientation;
         EnumFacing face = bo.facing;
         if (SpaceUtil.sign(face) == 1) {
-            GL11.glTranslated(face.getDirectionVec().getX(), face.getDirectionVec().getY(), face.getDirectionVec().getZ());
+            GlStateManager.translate(face.getDirectionVec().getX(), face.getDirectionVec().getY(), face.getDirectionVec().getZ());
         }
-        GL11.glTranslated(
+        GlStateManager.translate(
                 0.5*(1 - Math.abs(face.getDirectionVec().getX())), 
                 0.5*(1 - Math.abs(face.getDirectionVec().getY())), 
                 0.5*(1 - Math.abs(face.getDirectionVec().getZ()))
@@ -39,29 +34,27 @@ public class TileEntityDayBarrelRenderer extends TileEntitySpecialRenderer<TileE
         
         Quaternion quat = Quaternion.fromOrientation(bo.getSwapped());
         quat.glRotate();
-        GL11.glRotatef(90, 0, 1, 0);
-        GL11.glTranslated(0.25, 0.25 - 1.0/16.0, -1.0/128.0);
+        GlStateManager.rotate(90, 0, 1, 0);
+        GlStateManager.translate(0.25, 0.25 - 1.0/16.0, -1.0/128.0);
         if (barrel.type == TileEntityDayBarrel.Type.HOPPING) {
             double time = barrel.getWorld().getTotalWorldTime();
             if (Math.sin(time/20) > 0) {
                 double delta = Math.max(0, Math.sin(time/2)/16);
-                GL11.glTranslated(0, delta, 0);
+                GlStateManager.translate(0, delta, 0);
             }
         }
 
         
-        GL11.glPushAttrib(GL11.GL_COLOR_BUFFER_BIT | GL11.GL_ENABLE_BIT);
-        GL11.glEnable(GL11.GL_ALPHA_TEST);
-        GL11.glDisable(GL11.GL_LIGHTING);
-        GL11.glAlphaFunc(GL11.GL_GREATER, 0.0F);
-        
+        //GL11.glPushAttrib(GL11.GL_COLOR_BUFFER_BIT | GL11.GL_ENABLE_BIT);
+        GlStateManager.enableAlpha();
+        GlStateManager.enableLighting();
+        GlStateManager.alphaFunc(GL11.GL_GREATER, 0.0F);
+
         boolean hasLabel = renderItemCount(is, barrel);
         handleRenderItem(is, barrel, hasLabel);
         
-        GL11.glPopAttrib();
-        GL11.glEnable(GL11.GL_LIGHTING);
-        
-        
+        //GL11.glPopAttrib();
+        GlStateManager.enableLighting();;
     }
 
     //Another optimization: don't render if the barrel's facing a solid block
@@ -73,35 +66,12 @@ public class TileEntityDayBarrelRenderer extends TileEntitySpecialRenderer<TileE
             return;
         }
         Core.profileStart("barrel");
-        GL11.glPushMatrix();
-        GL11.glTranslated(x, y, z);
+        GlStateManager.pushMatrix();
+        GlStateManager.translate(x, y, z);
 
-        if (FzConfig.render_barrel_use_displaylists && barrel.type != TileEntityDayBarrel.Type.HOPPING && barrel.should_use_display_list && barrel != FactoryType.DAYBARREL.getRepresentative()) {
-            if (barrel.display_list == -1) {
-                RenderUtil.checkGLError("FZ -- before barrel display list update. Someone left us a mess!");
-                if (barrel.display_list == -1) {
-                    barrel.display_list = GLAllocation.generateDisplayLists(1);
-                }
-                // https://www.opengl.org/archives/resources/faq/technical/displaylist.htm 16.070
-                GL11.glNewList(barrel.display_list, GL11.GL_COMPILE);
-                doDraw(barrel, is);
-                GL11.glEndList();
-                if (RenderUtil.checkGLError("FZ -- after barrel display list; does the item have an advanced renderer?")) {
-                    Core.logSevere("The item is: " + is);
-                    Core.logSevere("At: " + new Coord(barrel));
-                    barrel.should_use_display_list = false;
-                    doDraw(barrel, is);
-                } else {
-                    GL11.glCallList(barrel.display_list);
-                }
-            } else {
-                GL11.glCallList(barrel.display_list);
-            }
-        } else {
-            doDraw(barrel, is);
-        }
-        
-        GL11.glPopMatrix();
+        doDraw(barrel, is);
+
+        GlStateManager.popMatrix();
         Core.profileEnd();
     }
 
@@ -147,12 +117,12 @@ public class TileEntityDayBarrelRenderer extends TileEntitySpecialRenderer<TileE
         if (t.isEmpty()) {
             return false;
         }
-        GL11.glRotatef(180, 0, 0, 1);
+        GlStateManager.rotate(180, 0, 0, 1);
         final TextureAtlasSprite font = FzIcons.items$barrel_font;
         final int len = t.length();
         final double char_width = 1.0/10.0;
         final double char_height = 1.0/10.0;
-        final Tessellator tessI = Tessellator.getInstance();
+        final Tessellator tessI = Tessellator.getInstance(); //new Tessellator(len * 4);
         WorldRenderer tess = tessI.getWorldRenderer();
         tess.setTranslation(-char_width * len / 2 + 0.25, -char_height - 1F/32F, 0);
         tess.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX); // 3 double vertex positions + 2 double UV positions
@@ -176,10 +146,10 @@ public class TileEntityDayBarrelRenderer extends TileEntitySpecialRenderer<TileE
             if (!found) continue;
             double IX = i*char_width;
             final double dy = 1.0 - (1.0/256.0);
-            tess.tex(u + (x + 1) * du, v + y * dv).pos(IX + char_width, 0, 0);
-            tess.tex(u + x * du, v + y * dv).pos(IX, 0, 0);
-            tess.tex(u + x * du, v + (y + dy) * dv).pos(IX, char_height, 0);
-            tess.tex(u + (x + 1) * du, v + (y + dy) * dv).pos(IX + char_width, char_height, 0);
+            tess.pos(IX + char_width, 0, 0).tex(u + (x + 1) * du, v + y * dv).endVertex();
+            tess.pos(IX, 0, 0).tex(u + x * du, v + y * dv).endVertex();
+            tess.pos(IX, char_height, 0).tex(u + x * du, v + (y + dy) * dv).endVertex();
+            tess.pos(IX + char_width, char_height, 0).tex(u + (x + 1) * du, v + (y + dy) * dv).endVertex();
         }
         tessI.draw();
         tess.setTranslation(0, 0, 0);
@@ -197,7 +167,7 @@ public class TileEntityDayBarrelRenderer extends TileEntitySpecialRenderer<TileE
         float labelD = hasLabel ? 0F : -1F/16F;
 
         {
-            GL11.glTranslatef(0, labelD, 1F/32F);
+            GL11.glTranslatef(0, labelD, 1F/16F);
             float scale = 1F/32F;
             GL11.glScalef(scale, scale, scale);
             GL11.glScalef(1, 1, -0.02F);

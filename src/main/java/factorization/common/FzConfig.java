@@ -17,7 +17,6 @@ public class FzConfig {
     public static Configuration config;
     public static boolean render_barrel_item = true;
     public static boolean render_barrel_text = true;
-    public static boolean render_barrel_use_displaylists = true;
     public static boolean render_barrel_close = false;
     public static int entity_relight_task_id = -1;
     public static boolean gen_silver_ore = true;
@@ -162,7 +161,6 @@ public class FzConfig {
             render_barrel_item = editMain().getBoolConfig("renderBarrelItem", "client", render_barrel_item, null);
             render_barrel_text = editMain().getBoolConfig("renderBarrelText", "client", render_barrel_text, null);
             render_barrel_close = editMain().getBoolConfig("renderBarrelClose", "client", render_barrel_close, "If true, render barrel info only when nearby");
-            render_barrel_use_displaylists = editMain().getBoolConfig("renderBarrelUseDisplayLists", "client", render_barrel_use_displaylists, "If true, use OpenGL display lists for rendering barrels. Setting to false may fix some render issues, at the cost of making barrels render less efficiently");
             renderAO = editMain().getBoolConfig("renderAmbientOcclusion", "client", renderAO, "If false, never use smooth lighting for drawing sculptures");
             String attempt = getStringConfig("pocketCraftingActionKeys", "client", pocketActions, "4 keys for: removing (x), cycling (c), balancing (b), filling (f)");
             if (attempt.length() == pocketActions.length()) {

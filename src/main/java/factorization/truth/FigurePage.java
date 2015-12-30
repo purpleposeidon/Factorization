@@ -3,7 +3,6 @@ package factorization.truth;
 import factorization.shared.Core;
 import factorization.truth.api.AbstractPage;
 import factorization.util.RenderUtil;
-import factorization.weird.barrel.TileEntityDayBarrel;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.GLAllocation;
 import net.minecraft.client.renderer.chunk.CompiledChunk;
@@ -143,10 +142,19 @@ public class FigurePage extends AbstractPage {
         GLAllocation.deleteDisplayLists(display_list);
         display_list = -1;
     }
-    
+
     @Override
     protected void finalize() throws Throwable {
         super.finalize();
-        TileEntityDayBarrel.addFinalizedDisplayList(display_list);
+        if (display_list != -1) {
+            final int delete_me = display_list;
+            Minecraft.getMinecraft().addScheduledTask(new Runnable() {
+                @Override
+                public void run() {
+                    GLAllocation.deleteDisplayLists(delete_me);
+                }
+            });
+            display_list = -1;
+        }
     }
 }

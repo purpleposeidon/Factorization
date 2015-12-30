@@ -5,12 +5,12 @@ import factorization.api.datahelpers.DataHelper;
 import factorization.api.datahelpers.IDataSerializable;
 import factorization.util.SpaceUtil;
 import io.netty.buffer.ByteBuf;
+import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.Vec3;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
-import org.lwjgl.opengl.GL11;
 
 import javax.vecmath.Quat4f;
 import java.io.DataInput;
@@ -280,7 +280,7 @@ public class Quaternion implements IDataSerializable {
     public void glRotate() {
         double halfAngle = Math.acos(w);
         double sin = Math.sin(halfAngle);
-        GL11.glRotatef((float) Math.toDegrees(halfAngle*2), (float) (x/sin), (float) (y/sin), (float) (z/sin));
+        GlStateManager.rotate((float) Math.toDegrees(halfAngle*2), (float) (x/sin), (float) (y/sin), (float) (z/sin));
     }
     
     public double dotProduct(Quaternion other) {
