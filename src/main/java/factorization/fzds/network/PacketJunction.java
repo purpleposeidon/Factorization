@@ -22,7 +22,7 @@ import java.net.SocketAddress;
 
 public class PacketJunction extends SimpleChannelInboundHandler<Object> implements ChannelOutboundHandler, IFzdsShenanigans {
     private static final Packet WRAP_ON = new MarkerPacket(), WRAP_OFF = new MarkerPacket();
-    private static final AttributeKey<PacketJunction> junction = AttributeKey.valueOf("factorization:fzdsPacketJunction");
+    private static final AttributeKey<PacketJunction> JUNCTION_KEY = AttributeKey.valueOf("factorization:fzdsPacketJunction");
     private static final String CHANNEL_ENABLE_WRAP = "FZ9";
     private static final String CHANNEL_DISABLE_WRAP = "FZ8";
 
@@ -30,11 +30,12 @@ public class PacketJunction extends SimpleChannelInboundHandler<Object> implemen
         PacketJunction handler = new PacketJunction(isLocal);
         Channel channel = event.manager.channel();
         ChannelPipeline pipeline = channel.pipeline();
-        channel.attr(junction).set(handler);
+        channel.attr(JUNCTION_KEY).set(handler);
         // Not so sure about this.
         // When we're transmitting, we want to be last (err, unless the transmitter is part of the pipeline.)
         // And if we're receiving, we want to be first?
-        pipeline.addFirst(handler);
+        pipeline.addAfter("fml:packet_handler", "fzds:packetJunction", handler);
+        NORELEASE.fixme("Study the functioning of NetworkDispatcher; ask cpw for help if necessary...");
     }
 
     /**
@@ -50,7 +51,7 @@ public class PacketJunction extends SimpleChannelInboundHandler<Object> implemen
 
     private final boolean isLocal;
     private PacketJunction(boolean isLocal) {
-        super(); // This is the auto-releasing version. Whatever that means.
+        super(false);
         this.isLocal = isLocal;
     }
 
@@ -115,7 +116,6 @@ public class PacketJunction extends SimpleChannelInboundHandler<Object> implemen
             PacketBuffer empty = new PacketBuffer(Unpooled.buffer(0));
             ctx.write(new S3FPacketCustomPayload(channel, empty));
         }
-        NORELEASE.fixme("Write nextWriteState");
     }
 
     private static class MarkerPacket implements Packet<INetHandler> {
@@ -135,6 +135,10 @@ public class PacketJunction extends SimpleChannelInboundHandler<Object> implemen
         }
     }
 
+    private void deinit(ChannelHandlerContext ctx) {
+        ctx.channel().attr(JUNCTION_KEY).remove();
+    }
+
 
     // Boiler plate!? Is this right?
     @Override
@@ -149,11 +153,13 @@ public class PacketJunction extends SimpleChannelInboundHandler<Object> implemen
 
     @Override
     public void disconnect(ChannelHandlerContext ctx, ChannelPromise promise) throws Exception {
+        deinit(ctx);
         ctx.disconnect(promise);
     }
 
     @Override
     public void close(ChannelHandlerContext ctx, ChannelPromise promise) throws Exception {
+        deinit(ctx);
         ctx.close(promise);
     }
 
