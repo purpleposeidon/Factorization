@@ -19,7 +19,7 @@ import net.minecraftforge.fml.common.network.IGuiHandler;
 
 import java.util.Collection;
 
-public abstract class FactorizationProxy implements IGuiHandler {
+public class FactorizationProxy implements IGuiHandler {
 
     public Profiler getProfiler() {
         return MinecraftServer.getServer().theProfiler;

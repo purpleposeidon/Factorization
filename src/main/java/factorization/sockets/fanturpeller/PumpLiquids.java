@@ -630,7 +630,6 @@ public class PumpLiquids extends SocketFanturpeller implements IFluidHandler {
         return 2;
     }
     
-    @SideOnly(Side.CLIENT)
     private static FzModel corkscrew = new FzModel("corkscrew");
 
     @Override

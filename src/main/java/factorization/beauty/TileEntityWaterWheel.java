@@ -22,10 +22,10 @@ import net.minecraft.block.BlockFence;
 import net.minecraft.block.BlockLog;
 import net.minecraft.block.BlockWall;
 import net.minecraft.block.material.Material;
-import net.minecraft.client.renderer.texture.ITickable;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumFacing;
+import net.minecraft.util.ITickable;
 import net.minecraft.util.Vec3;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.BiomeGenBase;
@@ -236,7 +236,7 @@ public class TileEntityWaterWheel extends TileEntityCommon implements IRotationa
     }
 
     @Override
-    public void tick() {
+    public void update() {
         if (worldObj.isRemote) return;
         if (!idcRef.entityFound()) {
             if (velocity != 0) {

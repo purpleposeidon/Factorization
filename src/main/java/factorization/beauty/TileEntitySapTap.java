@@ -6,7 +6,6 @@ import java.util.HashSet;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockLog;
 import net.minecraft.block.material.Material;
-import net.minecraft.client.renderer.texture.ITickable;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.ISidedInventory;
 import net.minecraft.item.ItemStack;
@@ -14,6 +13,7 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ChatComponentTranslation;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.IChatComponent;
+import net.minecraft.util.ITickable;
 import net.minecraft.world.chunk.Chunk;
 
 import factorization.algos.FastBag;
@@ -150,7 +150,7 @@ public class TileEntitySapTap extends TileEntityCommon implements ISidedInventor
 
 
     @Override
-    public void tick() {
+    public void update() {
         if (worldObj.isRemote) return;
         final long nowish = worldObj.getTotalWorldTime() + this.hashCode();
         if (0 == nowish % (20 * 60 * 30)) {
