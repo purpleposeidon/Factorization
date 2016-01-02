@@ -69,8 +69,8 @@ public enum BlockClass implements IStringSerializable, Comparable<BlockClass> {
     }
 
     public static BlockClass get(int md) {
-        if (md < 0) return null;
-        if (md > Md.map.length) return null;
+        if (md < 0) return Default;
+        if (md > Md.map.length) return Default;
         BlockClass ret = Md.map[md];
         if (ret == null) {
             return Md.map[0];
