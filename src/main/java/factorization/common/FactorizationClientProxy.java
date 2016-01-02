@@ -191,6 +191,7 @@ public class FactorizationClientProxy extends FactorizationProxy {
     }
 
     private void setItemBlockModelFromState(Block block) {
+        if (block == null) return;
         for (IBlockState i : block.getBlockState().getValidStates()) {
             setItemBlockModel(block, block.getMetaFromState(i), DataUtil.getStatePropertyString(i));
         }
