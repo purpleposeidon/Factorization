@@ -59,7 +59,8 @@ public class TileEntityDayBarrel extends TileEntityFactorization implements ISor
     private static final ItemStack DEFAULT_LOG = new ItemStack(Blocks.log);
     private static final ItemStack DEFAULT_SLAB = new ItemStack(Blocks.planks);
     public ItemStack woodLog = DEFAULT_LOG.copy(), woodSlab = DEFAULT_SLAB.copy();
-    int display_list = -100;
+    int display_list = 0;
+    byte warmup_time = 0;
     boolean should_use_display_list = true;
     
     public FzOrientation orientation = FzOrientation.FACE_UP_POINT_NORTH;
@@ -1079,7 +1080,7 @@ public class TileEntityDayBarrel extends TileEntityFactorization implements ISor
     static final ArrayList<Integer> finalizedDisplayLists = new ArrayList();
     
     public static void addFinalizedDisplayList(int display_list) {
-        if (display_list <= 0) return;
+        if (display_list == 0) return;
         synchronized (finalizedDisplayLists) {
             finalizedDisplayLists.add(display_list);
         }
@@ -1089,22 +1090,22 @@ public class TileEntityDayBarrel extends TileEntityFactorization implements ISor
     @SideOnly(Side.CLIENT)
     protected void finalize() throws Throwable {
         super.finalize();
-        if (display_list != -1) {
+        if (display_list != 0) {
             if (Core.dev_environ) {
                 Core.logFine("Barrel display list released via finalization"); // dev environ, it's fine!
             }
             addFinalizedDisplayList(display_list);
-            display_list = -1;
+            display_list = 0;
         }
     }
     
     @SideOnly(Side.CLIENT)
     final void freeDisplayList() {
-        if (display_list <= 0) {
+        if (display_list == 0) {
             return;
         }
         GLAllocation.deleteDisplayLists(display_list);
-        display_list = -1;
+        display_list = 0;
     }
     
     @SubscribeEvent

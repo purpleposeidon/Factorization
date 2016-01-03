@@ -100,15 +100,15 @@ public class TileEntityDayBarrelRenderer extends TileEntitySpecialRenderer {
         try {
 
             if (FzConfig.render_barrel_use_displaylists && barrel.type != Type.HOPPING && barrel.should_use_display_list && barrel != FactoryType.DAYBARREL.getRepresentative()) {
-                if (barrel.display_list < -1) {
+                if (barrel.warmup_time < 20) {
+                    barrel.warmup_time++;
                     doDraw(barrel, is);
-                    barrel.display_list++;
                     if (RenderUtil.checkGLError("FZ -- Item found to have broken renderer during warmup period")) {
                         Core.logSevere("The item is: " + is);
                         Core.logSevere("At: " + new Coord(barrel));
                         barrel.should_use_display_list = false;
                     }
-                } else if (barrel.display_list == -1) {
+                } else if (barrel.display_list == 0) {
                     boolean crazyItem = itemHasCustomRender(is);
                     if (crazyItem) {
                         // FIXME: If a potion-barrel draws before a nether-star barrel, shit goes wonky
@@ -118,7 +118,7 @@ public class TileEntityDayBarrelRenderer extends TileEntitySpecialRenderer {
                         return;
                     }
                     RenderUtil.checkGLError("FZ -- before barrel display list update.");
-                    if (barrel.display_list == -1) {
+                    if (barrel.display_list == 0) {
                         barrel.display_list = GLAllocation.generateDisplayLists(1);
                     }
                     // https://www.opengl.org/archives/resources/faq/technical/displaylist.htm 16.070
