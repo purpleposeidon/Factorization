@@ -10,6 +10,7 @@ import factorization.fzds.gui.ProxiedGuiScreen;
 import factorization.fzds.interfaces.IDeltaChunk;
 import factorization.fzds.network.PacketJunction;
 import factorization.shared.Core;
+import factorization.shared.NORELEASE;
 import factorization.util.NumUtil;
 import factorization.util.SpaceUtil;
 import net.minecraft.block.Block;
@@ -195,6 +196,7 @@ public class HammerClientProxy extends HammerProxy {
     }
 
     private void setWorldAndPlayer(WorldClient wc, EntityPlayerSP player) {
+        NORELEASE.fixme("Keep track of each value. Probably a nice object... dedicated class for swapping; also allows nice APIfying");
         Minecraft mc = Minecraft.getMinecraft();
         if (wc == null || player == null) {
             throw new NullPointerException("Tried setting world/player to null!");
