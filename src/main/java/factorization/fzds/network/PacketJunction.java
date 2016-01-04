@@ -27,6 +27,7 @@ public class PacketJunction extends SimpleChannelInboundHandler<Object> implemen
     private static final String CHANNEL_DISABLE_WRAP = "FZ8";
 
     public static void setup(FMLNetworkEvent event, boolean isLocal) {
+        if (NORELEASE.on) return;
         PacketJunction handler = new PacketJunction(isLocal);
         Channel channel = event.manager.channel();
         ChannelPipeline pipeline = channel.pipeline();
@@ -34,7 +35,7 @@ public class PacketJunction extends SimpleChannelInboundHandler<Object> implemen
         // Not so sure about this.
         // When we're transmitting, we want to be last (err, unless the transmitter is part of the pipeline.)
         // And if we're receiving, we want to be first?
-        pipeline.addAfter("fml:packet_handler", "fzds:packetJunction", handler);
+        pipeline.addBefore("fml:packet_handler", "fzds:packetJunction", handler);
         NORELEASE.fixme("Study the functioning of NetworkDispatcher; ask cpw for help if necessary...");
     }
 
@@ -51,7 +52,7 @@ public class PacketJunction extends SimpleChannelInboundHandler<Object> implemen
 
     private final boolean isLocal;
     private PacketJunction(boolean isLocal) {
-        super(false);
+        super(MarkerPacket.class, false);
         this.isLocal = isLocal;
     }
 
