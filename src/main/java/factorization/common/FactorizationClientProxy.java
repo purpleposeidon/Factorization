@@ -273,7 +273,7 @@ public class FactorizationClientProxy extends FactorizationProxy {
     @SubscribeEvent
     public void onTextureStitch(TextureStitchEvent.Pre event) {
         RenderUtil.loadSprites("factorization", FzIcons.class, "", event);
-        RenderUtil.loadSprites("factorization", BarrelModel.class, "barrel/storage/", event);
+        RenderUtil.loadSprites("factorization", BarrelModel.class, "blocks/storage/", event);
         try {
             BarrelModel.template = (IRetexturableModel) ModelLoaderRegistry.getModel(new ResourceLocation("factorization:block/barrel_template"));
         } catch (IOException e) {

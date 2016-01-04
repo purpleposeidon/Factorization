@@ -125,7 +125,7 @@ public final class RenderUtil {
                 set = event.map.registerSprite(location);
             } else if (canVisit(type)) {
                 set = type.newInstance();
-                load0(domain, type, set, name + "/", event);
+                load0(domain, type, set, prefix + name + "/", event);
             } else {
                 continue;
             }
