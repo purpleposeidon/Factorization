@@ -17,6 +17,7 @@ import factorization.util.InvUtil;
 import factorization.util.SpaceUtil;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.block.Block;
+import net.minecraft.block.material.Material;
 import net.minecraft.client.renderer.RenderGlobal;
 import net.minecraft.client.resources.model.IBakedModel;
 import net.minecraft.entity.Entity;
@@ -47,7 +48,7 @@ import static factorization.ceramics.TileEntityGreenware.GreenwareMessage.*;
 
 public class TileEntityGreenware extends TileEntityCommon implements IFurnaceHeatable, ITickable {
     public static int MAX_PARTS = 32;
-    EnumFacing front = null;
+    EnumFacing front = EnumFacing.NORTH;
     byte rotation = 0;
     Quaternion rotation_quat = Quaternion.getRotationQuaternionRadians(0, EnumFacing.UP);
     
@@ -585,7 +586,7 @@ public class TileEntityGreenware extends TileEntityCommon implements IFurnaceHea
                     c.z += dz;
                     lump.toRotatedBlockBounds(this, block);
                     AxisAlignedBB in = block.getCollisionBoundingBox(worldObj, pos, c.getState());
-                    if (ab.intersectsWith(in)) {
+                    if (in != null && ab.intersectsWith(in)) {
                         // This block needs to be an Extension, or this
                         if (c.isAir() || c.isReplacable()) {
                             c.setId(Core.registry.legacy_factory_block);
@@ -758,12 +759,7 @@ public class TileEntityGreenware extends TileEntityCommon implements IFurnaceHea
 
     @Override
     public MovingObjectPosition collisionRayTrace(Vec3 startVec, Vec3 endVec) {
-        Block block;
-        if (FMLCommonHandler.instance().getEffectiveSide() == Side.CLIENT) {
-            block = Core.registry.clientTraceHelper;
-        } else {
-            block = Core.registry.serverTraceHelper;
-        }
+        Block block = new Block(Material.rock);
         // It's possible for the startVec to be embedded in a lump (causing it
         // to hit the opposite side), so we must move it farther away
         Vec3 d = startVec.subtract(endVec);
@@ -817,7 +813,7 @@ public class TileEntityGreenware extends TileEntityCommon implements IFurnaceHea
         EntityPlayer player = event.player;
         double partial = event.partialTicks;
         ClayLump lump = clay.parts.get(event.target.subHit);
-        Block block = Core.registry.clientTraceHelper;
+        Block block = new Block(Material.rock);
         lump.toRotatedBlockBounds(clay, block);
         double widen = 0.002;
         double oX = player.lastTickPosX + (player.posX - player.lastTickPosX) * partial;
@@ -857,8 +853,7 @@ public class TileEntityGreenware extends TileEntityCommon implements IFurnaceHea
 
     @Override
     public boolean addCollisionBoxesToList(Block ignore, AxisAlignedBB aabb, List<AxisAlignedBB> list, Entity entity) {
-        boolean remote = (entity != null && entity.worldObj != null) ? entity.worldObj.isRemote : FMLCommonHandler.instance().getEffectiveSide() == Side.CLIENT;
-        Block block = remote ? Core.registry.clientTraceHelper : Core.registry.serverTraceHelper;
+        Block block = new Block(Material.rock);
         ClayState state = getState();
         if (state == ClayState.WET) {
             block.setBlockBounds(0, 0, 0, 1, 1F / 8F, 1);
