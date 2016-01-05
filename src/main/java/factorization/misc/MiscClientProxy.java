@@ -51,6 +51,9 @@ public class MiscClientProxy extends MiscProxy {
         ClientCommandHandler.instance.registerCommand(new MiscClientCommands());
         FMLCommonHandler.instance().bus().register(cth);
         new NeptuneCape();
+
+        GameSettings gameSettings = Minecraft.getMinecraft().gameSettings;
+        gameSettings.setOptionValue(GameSettings.Options.REALMS_NOTIFICATIONS, 0);
     }
     
     
