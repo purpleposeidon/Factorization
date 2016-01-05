@@ -204,7 +204,14 @@ public class MiscClientCommands implements ICommand {
             //Not sketchy since you wouldn't be able to run it anyways.
             player.sendChatMessage("/gamemode " + (player.capabilities.isCreativeMode ? 0 : 1));
         }
-        
+
+        @alias("sp")
+        @help("Switch betweeen spectator and creative mode")
+        public static void spectate() {
+            //Not sketchy since you wouldn't be able to run it anyways.
+            player.sendChatMessage("/gamemode " + (player.capabilities.isCreativeMode ? 3 : 1));
+        }
+
         @alias({"n", "makenice"})
         @help("Makes it a sunny morning")
         public static void nice() {
@@ -521,6 +528,7 @@ public class MiscClientCommands implements ICommand {
             }
             RenderUtil.checkGLError("After save texture");
         }
+
 
         /*
         @help("Change the FOV")
