@@ -4,6 +4,7 @@ import com.google.common.base.Function;
 import com.google.common.collect.ImmutableMap;
 import factorization.api.FzOrientation;
 import factorization.api.Quaternion;
+import factorization.shared.Core;
 import factorization.shared.NORELEASE;
 import factorization.util.RenderUtil;
 import net.minecraft.block.Block;
@@ -13,24 +14,53 @@ import net.minecraft.client.renderer.block.model.BakedQuad;
 import net.minecraft.client.renderer.block.model.ItemCameraTransforms;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
+import net.minecraft.client.renderer.vertex.VertexFormat;
 import net.minecraft.client.resources.model.IBakedModel;
 import net.minecraft.init.Blocks;
+import net.minecraft.item.ItemCarrotOnAStick;
+import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumWorldBlockLayer;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.client.MinecraftForgeClient;
 import net.minecraftforge.client.model.*;
 import net.minecraftforge.common.property.IExtendedBlockState;
+import org.apache.commons.lang3.tuple.Pair;
 
 import javax.annotation.Nullable;
 import javax.vecmath.AxisAngle4f;
+import javax.vecmath.Matrix4f;
+import javax.vecmath.Vector3f;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 
-public class BarrelModel implements ISmartBlockModel {
+public class BarrelModel implements ISmartBlockModel, ISmartItemModel, IPerspectiveAwareModel {
     public static BarrelGroup normal, hopping, silky, sticky;
     public static TextureAtlasSprite font;
+
+    private final boolean isItem;
+    private final ImmutableMap<ItemCameraTransforms.TransformType, TRSRTransformation> transforms;
+
+    public BarrelModel(boolean isItem) {
+        this.isItem = isItem;
+        transforms = IPerspectiveAwareModel.MapWrapper.getTransforms(ItemCameraTransforms.DEFAULT);
+    }
+
+    @Override
+    public IBakedModel handleItemState(ItemStack stack) {
+        return get(CacheInfo.from(stack));
+    }
+
+    @Override
+    public Pair<? extends IFlexibleBakedModel, Matrix4f> handlePerspective(ItemCameraTransforms.TransformType cameraTransformType) {
+        return IPerspectiveAwareModel.MapWrapper.handlePerspective(this, transforms, cameraTransformType);
+    }
+
+    @Override
+    public VertexFormat getFormat() {
+        return isItem ? DefaultVertexFormats.ITEM : DefaultVertexFormats.BLOCK;
+    }
 
     @RenderUtil.LoadSprite
     public static class BarrelGroup {
@@ -67,17 +97,19 @@ public class BarrelModel implements ISmartBlockModel {
         TextureAtlasSprite side = group.side;
         HashMap<String, String> textures = new HashMap<String, String>();
         final HashMap<ResourceLocation, TextureAtlasSprite> map = new HashMap<ResourceLocation, TextureAtlasSprite>();
-        EnumWorldBlockLayer layer = MinecraftForgeClient.getRenderLayer();
-        if (layer == EnumWorldBlockLayer.SOLID) {
+        EnumWorldBlockLayer layer = isItem ? null : MinecraftForgeClient.getRenderLayer();
+        if (isItem || layer == EnumWorldBlockLayer.SOLID) {
             textures.put("log", log.getIconName());
             textures.put("plank", plank.getIconName());
-        } else if (layer == EnumWorldBlockLayer.CUTOUT) {
+        }
+        if (isItem || layer == EnumWorldBlockLayer.CUTOUT) {
             textures.put("top", top.getIconName());
-        } else if (layer == EnumWorldBlockLayer.TRANSLUCENT) {
+        }
+        if (isItem || layer == EnumWorldBlockLayer.TRANSLUCENT) {
             textures.put("front", front.getIconName());
             textures.put("side", side.getIconName());
         }
-        for (String s : new String[] { "log", "plank", "top", "front", "side"}) {
+        for (String s : new String[]{"log", "plank", "top", "front", "side"}) {
             if (textures.get(s) == null) {
                 textures.put(s, "");
                 textures.put("#" + s, "");
@@ -142,14 +174,15 @@ public class BarrelModel implements ISmartBlockModel {
         return mc.getBlockRendererDispatcher().getBlockModelShapes().getModelForState(use.getDefaultState());
     }
 
+    // Mostly unused boilerplate
     @Override
     public List<BakedQuad> getFaceQuads(EnumFacing face) {
-        return Collections.EMPTY_LIST;
+        return Collections.emptyList();
     }
 
     @Override
     public List<BakedQuad> getGeneralQuads() {
-        return Collections.EMPTY_LIST;
+        return Collections.emptyList();
     }
 
     @Override

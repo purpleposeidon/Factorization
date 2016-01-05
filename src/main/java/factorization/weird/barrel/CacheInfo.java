@@ -1,11 +1,14 @@
 package factorization.weird.barrel;
 
 import factorization.api.FzOrientation;
+import factorization.common.FactoryType;
+import factorization.shared.Core;
 import factorization.util.DataUtil;
 import factorization.util.RenderUtil;
 import net.minecraft.block.Block;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.item.ItemStack;
+import net.minecraftforge.common.property.IExtendedBlockState;
 
 public class CacheInfo {
     final TextureAtlasSprite log, plank;
@@ -55,6 +58,14 @@ public class CacheInfo {
         return new CacheInfo(log, slab, type, fzo, isMetal(barrel.woodLog));
     }
 
+
+    public static CacheInfo from(ItemStack is) {
+        TileEntityDayBarrel barrel = (TileEntityDayBarrel) FactoryType.DAYBARREL.getRepresentative();
+        assert barrel != null;
+        barrel.loadFromStack(is);
+        barrel.orientation = FzOrientation.FACE_WEST_POINT_UP;
+        return CacheInfo.from(barrel);
+    }
 
     static boolean isMetal(ItemStack it) {
         if (it == null) return true;

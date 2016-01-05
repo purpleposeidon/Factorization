@@ -208,6 +208,7 @@ public class FactorizationClientProxy extends FactorizationProxy {
                 Core.registry.gargantuan_block,
                 Core.registry.blastBlock,
                 Core.registry.mantlerock_block,
+                Core.registry.factory_block_barrel,
         }) {
             setItemBlockModel(b, 0, "inventory");
         }
@@ -236,9 +237,16 @@ public class FactorizationClientProxy extends FactorizationProxy {
 
     @SubscribeEvent
     public void registerComplicatedModels(ModelBakeEvent event) {
-        BarrelModel model = new BarrelModel();
-        event.modelRegistry.putObject(new ModelResourceLocation("factorization:FzBlockBarrel#normal"), model);
-        event.modelRegistry.putObject(new ModelResourceLocation("factorization:FzBlockBarrel#inventory"), model);
+        final ModelResourceLocation barrelNormal = new ModelResourceLocation("factorization:FzBlockBarrel#normal");
+        event.modelRegistry.putObject(barrelNormal, new BarrelModel(false));
+        final ModelResourceLocation barrelInv = new ModelResourceLocation("factorization:FzBlockBarrel#inventory");
+        event.modelRegistry.putObject(barrelInv, new BarrelModel(true));
+        ModelLoader.setCustomMeshDefinition(DataUtil.getItem(Core.registry.factory_block_barrel), new ItemMeshDefinition() {
+            @Override
+            public ModelResourceLocation getModelLocation(ItemStack stack) {
+                return barrelInv;
+            }
+        });
     }
 
     @Override
