@@ -10,8 +10,8 @@ import factorization.common.FactoryType;
 import factorization.notify.Notice;
 import factorization.notify.Style;
 import factorization.shared.BlockClass;
-import factorization.shared.Core;
 import factorization.shared.TileEntityCommon;
+import factorization.util.FzUtil;
 import factorization.util.ItemUtil;
 import factorization.util.SpaceUtil;
 import io.netty.buffer.ByteBuf;
@@ -111,7 +111,7 @@ public class TileEntityServoRail extends TileEntityCommon implements IChargeCond
     
     private boolean getCollisionBoxes(AxisAlignedBB aabb, List list, Entity entity) {
         boolean remote = (entity != null && entity.worldObj != null) ? entity.worldObj.isRemote : FMLCommonHandler.instance().getEffectiveSide() == Side.CLIENT;
-        Block block = remote ? Core.registry.clientTraceHelper : Core.registry.serverTraceHelper;
+        Block block = FzUtil.getTraceHelper();
         boolean[] sides = new boolean[6];
         fillSideInfo(sides);
         int count = 0;
@@ -164,8 +164,7 @@ public class TileEntityServoRail extends TileEntityCommon implements IChargeCond
     public boolean addCollisionBoxesToList(Block ignore, AxisAlignedBB aabb, List<AxisAlignedBB> list, Entity entity) {
         if (decoration != null && decoration.collides()) {
             float f = decoration.getSize();
-            boolean remote = (entity != null && entity.worldObj != null) ? entity.worldObj.isRemote : FMLCommonHandler.instance().getEffectiveSide() == Side.CLIENT;
-            Block block = remote ? Core.registry.clientTraceHelper : Core.registry.serverTraceHelper;
+            Block block = FzUtil.getTraceHelper();
             block.setBlockBounds(f, f, f, 1 - f, 1 - f, 1 - f);
             AxisAlignedBB a = block.getCollisionBoundingBox(worldObj, pos, null);
             if (aabb == null || aabb.intersectsWith(a)) {
@@ -184,9 +183,9 @@ public class TileEntityServoRail extends TileEntityCommon implements IChargeCond
     
     @Override
     public MovingObjectPosition collisionRayTrace(Vec3 startVec, Vec3 endVec) {
-        ArrayList<AxisAlignedBB> boxes = new ArrayList(4);
+        ArrayList<AxisAlignedBB> boxes = new ArrayList<AxisAlignedBB>(4);
         getCollisionBoxes(null, boxes, null);
-        Block b = FMLCommonHandler.instance().getEffectiveSide() == Side.SERVER ? Core.registry.serverTraceHelper : Core.registry.clientTraceHelper;
+        Block b = FzUtil.getTraceHelper();
         for (AxisAlignedBB ab : boxes) {
             ab = ab.addCoord(-pos.getX(), -pos.getY(), -pos.getZ());
             float d = 1F/16F;
@@ -238,7 +237,7 @@ public class TileEntityServoRail extends TileEntityCommon implements IChargeCond
                 notice.withItem(new ItemStack(Blocks.redstone_torch));
                 notice.withStyle(Style.DRAWITEM);
             }
-            notice.send(player);
+            notice.sendTo(player);
         }
     }
     

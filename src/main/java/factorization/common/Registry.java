@@ -92,8 +92,6 @@ public class Registry {
     @Deprecated // Each TE has its own block now. This block continues to exist for converting blocks & items.
     public BlockFactorization legacy_factory_block;
     public BlockBarrel factory_block_barrel;
-    public BlockFactorization factory_rendering_block;
-    public Block serverTraceHelper = null, clientTraceHelper = null;
     public BlockLightAir lightair_block;
     public BlockResource resource_block;
     public Block dark_iron_ore;
@@ -205,11 +203,6 @@ public class Registry {
         mantlerock_block = new BlockNetherrack().setUnlocalizedName("factorization:mantlerock").setHardness(1.25F).setResistance(7.0F).setStepSound(Block.soundTypeStone).setCreativeTab(Core.tabFactorization);
         matcher_block = new BlockMatcher();
         artifact_forge = new BlockForge();
-        if (FMLCommonHandler.instance().getSide() == Side.CLIENT) {
-            factory_rendering_block = new BlockFactorization(materialMachine);
-            clientTraceHelper = new BlockFactorization(materialMachine);
-        }
-        serverTraceHelper = new BlockFactorization(materialMachine);
 
         GameRegistry.registerBlock(legacy_factory_block, ItemFactorizationBlock.class, "FzBlock");
         GameRegistry.registerBlock(factory_block_barrel, ItemDayBarrel.class, "FzBlockBarrel");

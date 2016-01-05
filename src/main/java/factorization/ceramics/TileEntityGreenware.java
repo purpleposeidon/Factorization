@@ -13,6 +13,7 @@ import factorization.common.ResourceType;
 import factorization.notify.Notice;
 import factorization.shared.*;
 import factorization.util.DataUtil;
+import factorization.util.FzUtil;
 import factorization.util.InvUtil;
 import factorization.util.SpaceUtil;
 import io.netty.buffer.ByteBuf;
@@ -529,7 +530,7 @@ public class TileEntityGreenware extends TileEntityCommon implements IFurnaceHea
 
     ClayLump extrudeLump(ClayLump against, EnumFacing dir) {
         ClayLump lump = against.copy();
-        Block b = Core.registry.serverTraceHelper;
+        Block b = FzUtil.getTraceHelper();
         against.toBlockBounds(b);
         int wX = lump.maxX - lump.minX;
         int wY = lump.maxY - lump.minY;
@@ -575,7 +576,7 @@ public class TileEntityGreenware extends TileEntityCommon implements IFurnaceHea
             return false;
 
         // check for free space (needs to be last, as it can mutate the world)
-        Block block = Core.registry.serverTraceHelper;
+        Block block = FzUtil.getTraceHelper();
         for (int dx = -1; dx <= 1; dx++) {
             for (int dy = -1; dy <= 1; dy++) {
                 for (int dz = -1; dz <= 1; dz++) {

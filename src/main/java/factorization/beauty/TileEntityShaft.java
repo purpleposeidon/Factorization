@@ -8,6 +8,7 @@ import factorization.common.FactoryType;
 import factorization.shared.BlockClass;
 import factorization.shared.Core;
 import factorization.shared.TileEntityCommon;
+import factorization.util.FzUtil;
 import factorization.util.NumUtil;
 import factorization.util.SpaceUtil;
 import net.minecraft.block.Block;
@@ -213,7 +214,7 @@ public class TileEntityShaft extends TileEntityCommon implements IRotationalEner
     @Override
     public MovingObjectPosition collisionRayTrace(Vec3 startVec, Vec3 endVec) {
         // TODO: This belongs... somewhere else
-        Block block = worldObj.isRemote ? Core.registry.clientTraceHelper : Core.registry.serverTraceHelper;
+        Block block = FzUtil.getTraceHelper();
         setBlockBounds(block);
         return block.collisionRayTrace(worldObj, pos, startVec, endVec);
     }

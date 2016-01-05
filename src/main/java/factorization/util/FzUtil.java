@@ -5,6 +5,7 @@ import factorization.api.Coord;
 import factorization.shared.Core;
 import factorization.weird.barrel.TileEntityDayBarrel;
 import net.minecraft.block.Block;
+import net.minecraft.block.material.Material;
 import net.minecraft.block.properties.IProperty;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
@@ -15,6 +16,7 @@ import net.minecraft.entity.ai.attributes.AttributeModifier;
 import net.minecraft.entity.ai.attributes.BaseAttributeMap;
 import net.minecraft.entity.ai.attributes.IAttributeInstance;
 import net.minecraft.entity.ai.attributes.ServersideAttributeMap;
+import net.minecraft.init.Blocks;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
@@ -254,5 +256,9 @@ public class FzUtil {
 
     public static IUnlistedProperty[] uprops(IUnlistedProperty... ret) {
         return ret;
+    }
+
+    public static Block getTraceHelper() {
+        return new Block(Material.rock);
     }
 }

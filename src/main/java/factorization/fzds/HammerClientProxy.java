@@ -11,6 +11,7 @@ import factorization.fzds.interfaces.IDeltaChunk;
 import factorization.fzds.network.PacketJunction;
 import factorization.shared.Core;
 import factorization.shared.NORELEASE;
+import factorization.util.FzUtil;
 import factorization.util.NumUtil;
 import factorization.util.SpaceUtil;
 import net.minecraft.block.Block;
@@ -418,7 +419,7 @@ public class HammerClientProxy extends HammerProxy {
             return;
         }
         Coord here = new Coord(DeltaChunk.getClientShadowWorld(), shadowSelected.getBlockPos());
-        Block hereBlock = Core.registry.clientTraceHelper;
+        Block hereBlock = FzUtil.getTraceHelper();
         hereBlock.setBlockBounds(
                 (float) (box.minX - here.x), (float) (box.minY - here.y), (float) (box.minZ - here.z),
                 (float) (box.maxX - here.x), (float) (box.maxY - here.y), (float) (box.maxZ - here.z)

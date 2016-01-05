@@ -6,6 +6,7 @@ import factorization.common.FactoryType;
 import factorization.common.Registry;
 import factorization.net.StandardMessageType;
 import factorization.notify.Notice;
+import factorization.util.FzUtil;
 import factorization.weird.barrel.TileEntityDayBarrel;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockContainer;
@@ -347,7 +348,7 @@ public class BlockFactorization extends BlockContainer {
     public void addCollisionBoxesToList(World w, BlockPos pos, IBlockState state, AxisAlignedBB mask, List<AxisAlignedBB> list, Entity collidingEntity) {
         // NORELEASE: Check state first. *most* things are just cubes.
         TileEntityCommon tec = get(w, pos);
-        Block test = w.isRemote ? Core.registry.clientTraceHelper : Core.registry.serverTraceHelper;
+        Block test = FzUtil.getTraceHelper();
         if (tec == null || !tec.addCollisionBoxesToList(test, mask, list, collidingEntity)) {
             super.addCollisionBoxesToList(w, pos, state, mask, list, collidingEntity);
         }
