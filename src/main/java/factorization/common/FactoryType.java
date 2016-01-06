@@ -14,8 +14,10 @@ import factorization.shared.*;
 import factorization.sockets.*;
 import factorization.sockets.fanturpeller.BlowEntities;
 import factorization.sockets.fanturpeller.PumpLiquids;
+import factorization.util.DataUtil;
 import factorization.weird.barrel.TileEntityDayBarrel;
 import factorization.wrath.TileEntityWrathLamp;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 
@@ -106,27 +108,16 @@ public enum FactoryType {
     final private Class<? extends TileEntityCommon> clazz;
     final public String te_id;
     public BlockFactorization block;
-    private TileEntityCommon representative;
-    private boolean can_represent = true;
+    private TileEntityCommon representative = null;
     public boolean disabled = false;
 
     public TileEntityCommon getRepresentative() {
-        if (!can_represent || disabled) {
+        if (disabled) {
             return null;
         }
         if (representative == null) {
-            if (clazz == null) {
-                can_represent = false;
-                return null;
-            }
-            if (can_represent) {
-                can_represent = TileEntityCommon.class.isAssignableFrom(clazz);
-                if (!can_represent) {
-                    return null;
-                }
-            }
             try {
-                representative = ((Class<? extends TileEntityCommon>)clazz).newInstance();
+                representative = clazz.newInstance();
             } catch (Throwable e) {
                 throw new IllegalArgumentException("Can not instantiate: " + toString(), e);
             }
@@ -142,7 +133,7 @@ public enum FactoryType {
         static FactoryType mapping[] = new FactoryType[128];
     }
 
-    FactoryType(int metadata, boolean use_gui, int gui_id, Class clazz, String name) {
+    FactoryType(int metadata, boolean use_gui, int gui_id, Class<? extends TileEntityCommon> clazz, String name) {
         md = metadata;
         if (use_gui) {
             gui = gui_id;
@@ -154,11 +145,9 @@ public enum FactoryType {
         mapper.mapping[md] = this;
         this.clazz = clazz;
         this.te_id = name;
-        TileEntityCommon rep = null;
-        representative = rep;
     }
 
-    FactoryType(int md, boolean use_gui, Class clazz, String name) {
+    FactoryType(int md, boolean use_gui, Class<? extends TileEntityCommon> clazz, String name) {
         this(md, use_gui, md, clazz, name);
     }
 
@@ -176,7 +165,7 @@ public enum FactoryType {
             return null;
         }
         try {
-            return (TileEntityCommon) clazz.newInstance();
+            return clazz.newInstance();
         } catch (InstantiationException e) {
             e.printStackTrace();
         } catch (IllegalAccessException e) {
@@ -210,8 +199,13 @@ public enum FactoryType {
         if (disabled) {
             return null;
         }
-        ItemStack ret = new ItemStack(Core.registry.item_factorization, 1, this.md);
-        return ret;
+        BlockFactorization useBlock = this.block == null ? Core.registry.legacy_factory_block : this.block;
+        Item useItem = DataUtil.getItem(useBlock);
+        int useMd = this.md;
+        if (useBlock != Core.registry.legacy_factory_block) {
+            useMd = 0;
+        }
+        return new ItemStack(useItem, 1, useMd);
     }
 
     public static void registerTileEntities() {
