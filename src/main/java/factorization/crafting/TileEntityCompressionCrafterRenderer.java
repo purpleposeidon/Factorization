@@ -26,7 +26,7 @@ import net.minecraft.world.World;
 import factorization.api.Coord;
 import factorization.shared.Core;
 import factorization.shared.FzModel;
-import factorization.shared.NORELEASE;
+import factorization.util.NORELEASE;
 
 public class TileEntityCompressionCrafterRenderer extends TileEntitySpecialRenderer<TileEntityCompressionCrafter> {
     Random rand = new Random();

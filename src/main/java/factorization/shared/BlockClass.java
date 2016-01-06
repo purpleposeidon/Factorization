@@ -1,6 +1,7 @@
 package factorization.shared;
 
 import factorization.api.Coord;
+import factorization.util.NORELEASE;
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.util.IStringSerializable;

@@ -1,7 +1,6 @@
 package factorization.notify;
 
 import factorization.api.ISaneCoord;
-import factorization.shared.NORELEASE;
 import factorization.util.RenderUtil;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;

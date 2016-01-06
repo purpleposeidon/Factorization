@@ -10,7 +10,7 @@ import factorization.fzds.gui.ProxiedGuiScreen;
 import factorization.fzds.interfaces.IDeltaChunk;
 import factorization.fzds.network.PacketJunction;
 import factorization.shared.Core;
-import factorization.shared.NORELEASE;
+import factorization.util.NORELEASE;
 import factorization.util.FzUtil;
 import factorization.util.NumUtil;
 import factorization.util.SpaceUtil;

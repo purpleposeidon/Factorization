@@ -2,7 +2,7 @@ package factorization.fzds.network;
 
 import factorization.fzds.Hammer;
 import factorization.fzds.interfaces.IFzdsShenanigans;
-import factorization.shared.NORELEASE;
+import factorization.util.NORELEASE;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.*;
 import io.netty.util.AttributeKey;

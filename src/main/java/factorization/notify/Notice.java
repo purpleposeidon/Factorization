@@ -1,10 +1,9 @@
 package factorization.notify;
 
 import factorization.api.ISaneCoord;
-import factorization.shared.NORELEASE;
+import factorization.util.NORELEASE;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.BlockPos;

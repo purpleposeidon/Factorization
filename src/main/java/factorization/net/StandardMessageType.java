@@ -1,7 +1,6 @@
 package factorization.net;
 
-import factorization.shared.NORELEASE;
-import io.netty.buffer.ByteBuf;
+import factorization.util.NORELEASE;
 
 public enum StandardMessageType {
     @Deprecated // 0 refers to a custom value

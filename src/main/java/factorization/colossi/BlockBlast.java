@@ -3,7 +3,6 @@ package factorization.colossi;
 import java.util.List;
 import java.util.Random;
 
-import factorization.shared.NORELEASE;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.properties.IProperty;
