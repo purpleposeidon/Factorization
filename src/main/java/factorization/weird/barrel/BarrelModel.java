@@ -99,10 +99,8 @@ public class BarrelModel implements ISmartBlockModel, ISmartItemModel, IPerspect
             textures.put("log", log.getIconName());
             textures.put("plank", plank.getIconName());
         }
-        if (isItem || layer == EnumWorldBlockLayer.CUTOUT) {
-            textures.put("top", top.getIconName());
-        }
         if (isItem || layer == EnumWorldBlockLayer.TRANSLUCENT) {
+            textures.put("top", top.getIconName());
             textures.put("front", front.getIconName());
             textures.put("side", side.getIconName());
         }
