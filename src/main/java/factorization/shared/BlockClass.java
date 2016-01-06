@@ -32,6 +32,7 @@ public enum BlockClass implements IStringSerializable, Comparable<BlockClass> {
         Machine.setAbnormal();
         Ceramic.setAbnormal();
         Wire.passable = true;
+        NORELEASE.fixme("Destroy this");
     }
 
     static class Md {

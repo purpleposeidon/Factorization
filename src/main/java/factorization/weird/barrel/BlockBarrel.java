@@ -114,11 +114,6 @@ public class BlockBarrel extends BlockFactorization {
     ArrayList<ItemStack> todaysBarrels = null;
 
     @Override
-    public int getRenderType() {
-        return 3;
-    }
-
-    @Override
     public boolean canRenderInLayer(EnumWorldBlockLayer layer) {
         return layer == EnumWorldBlockLayer.TRANSLUCENT || layer == EnumWorldBlockLayer.CUTOUT || layer == EnumWorldBlockLayer.SOLID;
     }

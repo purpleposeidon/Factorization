@@ -230,10 +230,6 @@ public class BlockFactorization extends BlockContainer {
             return;
         }
         Registry reg = Core.registry;
-        //common
-        
-        put(itemList, reg.parasieve_item);
-
         //electric
         //put(itemList, reg.battery_item_hidden);
         if (reg.battery != null) {
@@ -450,15 +446,6 @@ public class BlockFactorization extends BlockContainer {
         if (tec != null) {
             tec.spawnDisplayTickParticles(rand);
         }
-    }
-
-    final ThreadLocal<EnumWorldBlockLayer> CURRENT_PASS = new ThreadLocal<EnumWorldBlockLayer>(); // NORELEASE: This might be available in forge. Or maybe not. May not even be necessary!?
-    // TODO: This is a bit lame. A bit of overhead just for barrels and mixers...
-
-    @Override
-    public boolean canRenderInLayer(EnumWorldBlockLayer layer) {
-        CURRENT_PASS.set(layer);
-        return layer == EnumWorldBlockLayer.SOLID || layer == EnumWorldBlockLayer.TRANSLUCENT;
     }
 
     @Override

@@ -10,10 +10,7 @@ import factorization.mechanics.SocketPoweredCrank;
 import factorization.mechanics.TileEntityHinge;
 import factorization.redstone.TileEntityParaSieve;
 import factorization.servo.TileEntityServoRail;
-import factorization.shared.Core;
-import factorization.shared.TileEntityCommon;
-import factorization.shared.TileEntityExtension;
-import factorization.shared.TileEntityFactorization;
+import factorization.shared.*;
 import factorization.sockets.*;
 import factorization.sockets.fanturpeller.BlowEntities;
 import factorization.sockets.fanturpeller.PumpLiquids;
@@ -108,9 +105,10 @@ public enum FactoryType {
     final public boolean hasGui;
     final private Class<? extends TileEntityCommon> clazz;
     final public String te_id;
+    public BlockFactorization block;
     private TileEntityCommon representative;
     private boolean can_represent = true;
-    private boolean disabled = false;
+    public boolean disabled = false;
 
     public TileEntityCommon getRepresentative() {
         if (!can_represent || disabled) {

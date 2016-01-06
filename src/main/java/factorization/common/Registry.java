@@ -23,6 +23,7 @@ import factorization.oreprocessing.ItemOreProcessing;
 import factorization.oreprocessing.ItemOreProcessing.OreType;
 import factorization.oreprocessing.TileEntityGrinder;
 import factorization.redstone.BlockMatcher;
+import factorization.redstone.BlockParasieve;
 import factorization.servo.*;
 import factorization.servo.stepper.ItemStepperEngine;
 import factorization.shared.*;
@@ -56,6 +57,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.FurnaceRecipes;
 import net.minecraft.item.crafting.IRecipe;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.WeightedRandomFishable;
 import net.minecraft.world.World;
@@ -92,6 +94,7 @@ public class Registry {
     @Deprecated // Each TE has its own block now. This block continues to exist for converting blocks & items.
     public BlockFactorization legacy_factory_block;
     public BlockBarrel factory_block_barrel;
+    public BlockParasieve parasieve_block;
     public BlockLightAir lightair_block;
     public BlockResource resource_block;
     public Block dark_iron_ore;
@@ -183,6 +186,8 @@ public class Registry {
     public void makeBlocks() {
         legacy_factory_block = new BlockFactorization(materialMachine);
         factory_block_barrel = new BlockBarrel();
+        parasieve_block = new BlockParasieve();
+        parasieve_block.setUnlocalizedName("factorization.factoryBlock.PARASIEVE");
         for (BlockClass bc : BlockClass.values()) {
             if (bc == BlockClass.Barrel) {
                 bc.block = factory_block_barrel;
@@ -216,6 +221,7 @@ public class Registry {
         GameRegistry.registerBlock(matcher_block, "BlockMatcher");
         GameRegistry.registerBlock(artifact_forge, "ArtifactForge");
         GameRegistry.registerBlock(blastBlock, "BlastBlock");
+        GameRegistry.registerBlock(parasieve_block, "Parasieve");
         if (DeltaChunk.enabled()) {
             GameRegistry.registerBlock(colossal_block, ColossalBlockItem.class, "ColossalBlock");
             GameRegistry.registerTileEntity(TileEntityColossalHeart.class, "fz_colossal_heart");
@@ -274,6 +280,21 @@ public class Registry {
             if (obj instanceof Item) {
                 foundItems.add((Item) obj);
             }
+            if (obj instanceof BlockFactorization) {
+                BlockFactorization block = (BlockFactorization) obj;
+                TileEntity te = block.createNewTileEntity(null, 0);
+                if (te instanceof TileEntityFzNull) {
+                    if (block != this.legacy_factory_block) {
+                        NORELEASE.println("Block didn't give a TE: " + block);
+                    }
+                }
+                for (FactoryType ft : FactoryType.values()) {
+                    if (ft.getFactoryTypeClass() == te.getClass()) {
+                        if (ft.block != null) throw new RuntimeException("Block already assigned to FactoryType!");
+                        ft.block = block;
+                    }
+                }
+            }
         }
 
         Block invalid = DataUtil.getBlock((Item) null);
@@ -283,6 +304,11 @@ public class Registry {
             }
         }
         Core.proxy.registerISensitiveMeshes(foundItems);
+        for (FactoryType ft : FactoryType.values()) {
+            if (!ft.disabled && ft.block != null) {
+                NORELEASE.println("FactoryType doesn't have an associated block: ", ft);
+            }
+        }
     }
 
     public void makeItems() {

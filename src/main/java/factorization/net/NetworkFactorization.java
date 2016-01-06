@@ -143,6 +143,7 @@ public class NetworkFactorization {
     }
     
     public void prefixEntityPacket(ByteBuf output, Entity to, Enum messageType) throws IOException {
+        output.writeByte(FzNetEventHandler.TO_ENTITY);
         output.writeByte(getMessageIndex(messageType));
         output.writeInt(to.getEntityId());
     }
