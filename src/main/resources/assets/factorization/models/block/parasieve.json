@@ -2,11 +2,11 @@
     "parent": "block/cube",
     "textures": {
         "particle": "factorization:blocks/machine/parasieve_side",
-        "down": "factorization:blocks/machine/parasieve_side",
+        "down": "factorization:blocks/machine/parasieve_front",
         "up": "factorization:blocks/machine/parasieve_back",
-        "north": "factorization:blocks/machine/parasieve_front",
+        "east": "factorization:blocks/machine/parasieve_side",
+        "north": "factorization:blocks/machine/parasieve_side",
         "south": "factorization:blocks/machine/parasieve_side",
-        "west": "factorization:blocks/machine/parasieve_side",
-        "east": "factorization:blocks/machine/parasieve_side"
+        "west": "factorization:blocks/machine/parasieve_side"
     }
 }

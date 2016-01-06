@@ -1,0 +1,34 @@
+{
+    "forge_marker": 1,
+    "defaults": {
+        "model": "factorization:parasieve",
+        "transform": "forge:default-block"
+    },
+    "variants": {
+        "normal": [{}],
+        "inventory": [{}],
+        "direction": {
+            "up": {
+            },
+            "down": {
+                "x": 180
+            },
+            "north": {
+                "x": 270,
+                "y": 180
+            },
+            "south": {
+                "x": 90,
+                "y": 180
+            },
+            "east": {
+                "x": 90,
+                "y": 90
+            },
+            "west": {
+                "x": 90,
+                "y": 270
+            }
+        }
+    }
+}

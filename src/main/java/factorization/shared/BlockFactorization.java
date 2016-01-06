@@ -43,6 +43,10 @@ public class BlockFactorization extends BlockContainer {
         setTickRandomly(false);
     }
 
+    public FactoryType getFactoryType(int md) {
+        return FactoryType.fromMd(md);
+    }
+
     @Override
     protected BlockState createBlockState() {
         return new BlockState(this, BLOCK_CLASS);

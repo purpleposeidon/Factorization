@@ -7,6 +7,7 @@ import factorization.shared.BlockClass;
 import factorization.shared.BlockFactorization;
 import factorization.shared.Core;
 import factorization.util.FzUtil;
+import factorization.util.NORELEASE;
 import net.minecraft.block.material.MapColor;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.BlockState;
@@ -31,9 +32,15 @@ import java.util.Random;
 public class BlockBarrel extends BlockFactorization {
     public static final Material materialBarrel = new Material(MapColor.woodColor) {{
         setAdventureModeExempt();
+        NORELEASE.fixme("Test adventure mode barrel breaking");
     }};
     public BlockBarrel() {
         super(materialBarrel);
+    }
+
+    @Override
+    public FactoryType getFactoryType(int md) {
+        return FactoryType.DAYBARREL;
     }
 
     @Override

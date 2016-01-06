@@ -26,7 +26,7 @@ public abstract class TileEntityFactorization extends TileEntityCommon
 
     //Save & Share
     public byte draw_active;
-    public EnumFacing facing_direction = EnumFacing.WEST;
+    public EnumFacing facing_direction = EnumFacing.UP;
 
     //Runtime
     protected transient boolean need_logic_check = true;

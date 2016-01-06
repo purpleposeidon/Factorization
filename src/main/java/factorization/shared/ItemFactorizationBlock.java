@@ -31,7 +31,7 @@ public class ItemFactorizationBlock extends ItemBlock {
             World w, BlockPos pos, EnumFacing side, float hitX, float hitY,
             float hitZ, IBlockState newState) {
         Coord here = new Coord(w, pos);
-        FactoryType f = FactoryType.fromMd((byte) is.getItemDamage());
+        FactoryType f = ((BlockFactorization) block).getFactoryType(is.getItemDamage());
         if (f == null) {
             is.stackSize = 0;
             return false;

@@ -315,7 +315,7 @@ public abstract class TileEntityCommon extends TileEntity implements ICoord, IFa
 
 
     public ItemStack getDroppedBlock() {
-        return new ItemStack(Core.registry.item_factorization, 1, getFactoryType().md);
+        return getFactoryType().itemStack();
     }
 
     public ItemStack getPickedBlock() {

@@ -6,11 +6,8 @@ import factorization.common.FactoryType;
 import factorization.shared.BlockClass;
 import factorization.shared.Core;
 import factorization.shared.TileEntityFactorization;
-import factorization.util.DataUtil;
-import factorization.util.InvUtil;
+import factorization.util.*;
 import factorization.util.InvUtil.FzInv;
-import factorization.util.ItemUtil;
-import factorization.util.SpaceUtil;
 import net.minecraft.entity.Entity;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.ISidedInventory;
@@ -83,11 +80,12 @@ public class TileEntityParaSieve extends TileEntityFactorization implements ISid
         return facing_direction.getOpposite();
     }
 
-    static Coord hereCache = new Coord(null, 0, 0, 0);
     private boolean isPowered() {
         if (redstone_cache == -1) {
-            hereCache.set(this);
-            redstone_cache = (byte) (hereCache.isPowered() ? 1 : 0);
+            if (worldObj == null) {
+                NORELEASE.breakpoint();
+            }
+            redstone_cache = (byte) /* seriously, Java? This is too much for you? Get a life. */ (new Coord(this).isPowered() ? 1 : 0);
         }
         return redstone_cache == 1;
     }

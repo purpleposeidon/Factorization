@@ -216,7 +216,7 @@ public class Registry {
         GameRegistry.registerBlock(matcher_block, "BlockMatcher");
         GameRegistry.registerBlock(artifact_forge, "ArtifactForge");
         GameRegistry.registerBlock(blastBlock, "BlastBlock");
-        GameRegistry.registerBlock(parasieve_block, "Parasieve");
+        GameRegistry.registerBlock(parasieve_block, ItemFactorizationBlock.class, "Parasieve");
         if (DeltaChunk.enabled()) {
             GameRegistry.registerBlock(colossal_block, ColossalBlockItem.class, "ColossalBlock");
             GameRegistry.registerTileEntity(TileEntityColossalHeart.class, "fz_colossal_heart");

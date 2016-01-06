@@ -112,7 +112,7 @@ public enum FactoryType {
     public boolean disabled = false;
 
     public TileEntityCommon getRepresentative() {
-        if (disabled) {
+        if (disabled || clazz == null) {
             return null;
         }
         if (representative == null) {
@@ -185,7 +185,7 @@ public enum FactoryType {
         return md == this.md;
     }
 
-    public static FactoryType fromMd(short md) {
+    public static FactoryType fromMd(int md) {
         if (md < 0) {
             return null;
         }

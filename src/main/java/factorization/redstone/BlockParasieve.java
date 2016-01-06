@@ -1,5 +1,6 @@
 package factorization.redstone;
 
+import factorization.common.FactoryType;
 import factorization.shared.BlockClass;
 import factorization.shared.BlockFactorization;
 import factorization.shared.Core;
@@ -22,6 +23,11 @@ public class BlockParasieve extends BlockFactorization {
     public static final IProperty<EnumFacing> FACING = PropertyDirection.create("direction");
     public BlockParasieve() {
         super(Core.registry.materialMachine);
+    }
+
+    @Override
+    public FactoryType getFactoryType(int md) {
+        return FactoryType.PARASIEVE;
     }
 
     @Override
