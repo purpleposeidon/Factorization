@@ -83,7 +83,7 @@ public class TileEntityParaSieve extends TileEntityFactorization implements ISid
     private boolean isPowered() {
         if (redstone_cache == -1) {
             if (worldObj == null) {
-                NORELEASE.breakpoint();
+                return true;
             }
             redstone_cache = (byte) /* seriously, Java? This is too much for you? Get a life. */ (new Coord(this).isPowered() ? 1 : 0);
         }
