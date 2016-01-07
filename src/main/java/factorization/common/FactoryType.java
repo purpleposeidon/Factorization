@@ -66,7 +66,7 @@ public enum FactoryType {
     //40 -- Was the short-lived SOCKET_MIXER
     SOCKET_BARE_MOTOR(41, false, SocketBareMotor.class, "fzsock_motor"),
     SOCKET_SCISSORS(42, false, SocketScissors.class, "fzsock_scissors"),
-    CREATIVE_CHARGE(43, false, InfiniteChargeBlock.class, "factory_creative_charge"),
+    CREATIVE_CHARGE(43, false, InfiniteEnergy.class, "factory_creative_charge"),
     HINGE(44, false, TileEntityHinge.class, "factory_hinge"),
     //ANCHOR(45, false, TileEntityAnchor.class, "factory_anchor"),
     //SOCKET_HAND_CRANK(46, false, SocketHandCrank.class, "fzsock_hand_crank"),

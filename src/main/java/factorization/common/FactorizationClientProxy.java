@@ -210,6 +210,9 @@ public class FactorizationClientProxy extends FactorizationProxy {
                 Core.registry.blastBlock,
                 Core.registry.mantlerock_block,
                 Core.registry.factory_block_barrel,
+                Core.registry.parasieve_block,
+                Core.registry.caliometric_burner_block,
+                Core.registry.creative_energy,
         }) {
             setItemBlockModel(b, 0, "inventory");
         }

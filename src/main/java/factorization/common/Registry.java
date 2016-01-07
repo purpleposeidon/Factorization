@@ -10,10 +10,7 @@ import factorization.ceramics.ItemGlazeBucket;
 import factorization.ceramics.ItemSculptingTool;
 import factorization.ceramics.TileEntityGreenware;
 import factorization.ceramics.TileEntityGreenware.ClayState;
-import factorization.charge.ItemAcidBottle;
-import factorization.charge.ItemBattery;
-import factorization.charge.ItemChargeMeter;
-import factorization.charge.TileEntityLeydenJar;
+import factorization.charge.*;
 import factorization.colossi.*;
 import factorization.darkiron.BlockDarkIronOre;
 import factorization.fzds.DeltaChunk;
@@ -90,6 +87,8 @@ public class Registry {
     public BlockFactorization legacy_factory_block;
     public BlockBarrel factory_block_barrel;
     public BlockParasieve parasieve_block;
+    public SimpleFzBlock caliometric_burner_block;
+    public SimpleFzBlock creative_energy;
     public BlockLightAir lightair_block;
     public BlockResource resource_block;
     public Block dark_iron_ore;
@@ -182,7 +181,9 @@ public class Registry {
         legacy_factory_block = new BlockFactorization(materialMachine);
         factory_block_barrel = new BlockBarrel();
         parasieve_block = new BlockParasieve();
-        parasieve_block.setUnlocalizedName("factorization.factoryBlock.PARASIEVE");
+        parasieve_block.setUnlocalizedName("factorization:factoryBlock.PARASIEVE");
+        caliometric_burner_block = new SimpleFzBlock(Material.piston, FactoryType.CALIOMETRIC_BURNER);
+        creative_energy = new SimpleFzBlock(Material.barrier, FactoryType.CREATIVE_CHARGE);
         for (BlockClass bc : BlockClass.values()) {
             if (bc == BlockClass.Barrel) {
                 bc.block = factory_block_barrel;
@@ -192,15 +193,21 @@ public class Registry {
         }
         lightair_block = new BlockLightAir();
         resource_block = new BlockResource();
-        dark_iron_ore = new BlockDarkIronOre().setUnlocalizedName("factorization:darkIronOre").setCreativeTab(Core.tabFactorization).setHardness(3.0F).setResistance(5.0F);
+        dark_iron_ore = new BlockDarkIronOre()
+                .setUnlocalizedName("factorization:darkIronOre")
+                .setHardness(3.0F).setResistance(5.0F);
         fractured_bedrock_block = new FracturedBedrock();
         blasted_bedrock_block = new BlastedBedrock();
         if (DeltaChunk.enabled()) {
             colossal_block = new ColossalBlock();
         }
         blastBlock = new BlockBlast();
-        gargantuan_block = new GargantuanBlock().setUnlocalizedName("factorization:gargantuanBrick").setCreativeTab(Core.tabFactorization);
-        mantlerock_block = new BlockNetherrack().setUnlocalizedName("factorization:mantlerock").setHardness(1.25F).setResistance(7.0F).setStepSound(Block.soundTypeStone).setCreativeTab(Core.tabFactorization);
+        gargantuan_block = new GargantuanBlock()
+                .setUnlocalizedName("factorization:gargantuanBrick");
+        mantlerock_block = new BlockNetherrack()
+                .setUnlocalizedName("factorization:mantlerock")
+                .setHardness(1.25F).setResistance(7.0F)
+                .setStepSound(Block.soundTypeStone);
         matcher_block = new BlockMatcher();
         artifact_forge = new BlockForge();
 
@@ -217,6 +224,8 @@ public class Registry {
         GameRegistry.registerBlock(artifact_forge, "ArtifactForge");
         GameRegistry.registerBlock(blastBlock, "BlastBlock");
         GameRegistry.registerBlock(parasieve_block, ItemFactorizationBlock.class, "Parasieve");
+        GameRegistry.registerBlock(caliometric_burner_block, ItemFactorizationBlock.class, "CaliometricBurner");
+        GameRegistry.registerBlock(creative_energy, ItemFactorizationBlock.class, "CreativeEnergy");
         if (DeltaChunk.enabled()) {
             GameRegistry.registerBlock(colossal_block, ColossalBlockItem.class, "ColossalBlock");
             GameRegistry.registerTileEntity(TileEntityColossalHeart.class, "fz_colossal_heart");
@@ -289,6 +298,10 @@ public class Registry {
                         ft.block = block;
                     }
                 }
+            }
+            if (obj instanceof Block) {
+                Block block = (Block) obj;
+                block.setCreativeTab(Core.tabFactorization);
             }
         }
 

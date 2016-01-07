@@ -1,0 +1,7 @@
+{
+    "parent": "factorization:block/top_side", 
+    "textures": {
+        "top": "factorization:blocks/charge/caliometric_top",
+        "side": "factorization:blocks/charge/caliometric_side"
+    }
+}

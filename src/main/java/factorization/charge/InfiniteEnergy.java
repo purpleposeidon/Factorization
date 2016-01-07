@@ -10,7 +10,7 @@ import net.minecraft.util.ITickable;
 
 import java.io.IOException;
 
-public class InfiniteChargeBlock extends TileEntityCommon implements IChargeConductor, ITickable {
+public class InfiniteEnergy extends TileEntityCommon implements IChargeConductor, ITickable {
     Charge charge = new Charge(this);
     
     @Override

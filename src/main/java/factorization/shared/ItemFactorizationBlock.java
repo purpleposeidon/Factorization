@@ -27,12 +27,16 @@ public class ItemFactorizationBlock extends ItemBlock {
         setHasSubtypes(true);
     }
 
+    public FactoryType getFT(ItemStack is) {
+        return ((BlockFactorization) block).getFactoryType(is.getItemDamage());
+    }
+
     @Override
     public boolean placeBlockAt(ItemStack is, EntityPlayer player,
             World w, BlockPos pos, EnumFacing side, float hitX, float hitY,
             float hitZ, IBlockState newState) {
         Coord here = new Coord(w, pos);
-        FactoryType f = ((BlockFactorization) block).getFactoryType(is.getItemDamage());
+        FactoryType f = getFT(is);
         if (f == null) {
             is.stackSize = 0;
             return false;
@@ -47,16 +51,16 @@ public class ItemFactorizationBlock extends ItemBlock {
         }
         if (super.placeBlockAt(is, player, w, pos, side, hitX, hitY, hitZ, newState)) {
             TileEntity built = here.getTE();
-            TileEntityCommon tef;
+            TileEntityCommon tec;
             if (built instanceof TileEntityCommon && (((TileEntityCommon) built).getFactoryType() == f)) {
-                tef = (TileEntityFactorization) built;
+                tec = (TileEntityCommon) built;
             } else {
-                tef = f.makeTileEntity();
-                here.setAsTileEntityLocation(tef);
+                tec = f.makeTileEntity();
+                here.setAsTileEntityLocation(tec);
             }
-            if (tef == null) return false;
-            tef.onPlacedBy(player, is, side, hitX, hitY, hitZ);
-            tef.getBlockClass().enforce(here);
+            if (tec == null) return false;
+            tec.onPlacedBy(player, is, side, hitX, hitY, hitZ);
+            tec.getBlockClass().enforce(here);
 
             here.markBlockForUpdate();
             return true;
@@ -71,8 +75,7 @@ public class ItemFactorizationBlock extends ItemBlock {
     
     @Override
     public String getUnlocalizedName(ItemStack is) {
-        int md = is.getItemDamage();
-        FactoryType ft = FactoryType.fromMd((byte) md);
+        FactoryType ft = getFT(is);
         return "factorization.factoryBlock." + ft;
     }
 

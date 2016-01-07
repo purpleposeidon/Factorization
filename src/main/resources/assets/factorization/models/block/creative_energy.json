@@ -1,0 +1,7 @@
+{
+    "parent": "factorization:block/top_side", 
+    "textures": {
+        "top": "factorization:blocks/charge/battery_top",
+        "side": "minecraft:blocks/bedrock"
+    }
+}
