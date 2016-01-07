@@ -1,6 +1,5 @@
 package factorization.artifact;
 
-import factorization.api.annotation.Nonnull;
 import factorization.shared.Core;
 import factorization.shared.ISensitiveMesh;
 import factorization.shared.ItemCraftingComponent;
@@ -21,7 +20,6 @@ import net.minecraftforge.event.AnvilUpdateEvent;
 import net.minecraftforge.event.entity.player.AnvilRepairEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 

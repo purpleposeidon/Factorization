@@ -1,6 +1,5 @@
 package factorization.truth.minecraft;
 
-import factorization.api.annotation.Nonnull;
 import factorization.shared.Core;
 import factorization.shared.ISensitiveMesh;
 import factorization.truth.api.DocReg;
@@ -10,11 +9,9 @@ import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemFood;
 import net.minecraft.item.ItemStack;
-import net.minecraft.network.play.server.S37PacketStatistics;
 import net.minecraft.potion.Potion;
 import net.minecraft.potion.PotionEffect;
 import net.minecraft.stats.StatBase;
@@ -26,7 +23,6 @@ import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 
 public class ItemManSandwich extends ItemFood implements IManwich, ISensitiveMesh {

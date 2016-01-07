@@ -2,7 +2,6 @@ package factorization.ceramics;
 
 import factorization.api.Coord;
 import factorization.api.Quaternion;
-import factorization.api.annotation.Nonnull;
 import factorization.api.datahelpers.DataInNBT;
 import factorization.ceramics.TileEntityGreenware.ClayLump;
 import factorization.ceramics.TileEntityGreenware.ClayState;

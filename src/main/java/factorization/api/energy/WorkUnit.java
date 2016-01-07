@@ -3,8 +3,8 @@ package factorization.api.energy;
 
 import com.google.common.base.Preconditions;
 
-import factorization.api.annotation.Nonnull;
-import factorization.api.annotation.Nullable;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 /**
  * A single unit of some kind of power, with energy sufficient to do one 'work action'.

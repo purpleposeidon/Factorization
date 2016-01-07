@@ -5,8 +5,8 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 
-import factorization.api.annotation.Nonnull;
-import factorization.api.annotation.Nullable;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 /**
  * <p>An {@link IWorker} is a thing that can accept {@link WorkUnit}s. Various standard Minecraft classes may implement

@@ -1,6 +1,5 @@
 package factorization.charge;
 
-import factorization.api.annotation.Nonnull;
 import factorization.shared.Core;
 import factorization.shared.Core.TabType;
 import factorization.shared.ISensitiveMesh;

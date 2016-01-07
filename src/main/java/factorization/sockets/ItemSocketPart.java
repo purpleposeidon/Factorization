@@ -1,6 +1,5 @@
 package factorization.sockets;
 
-import factorization.api.annotation.Nonnull;
 import factorization.common.FactoryType;
 import factorization.shared.Core.TabType;
 import factorization.shared.ISensitiveMesh;
@@ -14,8 +13,6 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.world.World;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
 
 import java.util.ArrayList;
 import java.util.List;
