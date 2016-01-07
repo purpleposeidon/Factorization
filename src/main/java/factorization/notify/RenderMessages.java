@@ -19,18 +19,24 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import org.lwjgl.opengl.GL11;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Iterator;
+import java.util.List;
 
 public class RenderMessages extends RenderMessagesProxy {
-    static ArrayList<ClientMessage> messages = new ArrayList<ClientMessage>();
+    static List<ClientMessage> messages = Collections.synchronizedList(new ArrayList<ClientMessage>());
     
     {
         NotifyImplementation.loadBus(this);
         ClientCommandHandler.instance.registerCommand(new PointCommand());
     }
-    
+
     @Override
-    synchronized public void addMessage(Object locus, ItemStack item, String format, String... args) {
+    public void addMessage(Object locus, ItemStack item, String format, String... args) {
+        addMessage0(locus, item, format, args);
+    }
+
+    private void addMessage0(Object locus, ItemStack item, String format, String... args) {
         EntityPlayer player = Minecraft.getMinecraft().thePlayer;
         if (player == null || player.worldObj == null) {
             return;
@@ -84,10 +90,12 @@ public class RenderMessages extends RenderMessagesProxy {
 
     @SubscribeEvent
     public void renderMessages(RenderWorldLastEvent event) {
-        doRenderMessages(event); // Forge events are too hard for eclipse to hot-swap?
+        synchronized (messages) {
+            doRenderMessages(event);
+        }
     }
     
-    synchronized void doRenderMessages(RenderWorldLastEvent event) {
+    void doRenderMessages(RenderWorldLastEvent event) {
         World w = Minecraft.getMinecraft().theWorld;
         if (w == null) {
             return;
