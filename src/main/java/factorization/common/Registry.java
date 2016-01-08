@@ -89,6 +89,7 @@ public class Registry {
     public BlockParasieve parasieve_block;
     public SimpleFzBlock caliometric_burner_block;
     public SimpleFzBlock creative_energy;
+    public BlockFurnaceHeater furnace_heater;
     public BlockLightAir lightair_block;
     public BlockResource resource_block;
     public Block dark_iron_ore;
@@ -182,8 +183,9 @@ public class Registry {
         factory_block_barrel = new BlockBarrel();
         parasieve_block = new BlockParasieve();
         parasieve_block.setUnlocalizedName("factorization:factoryBlock.PARASIEVE");
-        caliometric_burner_block = new SimpleFzBlock(Material.piston, FactoryType.CALIOMETRIC_BURNER);
+        caliometric_burner_block = new SimpleFzBlock(materialMachine, FactoryType.CALIOMETRIC_BURNER);
         creative_energy = new SimpleFzBlock(Material.barrier, FactoryType.CREATIVE_CHARGE);
+        furnace_heater = new BlockFurnaceHeater();
         for (BlockClass bc : BlockClass.values()) {
             if (bc == BlockClass.Barrel) {
                 bc.block = factory_block_barrel;
@@ -226,6 +228,7 @@ public class Registry {
         GameRegistry.registerBlock(parasieve_block, ItemFactorizationBlock.class, "Parasieve");
         GameRegistry.registerBlock(caliometric_burner_block, ItemFactorizationBlock.class, "CaliometricBurner");
         GameRegistry.registerBlock(creative_energy, ItemFactorizationBlock.class, "CreativeEnergy");
+        GameRegistry.registerBlock(furnace_heater, ItemFactorizationBlock.class, "FurnaceHeater");
         if (DeltaChunk.enabled()) {
             GameRegistry.registerBlock(colossal_block, ColossalBlockItem.class, "ColossalBlock");
             GameRegistry.registerTileEntity(TileEntityColossalHeart.class, "fz_colossal_heart");
@@ -325,7 +328,7 @@ public class Registry {
         ore_reduced = new ItemOreProcessing("reduced");
         ore_crystal = new ItemOreProcessing("crystal");
         sludge = new ItemCraftingComponent("sludge");
-        OreDictionary.registerOre("sludge", sludge);
+        NORELEASE.fixme("Delete these guys");
         //ItemBlocks
         item_factorization = (ItemFactorizationBlock) Item.getItemFromBlock(legacy_factory_block);
         item_resource = (ItemBlockResource) Item.getItemFromBlock(resource_block);

@@ -254,7 +254,6 @@ public class BlockFactorization extends BlockContainer {
         put(itemList, reg.wind_mill);
         put(itemList, reg.water_wheel);
         put(itemList, reg.steam_to_shaft);
-        put(itemList, reg.heater_item);
 
         put(itemList, reg.greenware_item);
 

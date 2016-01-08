@@ -4,6 +4,7 @@ import factorization.common.FactoryType;
 import factorization.shared.BlockClass;
 import factorization.shared.BlockFactorization;
 import factorization.shared.Core;
+import factorization.shared.SimpleFzBlock;
 import net.minecraft.block.properties.IProperty;
 import net.minecraft.block.properties.PropertyDirection;
 import net.minecraft.block.state.BlockState;
@@ -19,15 +20,10 @@ import net.minecraft.world.World;
 
 import java.util.List;
 
-public class BlockParasieve extends BlockFactorization {
+public class BlockParasieve extends SimpleFzBlock {
     public static final IProperty<EnumFacing> FACING = PropertyDirection.create("direction");
     public BlockParasieve() {
-        super(Core.registry.materialMachine);
-    }
-
-    @Override
-    public FactoryType getFactoryType(int md) {
-        return FactoryType.PARASIEVE;
+        super(Core.registry.materialMachine, FactoryType.PARASIEVE);
     }
 
     @Override
@@ -36,33 +32,8 @@ public class BlockParasieve extends BlockFactorization {
     }
 
     @Override
-    public int getMetaFromState(IBlockState state) {
-        return 0;
-    }
-
-    @Override
-    public IBlockState getStateFromMeta(int meta) {
-        return getDefaultState();
-    }
-
-    @Override
-    public TileEntity createNewTileEntity(World world, int metadata) {
-        return new TileEntityParaSieve();
-    }
-
-    @Override
-    public BlockClass getClass(IBlockAccess world, BlockPos pos) {
-        return BlockClass.Machine;
-    }
-
-    @Override
     public boolean isBlockSolid(IBlockAccess world, BlockPos pos, EnumFacing side) {
         return true;
-    }
-
-    @Override
-    public void getSubBlocks(Item me, CreativeTabs tab, List<ItemStack> itemList) {
-        itemList.add(new ItemStack(this));
     }
 
     @Override

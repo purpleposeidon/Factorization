@@ -66,6 +66,7 @@ import net.minecraftforge.client.event.TextureStitchEvent;
 import net.minecraftforge.client.model.IRetexturableModel;
 import net.minecraftforge.client.model.ModelLoader;
 import net.minecraftforge.client.model.ModelLoaderRegistry;
+import net.minecraftforge.client.model.obj.OBJLoader;
 import net.minecraftforge.fml.client.registry.ClientRegistry;
 import net.minecraftforge.fml.client.registry.RenderingRegistry;
 import net.minecraftforge.fml.common.FMLCommonHandler;
@@ -81,6 +82,7 @@ public class FactorizationClientProxy extends FactorizationProxy {
 
     public FactorizationClientProxy() {
         Core.loadBus(this);
+        OBJLoader.instance.addDomain("factorization");
     }
 
     @Override
@@ -213,6 +215,7 @@ public class FactorizationClientProxy extends FactorizationProxy {
                 Core.registry.parasieve_block,
                 Core.registry.caliometric_burner_block,
                 Core.registry.creative_energy,
+                Core.registry.furnace_heater,
         }) {
             setItemBlockModel(b, 0, "inventory");
         }
