@@ -71,20 +71,7 @@ configurations {
 targetCompatibility = '1.6'
 sourceCompatibility = '1.6'
 
-repositories {
-    maven {   
-        name = "ChickenBones"
-        url = "http://chickenbones.net/maven/"
-    }   
-}
-
-
 dependencies {
-    if (System.getenv("DISABLE_CBBS") == null) {
-        // How exactly do you set a variable? Tried 'ext.cbbs', but that doesn't work in places.
-        // That's pretty silly.
-        compile 'codechicken:NotEnoughItems:1.7.10-1.0.2.15:dev'
-    }
     api 'net.industrial-craft:industrialcraft-2:2.2.767-experimental:dev'
     // you may put jars on which you depend on in ./libs
     // or you may define them like so..
@@ -108,9 +95,6 @@ compileJava {
     }
     exclude "Gradle*.java"
     exclude "**.blend*"
-    if (System.getenv("DISABLE_CBBS") != null) {
-        exclude "factorization/nei/**.java"
-    }
 }
 
 task writeFzFile {
@@ -148,7 +132,6 @@ jar {
         attributes("FMLCorePlugin": "factorization.coremod.LoadingPlugin",
                    "FMLCorePluginContainsFMLMod": "true")
     }
-    exclude "codechicken/**"
     exclude "mods/**"
 }
 
@@ -162,7 +145,6 @@ task deobfJar(type: Jar) {
         attributes("FMLCorePlugin": "factorization.coremod.LoadingPlugin",
                    "FMLCorePluginContainsFMLMod": "true")
     }
-    exclude "codechicken/**"
     exclude "mods/**"
     // End copied from 'jar'?
 }
