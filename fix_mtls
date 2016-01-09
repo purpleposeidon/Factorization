@@ -1,0 +1,15 @@
+#!/bin/sh
+
+set -e
+
+NEEDLE=$(pwd)/src/main/resources/assets/factorization/
+REPLACE="factorization:"
+
+HAY=$(find $NEEDLE | grep mtl$)
+for filename in $HAY; do
+    echo "Processing:" $filename
+    rm -rf .tmp
+    python -c "print open('$filename').read().replace('$NEEDLE', '$REPLACE')" > .tmp
+    cat .tmp > $filename
+    rm -rf .tmp
+done
