@@ -107,6 +107,7 @@ compileJava {
         exclude "factorization/shared/NORELEASE.java"
     }
     exclude "Gradle*.java"
+    exclude "**.blend*"
     if (System.getenv("DISABLE_CBBS") != null) {
         exclude "factorization/nei/**.java"
     }
