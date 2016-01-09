@@ -216,6 +216,7 @@ public class FactorizationClientProxy extends FactorizationProxy {
                 Core.registry.caliometric_burner_block,
                 Core.registry.creative_energy,
                 Core.registry.furnace_heater,
+                Core.registry.whirligig,
         }) {
             setItemBlockModel(b, 0, "inventory");
         }

@@ -90,6 +90,7 @@ public class Registry {
     public SimpleFzBlock caliometric_burner_block;
     public SimpleFzBlock creative_energy;
     public BlockFurnaceHeater furnace_heater;
+    public SimpleFzBlock whirligig;
     public BlockLightAir lightair_block;
     public BlockResource resource_block;
     public Block dark_iron_ore;
@@ -179,6 +180,9 @@ public class Registry {
     }
 
     public void makeBlocks() {
+        ResourceLocation steamy = new ResourceLocation("factorization:textures/blocks/steam");
+        steamFluid = new Fluid("steam", steamy, steamy).setDensity(-500).setGaseous(true).setViscosity(100).setUnlocalizedName("factorization:fluid/steam").setTemperature(273 + 110);
+        FluidRegistry.registerFluid(steamFluid);
         legacy_factory_block = new BlockFactorization(materialMachine);
         factory_block_barrel = new BlockBarrel();
         parasieve_block = new BlockParasieve();
@@ -186,6 +190,7 @@ public class Registry {
         caliometric_burner_block = new SimpleFzBlock(materialMachine, FactoryType.CALIOMETRIC_BURNER);
         creative_energy = new SimpleFzBlock(Material.barrier, FactoryType.CREATIVE_CHARGE);
         furnace_heater = new BlockFurnaceHeater();
+        whirligig = new SimpleFzBlock(materialMachine, FactoryType.STEAM_SHAFT);
         for (BlockClass bc : BlockClass.values()) {
             if (bc == BlockClass.Barrel) {
                 bc.block = factory_block_barrel;
@@ -229,6 +234,7 @@ public class Registry {
         GameRegistry.registerBlock(caliometric_burner_block, ItemFactorizationBlock.class, "CaliometricBurner");
         GameRegistry.registerBlock(creative_energy, ItemFactorizationBlock.class, "CreativeEnergy");
         GameRegistry.registerBlock(furnace_heater, ItemFactorizationBlock.class, "FurnaceHeater");
+        GameRegistry.registerBlock(whirligig, ItemFactorizationBlock.class, "Whirligig");
         if (DeltaChunk.enabled()) {
             GameRegistry.registerBlock(colossal_block, ColossalBlockItem.class, "ColossalBlock");
             GameRegistry.registerTileEntity(TileEntityColossalHeart.class, "fz_colossal_heart");
@@ -416,9 +422,6 @@ public class Registry {
 
         //Misc
         pocket_table = new ItemPocketTable();
-        ResourceLocation steamy = new ResourceLocation("factorization:textures/blocks/steam");
-        steamFluid = new Fluid("steam", steamy, steamy).setDensity(-500).setGaseous(true).setViscosity(100).setUnlocalizedName("factorization:fluid/steam").setTemperature(273 + 110);
-        FluidRegistry.registerFluid(steamFluid);
 
         //Rocketry
         nether_powder = new ItemCraftingComponent("nether_powder");

@@ -23,6 +23,20 @@ public class TileEntitySolarBoiler extends TileEntityCommon implements IReflecti
     public static Fluid steam;
     public static FluidStack water_stack = null;
     public static FluidStack steam_stack = null;
+
+    public static FluidStack getWaterStack() {
+        if (water_stack == null) {
+            setupSteam();
+        }
+        return water_stack;
+    }
+
+    public static FluidStack getSteamStack() {
+        if (water_stack == null) {
+            setupSteam();
+        }
+        return steam_stack;
+    }
     
     public static void setupSteam() {
         if (water_stack == null) {

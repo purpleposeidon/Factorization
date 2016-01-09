@@ -27,7 +27,7 @@ import java.io.IOException;
 import java.util.Random;
 
 public class TileEntitySteamShaft extends TileEntityCommon implements IFluidHandler, IRotationalEnergySource, IMeterInfo, ITickable {
-    FluidTank steamTank = new FluidTank(/*this,*/ TileEntitySolarBoiler.steam_stack.copy(), 800);
+    FluidTank steamTank = new FluidTank(/*this,*/ TileEntitySolarBoiler.getSteamStack().copy(), 800);
 
     public static double Z = 1.6; // exponent on velocity for determining drag
     public static int TURBINE_MASS = 1000; // force:steam = mass * acceleration --> acceleration = force / mass

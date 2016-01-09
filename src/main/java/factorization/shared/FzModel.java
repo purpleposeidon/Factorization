@@ -18,6 +18,7 @@ import net.minecraftforge.client.model.IModel;
 import net.minecraftforge.client.model.IModelState;
 import net.minecraftforge.client.model.ModelLoaderRegistry;
 import net.minecraftforge.client.model.TRSRTransformation;
+import net.minecraftforge.client.model.obj.OBJModel;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.relauncher.Side;
@@ -26,6 +27,7 @@ import org.lwjgl.opengl.GL11;
 
 import javax.annotation.Nullable;
 import javax.vecmath.Matrix4f;
+import javax.vecmath.Vector3f;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -40,8 +42,11 @@ public class FzModel {
     IBakedModel model;
 
     public FzModel(String name) {
-        this.name = name;
+        this.name = "fzmodel/" + name;
         instances.add(this);
+        if (ModelWrangler.hasLoaded) {
+            Core.logSevere("FzModel was constructed too late: " + name);
+        }
     }
 
     public static final ArrayList<FzModel> instances = new ArrayList<FzModel>();
@@ -83,8 +88,10 @@ public class FzModel {
 
     @SideOnly(Side.CLIENT)
     public static class ModelWrangler {
+        static boolean hasLoaded = false;
         @SubscribeEvent
         public void loadModels(TextureStitchEvent event) {
+            hasLoaded = true;
             //event.modelBakery.reg
             Minecraft mc = Minecraft.getMinecraft();
 
@@ -118,10 +125,19 @@ public class FzModel {
                 }
             };
             IModelState identityMatrix = new TRSRTransformation(null, null, null, null);
+            float s = 1F / 16F;
+            IModelState sixteenth = new TRSRTransformation(null, null, new Vector3f(s, s, s), null);
             for (FzModel fzm : instances) {
                 IModel rawModel = raws.get(fzm);
-                if (rawModel == null) continue;
-                fzm.model = rawModel.bake(identityMatrix, DefaultVertexFormats.BLOCK, lookup);
+                if (rawModel == null) {
+                    fzm.model = null;
+                    continue;
+                }
+                IModelState m = identityMatrix;
+                if (rawModel instanceof OBJModel) {
+                    m = sixteenth;
+                }
+                fzm.model = rawModel.bake(m, DefaultVertexFormats.BLOCK, lookup);
             }
 
         }
@@ -129,7 +145,7 @@ public class FzModel {
 
     @Override
     public String toString() {
-        return "FzModel(" + name + ")";
+        return "FzModel " + name;
     }
 
     public static final ArrayList<String> extensions = new ArrayList<String>();
