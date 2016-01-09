@@ -9,4 +9,4 @@ Ks 0.500000 0.500000 0.500000
 Ni 1.000000
 d 1.000000
 illum 2
-map_Kd /home/poseidon/Development/FzGradle/factorization/resources/assets/factorization/textures/blocks/beauty/whirligig.png
+map_Kd factorization:blocks/beauty/whirligig

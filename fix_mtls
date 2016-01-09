@@ -13,9 +13,8 @@ for filename in $HAY; do
     #map_Kd factorization:blocks/resource/dark_iron_block
 
     cat $filename \
-       | sed "s/map_Kd \/.*\/factorization\/textures/map_Kd factorization:/g" \
-       | sed "s/\.png//g" \
-       | tee .tmp
+       | sed "s/map_Kd \/.*\/factorization\/textures\//map_Kd factorization:/g" \
+       | sed "s/\.png//g" > .tmp
     cat .tmp > $filename
     rm -rf .tmp
 done

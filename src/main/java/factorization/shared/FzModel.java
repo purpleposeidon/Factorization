@@ -3,6 +3,7 @@ package factorization.shared;
 import com.google.common.base.Function;
 import factorization.util.RenderUtil;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.WorldRenderer;
 import net.minecraft.client.renderer.block.model.BakedQuad;
@@ -65,6 +66,7 @@ public class FzModel {
     public void draw(int colorARGB) {
         if (model == null) return;
         RenderUtil.checkGLError("Unknown error");
+        GlStateManager.color(1, 1, 1, 1);
         Minecraft mc = Minecraft.getMinecraft();
         mc.getTextureManager().bindTexture(Core.blockAtlas);
         Tessellator tessI = Tessellator.getInstance();
