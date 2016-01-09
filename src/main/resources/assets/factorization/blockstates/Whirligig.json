@@ -1,11 +1,13 @@
 {
     "forge_marker": 1,
     "defaults": {
-        "model": "factorization:block/whirligig",
+        "model": "factorization:whirligig_shaft.obj",
         "transform": "forge:default-block"
     },
     "variants": {
         "normal": [{}],
-        "inventory": [{}]
+        "inventory": [{
+            "model": "factorization:whirligig_joined.obj"
+        }]
     }
 }

@@ -8,6 +8,4 @@ Kd 0.8 0.8 0.8
 Ks 0.8 0.8 0.8
 d 1
 illum 2
-map_Kd factorization:blocks/resource/dark_iron_block
-
-
+map_Kd /home/poseidon/Development/FzGradle/factorization/resources/assets/factorization/textures/blocks/resource/dark_iron_block.png

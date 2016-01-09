@@ -49,7 +49,7 @@ public class FzModel {
         }
     }
 
-    public static final ArrayList<FzModel> instances = new ArrayList<FzModel>();
+    private static final ArrayList<FzModel> instances = new ArrayList<FzModel>();
     static {
         if (FMLCommonHandler.instance().getSide() == Side.CLIENT) {
             Core.loadBus(new ModelWrangler());
@@ -125,19 +125,13 @@ public class FzModel {
                 }
             };
             IModelState identityMatrix = new TRSRTransformation(null, null, null, null);
-            float s = 1F / 16F;
-            IModelState sixteenth = new TRSRTransformation(null, null, new Vector3f(s, s, s), null);
             for (FzModel fzm : instances) {
                 IModel rawModel = raws.get(fzm);
                 if (rawModel == null) {
                     fzm.model = null;
                     continue;
                 }
-                IModelState m = identityMatrix;
-                if (rawModel instanceof OBJModel) {
-                    m = sixteenth;
-                }
-                fzm.model = rawModel.bake(m, DefaultVertexFormats.BLOCK, lookup);
+                fzm.model = rawModel.bake(identityMatrix, DefaultVertexFormats.BLOCK, lookup);
             }
 
         }
