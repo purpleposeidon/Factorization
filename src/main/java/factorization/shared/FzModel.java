@@ -41,13 +41,19 @@ public class FzModel {
     final String name;
     @SideOnly(Side.CLIENT)
     IBakedModel model;
+    final boolean blend;
 
     public FzModel(String name) {
+        this(name, false);
+    }
+
+    public FzModel(String name, boolean blend) {
         this.name = "fzmodel/" + name;
         instances.add(this);
         if (ModelWrangler.hasLoaded) {
             Core.logSevere("FzModel was constructed too late: " + name);
         }
+        this.blend = blend;
     }
 
     private static final ArrayList<FzModel> instances = new ArrayList<FzModel>();
@@ -76,7 +82,19 @@ public class FzModel {
         for (EnumFacing ef : EnumFacing.VALUES) {
             putQuads(tess, model.getFaceQuads(ef), colorARGB);
         }
+
+        boolean blendAnyways = (colorARGB & 0xFF000000) != 0xFF000000;
+        if (blend || blendAnyways) {
+            GlStateManager.enableBlend();
+        } else {
+            GlStateManager.disableBlend();
+            // This state is inconsistently enabled, and this is what it's
+            // "supposed" to be, so not re-enabling.
+        }
         tessI.draw();
+        if (blend) {
+            GlStateManager.disableBlend();
+        }
         RenderUtil.checkGLError("model draw");
     }
 

@@ -1,5 +1,6 @@
 package factorization.common;
 
+import com.google.common.collect.ImmutableMap;
 import factorization.api.Coord;
 import factorization.artifact.ContainerForge;
 import factorization.artifact.GuiArtifactForge;
@@ -63,10 +64,12 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
 import net.minecraftforge.client.event.ModelBakeEvent;
 import net.minecraftforge.client.event.TextureStitchEvent;
+import net.minecraftforge.client.model.IModel;
 import net.minecraftforge.client.model.IRetexturableModel;
 import net.minecraftforge.client.model.ModelLoader;
 import net.minecraftforge.client.model.ModelLoaderRegistry;
 import net.minecraftforge.client.model.obj.OBJLoader;
+import net.minecraftforge.client.model.obj.OBJModel;
 import net.minecraftforge.fml.client.registry.ClientRegistry;
 import net.minecraftforge.fml.client.registry.RenderingRegistry;
 import net.minecraftforge.fml.common.FMLCommonHandler;
@@ -82,7 +85,20 @@ public class FactorizationClientProxy extends FactorizationProxy {
 
     public FactorizationClientProxy() {
         Core.loadBus(this);
-        OBJLoader.instance.addDomain("factorization");
+        ModelLoaderRegistry.registerLoader(ObjLoaderWithFlippedUV.fzInstance);
+        ObjLoaderWithFlippedUV.fzInstance.addDomain("factorization");
+    }
+
+    static class ObjLoaderWithFlippedUV extends OBJLoader {
+        static ObjLoaderWithFlippedUV fzInstance = new ObjLoaderWithFlippedUV();
+
+        @Override
+        public IModel loadModel(ResourceLocation modelLocation) throws IOException {
+            OBJModel model = (OBJModel) super.loadModel(modelLocation);
+
+            ImmutableMap<String,String> flip = new ImmutableMap.Builder<String, String>().put("flip-v", "true").build();
+            return model.process(flip);
+        }
     }
 
     @Override
