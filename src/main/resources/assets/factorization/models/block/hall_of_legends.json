@@ -1,0 +1,7 @@
+{
+    "parent": "factorization:block/top_side", 
+    "textures": {
+        "top": "factorization:blocks/artifact/legendarium_top",
+        "side": "factorization:blocks/artifact/legendarium_side"
+    }
+}

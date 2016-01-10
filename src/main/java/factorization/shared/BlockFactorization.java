@@ -268,8 +268,6 @@ public class BlockFactorization extends BlockContainer {
 
         //mechanics
         put(itemList, reg.hinge);
-
-        put(itemList, reg.legendarium);
     }
 
 

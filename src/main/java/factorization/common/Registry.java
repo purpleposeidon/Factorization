@@ -101,6 +101,7 @@ public class Registry {
     public Block mantlerock_block;
     public BlockMatcher matcher_block;
     public BlockForge artifact_forge;
+    public SimpleFzBlock hall_of_legends;
 
     public ItemStack servorail_item;
     public ItemStack empty_socket_item, socket_lacerator, socket_robot_hand, socket_shifter;
@@ -191,6 +192,7 @@ public class Registry {
         creative_energy = new SimpleFzBlock(Material.barrier, FactoryType.CREATIVE_CHARGE);
         furnace_heater = new BlockFurnaceHeater();
         whirligig = new SimpleFzBlock(materialMachine, FactoryType.STEAM_SHAFT);
+        hall_of_legends = new SimpleFzBlock(Material.iron, FactoryType.LEGENDARIUM);
         for (BlockClass bc : BlockClass.values()) {
             if (bc == BlockClass.Barrel) {
                 bc.block = factory_block_barrel;
@@ -235,6 +237,7 @@ public class Registry {
         GameRegistry.registerBlock(creative_energy, ItemFactorizationBlock.class, "CreativeEnergy");
         GameRegistry.registerBlock(furnace_heater, ItemFactorizationBlock.class, "FurnaceHeater");
         GameRegistry.registerBlock(whirligig, ItemFactorizationBlock.class, "Whirligig");
+        GameRegistry.registerBlock(hall_of_legends, ItemFactorizationBlock.class, "HallOfLegends");
         if (DeltaChunk.enabled()) {
             GameRegistry.registerBlock(colossal_block, ColossalBlockItem.class, "ColossalBlock");
             GameRegistry.registerTileEntity(TileEntityColossalHeart.class, "fz_colossal_heart");

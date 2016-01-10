@@ -233,6 +233,7 @@ public class FactorizationClientProxy extends FactorizationProxy {
                 Core.registry.creative_energy,
                 Core.registry.furnace_heater,
                 Core.registry.whirligig,
+                Core.registry.hall_of_legends,
         }) {
             setItemBlockModel(b, 0, "inventory");
         }
