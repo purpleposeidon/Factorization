@@ -44,16 +44,18 @@ public class FzModel {
     final boolean blend;
 
     public FzModel(String name) {
+        // Really ought to use a factory method instead.
         this(name, false);
     }
 
     public FzModel(String name, boolean blend) {
         this.name = "fzmodel/" + name;
+        this.blend = blend;
+        if (FMLCommonHandler.instance().getEffectiveSide() != Side.CLIENT) return;
         instances.add(this);
         if (ModelWrangler.hasLoaded) {
             Core.logSevere("FzModel was constructed too late: " + name);
         }
-        this.blend = blend;
     }
 
     private static final ArrayList<FzModel> instances = new ArrayList<FzModel>();
