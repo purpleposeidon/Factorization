@@ -4,13 +4,14 @@ import factorization.api.FzOrientation;
 import factorization.api.Quaternion;
 import factorization.common.FzConfig;
 import factorization.shared.Core;
-import factorization.shared.FzIcons;
 import factorization.util.SpaceUtil;
+
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.WorldRenderer;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
+import net.minecraft.client.renderer.texture.TextureMap;
 import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.item.ItemStack;
@@ -117,7 +118,11 @@ public class TileEntityDayBarrelRenderer extends TileEntitySpecialRenderer<TileE
         if (t.isEmpty()) {
             return false;
         }
+
+        bindTexture(TextureMap.locationBlocksTexture);
         GlStateManager.rotate(180, 0, 0, 1);
+        GlStateManager.disableLighting();
+
         final TextureAtlasSprite font = BarrelModel.font;
         final int len = t.length();
         final double char_width = 1.0/10.0;
@@ -153,7 +158,9 @@ public class TileEntityDayBarrelRenderer extends TileEntitySpecialRenderer<TileE
         }
         tessI.draw();
         tess.setTranslation(0, 0, 0);
-        GL11.glRotatef(180, 0, 0, 1);
+
+        GlStateManager.enableLighting();
+        GlStateManager.rotate(180, 0, 0, 1);
         return true;
     }
 
@@ -162,17 +169,17 @@ public class TileEntityDayBarrelRenderer extends TileEntitySpecialRenderer<TileE
     public void handleRenderItem(ItemStack is, TileEntityDayBarrel barrel, boolean hasLabel) {
         if (!FzConfig.render_barrel_item) return;
         //Got problems? Consider looking at ForgeHooksClient.renderInventoryItem, that might be better than this here.
-        GL11.glPushMatrix();
-        GL11.glRotatef(180, 0, 0, 1);
+        GlStateManager.pushMatrix();
+        GlStateManager.rotate(180, 0, 0, 1);
         float labelD = hasLabel ? 0F : -1F/16F;
 
         {
-            GL11.glTranslatef(0, labelD, 1F/16F);
+            GlStateManager.translate(0, labelD, 1F/16F);
             float scale = 1F/32F;
-            GL11.glScalef(scale, scale, scale);
-            GL11.glScalef(1, 1, -0.02F);
+            GlStateManager.scale(scale, scale, scale);
+            GlStateManager.scale(1, 1, -0.02F);
             Minecraft.getMinecraft().getRenderItem().renderItemIntoGUI(is, 0, 0);
         }
-        GL11.glPopMatrix();
+        GlStateManager.popMatrix();
     }
 }
