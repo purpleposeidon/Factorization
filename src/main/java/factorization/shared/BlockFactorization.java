@@ -263,7 +263,6 @@ public class BlockFactorization extends BlockContainer {
         //dark
         put(itemList, reg.empty_socket_item);
         put(itemList, reg.servorail_item);
-        put(itemList, reg.lamp_item);
         put(itemList, reg.compression_crafter_item);
 
         //mechanics
@@ -395,8 +394,6 @@ public class BlockFactorization extends BlockContainer {
     public int getRenderType() {
         return 3;
     }
-
-    public static final float lamp_pad = 1F / 16F;
 
     @Override
     public boolean canProvidePower() {

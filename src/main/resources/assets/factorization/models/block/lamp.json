@@ -1,0 +1,124 @@
+{
+    "elements": [
+        {
+            "__coment": "lower left corner",
+            "from": [ 3.0, 3.0, 3.0 ],
+            "to": [ 1.0, 13.0, 1.0 ],
+            "faces": {
+                "down":  { "texture": "#metal" },
+                "up":    { "texture": "#metal" },
+                "north": { "texture": "#metal" },
+                "south": { "texture": "#metal" },
+                "west":  { "texture": "#metal" },
+                "east":  { "texture": "#metal" }
+            }
+        },
+        {
+            "__coment": "upper left corner",
+            "from": [ 3.0, 13.0, 13.0 ],
+            "to": [ 1.0, 3.0, 15.0 ],
+            "faces": {
+                "down":  { "texture": "#metal" },
+                "up":    { "texture": "#metal" },
+                "north": { "texture": "#metal" },
+                "south": { "texture": "#metal" },
+                "west":  { "texture": "#metal" },
+                "east":  { "texture": "#metal" }
+            }
+        },
+        {
+            "__coment": "upper right corner (unless I mixed it up with LLC? Whatever.)",
+            "from": [ 13.0, 3.0, 13.0 ],
+            "to": [ 15.0, 13.0, 15.0 ],
+            "faces": {
+                "down":  { "texture": "#metal" },
+                "up":    { "texture": "#metal" },
+                "north": { "texture": "#metal" },
+                "south": { "texture": "#metal" },
+                "west":  { "texture": "#metal" },
+                "east":  { "texture": "#metal" }
+            }
+        },
+        {
+            "__coment": "lower right corner",
+            "from": [ 13.0, 13.0, 3.0 ],
+            "to": [ 15.0, 3.0, 1.0 ],
+            "faces": {
+                "down":  { "texture": "#metal" },
+                "up":    { "texture": "#metal" },
+                "north": { "texture": "#metal" },
+                "south": { "texture": "#metal" },
+                "west":  { "texture": "#metal" },
+                "east":  { "texture": "#metal" }
+            }
+        },
+        {
+            "__coment": "glass",
+            "from": [ 2.0, 3.0, 2.0 ],
+            "to": [ 14.0, 13.0, 14.0 ],
+            "faces": {
+                "down":  { "texture": "#glass" },
+                "up":    { "texture": "#glass" },
+                "north": { "texture": "#glass" },
+                "south": { "texture": "#glass" },
+                "west":  { "texture": "#glass" },
+                "east":  { "texture": "#glass" }
+            }
+        },
+        {
+            "__coment": "bottom cover",
+            "from": [ 15.0, 1.0, 15.0 ],
+            "to": [ 1.0, 3.0, 1.0 ],
+            "faces": {
+                "down":  { "texture": "#metal" },
+                "up":    { "texture": "#metal" },
+                "north": { "texture": "#metal" },
+                "south": { "texture": "#metal" },
+                "west":  { "texture": "#metal" },
+                "east":  { "texture": "#metal" }
+            }
+        },
+        {
+            "__coment": "knob1",
+            "from": [ 2.0, 15.0, 2.0 ],
+            "to": [ 14.0, 16.0, 14.0 ],
+            "faces": {
+                "down":  { "texture": "#metal" },
+                "up":    { "texture": "#metal" },
+                "north": { "texture": "#metal" },
+                "south": { "texture": "#metal" },
+                "west":  { "texture": "#metal" },
+                "east":  { "texture": "#metal" }
+            }
+        },
+        {
+            "__coment": "top cover",
+            "from": [ 1.0, 13.0, 1.0 ],
+            "to": [ 15.0, 15.0, 15.0 ],
+            "faces": {
+                "down":  { "texture": "#metal" },
+                "up":    { "texture": "#metal" },
+                "north": { "texture": "#metal" },
+                "south": { "texture": "#metal" },
+                "west":  { "texture": "#metal" },
+                "east":  { "texture": "#metal" }
+            }
+        },
+        {
+            "__coment": "knob2",
+            "from": [ 2.0, 0.0, 2.0 ],
+            "to": [ 14.0, 1.0, 14.0 ],
+            "faces": {
+                "down":  { "texture": "#metal" },
+                "up":    { "texture": "#metal" },
+                "north": { "texture": "#metal" },
+                "south": { "texture": "#metal" },
+                "west":  { "texture": "#metal" },
+                "east":  { "texture": "#metal" }
+            }
+        }
+    ],
+    "textures": {
+        "particle": "#metal"
+    }
+}

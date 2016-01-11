@@ -54,6 +54,7 @@ import net.minecraft.client.resources.model.ModelBakery;
 import net.minecraft.client.resources.model.ModelResourceLocation;
 import net.minecraft.client.settings.GameSettings;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.init.Blocks;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.play.client.C07PacketPlayerDigging;
@@ -234,6 +235,8 @@ public class FactorizationClientProxy extends FactorizationProxy {
                 Core.registry.furnace_heater,
                 Core.registry.whirligig,
                 Core.registry.hall_of_legends,
+                Core.registry.lamp,
+                Core.registry.leyden_jar,
         }) {
             setItemBlockModel(b, 0, "inventory");
         }
@@ -324,9 +327,7 @@ public class FactorizationClientProxy extends FactorizationProxy {
         if (FMLCommonHandler.instance().getEffectiveSide() != Side.CLIENT) {
             return false;
         }
-        Minecraft mc = Minecraft.getMinecraft();
         return org.lwjgl.input.Keyboard.isKeyDown(42 /* sneak */);
-        //return !mc.gameSettings.keyBindSneak.pressed;
     }
 
     @Override
@@ -372,6 +373,4 @@ public class FactorizationClientProxy extends FactorizationProxy {
         }
         ModelBakery.addVariantName(item, found.toArray(new String[found.size()]));
     }
-
-
 }

@@ -1,0 +1,17 @@
+{
+    "forge_marker": 1,
+    "defaults": {
+        "model": "factorization:lamp",
+        "transform": "forge:default-block",
+        "glass": "minecraft:glass",
+        "metal": "factorization:resource/dark_iron_block",
+        "textures": {
+            "glass": "minecraft:blocks/glass",
+            "metal": "factorization:blocks/resource/dark_iron_block"
+        }
+    },
+    "variants": {
+        "normal": [{}],
+        "inventory": [{}]
+    }
+}

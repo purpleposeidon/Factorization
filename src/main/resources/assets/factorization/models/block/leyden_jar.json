@@ -1,0 +1,8 @@
+{
+    "elements": [
+    ],
+    "textures": {
+        "particle": "factorization:blocks/blastBlock",
+        "all": "factorization:blocks/blastBlock"
+    }
+}
