@@ -1,6 +1,5 @@
 {
-    "elements": [
-    ],
+    "parent": "factorization:lead_block",
     "textures": {
         "particle": "factorization:blocks/blastBlock",
         "all": "factorization:blocks/blastBlock"
