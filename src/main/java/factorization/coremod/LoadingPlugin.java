@@ -27,7 +27,7 @@ public class LoadingPlugin implements IFMLLoadingPlugin {
     
     @Override
     public String getAccessTransformerClass() {
-        return "factorization.coremod.FzAccessTransformer";
+        return null;
     }
 
     @Override

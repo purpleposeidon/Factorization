@@ -130,7 +130,8 @@ processResources {
 jar {
     manifest {
         attributes("FMLCorePlugin": "factorization.coremod.LoadingPlugin",
-                   "FMLCorePluginContainsFMLMod": "true")
+                   "FMLCorePluginContainsFMLMod": "true",
+                   "FMLAT": "factorization_at.cfg")
     }
     exclude "mods/**"
 }
@@ -143,7 +144,8 @@ task deobfJar(type: Jar) {
     // Copied from 'jar'
     manifest {
         attributes("FMLCorePlugin": "factorization.coremod.LoadingPlugin",
-                   "FMLCorePluginContainsFMLMod": "true")
+                   "FMLCorePluginContainsFMLMod": "true",
+                   "FMLAT": "factorization_at.cfg")
     }
     exclude "mods/**"
     // End copied from 'jar'?

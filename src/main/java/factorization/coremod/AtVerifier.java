@@ -20,7 +20,7 @@ public class AtVerifier {
     private static String currentLine;
     
     public static void verify() {
-        CharSource at = Resources.asCharSource(Resources.getResource("factorization_at.cfg"), Charsets.UTF_8);
+        CharSource at = Resources.asCharSource(Resources.getResource("META-INF/factorization_at.cfg"), Charsets.UTF_8);
         if (at == null) {
             throw new IllegalArgumentException("AT is missing!");
         }
