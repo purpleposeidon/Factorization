@@ -30,6 +30,7 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.Packet;
+import net.minecraft.network.play.server.S3FPacketCustomPayload;
 import net.minecraft.profiler.Profiler;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.BlockPos;
@@ -53,13 +54,15 @@ import net.minecraftforge.fml.relauncher.Side;
 import org.lwjgl.opengl.GL11;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.WeakHashMap;
 
 public class HammerClientProxy extends HammerProxy {
     static HammerClientProxy instance;
 
     public HammerClientProxy() {
-        RenderDimensionSliceEntity rwe = new RenderDimensionSliceEntity(Minecraft.getMinecraft().getRenderManager());
+        RenderDimensionSliceEntity rwe = new RenderDimensionSliceEntity(mc.getRenderManager());
         RenderingRegistry.registerEntityRenderingHandler(DimensionSliceEntity.class, rwe);
         Core.loadBus(rwe);
         HammerClientProxy.instance = this;
@@ -94,7 +97,7 @@ public class HammerClientProxy extends HammerProxy {
     @Override
     public World getClientRealWorld() {
         if (real_world == null) {
-            return Minecraft.getMinecraft().theWorld;
+            return mc.theWorld;
         }
         return real_world;
     }
@@ -102,7 +105,7 @@ public class HammerClientProxy extends HammerProxy {
     private static World lastWorld = null;
     static ShadowRenderGlobal shadowRenderGlobal = null;
     void checkForWorldChange() {
-        WorldClient currentWorld = Minecraft.getMinecraft().theWorld;
+        WorldClient currentWorld = mc.theWorld;
         if (currentWorld == null) {
             createClientShadowWorld();
             return;
@@ -128,7 +131,6 @@ public class HammerClientProxy extends HammerProxy {
     
     @Override
     public void createClientShadowWorld() {
-        final Minecraft mc = Minecraft.getMinecraft();
         World world = mc.theWorld;
         if (world == null || mc.thePlayer == null) {
             Hammer.worldClient = null;
@@ -197,8 +199,10 @@ public class HammerClientProxy extends HammerProxy {
     }
 
     private void setWorldAndPlayer(WorldClient wc, EntityPlayerSP player) {
+        if (!mc.isCallingFromMinecraftThread()) {
+            throw new IllegalStateException("Can only change world in main thread");
+        }
         NORELEASE.fixme("Keep track of each value. Probably a nice object... dedicated class for swapping; also allows nice APIfying");
-        Minecraft mc = Minecraft.getMinecraft();
         if (wc == null || player == null) {
             throw new NullPointerException("Tried setting world/player to null!");
         }
@@ -232,7 +236,7 @@ public class HammerClientProxy extends HammerProxy {
     private RenderGlobal getRenderGlobalForWorld(WorldClient wc) {
         RenderGlobal cached = renderglobal_cache.get(wc);
         if (cached != null) return cached;
-        RenderGlobal ret = new RenderGlobal(Minecraft.getMinecraft());
+        RenderGlobal ret = new RenderGlobal(mc);
         ret.setWorldAndLoadRenderers(wc);
         renderglobal_cache.put(wc, ret);
         return ret;
@@ -240,7 +244,7 @@ public class HammerClientProxy extends HammerProxy {
 
     public static RenderGlobal getRealRenderGlobal() {
         if (instance.real_renderglobal == null) {
-            return Minecraft.getMinecraft().renderGlobal;
+            return mc.renderGlobal;
         }
         return instance.real_renderglobal;
     }
@@ -263,7 +267,9 @@ public class HammerClientProxy extends HammerProxy {
     
     @Override
     public void setShadowWorld() {
-        Minecraft mc = Minecraft.getMinecraft();
+        if (!mc.isCallingFromMinecraftThread()) {
+            throw new IllegalStateException("Can only change world in main thread");
+        }
         WorldClient w = (WorldClient) DeltaChunk.getClientShadowWorld();
         assert w != null;
         if (real_player != null || real_world != null) {
@@ -289,6 +295,12 @@ public class HammerClientProxy extends HammerProxy {
         real_renderglobal = mc.renderGlobal;
         setWorldAndPlayer(w, fake_player);
         PacketJunction.switchJunction(mc.getNetHandler(), true);
+        if (fake_player == null) {
+            NORELEASE.breakpoint();
+        }
+        if (real_player == null) {
+            NORELEASE.breakpoint();
+        }
         fake_player.inventory = real_player.inventory;
     }
     
@@ -307,16 +319,14 @@ public class HammerClientProxy extends HammerProxy {
     }
 
 
-    final ArrayList<Packet> packetQueue = new ArrayList<Packet>(); // Does this need to be thread-safe?
+    final List<Packet> packetQueue = Collections.synchronizedList(new ArrayList<Packet>());
 
     @Override
     public boolean queueUnwrappedPacket(EntityPlayer player, Object packet) {
         if (super.queueUnwrappedPacket(player, packet)) return true;
         if (packet instanceof Packet) {
-            synchronized (packetQueue) {
-                packetQueue.add((Packet) packet);
-                return true;
-            }
+            packetQueue.add((Packet) packet);
+            return true;
         } else {
             Core.logWarning("Tried to queue this weird non-packet: " + packet.getClass() + ": " + packet.toString());
         }
@@ -324,15 +334,12 @@ public class HammerClientProxy extends HammerProxy {
     }
 
     void runShadowTick() {
-        final Minecraft mc = Minecraft.getMinecraft();
         if (mc.isGamePaused()) {
             return;
         }
         final WorldClient mcWorld = mc.theWorld;
         if (mcWorld == null) {
-            synchronized (packetQueue) {
-                packetQueue.clear();
-            }
+            packetQueue.clear();
             return;
         }
         final EntityPlayer mcPlayer = mc.thePlayer;
@@ -349,11 +356,13 @@ public class HammerClientProxy extends HammerProxy {
         int range = 10;
         AxisAlignedBB nearby = mcPlayer.getEntityBoundingBox().expand(range, range, range);
         Iterable<IDeltaChunk> nearbyChunks = mcWorld.getEntitiesWithinAABB(IDeltaChunk.class, nearby);
+        NORELEASE.fixme("Wrong. If the IDC has a large radius, then it won't be caught. UniversalCollider.");
         setShadowWorld();
         Core.profileStart("FZDStick");
         try {
             synchronized (packetQueue) {
                 for (Packet packet : packetQueue) {
+                    if (packet == null) continue;
                     packet.processPacket(send_queue);
                 }
                 packetQueue.clear();
@@ -377,7 +386,7 @@ public class HammerClientProxy extends HammerProxy {
         
     }
     
-    final Minecraft mc = Minecraft.getMinecraft();
+    static final Minecraft mc = Minecraft.getMinecraft();
     
     @SubscribeEvent
     public void resetTracing(ClientTickEvent event) {
@@ -575,19 +584,28 @@ public class HammerClientProxy extends HammerProxy {
 
     @Override
     public boolean guiCheckStart() {
-        return Minecraft.getMinecraft().currentScreen == null;
+        return mc.currentScreen == null;
     }
 
     @Override
     public void guiCheckEnd(boolean oldState) {
         if (oldState && !guiCheckStart()) {
-            GuiScreen wrap = Minecraft.getMinecraft().currentScreen;
+            GuiScreen wrap = mc.currentScreen;
             if (wrap instanceof GuiContainer) {
                 GuiContainer gc = (GuiContainer) wrap;
-                Minecraft.getMinecraft().displayGuiScreen(new ProxiedGuiContainer(gc.inventorySlots, gc));
+                mc.displayGuiScreen(new ProxiedGuiContainer(gc.inventorySlots, gc));
             } else if (wrap != null) {
-                Minecraft.getMinecraft().displayGuiScreen(new ProxiedGuiScreen(wrap));
+                mc.displayGuiScreen(new ProxiedGuiScreen(wrap));
             }
         }
+    }
+
+    @Override
+    public String getChannel(Packet packet) {
+        if (packet instanceof S3FPacketCustomPayload) {
+            S3FPacketCustomPayload p = (S3FPacketCustomPayload) packet;
+            return p.getChannelName();
+        }
+        return super.getChannel(packet);
     }
 }

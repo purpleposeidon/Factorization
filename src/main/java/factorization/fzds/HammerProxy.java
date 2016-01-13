@@ -8,6 +8,7 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.network.NetHandlerPlayServer;
 import net.minecraft.network.Packet;
 import net.minecraft.network.play.client.C00PacketKeepAlive;
+import net.minecraft.network.play.client.C17PacketCustomPayload;
 import net.minecraft.network.play.server.S00PacketKeepAlive;
 import net.minecraft.util.MovingObjectPosition;
 import net.minecraft.world.World;
@@ -90,5 +91,13 @@ public class HammerProxy {
         }
         packet.processPacket(handler);
         return true;
+    }
+
+    public String getChannel(Packet packet) {
+        if (packet instanceof C17PacketCustomPayload) {
+            C17PacketCustomPayload p = (C17PacketCustomPayload) packet;
+            return p.getChannelName();
+        }
+        return null;
     }
 }

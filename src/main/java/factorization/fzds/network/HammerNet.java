@@ -46,6 +46,7 @@ import factorization.fzds.interfaces.Interpolation;
 import factorization.shared.Core;
 import factorization.util.PlayerUtil;
 import factorization.util.SpaceUtil;
+import net.minecraftforge.fml.relauncher.Side;
 
 
 public class HammerNet {
@@ -61,12 +62,12 @@ public class HammerNet {
 
     @SubscribeEvent(priority = EventPriority.LOWEST)
     public void playerLoggedIn(FMLNetworkEvent.ServerConnectionFromClientEvent event) {
-        PacketJunction.setup(event, event.isLocal);
+        PacketJunction.setup(event, Side.SERVER);
     }
 
     @SubscribeEvent(priority = EventPriority.LOWEST)
     public void clientLoggedIn(FMLNetworkEvent.ClientConnectedToServerEvent event) {
-        PacketJunction.setup(event, event.isLocal);
+        PacketJunction.setup(event, Side.CLIENT);
     }
 
     public static class HammerNetType {
