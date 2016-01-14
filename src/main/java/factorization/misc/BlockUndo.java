@@ -1,12 +1,13 @@
 package factorization.misc;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-
+import factorization.api.Coord;
+import factorization.common.FzConfig;
+import factorization.util.DataUtil;
+import factorization.util.FzUtil;
+import factorization.util.ItemUtil;
+import factorization.util.PlayerUtil;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
-
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
@@ -22,7 +23,6 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.BlockPos;
 import net.minecraft.world.World;
-
 import net.minecraftforge.common.DimensionManager;
 import net.minecraftforge.common.ForgeHooks;
 import net.minecraftforge.common.util.FakePlayer;
@@ -38,12 +38,8 @@ import net.minecraftforge.fml.common.network.internal.FMLProxyPacket;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
-import factorization.api.Coord;
-import factorization.common.FzConfig;
-import factorization.util.DataUtil;
-import factorization.util.FzUtil;
-import factorization.util.ItemUtil;
-import factorization.util.PlayerUtil;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class BlockUndo {
     public static final String channelName = "FZ|blockundo";
@@ -105,7 +101,7 @@ public class BlockUndo {
     public static float MAX_TRUE_SPEED_TILEENTITY = 0.125F / 2;
     public static float ANTI_WARP_SPEED = 64;
 
-    HashMap<String, ArrayList<PlacedBlock>> recentlyPlaced = new HashMap<String, ArrayList<PlacedBlock>>();
+    final ConcurrentHashMap<String, List<PlacedBlock>> recentlyPlaced = new ConcurrentHashMap<String, List<PlacedBlock>>();
 
     private static String getName(EntityPlayer player) {
         return player.getName() + " #" + player.worldObj.isRemote;
@@ -119,25 +115,30 @@ public class BlockUndo {
     }
 
     void markPlacement(EntityPlayer player, PlacedBlock at) {
-        ArrayList<PlacedBlock> coords;
+        final List<PlacedBlock> coords;
         String playerName = getName(player);
         if (!recentlyPlaced.containsKey(playerName)) {
-            recentlyPlaced.put(playerName, coords = new ArrayList<PlacedBlock>());
+            coords = Collections.synchronizedList(new ArrayList<PlacedBlock>());
+            recentlyPlaced.put(playerName, coords);
         } else {
             coords = recentlyPlaced.get(playerName);
         }
-        for (Iterator<PlacedBlock> it = coords.iterator(); it.hasNext(); ) {
-            PlacedBlock c = it.next();
-            World w = DimensionManager.getWorld(c.w);
-            if (w == null || w.isAirBlock(c.pos)) {
-                it.remove();
-            } else if (c.pos.equals(at.pos)) {
-                it.remove();
+        synchronized (recentlyPlaced) {
+            synchronized (coords) {
+                for (Iterator<PlacedBlock> it = coords.iterator(); it.hasNext(); ) {
+                    PlacedBlock c = it.next();
+                    World w = DimensionManager.getWorld(c.w);
+                    if (w == null || w.isAirBlock(c.pos)) {
+                        it.remove();
+                    } else if (c.pos.equals(at.pos)) {
+                        it.remove();
+                    }
+                }
+                coords.add(at);
             }
-        }
-        coords.add(at);
-        if (coords.size() > UNDO_MAX) {
-            coords.remove(0);
+            if (coords.size() > UNDO_MAX) {
+                coords.remove(0);
+            }
         }
     }
 
@@ -155,8 +156,8 @@ public class BlockUndo {
         final ItemStack theItem = toItem(block, event.world, event.pos, bs);
         final PlacedBlock at = new PlacedBlock(FzUtil.getWorldDimension(event.world), event.pos, idmd, theItem);
         markPlacement(event.player, at);
-        if (!event.world.isRemote && event.player instanceof EntityPlayerMP) {
-            send((EntityPlayerMP) event.player, at);
+        if (event.player instanceof EntityPlayerMP) {
+            send(event.player, at);
         }
     }
 
@@ -174,7 +175,7 @@ public class BlockUndo {
         }
     }
 
-    private HashMap<Integer, Long> playerBreakage = new HashMap<Integer, Long>();
+    private Map<Integer, Long> playerBreakage = new ConcurrentHashMap<Integer, Long>();
     private boolean stillBusy(EntityPlayer player) {
         Integer code = player.hashCode();
         Long last = playerBreakage.get(code);
@@ -223,7 +224,7 @@ public class BlockUndo {
 
     private boolean canUndo(PlayerEvent event, BlockPos pos, Block block, IBlockState bs) {
         final EntityPlayer player = event.entityPlayer;
-        ArrayList<PlacedBlock> coords = recentlyPlaced.get(getName(player));
+        List<PlacedBlock> coords = recentlyPlaced.get(getName(player));
         if (coords == null) return false;
 
         int w = FzUtil.getWorldDimension(player.worldObj);
@@ -246,7 +247,7 @@ public class BlockUndo {
     public void playerRemovedBlock(BlockEvent.BreakEvent event) {
         EntityPlayer thePlayer = event.getPlayer();
         markBusy(thePlayer);
-        ArrayList<PlacedBlock> coords = recentlyPlaced.get(getName(thePlayer));
+        List<PlacedBlock> coords = recentlyPlaced.get(getName(thePlayer));
         if (coords == null) return;
         PlacedBlock heat = null;
         final World w = event.world;
@@ -282,7 +283,9 @@ public class BlockUndo {
         if (ForgeHooks.canToolHarvestBlock(w, pos, heldItem)) {
             return;
         }
-        if (block.getItemDropped(bs, thePlayer.worldObj.rand, 0) != DataUtil.getItem(block)) {
+        Item blockDrops = block.getItemDropped(bs, thePlayer.worldObj.rand, 0);
+        Item blocksItem = DataUtil.getItem(block); // banners: this can be null
+        if (blockDrops != blocksItem) {
             if (!real_player.isSneaking() && block.getBlockHardness(w, pos) < 1) {
                 return;
             }
@@ -302,8 +305,8 @@ public class BlockUndo {
             double r = 0.5;
             AxisAlignedBB box = new AxisAlignedBB(x - r, y - r, z - r, x + 1 + r, y + 1 + r, z + 1 + r);
             block.onBlockHarvested(w, pos, bs, fake_player);
-            boolean canDestroy = block.removedByPlayer(w, pos, fake_player, true);
             TileEntity te = w.getTileEntity(pos);
+            boolean canDestroy = block.removedByPlayer(w, pos, fake_player, true);
 
             if (canDestroy) {
                 block.onBlockDestroyedByPlayer(w, pos, bs);
