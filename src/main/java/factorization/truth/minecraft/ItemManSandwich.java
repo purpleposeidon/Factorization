@@ -61,7 +61,7 @@ public class ItemManSandwich extends ItemFood implements IManwich, ISensitiveMes
         }
         boolean spicy = stack.getItemDamage() > 0;
         int nomage = spicy ? 7 : 1;
-        StatUtil.FzStat stat = StatUtil.load(player, manwhichStatus);
+        StatUtil.IFzStat stat = StatUtil.load(player, manwhichStatus);
         stat.set(nomage);
         stat.sync();
         int saturationTime;
@@ -78,7 +78,7 @@ public class ItemManSandwich extends ItemFood implements IManwich, ISensitiveMes
 
     public int hasManual(EntityPlayer player) {
         if (PlayerUtil.isPlayerCreative(player)) return 1;
-        StatUtil.FzStat stat = StatUtil.load(player, manwhichStatus);
+        StatUtil.IFzStat stat = StatUtil.load(player, manwhichStatus);
         return stat.get();
     }
 
@@ -88,7 +88,7 @@ public class ItemManSandwich extends ItemFood implements IManwich, ISensitiveMes
         EntityPlayer player = event.entityPlayer;
         StatisticsFile stats = StatUtil.getStatsFile(player);
         if (stats == null) return;
-        StatUtil.FzStat stat = StatUtil.load(player, manwhichStatus);
+        StatUtil.IFzStat stat = StatUtil.load(player, manwhichStatus);
         if (stat.get() > 0) {
             stat.add(-1);
             stat.sync();
@@ -127,7 +127,7 @@ public class ItemManSandwich extends ItemFood implements IManwich, ISensitiveMes
     }
 
     @Override
-    public void addInformation(ItemStack stack, EntityPlayer player, List list, boolean verbose) {
+    public void addInformation(ItemStack stack, EntityPlayer player, List<String> list, boolean verbose) {
         if (Core.dev_environ) {
             list.add("Sandwich level: " + hasManual(player));
         }

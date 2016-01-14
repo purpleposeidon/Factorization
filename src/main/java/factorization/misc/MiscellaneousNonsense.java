@@ -221,7 +221,7 @@ public class MiscellaneousNonsense {
         {
             // Give the first achievement, because it is stupid and nobody cares.
             // If you're using this mod, you've probably opened your inventory before anyways.
-            StatUtil.FzStat stat = StatUtil.load(event.player, AchievementList.openInventory);
+            StatUtil.IFzStat stat = StatUtil.load(event.player, AchievementList.openInventory);
             if (stat.get() <= 0 && FMLCommonHandler.instance().getSide() == Side.CLIENT) {
                 stat.set(-1);
                 stat.set(300); // Literally, hundreds of times! :D

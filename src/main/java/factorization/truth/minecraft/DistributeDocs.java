@@ -37,7 +37,7 @@ public class DistributeDocs {
     
     static boolean givenBook(EntityPlayer player) {
         if (!FzConfig.players_discover_colossus_guides) return true;
-        StatUtil.FzStat stat = StatUtil.load(player, guideGet);
+        StatUtil.IFzStat stat = StatUtil.load(player, guideGet);
         return stat.get() > 0 || player.getEntityData().hasKey(guideKey);
     }
     

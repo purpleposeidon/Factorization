@@ -195,12 +195,12 @@ public class ItemMatrixProgrammer extends ItemFactorization {
     public static boolean isUserAuthenticated(EntityPlayerMP player) {
         if (PlayerUtil.isPlayerCreative(player)) return true;
         if (Core.dev_environ) return false;
-        StatUtil.FzStat stat = StatUtil.loadWithBackup(player, authStat, authTagName);
+        StatUtil.IFzStat stat = StatUtil.loadWithBackup(player, authStat, authTagName);
         return stat.get() > 0;
     }
 
     public static void setUserAuthenticated(EntityPlayerMP player) {
-        StatUtil.FzStat stat = StatUtil.loadWithBackup(player, authStat, authTagName);
+        StatUtil.IFzStat stat = StatUtil.loadWithBackup(player, authStat, authTagName);
         stat.set(1);
         stat.sync();
     }
