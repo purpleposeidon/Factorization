@@ -240,6 +240,7 @@ public class FactorizationClientProxy extends FactorizationProxy {
                 Core.registry.lamp,
                 Core.registry.leyden_jar,
                 Core.registry.compression_crafter,
+                Core.registry.socket,
         }) {
             setItemBlockModel(b, 0, "inventory");
         }

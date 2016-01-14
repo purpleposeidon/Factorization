@@ -25,7 +25,6 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.*;
 import net.minecraft.world.IBlockAccess;
-import net.minecraft.world.IWorldAccess;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.common.network.internal.FMLProxyPacket;
 
@@ -263,7 +262,6 @@ public class BlockFactorization extends BlockContainer {
         //dark
         put(itemList, reg.empty_socket_item);
         put(itemList, reg.servorail_item);
-        put(itemList, reg.compression_crafter_item);
 
         //mechanics
         put(itemList, reg.hinge);
@@ -377,6 +375,11 @@ public class BlockFactorization extends BlockContainer {
 
     @Override
     public boolean isOpaqueCube() {
+        return false;
+    }
+
+    @Override
+    public boolean isFullCube() {
         return false;
     }
 

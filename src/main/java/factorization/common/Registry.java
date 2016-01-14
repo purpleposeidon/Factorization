@@ -26,6 +26,7 @@ import factorization.servo.*;
 import factorization.servo.stepper.ItemStepperEngine;
 import factorization.shared.*;
 import factorization.shared.Core.TabType;
+import factorization.sockets.BlockSocket;
 import factorization.sockets.ItemSocketPart;
 import factorization.truth.minecraft.ItemDocBook;
 import factorization.truth.minecraft.ItemManSandwich;
@@ -103,6 +104,7 @@ public class Registry {
     public BlockMatcher matcher_block;
     public BlockForge artifact_forge;
     public BlockCompressionCrafter compression_crafter;
+    public BlockSocket socket;
     public SimpleFzBlock hall_of_legends;
     public SimpleFzBlock lamp;
     public SimpleFzBlock leyden_jar;
@@ -200,6 +202,7 @@ public class Registry {
         lamp = new SimpleFzBlockCutout(Material.iron, FactoryType.LAMP);
         leyden_jar = new SimpleFzBlockCutout(Material.glass, FactoryType.LEYDENJAR);
         compression_crafter = new BlockCompressionCrafter();
+        socket = new BlockSocket();
         for (BlockClass bc : BlockClass.values()) {
             if (bc == BlockClass.Barrel) {
                 bc.block = factory_block_barrel;
@@ -248,6 +251,7 @@ public class Registry {
         GameRegistry.registerBlock(lamp, ItemFactorizationBlock.class, "Lamp");
         GameRegistry.registerBlock(leyden_jar, ItemFactorizationBlock.class, "LeydenJar");
         GameRegistry.registerBlock(compression_crafter, ItemFactorizationBlock.class, "CompressionCrafter");
+        GameRegistry.registerBlock(socket, ItemFactorizationBlock.class, "Socket");
         if (DeltaChunk.enabled()) {
             GameRegistry.registerBlock(colossal_block, ColossalBlockItem.class, "ColossalBlock");
             GameRegistry.registerTileEntity(TileEntityColossalHeart.class, "fz_colossal_heart");

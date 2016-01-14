@@ -335,7 +335,7 @@ public class SocketScissors extends TileEntitySocketBase implements ICaptureDrop
 
     private static FzModel piston_base = new FzModel("socket/scissors/piston_base");
     private static FzModel piston_head = new FzModel("socket/scissors/piston_head");
-    private static FzModel scissor_half = new FzModel("socket/scissors/scossor_arm");
+    private static FzModel scissor_half = new FzModel("socket/scissors/scissor_arm");
 
     @Override
     @SideOnly(Side.CLIENT)
