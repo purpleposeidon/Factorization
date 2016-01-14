@@ -1,11 +1,9 @@
 package factorization.crafting;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Random;
-
-import org.lwjgl.opengl.GL11;
-
+import factorization.api.Coord;
+import factorization.shared.Core;
+import factorization.shared.FzModel;
+import factorization.util.NORELEASE;
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
@@ -22,26 +20,24 @@ import net.minecraft.util.BlockPos;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumWorldBlockLayer;
 import net.minecraft.world.World;
+import net.minecraftforge.client.ForgeHooksClient;
+import org.lwjgl.opengl.GL11;
 
-import factorization.api.Coord;
-import factorization.shared.Core;
-import factorization.shared.FzModel;
-import factorization.util.NORELEASE;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Random;
 
 public class TileEntityCompressionCrafterRenderer extends TileEntitySpecialRenderer<TileEntityCompressionCrafter> {
     Random rand = new Random();
     
     @Override
     public void renderTileEntityAt(TileEntityCompressionCrafter cc, double x, double y, double z, float partial, int damage) {
-        bindTexture(Core.blockAtlas);
         final float squishy = 3F/16F;
         final float extraAxialSquish = 10F/16F;
         float perc = cc.getProgressPerc();
         float p = perc*squishy;
 
         drawContents(partial, cc, extraAxialSquish, perc, p);
-        GL11.glPopMatrix();
-        GL11.glEnable(GL11.GL_LIGHTING);
     }
 
     private void drawContents(float partial, TileEntityCompressionCrafter cc, float extraAxialSquish, float perc, float p) {
@@ -94,6 +90,8 @@ public class TileEntityCompressionCrafterRenderer extends TileEntitySpecialRende
         sz /= -2;
         GL11.glTranslatef(sx, sy, sz);
         drawObscurringBox();
+        GL11.glPopMatrix();
+        GL11.glEnable(GL11.GL_LIGHTING);
     }
 
     static HashMap<String, FzModel> shrouds = new HashMap<String, FzModel>();
@@ -192,7 +190,9 @@ public class TileEntityCompressionCrafterRenderer extends TileEntitySpecialRende
                             }
                         }
                         if (b == Blocks.air || b == null) continue;
-                        if (b.getBlockLayer() == pass) {
+                        if (b.canRenderInLayer(pass)) {
+                            System.out.println("? " + b.getUnlocalizedName());
+                            ForgeHooksClient.setRenderLayer(pass);
                             br.renderBlock(bs, pos, w, tess);
                         }
                     }
@@ -200,7 +200,7 @@ public class TileEntityCompressionCrafterRenderer extends TileEntitySpecialRende
             }
         }
 
-        Tessellator.getInstance().draw();
+        tessI.draw();
 
         for (TileEntity te : tileEntities) {
             TileEntityRendererDispatcher.instance.renderTileEntity(te, partial, 0);

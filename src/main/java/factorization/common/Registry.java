@@ -12,6 +12,7 @@ import factorization.ceramics.TileEntityGreenware;
 import factorization.ceramics.TileEntityGreenware.ClayState;
 import factorization.charge.*;
 import factorization.colossi.*;
+import factorization.crafting.BlockCompressionCrafter;
 import factorization.darkiron.BlockDarkIronOre;
 import factorization.fzds.DeltaChunk;
 import factorization.fzds.HammerEnabled;
@@ -101,6 +102,7 @@ public class Registry {
     public Block mantlerock_block;
     public BlockMatcher matcher_block;
     public BlockForge artifact_forge;
+    public BlockCompressionCrafter compression_crafter;
     public SimpleFzBlock hall_of_legends;
     public SimpleFzBlock lamp;
     public SimpleFzBlock leyden_jar;
@@ -197,6 +199,7 @@ public class Registry {
         hall_of_legends = new SimpleFzBlock(Material.iron, FactoryType.LEGENDARIUM);
         lamp = new SimpleFzBlockCutout(Material.iron, FactoryType.LAMP);
         leyden_jar = new SimpleFzBlockCutout(Material.glass, FactoryType.LEYDENJAR);
+        compression_crafter = new BlockCompressionCrafter();
         for (BlockClass bc : BlockClass.values()) {
             if (bc == BlockClass.Barrel) {
                 bc.block = factory_block_barrel;
@@ -244,6 +247,7 @@ public class Registry {
         GameRegistry.registerBlock(hall_of_legends, ItemFactorizationBlock.class, "HallOfLegends");
         GameRegistry.registerBlock(lamp, ItemFactorizationBlock.class, "Lamp");
         GameRegistry.registerBlock(leyden_jar, ItemFactorizationBlock.class, "LeydenJar");
+        GameRegistry.registerBlock(compression_crafter, ItemFactorizationBlock.class, "CompressionCrafter");
         if (DeltaChunk.enabled()) {
             GameRegistry.registerBlock(colossal_block, ColossalBlockItem.class, "ColossalBlock");
             GameRegistry.registerTileEntity(TileEntityColossalHeart.class, "fz_colossal_heart");

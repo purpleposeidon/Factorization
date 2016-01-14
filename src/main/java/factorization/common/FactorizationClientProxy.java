@@ -45,7 +45,6 @@ import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.audio.ISound;
 import net.minecraft.client.audio.PositionedSoundRecord;
-import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.renderer.ItemMeshDefinition;
 import net.minecraft.client.renderer.entity.RenderManager;
@@ -59,7 +58,6 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.play.client.C07PacketPlayerDigging;
 import net.minecraft.profiler.Profiler;
-import net.minecraft.stats.StatFileWriter;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.MovingObjectPosition;
 import net.minecraft.util.ResourceLocation;
@@ -96,10 +94,13 @@ public class FactorizationClientProxy extends FactorizationProxy {
 
         @Override
         public IModel loadModel(ResourceLocation modelLocation) throws IOException {
-            OBJModel model = (OBJModel) super.loadModel(modelLocation);
-
-            ImmutableMap<String,String> flip = new ImmutableMap.Builder<String, String>().put("flip-v", "true").build();
-            return model.process(flip);
+            IModel model = super.loadModel(modelLocation);
+            if (model instanceof OBJModel) {
+                ImmutableMap<String, String> flip = new ImmutableMap.Builder<String, String>().put("flip-v", "true").build();
+                return ((OBJModel) model).process(flip);
+            } else {
+                return model;
+            }
         }
     }
 
@@ -238,6 +239,7 @@ public class FactorizationClientProxy extends FactorizationProxy {
                 Core.registry.hall_of_legends,
                 Core.registry.lamp,
                 Core.registry.leyden_jar,
+                Core.registry.compression_crafter,
         }) {
             setItemBlockModel(b, 0, "inventory");
         }

@@ -78,7 +78,7 @@ public class RenderStepperEngine extends RenderEntity {
             GL11.glLineWidth(1.5F);
             float d = 1F/2F, h = 0.25F;
             AxisAlignedBB ab = new AxisAlignedBB(-d, -h, -d, d, h, d);
-            RenderGlobal.func_181561_a(ab);
+            RenderGlobal.drawSelectionBoundingBox(ab);
             GL11.glPopAttrib();
             GL11.glEnable(GL11.GL_TEXTURE_2D);
 

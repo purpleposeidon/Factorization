@@ -826,7 +826,7 @@ public class TileEntityGreenware extends TileEntityCommon implements IFurnaceHea
         GL11.glLineWidth(2.0F);
         GL11.glColor4f(0, 0, 0, 0.4F);
         // GL11.glColor4f(0x4D/r, 0x34/r, 0x7C/r, 0.8F); //#4D347C
-        RenderGlobal.func_181561_a(bb);
+        RenderGlobal.drawSelectionBoundingBox(bb);
         GL11.glDepthMask(true);
         GL11.glEnable(GL11.GL_TEXTURE_2D);
         GL11.glDisable(GL11.GL_BLEND);

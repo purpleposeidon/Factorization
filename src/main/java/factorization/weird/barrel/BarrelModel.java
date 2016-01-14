@@ -192,7 +192,7 @@ public class BarrelModel implements ISmartBlockModel, ISmartItemModel, IPerspect
 
     @Override
     public boolean isBuiltInRenderer() {
-        return true;
+        return false;
     }
 
     @Override

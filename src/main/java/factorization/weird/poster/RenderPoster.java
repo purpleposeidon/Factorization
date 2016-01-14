@@ -34,7 +34,7 @@ public class RenderPoster extends RenderEntity {
             // They ordinarily don't move, so no need to bother w/ interpolation
             GL11.glTranslated(-ent.posX, -ent.posY, -ent.posZ + 1 / 16.0);
             GL11.glDisable(GL11.GL_TEXTURE_2D);
-            RenderGlobal.func_181561_a(ent.getEntityBoundingBox());
+            RenderGlobal.drawSelectionBoundingBox(ent.getEntityBoundingBox());
             GL11.glEnable(GL11.GL_TEXTURE_2D);
             GL11.glPopMatrix();
         }
