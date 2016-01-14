@@ -12,7 +12,6 @@ import factorization.util.ItemUtil;
 import factorization.util.SpaceUtil;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
-import io.netty.handler.codec.socks.SocksMessageType;
 import net.minecraft.block.Block;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
@@ -235,7 +234,7 @@ public abstract class TileEntityCommon extends TileEntity implements ICoord, IFa
     }
 
     public boolean power() {
-        return pulseTime + 4 > worldObj.getTotalWorldTime();
+        return worldObj != null ? pulseTime + 4 > worldObj.getTotalWorldTime() : false;
     }
 
     public AxisAlignedBB getCollisionBoundingBox() {

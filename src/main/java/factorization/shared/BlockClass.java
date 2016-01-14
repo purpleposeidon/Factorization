@@ -23,15 +23,12 @@ public enum BlockClass implements IStringSerializable, Comparable<BlockClass> {
     //LightAir(5, false, 0, 15, 0),
     //WrathFire(6, false, 0, 4, 0),
     MachineDynamicLightable(6, true, 0, 0, 3F),
-    Machine(7, true, 0, 0, 3F),
+    Machine(7, false, 0, 0, 3F),
     MachineLightable(8, true, 0, 13, 3F),
     Wire(9, false, 0, 0, 0.25F),
     Ceramic(10, false, 0, 0, 0.75F);
 
     static {
-        Wire.setAbnormal();
-        Machine.setAbnormal();
-        Ceramic.setAbnormal();
         Wire.passable = true;
         NORELEASE.fixme("Destroy this");
     }
@@ -43,12 +40,11 @@ public enum BlockClass implements IStringSerializable, Comparable<BlockClass> {
 
     public Block block = null; // has to be set later unfortunately, due to a loop
     public final int md;
-    final boolean normalCube;
     final int flamability;
     final boolean isFlamable;
     final int lightValue;
     final float hardness; //Our default is 2
-    boolean normal_cube = true;
+    boolean normalCube = true;
     boolean passable = false;
 
     BlockClass(int md, boolean normalCube, int flamability, int lightValue, float hardness) {
@@ -66,7 +62,7 @@ public enum BlockClass implements IStringSerializable, Comparable<BlockClass> {
     }
 
     BlockClass setAbnormal() {
-        normal_cube = false;
+        normalCube = false;
         return this;
     }
 
@@ -98,7 +94,7 @@ public enum BlockClass implements IStringSerializable, Comparable<BlockClass> {
     }
 
     boolean isNormal() {
-        return normal_cube;
+        return normalCube;
     }
 
     @Override

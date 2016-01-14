@@ -95,7 +95,7 @@ public class BlockFactorization extends BlockContainer {
     @Override
     public boolean isBlockSolid(IBlockAccess world, BlockPos pos, EnumFacing side) {
         TileEntityCommon tec = get(world, pos);
-        if (tec == null) return false;
+        if (tec == null) return isNormalCube(world, pos);
         return tec.isBlockSolidOnSide(side);
     }
 
@@ -280,6 +280,10 @@ public class BlockFactorization extends BlockContainer {
         return getClass(world, pos).isNormal();
     }
 
+    public BlockClass getBlockClass() {
+        return null;
+    }
+
     public BlockClass getClass(IBlockAccess world, BlockPos pos) {
         IBlockState bs = world.getBlockState(pos);
         if (bs.getBlock() != this) return BlockClass.Default;
@@ -370,22 +374,22 @@ public class BlockFactorization extends BlockContainer {
 
     @Override
     public boolean isNormalCube() {
-        return false;
+        return getBlockClass() != null ? getBlockClass().isNormal() : false;
     }
 
     @Override
     public boolean isOpaqueCube() {
-        return false;
+        return getBlockClass() != null ? getBlockClass().isNormal() : false;
     }
 
     @Override
     public boolean isFullCube() {
-        return false;
+        return getBlockClass() != null ? getBlockClass().isNormal() : false;
     }
 
     @Override
     public boolean isVisuallyOpaque() {
-        return false;
+        return getBlockClass() != null ? getBlockClass().isNormal() : false;
     }
 
     @Override

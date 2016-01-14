@@ -31,6 +31,11 @@ public class SimpleFzBlock extends BlockFactorization {
     }
 
     @Override
+    public BlockClass getBlockClass() {
+        return blockClass;
+    }
+
+    @Override
     public BlockClass getClass(IBlockAccess world, BlockPos pos) {
         return blockClass;
     }
