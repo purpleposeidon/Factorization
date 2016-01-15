@@ -590,7 +590,7 @@ public class Registry {
         oreRecipe(new ItemStack(logicMatrixIdentifier),
                 "MiX",
                 'M', logicMatrix,
-                'i', Items.quartz,
+                'i', "gemQuartz",
                 'X', logicMatrixProgrammer);
         GameRegistry.addSmelting(logicMatrixIdentifier, new ItemStack(logicMatrix), 0);
         oreRecipe(new ItemStack(logicMatrixController),
@@ -1319,7 +1319,7 @@ public class Registry {
                 "qCL",
                 "SIB",
                 "rCL",
-                'q', Items.quartz,
+                'q', "gemQuartz",
                 'r', Items.redstone,
                 'S', dark_iron_sprocket,
                 'C', insulated_coil,

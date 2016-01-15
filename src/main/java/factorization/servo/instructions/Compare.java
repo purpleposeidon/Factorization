@@ -9,8 +9,6 @@ import factorization.servo.ServoMotor;
 import factorization.servo.ServoStack;
 import factorization.util.FzUtil;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.init.Items;
-import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumFacing;
 
 import java.io.IOException;
@@ -44,7 +42,7 @@ public class Compare extends Instruction {
 
     @Override
     protected Object getRecipeItem() {
-        return new ItemStack(Items.quartz);
+        return "gemQuartz";
     }
 
     @Override
