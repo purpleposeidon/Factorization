@@ -205,7 +205,7 @@ public class BlockUndo {
         }
         String heldName = DataUtil.getName(player.getHeldItem());
         if (heldName == null) heldName = "";
-        if (heldName.startsWith("TConstruct:")) {
+        if (heldName.toLowerCase(Locale.ROOT).startsWith("tconstruct:")) {
             return; // avoid warp-speed issues
         }
         final float harvestingSpeed = ForgeHooks.canHarvestBlock(block, player, player.worldObj, event.pos) ? 30F : 100F;
