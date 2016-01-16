@@ -2,10 +2,7 @@ package factorization.misc;
 
 import factorization.api.Coord;
 import factorization.common.FzConfig;
-import factorization.util.DataUtil;
-import factorization.util.FzUtil;
-import factorization.util.ItemUtil;
-import factorization.util.PlayerUtil;
+import factorization.util.*;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import net.minecraft.block.Block;
@@ -257,6 +254,7 @@ public class BlockUndo {
         final BlockPos pos = event.pos;
         final IBlockState bs = event.state;
         final Block block = event.state.getBlock();
+        final TileEntity te = w.getTileEntity(pos);
         int wDim = FzUtil.getWorldDimension(w);
         if (PlayerUtil.isPlayerCreative(thePlayer)) return;
         for (Iterator<PlacedBlock> iterator = coords.iterator(); iterator.hasNext(); ) {
@@ -302,30 +300,35 @@ public class BlockUndo {
         EntityPlayer fake_player = PlayerUtil.makePlayer(new Coord(w, pos), "BlockUndo");
         fake_player.setCurrentItemOrArmor(0, tool);
         {
-            double r = 0.5;
-            AxisAlignedBB box = new AxisAlignedBB(x - r, y - r, z - r, x + 1 + r, y + 1 + r, z + 1 + r);
-            block.onBlockHarvested(w, pos, bs, fake_player);
-            TileEntity te = w.getTileEntity(pos);
-            boolean canDestroy = block.removedByPlayer(w, pos, fake_player, true);
+            // See ItemInWorldManager.tryHarvestBlock
 
-            if (canDestroy) {
-                block.onBlockDestroyedByPlayer(w, pos, bs);
+            boolean canHarvest = block.canHarvestBlock(w, pos, fake_player);
+            boolean removed;
+            {
+                block.onBlockHarvested(w, pos, bs, fake_player);
+                removed = block.removedByPlayer(w, pos, fake_player, canHarvest);
+                if (removed) {
+                    block.onBlockDestroyedByPlayer(w, pos, bs);
+                }
             }
-            block.harvestBlock(w, fake_player, pos, bs, te);
-            if (canDestroy) {
-                int xp = block.getExpDrop(w, pos, 0);
+            if (canHarvest && removed) {
+                block.harvestBlock(w, fake_player, pos, bs, te);
+            }
+            int xp = event.getExpToDrop();
+            if (removed && xp > 0) {
                 block.dropXpOnBlockBreak(w, pos, xp);
             }
-            if (FzConfig.blockundo_grab) {
-                for (Object o : w.getEntitiesWithinAABB(EntityItem.class, box)) {
-                    EntityItem ei = (EntityItem) o;
-                    // NORELEASE: Add delayBeforeCanPickup to AT
-                    //int orig_delay = ei.delayBeforeCanPickup;
-                    ei.setNoPickupDelay();
-                    ei.onCollideWithPlayer(real_player);
-                    ei.setDefaultPickupDelay();
-                    //ei.delayBeforeCanPickup = orig_delay;
-                }
+        }
+        double r = 0.5;
+        AxisAlignedBB box = new AxisAlignedBB(x - r, y - r, z - r, x + 1 + r, y + 1 + r, z + 1 + r);
+        if (FzConfig.blockundo_grab) {
+            for (Object o : w.getEntitiesWithinAABB(EntityItem.class, box)) {
+                EntityItem ei = (EntityItem) o;
+                int orig_delay = ei.delayBeforeCanPickup;
+                ei.setNoPickupDelay();
+                ei.onCollideWithPlayer(real_player);
+                ei.setDefaultPickupDelay();
+                ei.setPickupDelay(orig_delay);
             }
         }
         PlayerUtil.recycleFakePlayer(fake_player);
