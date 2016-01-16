@@ -4,6 +4,7 @@ import factorization.api.IActOnCraft;
 import factorization.artifact.BlockForge;
 import factorization.artifact.ItemBrokenArtifact;
 import factorization.artifact.ItemPotency;
+import factorization.beauty.BlockAnthroGen;
 import factorization.beauty.ItemGrossFood;
 import factorization.beauty.ItemLeafBomb;
 import factorization.ceramics.ItemGlazeBucket;
@@ -108,6 +109,7 @@ public class Registry {
     public SimpleFzBlock hall_of_legends;
     public SimpleFzBlock lamp;
     public SimpleFzBlock leyden_jar;
+    public SimpleFzBlock anthrogen;
 
     public ItemStack servorail_item;
     public ItemStack empty_socket_item, socket_lacerator, socket_robot_hand, socket_shifter;
@@ -201,6 +203,7 @@ public class Registry {
         hall_of_legends = new SimpleFzBlock(Material.iron, FactoryType.LEGENDARIUM);
         lamp = new SimpleFzBlockCutout(Material.iron, FactoryType.LAMP);
         leyden_jar = new SimpleFzBlockCutout(Material.glass, FactoryType.LEYDENJAR);
+        anthrogen = new BlockAnthroGen(Material.wood, FactoryType.ANTHRO_GEN);
         compression_crafter = new BlockCompressionCrafter();
         socket = new BlockSocket();
         for (BlockClass bc : BlockClass.values()) {
@@ -250,6 +253,7 @@ public class Registry {
         GameRegistry.registerBlock(hall_of_legends, ItemFactorizationBlock.class, "HallOfLegends");
         GameRegistry.registerBlock(lamp, ItemFactorizationBlock.class, "Lamp");
         GameRegistry.registerBlock(leyden_jar, ItemFactorizationBlock.class, "LeydenJar");
+        GameRegistry.registerBlock(anthrogen, ItemFactorizationBlock.class, "AnthropicGenerator");
         GameRegistry.registerBlock(compression_crafter, ItemFactorizationBlock.class, "CompressionCrafter");
         GameRegistry.registerBlock(socket, ItemFactorizationBlock.class, "Socket");
         if (DeltaChunk.enabled()) {

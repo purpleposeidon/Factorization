@@ -102,6 +102,11 @@ public class FactorizationClientProxy extends FactorizationProxy {
                 return model;
             }
         }
+
+        @Override
+        public boolean accepts(ResourceLocation modelLocation) {
+            return super.accepts(modelLocation);
+        }
     }
 
     @Override
@@ -239,6 +244,7 @@ public class FactorizationClientProxy extends FactorizationProxy {
                 Core.registry.hall_of_legends,
                 Core.registry.lamp,
                 Core.registry.leyden_jar,
+                Core.registry.anthrogen,
                 Core.registry.compression_crafter,
                 Core.registry.socket,
         }) {

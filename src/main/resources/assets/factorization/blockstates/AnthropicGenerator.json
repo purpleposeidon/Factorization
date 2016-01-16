@@ -1,0 +1,16 @@
+{
+    "forge_marker": 1,
+    "defaults": {
+        "model": "factorization:anthrogen_lit.obj",
+        "transform": "forge:default-block",
+        "textures": {}
+    },
+    "variants": {
+        "normal": [{}],
+        "inventory": [{}],
+        "lit": {
+            "true": "factorization:anthrogen_lit.obj",
+            "false": "factorization:anthrogen_unlit.obj"
+        }
+    }
+}
