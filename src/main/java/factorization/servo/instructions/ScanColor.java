@@ -14,7 +14,6 @@ import net.minecraft.block.BlockCactus;
 import net.minecraft.block.BlockCrops;
 import net.minecraft.block.BlockReed;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.init.Items;
 import net.minecraft.util.EnumFacing;
 
 import java.io.IOException;
@@ -73,7 +72,7 @@ public class ScanColor extends Decorator {
                 "Q#Q",
                 "+Q+",
                 '+', FactoryType.SERVORAIL.itemStack(),
-                'Q', Items.quartz,
+                'Q', "gemQuartz",
                 '#', Core.registry.logicMatrixIdentifier);
     }
     
