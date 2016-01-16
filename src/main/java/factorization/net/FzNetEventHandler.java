@@ -106,7 +106,7 @@ public class FzNetEventHandler {
                 return;
             }
             if (!(ent instanceof INet)) {
-                Core.logWarning("Tried to send packet to entity that can not handle our packets at " + new Coord(ent) + ", a " + ent);
+                Core.logWarning("Tried to send packet to entity that can not handle our packets: an " + ent + "    at " + new Coord(ent));
                 return;
             }
             INet it = (INet) ent;
