@@ -13,4 +13,9 @@ public class SimpleFzBlockCutout extends SimpleFzBlock {
     public boolean canRenderInLayer(EnumWorldBlockLayer layer) {
         return layer == EnumWorldBlockLayer.CUTOUT;
     }
+
+    @Override
+    public boolean isOpaqueCube() {
+        return false;
+    }
 }

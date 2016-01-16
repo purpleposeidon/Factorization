@@ -2,7 +2,14 @@
     "forge_marker": 1,
     "defaults": {
         "model": "factorization:leyden_jar",
-        "transform": "forge:default-block"
+        "transform": "forge:default-block",
+        "textures": {
+            "base": "factorization:blocks/charge/leyden_bottom",
+            "post": "factorization:blocks/charge/leyden_bottom",
+            "jar_top": "factorization:blocks/charge/leyden_glass",
+            "jar_side": "factorization:blocks/charge/leyden_glass_side",
+            "knob": "factorization:blocks/charge/leyden_knob"
+        }
     },
     "variants": {
         "normal": [{}],

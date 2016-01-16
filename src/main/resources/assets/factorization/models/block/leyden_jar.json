@@ -1,7 +1,52 @@
 {
-    "parent": "factorization:lead_block",
+    "elements": [
+        {   "from": [ 2, 0, 2 ],
+            "to": [ 14, 2, 14 ],
+            "faces": {
+                "down":  { "uv": [ 0, 0, 14, 14 ], "texture": "#base", "cullface": "down" },
+                "up":    { "uv": [ 0, 0, 14, 14 ], "texture": "#base" },
+                "north": { "uv": [ 0, 0, 14, 2 ], "texture": "#base" },
+                "south": { "uv": [ 0, 0, 14, 2 ], "texture": "#base" },
+                "west":  { "uv": [ 0, 0, 14, 2 ], "texture": "#base" },
+                "east":  { "uv": [ 0, 0, 14, 2 ], "texture": "#base" }
+            },
+            "__comment": "Lead slab base of the jar"
+        },
+        {   "from": [ 7, 0, 7 ],
+            "to": [ 9, 16, 9 ],
+            "faces": {
+                "up":    { "uv": [ 0, 0, 2, 2 ], "texture": "#post", "cullface": "up" },
+                "north": { "uv": [ 0, 0, 16, 16 ], "texture": "#post" },
+                "south": { "uv": [ 0, 0, 16, 16 ], "texture": "#post" },
+                "west":  { "uv": [ 0, 0, 16, 16 ], "texture": "#post" },
+                "east":  { "uv": [ 0, 0, 16, 16 ], "texture": "#post" }
+            },
+            "__comment": "Inner pillar"
+        },
+        {   "from": [ 3, 2, 3 ],
+            "to": [ 13, 16, 13 ],
+            "faces": {
+                "up":    { "uv": [ 3, 3, 13, 13 ], "texture": "#jar_top" },
+                "north": { "uv": [ 3, 0, 13, 14 ], "texture": "#jar_side" },
+                "south": { "uv": [ 3, 0, 13, 14 ], "texture": "#jar_side" },
+                "west":  { "uv": [ 3, 0, 13, 14 ], "texture": "#jar_side" },
+                "east":  { "uv": [ 3, 0, 13, 14 ], "texture": "#jar_side" }
+            },
+            "__comment": "Glass bell of the jar"
+        },
+        {   "from": [ 6, 16, 6 ],
+            "to": [ 10, 18, 10 ],
+            "faces": {
+                "up":    { "uv": [ 5, 5, 11, 11 ], "texture": "#knob", "cullface": "up" },
+                "north": { "uv": [ 5, 13, 11, 16 ], "texture": "#knob", "cullface": "up" },
+                "south": { "uv": [ 5, 13, 11, 16 ], "texture": "#knob", "cullface": "up" },
+                "west":  { "uv": [ 5, 13, 11, 16 ], "texture": "#knob", "cullface": "up" },
+                "east":  { "uv": [ 5, 13, 11, 16 ], "texture": "#knob", "cullface": "up" }
+            },
+            "__comment": "Glass knob"
+        }
+    ],
     "textures": {
-        "particle": "factorization:blocks/blastBlock",
-        "all": "factorization:blocks/blastBlock"
+        "particle": "#jar_side"
     }
 }
