@@ -120,6 +120,10 @@ public class RenderMessages extends RenderMessagesProxy {
         GlStateManager.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
         GlStateManager.color(1, 1, 1, 1);
 
+        if (renderItem == null) {
+            renderItem = Minecraft.getMinecraft().getRenderItem();
+        }
+
         while (it.hasNext()) {
             ClientMessage m = it.next();
             long timeExisted = approximateNow - m.creationTime;
@@ -153,7 +157,7 @@ public class RenderMessages extends RenderMessagesProxy {
         RenderUtil.checkGLError("Notification render error!");
     }
 
-    RenderItem renderItem = Minecraft.getMinecraft().getRenderItem();
+    private RenderItem renderItem = null;
 
     private void renderMessage(ClientMessage m, float partial, float opacity, double cx, double cy, double cz) {
         int width = 0;
@@ -253,11 +257,11 @@ public class RenderMessages extends RenderMessagesProxy {
                 GlStateManager.translate(0, -centeringOffset, 0);
 
                 GlStateManager.translate((float) (halfWidth + 4), -lineCount/2, 0);
-                renderItem.zLevel -= 50;
+                renderItem.zLevel -= 100; // Undoes the effects of setupGuiTransform
                 GL11.glPushAttrib(GL11.GL_ENABLE_BIT);
-                renderItem.renderItemAndEffectIntoGUI(m.item, 0, 0);
+                renderItem.renderItemIntoGUI(m.item, 0, 0);
                 GL11.glPopAttrib();
-                renderItem.zLevel += 50;
+                renderItem.zLevel += 100;
             }
         }
         GlStateManager.popMatrix();
