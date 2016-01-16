@@ -23,6 +23,7 @@ import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.client.multiplayer.ChunkProviderClient;
 import net.minecraft.client.multiplayer.WorldClient;
 import net.minecraft.client.network.NetHandlerPlayClient;
+import net.minecraft.client.renderer.OpenGlHelper;
 import net.minecraft.client.renderer.RenderGlobal;
 import net.minecraft.client.renderer.entity.RenderManager;
 import net.minecraft.client.renderer.tileentity.TileEntityRendererDispatcher;
@@ -204,9 +205,10 @@ public class HammerClientProxy extends HammerProxy {
             throw new NullPointerException("Tried setting world/player to null!");
         }
         //For logic
-        if (mc.renderViewEntity == mc.thePlayer) {
+        if (mc.getRenderViewEntity() == mc.thePlayer) {
             mc.renderViewEntity = player;
             // We *can not* use the setter here.
+            // ... at least not in 1.7.10. 1.8 has shader bits which would we could potentially de-fang.
         }
         mc.theWorld = wc;
         mc.thePlayer = player;
