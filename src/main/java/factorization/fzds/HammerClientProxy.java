@@ -10,8 +10,8 @@ import factorization.fzds.gui.ProxiedGuiScreen;
 import factorization.fzds.interfaces.IDeltaChunk;
 import factorization.fzds.network.PacketJunction;
 import factorization.shared.Core;
-import factorization.util.NORELEASE;
 import factorization.util.FzUtil;
+import factorization.util.NORELEASE;
 import factorization.util.NumUtil;
 import factorization.util.SpaceUtil;
 import net.minecraft.block.Block;
@@ -53,10 +53,7 @@ import net.minecraftforge.fml.common.network.FMLNetworkEvent.ClientDisconnection
 import net.minecraftforge.fml.relauncher.Side;
 import org.lwjgl.opengl.GL11;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.WeakHashMap;
+import java.util.*;
 
 public class HammerClientProxy extends HammerProxy {
     static HammerClientProxy instance;
@@ -264,9 +261,24 @@ public class HammerClientProxy extends HammerProxy {
     private WorldClient real_world = null;
     private EntityPlayerSP fake_player = null;
     private RenderGlobal real_renderglobal = null;
+    private boolean operating = false;
     
     @Override
     public void setShadowWorld() {
+        if (operating) {
+            String s = "concurrent call to setShadowWorld()!";
+            dumpAllThreads(s);
+            throw new IllegalStateException(s);
+        }
+        operating = true;
+        try {
+            setShadowWorld0();
+        } finally {
+            operating = false;
+        }
+    }
+
+    private void setShadowWorld0() {
         if (!mc.isCallingFromMinecraftThread()) {
             throw new IllegalStateException("Can only change world in main thread");
         }
@@ -293,19 +305,47 @@ public class HammerClientProxy extends HammerProxy {
             fake_player.movementInput = real_player.movementInput;
         }
         real_renderglobal = mc.renderGlobal;
+        fake_player.inventory = real_player.inventory;
         setWorldAndPlayer(w, fake_player);
         PacketJunction.switchJunction(mc.getNetHandler(), true);
         if (fake_player == null) {
-            NORELEASE.breakpoint();
+            dumpAllThreads("fake_player is null, despite the assurances of static analysis:");
         }
         if (real_player == null) {
-            NORELEASE.breakpoint();
+            dumpAllThreads("real_player is null, despite the assurances of static analysis:");
         }
-        fake_player.inventory = real_player.inventory;
     }
+
+    private static void dumpAllThreads(String header) {
+        for (Map.Entry<Thread, StackTraceElement[]> e : Thread.getAllStackTraces().entrySet()) {
+            Thread thread = e.getKey();
+            StackTraceElement[] stack = e.getValue();
+            Core.logSevere(header);
+            header = "";
+            Core.logSevere(thread.getName());
+            for (StackTraceElement s : stack) {
+                Core.logSevere("    " + s.toString());
+            }
+        }
+    }
+
     
     @Override
     public void restoreRealWorld() {
+        if (operating) {
+            String s = "Concurrent call to restoreRealWorld()!";
+            dumpAllThreads(s);
+            throw new IllegalStateException(s);
+        }
+        operating = true;
+        try {
+            restoreRealWorld0();
+        } finally {
+            operating = false;
+        }
+    }
+
+    private void restoreRealWorld0() {
         setWorldAndPlayer(real_world, real_player);
         real_world = null;
         real_player = null;

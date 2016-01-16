@@ -75,7 +75,12 @@ public class NORELEASE {
     }
 
     /**
-     * Use this method to create a line of code that a debugging breakpoint can be placed on.
+     * Use this method to create a line of code that a debugging breakpoint can be placed on, eg
+     * <code>
+     *     if (someBuggyCondition()) {
+     *         NORELEASE.breakpoint();
+     *     }
+     * </code>
      */
     public static void breakpoint() {
     }
