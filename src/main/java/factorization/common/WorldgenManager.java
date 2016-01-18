@@ -3,11 +3,9 @@ package factorization.common;
 import factorization.colossi.WorldGenColossus;
 import factorization.shared.Core;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.util.BlockPos;
 import net.minecraft.world.World;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.chunk.IChunkProvider;
-import net.minecraft.world.gen.feature.WorldGenMinable;
 import net.minecraftforge.event.world.ChunkDataEvent;
 import net.minecraftforge.fml.common.IWorldGenerator;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
@@ -22,31 +20,13 @@ public class WorldgenManager {
         setupWorldGenerators();
     }
     
-    IWorldGenerator silverGen, darkIronGen; 
+    IWorldGenerator copperGeyserGen, darkIronGen;
     
     void setupWorldGenerators() {
         // NORELEASE: Apparently we should only generate in particular side of chunks? Like [-8, +8] instead of [0, 16]
-        if (FzConfig.gen_silver_ore) {
-            silverGen = new IWorldGenerator() {
-                WorldGenMinable gen = new WorldGenMinable(Core.registry.resource_block.getDefaultState(), FzConfig.silver_ore_node_new_size);
-                @Override
-                public void generate(Random rand, int chunkX, int chunkZ, World world, IChunkProvider chunkGenerator, IChunkProvider chunkProvider) {
-                    if (!FzConfig.gen_silver_ore) {
-                        return;
-                    }
-                    if (!world.provider.isSurfaceWorld()) {
-                        return;
-                    }
-                    int count = 1; // + (rand.nextBoolean() && rand.nextBoolean() && rand.nextBoolean() ? 1 : 0);
-                    for (int i = 0; i < count; i++) {
-                        int x = chunkX*16 + rand.nextInt(16);
-                        int z = chunkZ*16 + rand.nextInt(16);
-                        int y = 4 + rand.nextInt(42);
-                        gen.generate(world, rand, new BlockPos(x, y, z));
-                    }
-                }
-            };
-            GameRegistry.registerWorldGenerator(silverGen, 0);
+        if (FzConfig.gen_copper_geysers) {
+            copperGeyserGen = new CopperGeyserGen();
+            GameRegistry.registerWorldGenerator(copperGeyserGen, -4);
         }
         if (FzConfig.gen_dark_iron_ore) {
             darkIronGen = new DarkIronOreGenerator();
@@ -57,10 +37,11 @@ public class WorldgenManager {
         }
     }
     
-    private static ArrayList<Chunk> retrogenQueue = new ArrayList();
+    private static ArrayList<Chunk> retrogenQueue = new ArrayList<Chunk>();
     
     @SubscribeEvent
     public void enqueueRetrogen(ChunkDataEvent.Load event) {
+        // See also: http://minecraft.curseforge.com/projects/simpleretrogen
         if (!FzConfig.enable_retrogen) {
             return;
         }
@@ -104,7 +85,7 @@ public class WorldgenManager {
         log("Starting %s chunks", retrogenQueue.size());
         for (int i = 0; i < retrogenQueue.size(); i++) {
             Chunk chunk = retrogenQueue.get(i);
-            doRetrogen(FzConfig.retrogen_silver, chunk, "Silver", silverGen);
+            doRetrogen(FzConfig.gen_copper_geysers, chunk, "Copper/Geyser", copperGeyserGen);
             doRetrogen(FzConfig.retrogen_dark_iron, chunk, "Dark Iron", darkIronGen);
         }
         retrogenQueue.clear();

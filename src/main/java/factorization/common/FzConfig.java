@@ -19,7 +19,7 @@ public class FzConfig {
     public static boolean render_barrel_text = true;
     public static boolean render_barrel_close = false;
     public static int entity_relight_task_id = -1;
-    public static boolean gen_silver_ore = true;
+    public static boolean gen_copper_geysers = true;
     public static boolean gen_dark_iron_ore = true;
     public static int silver_ore_node_new_size = 18;
     public static boolean gen_colossi = true;
@@ -186,11 +186,11 @@ public class FzConfig {
 
         add_branding = getBoolConfig("addBranding", "general", add_branding, null);
 
-        gen_silver_ore = getBoolConfig("generateSilverOre", "general", gen_silver_ore, "Set to false to disable silver ore generation");
+        gen_copper_geysers = getBoolConfig("generateCopperGeysers", "general", gen_copper_geysers, "Set to false to disable copper/geyser generation");
         int config_silver_size = getIntConfig("silverOreNodeNewSize", "general", silver_ore_node_new_size, "The size of silver ore nodes. Between 5 & 35. Default is " + silver_ore_node_new_size);
         silver_ore_node_new_size = Math.max(5, Math.min(config_silver_size, 35));
         gen_dark_iron_ore = getBoolConfig("generateDarkIronOre", "general", gen_dark_iron_ore, "Set to false to disable dark iron ore generation");
-        gen_colossi = getBoolConfig("generateColossi", "general", gen_colossi, "If true, Colossi will generate in the world. If false, the player will be given an LMP instead of a lost map.");
+        gen_colossi = getBoolConfig("generateColossi", "general", gen_colossi, "If true, Colossi will generate in the world. If false, the player will be given an LMP instead of a lost map. Note that attempting to apply retrogen to colossi is unadvised.");
         colossus_spacing = getIntConfig("colossusSpacing", "general", colossus_spacing, "Distance between colossi in chunks");
 
         {

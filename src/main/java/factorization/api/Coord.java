@@ -195,6 +195,10 @@ public final class Coord implements IDataSerializable, ISaneCoord, Comparable<Co
     public void set(Coord c) {
         set(c.w, c.x, c.y, c.z);
     }
+
+    public void setOff(Coord c, int dx, int dy, int dz) {
+        set(c.w, c.x + dx, c.y + dy, c.z + dz);
+    }
     
     public void set(Vec3 v) {
         set(w, (int)v.xCoord, (int)v.yCoord, (int)v.zCoord);

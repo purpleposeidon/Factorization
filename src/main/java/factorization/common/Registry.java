@@ -1299,10 +1299,6 @@ public class Registry {
                 '#', new ItemStack(Blocks.quartz_block, 1, 1),
                 '-', "ingotGold",
                 '*', Items.nether_star);
-
-        if (Core.enable_test_content) {
-            //TestContent.add();
-        }
     }
     
     private void makeServoRecipes() {
