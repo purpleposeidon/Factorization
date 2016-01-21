@@ -16,6 +16,7 @@ import java.util.Set;
 import factorization.common.*;
 import factorization.net.FzNetEventHandler;
 import factorization.net.NetworkFactorization;
+import factorization.util.NORELEASE;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -290,9 +291,12 @@ public class Core {
         if (HammerEnabled.ENABLED) {
             event.registerServerCommand(new BuildColossusCommand());
         }
+        if (NORELEASE.on) {
+            // Perhaps we could keep it.
+            event.registerServerCommand(new GeyserTest());
+        }
         if (Core.dev_environ) {
             event.registerServerCommand(new GenBlockStates());
-            event.registerServerCommand(new GeyserTest());
         }
     }
     

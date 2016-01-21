@@ -34,9 +34,4 @@ public class GeyserTest extends CommandBase {
             sender.addChatMessage(new ChatComponentText("Usage: /geyser volcanism|spawn"));
         }
     }
-
-    @Override
-    public boolean canCommandSenderUseCommand(ICommandSender sender) {
-        return sender instanceof EntityPlayer;
-    }
 }
