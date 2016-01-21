@@ -3,7 +3,7 @@
   "authorList": [
    "neptunepink"
   ], 
-  "credits": "", 
+  "credits": "asie, SoundLogic", 
   "dependencies": [], 
   "description": "Auto-crafting, ore processing, barrels, and other tools", 
   "mcversion": "${mcversion}", 
