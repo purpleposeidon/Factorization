@@ -17,12 +17,7 @@ public enum Sound {
     // it might be kinda cool to have this be configable?
     rightClick("random.click", 1.0, 1.25),
     leftClick("random.click", 1.0, 0.75),
-    routerCluck("mob.chicken.say", 0.5, 0.66, false),
     stamperUse("tile.piston.in", 0.1, 1.1, false),
-    makerUse("tile.piston.out", 0.08, 0.5 * 0.3 + 1.1, false),
-    bagSlurp("random.drink", 0.6, 8.0, false),
-    demonSqueek("mob.enderman.scream", 0.9, 8, true),
-    wandCool("random.fizz", .2, 0.5, true),
     acidBurn("random.fizz", 1, 1, true),
     caliometricDigest("random.burp", 1, 0.5, true),
     barrelPunt("mob.zombie.infect", 0.9, 1.5, true),
@@ -31,7 +26,9 @@ public enum Sound {
     servoInstall("mob.slime.attack", 1.0, 1.0, true),
     artifactForged("random.anvil_use", 1.0, 0.25, true),
     legendariumInsert("factorization:legendarium.insert", 0.75, 1.0, true),
-    
+    extruderExtrude("random.fizz", .2, 0.5, true),
+    extruderBreak("random.fizz", .2, 0.5, true),
+    geyserBlast("random.fizz", .2, 0.5, true),
     ;
     String src;
     float volume, pitch;

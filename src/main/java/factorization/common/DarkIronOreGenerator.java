@@ -80,13 +80,13 @@ public class DarkIronOreGenerator implements IWorldGenerator {
         }
     }
 
-    static double[] samples = new double[maxWidth * maxWidth * maxWidth];
 
     static class BlitGen {
         final Coord min, max;
         final int chunkX, chunkZ;
         final Random random;
         final AxisAlignedBB chunkBox;
+        double[] samples = new double[maxWidth * maxWidth * maxWidth];
 
         Block stoneId = Blocks.stone;
         int stoneMd = 0;

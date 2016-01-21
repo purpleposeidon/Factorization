@@ -11,6 +11,7 @@ import com.google.common.io.ByteArrayDataOutput;
 import io.netty.buffer.ByteBuf;
 
 import net.minecraft.block.Block;
+import net.minecraft.block.material.Material;
 import net.minecraft.block.properties.IProperty;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.Entity;
@@ -588,6 +589,10 @@ public final class Coord implements IDataSerializable, ISaneCoord, Comparable<Co
         return getState().getBlock();
     }
 
+    public Material getMaterial() {
+        return getState().getBlock().getMaterial();
+    }
+
     @Deprecated
     public int getMd() {
         IBlockState bs = getState();
@@ -698,7 +703,10 @@ public final class Coord implements IDataSerializable, ISaneCoord, Comparable<Co
         return w.setBlockState(toBlockPos(), state, notifyFlag);
     }
 
-    @Deprecated // Use IBlockState
+    public boolean set(IBlockState state, int notifyFlag) {
+        return w.setBlockState(toBlockPos(), state, notifyFlag);
+    }
+
     public boolean setId(Block block, boolean notify) {
         return set(block.getDefaultState(), notify);
     }

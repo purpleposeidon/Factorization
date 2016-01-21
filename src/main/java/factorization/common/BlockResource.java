@@ -11,29 +11,15 @@ import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.BlockPos;
-import net.minecraft.util.IStringSerializable;
 import net.minecraft.world.IBlockAccess;
 
 import java.util.List;
-import java.util.Locale;
 
 public class BlockResource extends Block {
-    enum ResourceTypes implements IStringSerializable, Comparable<ResourceTypes> {
-        COPPER_ORE, SILVER_BLOCK, LEAD_BLOCK, DARK_IRON_BLOCK, COPPER_BLOCK;
-
-        public static final ResourceTypes[] values = values();
-
-        @Override
-        public String getName() {
-            return name().toLowerCase(Locale.ROOT);
-        }
-
-        public boolean isMetal() {
-            return this == SILVER_BLOCK || this == LEAD_BLOCK || this == DARK_IRON_BLOCK || this == COPPER_BLOCK;
-        }
-    }
-
-    public static final IProperty<ResourceTypes> TYPE = PropertyEnum.create("type", ResourceTypes.class);
+    public static final IProperty<ResourceType> TYPE = PropertyEnum.create("type", ResourceType.class,
+            ResourceType.COPPER_ORE,
+            ResourceType.DARK_IRON_BLOCK,
+            ResourceType.COPPER_BLOCK);
 
     protected BlockResource() {
         super(Material.rock);
@@ -53,13 +39,12 @@ public class BlockResource extends Block {
 
     @Override
     public IBlockState getStateFromMeta(int meta) {
-        return getDefaultState().withProperty(TYPE, ResourceTypes.values[meta]);
+        return getDefaultState().withProperty(TYPE, ResourceType.values[meta]);
     }
 
     public void addCreativeItems(List<ItemStack> itemList) {
-        itemList.add(Core.registry.silver_ore_item);
-        itemList.add(Core.registry.silver_block_item);
-        itemList.add(Core.registry.lead_block_item);
+        itemList.add(Core.registry.copper_ore_item);
+        itemList.add(Core.registry.copper_block_item);
         itemList.add(Core.registry.dark_iron_block_item);
     }
     

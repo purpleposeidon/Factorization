@@ -3,14 +3,14 @@ package factorization.common;
 import factorization.api.Coord;
 import factorization.api.DeltaCoord;
 import factorization.api.ICoordFunction;
+import factorization.shared.Core;
 import factorization.util.NORELEASE;
 import factorization.util.NumUtil;
 import net.minecraft.block.Block;
-import net.minecraft.block.BlockColored;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.init.Blocks;
-import net.minecraft.item.EnumDyeColor;
+import net.minecraft.util.EnumFacing;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.BiomeGenBase;
 import net.minecraft.world.chunk.IChunkProvider;
@@ -18,6 +18,7 @@ import net.minecraft.world.gen.NoiseGeneratorImproved;
 import net.minecraftforge.common.BiomeDictionary;
 import net.minecraftforge.fml.common.IWorldGenerator;
 
+import java.util.ArrayList;
 import java.util.Random;
 
 public class CopperGeyserGen implements IWorldGenerator {
@@ -27,22 +28,61 @@ public class CopperGeyserGen implements IWorldGenerator {
         air = Blocks.air.getDefaultState();
         tube = Blocks.hardened_clay.getDefaultState();
         lava = Blocks.lava.getDefaultState();
-        geyser = Blocks.stained_hardened_clay.getDefaultState().withProperty(BlockColored.COLOR, EnumDyeColor.GREEN);
-        extruder = Blocks.stained_hardened_clay.getDefaultState().withProperty(BlockColored.COLOR, EnumDyeColor.RED);
-        NORELEASE.fixme("Implement these blocks");
+        geyser = Core.registry.geyser.getDefaultState();
+        extruder = Core.registry.extruder.getDefaultState();
         NORELEASE.fixme("Config options");
     }
 
-    double chance = 0.3;
-    int genSpacing = 4;
-    private static final boolean notify = true;
+    private Random volcanoRng = new Random(0);
+    private boolean sampleVolcanism(int x, int z, int depth, long seed) {
+        x >>= depth;
+        z >>= depth;
+        volcanoRng.setSeed((depth << 16L) + z + seed);
+        return volcanoRng.nextFloat() > volcanismScale;
+    }
+
+    public float getVolcanism(int chunkX, int chunkZ, long seed) {
+        chunkX /= minSpacing;
+        chunkZ /= minSpacing;
+        for (int depth = 0; depth < volcanismNoiseDepth; depth++) {
+            if (sampleVolcanism(chunkX, chunkZ, depth, seed)) return (float) chancePerVolcanism[depth];
+        }
+        return (float) chancePerVolcanism[chancePerVolcanism.length - 1];
+    }
+
+    /**
+     * This is a list of probabilities between 0 and 1. Areas with low volcanism choose from the begining of the
+     * list, and areas with high volcanism choose from the end.
+     * The length of this list defines volcanismDepth. The chance of getting the highest volcanism is
+     * volcanismScale**volcanismDepth.
+     */
+    double chancePerVolcanism[] = new double[] {
+            0.00,
+            0.00,
+            0.00,
+            0.03,
+            0.20,
+            0.90,
+    };
+    float volcanismScale = 0.5F;
+    /**
+     * This defines the minimum distance between geysers in chunks. This is the size of the grid that geysers can occur
+     * on. Reasonable values are in 1 to 4. Due to the grid-nature of this, large values make it possible for a player
+     * to walk in a straight line forever without finding a geyser.
+     */
+    int minSpacing = 3;
+    final int volcanismNoiseDepth = chancePerVolcanism.length;
+    private static final boolean notify = NORELEASE.just(true);
+    int extrudersPerChamber = 6;
 
     @Override
     public void generate(Random random, int chunkX, int chunkZ, World world, IChunkProvider chunkGenerator, IChunkProvider chunkProvider) {
-        if (chunkX % genSpacing != 0 || chunkZ % genSpacing != 0) {
+        if (chunkX % minSpacing != 0 || chunkZ % minSpacing != 0) {
             return;
         }
-        if (random.nextDouble() > chance) return;
+        float volcanism = getVolcanism(chunkX, chunkZ, world.getSeed());
+        NORELEASE.println("Volcanism: " + volcanism + "\t at " + chunkX + ", " + chunkZ);
+        if (random.nextDouble() > volcanism) return;
         int x = 8 + chunkX * 16;
         int z = 8 + chunkZ * 16;
         Coord start = new Coord(world, x, 0, z);
@@ -153,8 +193,30 @@ public class CopperGeyserGen implements IWorldGenerator {
         final double noSq = chamberSize * chamberSize;
         ChamberBuilder builder = new ChamberBuilder(at, noSq, yesSq, chamberNoise);
         Coord.iterateCube(chamberNoise.min, chamberNoise.max, builder);
-        builder.firstPass = false;
-        Coord.iterateCube(chamberNoise.min, chamberNoise.max, builder);
+        placeExtruders(random, builder.topLavas);
+    }
+
+    private void placeExtruders(Random random, ArrayList<Coord> topLavas) {
+        int available = extrudersPerChamber;
+        while (!topLavas.isEmpty() && available > 0) {
+            int i = random.nextInt(topLavas.size());
+            Coord lavaSpot = topLavas.get(i);
+            boolean good = true;
+            for (EnumFacing dir : EnumFacing.VALUES) {
+                lavaSpot.adjust(dir);
+                if (lavaSpot.getMaterial() == Material.lava || lavaSpot.isSolid()) {
+                    lavaSpot.adjust(dir.getOpposite());
+                    continue;
+                }
+                good = false;
+                break;
+            }
+            if (good) {
+                lavaSpot.set(extruder, notify);
+                available--;
+            }
+            topLavas.remove(i);
+        }
     }
 
     class NoiseSampler {
@@ -195,7 +257,7 @@ public class CopperGeyserGen implements IWorldGenerator {
         private final double noSq;
         private final double yesSq;
         private final NoiseSampler chamberNoise;
-        boolean firstPass = true;
+        ArrayList<Coord> topLavas = new ArrayList<Coord>();
 
         public ChamberBuilder(Coord middle, double noSq, double yesSq, NoiseSampler chamberNoise) {
             this.middle = middle;
@@ -217,35 +279,11 @@ public class CopperGeyserGen implements IWorldGenerator {
             //if (block instanceof BlockOre) return;
             IBlockState use = lava;
             if (here.y == middle.y - 1) {
-                if (Math.abs(chamberNoise.sample(here)) > 0.2) {
-                    use = firstPass ? lava : extruder;
-                }
+                topLavas.add(here.copy());
             } else if (here.y > middle.y) {
                 use = air;
             }
-            if (firstPass) {
-                here.set(use, notify);
-            } else if (use == lava) {
-                for (Coord neighbor : here.getNeighborsAdjacent()) {
-                    if (neighbor.y > here.y) continue;
-                    if (neighbor.isAir()) {
-                        neighbor.set(tube, notify);
-                    }
-                }
-            } else if (use == extruder) {
-                Material lavaMat = lava.getBlock().getMaterial();
-                Block extruderBlock = extruder.getBlock();
-                for (Coord neighbor : here.getNeighborsAdjacent()) {
-                    if (neighbor.y == middle.y) continue;
-                    Block neighborBlock = neighbor.getBlock();
-                    if (neighborBlock.getMaterial() != lavaMat) {
-                        if (neighborBlock == extruderBlock) continue;
-                        return;
-                    }
-                }
-                here.set(extruder, true);
-                NORELEASE.fixme("Prime the extruders");
-            }
+            here.set(use, notify);
         }
     }
 }

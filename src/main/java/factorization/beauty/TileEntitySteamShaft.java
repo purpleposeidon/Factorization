@@ -16,6 +16,7 @@ import factorization.util.NumUtil;
 import factorization.util.SpaceUtil;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.particle.EffectRenderer;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ITickable;
 import net.minecraft.util.Vec3;
@@ -173,6 +174,7 @@ public class TileEntitySteamShaft extends TileEntityCommon implements IFluidHand
         double motFuzz = v / 20;
         Random rng = worldObj.rand;
         double threshold = velocity / (particleLevel == 1 ? 1 : 4);
+        EffectRenderer effectRenderer = Minecraft.getMinecraft().effectRenderer;
         for (int side = 0; side < 4; side++) {
             for (int y = 0; y < 3; y++) {
                 if (rng.nextFloat() > threshold) continue;
@@ -183,7 +185,7 @@ public class TileEntitySteamShaft extends TileEntityCommon implements IFluidHand
 
                 EntityFXSteam steam = new EntityFXSteam(worldObj, pos.xCoord + 0.5 + pos.xCoord, pos.yCoord + 0.5 + pos.yCoord, pos.zCoord + 0.5 + pos.zCoord);
                 SpaceUtil.toEntVel(steam, mot);
-                Minecraft.getMinecraft().effectRenderer.addEffect(steam);
+                effectRenderer.addEffect(steam);
             }
             rot.incrMultiply(Quaternion.getRotationQuaternionRadians(Math.PI / 2, EnumFacing.UP));
         }

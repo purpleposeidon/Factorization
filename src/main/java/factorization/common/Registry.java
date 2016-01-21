@@ -110,6 +110,8 @@ public class Registry {
     public SimpleFzBlock lamp;
     public SimpleFzBlock leyden_jar;
     public SimpleFzBlock anthrogen;
+    public BlockGeyser geyser;
+    public BlockOreExtruder extruder;
 
     public ItemStack servorail_item;
     public ItemStack empty_socket_item, socket_lacerator, socket_robot_hand, socket_shifter;
@@ -124,13 +126,12 @@ public class Registry {
             compression_crafter_item,
             sap_generator_item, anthro_generator_item,
             shaft_generator_item, steam_to_shaft, wooden_shaft, bibliogen, wind_mill, water_wheel;
-    public ItemStack silver_ore_item, silver_block_item, lead_block_item,
-            dark_iron_block_item;
+    public ItemStack dark_iron_block_item, copper_block_item;
     public ItemStack is_factory, is_lightair;
     public ItemPocketTable pocket_table;
     public ItemCraftingComponent diamond_shard;
-    public ItemCraftingComponent silver_ingot, lead_ingot;
-    public ItemCraftingComponent dark_iron;
+    public ItemCraftingComponent copper_ingot, dark_iron_ingot;
+    public ItemStack copper_ore_item;
     public ItemAcidBottle acid;
     public ItemCraftingComponent insulated_coil, motor, fan, diamond_cutting_head, corkscrew;
     public ItemStack sulfuric_acid, aqua_regia;
@@ -204,6 +205,10 @@ public class Registry {
         lamp = new SimpleFzBlockCutout(Material.iron, FactoryType.LAMP);
         leyden_jar = new SimpleFzBlockCutout(Material.glass, FactoryType.LEYDENJAR);
         anthrogen = new BlockAnthroGen(Material.wood, FactoryType.ANTHRO_GEN);
+        geyser = new BlockGeyser();
+        geyser.setUnlocalizedName("factorization:geyser");
+        extruder = new BlockOreExtruder();
+        extruder.setUnlocalizedName("factorization:extruder");
         compression_crafter = new BlockCompressionCrafter();
         socket = new BlockSocket();
         for (BlockClass bc : BlockClass.values()) {
@@ -254,6 +259,8 @@ public class Registry {
         GameRegistry.registerBlock(lamp, ItemFactorizationBlock.class, "Lamp");
         GameRegistry.registerBlock(leyden_jar, ItemFactorizationBlock.class, "LeydenJar");
         GameRegistry.registerBlock(anthrogen, ItemFactorizationBlock.class, "AnthropicGenerator");
+        GameRegistry.registerBlock(geyser, "Geyser");
+        GameRegistry.registerBlock(extruder, "OreExtruder");
         GameRegistry.registerBlock(compression_crafter, ItemFactorizationBlock.class, "CompressionCrafter");
         GameRegistry.registerBlock(socket, ItemFactorizationBlock.class, "Socket");
         if (DeltaChunk.enabled()) {
@@ -388,24 +395,19 @@ public class Registry {
         legendarium = FactoryType.LEGENDARIUM.itemStack();
 
         //BlockResource stuff
-        silver_ore_item = ResourceType.SILVERORE.itemStack("Silver Ore");
-        silver_block_item = ResourceType.SILVERBLOCK.itemStack("Block of Silver");
-        lead_block_item = ResourceType.LEADBLOCK.itemStack("Block of Lead");
-        dark_iron_block_item = ResourceType.DARKIRONBLOCK.itemStack("Block of Dark Iron");
+        copper_block_item = ResourceType.COPPER_BLOCK.itemStack();
+        dark_iron_block_item = ResourceType.DARK_IRON_BLOCK.itemStack();
+        copper_ore_item = ResourceType.COPPER_ORE.itemStack();
 
 
         diamond_shard = new ItemCraftingComponent("diamond_shard");
-        dark_iron = new ItemCraftingComponent("dark_iron_ingot");
+        dark_iron_ingot = new ItemCraftingComponent("dark_iron_ingot");
+        copper_ingot = new ItemCraftingComponent("copper_ingot");
 
-        lead_ingot = new ItemCraftingComponent("lead_ingot");
-        silver_ingot = new ItemCraftingComponent("silver_ingot");
-        OreDictionary.registerOre("oreSilver", silver_ore_item);
-        OreDictionary.registerOre("ingotSilver", new ItemStack(silver_ingot));
-        OreDictionary.registerOre("ingotLead", new ItemStack(lead_ingot));
-        OreDictionary.registerOre("blockSilver", silver_block_item);
-        OreDictionary.registerOre("blockLead", lead_block_item);
+        OreDictionary.registerOre("oreCopper", copper_ingot);
+        OreDictionary.registerOre("blockCopper", copper_block_item);
         OreDictionary.registerOre("oreFzDarkIron", dark_iron_ore);
-        OreDictionary.registerOre("ingotFzDarkIron", dark_iron);
+        OreDictionary.registerOre("ingotFzDarkIron", dark_iron_ingot);
         OreDictionary.registerOre("blockFzDarkIron", dark_iron_block_item);
 
 
@@ -542,18 +544,23 @@ public class Registry {
     
     private void convertOreItems(Object[] params) {
         for (int i = 0; i < params.length; i++) {
+            if (params[i].equals("ingotSilver")) {
+                throw new IllegalArgumentException("No silver!");
+            }
+            if (params[i].equals("ingotLead")) {
+                throw new IllegalArgumentException("No lead!");
+            }
+            NORELEASE.fixme("Remove above checks");
             if (params[i] == Blocks.cobblestone) {
                 params[i] = "cobblestone";
             } else if (params[i] == Blocks.stone) {
                 params[i] = "stone";
             } else if (params[i] == Items.stick) {
                 params[i] = "stickWood";
-            } else if (params[i] == dark_iron) {
+            } else if (params[i] == dark_iron_ingot) {
                 params[i] = "ingotFzDarkIron";
-            } else if (params[i] == lead_ingot) {
-                params[i] = "ingotLead";
-            } else if (params[i] == silver_ingot) {
-                params[i] = "ingotSilver";
+            } else if (params[i] == copper_ingot) {
+                params[i] = "ingotCopper";
             }
         }
     }
@@ -577,12 +584,12 @@ public class Registry {
                 Blocks.dirt,
                 Blocks.dirt);
         
-        shapelessOreRecipe(new ItemStack(dark_iron, 9), dark_iron_block_item);
+        shapelessOreRecipe(new ItemStack(dark_iron_ingot, 9), dark_iron_block_item);
         oreRecipe(dark_iron_block_item,
                 "III",
                 "III",
                 "III",
-                'I', dark_iron);
+                'I', dark_iron_ingot);
         
         // Pocket Crafting Table (pocket table)
         oreRecipe(new ItemStack(pocket_table),
@@ -600,13 +607,13 @@ public class Registry {
         oreRecipe(new ItemStack(logicMatrixController),
                 "MiX",
                 'M', logicMatrix,
-                'i', "ingotSilver",
+                'i', Items.gold_ingot,
                 'X', logicMatrixProgrammer);
         GameRegistry.addSmelting(logicMatrixController, new ItemStack(logicMatrix), 0);
         oreRecipe(new ItemStack(logicMatrixProgrammer),
                 "MiX",
                 'M', logicMatrix,
-                'i', dark_iron,
+                'i', dark_iron_ingot,
                 'X', logicMatrixProgrammer);
         oreRecipe(new ItemStack(logicMatrixProgrammer),
                 "DSI",
@@ -615,17 +622,19 @@ public class Registry {
                 'D', Items.record_13,
                 'B', Items.record_11,
                 'S', diamond_shard,
-                'I', dark_iron,
+                'I', dark_iron_ingot,
                 '#', logicMatrix,
                 '>', Items.comparator);
 
         //Resources
-        oreRecipe(new ItemStack(lead_ingot, 9), "#", '#', lead_block_item);
-        oreRecipe(new ItemStack(silver_ingot, 9), "#", '#', silver_block_item);
-        oreRecipe(lead_block_item, "###", "###", "###", '#', "ingotLead");
-        oreRecipe(silver_block_item, "###", "###", "###", '#', "ingotSilver");
-        FurnaceRecipes.instance().addSmeltingRecipe(new ItemStack(resource_block, 1, ResourceType.SILVERORE.md), new ItemStack(silver_ingot), 0.3F);
-        FurnaceRecipes.instance().addSmeltingRecipe(new ItemStack(dark_iron_ore), new ItemStack(dark_iron), 0.5F);
+        shapelessOreRecipe(new ItemStack(copper_ingot, 9), copper_block_item);
+        oreRecipe(copper_block_item,
+                "###",
+                "###",
+                "###",
+                '#', copper_ingot);
+        FurnaceRecipes.instance().addSmeltingRecipe(copper_ore_item.copy(), new ItemStack(copper_ingot), 0.3F);
+        FurnaceRecipes.instance().addSmeltingRecipe(new ItemStack(dark_iron_ore), new ItemStack(dark_iron_ingot), 0.5F);
 
         //ceramics
         oreRecipe(new ItemStack(sculpt_tool),
@@ -660,7 +669,6 @@ public class Registry {
         IRecipe sculptureMergeRecipe = new IRecipe() {
             ArrayList<ItemStack> merge(InventoryCrafting inv) {
                 ArrayList<ItemStack> match = null;
-                int part_count = 0;
                 for (int i = 0; i < inv.getSizeInventory(); i++) {
                     ItemStack is = inv.getStackInSlot(i);
                     if (is == null) {
@@ -669,7 +677,6 @@ public class Registry {
                     if (!is.hasTagCompound()) {
                         return null;
                     }
-                    Item item = is.getItem();
                     if (ItemUtil.similar(Core.registry.greenware_item, is)) {
                         if (match == null) match = new ArrayList<ItemStack>(2);
                         match.add(is);
@@ -908,7 +915,7 @@ public class Registry {
                 "D",
                 "C",
                 "P",
-                'D', dark_iron,
+                'D', dark_iron_ingot,
                 'C', Blocks.crafting_table,
                 'P', Blocks.piston);
 
@@ -917,8 +924,8 @@ public class Registry {
                 "ISI",
                 "GWG",
                 "ISI",
-                'I', dark_iron,
-                'S', "ingotSilver",
+                'I', dark_iron_ingot,
+                'S', Items.gold_ingot,
                 'G', Blocks.glass_pane,
                 'W', diamond_shard);
 
@@ -991,14 +998,14 @@ public class Registry {
                 'W', "plankWood",
                 'S', Items.sign,
                 '|', Items.stick,
-                'L', "ingotLead",
+                'L', "ingotCopper",
                 'I', Items.iron_ingot);
         oreRecipe(new ItemStack(battery, 1, 2),
                 "ILI",
                 "LAL",
                 "ILI",
                 'I', Items.iron_ingot,
-                'L', "ingotLead",
+                'L', "ingotCopper",
                 'A', acid);
         oreRecipe(leydenjar_item,
                 "#G#",
@@ -1006,19 +1013,19 @@ public class Registry {
                 "LLL",
                 '#', Blocks.glass_pane,
                 'G', Blocks.glass,
-                'L', "ingotLead");
+                'L', "ingotCopper");
 
         oreRecipe(heater_item,
                 "CCC",
                 "L L",
                 "CCC",
                 'C', insulated_coil,
-                'L', "ingotLead");
+                'L', "ingotCopper");
         oreRecipe(new ItemStack(insulated_coil, 4),
                 "LLL",
                 "LCL",
                 "LLL",
-                'L', "ingotLead",
+                'L', "ingotCopper",
                 'C', Blocks.clay);
         batteryRecipe(new ItemStack(motor),
                 "CIC",
@@ -1026,14 +1033,14 @@ public class Registry {
                 "LBL",
                 'C', insulated_coil,
                 'B', battery,
-                'L', "ingotLead",
+                'L', "ingotCopper",
                 'I', Items.iron_ingot);
         if (FzConfig.enable_solar_steam) { //NOTE: This'll probably cause a bug should we use mirrors for other things
             oreRecipe(new ItemStack(mirror),
                     "SSS",
                     "S#S",
                     "SSS",
-                    'S', "ingotSilver",
+                    'S', "ingotCopper",
                     '#', Blocks.glass_pane);
         }
         oreRecipe(new ItemStack(diamond_cutting_head),
@@ -1102,7 +1109,6 @@ public class Registry {
         
         
         FurnaceRecipes.instance().addSmeltingRecipe(new ItemStack(sludge), new ItemStack(Items.clay_ball), 0.1F);
-        ItemStack lime = new ItemStack(Items.dye, 1, 10);
 
         //Rocketry
         TileEntityGrinder.addRecipe(new ItemStack(Blocks.netherrack), new ItemStack(nether_powder, 1), 1);
@@ -1134,7 +1140,7 @@ public class Registry {
                 "I ",
                 "I>",
                 "I ",
-                'I', dark_iron,
+                'I', dark_iron_ingot,
                 '>', logicMatrixProgrammer);
         oreRecipe(new ItemStack(servo_rail_comment_editor),
                 "#",
@@ -1200,14 +1206,14 @@ public class Registry {
                     "|##",
                     "|  ",
                     "|##",
-                    '|', dark_iron,
+                    '|', dark_iron_ingot,
                     '#', Blocks.iron_block);
             oreRecipe(new ItemStack(chainLink, 15),
                     "DD ",
                     "D L",
                     "DD ",
-                    'D', dark_iron,
-                    'L', "ingotLead");
+                    'D', dark_iron_ingot,
+                    'L', Items.iron_ingot);
             oreRecipe(new ItemStack(shortChain),
                     "LLL",
                     "LLL",
@@ -1246,7 +1252,7 @@ public class Registry {
                 "-B-",
                 " I ",
                 '-', Blocks.heavy_weighted_pressure_plate,
-                'I', dark_iron,
+                'I', dark_iron_ingot,
                 'B', "blockIron");
         ItemStack shaft8 = wooden_shaft.copy();
         shaft8.stackSize = 8;
@@ -1255,16 +1261,16 @@ public class Registry {
                 "LIL",
                 "LIL",
                 'L', "logWood",
-                'I', dark_iron);
+                'I', dark_iron_ingot);
         oreRecipe(shaft_generator_item,
                 "IDI",
                 "CMC",
                 "LIL",
                 'I', "ingotIron",
-                'D', dark_iron,
+                'D', dark_iron_ingot,
                 'C', insulated_coil,
                 'M', motor,
-                'L', lead_ingot);
+                'L', copper_ingot);
         oreRecipe(bibliogen,
                 "I",
                 "O",
@@ -1291,7 +1297,7 @@ public class Registry {
                 " - ",
                 "---",
                 '#', dark_iron_block_item,
-                '-', dark_iron);
+                '-', dark_iron_ingot);
         oreRecipe(legendarium,
                 "-*-",
                 "###",
@@ -1305,16 +1311,15 @@ public class Registry {
         ItemStack rails = servorail_item.copy();
         rails.stackSize = 8;
         oreRecipe(rails, "LDL",
-                'D', dark_iron,
-                'L', "ingotLead");
+                'D', dark_iron_ingot,
+                'L', Items.iron_ingot);
         ItemStack two_sprockets = dark_iron_sprocket.copy();
         two_sprockets.stackSize = 2;
         oreRecipe(two_sprockets,
                 " D ",
-                "DSD",
+                "D D",
                 " D ",
-                'D', dark_iron,
-                'S', "ingotSilver");
+                'D', dark_iron_ingot);
         batteryRecipe(servo_motor,
                 "qCL",
                 "SIB",
@@ -1325,7 +1330,7 @@ public class Registry {
                 'C', insulated_coil,
                 'I', Items.iron_ingot,
                 'B', battery,
-                'L', "ingotLead");
+                'L', "ingotCopper");
         oreRecipe(new ItemStack(servo_placer),
                 "M#P",
                 " S ",
@@ -1451,13 +1456,10 @@ public class Registry {
                     null, null, null,
                     null, null, null));
             ItemStack slab;
-            String odType;
             if (slabs.size() != 1 || !CraftUtil.craft_succeeded) {
                 slab = plank; // can't convert to slabs; strange wood
-                odType = "plankWood";
             } else {
                 slab = slabs.get(0);
-                odType = "slabWood";
             }
             // Some modwoods have planks, but no slabs, and their planks convert to vanilla slabs.
             // In this case we're going to want to use the plank.

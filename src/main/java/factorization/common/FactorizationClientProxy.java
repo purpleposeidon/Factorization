@@ -105,6 +105,9 @@ public class FactorizationClientProxy extends FactorizationProxy {
 
         @Override
         public boolean accepts(ResourceLocation modelLocation) {
+            if (modelLocation.toString().toLowerCase().contains("anthro")) {
+                NORELEASE.breakpoint();
+            }
             return super.accepts(modelLocation);
         }
     }
@@ -247,6 +250,8 @@ public class FactorizationClientProxy extends FactorizationProxy {
                 Core.registry.anthrogen,
                 Core.registry.compression_crafter,
                 Core.registry.socket,
+                Core.registry.geyser,
+                Core.registry.extruder,
         }) {
             setItemBlockModel(b, 0, "inventory");
         }
@@ -265,10 +270,8 @@ public class FactorizationClientProxy extends FactorizationProxy {
         standardItems = null;
 
         NORELEASE.fixme("Glaze bucket");
-        NORELEASE.fixme("Barrel");
         NORELEASE.fixme("Artifacts");
         // MinecraftForgeClient.registerItemRenderer(Core.registry.glaze_bucket, new ItemRenderGlazeBucket());
-        // MinecraftForgeClient.registerItemRenderer(Core.registry.daybarrel, new DayBarrelItemRenderer(renderBarrel));
         // MinecraftForgeClient.registerItemRenderer(Core.registry.brokenTool, new RenderBrokenArtifact());
         Core.loadBus(GooRenderer.INSTANCE);
     }
@@ -314,6 +317,7 @@ public class FactorizationClientProxy extends FactorizationProxy {
         RenderingRegistry.registerEntityRenderingHandler(EntityCitizen.class, new RenderCitizen(rm));
         RenderingRegistry.registerEntityRenderingHandler(EntityMinecartDayBarrel.class, new RenderMinecartDayBarrel(rm));
         RenderingRegistry.registerEntityRenderingHandler(EntityLeafBomb.class, new RenderSnowball<EntityLeafBomb>(rm, Core.registry.leafBomb, Minecraft.getMinecraft().getRenderItem()));
+        RenderingRegistry.registerEntityRenderingHandler(EntitySteamGeyser.class, new EmptyRender(rm));
     }
 
     @SubscribeEvent

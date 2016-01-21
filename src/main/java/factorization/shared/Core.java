@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import factorization.common.*;
 import factorization.net.FzNetEventHandler;
 import factorization.net.NetworkFactorization;
 import org.apache.logging.log4j.LogManager;
@@ -60,10 +61,6 @@ import factorization.citizen.EntityCitizen;
 import factorization.colossi.BuildColossusCommand;
 import factorization.colossi.ColossusController;
 import factorization.colossi.ColossusFeature;
-import factorization.common.FactorizationProxy;
-import factorization.common.FactoryType;
-import factorization.common.FzConfig;
-import factorization.common.Registry;
 import factorization.coremod.AtVerifier;
 import factorization.coremod.LoadingPlugin;
 import factorization.fzds.Hammer;
@@ -249,15 +246,17 @@ public class Core {
         //TileEntity renderers are registered in the client proxy
 
         // See EntityTracker.addEntityToTracker for reference on what the three last values should be
-        EntityRegistry.registerModEntity(TileEntityWrathLamp.RelightTask.class, "fz_relight_task", 0, Core.instance, 1, 10, false);
-        EntityRegistry.registerModEntity(ServoMotor.class, "factory_servo", 1, Core.instance, 100, 1, true);
-        EntityRegistry.registerModEntity(ColossusController.class, "fz_colossal_controller", 2, Core.instance, 256, 20, false);
-        EntityRegistry.registerModEntity(EntityPoster.class, "fz_entity_poster", 3, Core.instance, 160, Integer.MAX_VALUE, false);
-        EntityRegistry.registerModEntity(EntityCitizen.class, "fz_entity_citizen", 4, Core.instance, 100, 1, true);
-        EntityRegistry.registerModEntity(EntityMinecartDayBarrel.class, "fz_minecart_barrel", 5, this, 80, 3, true);
-        EntityRegistry.registerModEntity(EntityLeafBomb.class, "fz_leaf_bomb", 6, this, 64, 10, true);
-        EntityRegistry.registerModEntity(StepperEngine.class, "fz_stepper_engine", 7, Core.instance, 100, 1, true);
-        EntityRegistry.registerModEntity(EntityGrabController.class, "fz_grab_controller", 8, Core.instance, 100, 1, true);
+        //                                                                                               ID  mod   rng  freq  sendVelocityUpdates
+        EntityRegistry.registerModEntity(TileEntityWrathLamp.RelightTask.class, "fz_relight_task",        0, this, 1,   10, false);
+        EntityRegistry.registerModEntity(ServoMotor.class,                      "factory_servo",          1, this, 100,  1, true);
+        EntityRegistry.registerModEntity(ColossusController.class,              "fz_colossal_controller", 2, this, 256, 20, false);
+        EntityRegistry.registerModEntity(EntityPoster.class,                    "fz_entity_poster",       3, this, 160, 60, false);
+        EntityRegistry.registerModEntity(EntityCitizen.class,                   "fz_entity_citizen",      4, this, 100,  1, true);
+        EntityRegistry.registerModEntity(EntityMinecartDayBarrel.class,         "fz_minecart_barrel",     5, this, 80,   3, true);
+        EntityRegistry.registerModEntity(EntityLeafBomb.class,                  "fz_leaf_bomb",           6, this, 64,  10, true);
+        EntityRegistry.registerModEntity(StepperEngine.class,                   "fz_stepper_engine",      7, this, 100,  1, true);
+        EntityRegistry.registerModEntity(EntityGrabController.class,            "fz_grab_controller",     8, this, 100,  1, true);
+        EntityRegistry.registerModEntity(EntitySteamGeyser.class,               "fz_steam_geyser",        9, this, 160, 60, false);
         // The "fz_" prefix isn't necessary these days; FML adds a prefix.
     }
     
@@ -293,6 +292,7 @@ public class Core {
         }
         if (Core.dev_environ) {
             event.registerServerCommand(new GenBlockStates());
+            event.registerServerCommand(new GeyserTest());
         }
     }
     

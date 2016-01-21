@@ -45,7 +45,7 @@ public class BlockMatcher extends Block {
         super(Material.rock);
         setTickRandomly(false);
         setCreativeTab(Core.tabFactorization);
-        setUnlocalizedName("BlockMatcher");
+        setUnlocalizedName("factorization:BlockMatcher");
     }
 
     @Override

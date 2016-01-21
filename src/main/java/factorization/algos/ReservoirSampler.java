@@ -1,9 +1,8 @@
 package factorization.algos;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Random;
+import net.minecraft.potion.PotionEffect;
+
+import java.util.*;
 
 public class ReservoirSampler<E> implements Iterable<E> {
     private final ArrayList<E> samples;
@@ -45,5 +44,10 @@ public class ReservoirSampler<E> implements Iterable<E> {
     public void preGive(int given) {
         this.given = given;
     }
-    
+
+    public void giveAll(Collection<E> potions) {
+        for (E e : potions) {
+            give(e);
+        }
+    }
 }

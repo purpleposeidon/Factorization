@@ -5,8 +5,6 @@
     },
     "variants": {
         "type=copper_ore": { "model": "factorization:copper_ore" },
-        "type=silver_block": { "model": "factorization:silver_block" },
-        "type=lead_block": { "model": "factorization:lead_block" },
         "type=dark_iron_block": { "model": "factorization:dark_iron_block" },
         "type=copper_block": { "model": "factorization:copper_block" }
     }

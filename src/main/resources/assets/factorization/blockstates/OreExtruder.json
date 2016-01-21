@@ -1,0 +1,39 @@
+{
+    "forge_marker": 1,
+    "defaults": {
+        "model": "minecraft:cube",
+        "transform": "forge:default-block",
+        "textures": {
+            "particle": "factorization:blocks/resource/extruder",
+            "up":       "factorization:blocks/resource/extruder",
+            "north":    "factorization:blocks/resource/extruder_bottom",
+            "east":     "factorization:blocks/resource/extruder_bottom",
+            "south":    "factorization:blocks/resource/extruder_bottom",
+            "west":     "factorization:blocks/resource/extruder_bottom",
+            "down":     "factorization:blocks/resource/extruder_bottom"
+        }
+    },
+    "variants": {
+        "normal": [{}],
+        "inventory": [{}],
+        "extrusions": {
+            "0":  {"custom": {}},
+            "1":  {"custom": {}},
+            "2":  {"custom": {}},
+            "3":  {"custom": {}},
+            "4":  {"custom": {}},
+            "5":  {"custom": {}},
+            "6":  {"custom": {}},
+            "7":  {"custom": {}},
+            "8":  {"custom": {}},
+            "9":  {"custom": {}},
+            "10": {"custom": {}},
+            "11": {"custom": {}},
+            "12": {"custom": {}},
+            "13": {"custom": {}},
+            "14": {"custom": {}},
+            "15": {"custom": {}},
+            "16": {"custom": {}}
+        }
+    }
+}

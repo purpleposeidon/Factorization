@@ -1,6 +1,6 @@
 {
     "parent": "factorization:item/base",
     "textures": {
-        "layer0": "factorization:items/silver_ingot"
+        "layer0": "factorization:items/copper_ingot"
     }
 }
