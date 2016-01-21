@@ -404,8 +404,9 @@ public class Registry {
         dark_iron_ingot = new ItemCraftingComponent("dark_iron_ingot");
         copper_ingot = new ItemCraftingComponent("copper_ingot");
 
-        OreDictionary.registerOre("oreCopper", copper_ingot);
+        OreDictionary.registerOre("ingotCopper", copper_ingot);
         OreDictionary.registerOre("blockCopper", copper_block_item);
+        OreDictionary.registerOre("oreCopper", copper_ore_item);
         OreDictionary.registerOre("oreFzDarkIron", dark_iron_ore);
         OreDictionary.registerOre("ingotFzDarkIron", dark_iron_ingot);
         OreDictionary.registerOre("blockFzDarkIron", dark_iron_block_item);
