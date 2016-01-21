@@ -30,7 +30,7 @@ public class CopperGeyserGen implements IWorldGenerator {
         lava = Blocks.lava.getDefaultState();
         geyser = Core.registry.geyser.getDefaultState();
         extruder = Core.registry.extruder.getDefaultState();
-        NORELEASE.fixme("Config options");
+        NORELEASE.fixme("Config options for below items");
     }
 
     private Random volcanoRng = new Random(0);
@@ -61,8 +61,8 @@ public class CopperGeyserGen implements IWorldGenerator {
             0.00,
             0.00,
             0.03,
-            0.20,
-            0.90,
+            0.10,
+            0.60,
     };
     float volcanismScale = 0.5F;
     /**
