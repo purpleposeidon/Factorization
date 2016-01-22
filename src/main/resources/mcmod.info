@@ -3,7 +3,7 @@
   "authorList": [
    "neptunepink"
   ], 
-  "credits": "asie, SoundLogic", 
+  "credits": "asie (1.8 porting; barrelcarts), SoundLogic (enormous scissors)", 
   "dependencies": [], 
   "description": "Auto-crafting, ore processing, barrels, and other tools", 
   "mcversion": "${mcversion}", 
