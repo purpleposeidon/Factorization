@@ -51,7 +51,7 @@ public class WorldgenManager {
         if (FzConfig.retrogen_key.equals(oldKey)) {
             return;
         }
-        if (FzConfig.retrogen_silver || FzConfig.retrogen_dark_iron) {
+        if (FzConfig.retrogen_copper_geyser || FzConfig.retrogen_dark_iron) {
             retrogenQueue.add(event.getChunk());
         }
     }
@@ -83,10 +83,20 @@ public class WorldgenManager {
     public void tickRetrogenQueue() {
         if (retrogenQueue.isEmpty()) return;
         log("Starting %s chunks", retrogenQueue.size());
+        int skipped = 0;
         for (int i = 0; i < retrogenQueue.size(); i++) {
             Chunk chunk = retrogenQueue.get(i);
+            chunk.setModified(true);
+            if (chunk.getInhabitedTime() > 3600 /* 3 minutes, the amount of time used by ocean monuments. See usages of that call. */) {
+                // (It might not be unreasonable to also check the inhabited time of adjacent chunks?)
+                skipped++;
+                continue;
+            }
             doRetrogen(FzConfig.gen_copper_geysers, chunk, "Copper/Geyser", copperGeyserGen);
             doRetrogen(FzConfig.retrogen_dark_iron, chunk, "Dark Iron", darkIronGen);
+        }
+        if (skipped > 0) {
+            log(skipped + " chunks were skipped due to sustained player presence");
         }
         retrogenQueue.clear();
         log("Done");
