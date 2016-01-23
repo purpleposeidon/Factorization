@@ -185,7 +185,7 @@ public class Registry {
         String find = Matcher.quoteReplacement("item.factorization:");
         String unlocalizedName = item.getUnlocalizedName();
         String useName = unlocalizedName.replaceFirst(find, "");
-        GameRegistry.registerItem(item, useName, Core.modId);
+        GameRegistry.registerItem(item, useName);
         nameCleanup.put("factorization:" + unlocalizedName, item);
     }
 
