@@ -1,6 +1,7 @@
 package factorization.shared;
 
 import factorization.util.ItemUtil;
+import factorization.util.NORELEASE;
 import factorization.weird.barrel.TileEntityDayBarrel;
 import net.minecraft.item.ItemStack;
 
@@ -12,6 +13,8 @@ public class PatreonRewards {
 
     static void init() {
         // NORELEASE: Patron update
+        NORELEASE.fixme("Thaumcraft logs have changed names I think");
+        NORELEASE.fixme("mallrat's recipe must change due to lead not existing. Has he responded yet?");
         customBarrel("neptunepink", "Forever", NORMAL, "Thaumcraft:blockMagicalLog#0", "Thaumcraft:blockCosmeticSlabWood#0");
         customBarrel("neptunepink", "Forever", NORMAL, "Thaumcraft:blockMagicalLog#1", "Thaumcraft:blockCosmeticSlabWood#1");
         customBarrel("SoundLogic", "May 2015", NORMAL, "Botania:livingwood#0", "Botania:livingwood#1");

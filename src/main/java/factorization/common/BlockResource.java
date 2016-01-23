@@ -39,6 +39,7 @@ public class BlockResource extends Block {
 
     @Override
     public IBlockState getStateFromMeta(int meta) {
+        if (meta == 1 || meta == 2) meta = 7;
         return getDefaultState().withProperty(TYPE, ResourceType.values[meta]);
     }
 
