@@ -33,7 +33,7 @@ public class HammerInfo {
         channelConfig = new Configuration(f);
         final String rem = "The dimension used for FZDS/Hammer/Colossi/rotated/moving blocks, etc.\n" +
                 "If things go really south with those features, as a last resort you can try deleting this dimension.\n" +
-                "But first see if you can use the /fzds to fix it.";
+                "But first see if you can use the /fzds command to fix it.";
         dimension_slice_dimid = channelConfig.getInt("FzdsDimension", "Hammer", dimension_slice_dimid, Integer.MIN_VALUE, Integer.MAX_VALUE, rem);
         saveChannelConfig();
     }

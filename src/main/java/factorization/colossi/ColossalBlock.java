@@ -3,6 +3,7 @@ package factorization.colossi;
 import java.util.*;
 
 import factorization.util.DataUtil;
+import factorization.util.NORELEASE;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.MapColor;
 import net.minecraft.block.material.Material;
@@ -33,6 +34,9 @@ import factorization.shared.Core.TabType;
 import factorization.util.PlayerUtil;
 import factorization.weird.poster.EntityPoster;
 import factorization.weird.poster.ItemSpawnPoster;
+import net.minecraftforge.fml.common.FMLCommonHandler;
+import net.minecraftforge.fml.relauncher.Side;
+
 import static factorization.colossi.ColossalBlock.Md.ARM;
 import static factorization.colossi.ColossalBlock.Md.BODY;
 import static factorization.colossi.ColossalBlock.Md.BODY_COVERED;
@@ -298,6 +302,11 @@ public class ColossalBlock extends Block {
 
     @Override
     public boolean hasTileEntity(IBlockState state) {
+        if (state.getBlock() != this) {
+            Core.logWarning("Why are you asking me? Don't be stupid, ask " + state.getBlock());
+            Thread.dumpStack();
+            return state.getBlock().hasTileEntity(state);
+        }
         return state.getValue(VARIANT) == Md.CORE;
     }
 
