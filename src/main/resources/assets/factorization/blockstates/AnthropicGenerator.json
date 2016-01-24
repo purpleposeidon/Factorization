@@ -1,16 +1,31 @@
 {
     "forge_marker": 1,
     "defaults": {
-        "model": "factorization:anthrogen_lit.obj",
+        "model": "factorization:anthrogen_lamp",
         "transform": "forge:default-block",
         "textures": {}
     },
     "variants": {
         "normal": [{}],
-        "inventory": [{}],
+        "inventory": [{
+            "textures": {
+               "base": "factorization:beauty/anthrogen/base_on.png",
+               "lamp": "factorization:beauty/anthrogen/lamp_on.png"
+            }
+        }],
         "lit": {
-            "true": "factorization:anthrogen_lit.obj",
-            "false": "factorization:anthrogen_unlit.obj"
+            "true": {
+                "textures": {
+                   "base": "factorization:beauty/anthrogen/base_on.png",
+                   "lamp": "factorization:beauty/anthrogen/lamp_on.png"
+                }
+            },
+            "false": {
+                "textures": {
+                   "base": "factorization:beauty/anthrogen/base_off.png",
+                   "lamp": "factorization:beauty/anthrogen/lamp_off.png"
+                }
+            }
         }
     }
 }
