@@ -14,6 +14,8 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.potion.PotionEffect;
 import net.minecraft.util.EntitySelectors;
 import net.minecraft.world.World;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 import java.io.IOException;
 import java.util.Collection;
@@ -68,6 +70,7 @@ public class EntitySteamGeyser extends EntityFz {
         }
     }
 
+    @SideOnly(Side.CLIENT)
     void spawnParticles() {
         final double r = 0.5;
         EffectRenderer effectRenderer = Minecraft.getMinecraft().effectRenderer;
