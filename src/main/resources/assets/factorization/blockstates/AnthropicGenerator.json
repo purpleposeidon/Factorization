@@ -9,21 +9,21 @@
         "normal": [{}],
         "inventory": [{
             "textures": {
-               "base": "factorization:beauty/anthrogen/base_on.png",
-               "lamp": "factorization:beauty/anthrogen/lamp_on.png"
+               "base": "factorization:beauty/anthrogen/base_on",
+               "lamp": "factorization:beauty/anthrogen/lamp_on"
             }
         }],
         "lit": {
             "true": {
                 "textures": {
-                   "base": "factorization:beauty/anthrogen/base_on.png",
-                   "lamp": "factorization:beauty/anthrogen/lamp_on.png"
+                   "base": "factorization:beauty/anthrogen/base_on",
+                   "lamp": "factorization:beauty/anthrogen/lamp_on"
                 }
             },
             "false": {
                 "textures": {
-                   "base": "factorization:beauty/anthrogen/base_off.png",
-                   "lamp": "factorization:beauty/anthrogen/lamp_off.png"
+                   "base": "factorization:beauty/anthrogen/base_off",
+                   "lamp": "factorization:beauty/anthrogen/lamp_off"
                 }
             }
         }
