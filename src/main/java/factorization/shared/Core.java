@@ -17,6 +17,7 @@ import factorization.common.*;
 import factorization.net.FzNetEventHandler;
 import factorization.net.NetworkFactorization;
 import factorization.util.NORELEASE;
+import net.minecraft.entity.Entity;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -247,20 +248,28 @@ public class Core {
         //TileEntity renderers are registered in the client proxy
 
         // See EntityTracker.addEntityToTracker for reference on what the three last values should be
-        //                                                                                               ID  mod   rng  freq  sendVelocityUpdates
-        EntityRegistry.registerModEntity(TileEntityWrathLamp.RelightTask.class, "fz_relight_task",        0, this, 1,   10, false);
-        EntityRegistry.registerModEntity(ServoMotor.class,                      "factory_servo",          1, this, 100,  1, true);
-        EntityRegistry.registerModEntity(ColossusController.class,              "fz_colossal_controller", 2, this, 256, 20, false);
-        EntityRegistry.registerModEntity(EntityPoster.class,                    "fz_entity_poster",       3, this, 160, 60, false);
-        EntityRegistry.registerModEntity(EntityCitizen.class,                   "fz_entity_citizen",      4, this, 100,  1, true);
-        EntityRegistry.registerModEntity(EntityMinecartDayBarrel.class,         "fz_minecart_barrel",     5, this, 80,   3, true);
-        EntityRegistry.registerModEntity(EntityLeafBomb.class,                  "fz_leaf_bomb",           6, this, 64,  10, true);
-        EntityRegistry.registerModEntity(StepperEngine.class,                   "fz_stepper_engine",      7, this, 100,  1, true);
-        EntityRegistry.registerModEntity(EntityGrabController.class,            "fz_grab_controller",     8, this, 100,  1, true);
-        EntityRegistry.registerModEntity(EntitySteamGeyser.class,               "fz_steam_geyser",        9, this, 160, 60, false);
+        final int never = Integer.MAX_VALUE;
+        final int always = 1;
+        final boolean moves = true;
+        final boolean still = false;
+        //                                                                      ID rng  posFreq  sendVelocityUpdates
+        regEnt(TileEntityWrathLamp.RelightTask.class, "fz_relight_task",        0, 1,   10,      still);
+        regEnt(ServoMotor.class,                      "factory_servo",          1, 100, always,  moves);
+        regEnt(ColossusController.class,              "fz_colossal_controller", 2, 256, 20,      moves);
+        regEnt(EntityPoster.class,                    "fz_entity_poster",       3, 160, never,   still);
+        regEnt(EntityCitizen.class,                   "fz_entity_citizen",      4, 100, always,  moves);
+        regEnt(EntityMinecartDayBarrel.class,         "fz_minecart_barrel",     5, 80,  3,       moves);
+        regEnt(EntityLeafBomb.class,                  "fz_leaf_bomb",           6, 64,  10,      moves);
+        regEnt(StepperEngine.class,                   "fz_stepper_engine",      7, 100, always,  moves);
+        regEnt(EntityGrabController.class,            "fz_grab_controller",     8, 100, always,  moves);
+        regEnt(EntitySteamGeyser.class,               "fz_steam_geyser",        9, 160, 60,      still);
         // The "fz_" prefix isn't necessary these days; FML adds a prefix.
     }
-    
+
+    private void regEnt(Class<? extends Entity> entityClass, String entityName, int id, int range, int posUpdateFrequency, boolean canMove) {
+        EntityRegistry.registerModEntity(entityClass, entityName, id, this, range, posUpdateFrequency, canMove);
+    }
+
     @EventHandler
     public void handleInteractions(FMLInitializationEvent event) {
         registry.sendIMC();
