@@ -29,5 +29,8 @@
 \index{cgi/worldgen}{Mod Worldgen}
 \index{cgi/eventbus}{Event Bus}
 \index{cgi/tesrs}{TESRs}
+\index{cgi/registry/entity}{Entities}
+% \index{cgi/registry/tileentity}{TileEntities}
+
 
 \nl

@@ -77,6 +77,7 @@ public class DocumentationModule implements factorization.truth.api.IDocModule {
         DocReg.registerGenerator("worldgen", new WorldgenViewer());
         DocReg.registerGenerator("eventbus", new EventbusViewer());
         DocReg.registerGenerator("tesrs", new TesrViewer());
+        DocReg.registerGenerator("registry", new RegistrationViewer());
         if (FMLCommonHandler.instance().getSide() == Side.CLIENT) {
             Core.loadBus(new DocKeyListener());
         }
