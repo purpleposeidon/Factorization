@@ -74,6 +74,9 @@ public class RenderPoster extends RenderEntity {
         float cb = (float)(itemColor & 255) / 255.0F;
         GL11.glColor4f(cr, cg, cb, 1.0F);
 
-        Minecraft.getMinecraft().getItemRenderer().renderItem(dummy_entity, is, ItemCameraTransforms.TransformType.FIXED);
+        GL11.glRotated(180, 0, 1, 0);
+        // Why is this necessary? Changing the TransformType below does nothing...
+
+        Minecraft.getMinecraft().getItemRenderer().renderItem(dummy_entity, is, ItemCameraTransforms.TransformType.NONE);
     }
 }
