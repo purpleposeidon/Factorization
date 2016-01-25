@@ -1054,8 +1054,12 @@ public final class Coord implements IDataSerializable, ISaneCoord, Comparable<Co
         if (dropped == null || dropped.isEmpty()) {
             return null;
         }
-        ItemStack main = dropped.remove(0);
+        ItemStack main = null;
         for (ItemStack other : dropped) {
+            if (main == null) {
+                main = other.copy();
+                continue;
+            }
             if (!ItemUtil.couldMerge(main, other)) {
                 return null;
             }
