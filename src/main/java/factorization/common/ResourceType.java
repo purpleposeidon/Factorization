@@ -48,4 +48,8 @@ public enum ResourceType implements IStringSerializable, Comparable<ResourceType
     public boolean isMetal() {
         return this == DARK_IRON_BLOCK || this == COPPER_BLOCK;
     }
+
+    public boolean isValid() {
+        return !(this == EMPTY1 || this == EMPTY2 || this == EMPTY4 || this == DRY || this == BISQUE);
+    }
 }

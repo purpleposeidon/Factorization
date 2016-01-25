@@ -11,6 +11,7 @@ import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.BlockPos;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.IBlockAccess;
 
 import java.util.List;
@@ -39,8 +40,12 @@ public class BlockResource extends Block {
 
     @Override
     public IBlockState getStateFromMeta(int meta) {
-        if (meta == 1 || meta == 2) meta = 7;
-        return getDefaultState().withProperty(TYPE, ResourceType.values[meta]);
+        if (meta < 0 || meta >= ResourceType.values.length) return getDefaultState();
+        ResourceType value = ResourceType.values[meta];
+        if (value.isValid()) {
+            return getDefaultState().withProperty(TYPE, value);
+        }
+        return getDefaultState();
     }
 
     public void addCreativeItems(List<ItemStack> itemList) {
