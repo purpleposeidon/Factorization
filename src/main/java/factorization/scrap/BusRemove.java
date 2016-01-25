@@ -3,7 +3,6 @@ package factorization.scrap;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
 import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.common.eventhandler.*;
 import net.minecraftforge.fml.relauncher.ReflectionHelper;
 
@@ -20,15 +19,14 @@ import java.util.Scanner;
 public class BusRemove implements IRevertible {
     static final List<EventBus> busses = Arrays.asList(MinecraftForge.EVENT_BUS,
             MinecraftForge.ORE_GEN_BUS,
-            MinecraftForge.TERRAIN_GEN_BUS,
-            FMLCommonHandler.instance().bus());
+            MinecraftForge.TERRAIN_GEN_BUS);
 
     final Class<?> handlerClass;
     final Class<? extends Event> eventClass;
     final Multimap<EventBus, Object> map = ArrayListMultimap.create();
 
     public BusRemove(Scanner in) throws ClassNotFoundException {
-        handlerClass = (Class<? extends Event>) ScannerHelper.nextClass(in);
+        handlerClass = (Class<?>) ScannerHelper.nextClass(in);
         String methodName = in.next();
         Class<? extends Event> foundEvent = null;
         for (Method method : handlerClass.getMethods()) {
@@ -96,10 +94,7 @@ public class BusRemove implements IRevertible {
 
     @Override
     public String info() {
-        int reg = 0;
-        for (Object x : map.values()) {
-            reg++;
-        }
+        int reg = map.values().size();
         return "BusRemove " + eventClass.getCanonicalName() + " " + handlerClass.getCanonicalName()
                 + " # "  + reg + " registered on " + map.size() + " busses";
     }

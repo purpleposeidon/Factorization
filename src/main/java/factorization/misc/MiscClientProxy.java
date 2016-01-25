@@ -49,7 +49,7 @@ public class MiscClientProxy extends MiscProxy {
         Minecraft.memoryReserve = new byte[0]; // Frees 10MB. Used for OOM screen, but that *never* happens.
         Core.loadBus(this);
         ClientCommandHandler.instance.registerCommand(new MiscClientCommands());
-        FMLCommonHandler.instance().bus().register(cth);
+        Core.loadBus(cth);
         new NeptuneCape();
 
         GameSettings gameSettings = Minecraft.getMinecraft().gameSettings;

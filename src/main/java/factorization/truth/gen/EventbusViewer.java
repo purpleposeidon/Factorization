@@ -7,7 +7,6 @@ import factorization.truth.api.TruthError;
 import factorization.truth.word.ClipboardWord;
 import factorization.truth.word.TextWord;
 import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.common.eventhandler.EventBus;
 import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.IEventListener;
@@ -24,7 +23,6 @@ public class EventbusViewer implements IDocGenerator {
     public void process(ITypesetter out, String arg) throws TruthError {
         if ("".equals(arg)) arg = null;
         inspectBus(out, MinecraftForge.EVENT_BUS, "Forge Event Bus", arg);
-        inspectBus(out, FMLCommonHandler.instance().bus(), "FML Event Bus", arg);
         inspectBus(out, MinecraftForge.ORE_GEN_BUS, "Ore Gen Bus", arg);
         inspectBus(out, MinecraftForge.TERRAIN_GEN_BUS, "Terrain Gen Bus", arg);
     }
@@ -39,7 +37,6 @@ public class EventbusViewer implements IDocGenerator {
         HashSet<Class<?>> eventTypesSet = new HashSet<Class<?>>();
         for (Map.Entry<Object, ArrayList<IEventListener>> entry : listeners.entrySet()) {
             Object eventHandler = entry.getKey();
-            ArrayList<IEventListener> eventListeners = entry.getValue();
             for (Method method : eventHandler.getClass().getMethods()) {
                 if (method.getAnnotation(SubscribeEvent.class) != null) {
                     methodsSet.add(method);
@@ -47,7 +44,7 @@ public class EventbusViewer implements IDocGenerator {
                 }
             }
         }
-        ArrayList<Method> methods = new ArrayList(methodsSet);
+        ArrayList<Method> methods = new ArrayList<Method>(methodsSet);
         Collections.sort(methods, new Comparator<Method>() {
             @Override
             public int compare(Method o1, Method o2) {
@@ -56,7 +53,7 @@ public class EventbusViewer implements IDocGenerator {
                 return o1.getName().compareTo(o2.getName());
             }
         });
-        ArrayList<Class<?>> eventTypes = new ArrayList(eventTypesSet);
+        ArrayList<Class<?>> eventTypes = new ArrayList<Class<?>>(eventTypesSet);
         Collections.sort(eventTypes, new Comparator<Class<?>>() {
             @Override
             public int compare(Class<?> o1, Class<?> o2) {
@@ -102,8 +99,7 @@ public class EventbusViewer implements IDocGenerator {
                     String hc = highest.getCanonicalName();
                     int start = hc.length();
                     start -= highest.getSimpleName().length();
-                    String ec = canonicalName;
-                    simpleName = ec.substring(start);
+                    simpleName = canonicalName.substring(start);
                 } else {
                     simpleName = eventType.getSimpleName();
                 }

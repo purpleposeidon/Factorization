@@ -53,7 +53,6 @@ public class NotifyImplementation {
     
     static void loadBus(Object obj) {
         // A copy of Core.loadBus(), for the sake of independence.
-        FMLCommonHandler.instance().bus().register(obj);
         MinecraftForge.EVENT_BUS.register(obj);
     }
     

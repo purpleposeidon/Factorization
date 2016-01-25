@@ -222,9 +222,7 @@ public class Core {
         proxy.registerRenderers();
 
         if (FzConfig.players_discover_colossus_guides) {
-            DistributeDocs dd = new DistributeDocs();
-            MinecraftForge.EVENT_BUS.register(dd);
-            FMLCommonHandler.instance().bus().register(dd);
+            Core.loadBus(new DistributeDocs());
         }
 
         MechanismsFeature.initialize();
