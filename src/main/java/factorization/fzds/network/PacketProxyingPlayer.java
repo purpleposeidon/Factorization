@@ -117,6 +117,13 @@ public class PacketProxyingPlayer extends EntityPlayerMP implements
         isImmuneToFire = true;
         this.dimensionSlice = new WeakReference<DimensionSliceEntity>(dimensionSlice);
         Coord c = dimensionSlice.getCenter();
+        {
+            Chunk chunk = c.getChunk();
+            int chunkX = c.x >> 4, chunkZ = c.z >> 4;
+            if (chunk.xPosition != chunkX || chunk.zPosition != chunkZ) {
+                Core.logSevere("Getting chunk at chunk coordinates " + chunkX + "," + chunkZ + " returned chunk with *wrong* coordinates: " + chunk.xPosition + "," + chunk.zPosition);
+            }
+        }
         c.y = -8; // lurk in the void; we should catch most mod's packets.
         DeltaCoord size = dimensionSlice.getFarCorner().difference(dimensionSlice.getCorner());
         size.y = 0;
@@ -243,6 +250,10 @@ public class PacketProxyingPlayer extends EntityPlayerMP implements
     }
 
     boolean canDie = false;
+
+    public void setCanDie(boolean v) {
+        canDie = v;
+    }
 
     public void endProxy() {
         if (canDie && isDead) {

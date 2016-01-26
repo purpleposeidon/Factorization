@@ -3,6 +3,7 @@ package factorization.fzds.network;
 import factorization.fzds.Hammer;
 import factorization.fzds.interfaces.IFzdsShenanigans;
 import factorization.shared.Core;
+import factorization.util.NORELEASE;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.*;
 import io.netty.util.Attribute;
@@ -13,7 +14,6 @@ import net.minecraft.network.play.client.C17PacketCustomPayload;
 import net.minecraft.network.play.server.S3FPacketCustomPayload;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.common.network.FMLNetworkEvent;
-import net.minecraftforge.fml.common.network.NetworkRegistry;
 import net.minecraftforge.fml.relauncher.Side;
 
 import java.net.SocketAddress;
@@ -42,9 +42,17 @@ public class PacketJunction extends SimpleChannelInboundHandler<Object> implemen
     }
 
     private final Side side;
+    private EntityPlayer player = null;
     private PacketJunction(Side side) {
         super(Object.class, false);
         this.side = side;
+    }
+
+    private EntityPlayer getPlayer(ChannelHandlerContext ctx) {
+        if (player != null) return player;
+        ChannelHandler pipe = ctx.pipeline().get("packet_handler");
+        NetworkManager manager = (NetworkManager) pipe;
+        return player = Hammer.proxy.getPlayerFrom(manager.getNetHandler());
     }
 
 
@@ -57,13 +65,7 @@ public class PacketJunction extends SimpleChannelInboundHandler<Object> implemen
             return;
         }
         if (readingWrapped) {
-            INetHandler inh = ctx.attr(NetworkRegistry.NET_HANDLER).get();
-            EntityPlayer player = null;
-            if (inh instanceof NetHandlerPlayServer) {
-                NetHandlerPlayServer netHandler = (NetHandlerPlayServer) inh;
-                player = netHandler.playerEntity;
-            }
-            Hammer.proxy.queueUnwrappedPacket(player, msg);
+            Hammer.proxy.queueUnwrappedPacket(getPlayer(ctx), msg);
             return;
         }
         ensurePlay(ctx.channel());

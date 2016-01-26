@@ -5,6 +5,7 @@ import factorization.fzds.network.InteractionLiason;
 import factorization.shared.Core;
 import factorization.util.NORELEASE;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.network.INetHandler;
 import net.minecraft.network.NetHandlerPlayServer;
 import net.minecraft.network.Packet;
 import net.minecraft.network.play.client.C00PacketKeepAlive;
@@ -97,6 +98,14 @@ public class HammerProxy {
         if (packet instanceof C17PacketCustomPayload) {
             C17PacketCustomPayload p = (C17PacketCustomPayload) packet;
             return p.getChannelName();
+        }
+        return null;
+    }
+
+    public EntityPlayer getPlayerFrom(INetHandler netHandler) {
+        if (netHandler instanceof NetHandlerPlayServer) {
+            NetHandlerPlayServer nh = (NetHandlerPlayServer) netHandler;
+            return nh.playerEntity;
         }
         return null;
     }

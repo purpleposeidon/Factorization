@@ -17,6 +17,7 @@ import factorization.fzds.network.HammerNet;
 import factorization.fzds.network.PacketProxyingPlayer;
 import factorization.shared.Core;
 import factorization.shared.EntityReference;
+import factorization.util.NORELEASE;
 import factorization.util.SpaceUtil;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
@@ -27,6 +28,7 @@ import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 import net.minecraft.server.MinecraftServer;
@@ -863,10 +865,28 @@ public class DimensionSliceEntity extends IDeltaChunk implements IFzdsEntryContr
             if (isOracle) {
                 packetRelay = this;
             } else {
+                if (NORELEASE.on) {
+                    Coord wtf = cornerMin.copy();
+                    wtf.setId(Blocks.mossy_cobblestone);
+                    wtf.add(0, 2, 0).spawnItem(Items.apple);
+                }
+
+
                 DeltaChunk.getSlices(worldObj).add(this);
                 World shadowWorld = DeltaChunk.getServerShadowWorld();
-                packetRelay = new PacketProxyingPlayer(this, shadowWorld);
-                packetRelay.worldObj.spawnEntityInWorld(packetRelay);
+                PacketProxyingPlayer ppp = new PacketProxyingPlayer(this, shadowWorld);
+                ppp.setCanDie(true);
+                boolean success = ppp.worldObj.spawnEntityInWorld(ppp);
+                if (!success || ppp.isDead) {
+                    Core.logSevere("Failed to spawn packetRelay");
+                    if (NORELEASE.on) {
+                        setDead();
+                        return;
+                    }
+                    throw new IllegalStateException("Failed to spawn packetRelay");
+                }
+                ppp.setCanDie(false);
+                packetRelay = ppp;
             }
             return;
         }

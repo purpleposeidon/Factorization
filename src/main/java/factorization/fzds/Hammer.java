@@ -90,12 +90,10 @@ public class Hammer {
         DimensionManager.registerDimension(DeltaChunk.getDimensionId(), DeltaChunk.getDimensionId());
         fzds_command_channel = hammerInfo.makeChannelFor(Core.modId, "fzdscmd", fzds_command_channel, -1, "This channel is used for Slices created using the /fzds command");
         FzdsPacketRegistry.init();
-        
-        if (FMLCommonHandler.instance().getSide() == Side.CLIENT) {
-            //When the client logs in or out, we need to do something to the shadow world
-            proxy.clientInit();
-        }
-        
+
+        //When the client logs in or out, we need to do something to the shadow world
+        proxy.clientInit();
+
         //This sets up saving how many IDs we've used
         Core.loadBus(hammerInfo);
         Core.loadBus(proxy);

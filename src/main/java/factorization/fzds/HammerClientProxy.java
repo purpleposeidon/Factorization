@@ -10,6 +10,7 @@ import factorization.fzds.gui.ProxiedGuiScreen;
 import factorization.fzds.interfaces.IDeltaChunk;
 import factorization.fzds.network.PacketJunction;
 import factorization.shared.Core;
+import factorization.shared.GenericRenderFactory;
 import factorization.util.FzUtil;
 import factorization.util.NORELEASE;
 import factorization.util.NumUtil;
@@ -23,13 +24,14 @@ import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.client.multiplayer.ChunkProviderClient;
 import net.minecraft.client.multiplayer.WorldClient;
 import net.minecraft.client.network.NetHandlerPlayClient;
-import net.minecraft.client.renderer.OpenGlHelper;
 import net.minecraft.client.renderer.RenderGlobal;
 import net.minecraft.client.renderer.entity.RenderManager;
 import net.minecraft.client.renderer.tileentity.TileEntityRendererDispatcher;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
+import net.minecraft.network.INetHandler;
+import net.minecraft.network.NetHandlerPlayServer;
 import net.minecraft.network.Packet;
 import net.minecraft.network.play.server.S3FPacketCustomPayload;
 import net.minecraft.profiler.Profiler;
@@ -60,12 +62,9 @@ public class HammerClientProxy extends HammerProxy {
     static HammerClientProxy instance;
 
     public HammerClientProxy() {
-        RenderDimensionSliceEntity rwe = new RenderDimensionSliceEntity(mc.getRenderManager());
-        RenderingRegistry.registerEntityRenderingHandler(DimensionSliceEntity.class, rwe);
-        Core.loadBus(rwe);
         HammerClientProxy.instance = this;
     }
-    
+
     //These two classes below make it easy to see in a debugger.
     public static class HammerChunkProviderClient extends ChunkProviderClient {
         public HammerChunkProviderClient(World par1World) {
@@ -425,7 +424,7 @@ public class HammerClientProxy extends HammerProxy {
     
     @Override
     public void clientInit() {
-        
+        RenderingRegistry.registerEntityRenderingHandler(DimensionSliceEntity.class, new GenericRenderFactory<DimensionSliceEntity>(RenderDimensionSliceEntity.class));
     }
     
     static final Minecraft mc = Minecraft.getMinecraft();
@@ -649,5 +648,13 @@ public class HammerClientProxy extends HammerProxy {
             return p.getChannelName();
         }
         return super.getChannel(packet);
+    }
+
+    @Override
+    public EntityPlayer getPlayerFrom(INetHandler netHandler) {
+        if (netHandler instanceof NetHandlerPlayClient) {
+            return getRealPlayerWhileInShadow();
+        }
+        return super.getPlayerFrom(netHandler);
     }
 }

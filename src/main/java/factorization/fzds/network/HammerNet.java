@@ -9,6 +9,8 @@ import io.netty.buffer.Unpooled;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.network.NetHandlerPlayClient;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
@@ -47,6 +49,7 @@ import factorization.shared.Core;
 import factorization.util.PlayerUtil;
 import factorization.util.SpaceUtil;
 import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 
 public class HammerNet {
@@ -66,6 +69,7 @@ public class HammerNet {
     }
 
     @SubscribeEvent(priority = EventPriority.LOWEST)
+    @SideOnly(Side.CLIENT)
     public void clientLoggedIn(FMLNetworkEvent.ClientConnectedToServerEvent event) {
         PacketJunction.setup(event, Side.CLIENT);
     }

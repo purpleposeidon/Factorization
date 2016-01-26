@@ -45,7 +45,7 @@ import static org.lwjgl.opengl.GL11.glPopMatrix;
 import static org.lwjgl.opengl.GL11.glPushMatrix;
 
 
-public class RenderDimensionSliceEntity extends Render implements IFzdsShenanigans {
+public class RenderDimensionSliceEntity extends Render<DimensionSliceEntity> implements IFzdsShenanigans {
     public static int update_frequency = 16;
     public static RenderDimensionSliceEntity instance;
     
@@ -56,13 +56,11 @@ public class RenderDimensionSliceEntity extends Render implements IFzdsShenaniga
         super(renderManager);
         instance = this;
         Core.loadBus(this);
-        HashMap butts;
     }
 
     @Override
-    protected ResourceLocation getEntityTexture(Entity entity) { return null; }
+    protected ResourceLocation getEntityTexture(DimensionSliceEntity entity) { return null; }
 
-    Vec3 shadowEyeVec = new Vec3(0, 0, 0);
     EntityLivingBase shadowEye = new EntityLivingBase(null) {
         @Override protected void entityInit() { }
         @Override public void readEntityFromNBT(NBTTagCompound var1) { }
@@ -400,12 +398,11 @@ public class RenderDimensionSliceEntity extends Render implements IFzdsShenaniga
     
     public static int nest = 0; //is 0 usually. Gets incremented right before we start actually rendering.
     @Override
-    public void doRender(Entity ent, double x, double y, double z, float yaw, float partialTicks) {
+    public void doRender(DimensionSliceEntity dse, double x, double y, double z, float yaw, float partialTicks) {
         //need to do: Don't render if we're far away! (This should maybe be done in some other function?)
-        if (ent.isDead) {
+        if (dse.isDead) {
             return;
         }
-        DimensionSliceEntity dse = (DimensionSliceEntity) ent;
         DSRenderInfo renderInfo = getRenderInfo(dse);
         Minecraft mc = Minecraft.getMinecraft();
         if (nest == 0) {
