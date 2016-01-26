@@ -653,7 +653,8 @@ public class HammerClientProxy extends HammerProxy {
     @Override
     public EntityPlayer getPlayerFrom(INetHandler netHandler) {
         if (netHandler instanceof NetHandlerPlayClient) {
-            return getRealPlayerWhileInShadow();
+            if (real_player != null) return real_player;
+            return mc.thePlayer;
         }
         return super.getPlayerFrom(netHandler);
     }
