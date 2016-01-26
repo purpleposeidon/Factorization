@@ -79,17 +79,22 @@ public class ColossusController extends EntityFz implements IBossDisplayData, ID
     int target_count = 0;
     transient Entity target_entity;
 
-    private static final int _destroyed_cracked_block_id = 2;
-    private static final int _unbroken_cracked_block_id = 3;
+    // Vanilla uses 0-4 as of 1.8. Let's just give them plenty of room.
+    private static final int _destroyed_cracked_block_id = 10;
+    private static final int _unbroken_cracked_block_id = 11;
     
     public ColossusController(World world) {
         super(world);
         path_target = null;
         ignoreFrustumCheck = true;
-        dataWatcher.addObject(_destroyed_cracked_block_id, (Integer) 0);
-        dataWatcher.addObject(_unbroken_cracked_block_id, (Integer) 0);
     }
-    
+
+    @Override
+    protected void entityInit() {
+        dataWatcher.addObject(_destroyed_cracked_block_id, 0);
+        dataWatcher.addObject(_unbroken_cracked_block_id, 0);
+    }
+
     public ColossusController(World world, LimbInfo[] limbInfo, int arm_size, int arm_length, int leg_size, int leg_length, int width) {
         this(world);
         this.limbs = limbInfo;
@@ -159,9 +164,6 @@ public class ColossusController extends EntityFz implements IBossDisplayData, ID
         setup = true;
     }
 
-    @Override
-    protected void entityInit() { }
-    
     public void putData(DataHelper data) throws IOException {
         int limb_count = data.as(Share.PRIVATE, "limbCount").putInt(limbs == null ? 0 : limbs.length);
         if (data.isReader()) {

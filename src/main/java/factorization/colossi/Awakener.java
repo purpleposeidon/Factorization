@@ -171,9 +171,9 @@ public class Awakener {
         details("heart", heart);
         Set<Coord> body = iterateFrom(heart, BODY_ANY, false);
         details("body", body);
-        Set<Coord> mask = iterateFrom(body, ColossalBuilder.MASK, true);
+        Set<Coord> mask = iterateFrom(body, ColossalBuilder.MASK_ANY, true);
         details("mask", mask);
-        Set<Coord> eyes = iterateFrom(mask, ColossalBuilder.EYE, true);
+        Set<Coord> eyes = iterateFrom(mask, ColossalBuilder.EYE_ANY, true);
         details("eyes", eyes);
         ArrayList<Set<Coord>> arms = getConnectedLimbs(body, ColossalBuilder.ARM);
         limbDetails("arms", arms);

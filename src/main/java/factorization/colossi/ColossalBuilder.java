@@ -4,7 +4,6 @@ import factorization.api.Coord;
 import factorization.api.DeltaCoord;
 import factorization.api.ICoordFunction;
 import factorization.colossi.Brush.BrushMask;
-import factorization.shared.Core;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockFalling;
 import net.minecraft.block.BlockSand;
@@ -26,20 +25,18 @@ public class ColossalBuilder {
     int shoulder_start;
     int face_width, face_height, face_depth;
 
-    private static final IBlockState cb = Core.registry.colossal_block.getDefaultState();
-    private static ColossusBuilderBlock get(ColossalBlock.Md md) {
-        return new ColossusBuilderBlock(cb.withProperty(ColossalBlock.VARIANT, md));
+    private static ColossusBuilderBlock get(ColossalBlock.Md... md) {
+        return new ColossusBuilderBlock(md);
     }
     static final ColossusBuilderBlock LEG = get(ColossalBlock.Md.LEG);
-    static final ColossusBuilderBlock BODY = get(ColossalBlock.Md.BODY);
-    static final ColossusBuilderBlock ARM = get(ColossalBlock.Md.ARM);
-    static final ColossusBuilderBlock MASK = get(ColossalBlock.Md.MASK);
-    static final ColossusBuilderBlock EYE = get(ColossalBlock.Md.EYE);
-    static final ColossusBuilderBlock HEART = get(ColossalBlock.Md.CORE);
+    static final ColossusBuilderBlock BODY_ANY = get(ColossalBlock.Md.BODY, ColossalBlock.Md.BODY_CRACKED, ColossalBlock.Md.BODY_COVERED);
     static final ColossusBuilderBlock BODY_CRACK = get(ColossalBlock.Md.BODY_CRACKED);
+    static final ColossusBuilderBlock ARM = get(ColossalBlock.Md.ARM);
     static final ColossusBuilderBlock MASK_CRACK = get(ColossalBlock.Md.MASK_CRACKED);
-    static final ColossusBuilderBlock AIR = new ColossusBuilderBlock(Blocks.air.getDefaultState());
-    
+    static final ColossusBuilderBlock MASK_ANY = get(ColossalBlock.Md.MASK, ColossalBlock.Md.MASK_CRACKED);
+    static final ColossusBuilderBlock EYE_ANY = get(ColossalBlock.Md.EYE, ColossalBlock.Md.EYE_OPEN);
+    static final ColossusBuilderBlock HEART = get(ColossalBlock.Md.CORE);
+
     public ColossalBuilder(int seed, Coord start) {
         this.seed = seed;
         this.rand = new Random(seed);
@@ -171,7 +168,7 @@ public class ColossalBuilder {
         int face_center_adjust = ((leg_size * 2 + leg_spread + 1) - face_width) / 2;
         Coord mask_start = start.add(leg_size + body_front_padding + 1, leg_height + 1 + body_height, face_center_adjust);
         Coord mask_end = mask_start.add(-face_depth, face_height, face_width);
-        fill(mask_start, mask_end, MASK);
+        fill(mask_start, mask_end, MASK_ANY);
         
         Coord leg_start = start.copy();
         Coord leg_end = leg_start.add(leg_size, leg_height, leg_size);
@@ -185,7 +182,7 @@ public class ColossalBuilder {
         Coord body_inner_start = start.add(0, leg_height + 1, 0);
         Coord body_start = body_inner_start.add(-body_back_padding, 0, -body_arm_padding);
         Coord body_end = body_inner_start.add(leg_size + body_front_padding, body_height, leg_size * 2 + leg_spread + body_arm_padding + 1);
-        fill(body_start, body_end, BODY);
+        fill(body_start, body_end, BODY_ANY);
         
         Coord arm_start = start.add(0, leg_height + 1 + body_height - shoulder_start, 0).add(0, 0, -body_arm_padding - 1).add(arm_size, 0, 0);
         if (leg_size > arm_size) {
@@ -202,7 +199,7 @@ public class ColossalBuilder {
         paintMask(EnumFacing.DOWN);
         
         Coord standard_eyeball = start.add(leg_size + body_front_padding + 1, leg_height + 1 + body_height + (face_height / 2), 1 + leg_size + leg_spread / 2);
-        fill(standard_eyeball, standard_eyeball, EYE);
+        fill(standard_eyeball, standard_eyeball, EYE_ANY);
         
         Drawer drawer = new Drawer();
         drawer.generateBlob();
@@ -210,7 +207,7 @@ public class ColossalBuilder {
         
         Coord heart_crack = start.add(leg_size + body_front_padding, leg_height + 1 + ((body_height + 1) / 2), leg_size + ((1 + leg_spread) / 2));
         Coord hc_front = heart_crack.add(EnumFacing.EAST);
-        if (MASK.matches(hc_front) || EYE.matches(hc_front)) {
+        if (MASK_ANY.matches(hc_front) || EYE_ANY.matches(hc_front)) {
             heart_crack.adjust(EnumFacing.EAST);
             fill(heart_crack, heart_crack, MASK_CRACK);
         } else {
@@ -234,7 +231,7 @@ public class ColossalBuilder {
                 at.y = y;
                 for (int z = min.z; z <= max.z; z++) {
                     at.z = z;
-                    at.set(state.bs, true);
+                    state.set(at, true);
                 }
             }
         }
@@ -260,8 +257,8 @@ public class ColossalBuilder {
         if (dir == EnumFacing.DOWN) {
             mask_anchor = mask_anchor.add(0, face_height, 0);
         }
-        Brush maskBrush = new Brush(MASK.bs, BrushMask.ALL, rand);
-        Brush eyeBrush = new Brush(EYE.bs, BrushMask.ALL, rand);
+        Brush maskBrush = new Brush(MASK_ANY.getState(), BrushMask.ALL, rand);
+        Brush eyeBrush = new Brush(EYE_ANY.getState(), BrushMask.ALL, rand);
         mask.paint(mask_anchor, maskBrush, eyeBrush);
     }
     
