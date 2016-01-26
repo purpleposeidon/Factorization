@@ -48,6 +48,7 @@ It mines! It crafts!
 Millions of JSON files!
 If it isn't backed up, it isn't important!
 I love potato knishes!
+Seeing the bouncing splash text... it fills you with DETERMINATION!
 
 #FUTURE
 # Lines that start with a # are comments!
