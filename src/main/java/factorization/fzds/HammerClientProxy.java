@@ -429,7 +429,8 @@ public class HammerClientProxy extends HammerProxy {
             return;
         }
         Core.profileStart("FZDStick");
-        setShadowWorld();
+        boolean NORELEASE_misdirect_packet = NORELEASE.just(false);
+        if (!NORELEASE_misdirect_packet) setShadowWorld();
         try {
             synchronized (packetQueue) {
                 for (Packet<INetHandlerPlayClient> packet : packetQueue) {
@@ -448,6 +449,7 @@ public class HammerClientProxy extends HammerProxy {
                 }
                 if (NORELEASE.off) packetQueue.clear();
             }
+            if (NORELEASE_misdirect_packet) setShadowWorld();
             //Inspired by Minecraft.runTick()
             shadowWorld.updateEntities();
             Vec3 playerPos = new Vec3(mcPlayer.posX, mcPlayer.posY, mcPlayer.posZ);

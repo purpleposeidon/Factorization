@@ -2,6 +2,8 @@ package factorization.fzds.interfaces;
 
 import factorization.api.Coord;
 import factorization.api.Quaternion;
+import factorization.fzds.DeltaChunk;
+import factorization.fzds.Hammer;
 import factorization.shared.EntityFz;
 import factorization.util.SpaceUtil;
 import net.minecraft.util.AxisAlignedBB;
@@ -220,10 +222,18 @@ public abstract class IDeltaChunk extends EntityFz {
     @CheckReturnValue
     public abstract Vec3 shadow2real(final Vec3 shadowVector);
 
+    public World getShadowWorld() {
+        if (worldObj.isRemote) {
+            return DeltaChunk.getClientShadowWorld();
+        } else {
+            return DeltaChunk.getServerShadowWorld();
+        }
+    }
+
     @CheckReturnValue
     public Coord real2shadow(Coord real) {
         Vec3 s = real2shadow(real.toMiddleVector());
-        return new Coord(worldObj, (int) Math.floor(s.xCoord), (int) Math.floor(s.yCoord), (int) Math.floor(s.zCoord));
+        return new Coord(getShadowWorld(), (int) Math.floor(s.xCoord), (int) Math.floor(s.yCoord), (int) Math.floor(s.zCoord));
     }
 
     @CheckReturnValue

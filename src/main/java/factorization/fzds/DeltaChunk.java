@@ -7,6 +7,7 @@ import factorization.coremodhooks.IExtraChunkData;
 import factorization.fzds.interfaces.IDeltaChunk;
 import factorization.fzds.network.InteractionLiason;
 import factorization.fzds.network.PacketProxyingPlayer;
+import factorization.util.NORELEASE;
 import factorization.util.SpaceUtil;
 import gnu.trove.set.hash.THashSet;
 import net.minecraft.entity.Entity;
@@ -106,8 +107,14 @@ public class DeltaChunk {
     
     public static IDeltaChunk allocateSlice(World spawnWorld, int channel, DeltaCoord size) {
         if (spawnWorld.isRemote) throw new IllegalArgumentException("Attempted client-side DSE allocation!");
-        Coord base = Hammer.hammerInfo.takeCell(channel, size);
-        Coord end = base.add(size);
+        Coord base, end;
+        if (NORELEASE.off) {
+            base = Hammer.hammerInfo.takeCell(channel, size);
+            end = base.add(size);
+        } else {
+            base = new Coord(getServerShadowWorld(), 8, 8, 8);
+            end = base.add(size);
+        }
         wipeRegion(base, end);
         return new DimensionSliceEntity(spawnWorld, base, end);
     }
@@ -245,7 +252,7 @@ public class DeltaChunk {
     }
     
     static void outsetChunks(Collection<Chunk> chunks) {
-        ArrayList<Chunk> edges = new ArrayList();
+        ArrayList<Chunk> edges = new ArrayList<Chunk>();
         for (Chunk chunk : chunks) {
             for (EnumFacing fd : EnumFacing.VALUES) {
                 if (fd.getDirectionVec().getY() != 0) continue;

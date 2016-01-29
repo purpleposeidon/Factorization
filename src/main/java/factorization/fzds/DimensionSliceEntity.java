@@ -874,13 +874,6 @@ public class DimensionSliceEntity extends IDeltaChunk implements IFzdsEntryContr
             if (isOracle) {
                 packetRelay = this;
             } else {
-                if (NORELEASE.on) {
-                    Coord wtf = cornerMin.copy();
-                    wtf.setId(Blocks.mossy_cobblestone);
-                    wtf.add(0, 2, 0).spawnItem(Items.apple);
-                }
-
-
                 DeltaChunk.getSlices(worldObj).add(this);
                 World shadowWorld = DeltaChunk.getServerShadowWorld();
                 PacketProxyingPlayer ppp = new PacketProxyingPlayer(this, shadowWorld);
