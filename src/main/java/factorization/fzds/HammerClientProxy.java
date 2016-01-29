@@ -1,5 +1,6 @@
 package factorization.fzds;
 
+import com.mojang.authlib.GameProfile;
 import factorization.aabbdebug.AabbDebugger;
 import factorization.api.Coord;
 import factorization.api.Quaternion;
@@ -9,8 +10,8 @@ import factorization.fzds.gui.ProxiedGuiContainer;
 import factorization.fzds.gui.ProxiedGuiScreen;
 import factorization.fzds.interfaces.IDeltaChunk;
 import factorization.fzds.network.PacketJunction;
+import factorization.fzds.network.PacketProxyingPlayer;
 import factorization.shared.Core;
-import factorization.shared.GenericRenderFactory;
 import factorization.util.FzUtil;
 import factorization.util.NORELEASE;
 import factorization.util.NumUtil;
@@ -24,15 +25,18 @@ import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.client.multiplayer.ChunkProviderClient;
 import net.minecraft.client.multiplayer.WorldClient;
 import net.minecraft.client.network.NetHandlerPlayClient;
+import net.minecraft.client.network.NetworkPlayerInfo;
 import net.minecraft.client.renderer.RenderGlobal;
+import net.minecraft.client.renderer.entity.Render;
 import net.minecraft.client.renderer.entity.RenderManager;
 import net.minecraft.client.renderer.tileentity.TileEntityRendererDispatcher;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.INetHandler;
-import net.minecraft.network.NetHandlerPlayServer;
+import net.minecraft.network.NetworkManager;
 import net.minecraft.network.Packet;
+import net.minecraft.network.play.INetHandlerPlayClient;
 import net.minecraft.network.play.server.S3FPacketCustomPayload;
 import net.minecraft.profiler.Profiler;
 import net.minecraft.util.AxisAlignedBB;
@@ -46,6 +50,7 @@ import net.minecraft.world.storage.WorldInfo;
 import net.minecraftforge.client.ForgeHooksClient;
 import net.minecraftforge.client.event.DrawBlockHighlightEvent;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
+import net.minecraftforge.fml.client.registry.IRenderFactory;
 import net.minecraftforge.fml.client.registry.RenderingRegistry;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
@@ -67,19 +72,19 @@ public class HammerClientProxy extends HammerProxy {
 
     //These two classes below make it easy to see in a debugger.
     public static class HammerChunkProviderClient extends ChunkProviderClient {
-        public HammerChunkProviderClient(World par1World) {
-            super(par1World);
+        public HammerChunkProviderClient(World world) {
+            super(world);
         }
     }
     
     public static class HammerWorldClient extends WorldClient {
-        public HammerWorldClient(NetHandlerPlayClient par1NetClientHandler, WorldSettings par2WorldSettings, int par3, EnumDifficulty par4, Profiler par5Profiler) {
-            super(par1NetClientHandler, par2WorldSettings, par3, par4, par5Profiler);
+        public HammerWorldClient(NetHandlerPlayClient netHandler, WorldSettings worldSettings, int dimension, EnumDifficulty difficulty, Profiler profiler) {
+            super(netHandler, worldSettings, dimension, difficulty, profiler);
         }
         
         @Override
-        public void playSoundAtEntity(Entity par1Entity, String par2Str, float par3, float par4) {
-            super.playSoundAtEntity(par1Entity, par2Str, par3, par4);
+        public void playSoundAtEntity(Entity ent, String name, float volume, float pitch) {
+            super.playSoundAtEntity(ent, name, volume, pitch);
         }
         
         public void clearAccesses() {
@@ -125,6 +130,40 @@ public class HammerClientProxy extends HammerProxy {
             shadowRenderGlobal.removeStaleDamage();
         }
     }
+
+    private static class HammerNetHandlerPlayClient extends NetHandlerPlayClient {
+        final NetHandlerPlayClient parent;
+        public HammerNetHandlerPlayClient(NetHandlerPlayClient orig) {
+            super(mc, null, orig.getNetworkManager(), orig.getGameProfile());
+            parent = orig;
+        }
+
+
+
+        private final NetworkPlayerInfo proxyProfile = new NetworkPlayerInfo(PacketProxyingPlayer.proxyProfile);
+
+        @Override
+        public NetworkPlayerInfo getPlayerInfo(UUID uuid) {
+            NetworkPlayerInfo playerInfo = parent.getPlayerInfo(uuid);
+            if (playerInfo == null) {
+                if (uuid.equals(PacketProxyingPlayer.proxyUuid)) {
+                    return proxyProfile;
+                }
+            }
+            return playerInfo;
+        }
+
+        @Override
+        public NetworkPlayerInfo getPlayerInfo(String name) {
+            NetworkPlayerInfo playerInfo = parent.getPlayerInfo(name);
+            if (playerInfo == null) {
+                if (name.equals(proxyProfile.getDisplayName().getUnformattedTextForChat())) {
+                    return proxyProfile;
+                }
+            }
+            return playerInfo;
+        }
+    }
     
     @Override
     public void createClientShadowWorld() {
@@ -136,7 +175,7 @@ public class HammerClientProxy extends HammerProxy {
             shadowRenderGlobal = null;
             return;
         }
-        send_queue = mc.thePlayer.sendQueue;
+        send_queue = new HammerNetHandlerPlayClient(mc.thePlayer.sendQueue);
         WorldInfo wi = world.getWorldInfo();
         try {
             HookTargetsClient.clientWorldLoadEventAbort.set(Boolean.TRUE);
@@ -300,7 +339,7 @@ public class HammerClientProxy extends HammerProxy {
         if (fake_player == null || w != fake_player.worldObj) {
             fake_player = new EntityPlayerSP(
                     mc,
-                    mc.theWorld /* why is this real world? NORELEASE: world leakage? */,
+                    mc.theWorld /* why is this real world? (No world leak; gets unset on world unload.) */,
                     real_player.sendQueue /* not sure about this one. */,
                     real_player.getStatFileWriter());
             fake_player.movementInput = real_player.movementInput;
@@ -360,13 +399,14 @@ public class HammerClientProxy extends HammerProxy {
     }
 
 
-    final List<Packet> packetQueue = Collections.synchronizedList(new ArrayList<Packet>());
+    final List<Packet<INetHandlerPlayClient>> packetQueue = Collections.synchronizedList(new ArrayList<Packet<INetHandlerPlayClient>>());
 
     @Override
     public boolean queueUnwrappedPacket(EntityPlayer player, Object packet) {
         if (super.queueUnwrappedPacket(player, packet)) return true;
         if (packet instanceof Packet) {
-            packetQueue.add((Packet) packet);
+            //noinspection unchecked
+            packetQueue.add((Packet<INetHandlerPlayClient>) packet);
             return true;
         } else {
             Core.logWarning("Tried to queue this weird non-packet: " + packet.getClass() + ": " + packet.toString());
@@ -379,54 +419,60 @@ public class HammerClientProxy extends HammerProxy {
             return;
         }
         final WorldClient mcWorld = mc.theWorld;
-        if (mcWorld == null) {
+        final EntityPlayer mcPlayer = mc.thePlayer;
+        if (mcWorld == null || mcPlayer == null || mc.getNetHandler() == null) {
             packetQueue.clear();
             return;
         }
-        final EntityPlayer mcPlayer = mc.thePlayer;
-        if (mcPlayer == null) {
+        HammerWorldClient shadowWorld = (HammerWorldClient) DeltaChunk.getClientShadowWorld();
+        if (shadowWorld == null) {
             return;
         }
-        if (mc.getNetHandler() == null) {
-            return;
-        }
-        HammerWorldClient w = (HammerWorldClient) DeltaChunk.getClientShadowWorld();
-        if (w == null) {
-            return;
-        }
-        int range = 10;
-        AxisAlignedBB nearby = mcPlayer.getEntityBoundingBox().expand(range, range, range);
-        Iterable<IDeltaChunk> nearbyChunks = mcWorld.getEntitiesWithinAABB(IDeltaChunk.class, nearby);
-        NORELEASE.fixme("Wrong. If the IDC has a large radius, then it won't be caught. UniversalCollider.");
-        setShadowWorld();
         Core.profileStart("FZDStick");
+        setShadowWorld();
         try {
             synchronized (packetQueue) {
-                for (Packet packet : packetQueue) {
+                for (Packet<INetHandlerPlayClient> packet : packetQueue) {
                     if (packet == null) continue;
-                    packet.processPacket(send_queue);
+                    try {
+                            NORELEASE.println(packet);
+                        packet.processPacket(send_queue);
+                        if (NORELEASE.on) {
+                            packetQueue.remove(packet);
+                            break;
+                        }
+                    } catch (RuntimeException t) {
+                        t.printStackTrace();
+                        throw t;
+                    }
                 }
-                packetQueue.clear();
+                if (NORELEASE.off) packetQueue.clear();
             }
             //Inspired by Minecraft.runTick()
-            w.updateEntities();
+            shadowWorld.updateEntities();
             Vec3 playerPos = new Vec3(mcPlayer.posX, mcPlayer.posY, mcPlayer.posZ);
-            for (IDeltaChunk idc : nearbyChunks) {
+            int fogTickRange = 10;
+            for (IDeltaChunk idc : DeltaChunk.getAround(new Coord(mcPlayer), fogTickRange)) {
                 Vec3 center = idc.real2shadow(playerPos);
-                w.doVoidFogParticles((int) center.xCoord, (int) center.yCoord, (int) center.zCoord);
+                shadowWorld.doVoidFogParticles((int) center.xCoord, (int) center.yCoord, (int) center.zCoord);
             }
-            w.shadowTick();
+            shadowWorld.shadowTick();
         } finally {
-            Core.profileEnd();
             restoreRealWorld();
+            Core.profileEnd();
         }
     }
     
     @Override
     public void clientInit() {
-        RenderingRegistry.registerEntityRenderingHandler(DimensionSliceEntity.class, new GenericRenderFactory<DimensionSliceEntity>(RenderDimensionSliceEntity.class));
+        RenderingRegistry.registerEntityRenderingHandler(DimensionSliceEntity.class, new IRenderFactory<DimensionSliceEntity>() {
+            @Override
+            public Render<? super DimensionSliceEntity> createRenderFor(RenderManager manager) {
+                return new RenderDimensionSliceEntity(manager);
+            }
+        });
     }
-    
+
     static final Minecraft mc = Minecraft.getMinecraft();
     
     @SubscribeEvent

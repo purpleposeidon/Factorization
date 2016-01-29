@@ -11,7 +11,6 @@ import net.minecraft.util.Vec3;
 
 import java.io.IOException;
 
-@Deprecated // NORELEASE: Remove; BlockPos
 public class DeltaCoord implements IDataSerializable {
     public int x, y, z;
 

@@ -971,6 +971,12 @@ public final class Coord implements IDataSerializable, ISaneCoord, Comparable<Co
         }
     }
 
+    public static void iterateChunksAround(Coord mid, int r, ICoordFunction func) {
+        Coord min = mid.add(-r, -r, -r);
+        Coord max = min.add(+r, +r, +r);
+        iterateChunks(min, max, func);
+    }
+
     public static void iterateChunks(Coord min, Coord max, ICoordFunction func) {
         min = min.copy();
         max = max.copy();

@@ -160,6 +160,7 @@ public final class PlayerUtil {
             this.channel.pipeline().addFirst("fz:null", new ChannelOutboundHandlerAdapter() {
                 @Override public void write(ChannelHandlerContext ctx, Object msg, ChannelPromise promise) throws Exception { }
             });
+            NORELEASE.println("A fake player has channel: " + this.channel);
         }
 
     }

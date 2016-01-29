@@ -32,7 +32,7 @@ public class HammerChunkProvider implements IChunkProvider {
 
     @Override
     public Chunk provideChunk(int x, int z) {
-        Chunk chunk = new Chunk(world, x >> 4, z >> 4);
+        Chunk chunk = new Chunk(world, x, z);
         chunk.generateSkylightMap();
         byte[] biomes = chunk.getBiomeArray();
         Arrays.fill(biomes, (byte) BiomeGenBase.plains.biomeID);

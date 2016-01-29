@@ -2,6 +2,8 @@ package factorization.fzds;
 
 import factorization.api.Coord;
 import factorization.api.DeltaCoord;
+import factorization.api.ICoordFunction;
+import factorization.coremodhooks.IExtraChunkData;
 import factorization.fzds.interfaces.IDeltaChunk;
 import factorization.fzds.network.InteractionLiason;
 import factorization.fzds.network.PacketProxyingPlayer;
@@ -134,6 +136,24 @@ public class DeltaChunk {
         return closest;
     }
 
+    public static Iterable<IDeltaChunk> getAround(Coord pos, int radius) {
+        final HashSet<IDeltaChunk> nearbyChunks = new HashSet<IDeltaChunk>(); // This should be extracted.
+        Coord.iterateChunksAround(pos, radius, new ICoordFunction() {
+            @Override
+            public void handle(Coord here) {
+                IExtraChunkData c = (IExtraChunkData) here.getChunk();
+                Entity[] ccs = c.getConstantColliders();
+                if (ccs == null) return;
+                for (Entity ent : ccs) {
+                    if (ent instanceof IDeltaChunk) {
+                        nearbyChunks.add((IDeltaChunk) ent);
+                    }
+                }
+            }
+        });
+        return nearbyChunks;
+    }
+
     public static BlockPos shadow2nearestReal(Entity player, BlockPos pos) {
         return new BlockPos(shadow2nearestReal(player, new Vec3(pos)));
     }
@@ -152,15 +172,13 @@ public class DeltaChunk {
         return HammerInfo.dimension_slice_dimid;
     }
 
-    public static interface AreaMap {
+    public interface AreaMap {
         void fillDse(DseDestination destination);
     }
     
-    public static interface DseDestination {
+    public interface DseDestination {
         void include(Coord c);
     }
-    
-    private static Coord shadow = new Coord(null, 0, 0, 0);
     
     public static void wipeRegion(final Coord min, final Coord max) {
         Coord.sort(min, max);
@@ -176,8 +194,8 @@ public class DeltaChunk {
             }
         }
     }
-    
-    public static IDeltaChunk makeSlice(int channel, Coord min, Coord max, AreaMap mapper, final boolean wipeSrc) {
+
+    public static IDeltaChunk makeSlice(int channel, Coord min, Coord max, Collection<Coord> coords, final boolean wipeSrc) {
         min = min.copy();
         max = max.copy();
         DeltaCoord size = max.difference(min);
@@ -186,42 +204,44 @@ public class DeltaChunk {
         dse.posX = (int)vrm.xCoord;
         dse.posY = (int)vrm.yCoord;
         dse.posZ = (int)vrm.zCoord;
-        final HashSet<Chunk> chunks = new HashSet();
-        mapper.fillDse(new DseDestination() {
-            @Override
-            public void include(Coord real) {
-                shadow.set(real);
-                dse.real2shadow(shadow);
-                TransferLib.move(real, shadow, false, true);
-                chunks.add(real.getChunk());
+        final HashSet<Chunk> chunks = new HashSet<Chunk>();
+        for (Coord real : coords) {
+            Coord shadow = dse.real2shadow(real);
+            TransferLib.move(real, shadow, false, true);
+            chunks.add(real.getChunk());
+        }
+        {
+            // Force-load chunks to ensure that lighting updates happen
+            // shadow.updateLight requires that chunks 17 blocks away be loaded...
+            outsetChunks(chunks);
+            outsetChunks(chunks);
+        }
+        for (Coord real : coords) {
+            if (wipeSrc) {
+                TransferLib.rawErase(real);
             }
-        });
-        // Force-load chunks to ensure that lighting updates happen
-        // shadow.updateLight requires that chunks 17 blocks away be loaded...
-        outsetChunks(chunks);
-        outsetChunks(chunks);
-        mapper.fillDse(new DseDestination() {
-            @Override
-            public void include(Coord real) {
-                if (wipeSrc) {
-                    TransferLib.rawErase(real);
-                }
-                shadow.set(real);
-                dse.real2shadow(shadow);
-                shadow.markBlockForUpdate();
-                shadow.updateLight();
-            }
-        });
+            Coord shadow = dse.real2shadow(real);
+            shadow.markBlockForUpdate();
+            //shadow.updateLight(); // This may be too slow to actually use. :/
+        }
         if (wipeSrc) {
-            mapper.fillDse(new DseDestination() {
-                @Override
-                public void include(Coord real) {
-                    real.markBlockForUpdate();
-                    real.notifyBlockChange();
-                }
-            });
+            for (Coord real : coords) {
+                real.markBlockForUpdate();
+                real.notifyBlockChange();
+            }
         }
         return dse;
+    }
+
+    public static IDeltaChunk makeSlice(int channel, Coord min, Coord max, AreaMap mapper, final boolean wipeSrc) {
+        final ArrayList<Coord> buffer = new ArrayList<Coord>();
+        mapper.fillDse(new DseDestination() {
+            @Override
+            public void include(Coord c) {
+                buffer.add(c.copy());
+            }
+        });
+        return makeSlice(channel, min, max, buffer, wipeSrc);
     }
     
     static void outsetChunks(Collection<Chunk> chunks) {

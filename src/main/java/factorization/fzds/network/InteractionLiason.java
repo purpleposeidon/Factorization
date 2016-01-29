@@ -3,6 +3,7 @@ package factorization.fzds.network;
 import factorization.fzds.ShadowPlayerAligner;
 import factorization.fzds.interfaces.IDeltaChunk;
 import factorization.fzds.interfaces.IFzdsShenanigans;
+import factorization.util.NORELEASE;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelOutboundHandlerAdapter;
 import io.netty.channel.ChannelPromise;
@@ -38,6 +39,7 @@ public class InteractionLiason extends EntityPlayerMP implements IFzdsShenanigan
         realPlayerRef = new WeakReference<EntityPlayerMP>(realPlayer);
         initLiason();
         updateFromPlayerStatus();
+        NORELEASE.println("An interaction liason has channel: " + networkManager.channel());
     }
 
     private void initLiason() {

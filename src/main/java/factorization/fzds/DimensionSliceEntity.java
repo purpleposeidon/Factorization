@@ -112,6 +112,15 @@ public class DimensionSliceEntity extends IDeltaChunk implements IFzdsEntryContr
         Coord.sort(lowerCorner, upperCorner);
         this.cornerMin = lowerCorner;
         this.cornerMax = upperCorner;
+        if (NORELEASE.on) {
+            Chunk chunk = cornerMin.getChunk();
+            int cx = cornerMin.x / 16;
+            int cz = cornerMin.z / 16;
+            if (cx != chunk.xPosition || cz != chunk.zPosition) {
+                Core.logSevere("Chunk positioning fail. " + cx + "," + cz + " vs " + chunk);
+                Core.logSevere("Chunk positioning fail. " + cornerMin.x + "," + cornerMin.z + " vs " + chunk);
+            }
+        }
         DeltaCoord dc = upperCorner.difference(lowerCorner);
         centerOffset = new Vec3(
                 dc.x/2,

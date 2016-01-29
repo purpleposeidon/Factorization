@@ -1,6 +1,7 @@
 package factorization.fzds;
 
 import factorization.api.Coord;
+import factorization.util.NORELEASE;
 import net.minecraft.block.Block;
 import net.minecraft.init.Blocks;
 import net.minecraft.nbt.NBTTagCompound;
@@ -81,7 +82,7 @@ public class TransferLib {
                 extendsHeight = c.y >= origColumHeight;
             }
 
-            extendedblockstorage.set(blockXChunk, blockYChunk, blockZChunk, origBlock.getStateFromMeta(origMd));
+            extendedblockstorage.set(blockXChunk, blockYChunk, blockZChunk, id.getStateFromMeta(md));
             if (extendedblockstorage.getBlockByExtId(blockXChunk, c.y & 15, blockZChunk) != id) return;
             if (use_method == SET_SNEAKY_NO_LIGHTING_UPDATES) return;
             chunk.setChunkModified();
@@ -129,6 +130,7 @@ public class TransferLib {
     }
     
     public static TileEntity move(Coord src, Coord dest, boolean wipeSrc, boolean overwriteDestination) {
+        default_set_method = NORELEASE.just(SET_DIRECT);
         return move(src, dest, wipeSrc, overwriteDestination, default_set_method);
     }
 
@@ -173,7 +175,7 @@ public class TransferLib {
         if (dest.getTE() != null) {
             rawRemoveTE(dest);
         }
-        setRaw(dest, id, md);
+        setRaw(dest, id, md, setMethod);
         dest.setLightLevelBlock(blockLight);
         dest.setLightLevelSky(skyLight);
         TileEntity ret = null;

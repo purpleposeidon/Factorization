@@ -76,8 +76,8 @@ public class HammerProxy {
                 // Seems our system isn't perfect. :/
                 // Keepalives are generated from a different thread I guess.
                 Hammer.logWarning("Liasonless wrapped packet: " + packet.getClass().getSimpleName() + " " + packet.toString());
-                return true;
             }
+            return true;
         }
         NetHandlerPlayServer handler = liason.playerNetServerHandler;
         if (packet instanceof FMLProxyPacket) {

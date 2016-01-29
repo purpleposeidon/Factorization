@@ -9,6 +9,7 @@ import java.util.Set;
 import java.util.UUID;
 
 import com.mojang.authlib.GameProfile;
+import factorization.util.NORELEASE;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelOutboundHandlerAdapter;
 import io.netty.channel.ChannelPromise;
@@ -109,10 +110,11 @@ public class PacketProxyingPlayer extends EntityPlayerMP implements
         return ret;
     }
 
-    private static final UUID proxyUuid = UUID.fromString("69f64f92-665f-457e-ad33-f6082d0b8a75");
+    public static final UUID proxyUuid = UUID.fromString("69f64f92-665f-457e-ad33-f6082d0b8a75");
+    public static final GameProfile proxyProfile = new GameProfile(proxyUuid, "[FzdsPacket]");
 
     public PacketProxyingPlayer(final DimensionSliceEntity dimensionSlice, World shadowWorld) {
-        super(MinecraftServer.getServer(), (WorldServer) shadowWorld, new GameProfile(proxyUuid, "[FzdsPacket]"), new ItemInWorldManager(shadowWorld));
+        super(MinecraftServer.getServer(), (WorldServer) shadowWorld, proxyProfile, new ItemInWorldManager(shadowWorld));
         invulnerable = true;
         isImmuneToFire = true;
         this.dimensionSlice = new WeakReference<DimensionSliceEntity>(dimensionSlice);
@@ -297,6 +299,11 @@ public class PacketProxyingPlayer extends EntityPlayerMP implements
     }
     
     void addNettyMessageForPlayer(EntityPlayerMP player, Object packet) {
+        /*if (NORELEASE.on) {
+            NORELEASE.println("Not sending packet: ", packet);
+            return;
+        }*/
+        NORELEASE.println("Proxying packet: ", packet);
         // See NetworkManager.dispatchPacket
         if (player instanceof PacketProxyingPlayer) {
             throw new IllegalStateException("Sending a packet to myself!");
