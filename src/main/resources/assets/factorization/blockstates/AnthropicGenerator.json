@@ -9,21 +9,21 @@
         "normal": [{}],
         "inventory": [{
             "textures": {
-               "base": "factorization:beauty/anthrogen/base_on",
-               "lamp": "factorization:beauty/anthrogen/lamp_on"
+               "base": "factorization:blocks/beauty/anthrogen/base_on",
+               "lamp": "factorization:blocks/beauty/anthrogen/lamp_on"
             }
         }],
         "lit": {
             "true": {
                 "textures": {
-                   "base": "factorization:beauty/anthrogen/base_on",
-                   "lamp": "factorization:beauty/anthrogen/lamp_on"
+                   "base": "factorization:blocks/beauty/anthrogen/base_on",
+                   "lamp": "factorization:blocks/beauty/anthrogen/lamp_on"
                 }
             },
             "false": {
                 "textures": {
-                   "base": "factorization:beauty/anthrogen/base_off",
-                   "lamp": "factorization:beauty/anthrogen/lamp_off"
+                   "base": "factorization:blocks/beauty/anthrogen/base_off",
+                   "lamp": "factorization:blocks/beauty/anthrogen/lamp_off"
                 }
             }
         }
