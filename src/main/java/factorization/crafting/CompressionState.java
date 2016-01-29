@@ -4,13 +4,13 @@ import factorization.api.Coord;
 import factorization.notify.Notice;
 import factorization.notify.Style;
 import factorization.shared.Core;
-import factorization.util.CraftUtil;
-import factorization.util.InvUtil;
+import factorization.util.*;
 import factorization.util.InvUtil.FzInv;
-import factorization.util.ItemUtil;
-import factorization.util.SpaceUtil;
 import factorization.weird.barrel.TileEntityDayBarrel;
+import net.minecraft.block.Block;
+import net.minecraft.block.BlockLiquid;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.init.Blocks;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumFacing;
@@ -303,6 +303,17 @@ public class CompressionState {
                     items[SMACKED] = craftRes.get(0);
                 }
             }
+            Block block = cell.getBlock();
+            if (block == Blocks.water || block == Blocks.flowing_water) {
+                if (cell.getProperty(BlockLiquid.LEVEL) == 0) {
+                    items[BREAK] = new ItemStack(Core.registry.waterBlockItem);
+                }
+            }
+            if (block == Blocks.lava || block == Blocks.flowing_lava) {
+                if (cell.getProperty(BlockLiquid.LEVEL) == 0) {
+                    items[BREAK] = new ItemStack(Core.registry.lavaBlockItem);
+                }
+            }
             airBlock = items[PICKED] == null && items[BREAK] == null && items[SMACKED] == null;
         }
         
@@ -475,7 +486,7 @@ public class CompressionState {
                 }
                 any = true;
                 Item it = is.getItem();
-                if (is.getMaxStackSize() == 1 && it.hasContainerItem(is) && it.getMaxDamage() > 1) {
+                if (it != null /* fluids */ && is.getMaxStackSize() == 1 && it.hasContainerItem(is) && it.getMaxDamage() > 1) {
                     int useCount = 0;
                     int origDamage = is.getItemDamage();
                     while (useCount < maxCraft) {
@@ -506,7 +517,7 @@ public class CompressionState {
                 continue iteratePermutations;
             }
             
-            ArrayList<ItemStack> total = new ArrayList(maxCraft+4);
+            ArrayList<ItemStack> total = new ArrayList<ItemStack>(maxCraft+4);
             int items_used = 0;
             for (int craftCount = 0; craftCount < maxCraft; craftCount++) {
                 if (craftCount == 0) {

@@ -174,6 +174,7 @@ public class Registry {
     public ItemStack legendarium;
     public ItemBrokenArtifact brokenTool;
     public ItemManSandwich manSandwich;
+    public ItemBlock waterBlockItem, lavaBlockItem;
 
     public Material materialMachine = new Material(MapColor.ironColor);
 
@@ -409,7 +410,12 @@ public class Registry {
         OreDictionary.registerOre("oreCopper", copper_ore_item);
         OreDictionary.registerOre("oreFzDarkIron", dark_iron_ore);
         OreDictionary.registerOre("ingotFzDarkIron", dark_iron_ingot);
+        OreDictionary.registerOre("ingotDankIron", dark_iron_ingot);
         OreDictionary.registerOre("blockFzDarkIron", dark_iron_block_item);
+        OreDictionary.registerOre("blockDankIron", dark_iron_block_item);
+
+        OreDictionary.registerOre("blockWater", waterBlockItem);
+        OreDictionary.registerOre("blockLava", lavaBlockItem);
 
 
         logicMatrixProgrammer = new ItemMatrixProgrammer();
@@ -493,6 +499,8 @@ public class Registry {
         item_potency = new ItemPotency();
         brokenTool = new ItemBrokenArtifact();
 
+        waterBlockItem = new ItemBlock(Blocks.water);
+        lavaBlockItem = new ItemBlock(Blocks.lava);
         postMakeItems();
     }
 
@@ -605,6 +613,19 @@ public class Registry {
                 'i', "gemQuartz",
                 'X', logicMatrixProgrammer);
         GameRegistry.addSmelting(logicMatrixIdentifier, new ItemStack(logicMatrix), 0);
+        oreRecipe(new ItemStack(logicMatrix),
+                "CLC",
+                "WRW",
+                "CLC",
+                'C', Blocks.cobblestone,
+                'L', "blockLava",
+                'W', "blockWater",
+                'R', Blocks.redstone_block);
+        oreRecipe(new ItemStack(Blocks.hardened_clay, 3),
+                "WWW",
+                "CCC",
+                'W', "blockWater",
+                'C', ItemUtil.makeWildcard(Blocks.stained_hardened_clay));
         oreRecipe(new ItemStack(logicMatrixController),
                 "MiX",
                 'M', logicMatrix,
@@ -913,10 +934,8 @@ public class Registry {
 
         //Compression Crafter
         oreRecipe(compression_crafter_item,
-                "D",
                 "C",
                 "P",
-                'D', dark_iron_ingot,
                 'C', Blocks.crafting_table,
                 'P', Blocks.piston);
 
