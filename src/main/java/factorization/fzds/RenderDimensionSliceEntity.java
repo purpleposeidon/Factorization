@@ -6,6 +6,7 @@ import factorization.api.Quaternion;
 import factorization.fzds.interfaces.DeltaCapability;
 import factorization.fzds.interfaces.IFzdsShenanigans;
 import factorization.shared.Core;
+import factorization.util.NORELEASE;
 import factorization.util.NumUtil;
 import factorization.util.RenderUtil;
 import factorization.util.SpaceUtil;
@@ -14,6 +15,7 @@ import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.*;
+import net.minecraft.client.renderer.chunk.ListedRenderChunk;
 import net.minecraft.client.renderer.chunk.RenderChunk;
 import net.minecraft.client.renderer.entity.Render;
 import net.minecraft.client.renderer.entity.RenderManager;
@@ -37,9 +39,7 @@ import net.minecraftforge.fml.common.gameevent.TickEvent.RenderTickEvent;
 import org.lwjgl.opengl.GL11;
 
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
-import java.util.Set;
 
 import static org.lwjgl.opengl.GL11.glPopMatrix;
 import static org.lwjgl.opengl.GL11.glPushMatrix;
@@ -49,7 +49,6 @@ public class RenderDimensionSliceEntity extends Render<DimensionSliceEntity> imp
     public static int update_frequency = 16;
     public static RenderDimensionSliceEntity instance;
     
-    private Set<DSRenderInfo> renderInfoTracker = new HashSet<DSRenderInfo>();
     private static long megatickCount = 0;
 
     protected RenderDimensionSliceEntity(RenderManager renderManager) {
@@ -121,8 +120,10 @@ public class RenderDimensionSliceEntity extends Render<DimensionSliceEntity> imp
                         //We could allocate lists per WR instead?
                         //NORELEASE: w.loadedTileEntityList might be wrong? Might be inefficient?
                         //It creates a list... maybe we should use that instead?
-                        renderers[i] = new RenderChunk(corner.w, rg, new BlockPos(x, y, z), i /* index; not actually used. */);
-                        rg.renderDispatcher.updateChunkLater(renderers[i]);
+                        NORELEASE.fixme("Pick the right one");
+                        RenderChunk rc = new ListedRenderChunk(corner.w, rg, new BlockPos(x, y, z), i /* index; not actually used. */);
+                        renderers[i] = rc;
+                        chunkNeedsRedraw(rg, renderers[i]);
                         RenderUtil.checkGLError("FZDS WorldRenderer init");
                         i++;
                     }
@@ -140,30 +141,9 @@ public class RenderDimensionSliceEntity extends Render<DimensionSliceEntity> imp
             shadowEye.posX = eyepos.xCoord;
             shadowEye.posY = eyepos.yCoord;
             shadowEye.posZ = eyepos.zCoord;
+            renderContainer.initialize(shadowEye.posX, shadowEye.posY, shadowEye.posZ);
         }
-        
-        void update() {
-            if (far.getChunk().isEmpty()) {
-                return;
-            }
-            if (!anyRenderersDirty) {
-                last_update_index = 0;
-                return;
-            }
-            boolean start_from_begining = last_update_index == 0;
-            Core.profileStart("updateFzdsTerrain");
-            RenderUtil.checkGLError("FZDS before WorldRender update");
-            int updates = 0;
-            // NORELEASE: How do we update player position, for transparent face sorting?
-            if (last_update_index == renderers.length) {
-                last_update_index = 0;
-            }
-            if (start_from_begining) {
-                anyRenderersDirty = false;
-            }
-            Core.profileEnd();
-        }
-        
+
         void renderTerrain(int pass, double partial) {
             //GL11.glPushAttrib(GL11.GL_COLOR_BUFFER_BIT | GL11.GL_LIGHTING_BIT);
             RenderHelper.disableStandardItemLighting();
@@ -349,33 +329,16 @@ public class RenderDimensionSliceEntity extends Render<DimensionSliceEntity> imp
             GL11.glDisable(GL11.GL_BLEND);*/ // See comment above re. these attributes
             GL11.glPopAttrib();
         }
-        
-        int getRenderList() {
-            if (renderList == -1) {
-                renderList = GLAllocation.generateDisplayLists(wr_display_list_size*cubicChunkCount);
-                renderInfoTracker.add(this);
-                if (renderList == -1) {
-                    Core.logWarning("GL display list allocation failed!");
-                }
-            }
-            return renderList;
-        }
-        
-        void discardRenderList() {
-            if (renderList != -1) {
-                GLAllocation.deleteDisplayLists(renderList);
-                renderList = -1;
-            }
-            dse.renderInfo = null;
-        }
     }
     
     static void markBlocksForUpdate(DimensionSliceEntity dse, int lx, int ly, int lz, int hx, int hy, int hz) {
         if (dse.renderInfo == null) {
             dse.renderInfo = instance.new DSRenderInfo(dse);
+            return;
         }
         DSRenderInfo renderInfo = (DSRenderInfo) dse.renderInfo;
         renderInfo.anyRenderersDirty = true;
+        RenderGlobal rg = Minecraft.getMinecraft().renderGlobal;
         for (int i = 0; i < renderInfo.renderers.length; i++) {
             RenderChunk wr = renderInfo.renderers[i];
             int wr_posX = wr.getPosition().getX();
@@ -384,9 +347,16 @@ public class RenderDimensionSliceEntity extends Render<DimensionSliceEntity> imp
             if (NumUtil.intersect(lx, hx, wr_posX, wr_posX + 16) &&
                     NumUtil.intersect(ly, hy, wr_posY, wr_posY + 16) &&
                     NumUtil.intersect(lz, hz, wr_posZ, wr_posZ + 16)) {
-                wr.setNeedsUpdate(true);
+                chunkNeedsRedraw(rg, wr);
             }
         }
+    }
+
+    static void chunkNeedsRedraw(RenderGlobal rg, RenderChunk wr) {
+        wr.setNeedsUpdate(true);
+        //rg.renderDispatcher.updateChunkLater(wr);
+        rg.renderDispatcher.updateChunkNow(wr);
+        NORELEASE.fixme("This is bad. Multiple block updates could potentially cause thrashing.");
     }
     
     DSRenderInfo getRenderInfo(DimensionSliceEntity dse) {
@@ -422,23 +392,6 @@ public class RenderDimensionSliceEntity extends Render<DimensionSliceEntity> imp
         nest++;
         try {
             final boolean oracle = dse.can(DeltaCapability.ORACLE);
-            if (nest == 1) {
-                Core.profileStart("update");
-                try {
-                    if (oracle) {
-                        renderInfo.update();
-                    } else {
-                        Hammer.proxy.setShadowWorld();
-                        try {
-                            renderInfo.update();
-                        } finally {
-                            Hammer.proxy.restoreRealWorld();
-                        }
-                    }
-                } finally {
-                    Core.profileEnd();
-                }
-            }
             glPushMatrix();
             try {
                 GL11.glTranslated(x, y, z);
@@ -459,6 +412,9 @@ public class RenderDimensionSliceEntity extends Render<DimensionSliceEntity> imp
                 if (dse.opacity != 1) {
                     GL11.glColor4f(1, 1, 1, dse.opacity);
                 }
+                if (nest == 1) {
+                    renderInfo.updateRelativeEyePosition();
+                }
                 Core.profileStart("renderTerrain");
                 renderInfo.renderTerrain(0, partialTicks);
                 Core.profileEnd();
@@ -467,7 +423,6 @@ public class RenderDimensionSliceEntity extends Render<DimensionSliceEntity> imp
                 Coord c = dse.getCorner();
                 GL11.glTranslated(-c.x, -c.y, -c.z);
                 if (nest == 1) {
-                    renderInfo.updateRelativeEyePosition();
                     // renderBreakingBlocks needs to happen before renderEntities due to gl state nonsense.
                     if (oracle) {
                         renderInfo.renderBreakingBlocks(real_player, partialTicks);
@@ -506,19 +461,6 @@ public class RenderDimensionSliceEntity extends Render<DimensionSliceEntity> imp
         }
     }
     
-    void discardOldRenderLists() {
-        //discard unused renderlists
-        //The display list will be deallocated if it hasn't been used recently.
-        Iterator<DSRenderInfo> it = renderInfoTracker.iterator();
-        while (it.hasNext()) {
-            DSRenderInfo renderInfo = it.next();
-            if (renderInfo.lastRenderInMegaticks < megatickCount - 1) {
-                renderInfo.discardRenderList();
-                it.remove();
-            }
-        }
-    }
-    
     @SubscribeEvent
     public void worldChanged(WorldEvent.Unload unloadEvent) {
         //This only happens when a local server is unloaded.
@@ -535,8 +477,6 @@ public class RenderDimensionSliceEntity extends Render<DimensionSliceEntity> imp
         tickDelay = 0;
         if (event.phase == Phase.START) {
             tickStart();
-        } else if (event.phase == Phase.END) {
-            tickEnd();
         }
     }
     
@@ -546,9 +486,5 @@ public class RenderDimensionSliceEntity extends Render<DimensionSliceEntity> imp
             nest = 0;
             Core.logSevere("FZDS render nesting depth was not 0");
         }
-    }
-
-    public void tickEnd() {
-        discardOldRenderLists();
     }
 }
