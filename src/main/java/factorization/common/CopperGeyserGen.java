@@ -33,75 +33,71 @@ public class CopperGeyserGen implements IWorldGenerator {
         NORELEASE.fixme("Config options for below items");
     }
 
-    private Random volcanoRng = new Random(0);
-    private boolean sampleVolcanism(int x, int z, int depth, long seed) {
-        x >>= depth;
-        z >>= depth;
-        volcanoRng.setSeed((depth << 16L) + z + seed);
-        return volcanoRng.nextFloat() > volcanismScale;
+    private static int getWidth() {
+        return FzConfig.volcanism_region_size_in_chunks;
     }
 
-    public float getVolcanism(int chunkX, int chunkZ, long seed) {
-        chunkX /= minSpacing;
-        chunkZ /= minSpacing;
-        for (int depth = 0; depth < volcanismNoiseDepth; depth++) {
-            if (sampleVolcanism(chunkX, chunkZ, depth, seed)) return (float) chancePerVolcanism[depth];
+    private static Random getRegionRandom(World world, long x, long z) {
+        long seed = (x / getWidth() | ((z / getWidth()) * getWidth())) + world.getSeed() + 99;
+        return new Random(seed);
+    }
+
+    public static boolean isChunkVolcanic(World world, int x, int z, Random chunkRandom, float biomeModifier) {
+        Random regionRand = getRegionRandom(world, x, z);
+        float biomeRand = regionRand.nextFloat();
+        int xRand = regionRand.nextInt(getWidth());
+        int zRand = regionRand.nextInt(getWidth());
+        // biomeModifier may change throughout the region since chunks may have different biomes,
+        // so the RNG calls are always made to increase consistency. Maybe it's not necessary. But it's easy.
+        //
+
+        if (biomeRand > FzConfig.region_volcanism_chance * biomeModifier) return false;
+        int localX = x % getWidth();
+        int localZ = z % getWidth();
+        if (xRand == localX && zRand == localZ) return true;
+        return chunkRandom.nextInt(getWidth() * getWidth()) < FzConfig.average_extra_geysers;
+    }
+
+    public static final float biome_suitability_modifier = 0.1F;
+    public static float getModifierForBiome(BiomeGenBase biome) {
+        int points = 0;
+        for (BiomeDictionary.Type type : BiomeDictionary.getTypesForBiome(biome)) {
+            // It's not safe to do a switch on BiomeDictionary.Type; I've gotten a crash caused by weirdos modifying the enum.
+            if (type == BiomeDictionary.Type.OCEAN
+                    || type == BiomeDictionary.Type.RIVER
+                    || type == BiomeDictionary.Type.WATER
+                    || type == BiomeDictionary.Type.NETHER
+                    || type == BiomeDictionary.Type.END) {
+                return 0;
+            }
+            if (type == BiomeDictionary.Type.HOT) points++;
+            if (type == BiomeDictionary.Type.JUNGLE) points -= 2;
+            if (type == BiomeDictionary.Type.MAGICAL) points--;
+            if (type == BiomeDictionary.Type.WASTELAND) points++;
+            if (type == BiomeDictionary.Type.MOUNTAIN) points++;
+            if (type == BiomeDictionary.Type.HILLS) points++;
+            if (type == BiomeDictionary.Type.DEAD) points++;
+            if (type == BiomeDictionary.Type.MESA) points += 3;
+            if (type == BiomeDictionary.Type.SANDY) points++;
+            if (type == BiomeDictionary.Type.SNOWY) points++;
+            if (type == BiomeDictionary.Type.MUSHROOM) points--;
+            if (type == BiomeDictionary.Type.CONIFEROUS) points++;
         }
-        return (float) chancePerVolcanism[chancePerVolcanism.length - 1];
+        return 1 + biome_suitability_modifier * points;
     }
 
-    /**
-     * This is a list of probabilities between 0 and 1. Areas with low volcanism choose from the begining of the
-     * list, and areas with high volcanism choose from the end.
-     * The length of this list defines volcanismDepth. The chance of getting the highest volcanism is
-     * volcanismScale**volcanismDepth.
-     */
-    double chancePerVolcanism[] = new double[] {
-            0.00,
-            0.00,
-            0.00,
-            0.03,
-            0.10,
-            0.60,
-    };
-    float volcanismScale = 0.5F;
-    /**
-     * This defines the minimum distance between geysers in chunks. This is the size of the grid that geysers can occur
-     * on. Reasonable values are in 1 to 4. Due to the grid-nature of this, large values make it possible for a player
-     * to walk in a straight line forever without finding a geyser.
-     */
-    int minSpacing = 3;
-    final int volcanismNoiseDepth = chancePerVolcanism.length;
-    private static final boolean notify = NORELEASE.just(true);
+    private static final boolean notify = true; // We do want notify, right?
     int extrudersPerChamber = 6;
 
     @Override
     public void generate(Random random, int chunkX, int chunkZ, World world, IChunkProvider chunkGenerator, IChunkProvider chunkProvider) {
-        if (chunkX % minSpacing != 0 || chunkZ % minSpacing != 0) {
-            return;
-        }
-        float volcanism = getVolcanism(chunkX, chunkZ, world.getSeed());
-        NORELEASE.println("Volcanism: " + volcanism + "\t at " + chunkX + ", " + chunkZ);
-        if (random.nextDouble() > volcanism) return;
         int x = 8 + chunkX * 16;
         int z = 8 + chunkZ * 16;
-        Coord start = new Coord(world, x, 0, z);
-        boolean validBiome = validBiome(start.getBiome());
-        NORELEASE.println("Might generate copper geyser " + validBiome + " at " + start);
-        if (!validBiome) return;
+        Coord start = new Coord(world, x, world.getSeaLevel(), z);
+        BiomeGenBase biome = start.getBiome();
+        float rarityModifier = getModifierForBiome(biome);
+        if (!isChunkVolcanic(world, chunkX, chunkZ, random, rarityModifier)) return;
         generateAt(random, start);
-    }
-
-    boolean validBiome(BiomeGenBase biome) {
-        for (BiomeDictionary.Type type : BiomeDictionary.getTypesForBiome(biome)) {
-            if (type == BiomeDictionary.Type.OCEAN
-                    || type == BiomeDictionary.Type.NETHER
-                    || type == BiomeDictionary.Type.END
-                    || type == BiomeDictionary.Type.RIVER) {
-                return false;
-            }
-        }
-        return true;
     }
 
     public void generateAt(Random random, Coord at) {

@@ -62,6 +62,9 @@ public class FzConfig {
     public static Graylist<Block> lacerator_block_graylist;
     public static int legendarium_queue_size = 7;
     public static int legendarium_delay_hours = 24 * 5;
+    public static double region_volcanism_chance = 0.75;
+    public static int average_extra_geysers = 2;
+    public static int volcanism_region_size_in_chunks = 8;
     public static String f = "f";
 
     public static boolean enable_retrogen = false;
@@ -184,6 +187,10 @@ public class FzConfig {
         add_branding = getBoolConfig("addBranding", "general", add_branding, null);
 
         gen_copper_geysers = getBoolConfig("generateCopperGeysers", "general", gen_copper_geysers, "Set to false to disable copper/geyser generation");
+        region_volcanism_chance = getDoubleConfig("copperGeyserVolcanismChance", "general", region_volcanism_chance, "This is the probability that a particular region will be volcanic. If a region is volcanic, then it will have at least 1 geyser. This value is influenced by biome.");
+        volcanism_region_size_in_chunks = getIntConfig("copperGeyserVolcanismRegionSize", "general", volcanism_region_size_in_chunks, "The grid size for volcanism.");
+        average_extra_geysers = getIntConfig("copperGeyserAverageExtra", "general", average_extra_geysers, "A volcanic region always has at least 1 geyser. The chance for a chunk to have an extra geyser is: averageExtra / (regionSize * regionSize)");
+
         gen_dark_iron_ore = getBoolConfig("generateDarkIronOre", "general", gen_dark_iron_ore, "Set to false to disable dark iron ore generation");
         gen_colossi = getBoolConfig("generateColossi", "general", gen_colossi, "If true, Colossi will generate in the world. If false, the player will be given an LMP instead of a lost map. Note that attempting to apply retrogen to colossi is unadvised.");
         colossus_spacing = getIntConfig("colossusSpacing", "general", colossus_spacing, "Distance between colossi in chunks");
