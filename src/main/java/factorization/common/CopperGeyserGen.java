@@ -30,7 +30,8 @@ public class CopperGeyserGen implements IWorldGenerator {
         lava = Blocks.lava.getDefaultState();
         geyser = Core.registry.geyser.getDefaultState();
         extruder = Core.registry.extruder.getDefaultState();
-        NORELEASE.fixme("Config options for below items");
+        NORELEASE.fixme("Config options");
+        //tube = NORELEASE.just(Blocks.glass.getDefaultState());
     }
 
     private static int getWidth() {
@@ -116,15 +117,17 @@ public class CopperGeyserGen implements IWorldGenerator {
         if (avail_space < 6) return;
         avail_space /= 3;
 
-        final int height = avail_space + random.nextInt(avail_space);
-        int minR = 4, maxR = 7;
-        int varR = maxR;
-        NoiseSampler pipeNoise = new NoiseSampler(at, maxR, height, random, 8);
-        boolean first = true;
+        final int height = NORELEASE.justChoose(30, avail_space + random.nextInt(avail_space));
+        final int minR = 2, maxR = 5;
+        final int rRange = maxR - minR;
+        final int rBoost = 2;
+        final int startR = random.nextInt(rRange - rBoost) + minR + rBoost;
+        int varR = startR;
+        NoiseSampler pipeNoise = new NoiseSampler(at, maxR, height, random, 1.0 / 8.0);
+        boolean firstLayer = true;
         Coord pos = at.copy();
-        int depth = height;
         int fuzz = 3;
-        boolean top_is_water = random.nextInt(3) == 0;
+        boolean top_is_water = random.nextInt(9) == 0;
         if (top_is_water) {
             // see World.canBlockFreezeBody
             float temp = at.getBiome().getFloatTemperature(at.toBlockPos());
@@ -135,20 +138,21 @@ public class CopperGeyserGen implements IWorldGenerator {
         IBlockState top_layer = (top_is_water ? Blocks.water : Blocks.air).getDefaultState();
         Coord groundClean = at.copy();
         Coord geyser_spot = null;
+        int depth = height;
         while (depth-- > 0) {
-            final double maxRSq = varR * varR;
-            final double minRSq = (varR - fuzz) * (varR - fuzz);
+            final double maxVarR = varR;
+            final double minVarR = varR - fuzz;
+            final double shrinkComplete = NumUtil.uninterp(minR, startR, varR);
+            final double diveComplete = depth / (double) height;
             for (int dx = -varR; dx <= +varR; dx++) {
                 for (int dz = -varR; dz <= +varR; dz++) {
                     pos.setOff(at, dx, 0, dz);
-                    double dist = dx * dx + dz * dz;
-                    double interp = NumUtil.uninterp(minRSq, maxRSq, dist);
-                    if (interp > 1) continue;
-                    if (interp > 0) {
-                        double sample = Math.abs(pipeNoise.sample(pos));
-                        if (sample - interp < 0) continue;
-                    }
-                    if (first) {
+                    double sample = Math.abs(pipeNoise.sample(pos));
+                    double dist = Math.sqrt(dx * dx + dz * dz);
+                    double interp = NumUtil.uninterp(minVarR, maxVarR, dist);
+                    double combined = interp + sample;
+                    if (combined > 1 && interp > 0.15) continue;
+                    if (firstLayer) {
                         pos.set(top_layer, notify);
                         int clearUp = pos.getColumnHeight() - pos.y;
                         if (clearUp < 0) clearUp = 0;
@@ -169,10 +173,10 @@ public class CopperGeyserGen implements IWorldGenerator {
                     }
                 }
             }
-            if (first) {
+            if (firstLayer) {
                 geyser_spot = at.add(0, -1, 0);
-                first = false;
-            } else if (varR > minR && random.nextDouble() > depth / (double) height) {
+                firstLayer = false;
+            } else if (varR > minR && shrinkComplete > diveComplete && random.nextBoolean()) {
                 varR--;
             }
             at.y--;
@@ -182,7 +186,7 @@ public class CopperGeyserGen implements IWorldGenerator {
         }
 
         int R = chamberSize;
-        at.y += R;
+        at.y += R / 2;
         final NoiseSampler chamberNoise = new NoiseSampler(at.add(-R, -R, -R), at.add(+R, +R, +R), random, 1.0 / 256);
         int chamberSure = chamberSize - 1;
         final double yesSq = chamberSure * chamberSure;
@@ -223,11 +227,15 @@ public class CopperGeyserGen implements IWorldGenerator {
 
         double sample(Coord at) {
             if (!at.inside(min, max)) {
+                // Could clamp?
                 return 0;
             }
             DeltaCoord dc = at.difference(min);
-            int idx = dc.x * (size.y * size.z) + dc.y * size.z + dc.z;
+            // What's the data order? Look at the loops in NoiseGeneratorImproved.populateNoiseArray
+            // The loop order is: XZY.
+            int idx = dc.x * (size.y * size.z) + dc.z * size.y + dc.y;
             if (idx < 0 || idx >= noise.length) {
+                // Shouldn't happen.
                 return 0;
             }
             return noise[idx];
@@ -240,10 +248,13 @@ public class CopperGeyserGen implements IWorldGenerator {
         NoiseSampler(Coord min, Coord max, Random rng, double s) {
             this.min = min;
             this.max = max;
+            max = max.add(1, 1, 1);
             size = max.difference(min);
             maxIdx = size.x * size.y * size.z;
             noise = new double[maxIdx];
             new NoiseGeneratorImproved(rng).populateNoiseArray(noise, min.x, min.y, min.z, size.x, size.y, size.z, s, s, s, 1);
+            sample(this.min);
+            sample(this.max);
         }
 
     }
