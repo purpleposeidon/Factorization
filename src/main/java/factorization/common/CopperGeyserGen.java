@@ -4,7 +4,6 @@ import factorization.api.Coord;
 import factorization.api.DeltaCoord;
 import factorization.api.ICoordFunction;
 import factorization.shared.Core;
-import factorization.util.NORELEASE;
 import factorization.util.NumUtil;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
@@ -30,8 +29,6 @@ public class CopperGeyserGen implements IWorldGenerator {
         lava = Blocks.lava.getDefaultState();
         geyser = Core.registry.geyser.getDefaultState();
         extruder = Core.registry.extruder.getDefaultState();
-        NORELEASE.fixme("Config options");
-        //tube = NORELEASE.just(Blocks.glass.getDefaultState());
     }
 
     private static int getWidth() {
@@ -117,7 +114,7 @@ public class CopperGeyserGen implements IWorldGenerator {
         if (avail_space < 6) return;
         avail_space /= 3;
 
-        final int height = NORELEASE.justChoose(30, avail_space + random.nextInt(avail_space));
+        final int height = avail_space + random.nextInt(avail_space);
         final int minR = 2, maxR = 5;
         final int rRange = maxR - minR;
         final int rBoost = 2;
