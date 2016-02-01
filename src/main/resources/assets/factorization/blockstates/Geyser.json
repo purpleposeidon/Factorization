@@ -15,6 +15,12 @@
     },
     "variants": {
         "normal": [{}],
-        "inventory": [{}]
+        "inventory": [{}],
+        "pressurized": {
+            "false": {},
+            "true": {
+                "__comment": "TODO: Make it a little red?"
+            }
+        }
     }
 }
