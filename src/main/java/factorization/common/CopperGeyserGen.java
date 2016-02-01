@@ -187,10 +187,10 @@ public class CopperGeyserGen implements IWorldGenerator {
 
         int R = chamberSize;
         at.y += R / 2;
-        final NoiseSampler chamberNoise = new NoiseSampler(at.add(-R, -R, -R), at.add(+R, +R, +R), random, 1.0 / 256);
+        final NoiseSampler chamberNoise = new NoiseSampler(at.add(-R, -R, -R), at.add(+R, +R, +R), random, 1.0 / 8);
         int chamberSure = chamberSize - 1;
         final double yesSq = chamberSure * chamberSure;
-        final double noSq = chamberSize * chamberSize;
+        final double noSq = (chamberSize * chamberSize) - 1 /* squish slightly to avoid ugly 1-block nubs at axis of the chamber */;
         ChamberBuilder builder = new ChamberBuilder(at, noSq, yesSq, chamberNoise);
         Coord.iterateCube(chamberNoise.min, chamberNoise.max, builder);
         placeExtruders(random, builder.topLavas);
@@ -264,12 +264,15 @@ public class CopperGeyserGen implements IWorldGenerator {
         private final double noSq;
         private final double yesSq;
         private final NoiseSampler chamberNoise;
+        private final double no, yes;
         ArrayList<Coord> topLavas = new ArrayList<Coord>();
 
         public ChamberBuilder(Coord middle, double noSq, double yesSq, NoiseSampler chamberNoise) {
             this.middle = middle;
             this.noSq = noSq;
             this.yesSq = yesSq;
+            this.no = Math.sqrt(noSq);
+            this.yes = Math.sqrt(yesSq);
             this.chamberNoise = chamberNoise;
         }
 
@@ -278,7 +281,7 @@ public class CopperGeyserGen implements IWorldGenerator {
             double distSq = middle.distanceSq(here);
             if (distSq > noSq) return;
             if (distSq > yesSq) {
-                double dist = NumUtil.uninterp(yesSq, noSq, distSq);
+                double dist = NumUtil.uninterp(yes, no, Math.sqrt(distSq));
                 if (Math.abs(chamberNoise.sample(here)) > dist) return;
             }
             Block block = here.getBlock();
