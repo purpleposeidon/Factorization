@@ -34,22 +34,22 @@ public class BlockOreExtruder extends Block {
     public int delay_min = 24, delay_rng_add = 8;
     public Object[] extrudeInfo = new Object[] {
             // BlockState                       yield  delay
-            copper(),                           8,     0,
-            clay(null),                         6,     0,
-            copper(),                           8,     1,
-            clay(EnumDyeColor.WHITE),           4,     8,
-            copper(),                           16,    4,
-            clay(null),                         32,    6,
-            copper(),                           32,    8,
-            clay(EnumDyeColor.LIME),            18,    20,
-            copper(),                           48,    20 * 4,
-            clay(EnumDyeColor.BROWN),           18,    20 * 5,
-            copper(),                           64,    20 * 8,
+            copper(),                           8,     0, // Oooh, copper! And *more* copper?
+            clay(null),                         6,     0, // Now it gives clay?
+            copper(),                           8,     1, // Copper again!
+            clay(EnumDyeColor.WHITE),           4,     8, // Gasp! *White clay*!?
+            copper(),                           16,    4, // Ah, more of what I really want.
+            clay(null),                         24,    16, //This stupid clay is slow.
+            copper(),                           32,    12, // Hey, is the copper slowing as well?
+            clay(EnumDyeColor.LIME),            18,    20 * 2, // Jeeze this clay is slow
+            copper(),                           48,    20 * 4, // This is boring.
+            clay(EnumDyeColor.BROWN),           18,    20 * 5, // I'll mine a different extruder
+            copper(),                           64,    20 * 8, // Or perhaps automate it.
             clay(null),                         128,   20 * 10,
             copper(),                           64,    20 * 30,
-            clay(EnumDyeColor.ORANGE),          18,    20 * 60,
-            copper(),                           32,    20 * 120,
-            clay(EnumDyeColor.RED),             16,    0
+            clay(EnumDyeColor.ORANGE),          32,    20 * 60,
+            copper(),                           64,    20 * 120,
+            clay(EnumDyeColor.RED),             16,    0 // You'll probably never notice this. You might notice red is the last one tho.
     };
     {
         for (int i = 0; i < 16; i++) {
@@ -76,7 +76,7 @@ public class BlockOreExtruder extends Block {
 
     public BlockOreExtruder() {
         super(Material.rock, MapColor.stoneColor);
-        setHardness(30);
+        setHardness(40);
     }
 
     @Override
