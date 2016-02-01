@@ -2,33 +2,27 @@ package factorization.citizen;
 
 import factorization.api.Quaternion;
 import factorization.fzds.interfaces.Interpolation;
-import factorization.shared.FzModel;
 import factorization.net.NetworkFactorization;
+import factorization.shared.FzModel;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.entity.RenderEntity;
+import net.minecraft.client.renderer.entity.Render;
 import net.minecraft.client.renderer.entity.RenderManager;
 import net.minecraft.client.settings.GameSettings;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.item.EntityItem;
-import net.minecraft.entity.monster.EntityEnderman;
 import net.minecraft.util.ResourceLocation;
 import org.lwjgl.opengl.GL11;
 
-public class RenderCitizen extends RenderEntity {
-    private EntityLiving dummy_entity = new EntityEnderman(null);
-
+public class RenderCitizen extends Render<EntityCitizen> {
     public RenderCitizen(RenderManager renderManagerIn) {
         super(renderManagerIn);
     }
 
     @Override
-    public void doRender(Entity ent, double x, double y, double z, float yaw, float partial) {
-        EntityCitizen citizen = (EntityCitizen) ent;
+    public void doRender(EntityCitizen citizen, double x, double y, double z, float yaw, float partial) {
         if (!citizen.visible) return;
 
 
-        Minecraft.getMinecraft().getTextureManager().bindTexture(getEntityTexture(ent));
+        Minecraft.getMinecraft().getTextureManager().bindTexture(getEntityTexture(citizen));
         GL11.glPushMatrix();
         GL11.glTranslated(x, y, z);
 
@@ -54,7 +48,7 @@ public class RenderCitizen extends RenderEntity {
             GL11.glScalef(s, s, s);
             GL11.glRotatef(90, 1, 0, 0);
             GL11.glRotatef(90, 0, 1, 0);
-            float now = ent.worldObj.getTotalWorldTime() + partial;
+            float now = citizen.worldObj.getTotalWorldTime() + partial;
             float angle = 40 + (float) Interpolation.SMOOTH.scale(Math.abs(Math.sin(now / 20))) * 5;
             GL11.glRotatef(angle, 0, 1, 0);
             GL11.glTranslatef(-1.25F, -3.25F / 16F, 0);
@@ -74,7 +68,7 @@ public class RenderCitizen extends RenderEntity {
     static FzModel model = new FzModel("citizen");
 
     @Override
-    protected ResourceLocation getEntityTexture(Entity ent) {
+    protected ResourceLocation getEntityTexture(EntityCitizen ent) {
         return skin;
     }
 }

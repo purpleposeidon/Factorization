@@ -14,9 +14,8 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.renderer.RenderGlobal;
 import net.minecraft.client.renderer.block.model.ItemCameraTransforms;
-import net.minecraft.client.renderer.entity.RenderEntity;
+import net.minecraft.client.renderer.entity.Render;
 import net.minecraft.client.renderer.entity.RenderManager;
-import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.monster.EntityEnderman;
 import net.minecraft.entity.player.EntityPlayer;
@@ -27,7 +26,7 @@ import org.lwjgl.opengl.GL12;
 
 import java.util.Iterator;
 
-public class RenderServoMotor extends RenderEntity {
+public class RenderServoMotor extends Render<ServoMotor> {
     static FzModel sprocket = new FzModel("servo/sprocket");
     static FzModel[] colorMarkings = new FzModel[FzColor.values().length];
     static {
@@ -56,15 +55,14 @@ public class RenderServoMotor extends RenderEntity {
     private static boolean debug_servo_orientation = false;
 
     @Override
-    public void doRender(Entity ent, double x, double y, double z, float yaw, float partial) {
+    public void doRender(ServoMotor motor, double x, double y, double z, float yaw, float partial) {
         Core.profileStartRender("servo");
         //Ugh, there's some state that changes when mousing over an item in the inventory...
         MovingObjectPosition mop = Minecraft.getMinecraft().objectMouseOver;
-        if (HammerEnabled.ENABLED && DeltaChunk.getClientShadowWorld() == ent.worldObj) {
+        if (HammerEnabled.ENABLED && DeltaChunk.getClientShadowWorld() == motor.worldObj) {
             mop = Hammer.proxy.getShadowHit();
         }
-        boolean highlighted = mop != null && mop.entityHit == ent;
-        ServoMotor motor = (ServoMotor) ent;
+        boolean highlighted = mop != null && mop.entityHit == motor;
 
         GL11.glPushMatrix();
         GL11.glEnable(GL12.GL_RESCALE_NORMAL);
@@ -205,7 +203,7 @@ public class RenderServoMotor extends RenderEntity {
     
     
     @Override
-    protected ResourceLocation getEntityTexture(Entity ent) {
+    protected ResourceLocation getEntityTexture(ServoMotor ent) {
         return Core.blockAtlas;
     }
     

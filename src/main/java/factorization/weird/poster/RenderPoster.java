@@ -1,28 +1,28 @@
 package factorization.weird.poster;
 
-import org.lwjgl.opengl.GL11;
-import org.lwjgl.opengl.GL12;
-
+import factorization.shared.Core;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.RenderGlobal;
 import net.minecraft.client.renderer.block.model.ItemCameraTransforms;
-import net.minecraft.client.renderer.entity.RenderEntity;
+import net.minecraft.client.renderer.entity.Render;
 import net.minecraft.client.renderer.entity.RenderManager;
-import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.monster.EntityEnderman;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.MovingObjectPosition;
+import net.minecraft.util.ResourceLocation;
+import org.lwjgl.opengl.GL11;
+import org.lwjgl.opengl.GL12;
 
-public class RenderPoster extends RenderEntity {
+public class RenderPoster extends Render<EntityPoster> {
 
     public RenderPoster(RenderManager renderManagerIn) {
         super(renderManagerIn);
     }
 
     @Override
-    public void doRender(Entity ent, double x, double y, double z, float yaw, float partial) {
+    public void doRender(EntityPoster ent, double x, double y, double z, float yaw, float partial) {
         EntityPoster poster = (EntityPoster) ent;
         final Minecraft mc = Minecraft.getMinecraft();
         final MovingObjectPosition mop = mc.objectMouseOver;
@@ -54,6 +54,11 @@ public class RenderPoster extends RenderEntity {
             GL11.glPopAttrib();
         }
         GL11.glPopMatrix();
+    }
+
+    @Override
+    protected ResourceLocation getEntityTexture(EntityPoster entity) {
+        return Core.itemAtlas;
     }
 
     static EntityLiving dummy_entity = new EntityEnderman(null);

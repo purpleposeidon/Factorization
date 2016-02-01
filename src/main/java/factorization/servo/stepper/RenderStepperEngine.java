@@ -1,19 +1,5 @@
 package factorization.servo.stepper;
 
-import org.lwjgl.opengl.GL11;
-import org.lwjgl.opengl.GL12;
-
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.RenderGlobal;
-import net.minecraft.client.renderer.entity.RenderEntity;
-import net.minecraft.client.renderer.entity.RenderManager;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.AxisAlignedBB;
-import net.minecraft.util.MovingObjectPosition;
-import net.minecraft.util.ResourceLocation;
-
 import factorization.api.FzOrientation;
 import factorization.api.Quaternion;
 import factorization.fzds.DeltaChunk;
@@ -22,8 +8,19 @@ import factorization.fzds.HammerEnabled;
 import factorization.shared.Core;
 import factorization.shared.FzModel;
 import factorization.util.NumUtil;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.RenderGlobal;
+import net.minecraft.client.renderer.entity.Render;
+import net.minecraft.client.renderer.entity.RenderManager;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.item.ItemStack;
+import net.minecraft.util.AxisAlignedBB;
+import net.minecraft.util.MovingObjectPosition;
+import net.minecraft.util.ResourceLocation;
+import org.lwjgl.opengl.GL11;
+import org.lwjgl.opengl.GL12;
 
-public class RenderStepperEngine extends RenderEntity {
+public class RenderStepperEngine extends Render<StepperEngine> {
     static FzModel sprocket = new FzModel("servo/sprocket");
     static FzModel chasis = new FzModel("servo/stepper");
 
@@ -46,15 +43,14 @@ public class RenderStepperEngine extends RenderEntity {
     private static boolean debug_servo_orientation = false;
 
     @Override
-    public void doRender(Entity ent, double x, double y, double z, float yaw, float partial) {
+    public void doRender(StepperEngine motor, double x, double y, double z, float yaw, float partial) {
         Core.profileStartRender("servo");
         //Ugh, there's some state that changes when mousing over an item in the inventory...
         MovingObjectPosition mop = Minecraft.getMinecraft().objectMouseOver;
-        if (HammerEnabled.ENABLED && DeltaChunk.getClientShadowWorld() == ent.worldObj) {
+        if (HammerEnabled.ENABLED && DeltaChunk.getClientShadowWorld() == motor.worldObj) {
             mop = Hammer.proxy.getShadowHit();
         }
-        boolean highlighted = mop != null && mop.entityHit == ent;
-        StepperEngine motor = (StepperEngine) ent;
+        boolean highlighted = mop != null && mop.entityHit == motor;
 
         GL11.glPushMatrix();
         GL11.glEnable(GL12.GL_RESCALE_NORMAL);
@@ -162,7 +158,7 @@ public class RenderStepperEngine extends RenderEntity {
 
 
     @Override
-    protected ResourceLocation getEntityTexture(Entity ent) {
+    protected ResourceLocation getEntityTexture(StepperEngine ent) {
         return Core.blockAtlas;
     }
 
