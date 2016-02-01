@@ -84,11 +84,18 @@ public class WorldgenManager {
         if (retrogenQueue.isEmpty()) return;
         log("Starting %s chunks", retrogenQueue.size());
         int skipped = 0;
+        final int max_inhabited_time = 20 * 60 * 6;
+        // Vanilla's ocean monument retrogen uses 3 minutes.
+        // I'll go with 6 minutes. My world has a wide range of times,
+        // However *tons* of chunks have 0 time.
+        // 3 minutes seems *way* too short; pretty sure getInhabitedTime is not how long a player entity has been in,
+        // but rather how long they've been receiving packet updates...
+        // I suspect very few chunks have an occupancy time of less than 3 minutes.
+        // See usages of chunk.getInhabitedTime().
         for (int i = 0; i < retrogenQueue.size(); i++) {
             Chunk chunk = retrogenQueue.get(i);
             chunk.setModified(true);
-            if (chunk.getInhabitedTime() > 3600 /* 3 minutes, the amount of time used by ocean monuments. See usages of that call. */) {
-                // (It might not be unreasonable to also check the inhabited time of adjacent chunks?)
+            if (chunk.getInhabitedTime() > max_inhabited_time) {
                 skipped++;
                 continue;
             }
