@@ -1,24 +1,5 @@
 package factorization.weird.poster;
 
-import java.io.IOException;
-
-import net.minecraft.client.Minecraft;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.item.EntityItem;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.AxisAlignedBB;
-import net.minecraft.util.BlockPos;
-import net.minecraft.util.EnumFacing;
-import net.minecraft.util.MathHelper;
-import net.minecraft.util.MovingObjectPosition;
-import net.minecraft.util.Vec3;
-import net.minecraft.world.World;
-
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
-
 import factorization.api.Coord;
 import factorization.api.Quaternion;
 import factorization.api.datahelpers.DataHelper;
@@ -29,6 +10,18 @@ import factorization.util.ItemUtil;
 import factorization.util.NumUtil;
 import factorization.util.PlayerUtil;
 import factorization.util.SpaceUtil;
+import net.minecraft.client.Minecraft;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.item.EntityItem;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
+import net.minecraft.util.*;
+import net.minecraft.world.World;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
+
+import java.io.IOException;
 
 public class EntityPoster extends EntityFz  {
     public ItemStack inv = new ItemStack(Core.registry.spawnPoster);
@@ -50,16 +43,19 @@ public class EntityPoster extends EntityFz  {
     void updateSize() {
         Vec3 here = SpaceUtil.fromEntPos(this);
         Vec3[] parts = new Vec3[6];
-        for (EnumFacing dir : EnumFacing.VALUES) {
-            if (dir == norm) continue;
-            float s = (float) scale;
+        EnumFacing[] values = EnumFacing.VALUES;
+        for (int i = 0; i < values.length; i++) {
+            EnumFacing dir = values[i];
             if (dir == norm.getOpposite()) {
+                continue;
+            }
+            float s = (float) scale;
+            if (dir == norm) {
                 s /= 16;
             } else {
                 s /= 2;
             }
-            Vec3 d = SpaceUtil.fromDirection(dir);
-            parts[dir.ordinal()] = rot.applyRotation(SpaceUtil.scale(d, s)).add(here);
+            parts[i] = SpaceUtil.scale(SpaceUtil.fromDirection(dir), s).add(here);
         }
         setEntityBoundingBox(SpaceUtil.newBox(parts));
     }
@@ -172,9 +168,9 @@ public class EntityPoster extends EntityFz  {
         spin_vertical = data.as(Share.PRIVATE, "spinVertical").putShort(spin_vertical);
         spin_tilt = data.as(Share.PRIVATE, "spinTilt").putShort(spin_tilt);
         delta_scale = data.as(Share.PRIVATE, "deltaScale").putByte(delta_scale);
-        norm = data.as(Share.PRIVATE, "norm").putEnum(norm);
-        top = data.as(Share.PRIVATE, "top").putEnum(top);
-        tilt = data.as(Share.PRIVATE, "tilt").putEnum(tilt);
+        norm = data.as(Share.VISIBLE, "norm").putEnum(norm);
+        top = data.as(Share.VISIBLE, "top").putEnum(top);
+        tilt = data.as(Share.VISIBLE, "tilt").putEnum(tilt);
         if (data.isReader()) {
             updateSize();
             if (inv == null) {
@@ -240,15 +236,19 @@ public class EntityPoster extends EntityFz  {
 
     @Override
     public int getBrightnessForRender(float partial) {
-        // Modified version of super; prevents us from rendering odly when there's a block above.
-        int x = MathHelper.floor_double(posX);
-        int z = MathHelper.floor_double(posZ);
-
-        double d = -0.5;
-        if (EnumFacing.UP == top) {
-            d = +0;
+        EnumFacing front = norm;
+        double dx = 0, dy = 0, dz = 0;
+        if (front == EnumFacing.DOWN) {
+            dy -= 1;
+        } else if (front == EnumFacing.NORTH) {
+            dz -= 1;
+        } else if (front == EnumFacing.WEST) {
+            dx = -1;
         }
-        BlockPos blockpos = new BlockPos(x, MathHelper.floor_double(posY + d), z);
+        int x = MathHelper.floor_double(posX + dx);
+        int y = MathHelper.floor_double(posY + dy);
+        int z = MathHelper.floor_double(posZ + dz);
+        BlockPos blockpos = new BlockPos(x, y, z);
         return worldObj.getCombinedLight(blockpos, 0);
     }
 
