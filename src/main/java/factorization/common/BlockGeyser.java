@@ -28,8 +28,8 @@ public class BlockGeyser extends BlockHardenedClay {
     }
 
     int getDelay(World world, BlockPos pos) {
-        int min_time = 20 * 12;
-        int max_time = 20 * 35;
+        int min_time = 20 * 6;
+        int max_time = 20 * 20;
         return getHashVal(world, pos, min_time, max_time);
     }
 
