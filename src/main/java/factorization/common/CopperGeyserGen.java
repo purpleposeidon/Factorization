@@ -113,6 +113,7 @@ public class CopperGeyserGen implements IWorldGenerator {
         int avail_space = at.y - chamberSize;
         if (avail_space < 6) return;
         avail_space /= 3;
+        if (avail_space > 20) avail_space = 20;
 
         final int height = avail_space + random.nextInt(avail_space);
         final int minR = 2, maxR = 5;
