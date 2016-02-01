@@ -1173,7 +1173,13 @@ public class Registry {
                 'B', Items.book,
                 '~', new ItemStack(Items.dye, 1, 0), // The book says "ink sac", so you'll have to use an actual ink sac.
                 '>', logicMatrixProgrammer);
-        for (Item meat : new Item[] { Items.cooked_beef, Items.cooked_porkchop, Items.cooked_chicken, Items.cooked_fish }) {
+        for (Item meat : new Item[] {
+                Items.cooked_beef,
+                Items.cooked_porkchop,
+                Items.cooked_chicken,
+                Items.cooked_fish,
+                Items.cooked_rabbit,
+                Items.cooked_mutton }) {
             oreRecipe(new ItemStack(manSandwich, 1, 0),
                     "BMM",
                     "M#M",
