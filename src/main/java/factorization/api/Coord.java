@@ -153,32 +153,25 @@ public final class Coord implements IDataSerializable, ISaneCoord, Comparable<Co
 
     @Override
     public String toString() {
-        String ret = "(" + x + ", " + y + ", " + z + ")";
+        String worldInfo;
+        String extra = "";
         if (w == null) {
-            ret += " null world";
+            worldInfo = "null";
         } else {
-            ret += " (Dimension " + FzUtil.getWorldDimension(w) + ")";
+            worldInfo = "" + FzUtil.getWorldDimension(w);
             if (!blockExists()) {
-                ret += " not loaded";
+                extra += " unloaded";
             } else {
-                Block b = getBlock();
-                if (b != null) {
-                    ret += " " + getBlock().getClass().getSimpleName();
-                    ret += " " + b.getUnlocalizedName();
-                } else {
-                    ret += " null";
-                }
-                int md = getMd();
-                ret += "#" + md;
+                extra += " " + getState();
                 TileEntity te = getTE();
                 if (te != null) {
-                    ret += " " + te.getClass().getSimpleName();
+                    extra += " " + te.getClass().getSimpleName();
                 }
                 //Chunk chunk = getChunk();
-                //ret += " " + chunk;
+                //extra += " " + chunk;
             }
         }
-        return ret;
+        return worldInfo + "(" + x + ", " + y + ", " + z + ")" + extra;
     }
 
     public String toShortString() {
