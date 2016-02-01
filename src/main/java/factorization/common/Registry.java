@@ -194,6 +194,8 @@ public class Registry {
         ResourceLocation steamy = new ResourceLocation("factorization:textures/blocks/steam");
         steamFluid = new Fluid("steam", steamy, steamy).setDensity(-500).setGaseous(true).setViscosity(100).setUnlocalizedName("factorization:fluid/steam").setTemperature(273 + 110);
         FluidRegistry.registerFluid(steamFluid);
+        resource_block = new BlockResource(); // This needs to be at the top for things that refer to it.
+        lightair_block = new BlockLightAir();
         legacy_factory_block = new BlockFactorization(materialMachine);
         factory_block_barrel = new BlockBarrel();
         parasieve_block = new BlockParasieve();
@@ -219,8 +221,6 @@ public class Registry {
                 bc.block = legacy_factory_block;
             }
         }
-        lightair_block = new BlockLightAir();
-        resource_block = new BlockResource();
         dark_iron_ore = new BlockDarkIronOre()
                 .setUnlocalizedName("factorization:darkIronOre")
                 .setHardness(3.0F).setResistance(5.0F);
