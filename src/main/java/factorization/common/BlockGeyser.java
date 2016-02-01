@@ -104,7 +104,7 @@ public class BlockGeyser extends BlockHardenedClay {
                 return tank.fill(EnumFacing.DOWN, steam, true) > 0;
             }
         }
-        if (!blockAbove.isPassable(world, pos)) {
+        if (!blockAbove.isPassable(world, up)) {
             return false;
         }
         if (world.getClosestPlayer(pos.getX(), pos.getY(), pos.getZ(), 16 * 3) != null) {
