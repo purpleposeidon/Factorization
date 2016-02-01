@@ -8,9 +8,9 @@ import net.minecraft.util.*;
 import java.util.*;
 
 /**
- * Operations on AxisAlignedBB (aka 'Box'), Vec3, Entities, and conversions between the three.
+ * Operations on AxisAlignedBB (aka 'Box'), Vec3, EnumFacing, Entities, and conversions between them.
  *
- * Vec3 is an unreliable class; it's best to use this.
+ * Vec3 is unreliable (particularly historically!); it's best to use this.
  */
 public final class SpaceUtil {
 
@@ -117,6 +117,8 @@ public final class SpaceUtil {
     }
 
     public static Vec3 fromDirection(EnumFacing dir) {
+        //return new Vec3(pos.getX(), pos.getY(), pos.getZ());
+        NORELEASE.fixme("There may be more bad conversions like this; there is a direct coord query from EnumFacing.");
         return new Vec3(dir.getDirectionVec().getX(), dir.getDirectionVec().getY(), dir.getDirectionVec().getZ());
     }
 
@@ -255,7 +257,7 @@ public final class SpaceUtil {
         double x, y, z;
         x = y = z = 0;
         boolean first = true;
-        for (int i = 1; i < vs.length; i++) {
+        for (int i = 0; i < vs.length; i++) {
             Vec3 v = vs[i];
             if (v == null) continue;
             if (first) {
@@ -276,7 +278,7 @@ public final class SpaceUtil {
         double x, y, z;
         x = y = z = 0;
         boolean first = true;
-        for (int i = 1; i < vs.length; i++) {
+        for (int i = 0; i < vs.length; i++) {
             Vec3 v = vs[i];
             if (v == null) continue;
             if (first) {
@@ -630,9 +632,5 @@ public final class SpaceUtil {
 
     public static Iterable<BlockPos.MutableBlockPos> iteratePos(BlockPos src, int r) {
         return BlockPos.getAllInBoxMutable(src.add(-r, -r, -r), src.add(+r, +r, +r));
-    }
-
-    public static Vec3 toVec(BlockPos pos) {
-        return new Vec3(pos.getX(), pos.getY(), pos.getZ());
     }
 }
