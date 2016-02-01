@@ -17,7 +17,6 @@ import net.minecraft.init.Blocks;
 import net.minecraft.item.EnumDyeColor;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.EnumFacing;
-import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 
 import java.util.Random;
@@ -25,27 +24,53 @@ import java.util.Random;
 public class BlockOreExtruder extends Block {
     public static final IProperty<Integer> EXTRUSIONS = PropertyInteger.create("extrusions", 0, 15);
 
-    public int EXPECTED_ORE_YIELD = 64;
-    public int EXPECTED_CLAY_YIELD = 48;
-    public IBlockState[] clays = new IBlockState[] {
-            clay(null),
-            clay(EnumDyeColor.WHITE),
-            clay(null),
-            clay(EnumDyeColor.LIME),
-            clay(EnumDyeColor.BROWN),
-            clay(null),
-            clay(EnumDyeColor.ORANGE),
-            clay(EnumDyeColor.RED),
-    };
-    public int delay_min = 24, delay_rng_add = 8;
-
-    {
-        if (clays.length != 8) throw new IllegalArgumentException("Must have 8 stained clays");
-    }
-
-    private IBlockState clay(EnumDyeColor color) {
+    private static IBlockState clay(EnumDyeColor color) {
         if (color == null) return Blocks.hardened_clay.getDefaultState();
         return Blocks.stained_hardened_clay.getDefaultState().withProperty(BlockStainedGlass.COLOR, color);
+    }
+    private static IBlockState copper() {
+        return ResourceType.COPPER_ORE.blockState();
+    }
+    public int delay_min = 24, delay_rng_add = 8;
+    public Object[] extrudeInfo = new Object[] {
+            // BlockState                       yield  delay
+            copper(),                           8,     0,
+            clay(null),                         6,     0,
+            copper(),                           8,     1,
+            clay(EnumDyeColor.WHITE),           4,     8,
+            copper(),                           16,    4,
+            clay(null),                         32,    6,
+            copper(),                           32,    8,
+            clay(EnumDyeColor.LIME),            18,    20,
+            copper(),                           48,    20 * 4,
+            clay(EnumDyeColor.BROWN),           18,    20 * 5,
+            copper(),                           64,    20 * 8,
+            clay(null),                         128,   20 * 10,
+            copper(),                           64,    20 * 30,
+            clay(EnumDyeColor.ORANGE),          18,    20 * 60,
+            copper(),                           32,    20 * 120,
+            clay(EnumDyeColor.RED),             16,    0
+    };
+    {
+        for (int i = 0; i < 16; i++) {
+            toExtrude(i);
+            getDecayChance(i);
+            getDelay(i);
+        }
+        if (extrudeInfo.length != 16 * 3) throw new AssertionError("Extrusions must have 16 * 3 elements");
+    }
+
+    IBlockState toExtrude(int extrusionLevel) {
+        return (IBlockState) extrudeInfo[extrusionLevel * 3];
+    }
+
+    public double getDecayChance(int extrusionLevel) {
+        int expect = (Integer) extrudeInfo[extrusionLevel * 3 + 1];
+        return 1.0 / expect;
+    }
+
+    public int getDelay(int extrusionLevel) {
+        return (Integer) extrudeInfo[extrusionLevel * 3 + 2];
     }
 
 
@@ -80,7 +105,9 @@ public class BlockOreExtruder extends Block {
     }
 
     void scheduleTick(World world, BlockPos pos) {
-        world.scheduleBlockUpdate(pos, this, world.rand.nextInt(delay_rng_add) + delay_min, 0);
+        int i = world.getBlockState(pos).getValue(EXTRUSIONS);
+        int delay = world.rand.nextInt(delay_rng_add) + delay_min + getDelay(i);
+        world.scheduleBlockUpdate(pos, this, delay, 0);
     }
 
     @Override
@@ -111,7 +138,7 @@ public class BlockOreExtruder extends Block {
         Coord up = at.add(EnumFacing.UP);
         if (!up.isReplacable()) return;
         int extrusions = at.getPropertyOr(EXTRUSIONS, 0);
-        double pDegrade = degradeChance(extrusions);
+        double pDegrade = this.getDecayChance(extrusions);
         extrudeBlock(up, extrusions);
         if (world.rand.nextDouble() >= pDegrade) {
             return;
@@ -136,22 +163,6 @@ public class BlockOreExtruder extends Block {
             return true;
         }
         return false;
-    }
-
-    IBlockState toExtrude(int extrusions) {
-        if (extrusions % 2 == 0) {
-            return ResourceType.COPPER_ORE.blockState();
-        } else {
-            return clays[extrusions >> 1];
-        }
-    }
-
-    double degradeChance(int extrusions) {
-        if (extrusions % 2 == 0) {
-            return 8.0 / EXPECTED_ORE_YIELD;
-        } else {
-            return 8.0 / EXPECTED_CLAY_YIELD;
-        }
     }
 
     void extrudeBlock(Coord at, int extrusions) {
