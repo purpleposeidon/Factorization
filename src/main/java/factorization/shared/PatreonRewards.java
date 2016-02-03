@@ -13,13 +13,11 @@ public class PatreonRewards {
 
     static void init() {
         // NORELEASE: Patron update
-        NORELEASE.fixme("Thaumcraft logs have changed names I think");
-        NORELEASE.fixme("mallrat's recipe must change due to lead not existing. Has he responded yet?");
-        customBarrel("neptunepink", "Forever", NORMAL, "Thaumcraft:blockMagicalLog#0", "Thaumcraft:blockCosmeticSlabWood#0");
-        customBarrel("neptunepink", "Forever", NORMAL, "Thaumcraft:blockMagicalLog#1", "Thaumcraft:blockCosmeticSlabWood#1");
+        customBarrel("neptunepink", "Forever", NORMAL, "thaumcraft:log#0", "thaumcraft:slab_wood#0"); // Greatwood
+        customBarrel("neptunepink", "Forever", NORMAL, "thaumcraft:log#3", "thaumcraft:slab_wood#1"); // Silverwood
         customBarrel("SoundLogic", "May 2015", NORMAL, "Botania:livingwood#0", "Botania:livingwood#1");
         customBarrel("SoundLogic", "May 2015", NORMAL, "Botania:dreamwood#0", "Botania:dreamwood#1"); // *two* barrel recipes!? Oh well; they're a pair.
-        customBarrel("mallrat208", "Feb 2015", EXPENSIVE, "factorization:ResourceBlock#3", "factorization:ResourceBlock#2");
+        customBarrel("mallrat208", "Feb 2015", EXPENSIVE, "factorization:ResourceBlock#3", "factorization:ResourceBlock#7");
         masquerader("asiekierka", "Dec 2015");
     }
 
