@@ -234,7 +234,7 @@ public class RenderDimensionSliceEntity extends Render<DimensionSliceEntity> imp
                             TileEntityRendererDispatcher.staticPlayerY = te.yCoord;
                             TileEntityRendererDispatcher.staticPlayerZ = te.zCoord;*/
                             
-                            TileEntityRendererDispatcher.instance.renderTileEntity(te, partialTicks, 0 /* NORELEASE: Damage */);
+                            TileEntityRendererDispatcher.instance.renderTileEntity(te, partialTicks, -1 /* NORELEASE: Damage */);
                             // NORELEASE (probably): cull if outside camera!
                             // NORELEASE: That's the wrong list? It's every TE, not the TESR'd TEs.
                         }
