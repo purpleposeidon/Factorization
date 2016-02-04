@@ -193,6 +193,8 @@ public class RenderDimensionSliceEntity extends Render<DimensionSliceEntity> imp
             // NORELEASE: Transparent pass needs face sorting, which may be *extremely gnarly* for rapidly spinning DSEs.
             // May just disable sorting if we're spinning too quickly?
             // A possible solution that I'm unlikely to use: multiple copies of the transparent pass sorted for different rotations
+            // NORELEASE: See RenderGlobal.renderBlockLayer for info on transparency sorting
+            // NORELEASE: We should probably be replacing this class with render global!
             renderBlockLayer(EnumWorldBlockLayer.TRANSLUCENT, partial, shadowEye);
             //Entities (eg, this DSE) can do multi-pass rendering, right?
 
@@ -200,7 +202,6 @@ public class RenderDimensionSliceEntity extends Render<DimensionSliceEntity> imp
         }
 
         private void renderBlockLayer(EnumWorldBlockLayer drawMode, double partial, EntityLivingBase shadowEye) {
-            // NORELEASE: See RenderGlobal.renderBlockLayer for info on transparency sorting
             int start = 0;
             int end = renderers.length;
             int step = 1;
@@ -214,7 +215,6 @@ public class RenderDimensionSliceEntity extends Render<DimensionSliceEntity> imp
                 if (rc.getCompiledChunk().isLayerEmpty(drawMode)) continue;
                 chunkBox.addRenderChunk(rc, drawMode);
             }
-            // NORELEASE: Also needs DisplayList vs. VBO stuff? We should probably be replacing this class with render global!
             chunkBox.renderChunkLayer(drawMode);
         }
 
@@ -272,7 +272,7 @@ public class RenderDimensionSliceEntity extends Render<DimensionSliceEntity> imp
                             TileEntityRendererDispatcher.staticPlayerY = te.yCoord;
                             TileEntityRendererDispatcher.staticPlayerZ = te.zCoord;*/
                             
-                            TileEntityRendererDispatcher.instance.renderTileEntity(te, partialTicks, -1 /* NORELEASE: Damage */);
+                            TileEntityRendererDispatcher.instance.renderTileEntity(te, partialTicks, -1);
                             // NORELEASE (probably): cull if outside camera!
                             // NORELEASE: That's the wrong list? It's every TE, not the TESR'd TEs.
                         }
@@ -302,7 +302,7 @@ public class RenderDimensionSliceEntity extends Render<DimensionSliceEntity> imp
 
             RenderGlobal realRg = HammerClientProxy.getRealRenderGlobal();
 
-            TextureAtlasSprite[] crackIcons = mc.renderGlobal.destroyBlockIcons;
+            TextureAtlasSprite[] crackIcons = realRg.destroyBlockIcons;
             BlockRendererDispatcher brd = mc.getBlockRendererDispatcher();
             
             for (Iterator<DestroyBlockProgress> iterator = damagedBlocks.values().iterator(); iterator.hasNext();) {
@@ -313,19 +313,23 @@ public class RenderDimensionSliceEntity extends Render<DimensionSliceEntity> imp
                 if (a.x <= damage_getPartialBlockX && damage_getPartialBlockX <= b.x
                         && a.y <= damage_getPartialBlockY && damage_getPartialBlockY <= b.y
                         && a.z <= damage_getPartialBlockZ && damage_getPartialBlockZ <= b.z) {
-                    renderDamage(a.w, damage, crackIcons, brd);
+                    renderDamage(a.w, damage, crackIcons, brd, partial);
                 }
             }
             
             endDamageDrawing(tess);
         }
         
-        void renderDamage(World world, DestroyBlockProgress damage, TextureAtlasSprite[] icons, BlockRendererDispatcher brd) {
+        void renderDamage(World world, DestroyBlockProgress damage, TextureAtlasSprite[] icons, BlockRendererDispatcher brd, float partial) {
             IBlockState bs = world.getBlockState(damage.getPosition());
             Block block = bs.getBlock();
             if (block.getMaterial() == Material.air) return;
             int dmg = damage.getPartialBlockDamage();
             brd.renderBlockDamage(bs, damage.getPosition(), icons[dmg], world);
+            if (block.hasTileEntity(bs)) {
+                TileEntity te = world.getTileEntity(damage.getPosition());
+                TileEntityRendererDispatcher.instance.renderTileEntity(te, partial, damage.getPartialBlockDamage());
+            }
         }
         
         void startDamageDrawing(EntityPlayer player, float partial) {
@@ -460,13 +464,15 @@ public class RenderDimensionSliceEntity extends Render<DimensionSliceEntity> imp
                 if (nest == 1) {
                     renderInfo.updateRelativeEyePosition();
                 }
+                Coord c = dse.getCorner().add(2, 2, 2);
+                GL11.glTranslated(-c.x, -c.y, -c.z);
                 Core.profileStart("renderTerrain");
-                renderInfo.renderTerrain(partialTicks);
+                {
+                    renderInfo.renderTerrain(partialTicks);
+                }
                 Core.profileEnd();
                 RenderUtil.checkGLError("FZDS terrain display list render");
                 GL11.glTranslated(dse.posX - x, dse.posY - y, dse.posZ - z);
-                Coord c = dse.getCorner();
-                GL11.glTranslated(-c.x, -c.y, -c.z);
                 if (nest == 1) {
                     // renderBreakingBlocks needs to happen before renderEntities due to gl state nonsense.
                     if (oracle) {

@@ -126,6 +126,7 @@ public class Core {
 
     private static boolean checked = false;
     public static void checkJar() {
+        // Was necessary in 1.7. Is this still needed in 1.8?
         if (checked) return;
         checked = true;
         // Apparently some people somehow manage to get "Factorization.jar.zip", which somehow breaks the coremod.
