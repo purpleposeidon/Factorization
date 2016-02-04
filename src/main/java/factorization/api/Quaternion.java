@@ -12,6 +12,7 @@ import net.minecraft.util.Vec3;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
+import javax.vecmath.Quat4d;
 import javax.vecmath.Quat4f;
 import java.io.DataInput;
 import java.io.DataOutputStream;
@@ -575,5 +576,9 @@ public class Quaternion implements IDataSerializable {
 
     public Quat4f toJavax() {
         return new Quat4f((float) x, (float) y, (float) z, (float) w);
+    }
+
+    public Quat4d toJavaxD() {
+        return new Quat4d(x, y, z, w);
     }
 }
