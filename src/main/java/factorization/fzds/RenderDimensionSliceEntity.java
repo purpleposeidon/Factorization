@@ -15,8 +15,7 @@ import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.*;
-import net.minecraft.client.renderer.chunk.ListedRenderChunk;
-import net.minecraft.client.renderer.chunk.RenderChunk;
+import net.minecraft.client.renderer.chunk.*;
 import net.minecraft.client.renderer.entity.Render;
 import net.minecraft.client.renderer.entity.RenderManager;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
@@ -91,6 +90,50 @@ public class RenderDimensionSliceEntity extends Render<DimensionSliceEntity> imp
         int xSizeChunk, ySizeChunk, zSizeChunk;
         int cubicChunkCount;
 
+        boolean previousDrawModeIsVbo;
+        ChunkRenderContainer chunkBox;
+        IRenderChunkFactory chunkRenderFactory;
+
+        void updateContainerType() {
+            if (previousDrawModeIsVbo != OpenGlHelper.useVbo()) {
+                assignAppropriateContainers();
+            }
+        }
+
+        void assignAppropriateContainers() {
+            RenderUtil.checkGLError("FZDS: before DSRenderInfo container init");
+            previousDrawModeIsVbo = OpenGlHelper.useVbo();
+            if (previousDrawModeIsVbo) {
+                chunkBox = new VboRenderList();
+                chunkRenderFactory = new VboChunkFactory();
+            } else {
+                chunkBox = new RenderList();
+                chunkRenderFactory = new ListChunkFactory();
+            }
+            renderers = new RenderChunk[cubicChunkCount];
+            int i = 0;
+            RenderGlobal rg = Minecraft.getMinecraft().renderGlobal;
+            int DC = 16;
+            for (int y = corner.y; y <= far.y; y += DC) {
+                for (int x = corner.x; x <= far.x; x += DC) {
+                    for (int z = corner.z; z <= far.z; z += DC) {
+                        //We could allocate lists per WR instead?
+                        //NORELEASE: w.loadedTileEntityList might be wrong? Might be inefficient?
+                        //It creates a list... maybe we should use that instead?
+                        if (renderers[i] != null) {
+                            renderers[i].deleteGlResources();
+                        }
+                        RenderChunk rc = chunkRenderFactory.makeRenderChunk(corner.w, rg, new BlockPos(x, y, z), i);
+                        renderers[i] = rc;
+                        chunkNeedsRedraw(rg, rc);
+                        i++;
+                    }
+                }
+            }
+            if (i != cubicChunkCount) throw new AssertionError();
+            RenderUtil.checkGLError("FZDS: after DSRenderInfo container init");
+        }
+
         public DSRenderInfo(DimensionSliceEntity dse) {
             this.dse = dse;
             this.corner = dse.getCorner();
@@ -109,75 +152,68 @@ public class RenderDimensionSliceEntity extends Render<DimensionSliceEntity> imp
             
             cubicChunkCount = xSizeChunk * ySizeChunk * zSizeChunk;
 
-            renderers = new RenderChunk[cubicChunkCount];
-            int i = 0;
-            RenderGlobal rg = Minecraft.getMinecraft().renderGlobal;
-            RenderUtil.checkGLError("FZDS before render");
-            int DC = 16;
-            for (int y = corner.y; y <= far.y; y += DC) {
-                for (int x = corner.x; x <= far.x; x += DC) {
-                    for (int z = corner.z; z <= far.z; z += DC) {
-                        //We could allocate lists per WR instead?
-                        //NORELEASE: w.loadedTileEntityList might be wrong? Might be inefficient?
-                        //It creates a list... maybe we should use that instead?
-                        NORELEASE.fixme("Pick the right one");
-                        RenderChunk rc = new ListedRenderChunk(corner.w, rg, new BlockPos(x, y, z), i /* index; not actually used. */);
-                        renderers[i] = rc;
-                        chunkNeedsRedraw(rg, renderers[i]);
-                        RenderUtil.checkGLError("FZDS WorldRenderer init");
-                        i++;
-                    }
-                }
-            }
-            if (i != cubicChunkCount) throw new AssertionError();
+            assignAppropriateContainers();
         }
         
         int last_update_index = 0;
         int render_skips = 0;
         
         void updateRelativeEyePosition() {
+            updateContainerType();
             final Entity player = Minecraft.getMinecraft().getRenderViewEntity();
             Vec3 eyepos = dse.real2shadow(SpaceUtil.fromEntPos(player));
-            shadowEye.posX = eyepos.xCoord;
-            shadowEye.posY = eyepos.yCoord;
-            shadowEye.posZ = eyepos.zCoord;
-            renderContainer.initialize(shadowEye.posX, shadowEye.posY, shadowEye.posZ);
+            SpaceUtil.toEntPos(shadowEye, eyepos);
+            //chunkBox.initialize(shadowEye.posX, shadowEye.posY, shadowEye.posZ);
+            chunkBox.initialize(0, 0, 0);
         }
 
-        void renderTerrain(int pass, double partial) {
+        void renderTerrain(double partial) {
             //GL11.glPushAttrib(GL11.GL_COLOR_BUFFER_BIT | GL11.GL_LIGHTING_BIT);
-            RenderHelper.disableStandardItemLighting();
+            RenderHelper.disableStandardItemLighting(); // Might disable this if we get shadeless rendering.
             Minecraft mc = Minecraft.getMinecraft();
             //if (Minecraft.isAmbientOcclusionEnabled() && FzConfig.dimension_slice_allow_smooth) {
             //    GL11.glShadeModel(GL11.GL_SMOOTH);
             //}
 
 
-            GlStateManager.disableAlpha();
-            renderBlockLayer(EnumWorldBlockLayer.SOLID, 0, pass, shadowEye);
+            GlStateManager.disableAlpha(); // Vanilla does this odd thing for leaves.
+            renderBlockLayer(EnumWorldBlockLayer.SOLID, partial, shadowEye);
             GlStateManager.enableAlpha();
-            renderBlockLayer(EnumWorldBlockLayer.CUTOUT_MIPPED, partial, pass, shadowEye);
+
+            renderBlockLayer(EnumWorldBlockLayer.CUTOUT_MIPPED, partial, shadowEye);
             mc.getTextureManager().getTexture(TextureMap.locationBlocksTexture).setBlurMipmap(false, false);
-            renderBlockLayer(EnumWorldBlockLayer.CUTOUT, partial, pass, shadowEye);
+
+            renderBlockLayer(EnumWorldBlockLayer.CUTOUT, partial, shadowEye);
             mc.getTextureManager().getTexture(TextureMap.locationBlocksTexture).restoreLastBlurMipmap();
-            //NORELEASE (alpha): Oh god, this is going to be a pain to get working properly...
-            renderBlockLayer(EnumWorldBlockLayer.TRANSLUCENT, partial, pass, shadowEye);
-            //Entities can do multi-pass rendering, right?
+
+            GlStateManager.shadeModel(7424);
+            GlStateManager.alphaFunc(516, 0.1F);
+            // NORELEASE: Transparent pass needs face sorting, which may be *extremely gnarly* for rapidly spinning DSEs.
+            // May just disable sorting if we're spinning too quickly?
+            // A possible solution that I'm unlikely to use: multiple copies of the transparent pass sorted for different rotations
+            renderBlockLayer(EnumWorldBlockLayer.TRANSLUCENT, partial, shadowEye);
+            //Entities (eg, this DSE) can do multi-pass rendering, right?
 
             //GL11.glPopAttrib();
         }
 
-        ChunkRenderContainer renderContainer = new RenderList(); // NORELEASE: Check VBO enabled
-
-        private void renderBlockLayer(EnumWorldBlockLayer drawMode, double partial, int pass, EntityLivingBase shadowEye) {
+        private void renderBlockLayer(EnumWorldBlockLayer drawMode, double partial, EntityLivingBase shadowEye) {
             // NORELEASE: See RenderGlobal.renderBlockLayer for info on transparency sorting
-            for (int i = 0; i < renderers.length; i++) {
+            int start = 0;
+            int end = renderers.length;
+            int step = 1;
+            if (drawMode == EnumWorldBlockLayer.TRANSLUCENT) {
+                start = end - 1;
+                end = -1;
+                step = -1;
+            }
+            for (int i = start; i != end; i += step) {
                 RenderChunk rc = renderers[i];
                 if (rc.getCompiledChunk().isLayerEmpty(drawMode)) continue;
-                renderContainer.addRenderChunk(rc, drawMode);
+                chunkBox.addRenderChunk(rc, drawMode);
             }
             // NORELEASE: Also needs DisplayList vs. VBO stuff? We should probably be replacing this class with render global!
-            renderContainer.renderChunkLayer(drawMode);
+            chunkBox.renderChunkLayer(drawMode);
         }
 
         void renderEntities(float partialTicks) {
@@ -354,9 +390,16 @@ public class RenderDimensionSliceEntity extends Render<DimensionSliceEntity> imp
 
     static void chunkNeedsRedraw(RenderGlobal rg, RenderChunk wr) {
         wr.setNeedsUpdate(true);
-        //rg.renderDispatcher.updateChunkLater(wr);
-        rg.renderDispatcher.updateChunkNow(wr);
-        NORELEASE.fixme("This is bad. Multiple block updates could potentially cause thrashing.");
+        if (NORELEASE.off) {
+            rg.renderDispatcher.updateChunkLater(wr);
+        } else {
+            rg.renderDispatcher.updateChunkNow(wr);
+            wr.setNeedsUpdate(false);
+            long dueBy = System.nanoTime() + 1000;
+            //rg.renderDispatcher.uploadChunk()
+            rg.renderDispatcher.runChunkUploads(dueBy);
+            NORELEASE.fixme("This is bad. Multiple block updates could potentially cause thrashing.");
+        }
     }
     
     DSRenderInfo getRenderInfo(DimensionSliceEntity dse) {
@@ -402,10 +445,10 @@ public class RenderDimensionSliceEntity extends Render<DimensionSliceEntity> imp
                     rot.glRotate();
                 }
                 Vec3 centerOffset = dse.getRotationalCenterOffset();
-                GL11.glTranslated(
+                /*GL11.glTranslated(
                         -centerOffset.xCoord,
                         -centerOffset.yCoord,
-                        -centerOffset.zCoord);
+                        -centerOffset.zCoord);*/
                 if (dse.scale != 1) {
                     GL11.glScalef(dse.scale, dse.scale, dse.scale);
                 }
@@ -416,7 +459,7 @@ public class RenderDimensionSliceEntity extends Render<DimensionSliceEntity> imp
                     renderInfo.updateRelativeEyePosition();
                 }
                 Core.profileStart("renderTerrain");
-                renderInfo.renderTerrain(0, partialTicks);
+                renderInfo.renderTerrain(partialTicks);
                 Core.profileEnd();
                 RenderUtil.checkGLError("FZDS terrain display list render");
                 GL11.glTranslated(dse.posX - x, dse.posY - y, dse.posZ - z);
