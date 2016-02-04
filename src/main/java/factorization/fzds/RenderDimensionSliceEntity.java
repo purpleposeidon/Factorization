@@ -31,6 +31,7 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.*;
 import net.minecraft.world.World;
 import net.minecraft.world.chunk.Chunk;
+import net.minecraftforge.client.model.b3d.B3DModel;
 import net.minecraftforge.event.world.WorldEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent.Phase;
@@ -176,6 +177,7 @@ public class RenderDimensionSliceEntity extends Render<DimensionSliceEntity> imp
             //}
 
 
+            mc.getTextureManager().bindTexture(TextureMap.locationBlocksTexture);
             GlStateManager.disableAlpha(); // Vanilla does this odd thing for leaves.
             renderBlockLayer(EnumWorldBlockLayer.SOLID, partial, shadowEye);
             GlStateManager.enableAlpha();
