@@ -89,8 +89,9 @@ public class CopperGeyserGen implements IWorldGenerator {
 
     @Override
     public void generate(Random random, int chunkX, int chunkZ, World world, IChunkProvider chunkGenerator, IChunkProvider chunkProvider) {
-        int x = 8 + chunkX * 16;
-        int z = 8 + chunkZ * 16;
+        int x = chunkX * 16 + 8;
+        int z = chunkZ * 16 + 8;
+        // MC currently loads populates a chunk when a 3x3 area around it exist
         Coord start = new Coord(world, x, world.getSeaLevel(), z);
         BiomeGenBase biome = start.getBiome();
         float rarityModifier = getModifierForBiome(biome);
