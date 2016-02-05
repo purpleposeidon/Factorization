@@ -3,10 +3,7 @@ package factorization.fzds;
 import com.google.common.base.Predicate;
 import factorization.aabbdebug.AabbDebugger;
 import factorization.algos.TortoiseAndHare;
-import factorization.api.Coord;
-import factorization.api.DeltaCoord;
-import factorization.api.ICoordFunction;
-import factorization.api.Quaternion;
+import factorization.api.*;
 import factorization.api.datahelpers.DataHelper;
 import factorization.api.datahelpers.Share;
 import factorization.common.FzConfig;
@@ -18,6 +15,7 @@ import factorization.fzds.network.PacketProxyingPlayer;
 import factorization.shared.Core;
 import factorization.shared.EntityReference;
 import factorization.util.NORELEASE;
+import factorization.util.NumUtil;
 import factorization.util.SpaceUtil;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
@@ -28,7 +26,6 @@ import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
-import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 import net.minecraft.server.MinecraftServer;
@@ -126,6 +123,51 @@ public class DimensionSliceEntity extends IDeltaChunk implements IFzdsEntryContr
                 dc.x/2,
                 dc.y/2,
                 dc.z/2);
+    }
+
+    Mat _transform = null, _transform_inverted = null;
+
+    @Override
+    public Mat getShadow2Real(float partial) {
+        if (NORELEASE.off) {
+            if (partial != 1) return getTransformUncached(partial);
+            if (_transform != null) return _transform;
+        }
+        return _transform = getTransformUncached(partial);
+    }
+
+    @Override
+    public Mat getReal2Shadow(float partial) {
+        if (NORELEASE.off) {
+            if (partial != 1) return getTransformUncached(partial).invert();
+            if (_transform_inverted != null) return _transform_inverted;
+        }
+        return _transform_inverted = getTransformUncached(partial).invert();
+    }
+
+    private Mat getTransformUncached(float partial) {
+        // shadow2real more likely to be called? Worst case we just implement the other side.
+        // real = rotate($shadow - corner - centerOffset) + DSE position
+        return Mat.mul(
+                    Mat.trans(
+                            -cornerMin.x - centerOffset.xCoord,
+                            -cornerMin.y - centerOffset.yCoord,
+                            -cornerMin.z - centerOffset.zCoord),
+                    Mat.rotate(slerpRotation(partial)).invert(),
+                    Mat.trans(
+                            NumUtil.interp(prevPosX, posX, partial),
+                            NumUtil.interp(prevPosY, posY, partial),
+                            NumUtil.interp(prevPosZ, posZ, partial)));
+    }
+
+    private Quaternion slerpRotation(float partial) {
+        if (partial == 1) return rotation;
+        return prevTickRotation.slerp(rotation, partial).incrNormalize();
+    }
+
+    private void dirty() {
+        _transform = null;
+        _transform_inverted = null;
     }
 
     public final Vec3 real2shadow(final Vec3 realVector) {

@@ -21,6 +21,7 @@
 ' I bet giant antlers would be totally kick-ass
 ' I tried an arc, and it was super-lame
 ' I don't want hair or wavey tentacles
+' Masks should *not* be bland!
 '
 '
 ' Quantity is pretty important, but similar variants should have their weight reduced.
@@ -169,41 +170,49 @@ weight 5
 ###..###..###
 .###vvvvv###.
 
-#.#
-#.#
-vvv
 
-#.#
-.#.
-vvv
-
-.#.....#.
-.#.....#.
-.#.....#.
-.#.....#.
-..#...#..
-..#...#..
 ...#.#...
-..vvvvv..
+.#.#.#.#.
+##.#.#.##
+.###.###.
+###...###
+.##.#.##.
+##..#..##
+.#.###.#.
+.#vvvvv#.
+
+#.#
+#.#
+vvv
+
+##.##
+.#.#.
+#vvv#
+
+#.#
+###
+vvv
 
 .#...#.
 #.....#
-#.....#
+##...##
 #.....#
 #.....#
 .#...#.
-..vvv..
+#.vvv.#
 
-#.....#
-.#...#.
-.#...#.
-.#...#.
-.vvvvv.
+#..#..#
+.##@##.
+.#.#.#.
+##...##
+#vvvvv#
 
-.#..#.
-#....#
-#....#
-vvvvvv
+..#.#..
+##...##
+.#...#.
+###.###
+#@###@#
+vvvvvvv
 
 .#..#.
 #....#
@@ -216,10 +225,11 @@ vvvvvv
 #...#
 .#.#.
 
-^^^^^
-#...#
-#...#
-##.##
+#^^^^^#
+.#...#.
+.#...#.
+###.###
+#.....#
 
 ^^^^^
 #.#.#

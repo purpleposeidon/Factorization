@@ -305,6 +305,7 @@ public class Core {
         }
         if (Core.dev_environ) {
             event.registerServerCommand(new GenBlockStates());
+            event.registerServerCommand(new TestCommand());
         }
     }
     

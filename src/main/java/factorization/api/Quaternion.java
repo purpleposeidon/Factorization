@@ -184,16 +184,17 @@ public class Quaternion implements IDataSerializable {
     }
     
     //Math functions
-    public void incrNormalize() {
+    public Quaternion incrNormalize() {
         double normSquared = magnitudeSquared();
         if (normSquared == 1 || normSquared == 0) {
-            return;
+            return this;
         }
         double norm = Math.sqrt(normSquared);
         w /= norm;
         x /= norm;
         y /= norm;
         z /= norm;
+        return this;
     }
 
     /**
@@ -320,6 +321,8 @@ public class Quaternion implements IDataSerializable {
     }
     
     public Quaternion slerp(Quaternion other, double t) {
+        if (t == 1) return new Quaternion(other);
+        if (t == 0) return new Quaternion(this);
         // from blender/blenlib/intern/math_rotation.c interp_qt_qtqt
         double cosom = this.dotProduct(other);
         // We don't make the dot product > 0, because maybe we'd like long-ways rotation some times
@@ -394,10 +397,11 @@ public class Quaternion implements IDataSerializable {
         return magnitude();
     }
     
-    public void incrConjugate() {
+    public Quaternion incrConjugate() {
         x = -x;
         y = -y;
         z = -z;
+        return this;
     }
     
     public void incrAdd(Quaternion other) {

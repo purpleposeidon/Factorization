@@ -5,6 +5,8 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.*;
 
+import javax.vecmath.*;
+import javax.vecmath.Vector3d;
 import java.util.*;
 
 /**
@@ -632,5 +634,9 @@ public final class SpaceUtil {
 
     public static Iterable<BlockPos.MutableBlockPos> iteratePos(BlockPos src, int r) {
         return BlockPos.getAllInBoxMutable(src.add(-r, -r, -r), src.add(+r, +r, +r));
+    }
+
+    public static Vector3d toJavax(Vec3 val) {
+        return new Vector3d(val.xCoord, val.yCoord, val.zCoord);
     }
 }

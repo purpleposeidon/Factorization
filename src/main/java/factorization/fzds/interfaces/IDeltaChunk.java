@@ -1,6 +1,7 @@
 package factorization.fzds.interfaces;
 
 import factorization.api.Coord;
+import factorization.api.Mat;
 import factorization.api.Quaternion;
 import factorization.fzds.DeltaChunk;
 import factorization.fzds.Hammer;
@@ -20,6 +21,7 @@ import static factorization.fzds.interfaces.DeltaCapability.*;
 
 public abstract class IDeltaChunk extends EntityFz {
     //This would be an actual interface, but it needs to extend Entity.
+    //NORELEASE: Might be reasonable to make into a real interface now?
     public IDeltaChunk(World w) { super(w); }
     
     /**
@@ -66,6 +68,16 @@ public abstract class IDeltaChunk extends EntityFz {
      * @param r A {@link Quaternion}
      */
     public abstract void setRotation(Quaternion r);
+
+    public final Mat getShadow2Real() {
+        return getShadow2Real(1);
+    }
+
+    public final Mat getReal2Shadow() {
+        return getReal2Shadow(1);
+    }
+    public abstract Mat getShadow2Real(float partial);
+    public abstract Mat getReal2Shadow(float partial);
 
     /**
      * Sets the rotational velocity (omega), relative to the world. The default Quaternion represents zero angular velocity.

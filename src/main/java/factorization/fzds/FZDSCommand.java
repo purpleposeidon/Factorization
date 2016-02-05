@@ -243,6 +243,10 @@ public class FZDSCommand extends CommandBase {
     public static void setSelection(IDeltaChunk dse) {
         currentSelection = new WeakReference<IDeltaChunk>(dse);
     }
+
+    public static IDeltaChunk getSelection() {
+        return currentSelection.get();
+    }
     
     public static Coord parseCoord(World world, String src) throws WrongUsageException {
         ArrayList<Integer> parts = new ArrayList<Integer>();
