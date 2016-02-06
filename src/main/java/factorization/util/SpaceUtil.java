@@ -45,6 +45,7 @@ public final class SpaceUtil {
         return new DeltaCoord(dx, 0, dz);
     }
 
+    @Deprecated // newVec!
     public static Vec3 newvec() {
         return new Vec3(0, 0, 0);
     }

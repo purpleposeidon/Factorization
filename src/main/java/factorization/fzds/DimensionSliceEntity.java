@@ -129,14 +129,14 @@ public class DimensionSliceEntity extends IDeltaChunk implements IFzdsEntryContr
 
     @Override
     public Mat getShadow2Real(float partial) {
-        if (NORELEASE.on || partial != 1) return getTransformUncached(partial).invert();
+        if (partial != 1) return getTransformUncached(partial).invert();
         if (_transform_S2R != null) return _transform_S2R;
-        return _transform_S2R = getTransformUncached(partial).invert();
+        return _transform_S2R = getReal2Shadow(partial).invert();
     }
 
     @Override
     public Mat getReal2Shadow(float partial) {
-        if (NORELEASE.on || partial != 1) return getTransformUncached(partial);
+        if (partial != 1) return getTransformUncached(partial);
         if (_transform_R2S != null) return _transform_R2S;
         return _transform_R2S = getTransformUncached(partial);
     }
@@ -263,6 +263,9 @@ public class DimensionSliceEntity extends IDeltaChunk implements IFzdsEntryContr
         if (data.isReader() && data.isNBT()) {
             rotation = rotation.cleanAbnormalNumbers();
             rotationalVelocity = rotationalVelocity.cleanAbnormalNumbers();
+        }
+        if (data.isReader()) {
+            dirty();
         }
     }
     
@@ -1202,6 +1205,7 @@ public class DimensionSliceEntity extends IDeltaChunk implements IFzdsEntryContr
     @Override
     public void setRotation(Quaternion r) {
         rotation = r;
+        dirty();
     }
 
     @Override
