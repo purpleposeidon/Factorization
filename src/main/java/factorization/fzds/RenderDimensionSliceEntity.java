@@ -197,6 +197,7 @@ public class RenderDimensionSliceEntity extends Render<DimensionSliceEntity> imp
             // NORELEASE: We should probably be replacing this class with render global!
             renderBlockLayer(EnumWorldBlockLayer.TRANSLUCENT, partial, shadowEye);
             //Entities (eg, this DSE) can do multi-pass rendering, right?
+            NORELEASE.fixme("Use Entity.shouldRenderInPass");
 
             //GL11.glPopAttrib();
         }
@@ -441,20 +442,15 @@ public class RenderDimensionSliceEntity extends Render<DimensionSliceEntity> imp
         nest++;
         try {
             final boolean oracle = dse.can(DeltaCapability.ORACLE);
-            glPushMatrix();
+            GL11.glPushMatrix();
             try {
                 GL11.glTranslated(x, y, z);
                 Quaternion rotation = dse.getRotation();
-                if (!rotation.isZero() || !dse.prevTickRotation.isZero()) {
+                if (!(rotation.isZero() && dse.prevTickRotation.isZero())) {
                     Quaternion rot = dse.prevTickRotation.slerp(rotation, partialTicks);
                     rot.incrNormalize();
                     rot.glRotate();
                 }
-                Vec3 centerOffset = dse.getRotationalCenterOffset();
-                /*GL11.glTranslated(
-                        -centerOffset.xCoord,
-                        -centerOffset.yCoord,
-                        -centerOffset.zCoord);*/
                 if (dse.scale != 1) {
                     GL11.glScalef(dse.scale, dse.scale, dse.scale);
                 }

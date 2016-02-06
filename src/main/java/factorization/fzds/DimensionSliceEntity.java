@@ -125,49 +125,48 @@ public class DimensionSliceEntity extends IDeltaChunk implements IFzdsEntryContr
                 dc.z/2);
     }
 
-    Mat _transform = null, _transform_inverted = null;
+    Mat _transform_S2R = null, _transform_R2S = null;
 
     @Override
     public Mat getShadow2Real(float partial) {
-        if (NORELEASE.off) {
-            if (partial != 1) return getTransformUncached(partial);
-            if (_transform != null) return _transform;
-        }
-        return _transform = getTransformUncached(partial);
+        if (NORELEASE.on || partial != 1) return getTransformUncached(partial).invert();
+        if (_transform_S2R != null) return _transform_S2R;
+        return _transform_S2R = getTransformUncached(partial).invert();
     }
 
     @Override
     public Mat getReal2Shadow(float partial) {
-        if (NORELEASE.off) {
-            if (partial != 1) return getTransformUncached(partial).invert();
-            if (_transform_inverted != null) return _transform_inverted;
-        }
-        return _transform_inverted = getTransformUncached(partial).invert();
+        if (NORELEASE.on || partial != 1) return getTransformUncached(partial);
+        if (_transform_R2S != null) return _transform_R2S;
+        return _transform_R2S = getTransformUncached(partial);
     }
 
     private Mat getTransformUncached(float partial) {
+        return Mat.mul(
+                Mat.trans(
+                        cornerMin.x + centerOffset.xCoord,
+                        cornerMin.y + centerOffset.yCoord,
+                        cornerMin.z + centerOffset.zCoord),
+                Mat.scale(scale),
+                Mat.rotate(slerpRotation(partial)),
+                Mat.trans(
+                        -NumUtil.interp(prevPosX, posX, partial),
+                        -NumUtil.interp(prevPosY, posY, partial),
+                        -NumUtil.interp(prevPosZ, posZ, partial)));
         // shadow2real more likely to be called? Worst case we just implement the other side.
         // real = rotate($shadow - corner - centerOffset) + DSE position
-        return Mat.mul(
-                    Mat.trans(
-                            -cornerMin.x - centerOffset.xCoord,
-                            -cornerMin.y - centerOffset.yCoord,
-                            -cornerMin.z - centerOffset.zCoord),
-                    Mat.rotate(slerpRotation(partial)).invert(),
-                    Mat.trans(
-                            NumUtil.interp(prevPosX, posX, partial),
-                            NumUtil.interp(prevPosY, posY, partial),
-                            NumUtil.interp(prevPosZ, posZ, partial)));
+        // shadow = rotate⁻¹(real - DSE) + centerOffset + corner
     }
 
     private Quaternion slerpRotation(float partial) {
         if (partial == 1) return rotation;
+        if (partial == 0) return prevTickRotation;
         return prevTickRotation.slerp(rotation, partial).incrNormalize();
     }
 
     private void dirty() {
-        _transform = null;
-        _transform_inverted = null;
+        _transform_S2R = null;
+        _transform_R2S = null;
     }
 
     public final Vec3 real2shadow(final Vec3 realVector) {

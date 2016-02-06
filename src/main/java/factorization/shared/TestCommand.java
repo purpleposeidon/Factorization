@@ -36,11 +36,26 @@ public class TestCommand extends CommandBase {
     public void processCommand(ICommandSender sender, String[] args) throws CommandException {
         IDeltaChunk idc = FZDSCommand.getSelection();
         Mat mat = idc.getReal2Shadow();
+        /*mat = Mat.mul(
+                Mat.trans(idc.getCorner().toVector()),
+                Mat.trans(idc.getRotationalCenterOffset()),
+                Mat.rotate(idc.getRotation()),
+                Mat.trans(SpaceUtil.fromEntPos(idc)).invert(),
+                Mat.IDENTITY
+        );*/
+        /*
+        Vec3 buffer = realVector.subtract(SpaceUtil.fromEntPos(this));
+        rotation.applyRotation(buffer).addVector(cornerMin.x).add(centerOffset);
+        */
+
         Vec3 me = SpaceUtil.fromEntPos((Entity) sender);
         Vec3 matRet = mat.mul(me);
         Vec3 oldRet = idc.real2shadow(SpaceUtil.copy(me));
+        NORELEASE.println("\n\n\n");
         NORELEASE.println(mat);
         NORELEASE.println("Mat: " + matRet);
         NORELEASE.println("Old: " + oldRet);
+        Vec3 error = matRet.subtract(oldRet);
+        NORELEASE.println("Error: " + error.lengthVector() + "   " + error);
     }
 }
