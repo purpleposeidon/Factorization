@@ -150,19 +150,30 @@ public enum AabbDebugger {
         GL11.glColor4f(1, 1, 1, 0.5F);
         
         GL11.glDisable(GL11.GL_TEXTURE_2D);
+        drawRenderData(0.8F);
+        GL11.glDepthMask(true);
+        GL11.glDisable(GL11.GL_DEPTH_TEST);
+        drawRenderData(0.2F);
+
+        GL11.glPopMatrix();
+        GL11.glPopAttrib();
+    }
+
+    private void drawRenderData(float alpha) {
         GL11.glLineWidth(4);
+        int iAlpha = (int)(0xFF * alpha);
         synchronized (boxes) {
             for (AxisAlignedBB box : boxes) {
-                RenderGlobal.drawOutlinedBoundingBox(box, 0x80, 0, 0, 0xFF);
+                RenderGlobal.drawOutlinedBoundingBox(box, 0x80, 0, 0, iAlpha);
             }
         }
         synchronized (frozen) {
             for (AxisAlignedBB box : frozen) {
-                RenderGlobal.drawOutlinedBoundingBox(box, 0x40, 0x40, 0xb0, 0xFF);
+                RenderGlobal.drawOutlinedBoundingBox(box, 0x40, 0x40, 0xb0, iAlpha);
             }
         }
         GL11.glLineWidth(2);
-        GL11.glColor4f(1, 1, 0, 1);
+        GL11.glColor4f(1, 1, 0, alpha);
         GL11.glBegin(GL11.GL_LINES);
         synchronized (lines) {
             for (Line line : lines) {
@@ -173,7 +184,7 @@ public enum AabbDebugger {
             }
         }
         GL11.glEnd();
-        GL11.glColor4f(0, 1, 1, 1);
+        GL11.glColor4f(0, 1, 1, alpha);
         GL11.glBegin(GL11.GL_LINES);
         synchronized (frozen_lines) {
             for (Line line : frozen_lines) {
@@ -184,9 +195,5 @@ public enum AabbDebugger {
             }
         }
         GL11.glEnd();
-        GL11.glDepthMask(true);
-        
-        GL11.glPopMatrix();
-        GL11.glPopAttrib();
     }
 }

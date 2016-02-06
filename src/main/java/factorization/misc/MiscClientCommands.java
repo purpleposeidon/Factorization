@@ -480,7 +480,7 @@ public class MiscClientCommands implements ICommand {
         private static IWorldAccess debugger = null;
 
         @help("shows block render update ranges; run again to disable")
-        public static void debugBlockUpdates() {
+        public static String debugBlockUpdates() {
             if (debugger == null) {
                 debugger = new BlockUpdateDebugger();
                 AabbDebugger.freeze = true;
@@ -490,9 +490,11 @@ public class MiscClientCommands implements ICommand {
             if (hash == active_world_hash) {
                 w.removeWorldAccess(debugger);
                 active_world_hash = 0;
+                return "Render update tracing disabled. To remove boxes run: /boxdbg clean";
             } else {
                 w.addWorldAccess(debugger);
                 active_world_hash = hash;
+                return "Render update tracing enabled. Run this command again to disable.";
             }
         }
 
