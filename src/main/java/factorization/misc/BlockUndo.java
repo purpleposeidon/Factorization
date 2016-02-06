@@ -240,8 +240,15 @@ public class BlockUndo {
         return DataUtil.getId(bs.getBlock());
     }
 
-    @SubscribeEvent(priority = EventPriority.HIGH) // Cancel before most things, but permission-handlers can cancel before us
+    @SubscribeEvent(priority = EventPriority.LOW)
+    /*
+    My initial intuition for the priority was "cancel before most things, but permission-handlers can cancel before us".
+    However Emoniph uses this event to do a permissions check. Really it'd be better if there were a proper permissions
+    event that he could use instead of this. One might hope that such an event would be found in Forge. In the meantime,
+    this.
+     */
     public void playerRemovedBlock(BlockEvent.BreakEvent event) {
+        if (event.getExpToDrop() < 0) return; // This is for a 'test if player has permissions' hack for Emoniph.
         EntityPlayer thePlayer = event.getPlayer();
         markBusy(thePlayer);
         List<PlacedBlock> coords = recentlyPlaced.get(getName(thePlayer));
