@@ -1,8 +1,10 @@
 package factorization.fzds;
 
-import java.util.ArrayList;
-import java.util.List;
-
+import factorization.fzds.interfaces.IFzdsShenanigans;
+import factorization.shared.Core;
+import factorization.util.NORELEASE;
+import factorization.util.NumUtil;
+import factorization.util.SpaceUtil;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.BlockPos;
@@ -11,10 +13,8 @@ import net.minecraft.util.Vec3;
 import net.minecraft.world.World;
 import net.minecraft.world.chunk.Chunk;
 
-import factorization.fzds.interfaces.IFzdsShenanigans;
-import factorization.shared.Core;
-import factorization.util.NumUtil;
-import factorization.util.SpaceUtil;
+import java.util.ArrayList;
+import java.util.List;
 
 public class MetaAxisAlignedBB extends AxisAlignedBB implements IFzdsShenanigans {
     /*
@@ -29,18 +29,19 @@ public class MetaAxisAlignedBB extends AxisAlignedBB implements IFzdsShenanigans
      * 		alternative method:
      * 			Convert input AABB to 8 points, convert them all to shadow space, make AABB out of the maximum
      * 			Too expensive!
-     * 				
+     *
      * 2. We now have a list of AABBs in shadow space, and the passed in AABB in real world space.
      * 3. Iterate over the AABBs, converting each one to real space & applying the operation
      */
-    private DimensionSliceEntity idc;
-    private World shadowWorld;
+    private final DimensionSliceEntity idc;
+    private final World shadowWorld;
     
     public MetaAxisAlignedBB(DimensionSliceEntity idc, World shadowWorld, AxisAlignedBB orig) {
         super(orig.minX, orig.minY, orig.minZ,
                 orig.maxX, orig.maxY, orig.maxZ);
         this.idc = idc;
         this.shadowWorld = shadowWorld;
+        NORELEASE.fixme("Slopes. Probably easy? :D");
     }
 
     public MetaAxisAlignedBB setUnderlyingNew(AxisAlignedBB bb) {
@@ -126,6 +127,7 @@ public class MetaAxisAlignedBB extends AxisAlignedBB implements IFzdsShenanigans
     }
 
     List<AxisAlignedBB> getShadowBoxesInRealBox(AxisAlignedBB realBox) {
+        NORELEASE.fixme("Convert to iterator style");
         double expansion = 0.3660254037844387;
         // It is important that expansion be the right value.
         // If it is too small, then collisions will be incorrect when rotated.
@@ -147,7 +149,7 @@ public class MetaAxisAlignedBB extends AxisAlignedBB implements IFzdsShenanigans
         // Could probably be done as a simpleish function depending on rotationQuaternion.w
         // Or could do it a bit slower & cache it. (And maybe doing it live wouldn't be bad, since this isn't the slow part yet)
         AxisAlignedBB shadowBox = convertRealBoxToShadowBox(realBox);
-        if (!idc.getRotation().isZero()) {
+        if (!idc.getTransform().getRot().isZero()) {
             shadowBox = shadowBox.expand(expansion, expansion, expansion);
         }
         return getShadowBoxesWithinShadowBox(shadowBox);

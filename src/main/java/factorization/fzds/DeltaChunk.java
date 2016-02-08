@@ -4,11 +4,9 @@ import factorization.api.Coord;
 import factorization.api.DeltaCoord;
 import factorization.api.ICoordFunction;
 import factorization.coremodhooks.IExtraChunkData;
-import factorization.fzds.interfaces.IDeltaChunk;
+import factorization.fzds.interfaces.IDimensionSlice;
 import factorization.fzds.network.InteractionLiason;
 import factorization.fzds.network.PacketProxyingPlayer;
-import factorization.util.NORELEASE;
-import factorization.util.SpaceUtil;
 import gnu.trove.set.hash.THashSet;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
@@ -45,32 +43,32 @@ public class DeltaChunk {
         return w.isRemote ? Hammer.clientSlices : Hammer.serverSlices;
     }
 
-    public static Iterable<IDeltaChunk> getAllSlices(World w) {
+    public static Iterable<IDimensionSlice> getAllSlices(World w) {
         DeltaChunkMap dm = getSlices(w);
-        ArrayList<IDeltaChunk> ret = new ArrayList<IDeltaChunk>();
+        ArrayList<IDimensionSlice> ret = new ArrayList<IDimensionSlice>();
         if (dm == null) return ret;
-        for (IDeltaChunk[] array : dm.getIdcs()) {
+        for (IDimensionSlice[] array : dm.getIdcs()) {
             Collections.addAll(ret, array);
         }
         return ret;
     }
     
-    public static IDeltaChunk[] getSlicesContainingPoint(Coord at) {
+    public static IDimensionSlice[] getSlicesContainingPoint(Coord at) {
         return getSlices(at.w).get(at);
     }
     
-    static boolean addSlice(IDeltaChunk dse) {
-        return getSlices(dse.worldObj).add(dse);
+    static boolean addSlice(IDimensionSlice dse) {
+        return getSlices(dse.getRealWorld()).add(dse);
     }
     
-    static Set<IDeltaChunk> getSlicesInRange(World w, int lx, int ly, int lz, int hx, int hy, int hz) {
-        THashSet<IDeltaChunk> found_deltachunks = new THashSet<IDeltaChunk>(10);
+    static Set<IDimensionSlice> getSlicesInRange(World w, int lx, int ly, int lz, int hx, int hy, int hz) {
+        THashSet<IDimensionSlice> found_deltachunks = new THashSet<IDimensionSlice>(10);
         DeltaChunkMap map = DeltaChunk.getSlices(w); // NORELEASE: This guy keeps hold of dead DSEs? Such as after save reload.
-        IDeltaChunk last_found = null;
+        IDimensionSlice last_found = null;
         for (int x = lx; x <= hx; x += 16) {
             for (int z = lz; z <= hz; z += 16) {
-                IDeltaChunk new_idcs[] = map.get(x/16, z/16);
-                for (IDeltaChunk idc : new_idcs) {
+                IDimensionSlice new_idcs[] = map.get(x/16, z/16);
+                for (IDimensionSlice idc : new_idcs) {
                     if (idc == last_found) continue;
                     found_deltachunks.add(idc);
                     last_found = idc;
@@ -105,7 +103,7 @@ public class DeltaChunk {
         return remote ? getClientShadowWorld() : getServerShadowWorld();
     }
     
-    public static IDeltaChunk allocateSlice(World spawnWorld, int channel, DeltaCoord size) {
+    public static IDimensionSlice allocateSlice(World spawnWorld, int channel, DeltaCoord size) {
         if (spawnWorld.isRemote) throw new IllegalArgumentException("Attempted client-side DSE allocation!");
         Coord base, end;
         base = Hammer.hammerInfo.takeCell(channel, size);
@@ -114,22 +112,22 @@ public class DeltaChunk {
         return new DimensionSliceEntity(spawnWorld, base, end);
     }
     
-    public static IDeltaChunk findClosest(Entity target, Coord pos) {
+    public static IDimensionSlice findClosest(Entity target, Coord pos) {
         if (target == null) {
             return null;
         }
         World real_world = target.worldObj;
-        IDeltaChunk closest = null;
+        IDimensionSlice closest = null;
         double dist = Double.POSITIVE_INFINITY;
-        for (IDeltaChunk here : DeltaChunk.getSlicesContainingPoint(pos)) {
-            if (here.worldObj != real_world && !pos.inside(here.getCorner(), here.getFarCorner())) {
+        for (IDimensionSlice here : DeltaChunk.getSlicesContainingPoint(pos)) {
+            if (here.getRealWorld() != real_world && !pos.inside(here.getMinCorner(), here.getMaxCorner())) {
                 continue;
             }
             if (closest == null) {
                 closest = here;
                 continue;
             }
-            double here_dist = target.getDistanceSqToEntity(here);
+            double here_dist = target.getDistanceSqToEntity(here.getEntity());
             if (here_dist < dist) {
                 dist = here_dist;
                 closest = here;
@@ -138,8 +136,8 @@ public class DeltaChunk {
         return closest;
     }
 
-    public static Iterable<IDeltaChunk> getAround(Coord pos, int radius) {
-        final HashSet<IDeltaChunk> nearbyChunks = new HashSet<IDeltaChunk>(); // This should be extracted.
+    public static Iterable<IDimensionSlice> getAround(Coord pos, int radius) {
+        final HashSet<IDimensionSlice> nearbyChunks = new HashSet<IDimensionSlice>(); // This should be extracted.
         Coord.iterateChunksAround(pos, radius, new ICoordFunction() {
             @Override
             public void handle(Coord here) {
@@ -147,8 +145,8 @@ public class DeltaChunk {
                 Entity[] ccs = c.getConstantColliders();
                 if (ccs == null) return;
                 for (Entity ent : ccs) {
-                    if (ent instanceof IDeltaChunk) {
-                        nearbyChunks.add((IDeltaChunk) ent);
+                    if (ent instanceof IDimensionSlice) {
+                        nearbyChunks.add((IDimensionSlice) ent);
                     }
                 }
             }
@@ -162,7 +160,7 @@ public class DeltaChunk {
 
     public static Vec3 shadow2nearestReal(Entity player, Vec3 vec) {
         //The JVM sometimes segfaults in this function.
-        IDeltaChunk closest = findClosest(player, new Coord(player.worldObj, vec));
+        IDimensionSlice closest = findClosest(player, new Coord(player.worldObj, vec));
         if (closest == null) {
             return null;
         }
@@ -197,15 +195,13 @@ public class DeltaChunk {
         }
     }
 
-    public static IDeltaChunk makeSlice(int channel, Coord min, Coord max, Collection<Coord> coords, final boolean wipeSrc) {
+    public static IDimensionSlice makeSlice(int channel, Coord min, Coord max, Collection<Coord> coords, final boolean wipeSrc) {
         min = min.copy();
         max = max.copy();
         DeltaCoord size = max.difference(min);
-        final IDeltaChunk dse = allocateSlice(min.w, channel, size);
+        final IDimensionSlice dse = allocateSlice(min.w, channel, size);
         Vec3 vrm = min.centerVec(max);
-        dse.posX = (int)vrm.xCoord;
-        dse.posY = (int)vrm.yCoord;
-        dse.posZ = (int)vrm.zCoord;
+        dse.getTransform().setPos(vrm);
         final HashSet<Chunk> chunks = new HashSet<Chunk>();
         for (Coord real : coords) {
             Coord shadow = dse.real2shadow(real);
@@ -235,7 +231,7 @@ public class DeltaChunk {
         return dse;
     }
 
-    public static IDeltaChunk makeSlice(int channel, Coord min, Coord max, AreaMap mapper, final boolean wipeSrc) {
+    public static IDimensionSlice makeSlice(int channel, Coord min, Coord max, AreaMap mapper, final boolean wipeSrc) {
         final ArrayList<Coord> buffer = new ArrayList<Coord>();
         mapper.fillDse(new DseDestination() {
             @Override
@@ -257,18 +253,18 @@ public class DeltaChunk {
         chunks.addAll(edges);
     }
     
-    public static IDeltaChunk construct(World inWorld, final Coord min, final Coord max) {
+    public static IDimensionSlice construct(World inWorld, final Coord min, final Coord max) {
         return new DimensionSliceEntity(inWorld, min, max);
     }
     
-    public static void paste(IDeltaChunk selected, boolean overwriteDestination) {
+    public static void paste(IDimensionSlice selected, boolean overwriteDestination) {
         Coord a = new Coord(DeltaChunk.getServerShadowWorld(), 0, 0, 0);
         Coord b = a.copy();
-        Vec3 vShadowMin = selected.getCorner().toVector();
-        Vec3 vShadowMax = selected.getFarCorner().toVector();
+        Vec3 vShadowMin = selected.getMinCorner().toVector();
+        Vec3 vShadowMax = selected.getMaxCorner().toVector();
         a.set(vShadowMin);
         b.set(vShadowMax);
-        Coord dest = new Coord(selected);
+        Coord dest = new Coord(selected.getEntity());
         Coord c = new Coord(a.w, 0, 0, 0);
         
         int minX = 0, minY = 0, minZ = 0, maxX = 0, maxY = 0, maxZ = 0;
@@ -302,11 +298,11 @@ public class DeltaChunk {
         }
     }
     
-    public static void clear(IDeltaChunk selected) {
+    public static void clear(IDimensionSlice selected) {
         Coord a = new Coord(DeltaChunk.getServerShadowWorld(), 0, 0, 0);
         Coord b = a.copy();
-        Vec3 vShadowMin = selected.getCorner().toVector();
-        Vec3 vShadowMax = selected.getFarCorner().toVector();
+        Vec3 vShadowMin = selected.getMinCorner().toVector();
+        Vec3 vShadowMax = selected.getMaxCorner().toVector();
         a.set(vShadowMin);
         b.set(vShadowMax);
         

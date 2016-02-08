@@ -1,4 +1,4 @@
-package factorization.fzds;
+package factorization.algos;
 
 import java.util.Collection;
 import java.util.Iterator;

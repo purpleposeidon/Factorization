@@ -1,7 +1,7 @@
 package factorization.fzds;
 
 import factorization.api.Coord;
-import factorization.fzds.interfaces.IDeltaChunk;
+import factorization.fzds.interfaces.IDimensionSlice;
 import factorization.util.NumUtil;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.DestroyBlockProgress;
@@ -52,9 +52,9 @@ class ShadowRenderGlobal implements IWorldAccess {
     
     void markBlocksForUpdate(int lx, int ly, int lz, int hx, int hy, int hz) {
         World realClientWorld = DeltaChunk.getClientRealWorld();
-        for (IDeltaChunk idc : DeltaChunk.getSlicesInRange(realClientWorld, lx, ly, lz, hx, hy, hz)) {
+        for (IDimensionSlice idc : DeltaChunk.getSlicesInRange(realClientWorld, lx, ly, lz, hx, hy, hz)) {
             DimensionSliceEntity dse = (DimensionSliceEntity) idc;
-            Coord near = dse.getCorner(), far = dse.getFarCorner();
+            Coord near = dse.getMinCorner(), far = dse.getMaxCorner();
             if (NumUtil.intersect(near.x, far.x, lx, hx)
                     && NumUtil.intersect(near.y, far.y, ly, hy)
                     && NumUtil.intersect(near.z, far.z, lz, hz)) {
@@ -95,7 +95,7 @@ class ShadowRenderGlobal implements IWorldAccess {
     @Override
     public void broadcastSound(int soundType, BlockPos pos, int type) {
         final Coord here = new Coord(DeltaChunk.getClientShadowWorld(), pos);
-        for (IDeltaChunk idc : DeltaChunk.getSlicesContainingPoint(here)) {
+        for (IDimensionSlice idc : DeltaChunk.getSlicesContainingPoint(here)) {
             Coord at = here.copy();
             idc.shadow2real(at);
             at.w.playBroadcastSound(soundType, pos, type);
@@ -105,7 +105,7 @@ class ShadowRenderGlobal implements IWorldAccess {
     @Override
     public void playAuxSFX(EntityPlayer player, int soundType, BlockPos pos, int soundData) {
         final Coord here = new Coord(DeltaChunk.getClientShadowWorld(), pos);
-        for (IDeltaChunk idc : DeltaChunk.getSlicesContainingPoint(here)) {
+        for (IDimensionSlice idc : DeltaChunk.getSlicesContainingPoint(here)) {
             Coord at = idc.shadow2real(here);
             at.w.playAuxSFXAtEntity(player, soundType, at.toBlockPos(), soundData);
         }

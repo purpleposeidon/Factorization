@@ -404,27 +404,30 @@ public class Quaternion implements IDataSerializable {
         return this;
     }
     
-    public void incrAdd(Quaternion other) {
+    public Quaternion incrAdd(Quaternion other) {
         w += other.w;
         x += other.x;
         y += other.y;
         z += other.z;
+        return this;
     }
     
-    public void incrAdd(Quaternion other, double scale) {
+    public Quaternion incrAdd(Quaternion other, double scale) {
         w += other.w*scale;
         x += other.x*scale;
         y += other.y*scale;
         z += other.z*scale;
+        return this;
     }
     
-    public void incrMultiply(Quaternion other) {
+    public Quaternion incrMultiply(Quaternion other) {
         double nw, nx, ny, nz;
         nw = w*other.w - x*other.x - y*other.y - z*other.z;
         nx = w*other.x + x*other.w + y*other.z - z*other.y;
         ny = w*other.y - x*other.z + y*other.w + z*other.x;
         nz = w*other.z + x*other.y - y*other.x + z*other.w;
         update(nw, nx, ny, nz);
+        return this;
     }
     
     /** 

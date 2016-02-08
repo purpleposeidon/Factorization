@@ -24,7 +24,7 @@ import factorization.fzds.DeltaChunk;
 import factorization.fzds.DeltaChunk.AreaMap;
 import factorization.fzds.DeltaChunk.DseDestination;
 import factorization.fzds.interfaces.DeltaCapability;
-import factorization.fzds.interfaces.IDeltaChunk;
+import factorization.fzds.interfaces.IDimensionSlice;
 import factorization.notify.Notice;
 import factorization.notify.Style;
 import factorization.shared.Core;
@@ -260,10 +260,10 @@ public class Awakener {
         
         ArrayList<LimbInfo> parts = new ArrayList();
         int i = 0;
-        IDeltaChunk bodyIdc = null;
+        IDimensionSlice bodyIdc = null;
         for (SetAndInfo partInfo : limbInfo) {
             String name = partInfo.limbType + " " + partInfo.limbSide + (i++);
-            IDeltaChunk idc = createIDC(partInfo.set, partInfo.rotation, name);
+            IDimensionSlice idc = createIDC(partInfo.set, partInfo.rotation, name);
             LimbInfo li = new LimbInfo(partInfo.limbType, partInfo.limbSide, partInfo.length, idc);
             parts.add(li);
             if (li.type == LimbType.BODY) {
@@ -275,7 +275,7 @@ public class Awakener {
         if (bodyIdc == null) throw new NullPointerException();
         
         for (LimbInfo li : parts) {
-            IDeltaChunk idc = li.idc.getEntity();
+            IDimensionSlice idc = li.idc.getEntity();
             if (idc != bodyIdc) {
                 /*Vec3 at = SpaceUtil.fromEntPos(idc);
                 at = bodyIdc.real2shadow(at);
@@ -285,7 +285,7 @@ public class Awakener {
                 at.zCoord -= corner.z;*/
                 idc.setParent(bodyIdc);
             }
-            FzUtil.spawn(idc);
+            FzUtil.spawn(idc.getEntity());
         }
         
         int part_size = parts.size();
@@ -527,7 +527,7 @@ public class Awakener {
         return null;
     }
 
-    IDeltaChunk createIDC(final Set<Coord> parts, Vec3 rotationCenter, String partName) {
+    IDimensionSlice createIDC(final Set<Coord> parts, Vec3 rotationCenter, String partName) {
         Coord min = null, max = null;
         for (Coord c : parts) {
             if (min == null || max == null) {
@@ -548,7 +548,7 @@ public class Awakener {
         min.adjust(new DeltaCoord(-r, -r, -r));
         max.adjust(new DeltaCoord(r, r, r));
 
-        IDeltaChunk ret = DeltaChunk.makeSlice(ColossusFeature.deltachunk_channel, min, max, new AreaMap() {
+        IDimensionSlice ret = DeltaChunk.makeSlice(ColossusFeature.deltachunk_channel, min, max, new AreaMap() {
             @Override
             public void fillDse(DseDestination destination) {
                 for (Coord c : parts) {

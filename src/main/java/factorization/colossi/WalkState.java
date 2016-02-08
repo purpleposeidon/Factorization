@@ -4,8 +4,10 @@ import factorization.api.Coord;
 import factorization.api.Quaternion;
 import factorization.colossi.ColossusController.BodySide;
 import factorization.colossi.ColossusController.LimbType;
-import factorization.fzds.interfaces.IDeltaChunk;
+import factorization.fzds.interfaces.IDimensionSlice;
 import factorization.fzds.interfaces.Interpolation;
+import factorization.fzds.interfaces.transform.Pure;
+import factorization.fzds.interfaces.transform.TransformData;
 import factorization.util.SpaceUtil;
 import net.minecraft.block.Block;
 import net.minecraft.util.EnumFacing;
@@ -40,7 +42,7 @@ public enum WalkState implements IStateMachine<WalkState> {
             checkRotation(controller);
             final double arms_angle = Math.PI * 0.45;
             for (LimbInfo limb : controller.limbs) {
-                IDeltaChunk idc = limb.idc.getEntity();
+                IDimensionSlice idc = limb.idc.getEntity();
                 if (idc == null) continue;
                 if (limb.type == LimbType.ARM) {
                     if ((limb.side == BodySide.LEFT) ^ controller.turningDirection == 1) {
@@ -60,7 +62,7 @@ public enum WalkState implements IStateMachine<WalkState> {
             if (interruptWalk(controller)) return IDLE;
             if (controller.atTarget() || controller.targetChanged()) return IDLE;
             playStepSounds(controller, age);
-            if (!controller.body.hasOrderedRotation()) return checkRotation(controller);
+            if (!controller.body.hasOrders()) return checkRotation(controller);
             
             // System no longer supports joint displacement, but if it did:
             // double lift_height = 1.5F/16F;
@@ -68,7 +70,7 @@ public enum WalkState implements IStateMachine<WalkState> {
             double phase_length = 36; //18;
             for (LimbInfo limb : controller.limbs) {
                 // Twist the legs while the body turns
-                IDeltaChunk idc = limb.idc.getEntity();
+                IDimensionSlice idc = limb.idc.getEntity();
                 if (idc == null) continue;
                 if (limb.isTurning()) continue;
                 if (limb.type != LimbType.LEG) continue;
@@ -104,14 +106,15 @@ public enum WalkState implements IStateMachine<WalkState> {
         
         WalkState checkRotation(ColossusController controller) {
             if (controller.atTarget()) return IDLE;
-            IDeltaChunk body = controller.body;
+            IDimensionSlice body = controller.body;
             Vec3 target = controller.getTarget().createVector();
             target = SpaceUtil.setY(target, controller.posY);
-            Vec3 me = SpaceUtil.fromEntPos(body);
+            TransformData<Pure> transform = body.getTransform();
+            Vec3 me = transform.getPos();
             Vec3 delta = me.subtract(target);
             double angle = Math.atan2(delta.xCoord, delta.zCoord) - Math.PI / 2;
             Quaternion target_rotation = Quaternion.getRotationQuaternionRadians(angle, EnumFacing.UP);
-            Quaternion current_rotation = body.getRotation();
+            Quaternion current_rotation = transform.getRot();
             int size = controller.leg_size + 1;
             double rotation_distance = (((Math.toDegrees(target_rotation.getAngleBetween(current_rotation)) % 360) + 360) % 360) / 360;
             double rotation_speed = 80;
@@ -124,8 +127,8 @@ public enum WalkState implements IStateMachine<WalkState> {
                     li.lastTurnDirection = 0;
                 }
             } else if (rotation_time > 0.001) {
-                body.setRotation(target_rotation);
-                body.setRotationalVelocity(new Quaternion());
+                transform.setRot(target_rotation);
+                body.getVel().setRot(new Quaternion());
             } else {
                 return FORWARD;
             }
@@ -136,7 +139,9 @@ public enum WalkState implements IStateMachine<WalkState> {
         public void onExitState(ColossusController controller, WalkState nextState) {
             controller.turningDirection = 0;
             controller.resetLimbs(20, Interpolation.SMOOTH);
-            controller.body.motionY = 0; // Might not be quite where this belongs. Stop moving after block climbing.
+
+            controller.body.getVel().mulPos(new Vec3(1, 0, 1));
+            // Might not be quite where this belongs. Stop moving after block climbing.
         }
     },
     FORWARD {
@@ -153,15 +158,14 @@ public enum WalkState implements IStateMachine<WalkState> {
         @Override
         public void onEnterState(ColossusController controller, WalkState prevState) {
             if (controller.atTarget()) return;
-            IDeltaChunk body = controller.body;
+            IDimensionSlice body = controller.body;
             Vec3 target = controller.getTarget().createVector();
             target = SpaceUtil.setY(target, controller.posY);
-            Vec3 me = SpaceUtil.fromEntPos(body);
+            Vec3 me = body.getTransform().getPos();
             Vec3 delta = me.subtract(target);
             double walk_speed = Math.min(MAX_WALK_SPEED, delta.lengthVector()) * controller.getSpeedScale();
             delta = delta.normalize();
-            body.motionX = delta.xCoord * walk_speed;
-            body.motionZ = delta.zCoord * walk_speed;
+            body.getVel().setPos(delta.xCoord * walk_speed, 0, delta.zCoord * walk_speed);
             controller.walked += walk_speed;
             controller.resetLimbs(20, Interpolation.SMOOTH);
         }
@@ -187,7 +191,7 @@ public enum WalkState implements IStateMachine<WalkState> {
             for (LimbInfo limb : controller.limbs) {
                 if (limb.type != LimbType.LEG && limb.type != LimbType.ARM) continue;
                 if (limb.isTurning() && !(limb.type == LimbType.LEG && age == 0)) continue;
-                IDeltaChunk idc = limb.idc.getEntity();
+                IDimensionSlice idc = limb.idc.getEntity();
                 if (idc == null) continue;
                 double nextRotationTime = swingTime;
                 int p = limb.limbSwingParity() ? 1 : -1;
@@ -221,9 +225,9 @@ public enum WalkState implements IStateMachine<WalkState> {
         @Override
         public void onExitState(ColossusController controller, WalkState nextState) {
             controller.resetLimbs(20, Interpolation.SMOOTH);
-            IDeltaChunk body = controller.body;
-            body.motionX = body.motionZ = 0; // We've reached our destination
-            body.motionY = 0; // Might not be quite where this belongs. Stop moving after block climbing.
+            IDimensionSlice body = controller.body;
+            // Reached our destination
+            body.getVel().setPos(0, 0 /* Might not be quite where this belongs. Stop moving after block climbing. */, 0);
         }
     }
     ;
@@ -254,10 +258,10 @@ public enum WalkState implements IStateMachine<WalkState> {
         if (age % 35 != 0) return;
         for (LimbInfo limb : controller.limbs) {
             if (limb.type != LimbType.LEG) continue;
-            IDeltaChunk idc = limb.idc.getEntity();
+            IDimensionSlice idc = limb.idc.getEntity();
             if (idc == null) continue;
-            Coord min = idc.getCorner();
-            Coord max = idc.getFarCorner();
+            Coord min = idc.getMinCorner();
+            Coord max = idc.getMaxCorner();
             Coord.sort(min, max);
             max.y = min.y;
             Vec3 shadowFoot = min.centerVec(max);
@@ -269,7 +273,7 @@ public enum WalkState implements IStateMachine<WalkState> {
             if (stomped.isAir()) continue;
             Block.SoundType sound = stomped.getBlock().stepSound;
             if (sound == null) continue;
-            idc.worldObj.playSoundEffect(realFoot.xCoord, realFoot.yCoord, realFoot.zCoord, sound.getStepSound(), sound.getFrequency() * 0.9F, sound.getVolume() * 1.1F);
+            idc.getRealWorld().playSoundEffect(realFoot.xCoord, realFoot.yCoord, realFoot.zCoord, sound.getStepSound(), sound.getFrequency() * 0.9F, sound.getVolume() * 1.1F);
         }
     }
 }

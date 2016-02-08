@@ -2,7 +2,7 @@ package factorization.mechanics;
 
 import factorization.api.Coord;
 import factorization.api.ICoordFunction;
-import factorization.fzds.interfaces.IDeltaChunk;
+import factorization.fzds.interfaces.IDimensionSlice;
 import factorization.util.NumUtil;
 import factorization.util.SpaceUtil;
 import net.minecraft.nbt.NBTTagCompound;
@@ -12,16 +12,16 @@ import net.minecraft.util.Vec3;
 class MassCalculator implements ICoordFunction {
     private static final boolean ROUND_RESULTS = true;
 
-    static double calculateMass(IDeltaChunk idc) {
-        NBTTagCompound tag = idc.getEntityData();
+    static double calculateMass(IDimensionSlice idc) {
+        NBTTagCompound tag = idc.getTag();
         if (tag.hasKey(massKey)) return tag.getDouble(massKey);
         MassCalculator mc = new MassCalculator(idc);
         mc.calculate();
         return mc.massTotal;
     }
 
-    static Vec3 getCenterOfMass(IDeltaChunk idc) {
-        NBTTagCompound tag = idc.getEntityData();
+    static Vec3 getCenterOfMass(IDimensionSlice idc) {
+        NBTTagCompound tag = idc.getTag();
         if (tag.hasKey(comKey + ".x")) {
             double x = tag.getDouble(comKey + ".x");
             double y = tag.getDouble(comKey + ".y");
@@ -32,14 +32,14 @@ class MassCalculator implements ICoordFunction {
         return mc.com;
     }
 
-    static Coord getComCoord(IDeltaChunk idc) {
+    static Coord getComCoord(IDimensionSlice idc) {
         Vec3 com = SpaceUtil.floor(MassCalculator.getCenterOfMass(idc));
-        Coord min = idc.getCorner();
+        Coord min = idc.getMinCorner();
         return new Coord(min.w, com.subtract(min.x, min.y, min.z));
     }
 
-    static void dirty(IDeltaChunk idc) {
-        final NBTTagCompound tag = idc.getEntityData();
+    static void dirty(IDimensionSlice idc) {
+        final NBTTagCompound tag = idc.getTag();
         tag.removeTag(massKey);
         tag.removeTag(comKey + ".x");
         tag.removeTag(comKey + ".y");
@@ -58,18 +58,18 @@ class MassCalculator implements ICoordFunction {
 
     private double massTotal = 0;
     private Vec3 com = SpaceUtil.newVec();
-    private final IDeltaChunk idc;
+    private final IDimensionSlice idc;
     protected final Coord min, max;
 
-    protected MassCalculator(IDeltaChunk idc) {
+    protected MassCalculator(IDimensionSlice idc) {
         this.idc = idc;
-        min = idc.getCorner();
-        max = idc.getFarCorner();
+        min = idc.getMinCorner();
+        max = idc.getMaxCorner();
     }
 
     protected final void calculate() {
         Coord.iterateCube(min, max, this);
-        save(idc.getEntityData());
+        save(idc.getTag());
     }
 
     protected void save(final NBTTagCompound tag) {

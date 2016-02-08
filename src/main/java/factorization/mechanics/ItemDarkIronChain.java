@@ -3,7 +3,7 @@ package factorization.mechanics;
 import factorization.api.Coord;
 import factorization.fzds.DeltaChunk;
 import factorization.fzds.interfaces.DeltaCapability;
-import factorization.fzds.interfaces.IDeltaChunk;
+import factorization.fzds.interfaces.IDimensionSlice;
 import factorization.notify.Notice;
 import factorization.shared.Core;
 import factorization.shared.ItemFactorization;
@@ -39,7 +39,7 @@ public class ItemDarkIronChain extends ItemFactorization {
             return true;
         }
         if (world == DeltaChunk.getServerShadowWorld()) {
-            for (IDeltaChunk idc : DeltaChunk.getSlicesContainingPoint(at)) {
+            for (IDimensionSlice idc : DeltaChunk.getSlicesContainingPoint(at)) {
                 if (!acceptableIDC(idc)) continue;
                 if (!at.isSolidOnSide(dir)) continue;
                 setPos(is, "shadow", at, dir);
@@ -72,7 +72,7 @@ public class ItemDarkIronChain extends ItemFactorization {
         return !crank.isChained();
     }
 
-    boolean acceptableIDC(IDeltaChunk idc) {
+    boolean acceptableIDC(IDimensionSlice idc) {
         if (!MechanicsController.usable(idc)) return false;
         for (DeltaCapability req : new DeltaCapability[] {
                 DeltaCapability.INTERACT,
@@ -144,8 +144,8 @@ public class ItemDarkIronChain extends ItemFactorization {
             killChain(player, is);
             return;
         }
-        IDeltaChunk toHook = null;
-        for (IDeltaChunk idc : DeltaChunk.getSlicesContainingPoint(shadow)) {
+        IDimensionSlice toHook = null;
+        for (IDimensionSlice idc : DeltaChunk.getSlicesContainingPoint(shadow)) {
             if (!acceptableIDC(idc)) continue;
             toHook = idc;
             // Would probably be best to hook the IDC closest to the player... or maybe, you know, the one actually hit.

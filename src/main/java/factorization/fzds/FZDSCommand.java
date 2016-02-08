@@ -10,8 +10,10 @@ import factorization.api.Quaternion;
 import factorization.fzds.DeltaChunk.AreaMap;
 import factorization.fzds.DeltaChunk.DseDestination;
 import factorization.fzds.interfaces.DeltaCapability;
-import factorization.fzds.interfaces.IDeltaChunk;
+import factorization.fzds.interfaces.IDimensionSlice;
 import factorization.fzds.interfaces.Interpolation;
+import factorization.fzds.interfaces.transform.Pure;
+import factorization.fzds.interfaces.transform.TransformData;
 import factorization.notify.Notice;
 import factorization.shared.Core;
 import factorization.util.LangUtil;
@@ -85,7 +87,7 @@ public class FZDSCommand extends CommandBase {
         Coord user;
         boolean op;
         boolean creative;
-        IDeltaChunk selected;
+        IDimensionSlice selected;
         
         /** args: the arguments, not including the name */
         abstract void call(String[] args) throws CommandException;
@@ -238,13 +240,13 @@ public class FZDSCommand extends CommandBase {
         LangUtil.sendChatMessage(true, sender, "Not a command");
     }
     
-    private static WeakReference<IDeltaChunk> currentSelection = new WeakReference<IDeltaChunk>(null);
+    private static WeakReference<IDimensionSlice> currentSelection = new WeakReference<IDimensionSlice>(null);
     
-    public static void setSelection(IDeltaChunk dse) {
-        currentSelection = new WeakReference<IDeltaChunk>(dse);
+    public static void setSelection(IDimensionSlice dse) {
+        currentSelection = new WeakReference<IDimensionSlice>(dse);
     }
 
-    public static IDeltaChunk getSelection() {
+    public static IDimensionSlice getSelection() {
         return currentSelection.get();
     }
     
@@ -413,9 +415,9 @@ public class FZDSCommand extends CommandBase {
             public void call(String[] args) {
                 DSTeleporter tp = getTp();
                 if (arg0.equalsIgnoreCase("gob")) {
-                    tp.destination = selected.getCorner();
+                    tp.destination = selected.getMinCorner();
                 } else if (arg0.equalsIgnoreCase("got")) {
-                    tp.destination = selected.getFarCorner();
+                    tp.destination = selected.getMaxCorner();
                 } else {
                     tp.destination = selected.getCenter();
                 }
@@ -465,17 +467,21 @@ public class FZDSCommand extends CommandBase {
             @Override
             void call(String[] args) {
                 DSTeleporter tp = getTp();
-                tp.destination = new Coord(selected);
-                manager.transferPlayerToDimension(player, selected.dimension, tp);
+                tp.destination = new Coord(selected.getEntity());
+                manager.transferPlayerToDimension(player, selected.getEntity().dimension, tp);
             }}, Requires.PLAYER, Requires.CREATIVE, Requires.SLICE_SELECTED);
         add(new SubCommand("tome") {
             @Override
             String details() { return "Warps selection to player"; }
             @Override
             void call(String[] args) {
-                selected.posX = user.x;
-                selected.posY = user.y;
-                selected.posZ = user.z;
+                Vec3 at;
+                if (player != null) {
+                    at = SpaceUtil.fromEntPos(player);
+                } else {
+                    at = user.toMiddleVector();
+                }
+                selected.getTransform().setPos(at);
             }}, Requires.COORD, Requires.SLICE_SELECTED);
         add(new SubCommand("cut|copy", "x,y,z", "x,y,z") {
             @Override
@@ -500,7 +506,7 @@ public class FZDSCommand extends CommandBase {
                     new Notice(upper, "High").send(player);
                 }
                 
-                IDeltaChunk dse = DeltaChunk.makeSlice(Hammer.fzds_command_channel, lower, upper, new AreaMap() {
+                IDimensionSlice dse = DeltaChunk.makeSlice(Hammer.fzds_command_channel, lower, upper, new AreaMap() {
                     @Override
                     public void fillDse(DseDestination destination) {
                         Coord here = user.copy();
@@ -514,7 +520,7 @@ public class FZDSCommand extends CommandBase {
                         }
                     }}, !copy);
                 dse.loadUsualCapabilities();
-                dse.worldObj.spawnEntityInWorld(dse);
+                dse.getRealWorld().spawnEntityInWorld(dse.getEntity());
                 setSelection(dse);
             }}, Requires.COORD);
         add(new SubCommand("movecenter", "x,y,z") {
@@ -528,11 +534,11 @@ public class FZDSCommand extends CommandBase {
                             Double.parseDouble(vecArg[1]),
                             Double.parseDouble(vecArg[2]));
                 } catch (Throwable e) {
-                    Vec3 v = selected.getRotationalCenterOffset();
+                    Vec3 v = selected.getTransform().getOffset();
                     sendChat("Current rotational center: " + v.xCoord + "," + v.yCoord + "," + v.zCoord);
                 }
                 if (newOffset != null) {
-                    selected.setRotationalCenterOffset(newOffset);
+                    selected.getTransform().setOffset(newOffset);
                 }
             }
         }, Requires.SLICE_SELECTED);
@@ -553,7 +559,7 @@ public class FZDSCommand extends CommandBase {
                 max.y = 0xFF;
                 final Coord lower = min.copy();
                 final Coord upper = max.copy();
-                IDeltaChunk dse = DeltaChunk.makeSlice(Hammer.fzds_command_channel, lower, upper, new AreaMap() {
+                IDimensionSlice dse = DeltaChunk.makeSlice(Hammer.fzds_command_channel, lower, upper, new AreaMap() {
                     @Override
                     public void fillDse(DseDestination destination) {
                         Coord here = user.copy();
@@ -567,7 +573,7 @@ public class FZDSCommand extends CommandBase {
                         }
                     }}, true);
                 dse.loadUsualCapabilities();
-                dse.worldObj.spawnEntityInWorld(dse);
+                dse.getRealWorld().spawnEntityInWorld(dse.getEntity());
                 setSelection(dse);
             }}, Requires.COORD);
         add(new SubCommand("include") { //TODO: would pull blocks into the slice
@@ -582,7 +588,7 @@ public class FZDSCommand extends CommandBase {
             void call(String[] args) {
                 DeltaChunk.paste(selected, args.length >= 1);
                 DeltaChunk.clear(selected);
-                selected.setDead();
+                selected.killIDS();
                 setSelection(null);
             }}, Requires.SLICE_SELECTED);
         add(new SubCommand("paste", "[overwrite?]") {
@@ -601,11 +607,11 @@ public class FZDSCommand extends CommandBase {
                 AreaMap do_nothing = new AreaMap() {
                     @Override public void fillDse(DseDestination destination) { }
                 };
-                IDeltaChunk dse = DeltaChunk.makeSlice(Hammer.fzds_command_channel, low, up, do_nothing, false);
+                IDimensionSlice dse = DeltaChunk.makeSlice(Hammer.fzds_command_channel, low, up, do_nothing, false);
                 dse.permit(DeltaCapability.ORACLE);
                 dse.forbid(DeltaCapability.COLLIDE);
-                user.setAsEntityLocation(dse);
-                dse.worldObj.spawnEntityInWorld(dse);
+                dse.getTransform().setPos(user.toMiddleVector());
+                dse.getRealWorld().spawnEntityInWorld(dse.getEntity());
             }}, Requires.OP);
         
         add(new SubCommand("grass") {
@@ -620,9 +626,9 @@ public class FZDSCommand extends CommandBase {
             String details() { return "Rounds the Slice's position down to integers"; }
             @Override
             void call(String[] args) {
-                selected.posX = (int) selected.posX;
-                selected.posY = (int) selected.posY;
-                selected.posZ = (int) selected.posZ;
+                TransformData<Pure> trans = selected.getTransform();
+                Vec3 s = trans.getPos();
+                trans.setPos((int) s.xCoord, (int) s.yCoord, (int) s.zCoord);
             }}, Requires.SLICE_SELECTED);
         add(new SubCommand("removeall") {
             @Override
@@ -655,8 +661,8 @@ public class FZDSCommand extends CommandBase {
             String details() { return "Shows the rotation & angular velocity of the selection"; }
             @Override
             void call(String[] args) {
-                sendChat("r = " + selected.getRotation());
-                sendChat("ω = " + selected.getRotationalVelocity());
+                sendChat("r = " + selected.getTransform().getRot());
+                sendChat("ω = " + selected.getVel().getRot());
                 if (!selected.can(DeltaCapability.ROTATE)) {
                     sendChat("(Does not have the ROTATE cap, so this is meaningless)");
                 }
@@ -673,11 +679,11 @@ public class FZDSCommand extends CommandBase {
                     entityLists.add(world.loadedEntityList);
                 }
                 
-                IDeltaChunk first = null, prev = null, next = null, last = null;
+                IDimensionSlice first = null, prev = null, next = null, last = null;
                 boolean found_current = false;
                 for (Entity ent : Iterables.concat(entityLists)) {
-                    if (!(ent instanceof IDeltaChunk)) continue;
-                    IDeltaChunk here = (IDeltaChunk) ent;
+                    if (!(ent instanceof IDimensionSlice)) continue;
+                    IDimensionSlice here = (IDimensionSlice) ent;
                     last = here;
                     if (first == null) {
                         first = last;
@@ -716,10 +722,10 @@ public class FZDSCommand extends CommandBase {
         add(new SubCommand("select-nearest") {
             @Override
             void call(String[] args) {
-                IDeltaChunk selected = null;
+                IDimensionSlice selected = null;
                 double dist = Double.POSITIVE_INFINITY;
-                for (IDeltaChunk idc : DeltaChunk.getAllSlices(user.w)) {
-                    double d = user.distanceSq(new Coord(idc));
+                for (IDimensionSlice idc : DeltaChunk.getAllSlices(user.w)) {
+                    double d = user.distanceSq(new Coord(idc.getEntity()));
                     if (d > dist) continue;
                     dist = d;
                     selected = idc;
@@ -736,17 +742,17 @@ public class FZDSCommand extends CommandBase {
                 if (args.length == 1 && args[0].equalsIgnoreCase("part")) {
                     recursive = false;
                 }
-                HashSet<IDeltaChunk> toKill = new HashSet<IDeltaChunk>();
+                HashSet<IDimensionSlice> toKill = new HashSet<IDimensionSlice>();
                 toKill.add(selected);
                 if (recursive) {
                     boolean any = true;
                     while (any) {
                         any = false;
-                        ArrayList<IDeltaChunk> toAdd = new ArrayList<IDeltaChunk>();
-                        for (IDeltaChunk idc : toKill) {
-                            IDeltaChunk parent = idc.getParent();
+                        ArrayList<IDimensionSlice> toAdd = new ArrayList<IDimensionSlice>();
+                        for (IDimensionSlice idc : toKill) {
+                            IDimensionSlice parent = idc.getParent();
                             if (parent != null) toAdd.add(parent);
-                            List<IDeltaChunk> children = idc.getChildren();
+                            List<IDimensionSlice> children = idc.getChildren();
                             if (children == null) continue;
                             toAdd.addAll(children);
                         }
@@ -756,8 +762,8 @@ public class FZDSCommand extends CommandBase {
                     }
                 }
 
-                for (IDeltaChunk idc : toKill) {
-                    idc.setDead();
+                for (IDimensionSlice idc : toKill) {
+                    idc.killIDS();
                     clearDseArea(idc);
                 }
                 setSelection(null);
@@ -796,9 +802,9 @@ public class FZDSCommand extends CommandBase {
                 }
                 Quaternion newVal = Quaternion.getRotationQuaternionRadians(theta, dir);
                 if (arg0.equalsIgnoreCase("sr")) {
-                    selected.setRotation(newVal);
+                    selected.getTransform().setRot(newVal);
                 } else if (arg0.equalsIgnoreCase("sw")) {
-                    selected.setRotationalVelocity(newVal);
+                    selected.getVel().setRot(newVal);
                 } else {
                     throw new SyntaxErrorException();
                 }
@@ -832,48 +838,37 @@ public class FZDSCommand extends CommandBase {
                     sendChat("Selection does not have the ROTATE cap");
                     return;
                 }
+                TransformData<Pure> s = selected.getTransform();
+                TransformData<Pure> v = selected.getVel();
                 if (args[0].equals("+")) {
                     if (type == 'd' || type == 's') {
-                        selected.setPosition(selected.posX + x, selected.posY + y, selected.posZ + z);
+                        s.addPos(x, y, z);
                     } else if (type == 'v') {
-                        selected.addVelocity(x/20, y/20, z/20);
+                        v.addPos(x / 20, y / 20, z / 20);
                     } else if (type == 'r') {
-                        selected.getRotation().incrAdd(new Quaternion(w, x, y, z));
+                        s.setRot(s.getRot().add(new Quaternion(w, x, y, z)));
                     } else if (type == 'w') {
-                        selected.getRotationalVelocity().incrAdd(new Quaternion(w, x, y, z));
+                        v.setRot(v.getRot().add(new Quaternion(w, x, y, z)));
                     } else {
                         sendChat("Not a command?");
                     }
                 } else if (args[0].equals("=")) {
                     if (type == 'd' || type == 's') {
-                        selected.setPosition(x, y, z);
+                        s.setPos(x, y, z);
                     } else if (type == 'v') {
-                        selected.motionX = 0;
-                        selected.motionY = 0;
-                        selected.motionZ = 0;
-                        selected.addVelocity(x/20, y/20, z/20);
+                        v.setPos(x / 20, y / 20, z / 20);
                     } else if (type == 'r') {
-                        selected.setRotation((new Quaternion(w, x, y, z)));
+                        s.setRot(new Quaternion(w, x, y, z));
                     } else if (type == 'w') {
-                        Quaternion omega = (new Quaternion(w, x, y, z));
-                        selected.setRotationalVelocity(omega);
+                        v.setRot(new Quaternion(w, x, y, z));
                     } else {
                         sendChat("Not a command?");
                     }
-                    selected.getRotation().incrNormalize();
-                    selected.getRotationalVelocity().incrNormalize();
+                    v.setRot(v.getRot().incrNormalize());
+                    s.setRot(s.getRot().incrNormalize());
                 } else {
                     sendChat("+ or =?");
                 }
-            }}, Requires.SLICE_SELECTED);
-        add(new SubCommand("dirty") {
-            @Override
-            String details() { return "[Moves the selection back and forth]"; }
-            @Override
-            void call(String[] args) {
-                selected.getRotationalVelocity().w *= -1;
-                selected.getRotation().w *= -1;
-                selected.getRotation().w += 0.1;
             }}, Requires.SLICE_SELECTED);
         add(new SubCommand("caps") {
             @Override
@@ -920,7 +915,7 @@ public class FZDSCommand extends CommandBase {
                     sendChat("Selection doesn't have the SCALE cap");
                     return;
                 }
-                ((DimensionSliceEntity) selected).scale = Float.parseFloat(args[0]);
+                selected.getTransform().setScale(Double.parseDouble(args[0]));
             }}, Requires.SLICE_SELECTED, Requires.CREATIVE);
         add(new SubCommand("alpha", "newOpacity") {
             @Override
@@ -1010,10 +1005,10 @@ public class FZDSCommand extends CommandBase {
                 Coord low = origin.add(DeltaCoord.parse(args[0]));
                 Coord upr = origin.add(DeltaCoord.parse(args[1]));
                 Coord.sort(low, upr);
-                IDeltaChunk dse = DeltaChunk.construct(user.w, low, upr);
+                IDimensionSlice dse = DeltaChunk.construct(user.w, low, upr);
                 dse.loadUsualCapabilities();
-                user.setAsEntityLocation(dse);
-                user.w.spawnEntityInWorld(dse);
+                dse.getTransform().setPos(user.toMiddleVector());
+                user.w.spawnEntityInWorld(dse.getEntity());
             }
         }, Requires.COORD);
         add(new SubCommand("orbitme") {
@@ -1026,18 +1021,18 @@ public class FZDSCommand extends CommandBase {
         add(new SubCommand("resetbody") {
             @Override
             String details() {
-                return "Resets the rotation of a DSE & its children";
+                return "Resets the rotation of a DSE & its immediate children";
             }
             
             @Override
             void call(String[] args) {
-                selected.cancelOrderedRotation();
-                selected.setRotation(new Quaternion());
-                selected.setRotationalVelocity(new Quaternion());
-                for (IDeltaChunk idc : selected.getChildren()) {
+                selected.cancelOrder();
+                selected.getTransform().setRot(new Quaternion());
+                selected.getVel().setRot(new Quaternion());
+                for (IDimensionSlice idc : selected.getChildren()) {
                     Vec3 base = idc.getParentJoint();
                     Vec3 snapTo = idc.shadow2real(base);
-                    SpaceUtil.toEntPos(idc, snapTo);
+                    idc.getTransform().setPos(snapTo);
                     selected = idc;
                     this.call(args);
                 }
@@ -1053,12 +1048,12 @@ public class FZDSCommand extends CommandBase {
             @Override
             void call(String[] args) {
                 int id = Integer.parseInt(args[0]);
-                Entity ent = selected.worldObj.getEntityByID(id);
-                if (!(ent instanceof IDeltaChunk)) {
+                Entity ent = selected.getEntity().worldObj.getEntityByID(id);
+                if (!(ent instanceof IDimensionSlice)) {
                     sendChat("ID did not point to a DSE");
                     return;
                 }
-                IDeltaChunk parent = (IDeltaChunk) ent;
+                IDimensionSlice parent = (IDimensionSlice) ent;
                 if (parent == selected) {
                     sendChat("Can't parent to itself");
                     return;
@@ -1074,7 +1069,7 @@ public class FZDSCommand extends CommandBase {
                     Minecraft.getMinecraft().gameSettings.debugCamEnable ^= true;
                     return;
                 }
-                double angle = Math.PI * selected.worldObj.rand.nextDouble();
+                double angle = Math.PI * selected.getRealWorld().rand.nextDouble();
                 EnumFacing up = EnumFacing.UP;
                 int time = 30;
                 if (selected.getParent() == null) {
@@ -1082,7 +1077,7 @@ public class FZDSCommand extends CommandBase {
                     time = 300;
                 }
                 Quaternion quat = Quaternion.getRotationQuaternionRadians(angle, up);
-                selected.orderTargetRotation(quat, time, Interpolation.SMOOTH);
+                BasicTransformOrder.give(selected, quat, time, Interpolation.SMOOTH);
             }
             
         }, Requires.SLICE_SELECTED);
@@ -1118,9 +1113,9 @@ public class FZDSCommand extends CommandBase {
         }, Requires.CREATIVE, Requires.PLAYER);
     }
     
-    private static void clearDseArea(IDeltaChunk idc) {
-        Coord a = idc.getCorner();
-        Coord b = idc.getFarCorner();
+    private static void clearDseArea(IDimensionSlice idc) {
+        Coord a = idc.getMinCorner();
+        Coord b = idc.getMaxCorner();
         if (a.w == null || b.w == null) {
             Core.logSevere("DSE's area doesn't have the worlds set? Can't wipe its area. " + idc);
             return;

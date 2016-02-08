@@ -66,7 +66,7 @@ public class ClickHandler {
             if (rightClick) {
                 toSend = HammerNet.makePacket(HammerNetType.rightClickBlock, parent.getEntityId(), hit,
                         hit.hitVec.subtract(new Vec3(hit.getBlockPos())));
-                Coord at = new Coord(DeltaChunk.getClientShadowWorld(), hit);
+                Coord at = Coord.fromMop(DeltaChunk.getClientShadowWorld(), hit);
                 Block block = at.getBlock();
                 EntityPlayer real_player = Minecraft.getMinecraft().thePlayer;
                 Hammer.proxy.setShadowWorld();
@@ -118,7 +118,7 @@ public class ClickHandler {
     }
     
     void sendDigPacket(byte packetType, MovingObjectPosition hit) {
-        FMLProxyPacket toSend = HammerNet.makePacket(packetType, Hammer.proxy.getHitIDC().getEntityId(), hit);
+        FMLProxyPacket toSend = HammerNet.makePacket(packetType, Hammer.proxy.getHitIDC().getEntity().getEntityId(), hit);
         HammerNet.channel.sendToServer(toSend);
     }
     
@@ -134,7 +134,7 @@ public class ClickHandler {
         if (player == null) return;
         World shadowWorld = DeltaChunk.getClientShadowWorld();
         Minecraft mc = Minecraft.getMinecraft();
-        Coord at = new Coord(shadowWorld, hit);
+        Coord at = Coord.fromMop(shadowWorld, hit);
         Block hitBlock = at.getBlock();
         PlayerControllerMP controller = mc.playerController;
         if (!(mc.currentScreen == null && mc.gameSettings.keyBindAttack.isKeyDown() && mc.inGameHasFocus)) {

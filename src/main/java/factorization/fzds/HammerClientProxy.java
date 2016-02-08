@@ -1,6 +1,5 @@
 package factorization.fzds;
 
-import com.mojang.authlib.GameProfile;
 import factorization.aabbdebug.AabbDebugger;
 import factorization.api.Coord;
 import factorization.api.Quaternion;
@@ -8,7 +7,7 @@ import factorization.coremodhooks.HookTargetsClient;
 import factorization.coremodhooks.IExtraChunkData;
 import factorization.fzds.gui.ProxiedGuiContainer;
 import factorization.fzds.gui.ProxiedGuiScreen;
-import factorization.fzds.interfaces.IDeltaChunk;
+import factorization.fzds.interfaces.IDimensionSlice;
 import factorization.fzds.network.PacketJunction;
 import factorization.fzds.network.PacketProxyingPlayer;
 import factorization.shared.Core;
@@ -34,7 +33,6 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.INetHandler;
-import net.minecraft.network.NetworkManager;
 import net.minecraft.network.Packet;
 import net.minecraft.network.play.INetHandlerPlayClient;
 import net.minecraft.network.play.server.S3FPacketCustomPayload;
@@ -454,7 +452,7 @@ public class HammerClientProxy extends HammerProxy {
             shadowWorld.updateEntities();
             Vec3 playerPos = new Vec3(mcPlayer.posX, mcPlayer.posY, mcPlayer.posZ);
             int fogTickRange = 10;
-            for (IDeltaChunk idc : DeltaChunk.getAround(new Coord(mcPlayer), fogTickRange)) {
+            for (IDimensionSlice idc : DeltaChunk.getAround(new Coord(mcPlayer), fogTickRange)) {
                 Vec3 center = idc.real2shadow(playerPos);
                 shadowWorld.doVoidFogParticles((int) center.xCoord, (int) center.yCoord, (int) center.zCoord);
             }
@@ -527,8 +525,9 @@ public class HammerClientProxy extends HammerProxy {
         ItemStack is = event.currentItem;
         float partialTicks = event.partialTicks;
         DimensionSliceEntity dse = _hitSlice;
-        Coord corner = dse.getCorner();
-        Quaternion rotation = dse.prevTickRotation.slerp(dse.getRotation(), event.partialTicks);
+        Coord corner = dse.getMinCorner();
+        Quaternion rotation = dse.transformPrevTick.getRot().slerp(dse.transform.getRot(), event.partialTicks);
+        NORELEASE.fixme("dse.getTransform(partial)?");
         rotation.incrNormalize();
         try {
             GL11.glPushMatrix();
@@ -544,7 +543,7 @@ public class HammerClientProxy extends HammerProxy {
                     NumUtil.interp(dse.lastTickPosY - player.lastTickPosY, dse.posY - player.posY, partialTicks),
                     NumUtil.interp(dse.lastTickPosZ - player.lastTickPosZ, dse.posZ - player.posZ, partialTicks));
             rotation.glRotate();
-            Vec3 centerOffset = dse.getRotationalCenterOffset();
+            Vec3 centerOffset = dse.getTransform().getOffset();
             GL11.glTranslated(
                     -centerOffset.xCoord - corner.x,
                     -centerOffset.yCoord - corner.y,
@@ -656,7 +655,7 @@ public class HammerClientProxy extends HammerProxy {
     }
     
     @Override
-    IDeltaChunk getHitIDC() {
+    IDimensionSlice getHitIDC() {
         return _hitSlice;
     }
     

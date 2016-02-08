@@ -1,6 +1,6 @@
 package factorization.fzds;
 
-import factorization.fzds.interfaces.IDeltaChunk;
+import factorization.fzds.interfaces.IDimensionSlice;
 import factorization.util.SpaceUtil;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.AxisAlignedBB;
@@ -8,10 +8,10 @@ import net.minecraft.util.Vec3;
 
 public class ShadowPlayerAligner {
     final EntityPlayer real, shadow;
-    final IDeltaChunk idc;
+    final IDimensionSlice idc;
 
 
-    public ShadowPlayerAligner(EntityPlayer real, EntityPlayer shadow, IDeltaChunk idc) {
+    public ShadowPlayerAligner(EntityPlayer real, EntityPlayer shadow, IDimensionSlice idc) {
         this.real = real;
         this.shadow = shadow;
         this.idc = idc;

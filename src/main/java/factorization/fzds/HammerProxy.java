@@ -1,6 +1,6 @@
 package factorization.fzds;
 
-import factorization.fzds.interfaces.IDeltaChunk;
+import factorization.fzds.interfaces.IDimensionSlice;
 import factorization.fzds.network.InteractionLiason;
 import factorization.shared.Core;
 import factorization.util.NORELEASE;
@@ -43,7 +43,7 @@ public class HammerProxy {
     
     public MovingObjectPosition getShadowHit() { return null; }
     
-    IDeltaChunk getHitIDC() { return null; }
+    IDimensionSlice getHitIDC() { return null; }
 
     public void createClientShadowWorld() { }
 

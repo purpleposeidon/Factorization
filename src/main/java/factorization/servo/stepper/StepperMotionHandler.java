@@ -4,7 +4,8 @@ import factorization.api.FzOrientation;
 import factorization.api.Quaternion;
 import factorization.api.datahelpers.DataHelper;
 import factorization.api.datahelpers.Share;
-import factorization.fzds.interfaces.IDeltaChunk;
+import factorization.fzds.BasicTransformOrder;
+import factorization.fzds.interfaces.IDimensionSlice;
 import factorization.fzds.interfaces.Interpolation;
 import factorization.servo.MotionHandler;
 import net.minecraft.util.EnumFacing;
@@ -26,7 +27,7 @@ public class StepperMotionHandler extends MotionHandler {
         engine = stepperEngine;
     }
 
-    IDeltaChunk get() {
+    IDimensionSlice get() {
         EntityGrabController grabber = engine.grabber.getEntity();
         if (grabber == null) return null;
         return grabber.idcRef.getEntity();
@@ -50,16 +51,16 @@ public class StepperMotionHandler extends MotionHandler {
             turnThrough(Quaternion.fromOrientation(orig), Quaternion.fromOrientation(orientation));
             return;
         }
-        IDeltaChunk idc = get();
+        IDimensionSlice idc = get();
         if (idc == null) return;
         faceTarget(idc);
     }
 
-    private void faceTarget(IDeltaChunk idc) {
-        Quaternion startRot = idc.getRotation();
+    private void faceTarget(IDimensionSlice idc) {
+        Quaternion startRot = idc.getTransform().getRot();
         Quaternion endRot = Quaternion.fromOrientation(orientation);
         turnThrough(startRot, endRot);
-        idc.orderTargetRotation(endRot, reorientDistance, Interpolation.SMOOTH);
+        BasicTransformOrder.give(idc, endRot, reorientDistance, Interpolation.SMOOTH);
     }
 
     @Override
@@ -71,7 +72,7 @@ public class StepperMotionHandler extends MotionHandler {
         reorientDistance = data.as(Share.VISIBLE, "stepperReorientDistance").putInt(reorientDistance);
     }
 
-    boolean waitForObstructionClear(EntityGrabController grabber, IDeltaChunk idc) {
+    boolean waitForObstructionClear(EntityGrabController grabber, IDimensionSlice idc) {
         if (obstruction == EnumObstructionKind.NONE) return false;
         if (engine.worldObj.getTotalWorldTime() % 40 != 0) return true;
         idc.findAnyCollidingBox();
@@ -91,8 +92,8 @@ public class StepperMotionHandler extends MotionHandler {
         return true;
     }
 
-    private void matchVelocity(IDeltaChunk idc) {
-        idc.setVelocity(getVelocity());
+    private void matchVelocity(IDimensionSlice idc) {
+        idc.getVel().setPos(getVelocity());
     }
 
     @Override
@@ -109,9 +110,9 @@ public class StepperMotionHandler extends MotionHandler {
         if (grabber == null) {
             return;
         }
-        IDeltaChunk idc = grabber.idcRef.getEntity();
+        IDimensionSlice idc = grabber.idcRef.getEntity();
         if (idc == null) return;
-        if (!idc.worldObj.isRemote && waitForObstructionClear(grabber, idc)) return;
+        if (!idc.getRealWorld().isRemote && waitForObstructionClear(grabber, idc)) return;
         if (stepperReorient > 0) {
             stepperReorient--;
             setStopped(false);

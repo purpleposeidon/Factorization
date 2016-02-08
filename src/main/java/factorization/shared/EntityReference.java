@@ -59,6 +59,12 @@ public class EntityReference<E extends Entity> implements IDataSerializable {
             entity_uuid = ent.getUniqueID();
         }
     }
+
+    public E spawnAndTrack(E ent) {
+        trackEntity(ent);
+        ent.worldObj.spawnEntityInWorld(ent);
+        return ent;
+    }
     
     public boolean trackingEntity() {
         return !null_uuid.equals(entity_uuid);

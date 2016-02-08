@@ -2,7 +2,6 @@ package factorization.fzds;
 
 import factorization.aabbdebug.AabbDebugger;
 import factorization.api.Coord;
-import factorization.api.Quaternion;
 import factorization.fzds.interfaces.DeltaCapability;
 import factorization.fzds.interfaces.IFzdsShenanigans;
 import factorization.shared.Core;
@@ -15,7 +14,10 @@ import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.*;
-import net.minecraft.client.renderer.chunk.*;
+import net.minecraft.client.renderer.chunk.IRenderChunkFactory;
+import net.minecraft.client.renderer.chunk.ListChunkFactory;
+import net.minecraft.client.renderer.chunk.RenderChunk;
+import net.minecraft.client.renderer.chunk.VboChunkFactory;
 import net.minecraft.client.renderer.entity.Render;
 import net.minecraft.client.renderer.entity.RenderManager;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
@@ -31,7 +33,6 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.*;
 import net.minecraft.world.World;
 import net.minecraft.world.chunk.Chunk;
-import net.minecraftforge.client.model.b3d.B3DModel;
 import net.minecraftforge.event.world.WorldEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent.Phase;
@@ -42,7 +43,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 
 import static org.lwjgl.opengl.GL11.glPopMatrix;
-import static org.lwjgl.opengl.GL11.glPushMatrix;
 
 
 public class RenderDimensionSliceEntity extends Render<DimensionSliceEntity> implements IFzdsShenanigans {
@@ -137,8 +137,8 @@ public class RenderDimensionSliceEntity extends Render<DimensionSliceEntity> imp
 
         public DSRenderInfo(DimensionSliceEntity dse) {
             this.dse = dse;
-            this.corner = dse.getCorner();
-            this.far = dse.getFarCorner();
+            this.corner = dse.getMinCorner();
+            this.far = dse.getMaxCorner();
             
             xSize = (far.x - corner.x);
             ySize = (far.y - corner.y);
@@ -294,8 +294,8 @@ public class RenderDimensionSliceEntity extends Render<DimensionSliceEntity> imp
         void renderBreakingBlocks(EntityPlayer player, float partial) {
             HashMap<Integer, DestroyBlockProgress> damagedBlocks = HammerClientProxy.shadowRenderGlobal.damagedBlocks;
             if (damagedBlocks.isEmpty()) return;
-            Coord a = dse.getCorner();
-            Coord b = dse.getFarCorner();
+            Coord a = dse.getMinCorner();
+            Coord b = dse.getMaxCorner();
             
             Tessellator tess = Tessellator.getInstance();
             startDamageDrawing(player, partial);
@@ -445,22 +445,15 @@ public class RenderDimensionSliceEntity extends Render<DimensionSliceEntity> imp
             GL11.glPushMatrix();
             try {
                 GL11.glTranslated(x, y, z);
-                Quaternion rotation = dse.getRotation();
-                if (!(rotation.isZero() && dse.prevTickRotation.isZero())) {
-                    Quaternion rot = dse.prevTickRotation.slerp(rotation, partialTicks);
-                    rot.incrNormalize();
-                    rot.glRotate();
-                }
-                if (dse.scale != 1) {
-                    GL11.glScalef(dse.scale, dse.scale, dse.scale);
-                }
+                //dse.getTransform().interpolateBy(dse.transformPrevTick, partialTicks);
+                dse.getReal2Shadow(partialTicks).glMul();
                 if (dse.opacity != 1) {
                     GL11.glColor4f(1, 1, 1, dse.opacity);
                 }
                 if (nest == 1) {
                     renderInfo.updateRelativeEyePosition();
                 }
-                Coord c = dse.getCorner().add(2, 2, 2);
+                Coord c = dse.getMinCorner().add(2, 2, 2);
                 GL11.glTranslated(-c.x, -c.y, -c.z);
                 Core.profileStart("renderTerrain");
                 {

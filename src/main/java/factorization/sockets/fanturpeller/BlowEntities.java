@@ -8,7 +8,7 @@ import factorization.api.datahelpers.Share;
 import factorization.common.FactoryType;
 import factorization.common.FzConfig;
 import factorization.fzds.DeltaChunk;
-import factorization.fzds.interfaces.IDeltaChunk;
+import factorization.fzds.interfaces.IDimensionSlice;
 import factorization.mechanics.MechanicsController;
 import factorization.notify.Notice;
 import factorization.servo.RenderServoMotor;
@@ -126,7 +126,7 @@ public class BlowEntities extends SocketFanturpeller implements Predicate<Entity
         AxisAlignedBB area = SpaceUtil.newBox(range);
         iterateEntities(front_range, s, dir, area, death_area, worldObj);
         if (worldObj == DeltaChunk.getWorld(worldObj)) {
-            for (IDeltaChunk idc : DeltaChunk.getSlicesContainingPoint(coord)) {
+            for (IDimensionSlice idc : DeltaChunk.getSlicesContainingPoint(coord)) {
                 iterateFzdsEntities(front_range, s, dir, idc, area, death_area);
             }
         }
@@ -153,8 +153,8 @@ public class BlowEntities extends SocketFanturpeller implements Predicate<Entity
         }
     }
 
-    private void iterateFzdsEntities(int front_range, double s, EnumFacing dir, IDeltaChunk idc, AxisAlignedBB area, AxisAlignedBB death_area) {
-        iterateEntities(front_range, s, idc.shadow2real(dir), idc.shadow2real(area), idc.shadow2real(death_area), idc.worldObj);
+    private void iterateFzdsEntities(int front_range, double s, EnumFacing dir, IDimensionSlice idc, AxisAlignedBB area, AxisAlignedBB death_area) {
+        iterateEntities(front_range, s, idc.shadow2real(dir), idc.shadow2real(area), idc.shadow2real(death_area), idc.getRealWorld());
         if (!worldObj.isRemote && Core.dev_environ && idc.getController() instanceof MechanicsController) {
             Vec3 force = SpaceUtil.fromDirection(dir);
             double forceScale = target_speed / 20.0;

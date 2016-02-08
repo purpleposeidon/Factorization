@@ -1,6 +1,6 @@
 package factorization.fzds;
 
-import factorization.fzds.interfaces.IDeltaChunk;
+import factorization.fzds.interfaces.IDimensionSlice;
 import factorization.fzds.interfaces.IFzdsEntryControl;
 import net.minecraft.entity.Entity;
 import net.minecraft.nbt.NBTTagCompound;
@@ -8,7 +8,7 @@ import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.world.World;
 
 class UniversalCollider extends Entity implements IFzdsEntryControl {
-    private final DimensionSliceEntity dimensionSliceEntity;
+    public final DimensionSliceEntity dimensionSliceEntity;
 
     public UniversalCollider(DimensionSliceEntity dimensionSliceEntity, World world) {
         super(world);
@@ -35,20 +35,20 @@ class UniversalCollider extends Entity implements IFzdsEntryControl {
     }
 
     @Override
-    public boolean canEnter(IDeltaChunk dse) {
+    public boolean canEnter(IDimensionSlice dse) {
         return false;
     }
 
     @Override
-    public boolean canExit(IDeltaChunk dse) {
+    public boolean canExit(IDimensionSlice dse) {
         return false;
     }
 
     @Override
-    public void onEnter(IDeltaChunk dse) { }
+    public void onEnter(IDimensionSlice dse) { }
 
     @Override
-    public void onExit(IDeltaChunk dse) { }
+    public void onExit(IDimensionSlice dse) { }
 
     @Override
     public boolean doesEntityNotTriggerPressurePlate() {

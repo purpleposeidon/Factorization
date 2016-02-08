@@ -7,7 +7,8 @@ import factorization.common.FactoryType;
 import factorization.fzds.DeltaChunk;
 import factorization.fzds.TransferLib;
 import factorization.fzds.interfaces.DeltaCapability;
-import factorization.fzds.interfaces.IDeltaChunk;
+import factorization.fzds.interfaces.DimensionSliceEntityBase;
+import factorization.fzds.interfaces.IDimensionSlice;
 import factorization.net.StandardMessageType;
 import factorization.shared.BlockClass;
 import factorization.shared.EntityReference;
@@ -40,7 +41,7 @@ public class TileEntityWaterWheel extends TileEntityCommon implements IRotationa
     double water_strength = 0;
     boolean rs_power = false;
     int non_air_block_count;
-    final EntityReference<IDeltaChunk> idcRef = new EntityReference<IDeltaChunk>();
+    final EntityReference<DimensionSliceEntityBase> idcRef = new EntityReference<DimensionSliceEntityBase>();
 
     @Override
     public void setWorldObj(World w) {
@@ -93,8 +94,8 @@ public class TileEntityWaterWheel extends TileEntityCommon implements IRotationa
     protected boolean removedByPlayer(EntityPlayer player, boolean willHarvest) {
         if (!willHarvest) return super.removedByPlayer(player, willHarvest);
         if (PlayerUtil.isPlayerCreative(player) && player.isSneaking()) {
-            IDeltaChunk idc = idcRef.getEntity();
-            if (idc != null) idc.setDead();
+            IDimensionSlice idc = idcRef.getEntity();
+            if (idc != null) idc.killIDS();
             return super.removedByPlayer(player, willHarvest);
         }
         if (idcRef.trackedAndAlive()) return false;
@@ -187,7 +188,7 @@ public class TileEntityWaterWheel extends TileEntityCommon implements IRotationa
         if (!isFenceish(fenceLocation)) return false;
         DeltaCoord idcSize = new DeltaCoord(MAX_RADIUS * 2, MAX_OUT + MAX_IN, MAX_RADIUS * 2);
         DeltaCoord offset = new DeltaCoord(MAX_RADIUS, MAX_OUT, MAX_RADIUS);
-        IDeltaChunk idc = DeltaChunk.allocateSlice(worldObj, channel_id, idcSize);
+        IDimensionSlice idc = DeltaChunk.allocateSlice(worldObj, channel_id, idcSize);
         idc.permit(DeltaCapability.BLOCK_PLACE,
                 DeltaCapability.BLOCK_MINE,
                 DeltaCapability.INTERACT,
@@ -198,31 +199,28 @@ public class TileEntityWaterWheel extends TileEntityCommon implements IRotationa
                 DeltaCapability.COLLIDE,
                 DeltaCapability.VIOLENT_COLLISIONS,
                 DeltaCapability.DRAG);
-        idc.setRotationalCenterOffset(offset.toVector().addVector(0.5, 0.5, 0.5));
+        idc.getTransform().setOffset(offset.toVector().addVector(0.5, 0.5, 0.5));
+        idc.getTransform().setPos(new Coord(this).add(wheelDirection).toMiddleVector());
         final EnumFacing normal = wheelDirection.getOpposite();
-        Coord at = new Coord(this).add(wheelDirection);
-        at.setAsEntityLocation(idc);
         if (normal.getDirectionVec().getY() == 0) {
             //Vec3 up = SpaceUtil.fromDirection(EnumFacing.UP);
             //Vec3 vnorm = SpaceUtil.fromDirection(normal);
             //Vec3 axis = up.crossProduct(vnorm);
             //Quaternion rot = Quaternion.getRotationQuaternionRadians(-Math.PI / 2, axis);
             //idc.setRotation(rot);
-            idc.posY += 0.5;
+            idc.getTransform().addPos(0, 0.5, 0);
         } else {
             double a = .5;
-            idc.posX += wheelDirection.getDirectionVec().getX() * a;
-            idc.posY += wheelDirection.getDirectionVec().getY() * a;
-            idc.posZ += wheelDirection.getDirectionVec().getZ() * a;
+            Vec3 v = SpaceUtil.fromDirection(wheelDirection);
+            idc.getTransform().addPos(SpaceUtil.scale(v, 0.5));
             if (normal.getDirectionVec().getY() == 1) {
-                idc.posY += 1;
+                idc.getTransform().addPos(0, 1, 0);
             }
         }
         TransferLib.move(fenceLocation, idc.getCenter(), false /* We'll do it this way to synchronize them */, true);
         idc.setPartName("Waterwheel");
         fenceLocation.setAir();
-        worldObj.spawnEntityInWorld(idc);
-        idcRef.trackEntity(idc);
+        idcRef.spawnAndTrack(idc.getEntity());
         return true;
     }
 
@@ -254,9 +252,9 @@ public class TileEntityWaterWheel extends TileEntityCommon implements IRotationa
             if (error > 0.9999) {
                 velocity = target_velocity;
             }
-            IDeltaChunk idc = idcRef.getEntity();
+            IDimensionSlice idc = idcRef.getEntity();
             if (idc != null) {
-                idc.setRotationalVelocity(Quaternion.getRotationQuaternionRadians(getVelocity(wheelDirection.getOpposite()), wheelDirection));
+                idc.getVel().setRot(Quaternion.getRotationQuaternionRadians(getVelocity(wheelDirection.getOpposite()), wheelDirection));
             }
             sendVelocity();
         }
@@ -319,7 +317,7 @@ public class TileEntityWaterWheel extends TileEntityCommon implements IRotationa
     }
 
     void calculateWaterForce() {
-        final IDeltaChunk idc = idcRef.getEntity();
+        final IDimensionSlice idc = idcRef.getEntity();
         if (idc == null || getCoord().isWeaklyPowered()) {
             water_strength = 0;
             updatePowerPerTick();
@@ -330,7 +328,7 @@ public class TileEntityWaterWheel extends TileEntityCommon implements IRotationa
     }
 
     private class FlowCalculator implements ICoordFunction {
-        private final IDeltaChunk idc = idcRef.getEntity();
+        private final IDimensionSlice idc = idcRef.getEntity();
         final int sea_min = worldObj.provider.getAverageGroundLevel() + sea_level_range_min;
         final int sea_max = worldObj.provider.getAverageGroundLevel() + sea_level_range_max;
         final Vec3 centerOfMass = idc.getCenter().toMiddleVector();
@@ -347,7 +345,7 @@ public class TileEntityWaterWheel extends TileEntityCommon implements IRotationa
             // Overworld: Require river biome + sealevel or flowing blocks, & wood
             // Nether: Require flowing lava & metal blocks
 
-            Coord.iterateCube(idc.getCorner(), idc.getFarCorner(), this);
+            Coord.iterateCube(idc.getMinCorner(), idc.getMaxCorner(), this);
             water_strength = SpaceUtil.sum(water_torque) * -SpaceUtil.sign(wheelDirection);
 
             updatePowerPerTick();
@@ -412,7 +410,7 @@ public class TileEntityWaterWheel extends TileEntityCommon implements IRotationa
             } else {
                 return;
             }
-            idc.getRotation().applyReverseRotation(tmp);
+            idc.getTransform().getRot().applyReverseRotation(tmp);
             Vec3 P = here.toMiddleVector().subtract(centerOfMass);
             P = SpaceUtil.componentMultiply(P, antiMask); // Remove the axial component of P
             tmp = SpaceUtil.componentMultiply(tmp, antiMask); // And the same for F

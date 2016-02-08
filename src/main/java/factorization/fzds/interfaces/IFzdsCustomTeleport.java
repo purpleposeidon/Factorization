@@ -8,5 +8,5 @@ import net.minecraft.world.World;
  * @see factorization.fzds.interfaces.IFzdsEntryControl
  */
 public interface IFzdsCustomTeleport {
-    void transferEntity(IDeltaChunk idc, World newWorld, Vec3 newPosition);
+    void transferEntity(IDimensionSlice idc, World newWorld, Vec3 newPosition);
 }

@@ -10,10 +10,14 @@ import factorization.citizen.EntityCitizen;
 import factorization.colossi.ColossalBlock.Md;
 import factorization.colossi.ColossusController.BodySide;
 import factorization.colossi.ColossusController.LimbType;
+import factorization.fzds.BasicTransformOrder;
+import factorization.fzds.NullOrder;
 import factorization.fzds.TransferLib;
 import factorization.fzds.interfaces.DeltaCapability;
-import factorization.fzds.interfaces.IDeltaChunk;
+import factorization.fzds.interfaces.IDimensionSlice;
 import factorization.fzds.interfaces.Interpolation;
+import factorization.fzds.interfaces.transform.Pure;
+import factorization.fzds.interfaces.transform.TransformData;
 import factorization.shared.Core;
 import factorization.util.NumUtil;
 import factorization.util.SpaceUtil;
@@ -62,17 +66,17 @@ public enum Technique implements IStateMachine<Technique> {
         public Technique tick(ColossusController controller, int age) {
             if (controller.getHealth() <= 0) return DEATH_FALL;
             if (age == 0) {
-                Vec3 rot = controller.body.getRotation().toRotationVector();
+                Vec3 rot = controller.body.getTransform().getRot().toRotationVector();
                 double err = Math.abs(rot.xCoord) + Math.abs(rot.zCoord);
                 if (err > 0.00001) {
-                    controller.body.setRotationalVelocity(new Quaternion());
-                    Quaternion bodyRot = controller.body.getRotation();
+                    controller.body.getVel().setRot(new Quaternion());
+                    Quaternion bodyRot = controller.body.getTransform().getRot();
                     double yRot = bodyRot.toRotationVector().yCoord;
                     Quaternion straightRot = Quaternion.getRotationQuaternionRadians(yRot, EnumFacing.UP);
                     if (err > Math.PI / 160) {
                         controller.bodyLimbInfo.target(straightRot, 1 * controller.getSpeedScale());
                     } else {
-                        controller.body.setRotation(straightRot);
+                        controller.body.getTransform().setRot(straightRot);
                     }
                     return FINISH_MOVE;
                 }
@@ -132,16 +136,14 @@ public enum Technique implements IStateMachine<Technique> {
         public void onEnterState(ColossusController controller, Technique prevState) {
             // Reset everything, but set the body's rotation to its y-axis rotation
 
-            Quaternion bodyRot = controller.body.getRotation();
+            Quaternion bodyRot = controller.body.getTransform().getRot();
             double yRot = bodyRot.toRotationVector().yCoord;
             Quaternion straightRot = Quaternion.getRotationQuaternionRadians(yRot, EnumFacing.UP);
             controller.bodyLimbInfo.target(straightRot, 1 * controller.getSpeedScale());
-            int time = controller.bodyLimbInfo.idc.getEntity().getRemainingRotationTime();
+            int time = controller.getRemainingRotationTime();
 
             for (LimbInfo li : controller.limbs) {
                 if (li.type.isArmOrLeg()) {
-                    Quaternion or = li.idc.getEntity().getRotation();
-                    li.idc.getEntity().orderTargetRotation(or, time, Interpolation.SMOOTH3);
                     li.target(new Quaternion(), 1 * controller.getSpeedScale());
                 }
             }
@@ -185,7 +187,7 @@ public enum Technique implements IStateMachine<Technique> {
             Random rand = controller.worldObj.rand;
             EnumFacing dir = rand.nextBoolean() ? EnumFacing.NORTH : EnumFacing.SOUTH;
             Quaternion bend = Quaternion.getRotationQuaternionRadians(slight_bend, dir);
-            Quaternion rot = controller.body.getRotation().multiply(bend);
+            Quaternion rot = controller.body.getTransform().getRot().multiply(bend);
             controller.bodyLimbInfo.target(rot, controller.getSpeedScale());
             Quaternion legBack = bend.conjugate();
             legBack = legBack.slerp(legBack.multiply(legBack), 0.5);
@@ -304,7 +306,7 @@ public enum Technique implements IStateMachine<Technique> {
             BOW.onEnterState(controller, this);
             // Crack a mask blocks that is exposed UP but not EAST
             final ReservoirSampler<Coord> sampler = new ReservoirSampler<Coord>(1, controller.worldObj.rand);
-            Coord.iterateCube(controller.body.getCorner(), controller.body.getFarCorner(), new ICoordFunction() {
+            Coord.iterateCube(controller.body.getMinCorner(), controller.body.getMaxCorner(), new ICoordFunction() {
                 @Override
                 public void handle(Coord here) {
                     if (here.getProperty(ColossalBlock.VARIANT) != MASK) return;
@@ -333,7 +335,7 @@ public enum Technique implements IStateMachine<Technique> {
             // Add the other cracks
             int count = controller.getNaturalCrackCount();
             final ReservoirSampler<Coord> sampler = new ReservoirSampler<Coord>(count, controller.worldObj.rand);
-            Coord.iterateCube(controller.body.getCorner(), controller.body.getFarCorner(), new ICoordFunction() {
+            Coord.iterateCube(controller.body.getMinCorner(), controller.body.getMaxCorner(), new ICoordFunction() {
                 @Override
                 public void handle(Coord here) {
                     if (isExposedSkin(here)) {
@@ -382,7 +384,7 @@ public enum Technique implements IStateMachine<Technique> {
             if (player.posY < controller.posY) return null;
             double height = controller.bodyLimbInfo.length;
             if (player.posY > controller.posY + height + 5) return null; // cheap coarse-check if the player is far above us
-            Coord top = controller.body.getFarCorner().copy();
+            Coord top = controller.body.getMaxCorner().copy();
             controller.body.shadow2real(top);
             if (player.posY > top.y) return null;
             double radius = getTotalSize(controller) + 2;
@@ -396,8 +398,8 @@ public enum Technique implements IStateMachine<Technique> {
             return (bodWidth + armWidth) / 2.0;
         }
         
-        int measureWidth(IDeltaChunk bod) {
-            return bod.getFarCorner().difference(bod.getCorner()).z;
+        int measureWidth(IDimensionSlice bod) {
+            return bod.getMaxCorner().difference(bod.getMinCorner()).z;
         }
         
         @Override
@@ -409,11 +411,11 @@ public enum Technique implements IStateMachine<Technique> {
             // And hopefully we're bipedal! It'd do something hilarious & derpy if quadrapedal or polypedal.
             double bowAngle = Math.toRadians(70);
             Quaternion bow = Quaternion.getRotationQuaternionRadians(bowAngle, EnumFacing.NORTH);
-            Quaternion bodyBend = controller.body.getRotation().multiply(bow);
+            Quaternion bodyBend = controller.body.getTransform().getRot().multiply(bow);
             controller.bodyLimbInfo.target(bodyBend, bow_power, bendInterp);
             int bodyBendTime;
-            if (controller.body.hasOrderedRotation()) {
-                bodyBendTime = controller.body.getRemainingRotationTime();
+            if (controller.body.hasOrders()) {
+                bodyBendTime = controller.getRemainingRotationTime();
             } else {
                 bodyBendTime = 60; // Hmph! Make something up. Shouldn't happen.
             }
@@ -421,16 +423,16 @@ public enum Technique implements IStateMachine<Technique> {
             Quaternion bodyBack = bodyBend.conjugate();
             Quaternion legBend = bodyBack.slerp(bodyBack.multiply(bodyBack), 0.5);
             for (LimbInfo limb : controller.limbs) {
-                IDeltaChunk idc = limb.idc.getEntity();
+                IDimensionSlice idc = limb.idc.getEntity();
                 if (idc == null) continue;
                 if (limb.type == LimbType.LEG) {
-                    idc.orderTargetRotation(legBend, bodyBendTime /* Don't be influenced by controller.getSpeedScale() */, bendInterp);
+                    BasicTransformOrder.give(idc, legBend, bodyBendTime /* Don't be influenced by controller.getSpeedScale() */, bendInterp);
                 } else if (limb.type == LimbType.ARM) {
                     double armFlap = Math.toRadians(limb.side == BodySide.RIGHT ? -25 : 25);
                     double armHang = Math.toRadians(-90 - 45);
                     Quaternion flap = Quaternion.getRotationQuaternionRadians(armFlap, EnumFacing.EAST);
                     Quaternion hang = Quaternion.getRotationQuaternionRadians(armHang, EnumFacing.NORTH);
-                    idc.orderTargetRotation(flap.multiply(hang).multiply(bow), bodyBendTime /* Don't be influenced by the speed */, Interpolation.SMOOTH);
+                    BasicTransformOrder.give(idc, flap.multiply(hang).multiply(bow), bodyBendTime /* Don't be influenced by the speed */, Interpolation.SMOOTH);
                 }
             }
             controller.setTarget(null);
@@ -494,7 +496,7 @@ public enum Technique implements IStateMachine<Technique> {
         @Override
         public void onEnterState(ColossusController controller, Technique prevState) {
             if (prevState != INITIAL_UNBOW) playNoise(controller);
-            Quaternion bodyRot = controller.body.getRotation();
+            Quaternion bodyRot = controller.body.getTransform().getRot();
             double yRot = bodyRot.toRotationVector().yCoord;
             Quaternion straightRot = Quaternion.getRotationQuaternionRadians(-yRot, EnumFacing.UP);
             if (bodyRot.dotProduct(straightRot) < 0) {
@@ -504,11 +506,11 @@ public enum Technique implements IStateMachine<Technique> {
             controller.bodyLimbInfo.target(straightRot, 1 * controller.getSpeedScale());
 
             Quaternion straightenIsh = new Quaternion().slerp(bodyRot, 0.5);
-            int time = controller.bodyLimbInfo.idc.getEntity().getRemainingRotationTime();
+            int time = controller.getRemainingRotationTime();
             for (LimbInfo li : controller.limbs) {
                 if (li.type.isArmOrLeg()) {
                     // TODO/FIXME: Make the limbs end up normally rather than requiring STAND_STILL to fix it
-                    li.idc.getEntity().orderTargetRotation(straightenIsh, time, Interpolation.SMOOTH);
+                    BasicTransformOrder.give(li.idc.getEntity(), straightenIsh, time, Interpolation.SMOOTH);
                 }
             }
         }
@@ -574,7 +576,7 @@ public enum Technique implements IStateMachine<Technique> {
         @Override
         public void onEnterState(ColossusController controller, Technique prevState) {
             double v = controller.leg_length / (double) SIT_FALL_TIME;
-            controller.body.setVelocity(0, -v * controller.getSpeedScale(), 0);
+            controller.body.getVel().setPos(0, -v * controller.getSpeedScale(), 0);
             Quaternion legBend = Quaternion.getRotationQuaternionRadians(Math.PI / 2, EnumFacing.SOUTH);
             for (LimbInfo limb : controller.limbs) {
                 if (limb.type == LimbType.LEG) {
@@ -586,7 +588,7 @@ public enum Technique implements IStateMachine<Technique> {
 
         @Override
         public void onExitState(ColossusController controller, Technique nextState) {
-            controller.body.setVelocity(0, 0, 0);
+            controller.body.getVel().setPos(0, 0, 0);
         }
 
         @Override
@@ -624,7 +626,7 @@ public enum Technique implements IStateMachine<Technique> {
         @Override
         public void onEnterState(ColossusController controller, Technique prevState) {
             double v = controller.leg_length / (double) SIT_FALL_TIME;
-            controller.body.setVelocity(0, +v * controller.getSpeedScale(), 0);
+            controller.body.getVel().setPos(0, +v * controller.getSpeedScale(), 0);
             for (LimbInfo limb : controller.limbs) {
                 if (limb.type.isArmOrLeg()) {
                     limb.setTargetRotation(new Quaternion(), (int) (SIT_FALL_TIME * controller.getSpeedScale()), Interpolation.SMOOTH);
@@ -640,7 +642,7 @@ public enum Technique implements IStateMachine<Technique> {
 
         @Override
         public void onExitState(ColossusController controller, Technique nextState) {
-            controller.body.setVelocity(0, 0, 0);
+            controller.body.getVel().setPos(0, 0, 0);
         }
     },
 
@@ -725,33 +727,33 @@ public enum Technique implements IStateMachine<Technique> {
         
         @Override
         protected Object visitPlayer(EntityPlayer player, ColossusController controller) {
-            DeltaCoord bodySize = controller.body.getFarCorner().difference(controller.body.getCorner());
+            DeltaCoord bodySize = controller.body.getMaxCorner().difference(controller.body.getMinCorner());
             double halfBodyWidth = bodySize.x / 2;
             for (LimbInfo li : controller.limbs) {
                 if (li.type != LimbType.ARM && li.type != LimbType.LEG) continue;
                 if (controller.walk_controller.state != WalkState.IDLE && li.type == LimbType.LEG) continue;
-                IDeltaChunk idc = li.idc.getEntity();
+                IDimensionSlice idc = li.idc.getEntity();
                 if (idc == null) continue;
-                if (idc.hasOrderedRotation()) continue;
-                
+                if (idc.hasOrders()) continue;
+
                 // So! We need to hit the player. There are some constraints on hitability. (These are sorted for efficiency)
                 
                 // If it's a leg, we won't kick too far up
                 if (li.type == LimbType.LEG) {
-                    if (player.posY > idc.posY) continue;
+                    if (player.posY > idc.getTransform().getPos().yCoord) continue;
                 }
                 
                 // The player has to be within a shell defined by the limb's length
                 double farthest = li.length + 2; // And since this is too large, we can miss
                 double nearest = li.length - 2;
                 
-                double dist = idc.getDistanceToEntity(player);
+                double dist = idc.getEntity().getDistanceToEntity(player);
                 if (dist > farthest || dist < nearest) continue;
                 
                 // We won't hit across the body
-                Vec3 li2player = SpaceUtil.subtract(SpaceUtil.fromEntPos(player), SpaceUtil.fromEntPos(idc));
+                Vec3 li2player = SpaceUtil.subtract(SpaceUtil.fromEntPos(player), idc.getTransform().getPos());
                 Vec3 localOffset = SpaceUtil.copy(li2player);
-                controller.body.getRotation().applyReverseRotation(localOffset);
+                controller.body.getTransform().getRot().applyReverseRotation(localOffset);
                 if (li.side == BodySide.LEFT) {
                     if (localOffset.zCoord > +halfBodyWidth) continue;
                 } else {
@@ -771,7 +773,7 @@ public enum Technique implements IStateMachine<Technique> {
                 Vec3 axis = src.crossProduct(dst);
                 double angle = SpaceUtil.getAngle(src, dst);
 
-                controller.body.getRotation().applyReverseRotation(axis);
+                controller.body.getTransform().getRot().applyReverseRotation(axis);
 
                 // A single strike through your oponnent will hurt him more than two hundred blows to his skin
                 angle *= 1.5;
@@ -800,11 +802,11 @@ public enum Technique implements IStateMachine<Technique> {
         
         @Override
         public void onEnterState(ColossusController controller, Technique prevState) {
-            final Quaternion bodyRotation = controller.body.getRotation();
+            final Quaternion bodyRotation = controller.body.getTransform().getRot();
             for (LimbInfo li : controller.limbs) {
                 if (!li.type.isArmOrLeg()) continue;
                 li.causesPain(false);
-                double error = li.idc.getEntity().getRotation().getAngleBetween(bodyRotation);
+                double error = li.idc.getEntity().getTransform().getRot().getAngleBetween(bodyRotation);
                 if (error < 0.001) continue;
                 li.target(new Quaternion(), 1 * controller.getSpeedScale(), Interpolation.SMOOTH);
 
@@ -859,30 +861,29 @@ public enum Technique implements IStateMachine<Technique> {
         public void onEnterState(ColossusController controller, Technique prevState) {
             playNoise(controller);
             for (LimbInfo li : controller.limbs) {
-                IDeltaChunk idc = li.idc.getEntity();
-                idc.setVelocity(0, 0, 0);
-                idc.setRotationalVelocity(new Quaternion());
+                IDimensionSlice idc = li.idc.getEntity();
+                TransformData<Pure> vel = idc.getVel();
+                vel.setPos(0, 0, 0);
+                vel.setRot(new Quaternion());
                 idc.permit(DeltaCapability.VIOLENT_COLLISIONS);
             }
             Quaternion fallAxis = Quaternion.getRotationQuaternionRadians(Math.PI / 2, EnumFacing.SOUTH);
-            Quaternion rotation = controller.body.getRotation();
+            Quaternion rotation = controller.body.getTransform().getRot();
             fallAxis = rotation.multiply(fallAxis);
-            controller.body.orderTargetRotation(fallAxis, (int) (20 * 2.5 /* 2.5 seconds for the fall sound to hit */), Interpolation.SQUARE);
+            BasicTransformOrder.give(controller.body, fallAxis, (int) (20 * 2.5 /* 2.5 seconds for the fall sound to hit */), Interpolation.SQUARE);
             controller.setTarget(null);
             removeMyCreepers(controller);
         }
         
         @Override
         public Technique tick(ColossusController controller, int age) {
-            return controller.body.hasOrderedRotation() ? this : DEATH_EXPLODE;
+            return controller.body.hasOrders() ? this : DEATH_EXPLODE;
         }
         
         @Override
         public void onExitState(ColossusController controller, Technique nextState) {
             for (LimbInfo li : controller.limbs) {
-                IDeltaChunk idc = li.idc.getEntity();
-                idc.setVelocity(0, 0, 0);
-                idc.setRotationalVelocity(new Quaternion());
+                controller.body.getTransform().setPos(0, 0, 0).setRot(new Quaternion());
             }
         }
     },
@@ -900,8 +901,8 @@ public enum Technique implements IStateMachine<Technique> {
             double n = 1 + (controller.leg_size / 2.0) * age * age / 500;
             for (LimbInfo li : controller.limbs) {
                 final ReservoirSampler<Coord> sampler = new ReservoirSampler<Coord>((int)n, null);
-                IDeltaChunk idc = li.idc.getEntity();
-                Coord.iterateCube(idc.getCorner(), idc.getFarCorner(), new ICoordFunction() {
+                IDimensionSlice idc = li.idc.getEntity();
+                Coord.iterateCube(idc.getMinCorner(), idc.getMaxCorner(), new ICoordFunction() {
                     @Override
                     public void handle(Coord here) {
                         if (here.isAir()) return;
@@ -917,14 +918,14 @@ public enum Technique implements IStateMachine<Technique> {
             if (any) {
                 // Explosions can mess with our IDCs. :|
                 for (LimbInfo li : controller.limbs) {
-                    IDeltaChunk idc = li.idc.getEntity();
-                    idc.motionX = idc.motionY = idc.motionZ = 0;
+                    IDimensionSlice idc = li.idc.getEntity();
+                    idc.getVel().setPos(0, 0, 0);
                 }
             }
             return any ? this : DEATH_EXPIRE;
         }
         
-        void dislodge(IDeltaChunk idc, Coord src) {
+        void dislodge(IDimensionSlice idc, Coord src) {
             Coord dest = src.copy();
             idc.shadow2real(dest);
             Block b = src.getBlock();
@@ -971,9 +972,9 @@ public enum Technique implements IStateMachine<Technique> {
         public void onEnterState(final ColossusController controller, Technique prevState) {
             final ArrayList<Entity> debris = new ArrayList<Entity>();
             for (final LimbInfo li : controller.limbs) {
-                final IDeltaChunk idc = li.idc.getEntity();
-                Coord min = idc.getCorner();
-                Coord max = idc.getFarCorner();
+                final IDimensionSlice idc = li.idc.getEntity();
+                Coord min = idc.getMinCorner();
+                Coord max = idc.getMaxCorner();
                 Coord.iterateCube(min, max, new ICoordFunction() {
                     @Override
                     public void handle(Coord here) {
@@ -1035,7 +1036,7 @@ public enum Technique implements IStateMachine<Technique> {
             controller.walk_controller.forceState(WalkState.IDLE);
             controller.crackBroken();
 
-            Coord.iterateCube(controller.body.getCorner(), controller.body.getFarCorner(), new ICoordFunction() {
+            Coord.iterateCube(controller.body.getMinCorner(), controller.body.getMaxCorner(), new ICoordFunction() {
                 @Override
                 public void handle(Coord here) {
                     if (here.has(ColossalBlock.VARIANT, EYE)) {
@@ -1046,25 +1047,25 @@ public enum Technique implements IStateMachine<Technique> {
 
             int target_time = EntityCitizen.SURRENDER_TIME;
             for (LimbInfo limb : controller.limbs) {
-                IDeltaChunk idc = limb.idc.getEntity();
+                IDimensionSlice idc = limb.idc.getEntity();
                 if (idc == null) continue;
-                idc.cancelOrderedRotation();
-                idc.setRotationalVelocity(new Quaternion());
+                idc.giveOrder(new NullOrder());
+                idc.getVel().setRot(new Quaternion());
                 if (limb.type == LimbType.BODY) {
-                    Quaternion bodyRot = controller.body.getRotation();
+                    Quaternion bodyRot = controller.body.getTransform().getRot();
                     double yRot = bodyRot.toRotationVector().yCoord;
                     Quaternion straightRot = Quaternion.getRotationQuaternionRadians(-yRot, EnumFacing.UP);
                     if (bodyRot.dotProduct(straightRot) < 0) {
                         // Sometimes seems to go the long way 'round; this should make it short
                         straightRot.incrConjugate();
                     }
-                    idc.orderTargetRotation(straightRot, target_time, Interpolation.SMOOTH);
+                    BasicTransformOrder.give(idc, straightRot, target_time, Interpolation.SMOOTH);
                     continue;
                 }
                 int angleDeg = limb.type == LimbType.ARM ? 90 + 45 : 45;
                 if (limb.side == BodySide.RIGHT) angleDeg = -angleDeg;
                 Quaternion target = Quaternion.getRotationQuaternionRadians(Math.toRadians(angleDeg), EnumFacing.EAST);
-                idc.orderTargetRotation(target, target_time, Interpolation.INV_CUBIC);
+                BasicTransformOrder.give(idc, target, target_time, Interpolation.INV_CUBIC);
             }
 
             playNoise(controller);
@@ -1087,10 +1088,10 @@ public enum Technique implements IStateMachine<Technique> {
             if (age >= EntityCitizen.EXPLODE_TIME) {
                 Coord min = null, max = null;
                 for (LimbInfo limb : controller.limbs) {
-                    IDeltaChunk idc = limb.idc.getEntity();
+                    IDimensionSlice idc = limb.idc.getEntity();
                     if (idc == null) continue;
-                    final Coord corner = idc.shadow2real(idc.getCorner());
-                    final Coord farCorner = idc.shadow2real(idc.getFarCorner());
+                    final Coord corner = idc.shadow2real(idc.getMinCorner());
+                    final Coord farCorner = idc.shadow2real(idc.getMaxCorner());
                     Coord.sort(corner, farCorner);
                     if (min == null) {
                         min = corner;
@@ -1113,7 +1114,7 @@ public enum Technique implements IStateMachine<Technique> {
             }
             if (age % 24 == 0) {
                 final ReservoirSampler<Coord> eyes = new ReservoirSampler<Coord>(1, controller.worldObj.rand);
-                Coord.iterateCube(controller.body.getCorner(), controller.body.getFarCorner(), new ICoordFunction() {
+                Coord.iterateCube(controller.body.getMinCorner(), controller.body.getMaxCorner(), new ICoordFunction() {
                     @Override
                     public void handle(Coord here) {
                         if (here.has(ColossalBlock.VARIANT, Md.EYE, Md.EYE_OPEN)) {
@@ -1151,18 +1152,18 @@ public enum Technique implements IStateMachine<Technique> {
                 }
             };
             for (LimbInfo limb : controller.limbs) {
-                IDeltaChunk idc = limb.idc.getEntity();
+                IDimensionSlice idc = limb.idc.getEntity();
                 if (idc == null) continue;
-                Coord.iterateChunks(idc.getCorner(), idc.getFarCorner(), clear);
+                Coord.iterateChunks(idc.getMinCorner(), idc.getMaxCorner(), clear);
             }
         }
 
         @Override
         public Technique tick(ColossusController controller, int age) {
             for (LimbInfo limb : controller.limbs) {
-                IDeltaChunk idc = limb.idc.getEntity();
+                IDimensionSlice idc = limb.idc.getEntity();
                 if (idc == null) continue;
-                idc.setDead();
+                idc.killIDS();
             }
             controller.setDead();
             return DEAD;

@@ -7,11 +7,10 @@ import factorization.api.Quaternion;
 import factorization.api.datahelpers.DataHelper;
 import factorization.api.datahelpers.Share;
 import factorization.common.FactoryType;
+import factorization.fzds.BasicTransformOrder;
 import factorization.fzds.DeltaChunk;
-import factorization.fzds.interfaces.DeltaCapability;
-import factorization.fzds.interfaces.IDCController;
-import factorization.fzds.interfaces.IDeltaChunk;
-import factorization.fzds.interfaces.Interpolation;
+import factorization.fzds.NullOrder;
+import factorization.fzds.interfaces.*;
 import factorization.shared.BlockClass;
 import factorization.shared.EntityReference;
 import factorization.shared.TileEntityCommon;
@@ -33,7 +32,7 @@ import static factorization.util.SpaceUtil.*;
 
 public class TileEntityHinge extends TileEntityCommon implements IDCController, ITickable {
     FzOrientation facing = FzOrientation.FACE_EAST_POINT_DOWN;
-    final EntityReference<IDeltaChunk> idcRef = MechanicsController.autoJoin(this);
+    final EntityReference<DimensionSliceEntityBase> idcRef = MechanicsController.autoJoin(this);
     Vec3 dseOffset = SpaceUtil.newVec();
     transient boolean idc_ticking = false;
 
@@ -66,9 +65,9 @@ public class TileEntityHinge extends TileEntityCommon implements IDCController, 
     @Override
     public void neighborChanged() {
         if (idcRef.trackingEntity()) {
-            IDeltaChunk idc = idcRef.getEntity();
+            IDimensionSlice idc = idcRef.getEntity();
             if (idc != null && getCoord().isWeaklyPowered()) {
-                idc.setRotationalVelocity(new Quaternion());
+                idc.getVel().setRot(new Quaternion());
             }
         } else {
             initHinge();
@@ -95,7 +94,7 @@ public class TileEntityHinge extends TileEntityCommon implements IDCController, 
         DeltaCoord size = new DeltaCoord(8, 8, 8);
         Coord min = getCoord().add(size.reverse());
         Coord max = getCoord().add(size);
-        IDeltaChunk idc = DeltaChunk.makeSlice(MechanismsFeature.deltachunk_channel, min, max, new DeltaChunk.AreaMap() {
+        IDimensionSlice idc = DeltaChunk.makeSlice(MechanismsFeature.deltachunk_channel, min, max, new DeltaChunk.AreaMap() {
             @Override
             public void fillDse(DeltaChunk.DseDestination destination) {
                 destination.include(target);
@@ -110,7 +109,7 @@ public class TileEntityHinge extends TileEntityCommon implements IDCController, 
         idc.permit(DeltaCapability.CONSERVE_MOMENTUM);
         // idc.forbid(DeltaCapability.COLLIDE_WITH_WORLD);
 
-        Vec3 idcPos = fromEntPos(idc);
+        Vec3 idcPos = idc.getTransform().getPos();
 
         final int faceSign = sign(facing.facing);
         final int topSign = sign(facing.top);
@@ -120,25 +119,22 @@ public class TileEntityHinge extends TileEntityCommon implements IDCController, 
             half = half.add(fromDirection(facing.top));
         }
 
-        Vec3 com = idc.getRotationalCenterOffset();
+        Vec3 com = idc.getTransform().getOffset();
         com = com.add(half);
-        idc.setRotationalCenterOffset(com);
-        toEntPos(idc, idcPos.add(half));
+        idc.getTransform().setOffset(com);
+        idc.getTransform().addPos(half);
 
         Coord dest = idc.getCenter();
-        worldObj.spawnEntityInWorld(idc);
+        idcRef.spawnAndTrack(idc.getEntity());
         MechanicsController.register(idc, this);
-        idcRef.trackEntity(idc);
         updateComparators();
         markDirty();
         getCoord().syncTE();
-        dseOffset = SpaceUtil.fromEntPos(idc).subtract(new Vec3(pos));
+        dseOffset = idc.getTransform().getPos().subtract(new Vec3(pos));
     }
 
-    void setProperPosition(IDeltaChunk idc) {
-        idc.posX = dseOffset.xCoord + pos.getX();
-        idc.posY = dseOffset.yCoord + pos.getY();
-        idc.posZ = dseOffset.zCoord + pos.getZ();
+    void setProperPosition(IDimensionSlice idc) {
+        idc.getTransform().setPos(dseOffset.add(new Vec3(pos)));
     }
 
     @Override
@@ -174,19 +170,19 @@ public class TileEntityHinge extends TileEntityCommon implements IDCController, 
     }
 
     @Override
-    public boolean placeBlock(IDeltaChunk idc, EntityPlayer player, Coord at) {;
+    public boolean placeBlock(IDimensionSlice idc, EntityPlayer player, Coord at) {;
         dirtyInertia();
         return false;
     }
 
     @Override
-    public boolean breakBlock(IDeltaChunk idc, EntityPlayer player, Coord at, EnumFacing sideHit) {
+    public boolean breakBlock(IDimensionSlice idc, EntityPlayer player, Coord at, EnumFacing sideHit) {
         dirtyInertia();
         return false;
     }
 
     @Override
-    public boolean useBlock(IDeltaChunk idc, EntityPlayer player, Coord at, EnumFacing sideHit) {
+    public boolean useBlock(IDimensionSlice idc, EntityPlayer player, Coord at, EnumFacing sideHit) {
         if (player.isSneaking()) return false;
         if (worldObj.isRemote) return false;
         final ItemStack held = player.getHeldItem();
@@ -195,26 +191,26 @@ public class TileEntityHinge extends TileEntityCommon implements IDCController, 
         return applyForce(idc, player, at, -1);
     }
 
-    double getInertia(IDeltaChunk idc, Vec3 rotationAxis) {
+    double getInertia(IDimensionSlice idc, Vec3 rotationAxis) {
         double inertia = InertiaCalculator.getInertia(idc, rotationAxis);
         if (inertia < 20) inertia = 20; // Don't go too crazy
         return inertia;
     }
 
     void dirtyInertia() {
-        IDeltaChunk idc = idcRef.getEntity();
+        IDimensionSlice idc = idcRef.getEntity();
         if (idc == null) return;
         InertiaCalculator.dirty(idc);
     }
 
     @Override
-    public boolean hitBlock(IDeltaChunk idc, EntityPlayer player, Coord at, EnumFacing sideHit) {
+    public boolean hitBlock(IDimensionSlice idc, EntityPlayer player, Coord at, EnumFacing sideHit) {
         if (player.isSneaking()) return false;
         if (worldObj.isRemote) return false;
         return applyForce(idc, player, at, 1);
     }
 
-    private boolean applyForce(IDeltaChunk idc, EntityPlayer player, Coord at, double forceMultiplier) {
+    private boolean applyForce(IDimensionSlice idc, EntityPlayer player, Coord at, double forceMultiplier) {
         if (getCoord().isWeaklyPowered()) return true;
         if (player.isSprinting()) {
             forceMultiplier *= 2;
@@ -232,24 +228,24 @@ public class TileEntityHinge extends TileEntityCommon implements IDCController, 
         return false;
     }
 
-    void applyForce(IDeltaChunk idc, Coord at, Vec3 force) {
+    void applyForce(IDimensionSlice idc, Coord at, Vec3 force) {
         Vec3 rotationAxis = getRotationAxis();
         double I = getInertia(idc, rotationAxis);
 
 
-        idc.getRotation().applyReverseRotation(force);
+        idc.getTransform().getRot().applyReverseRotation(force);
 
         Vec3 hitBlock = at.createVector();
 
-        Vec3 idcCorner = idc.getCorner().createVector();
-        Vec3 idcRot = idcCorner.add(idc.getRotationalCenterOffset());
+        Vec3 idcCorner = idc.getMinCorner().createVector();
+        Vec3 idcRot = idcCorner.add(idc.getTransform().getOffset());
 
         Vec3 leverArm = subtract(hitBlock, idcRot);
 
         force = SpaceUtil.scale(force, 2.0 / I);
 
         Vec3 torque = leverArm.crossProduct(force);
-        idc.getRotation().applyRotation(torque);
+        idc.getTransform().getRot().applyRotation(torque);
 
         if (SpaceUtil.sum(rotationAxis) < 0) {
             rotationAxis = SpaceUtil.scale(rotationAxis, -1);
@@ -267,11 +263,11 @@ public class TileEntityHinge extends TileEntityCommon implements IDCController, 
             dOmega = Quaternion.getRotationQuaternionRadians(min_push_force, SpaceUtil.normalize(dOmega.toVector()));
         }
 
-        Quaternion origOmega = idc.getRotationalVelocity();
+        Quaternion origOmega = idc.getVel().getRot();
         Quaternion newOmega = origOmega.multiply(dOmega);
         newOmega.incrNormalize();
 
-        idc.setRotationalVelocity(newOmega);
+        idc.getVel().setRot(newOmega);
     }
 
     Vec3 getRotationAxis() {
@@ -281,7 +277,7 @@ public class TileEntityHinge extends TileEntityCommon implements IDCController, 
     }
 
     @Override
-    public void idcDied(IDeltaChunk idc) {
+    public void idcDied(IDimensionSlice idc) {
         idcRef.trackEntity(null);
         updateComparators();
         markDirty();
@@ -289,14 +285,14 @@ public class TileEntityHinge extends TileEntityCommon implements IDCController, 
     }
 
     @Override
-    public boolean onAttacked(IDeltaChunk idc, DamageSource damageSource, float damage) { return false; }
+    public boolean onAttacked(IDimensionSlice idc, DamageSource damageSource, float damage) { return false; }
 
     @Override
     public CollisionAction collidedWithWorld(World realWorld, AxisAlignedBB realBox, World shadowWorld, AxisAlignedBB shadowBox) {
         return CollisionAction.STOP_BEFORE;
     }
 
-    IDeltaChunk getIdc() {
+    IDimensionSlice getIdc() {
         return idcRef.getEntity();
     }
 
@@ -309,13 +305,13 @@ public class TileEntityHinge extends TileEntityCommon implements IDCController, 
     }
 
     @Override
-    public void beforeUpdate(IDeltaChunk idc) {
-        if (idc.hasOrderedRotation()) {
+    public void beforeUpdate(IDimensionSlice idc) {
+        if (idc.hasOrders()) {
             limitBend(idc);
             return;
         }
         idc_ticking = true;
-        Quaternion rotVel = idc.getRotationalVelocity();
+        Quaternion rotVel = idc.getVel().getRot();
         if (rotVel.isZero()) return;
         Quaternion dampened;
         if (isBasicallyZero(rotVel)) {
@@ -329,15 +325,15 @@ public class TileEntityHinge extends TileEntityCommon implements IDCController, 
                 dampened = rotVel.slerp(new Quaternion(), 0.05);
             }
         }
-        idc.setRotationalVelocity(dampened);
+        idc.getVel().setRot(dampened);
         limitBend(idc);
         limitVelocity(idc);
     }
 
-    private void limitBend(IDeltaChunk idc) {
-        final Quaternion rotationalVelocity = idc.getRotationalVelocity();
-        if (!idc.hasOrderedRotation() && rotationalVelocity.isZero()) return;
-        final Quaternion nextRotation = idc.getRotation().multiply(rotationalVelocity);
+    private void limitBend(IDimensionSlice idc) {
+        final Quaternion rotationalVelocity = idc.getVel().getRot();
+        if (!idc.hasOrders() && rotationalVelocity.isZero()) return;
+        final Quaternion nextRotation = idc.getTransform().getRot().multiply(rotationalVelocity);
         final Vec3 middle = SpaceUtil.fromDirection(facing.top);
         final Vec3 arm = SpaceUtil.fromDirection(facing.facing);
         nextRotation.applyRotation(arm);
@@ -347,32 +343,32 @@ public class TileEntityHinge extends TileEntityCommon implements IDCController, 
 
         if (angle < end) return;
 
-        if (idc.hasOrderedRotation()) {
-            idc.cancelOrderedRotation();
+        if (idc.hasOrders()) {
+            NullOrder.give(idc);
         } else {
-            idc.setRotationalVelocity(new Quaternion());
+            idc.getVel().setRot(new Quaternion());
         }
         double t = nextRotation.getAngleRadians();
         if (t < 0) t = -end;
         if (t > Math.PI) t = Math.PI;
-        idc.setRotation(Quaternion.getRotationQuaternionRadians(t, nextRotation.toVector()));
+        idc.getTransform().setRot(Quaternion.getRotationQuaternionRadians(t, nextRotation.toVector()));
     }
 
-    private void limitVelocity(IDeltaChunk idc) {
-        final Quaternion rot = idc.getRotationalVelocity();
+    private void limitVelocity(IDimensionSlice idc) {
+        final Quaternion rot = idc.getVel().getRot();
         double rv = rot.getAngleRadians();
         if (rv < max_velocity) return;
         double p = max_velocity / rv;
-        idc.setRotationalVelocity(new Quaternion().slerp(rot, p));
+        idc.getVel().setRot(new Quaternion().slerp(rot, p));
     }
 
     @Override
-    public void afterUpdate(IDeltaChunk idc) {
+    public void afterUpdate(IDimensionSlice idc) {
         idc_ticking = false;
-        if (!idc.getRotationalVelocity().isZero() || idc.hasOrderedRotation()) {
+        if (!idc.getVel().getRot().isZero() || idc.hasOrders()) {
             updateComparators();
         }
-        if (executing_order && !idc.hasOrderedRotation()) {
+        if (executing_order && !idc.hasOrders()) {
             executing_order = false;
         }
         if (worldObj.getTotalWorldTime() % 60 == 0) setProperPosition(idc); // Blame pistons
@@ -407,10 +403,10 @@ public class TileEntityHinge extends TileEntityCommon implements IDCController, 
 
     private void updateServer() {
         if (!idcRef.entityFound() && idcRef.trackingEntity()) {
-            IDeltaChunk idc = idcRef.getEntity();
+            IDimensionSlice idc = idcRef.getEntity();
             if (idc != null) {
                 MechanicsController.register(idc, this);
-                executing_order = idc.hasOrderedRotation();
+                executing_order = idc.hasOrders();
                 updateComparators();
             }
         }
@@ -419,17 +415,17 @@ public class TileEntityHinge extends TileEntityCommon implements IDCController, 
     @Override
     public void click(EntityPlayer entityplayer) {
         if (getCoord().isWeaklyPowered()) return;
-        IDeltaChunk idc = idcRef.getEntity();
+        IDimensionSlice idc = idcRef.getEntity();
         if (idc == null) return;
-        if (idc.hasOrderedRotation()) return;
-        Quaternion w = idc.getRotationalVelocity();
+        if (idc.hasOrders()) return;
+        Quaternion w = idc.getVel().getRot();
         if (!w.isZero()) {
-            idc.setRotationalVelocity(new Quaternion());
+            idc.getVel().setRot(new Quaternion());
         }
-        Quaternion rot = idc.getRotation();
+        Quaternion rot = idc.getTransform().getRot();
         if (rot.hasNaN() || rot.hasInf() || w.hasNaN() || w.hasInf()) {
-            idc.setRotation(new Quaternion());
-            idc.setRotationalVelocity(new Quaternion());
+            idc.getTransform().setRot(new Quaternion());
+            idc.getVel().setRot(new Quaternion());
             return;
         }
         Quaternion align;
@@ -442,16 +438,16 @@ public class TileEntityHinge extends TileEntityCommon implements IDCController, 
             if (t < 0 || t > 1) t = 1;
             align = rot.slerp(new Quaternion(), t);
         }
-        idc.orderTargetRotation(align, 10, Interpolation.SQUARE);
+        BasicTransformOrder.give(idc, align, 10, Interpolation.SQUARE);
         executing_order = true;
     }
 
     @Override
     protected boolean removedByPlayer(EntityPlayer player, boolean willHarvest) {
-        IDeltaChunk idc = idcRef.getEntity();
+        IDimensionSlice idc = idcRef.getEntity();
         boolean unload = false;
         if (idc != null) {
-            if (!isBasicallyZero(idc.getRotationalVelocity()) || !isBasicallyZero(idc.getRotation())) {
+            if (!isBasicallyZero(idc.getVel().getRot()) || !isBasicallyZero(idc.getTransform().getRot())) {
                 return false;
             }
             unload = true;
@@ -492,9 +488,9 @@ public class TileEntityHinge extends TileEntityCommon implements IDCController, 
         if (!idcRef.trackingEntity()) {
             return 0;
         }
-        IDeltaChunk idc = idcRef.getEntity();
+        IDimensionSlice idc = idcRef.getEntity();
         if (idc == null) return comparator_cache;
-        double angle = Math.toDegrees(idc.getRotation().getAngleBetween(new Quaternion()));
+        double angle = Math.toDegrees(idc.getTransform().getRot().getAngleBetween(new Quaternion()));
         angle /= 90;
         angle = 1 - angle;
         return (byte) (0xF * angle);

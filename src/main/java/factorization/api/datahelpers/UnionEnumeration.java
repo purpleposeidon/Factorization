@@ -47,6 +47,21 @@ public class UnionEnumeration {
         return new UnionEnumeration(classes, zeros);
     }
 
+    public UnionEnumeration extend(Object ...parts) {
+        int front = classes.length + zeros.length;
+        int len = front + parts.length;
+        Object[] x = new Object[len];
+        int i;
+        for (i = 0; i < front; i++) {
+            x[i] = (i % 2 == 0) ? classes[i / 2] : zeros[i / 2];
+        }
+        for (; i < x.length; i++) {
+            x[i] = parts[i - front];
+        }
+        return UnionEnumeration.build(x);
+    }
+
+
     final Class<?> classes[];
     final Object zeros[];
     final Map<Class<?>, Integer> indexMap = new HashMap<Class<?>, Integer>();

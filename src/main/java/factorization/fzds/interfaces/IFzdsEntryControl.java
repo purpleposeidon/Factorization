@@ -5,8 +5,8 @@ package factorization.fzds.interfaces;
  * @see factorization.fzds.interfaces.DeltaCapability
  */
 public interface IFzdsEntryControl {
-    boolean canEnter(IDeltaChunk dse);
-    boolean canExit(IDeltaChunk dse);
-    void onEnter(IDeltaChunk dse);
-    void onExit(IDeltaChunk dse);
+    boolean canEnter(IDimensionSlice dse);
+    boolean canExit(IDimensionSlice dse);
+    void onEnter(IDimensionSlice dse);
+    void onExit(IDimensionSlice dse);
 }

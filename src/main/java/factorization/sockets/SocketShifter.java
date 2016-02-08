@@ -7,7 +7,7 @@ import factorization.api.datahelpers.Share;
 import factorization.common.FactoryType;
 import factorization.fzds.DeltaChunk;
 import factorization.fzds.HammerEnabled;
-import factorization.fzds.interfaces.IDeltaChunk;
+import factorization.fzds.interfaces.IDimensionSlice;
 import factorization.notify.Notice;
 import factorization.servo.RenderServoMotor;
 import factorization.servo.ServoMotor;
@@ -282,12 +282,12 @@ public class SocketShifter extends TileEntitySocketBase {
         if (!HammerEnabled.ENABLED) return null;
         if (worldObj != DeltaChunk.getServerShadowWorld()) return null;
         Coord target = coord.add(facing);
-        for (IDeltaChunk idc : DeltaChunk.getSlicesContainingPoint(target)) {
+        for (IDimensionSlice idc : DeltaChunk.getSlicesContainingPoint(target)) {
             final EnumFacing realBack = idc.shadow2real(back);
 
             Vec3 v = idc.shadow2real(target.toMiddleVector());
 
-            Coord real = new Coord(idc.worldObj, (int) Math.floor(v.xCoord), (int) Math.floor(v.yCoord), (int) Math.floor(v.zCoord));
+            Coord real = new Coord(idc.getRealWorld(), (int) Math.floor(v.xCoord), (int) Math.floor(v.yCoord), (int) Math.floor(v.zCoord));
 
             //Coord real = idc.shadow2real(target);
             foreignInv = InvUtil.openInventory(real.getTE(IInventory.class), realBack);

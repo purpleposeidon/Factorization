@@ -1,7 +1,7 @@
 package factorization.fzds;
 
 import factorization.api.Coord;
-import factorization.fzds.interfaces.IDeltaChunk;
+import factorization.fzds.interfaces.IDimensionSlice;
 import org.apache.commons.lang3.ArrayUtils;
 
 import java.util.HashMap;
@@ -12,30 +12,30 @@ import java.util.Map;
  */
 public class DeltaChunkMap {
     //private TLongObjectHashMap<IDeltaChunk[]> values = new TLongObjectHashMap<IDeltaChunk[]>(32);
-    private Map<Long, IDeltaChunk[]> values = new HashMap();
+    private Map<Long, IDimensionSlice[]> values = new HashMap();
     
     private long hash(int chunkX, int chunkZ) {
         long ret = chunkX | (((long) chunkZ) << 32);
         return ret;
     }
     
-    private static final IDeltaChunk[] EMPTY_ARRAY = new IDeltaChunk[0];
+    private static final IDimensionSlice[] EMPTY_ARRAY = new IDimensionSlice[0];
     
-    private IDeltaChunk[] normalize(IDeltaChunk[] val) {
+    private IDimensionSlice[] normalize(IDimensionSlice[] val) {
         return val == null ? EMPTY_ARRAY : val;
     }
     
-    public IDeltaChunk[] get(int chunkX, int chunkZ) {
+    public IDimensionSlice[] get(int chunkX, int chunkZ) {
         return normalize(values.get(hash(chunkX, chunkZ)));
     }
     
-    public IDeltaChunk[] get(Coord at) {
+    public IDimensionSlice[] get(Coord at) {
         return normalize(values.get(hash(at.x/16, at.z/16)));
     }
     
-    public boolean remove(IDeltaChunk dse) {
-        Coord lower = dse.getCorner();
-        Coord upper = dse.getFarCorner();
+    public boolean remove(IDimensionSlice dse) {
+        Coord lower = dse.getMinCorner();
+        Coord upper = dse.getMaxCorner();
         boolean any = false;
         for (int x = lower.x - 16; x <= upper.x + 16; x += 16) {
             for (int z = lower.z - 16; z <= upper.z + 16; z += 16) {
@@ -45,20 +45,20 @@ public class DeltaChunkMap {
         return any;
     }
     
-    private boolean remove0(IDeltaChunk dse, int chunkX, int chunkZ) {
-        IDeltaChunk[] origArray = get(chunkX, chunkZ);
+    private boolean remove0(IDimensionSlice dse, int chunkX, int chunkZ) {
+        IDimensionSlice[] origArray = get(chunkX, chunkZ);
         if (origArray.length == 1 && origArray[0] == dse) {
             values.remove(hash(chunkX, chunkZ));
             return true;
         }
-        IDeltaChunk[] newArray = ArrayUtils.removeElement(origArray, dse);
+        IDimensionSlice[] newArray = ArrayUtils.removeElement(origArray, dse);
         values.put(hash(chunkX, chunkZ), newArray);
         return true;
     }
     
-    public boolean add(IDeltaChunk dse) {
-        Coord lower = dse.getCorner();
-        Coord upper = dse.getFarCorner();
+    public boolean add(IDimensionSlice dse) {
+        Coord lower = dse.getMinCorner();
+        Coord upper = dse.getMaxCorner();
         boolean any = false;
         for (int x = lower.x - 16; x <= upper.x + 16; x += 16) {
             for (int z = lower.z - 16; z <= upper.z + 16; z += 16) {
@@ -68,9 +68,9 @@ public class DeltaChunkMap {
         return any;
     }
     
-    private boolean add0(IDeltaChunk dse, int chunkX, int chunkZ) {
-        IDeltaChunk[] origArray = get(chunkX, chunkZ);
-        for (IDeltaChunk idc : origArray) {
+    private boolean add0(IDimensionSlice dse, int chunkX, int chunkZ) {
+        IDimensionSlice[] origArray = get(chunkX, chunkZ);
+        for (IDimensionSlice idc : origArray) {
             if (idc == dse) {
                 return false;
             }
@@ -83,7 +83,7 @@ public class DeltaChunkMap {
         values.clear();
     }
 
-    public Iterable<IDeltaChunk[]> getIdcs() {
+    public Iterable<IDimensionSlice[]> getIdcs() {
         return values.values();
     }
 }

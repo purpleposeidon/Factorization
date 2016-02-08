@@ -4,8 +4,11 @@ import factorization.api.Coord;
 import factorization.api.ICoordFunction;
 import factorization.api.Quaternion;
 import factorization.fzds.TransferLib;
+import factorization.fzds.interfaces.DimensionSliceEntityBase;
 import factorization.fzds.interfaces.IDCController;
-import factorization.fzds.interfaces.IDeltaChunk;
+import factorization.fzds.interfaces.IDimensionSlice;
+import factorization.fzds.interfaces.transform.Pure;
+import factorization.fzds.interfaces.transform.TransformData;
 import factorization.shared.Core;
 import factorization.shared.EntityReference;
 import factorization.util.SpaceUtil;
@@ -30,7 +33,7 @@ public class MechanicsController implements IDCController {
      * @param constraint The controller to add.
      * @throws IllegalArgumentException if the IDC already has a non-multicast controller.
      */
-    static void register(IDeltaChunk idc, IDCController constraint) {
+    static void register(IDimensionSlice idc, IDCController constraint) {
         rejoin(idc, constraint);
         changeCount(idc, +1);
     }
@@ -45,7 +48,7 @@ public class MechanicsController implements IDCController {
      * @throws IllegalArgumentException if the IDC already has a non-multicast controller.
      *
      */
-    static void rejoin(IDeltaChunk idc, IDCController constraint) {
+    static void rejoin(IDimensionSlice idc, IDCController constraint) {
         IDCController controller = idc.getController();
         if (controller == IDCController.default_controller) {
             idc.setController(controller = new MechanicsController());
@@ -62,7 +65,7 @@ public class MechanicsController implements IDCController {
      * @param idc        The IDC who is getting the controller removed
      * @param constraint The controller to remove.
      */
-    static void deregister(IDeltaChunk idc, IDCController constraint) {
+    static void deregister(IDimensionSlice idc, IDCController constraint) {
         IDCController controller = idc.getController();
         if (!(controller instanceof MechanicsController)) {
             Core.logWarning("Tried to deregister constraint for IDC that isn't a MechanicsController! IDC: " + idc + "; controller: " + controller + "; constraint: ", constraint);
@@ -79,13 +82,13 @@ public class MechanicsController implements IDCController {
      * @param idc The IDC to check
      * @return true if the IDC's controller is a MechanicsController, or it can have one applied.
      */
-    static boolean usable(IDeltaChunk idc) {
+    static boolean usable(IDimensionSlice idc) {
         IDCController controller = idc.getController();
         return controller == IDCController.default_controller || controller instanceof MechanicsController;
     }
 
-    private static int changeCount(IDeltaChunk idc, int d) {
-        NBTTagCompound tag = idc.getEntityData();
+    private static int changeCount(IDimensionSlice idc, int d) {
+        NBTTagCompound tag = idc.getTag();
         String key = "KinematicSystemEntries";
         int old = tag.getInteger(key);
         int upd = old + d;
@@ -94,13 +97,13 @@ public class MechanicsController implements IDCController {
         return upd;
     }
 
-    private static void dropIDC(final IDeltaChunk idc) {
+    private static void dropIDC(final IDimensionSlice idc) {
         // TODO: check all forge directions (including UNKNOWN) to count how many clashes there are. Move to the minimal direction before dropping IF the # of clashes is > 10% of the block count
-        idc.setRotation(new Quaternion());
-        idc.setRotationalVelocity(new Quaternion());
-        final Coord min = idc.getCorner();
-        final Coord max = idc.getFarCorner();
-        final Coord real = new Coord(idc);
+        idc.getTransform().setRot(new Quaternion());
+        idc.getVel().setRot(new Quaternion());
+        final Coord min = idc.getMinCorner();
+        final Coord max = idc.getMaxCorner();
+        final Coord real = new Coord(idc.getEntity());
         Coord.iterateCube(min, max, new ICoordFunction() {
             @Override
             public void handle(Coord shadow) {
@@ -124,10 +127,10 @@ public class MechanicsController implements IDCController {
                 here.setAir();
             }
         });
-        idc.setDead();
+        idc.killIDS();
     }
 
-    public static void push(IDeltaChunk idc, Coord at, Vec3 force) {
+    public static void push(IDimensionSlice idc, Coord at, Vec3 force) {
         final IDCController idcController = idc.getController();
         if (!(idcController instanceof MechanicsController)) {
             return;
@@ -150,8 +153,7 @@ public class MechanicsController implements IDCController {
          * equal to the force multiplied by the inverse of the mass.
          */
         force = SpaceUtil.scale(force, 1 / mass);
-        Vec3 newVel = force.add(SpaceUtil.fromEntVel(idc));
-        SpaceUtil.toEntVel(idc, newVel);
+        idc.getVel().addPos(force);
     }
 
     private IDCController[] constraints = new IDCController[0];
@@ -178,7 +180,7 @@ public class MechanicsController implements IDCController {
     }
 
     @Override
-    public boolean placeBlock(IDeltaChunk idc, EntityPlayer player, Coord at) {
+    public boolean placeBlock(IDimensionSlice idc, EntityPlayer player, Coord at) {
         for (IDCController c : constraints) {
             if (c.placeBlock(idc, player, at)) return true;
         }
@@ -186,7 +188,7 @@ public class MechanicsController implements IDCController {
     }
 
     @Override
-    public boolean breakBlock(IDeltaChunk idc, EntityPlayer player, Coord at, EnumFacing sideHit) {
+    public boolean breakBlock(IDimensionSlice idc, EntityPlayer player, Coord at, EnumFacing sideHit) {
         for (IDCController c : constraints) {
             if (c.breakBlock(idc, player, at, sideHit)) return true;
         }
@@ -194,7 +196,7 @@ public class MechanicsController implements IDCController {
     }
 
     @Override
-    public boolean hitBlock(IDeltaChunk idc, EntityPlayer player, Coord at, EnumFacing sideHit) {
+    public boolean hitBlock(IDimensionSlice idc, EntityPlayer player, Coord at, EnumFacing sideHit) {
         for (IDCController c : constraints) {
             if (c.hitBlock(idc, player, at, sideHit)) return true;
         }
@@ -202,7 +204,7 @@ public class MechanicsController implements IDCController {
     }
 
     @Override
-    public boolean useBlock(IDeltaChunk idc, EntityPlayer player, Coord at, EnumFacing sideHit) {
+    public boolean useBlock(IDimensionSlice idc, EntityPlayer player, Coord at, EnumFacing sideHit) {
         for (IDCController c : constraints) {
             if (c.useBlock(idc, player, at, sideHit)) return true;
         }
@@ -210,12 +212,12 @@ public class MechanicsController implements IDCController {
     }
 
     @Override
-    public void idcDied(IDeltaChunk idc) {
+    public void idcDied(IDimensionSlice idc) {
         for (IDCController c : constraints) c.idcDied(idc);
     }
 
     @Override
-    public void beforeUpdate(IDeltaChunk idc) {
+    public void beforeUpdate(IDimensionSlice idc) {
         for (IDCController c : constraints) {
             c.beforeUpdate(idc);
         }
@@ -225,12 +227,13 @@ public class MechanicsController implements IDCController {
     private static final double ROTATIONAL_DAMPENING = 0.98;
     private static final double GRAVITY = -0.08;
 
-    private void updatePhysics(IDeltaChunk idc) {
-        if (idc.worldObj.isRemote || constraints.length == 0) {
+    private void updatePhysics(IDimensionSlice idc) {
+        if (idc.getRealWorld().isRemote || constraints.length == 0) {
             return;
         }
-        if (idc.hasOrderedRotation()) return;
-        boolean anyMotion = idc.motionX != 0 || idc.motionY != 0 || idc.motionZ != 0 || !idc.getRotationalVelocity().isZero();
+        if (idc.hasOrders()) return;
+        TransformData<Pure> transformVel = idc.getVel();
+        boolean anyMotion = transformVel.isZero();
         if (!anyMotion) return;
         /*if (anyMotion) {
             // See EntityLivingBase.moveEntityWithHeading
@@ -240,17 +243,15 @@ public class MechanicsController implements IDCController {
             decay_time--;
             return;
         }*/
-        idc.motionX *= LINEAR_DAMPENING;
-        idc.motionY *= LINEAR_DAMPENING;
-        idc.motionZ *= LINEAR_DAMPENING;
-        Quaternion w = idc.getRotationalVelocity();
+        transformVel.mulPos(new Vec3(LINEAR_DAMPENING, LINEAR_DAMPENING, LINEAR_DAMPENING));
+        Quaternion w = transformVel.getRot();
         if (w.isZero()) return;
         Quaternion wp = new Quaternion().shortSlerp(w, ROTATIONAL_DAMPENING);
-        idc.setRotationalVelocity(wp);
+        transformVel.setRot(wp);
     }
 
     @Override
-    public void afterUpdate(IDeltaChunk idc) {
+    public void afterUpdate(IDimensionSlice idc) {
         for (IDCController c : constraints) {
             c.afterUpdate(idc);
         }
@@ -258,7 +259,7 @@ public class MechanicsController implements IDCController {
     }
 
     @Override
-    public boolean onAttacked(IDeltaChunk idc, DamageSource damageSource, float damage) { return false; }
+    public boolean onAttacked(IDimensionSlice idc, DamageSource damageSource, float damage) { return false; }
 
     @Override
     public CollisionAction collidedWithWorld(World realWorld, AxisAlignedBB realBox, World shadowWorld, AxisAlignedBB shadowBox) {
@@ -273,11 +274,11 @@ public class MechanicsController implements IDCController {
      * @param controller The controller that you want to rejoin.
      * @return The reference
      */
-    static EntityReference<IDeltaChunk> autoJoin(final IDCController controller) {
-        EntityReference<IDeltaChunk> ret = new EntityReference<IDeltaChunk>();
-        ret.whenFound(new EntityReference.OnFound<IDeltaChunk>() {
+    static EntityReference<DimensionSliceEntityBase> autoJoin(final IDCController controller) {
+        EntityReference<DimensionSliceEntityBase> ret = new EntityReference<DimensionSliceEntityBase>();
+        ret.whenFound(new EntityReference.OnFound<DimensionSliceEntityBase>() {
             @Override
-            public void found(IDeltaChunk ent) {
+            public void found(DimensionSliceEntityBase ent) {
                 MechanicsController.rejoin(ent, controller);
             }
         });

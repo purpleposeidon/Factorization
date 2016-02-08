@@ -1,7 +1,7 @@
 package factorization.fzds.network;
 
 import factorization.fzds.ShadowPlayerAligner;
-import factorization.fzds.interfaces.IDeltaChunk;
+import factorization.fzds.interfaces.IDimensionSlice;
 import factorization.fzds.interfaces.IFzdsShenanigans;
 import factorization.util.NORELEASE;
 import io.netty.channel.ChannelHandlerContext;
@@ -33,7 +33,7 @@ public class InteractionLiason extends EntityPlayerMP implements IFzdsShenanigan
 
     private EmbeddedChannel proxiedChannel = new EmbeddedChannel(new LiasonHandler());
 
-    public InteractionLiason(WorldServer world, ItemInWorldManager itemManager, EntityPlayerMP realPlayer, IDeltaChunk idc) {
+    public InteractionLiason(WorldServer world, ItemInWorldManager itemManager, EntityPlayerMP realPlayer, IDimensionSlice idc) {
         super(MinecraftServer.getServer(), world, realPlayer.getGameProfile(), itemManager);
         original_inventory = this.inventory;
         realPlayerRef = new WeakReference<EntityPlayerMP>(realPlayer);
@@ -61,7 +61,7 @@ public class InteractionLiason extends EntityPlayerMP implements IFzdsShenanigan
         this.capabilities = realPlayer.capabilities;
     }
 
-    void initializeFor(IDeltaChunk idc) {
+    void initializeFor(IDimensionSlice idc) {
         EntityPlayerMP realPlayer = realPlayerRef.get();
         if (realPlayer == null) return;
         aligner = new ShadowPlayerAligner(realPlayer, this, idc);

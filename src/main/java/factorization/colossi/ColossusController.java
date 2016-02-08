@@ -5,13 +5,18 @@ import factorization.api.ICoordFunction;
 import factorization.api.Quaternion;
 import factorization.api.datahelpers.DataHelper;
 import factorization.api.datahelpers.Share;
+import factorization.fzds.BasicTransformOrder;
+import factorization.fzds.ITransformOrder;
 import factorization.fzds.interfaces.DeltaCapability;
 import factorization.fzds.interfaces.IDCController;
-import factorization.fzds.interfaces.IDeltaChunk;
+import factorization.fzds.interfaces.IDimensionSlice;
 import factorization.fzds.interfaces.Interpolation;
+import factorization.fzds.interfaces.transform.Pure;
+import factorization.fzds.interfaces.transform.TransformData;
 import factorization.shared.Core;
 import factorization.shared.EntityFz;
 import factorization.util.LangUtil;
+import factorization.util.SpaceUtil;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.boss.IBossDisplayData;
 import net.minecraft.entity.player.EntityPlayer;
@@ -31,7 +36,7 @@ public class ColossusController extends EntityFz implements IBossDisplayData, ID
         public boolean isArmOrLeg() { return this == ARM || this == LEG; }
     };
     LimbInfo[] limbs;
-    IDeltaChunk body;
+    IDimensionSlice body;
     LimbInfo bodyLimbInfo;
     public final StateMachineExecutor walk_controller = new StateMachineExecutor(this, "walk", WalkState.IDLE);
     public final StateMachineExecutor ai_controller = new StateMachineExecutor(this, "tech", Technique.STATE_MACHINE_ENTRY);
@@ -99,7 +104,7 @@ public class ColossusController extends EntityFz implements IBossDisplayData, ID
         this(world);
         this.limbs = limbInfo;
         for (LimbInfo li : limbs) {
-            IDeltaChunk idc = li.idc.getEntity();
+            IDimensionSlice idc = li.idc.getEntity();
             idc.setController(this);
             if (li.type == LimbType.BODY) {
                 body = idc;
@@ -149,7 +154,7 @@ public class ColossusController extends EntityFz implements IBossDisplayData, ID
     void loadLimbs() {
         int i = 0;
         for (LimbInfo li : limbs) {
-            IDeltaChunk idc = li.idc.getEntity();
+            IDimensionSlice idc = li.idc.getEntity();
             if (idc == null) {
                 // It's possible to get in a state where all the DSEs are dead...
                 return;
@@ -234,7 +239,7 @@ public class ColossusController extends EntityFz implements IBossDisplayData, ID
             }
             if (!setup) return;
         }
-        if (body == null || body.isDead) {
+        if (body == null || body.isDead()) {
             setDead();
             return;
         }
@@ -247,14 +252,15 @@ public class ColossusController extends EntityFz implements IBossDisplayData, ID
             int dz = worldObj.rand.nextInt(d) - d/2;
             path_target = home.copy().add(dx * 2, 0, dz * 2);
         }*/
-        setPosition(body.posX, body.posY, body.posZ);
+        SpaceUtil.toEntPos(this, body.getTransform().getPos());
     }
 
     public boolean atTarget() {
         if (path_target == null) return true;
         double d = 0.1;
-        double dx = path_target.x - body.posX;
-        double dz = path_target.z - body.posZ;
+        Vec3 bodyPos = body.getTransform().getPos();
+        double dx = path_target.x - bodyPos.xCoord;
+        double dz = path_target.z - bodyPos.zCoord;
         
         if (dx < d && dx > -d && dz < d && dz > -d) {
             return true;
@@ -294,9 +300,9 @@ public class ColossusController extends EntityFz implements IBossDisplayData, ID
         for (LimbInfo li : limbs) {
             if (li.type == LimbType.BODY) continue;
             li.lastTurnDirection = 0;
-            IDeltaChunk idc = li.idc.getEntity();
+            IDimensionSlice idc = li.idc.getEntity();
             if (idc == null) continue;
-            idc.setRotationalVelocity(new Quaternion());
+            idc.getVel().setRot(new Quaternion());
             li.reset((int)(time * getSpeedScale()), interp);
         }
     }
@@ -379,6 +385,7 @@ public class ColossusController extends EntityFz implements IBossDisplayData, ID
             return;
         }
         int currentPosHash = new Coord(this).hashCode();
+        TransformData<Pure> vel = body.getVel();
         if (currentPosHash != last_pos_hash) {
             last_pos_hash = currentPosHash;
             int dy = new HeightCalculator().calc();
@@ -389,7 +396,7 @@ public class ColossusController extends EntityFz implements IBossDisplayData, ID
             if (last_step_direction != dy) {
                 last_step_direction = dy;
                 if (dy == 0 && target_y == posY) {
-                    body.motionY = 0;
+                    vel.setY(0);
                     return;
                 }
             }
@@ -398,7 +405,7 @@ public class ColossusController extends EntityFz implements IBossDisplayData, ID
         int sign = posY > target_y ? -1 : +1;
         if (posY == target_y) sign = 0;
         double delta = Math.abs(posY - target_y);
-        body.motionY = sign * Math.min(maxV, delta);
+        vel.setY(sign * Math.min(maxV, delta));
     }
 
     class HeightCalculator implements ICoordFunction {
@@ -416,14 +423,14 @@ public class ColossusController extends EntityFz implements IBossDisplayData, ID
                 }
             }
 
-            double rage = body.posY - leg_height;
+            double rage = body.getTransform().getPos().yCoord - leg_height;
             // hiccup? if (Math.abs(rage - Math.round(rage)) < 0.1 && rage != Math.round(rage)) { }
             int y = (int) rage; //Math.ceil(rage);
 
             for (LimbInfo li : limbs) {
                 if (li.type != LimbType.LEG) continue;
-                IDeltaChunk idc = li.idc.getEntity();
-                Coord at = new Coord(idc);
+                IDimensionSlice idc = li.idc.getEntity();
+                Coord at = new Coord(idc.getEntity());
                 at.y = y;
                 Coord min = at.copy();
                 Coord max = at.copy();
@@ -479,12 +486,12 @@ public class ColossusController extends EntityFz implements IBossDisplayData, ID
     }
 
     @Override
-    public boolean placeBlock(IDeltaChunk idc, EntityPlayer player, Coord at) {
+    public boolean placeBlock(IDimensionSlice idc, EntityPlayer player, Coord at) {
         return false;
     }
 
     @Override
-    public boolean breakBlock(IDeltaChunk idc, EntityPlayer player, Coord at, EnumFacing sideHit) {
+    public boolean breakBlock(IDimensionSlice idc, EntityPlayer player, Coord at, EnumFacing sideHit) {
         if (at.getBlock() != Core.registry.colossal_block) return false;
         if (at.has(ColossalBlock.VARIANT, ColossalBlock.Md.BODY_CRACKED, ColossalBlock.Md.MASK_CRACKED)) {
             crackBroken();
@@ -493,23 +500,23 @@ public class ColossusController extends EntityFz implements IBossDisplayData, ID
     }
 
     @Override
-    public boolean hitBlock(IDeltaChunk idc, EntityPlayer player, Coord at, EnumFacing sideHit) {
+    public boolean hitBlock(IDimensionSlice idc, EntityPlayer player, Coord at, EnumFacing sideHit) {
         return false;
     }
 
     @Override
-    public boolean useBlock(IDeltaChunk idc, EntityPlayer player, Coord at, EnumFacing sideHit) {
+    public boolean useBlock(IDimensionSlice idc, EntityPlayer player, Coord at, EnumFacing sideHit) {
         return false;
     }
 
     @Override
-    public void idcDied(IDeltaChunk idc) { }
+    public void idcDied(IDimensionSlice idc) { }
 
     @Override
-    public void beforeUpdate(IDeltaChunk idc) { }
+    public void beforeUpdate(IDimensionSlice idc) { }
 
     @Override
-    public void afterUpdate(IDeltaChunk idc) { }
+    public void afterUpdate(IDimensionSlice idc) { }
 
     public double getStrikeSpeedScale() {
         return 1;
@@ -521,7 +528,7 @@ public class ColossusController extends EntityFz implements IBossDisplayData, ID
     }
 
     @Override
-    public boolean onAttacked(IDeltaChunk idc, DamageSource damageSource, float damage) {
+    public boolean onAttacked(IDimensionSlice idc, DamageSource damageSource, float damage) {
         if (damageSource.isExplosion()) {
             confused = true;
         }
@@ -535,5 +542,20 @@ public class ColossusController extends EntityFz implements IBossDisplayData, ID
 
     public boolean peaceful() {
         return worldObj.getDifficulty() == EnumDifficulty.PEACEFUL;
+    }
+
+    public int getRemainingRotationTime(LimbInfo limb) {
+        ITransformOrder order = limb.idc.getEntity().getOrder();
+        if (order.isNull()) return 0;
+        if (order instanceof BasicTransformOrder) {
+            BasicTransformOrder bto = (BasicTransformOrder) order;
+            return bto.getTicksRemaining();
+        }
+        return 0;
+        // Or we could return '1' forever? Dunno.
+    }
+
+    public int getRemainingRotationTime() {
+        return getRemainingRotationTime(bodyLimbInfo);
     }
 }

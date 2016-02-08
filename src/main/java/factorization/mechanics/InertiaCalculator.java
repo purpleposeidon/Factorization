@@ -2,22 +2,22 @@ package factorization.mechanics;
 
 import factorization.api.Coord;
 import factorization.api.ICoordFunction;
-import factorization.fzds.interfaces.IDeltaChunk;
+import factorization.fzds.interfaces.IDimensionSlice;
 import factorization.util.SpaceUtil;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.Vec3;
 
 class InertiaCalculator extends MassCalculator implements ICoordFunction {
-    static double getInertia(IDeltaChunk idc, Vec3 axisOfRotation) {
-        NBTTagCompound tag = idc.getEntityData();
+    static double getInertia(IDimensionSlice idc, Vec3 axisOfRotation) {
+        NBTTagCompound tag = idc.getTag();
         if (axisNotUpdated(tag, axisOfRotation) && tag.hasKey(inertiaKey)) return tag.getDouble(inertiaKey);
         final InertiaCalculator inertiaCalculator = new InertiaCalculator(idc, axisOfRotation);
         inertiaCalculator.calculate();
         return inertiaCalculator.inertiaSum;
     }
 
-    static void dirty(IDeltaChunk idc) {
-        final NBTTagCompound tag = idc.getEntityData();
+    static void dirty(IDimensionSlice idc) {
+        final NBTTagCompound tag = idc.getTag();
         tag.removeTag(inertiaKey);
         MassCalculator.dirty(idc);
     }
@@ -40,9 +40,9 @@ class InertiaCalculator extends MassCalculator implements ICoordFunction {
     private final Vec3 origin, axisOfRotation;
     private double inertiaSum = 0;
 
-    protected InertiaCalculator(IDeltaChunk idc, Vec3 axisOfRotation) {
+    protected InertiaCalculator(IDimensionSlice idc, Vec3 axisOfRotation) {
         super(idc);
-        origin = min.toVector().add(idc.getRotationalCenterOffset());
+        origin = min.toVector().add(idc.getTransform().getOffset());
         this.axisOfRotation = axisOfRotation;
     }
 

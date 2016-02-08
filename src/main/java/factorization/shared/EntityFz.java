@@ -1,5 +1,6 @@
 package factorization.shared;
 
+import factorization.api.Coord;
 import factorization.api.datahelpers.*;
 import factorization.net.FzNetDispatch;
 import factorization.net.INet;
@@ -7,9 +8,11 @@ import factorization.net.StandardMessageType;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.Packet;
 import net.minecraft.world.World;
+import net.minecraftforge.fml.common.network.internal.FMLProxyPacket;
 import net.minecraftforge.fml.common.registry.IEntityAdditionalSpawnData;
 import net.minecraftforge.fml.relauncher.Side;
 
@@ -19,6 +22,11 @@ public abstract class EntityFz extends Entity implements IEntityAdditionalSpawnD
 
     public EntityFz(World w) {
         super(w);
+    }
+
+    @Override
+    protected void entityInit() {
+
     }
 
     @Override
@@ -95,5 +103,14 @@ public abstract class EntityFz extends Entity implements IEntityAdditionalSpawnD
     @Override
     public Enum[] getMessages() {
         return null;
+    }
+
+    public void broadcastMessage(EntityPlayer who, Enum messageType, Object... msg) {
+        FMLProxyPacket packet = Core.network.entityPacket(this, messageType, msg);
+        broadcastMessage(who, packet);
+    }
+
+    public void broadcastMessage(EntityPlayer who, FMLProxyPacket toSend) {
+        Core.network.broadcastPacket(who, new Coord(this), toSend);
     }
 }

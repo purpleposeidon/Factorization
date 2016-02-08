@@ -39,7 +39,7 @@ import factorization.api.ICoordFunction;
 import factorization.fzds.DeltaChunk;
 import factorization.fzds.DimensionSliceEntity;
 import factorization.fzds.Hammer;
-import factorization.fzds.interfaces.IDeltaChunk;
+import factorization.fzds.interfaces.IDimensionSlice;
 import factorization.fzds.interfaces.IFzdsEntryControl;
 import factorization.fzds.interfaces.IFzdsShenanigans;
 import factorization.shared.Core;
@@ -99,8 +99,8 @@ public class PacketProxyingPlayer extends EntityPlayerMP implements
         final HashSet<Chunk> ret = new HashSet<Chunk>();
         DimensionSliceEntity dse = dimensionSlice.get();
         if (dse == null) return ret;
-        Coord min = dse.getCorner();
-        Coord max = dse.getFarCorner();
+        Coord min = dse.getMinCorner();
+        Coord max = dse.getMaxCorner();
         Coord.iterateChunks(min, max, new ICoordFunction() {
             @Override
             public void handle(Coord here) {
@@ -127,7 +127,7 @@ public class PacketProxyingPlayer extends EntityPlayerMP implements
             }
         }
         c.y = -8; // lurk in the void; we should catch most mod's packets.
-        DeltaCoord size = dimensionSlice.getFarCorner().difference(dimensionSlice.getCorner());
+        DeltaCoord size = dimensionSlice.getMaxCorner().difference(dimensionSlice.getMinCorner());
         size.y = 0;
         int width = Math.abs(size.x);
         int depth = Math.abs(size.z);
@@ -223,8 +223,8 @@ public class PacketProxyingPlayer extends EntityPlayerMP implements
         final ArrayList<TileEntity> tileEntities = new ArrayList<TileEntity>();
         World world = DeltaChunk.getServerShadowWorld();
 
-        Coord low = dse.getCorner().add(-16, 0, -16);
-        Coord far = dse.getFarCorner().add(+16, 0, +16);
+        Coord low = dse.getMinCorner().add(-16, 0, -16);
+        Coord far = dse.getMaxCorner().add(+16, 0, +16);
         Coord.iterateChunks(low, far, new ICoordFunction() {
             @Override
             public void handle(Coord here) {
@@ -338,20 +338,20 @@ public class PacketProxyingPlayer extends EntityPlayerMP implements
     // IFzdsEntryControl implementation
     // PPP must stay in the shadow (It stays out of range anyways.)
     @Override
-    public boolean canEnter(IDeltaChunk dse) {
+    public boolean canEnter(IDimensionSlice dse) {
         return false;
     }
 
     @Override
-    public boolean canExit(IDeltaChunk dse) {
+    public boolean canExit(IDimensionSlice dse) {
         return false;
     }
 
     @Override
-    public void onEnter(IDeltaChunk dse) {
+    public void onEnter(IDimensionSlice dse) {
     }
 
     @Override
-    public void onExit(IDeltaChunk dse) {
+    public void onExit(IDimensionSlice dse) {
     }
 }

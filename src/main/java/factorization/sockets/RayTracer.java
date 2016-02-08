@@ -5,7 +5,7 @@ import factorization.api.FzOrientation;
 import factorization.api.Quaternion;
 import factorization.fzds.DeltaChunk;
 import factorization.fzds.HammerEnabled;
-import factorization.fzds.interfaces.IDeltaChunk;
+import factorization.fzds.interfaces.IDimensionSlice;
 import factorization.servo.TileEntityServoRail;
 import factorization.util.SpaceUtil;
 import net.minecraft.entity.Entity;
@@ -73,7 +73,7 @@ public class RayTracer {
 
         Coord shadowBaseLocation = new Coord(base);
 
-        for (IDeltaChunk idc : DeltaChunk.getSlicesContainingPoint(trueCoord)) {
+        for (IDimensionSlice idc : DeltaChunk.getSlicesContainingPoint(trueCoord)) {
             FzOrientation orientation = shadowOrientation(idc);
             if (orientation == null) continue;
             Coord at = new Coord(base);
@@ -108,8 +108,8 @@ public class RayTracer {
         return checkFzds && checkFzds();
     }
 
-    FzOrientation shadowOrientation(IDeltaChunk idc) {
-        Quaternion rot = idc.getRotation();
+    FzOrientation shadowOrientation(IDimensionSlice idc) {
+        Quaternion rot = idc.getTransform().getRot();
         Vec3 topVec = SpaceUtil.fromDirection(trueOrientation.top);
         Vec3 faceVec = SpaceUtil.fromDirection(trueOrientation.facing);
         rot.applyRotation(topVec);
@@ -128,7 +128,7 @@ public class RayTracer {
     }
 
 
-    boolean runPass(FzOrientation orientation, Coord coord, IDeltaChunk idc) {
+    boolean runPass(FzOrientation orientation, Coord coord, IDimensionSlice idc) {
         final EnumFacing top = orientation.top;
         final EnumFacing face = orientation.facing;
         final EnumFacing right = SpaceUtil.rotate(face, top);
@@ -172,7 +172,7 @@ public class RayTracer {
         return base.handleRay(socket, target.createMop(side, hitVec), target.w, isThis, powered);
     }
 
-    Iterable<Entity> getEntities(Coord coord, EnumFacing top, IDeltaChunk idc) {
+    Iterable<Entity> getEntities(Coord coord, EnumFacing top, IDimensionSlice idc) {
         if (idc == null) {
             Entity ent = null;
             if (socket instanceof Entity) {

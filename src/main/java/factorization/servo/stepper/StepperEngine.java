@@ -5,8 +5,7 @@ import factorization.api.datahelpers.DataHelper;
 import factorization.api.datahelpers.Share;
 import factorization.fzds.DeltaChunk;
 import factorization.fzds.interfaces.DeltaCapability;
-import factorization.fzds.interfaces.IDeltaChunk;
-import factorization.net.StandardMessageType;
+import factorization.fzds.interfaces.IDimensionSlice;
 import factorization.servo.AbstractServoMachine;
 import factorization.servo.MotionHandler;
 import factorization.servo.TileEntityServoRail;
@@ -115,7 +114,7 @@ public class StepperEngine extends AbstractServoMachine {
             }
         }
         if (min == null) return;
-        IDeltaChunk idc = DeltaChunk.makeSlice(ItemStepperEngine.channel, min, max, new DeltaChunk.AreaMap() {
+        IDimensionSlice idc = DeltaChunk.makeSlice(ItemStepperEngine.channel, min, max, new DeltaChunk.AreaMap() {
             @Override
             public void fillDse(DeltaChunk.DseDestination destination) {
                 for (Coord c : mesh) {
@@ -135,21 +134,21 @@ public class StepperEngine extends AbstractServoMachine {
                 DeltaCapability.REMOVE_ITEM_ENTITIES
                 /* NORELEASE: DeltaCapability.COLLIDE_WITH_WORLD */
                 );
-        idc.setPosition(posX, posY, posZ);
-        worldObj.spawnEntityInWorld(idc);
+        idc.getTransform().setPos(SpaceUtil.fromEntPos(this));
+        worldObj.spawnEntityInWorld(idc.getEntity());
         grabIdc(idc);
     }
 
     private boolean grabExistingIdc(Coord front) {
         double extreme_max = 4096 * 4096;
-        for (IDeltaChunk idc : DeltaChunk.getAllSlices(worldObj)) {
+        for (IDimensionSlice idc : DeltaChunk.getAllSlices(worldObj)) {
             if (!idc.can(DeltaCapability.COLLIDE_WITH_WORLD)) continue;
             if (!(idc.getController() instanceof EntityGrabController)) continue;
             EntityGrabController egc = (EntityGrabController) idc.getController();
             if (!egc.isUngrabbed()) continue;
-            if (getDistanceSqToEntity(idc) > extreme_max) continue;
+            if (getDistanceSqToEntity(idc.getEntity()) > extreme_max) continue;
             Coord grabPoint = idc.real2shadow(front);
-            if (SpaceUtil.contains(SpaceUtil.createAABB(idc.getCorner(), idc.getFarCorner()), grabPoint)) {
+            if (SpaceUtil.contains(SpaceUtil.createAABB(idc.getMinCorner(), idc.getMaxCorner()), grabPoint)) {
                 grabIdc(idc);
                 return true;
             }
@@ -157,7 +156,7 @@ public class StepperEngine extends AbstractServoMachine {
         return false;
     }
 
-    private void grabIdc(IDeltaChunk idc) {
+    private void grabIdc(IDimensionSlice idc) {
         //NORELEASE.fixme("translate the origin so that the origin's located at ourselves");
         EntityGrabController egc = new EntityGrabController(this, idc, DropMode.EVENTUALLY);
         worldObj.spawnEntityInWorld(egc);

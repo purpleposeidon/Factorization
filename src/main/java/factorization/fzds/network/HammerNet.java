@@ -9,10 +9,7 @@ import io.netty.buffer.Unpooled;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.network.NetHandlerPlayClient;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.NetHandlerPlayServer;
@@ -33,7 +30,6 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
 import net.minecraftforge.fml.common.network.FMLEventChannel;
 import net.minecraftforge.fml.common.network.FMLNetworkEvent;
-import net.minecraftforge.fml.common.network.FMLNetworkEvent.ClientCustomPacketEvent;
 import net.minecraftforge.fml.common.network.FMLNetworkEvent.ServerCustomPacketEvent;
 import net.minecraftforge.fml.common.network.NetworkRegistry;
 import net.minecraftforge.fml.common.network.internal.FMLProxyPacket;
@@ -43,8 +39,7 @@ import factorization.api.Quaternion;
 import factorization.fzds.DeltaChunk;
 import factorization.fzds.DimensionSliceEntity;
 import factorization.fzds.interfaces.DeltaCapability;
-import factorization.fzds.interfaces.IDeltaChunk;
-import factorization.fzds.interfaces.Interpolation;
+import factorization.fzds.interfaces.IDimensionSlice;
 import factorization.shared.Core;
 import factorization.util.PlayerUtil;
 import factorization.util.SpaceUtil;
@@ -76,97 +71,9 @@ public class HammerNet {
 
     public static class HammerNetType {
         // Next time, make it an enum.
-        public static final byte rotation = 0, rotationVelocity = 1, rotationBoth = 2, rotationCenterOffset = 10, exactPositionAndMotion = 11, orderedRotation = 12,
-                rightClickEntity = 3, leftClickEntity = 4, rightClickBlock = 5, leftClickBlock = 6, digStart = 7, digProgress = 8, digFinish = 9;
+        public static final byte rightClickEntity = 3, leftClickEntity = 4, rightClickBlock = 5, leftClickBlock = 6, digStart = 7, digProgress = 8, digFinish = 9;
     }
-    
-    @SubscribeEvent
-    public void messageFromServer(ClientCustomPacketEvent event) {
-        EntityPlayer player = Core.proxy.getClientPlayer();
-        try {
-            handleMessageFromServer(player, event.packet.payload());
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-    
-    public void handleMessageFromServer(EntityPlayer player, ByteBuf dis) throws IOException {
-        if (player == null || player.worldObj == null) {
-            return; //Blah, what...
-        }
-        World world = player.worldObj;
-        byte type = dis.readByte();
-        int dse_id = dis.readInt();
-        Entity ent = world.getEntityByID(dse_id);
-        DimensionSliceEntity dse = null;
-        if (ent instanceof DimensionSliceEntity) {
-            dse = (DimensionSliceEntity) ent;
-        } else {
-            if (ent != null) {
-                Core.logWarning("Packet %s to non-DSE (ID=%s) %s", type, dse_id, ent);
-            }
-            return;
-        }
-        switch (type) {
-        case HammerNetType.rotation:
-            setRotation(dis, dse);
-            break;
-        case HammerNetType.rotationVelocity:
-            setRotationalVelocity(dis, dse);
-            break;
-        case HammerNetType.rotationBoth:
-            setRotation(dis, dse);
-            setRotationalVelocity(dis, dse);
-            break;
-        case HammerNetType.rotationCenterOffset:
-            setCenterOffset(dis, dse);
-            break;
-        case HammerNetType.exactPositionAndMotion:
-            dse.setPosition(dis.readDouble(), dis.readDouble(), dis.readDouble());
-            dse.motionX = dis.readDouble();
-            dse.motionY = dis.readDouble();
-            dse.motionZ = dis.readDouble();
-            break;
-        case HammerNetType.orderedRotation:
-            Quaternion rotationStart = Quaternion.read(dis);
-            Quaternion rotationEnd = Quaternion.read(dis);
-            int orderTime = dis.readInt();
-            byte interpIndex = dis.readByte();
-            Interpolation interp = Interpolation.values()[interpIndex];
-            if (orderTime < 0) {
-                dse.cancelOrderedRotation();
-            } else {
-                dse.setRotation(rotationStart);
-                dse.orderTargetRotation(rotationEnd, orderTime, interp);
-            }
-            break;
-        }
-        
-    }
-    
-    void setRotation(ByteBuf dis, DimensionSliceEntity dse) throws IOException {
-        Quaternion q = Quaternion.read(dis);
-        if (dse != null) {
-            dse.setRotation(q);
-        }
-    }
-    
-    void setRotationalVelocity(ByteBuf dis, DimensionSliceEntity dse) throws IOException {
-        Quaternion q = Quaternion.read(dis);
-        if (dse != null) {
-            dse.setRotationalVelocity(q);
-        }
-    }
-    
-    void setCenterOffset(ByteBuf dis, DimensionSliceEntity dse) throws IOException {
-        double x = dis.readDouble();
-        double y = dis.readDouble();
-        double z = dis.readDouble();
-        Vec3 vec = new Vec3(x, y, z);
-        dse.setRotationalCenterOffset(vec);
-    }
-    
-    
+
     @SubscribeEvent
     public void messageFromClient(ServerCustomPacketEvent event) {
         EntityPlayerMP player = ((NetHandlerPlayServer) event.handler).playerEntity;
@@ -181,7 +88,7 @@ public class HammerNet {
         byte type = dis.readByte();
         int dse_id = dis.readInt();
         Entity ent = player.worldObj.getEntityByID(dse_id);
-        if (!(ent instanceof IDeltaChunk)) {
+        if (!(ent instanceof IDimensionSlice)) {
             throw new IOException("Did not select a DimensionSliceEntity (id = " + dse_id + ", messageType = " + type + ")");
         }
         DimensionSliceEntity idc = (DimensionSliceEntity) ent;
@@ -243,7 +150,7 @@ public class HammerNet {
             leftClickBlock(idc, player, dis, pos, sideHit, vecX, vecY, vecZ);
         } else if (type == HammerNetType.rightClickEntity || type == HammerNetType.leftClickEntity) {
             int entId = dis.readInt();
-            Entity hitEnt = idc.getCorner().w.getEntityByID(entId);
+            Entity hitEnt = idc.getMinCorner().w.getEntityByID(entId);
             if (hitEnt == null) {
                 Core.logWarning("%s tried clicking a non-existing entity", player);
                 return;
@@ -255,7 +162,7 @@ public class HammerNet {
     }
     
     private boolean dont_check_range = true;
-    private IDeltaChunk active_idc = null;
+    private IDimensionSlice active_idc = null;
     
     @SubscribeEvent
     public void handlePlace(PlaceEvent event) {
@@ -272,9 +179,9 @@ public class HammerNet {
     }
 
     void cancelOutOfRangePlacements(PlaceEvent event) {
-        Coord min = active_idc.getCorner();
+        Coord min = active_idc.getMinCorner();
         if (event.world != min.w) return;
-        Coord max = active_idc.getFarCorner();
+        Coord max = active_idc.getMaxCorner();
         BlockPos pos = event.blockSnapshot.pos;
         if (in(min.x, pos.getX(), max.x) && in(min.y, pos.getY(), max.y) && in(min.z, pos.getZ(), max.z)) return;
         event.setCanceled(true);
@@ -290,7 +197,7 @@ public class HammerNet {
         return low <= i && i <= high;
     }
     
-    boolean blockInReach(IDeltaChunk idc, EntityPlayerMP player, Coord at) {
+    boolean blockInReach(IDimensionSlice idc, EntityPlayerMP player, Coord at) {
         double reach_distance = player.theItemInWorldManager.getBlockReachDistance();
         Vec3 playerAt = SpaceUtil.fromEntPos(player);
         playerAt = idc.real2shadow(playerAt);
@@ -298,7 +205,7 @@ public class HammerNet {
         return distance <= reach_distance;
     }
     
-    void breakBlock(IDeltaChunk idc, EntityPlayerMP player, ByteBuf dis, BlockPos pos, EnumFacing sideHit) {
+    void breakBlock(IDimensionSlice idc, EntityPlayerMP player, ByteBuf dis, BlockPos pos, EnumFacing sideHit) {
         Coord at = new Coord(DeltaChunk.getServerShadowWorld(), pos);
         if (at.isAir()) return;
         if (!blockInReach(idc, player, at)) return;
@@ -313,7 +220,7 @@ public class HammerNet {
         }
     }
     
-    void punchBlock(IDeltaChunk idc, EntityPlayerMP player, ByteBuf dis, BlockPos pos, EnumFacing sideHit) {
+    void punchBlock(IDimensionSlice idc, EntityPlayerMP player, ByteBuf dis, BlockPos pos, EnumFacing sideHit) {
         Coord at = new Coord(DeltaChunk.getServerShadowWorld(), pos);
         if (at.isAir()) return;
         if (!blockInReach(idc, player, at)) return;
@@ -325,7 +232,7 @@ public class HammerNet {
         liason.finishUsingLiason();
     }
 
-    void leftClickBlock(IDeltaChunk idc, EntityPlayerMP player, ByteBuf dis, BlockPos pos, EnumFacing sideHit, float vecX, float vecY, float vecZ) {
+    void leftClickBlock(IDimensionSlice idc, EntityPlayerMP player, ByteBuf dis, BlockPos pos, EnumFacing sideHit, float vecX, float vecY, float vecZ) {
         Coord at = new Coord(DeltaChunk.getServerShadowWorld(), pos);
         if (at.isAir()) return;
         if (!blockInReach(idc, player, at)) return;
@@ -335,8 +242,8 @@ public class HammerNet {
         block.onBlockClicked(at.w, pos, player);
     }
 
-    void clickEntity(IDeltaChunk idc, EntityPlayerMP player, Entity hitEnt, boolean leftClick) {
-        InteractionLiason liason = getLiason((WorldServer) idc.getCorner().w, player, idc);
+    void clickEntity(IDimensionSlice idc, EntityPlayerMP player, Entity hitEnt, boolean leftClick) {
+        InteractionLiason liason = getLiason((WorldServer) idc.getMinCorner().w, player, idc);
         if (leftClick) {
             liason.attackTargetEntityWithCurrentItem(hitEnt);
         } else {
@@ -345,14 +252,14 @@ public class HammerNet {
         liason.finishUsingLiason();
     }
     
-    InteractionLiason getLiason(WorldServer shadowWorld, EntityPlayerMP real_player, IDeltaChunk idc) {
+    InteractionLiason getLiason(WorldServer shadowWorld, EntityPlayerMP real_player, IDimensionSlice idc) {
         // NORELEASE: Cache. Constructing fake players is muy expensivo
         InteractionLiason liason = new InteractionLiason(shadowWorld, new ItemInWorldManager(shadowWorld), real_player, idc);
         liason.initializeFor(idc);
         return liason;
     }
 
-    private boolean do_click(IDeltaChunk idc, WorldServer world, EntityPlayerMP player, BlockPos pos, EnumFacing sideHit, float vecX, float vecY, float vecZ) {
+    private boolean do_click(IDimensionSlice idc, WorldServer world, EntityPlayerMP player, BlockPos pos, EnumFacing sideHit, float vecX, float vecY, float vecZ) {
         // Copy of PlayerControllerMP.onPlayerRightClick
         ItemStack is = player.getHeldItem();
         if (is != null && is.getItem().onItemUseFirst(is, player, world, pos, sideHit, vecX, vecY, vecZ)) {
@@ -389,7 +296,7 @@ public class HammerNet {
         }
     }
     
-    void clickBlock(IDeltaChunk idc, EntityPlayerMP real_player, BlockPos pos, EnumFacing sideHit, float vecX, float vecY, float vecZ) throws IOException {
+    void clickBlock(IDimensionSlice idc, EntityPlayerMP real_player, BlockPos pos, EnumFacing sideHit, float vecX, float vecY, float vecZ) throws IOException {
         WorldServer shadowWorld = (WorldServer) DeltaChunk.getServerShadowWorld();
         Coord at = new Coord(shadowWorld, pos);
         if (at.isAir()) return;

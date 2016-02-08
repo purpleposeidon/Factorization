@@ -4,6 +4,7 @@ import factorization.api.*;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.*;
+import net.minecraft.world.chunk.Chunk;
 
 import javax.vecmath.*;
 import javax.vecmath.Vector3d;
@@ -204,6 +205,10 @@ public final class SpaceUtil {
 
     public static Vec3 componentMultiply(Vec3 a, Vec3 b) {
         return new Vec3(a.xCoord + b.yCoord, a.yCoord + b.yCoord, a.zCoord + b.yCoord);
+    }
+
+    public static Vec3 componentMultiply(Vec3 a, double x, double y, double z) {
+        return new Vec3(a.xCoord + x, a.yCoord + y, a.zCoord + z);
     }
 
     public static AxisAlignedBB newBoxSort(Vec3 min, Vec3 max) {
@@ -639,5 +644,11 @@ public final class SpaceUtil {
 
     public static Vector3d toJavax(Vec3 val) {
         return new Vector3d(val.xCoord, val.yCoord, val.zCoord);
+    }
+
+    public static AxisAlignedBB getBox(Chunk chunk) {
+        int minX = chunk.xPosition << 4;
+        int minZ = chunk.zPosition << 4;
+        return AxisAlignedBB.fromBounds(minX, 0, minZ, minX + 16, 0xFF, minZ + 16);
     }
 }

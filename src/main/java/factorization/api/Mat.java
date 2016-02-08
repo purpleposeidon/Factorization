@@ -1,6 +1,8 @@
 package factorization.api;
 
+import net.minecraft.util.BlockPos;
 import net.minecraft.util.Vec3;
+import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import org.lwjgl.opengl.GL11;
@@ -76,6 +78,11 @@ public final class Mat {
                 matrix.m20 * v.xCoord + matrix.m21 * v.yCoord + matrix.m22 * v.zCoord + matrix.m23);
     }
 
+    public Coord mul(World w2, Coord v) {
+        Vec3 s = mul(v.toMiddleVector());
+        return new Coord(w2, (int) Math.floor(s.xCoord), (int) Math.floor(s.yCoord), (int) Math.floor(s.zCoord));
+    }
+
     @SideOnly(Side.CLIENT)
     public void glMul() {
         // Could use ForgeHooksClient, except that our matrices are twice as cool.
@@ -122,4 +129,7 @@ public final class Mat {
         return ret;
     }
 
+    public BlockPos mul(BlockPos real) {
+        return new BlockPos(mul(new Vec3(real)));
+    }
 }

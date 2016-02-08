@@ -5,8 +5,10 @@ import factorization.api.datahelpers.DataHelper;
 import factorization.api.datahelpers.Share;
 import factorization.colossi.ColossusController.BodySide;
 import factorization.colossi.ColossusController.LimbType;
+import factorization.fzds.BasicTransformOrder;
 import factorization.fzds.interfaces.DeltaCapability;
-import factorization.fzds.interfaces.IDeltaChunk;
+import factorization.fzds.interfaces.DimensionSliceEntityBase;
+import factorization.fzds.interfaces.IDimensionSlice;
 import factorization.fzds.interfaces.Interpolation;
 import factorization.shared.EntityReference;
 import net.minecraft.world.World;
@@ -18,20 +20,20 @@ class LimbInfo {
     BodySide side = BodySide.UNKNOWN_BODY_SIDE;
     byte parity = 0; // If you have a centipede, you kind of need to swap left & right every other foot
     int length; // How long the limb is
-    EntityReference<IDeltaChunk> idc;
+    EntityReference<DimensionSliceEntityBase> idc;
     
     byte lastTurnDirection = 0;
     
-    public LimbInfo(LimbType type, BodySide side, int length, IDeltaChunk ent) {
-        this(ent.worldObj);
+    public LimbInfo(LimbType type, BodySide side, int length, IDimensionSlice ent) {
+        this(ent.getRealWorld());
         this.type = type;
         this.side = side;
         this.length = length;
-        this.idc.trackEntity(ent);
+        this.idc.trackEntity(ent.getEntity());
     }
     
     public LimbInfo(World world) {
-        idc = new EntityReference<IDeltaChunk>(world);
+        idc = new EntityReference<DimensionSliceEntityBase>(world);
     }
 
 
@@ -49,9 +51,9 @@ class LimbInfo {
     }
     
     public void setTargetRotation(Quaternion rot, int time, Interpolation interp) {
-        IDeltaChunk dse = idc.getEntity();
+        IDimensionSlice dse = idc.getEntity();
         if (dse == null) return;
-        dse.orderTargetRotation(rot, time, interp);
+        BasicTransformOrder.give(dse, rot, time, interp);
     }
     
     /**
@@ -68,20 +70,20 @@ class LimbInfo {
     }
     
     public boolean isTurning() {
-        IDeltaChunk dse = idc.getEntity();
+        IDimensionSlice dse = idc.getEntity();
         if (dse == null) return true; // isTurning() is used to block action, so we'll return true here
-        return dse.hasOrderedRotation();
+        return dse.hasOrders();
     }
     
     public void reset(int time, Interpolation interp) {
-        IDeltaChunk dse = idc.getEntity();
+        IDimensionSlice dse = idc.getEntity();
         if (dse == null) return;
         Quaternion zero = new Quaternion();
         setTargetRotation(zero, time, interp);
     }
     
     public void causesPain(boolean pain) {
-        IDeltaChunk dse = idc.getEntity();
+        IDimensionSlice dse = idc.getEntity();
         if (dse == null) return;
         if (pain) {
             dse.permit(DeltaCapability.PHYSICS_DAMAGE);
@@ -99,14 +101,15 @@ class LimbInfo {
     int creak_delay = 20 * 25;
 
     public void creak() {
-        IDeltaChunk ent = idc.getEntity();
+        IDimensionSlice ent = idc.getEntity();
         if (ent == null) return;
-        long now = ent.worldObj.getTotalWorldTime();
+        World w = ent.getRealWorld();
+        long now = w.getTotalWorldTime();
         if (now < next_creak) return;
-        if (ent.worldObj.rand.nextInt(6) != 0) return;
+        if (w.rand.nextInt(6) != 0) return;
         next_creak = now + creak_delay;
-        float volume = 0.1F + ent.worldObj.rand.nextFloat() * 0.3F;
-        float pitch = 1F / 32F + (1F / 16F) * ent.worldObj.rand.nextFloat();
-        ent.worldObj.playSoundAtEntity(ent, "factorization:colossus.creak", volume, pitch);
+        float volume = 0.1F + w.rand.nextFloat() * 0.3F;
+        float pitch = 1F / 32F + (1F / 16F) * w.rand.nextFloat();
+        w.playSoundAtEntity(ent.getEntity(), "factorization:colossus.creak", volume, pitch);
     }
 }

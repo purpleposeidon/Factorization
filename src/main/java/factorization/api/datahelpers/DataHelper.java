@@ -272,4 +272,8 @@ for t in all_types:
         // End generated code. Gotta poke it a tad tho.
         throw new IOException("Unhandled class: " + k);
     }
+
+    public IDataSerializable putRegisteredUnion(RegisteredDataUnion classes, IDataSerializable value) throws IOException {
+        return classes.put(name, this, value);
+    }
 }

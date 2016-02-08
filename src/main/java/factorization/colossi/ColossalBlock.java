@@ -3,7 +3,6 @@ package factorization.colossi;
 import java.util.*;
 
 import factorization.util.DataUtil;
-import factorization.util.NORELEASE;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.MapColor;
 import net.minecraft.block.material.Material;
@@ -26,7 +25,7 @@ import factorization.api.Coord;
 import factorization.citizen.EntityCitizen;
 import factorization.fzds.DeltaChunk;
 import factorization.fzds.TransferLib;
-import factorization.fzds.interfaces.IDeltaChunk;
+import factorization.fzds.interfaces.IDimensionSlice;
 import factorization.oreprocessing.ItemOreProcessing;
 import factorization.servo.ItemMatrixProgrammer;
 import factorization.shared.Core;
@@ -34,8 +33,6 @@ import factorization.shared.Core.TabType;
 import factorization.util.PlayerUtil;
 import factorization.weird.poster.EntityPoster;
 import factorization.weird.poster.ItemSpawnPoster;
-import net.minecraftforge.fml.common.FMLCommonHandler;
-import net.minecraftforge.fml.relauncher.Side;
 
 import static factorization.colossi.ColossalBlock.Md.ARM;
 import static factorization.colossi.ColossalBlock.Md.BODY;
@@ -337,7 +334,7 @@ public class ColossalBlock extends Block {
         if (heart == null) return null;
         UUID controllerId = heart.controllerUuid;
         if (controllerId.equals(TileEntityColossalHeart.noController)) return null;
-        for (IDeltaChunk idc : DeltaChunk.getSlicesContainingPoint(at)) {
+        for (IDimensionSlice idc : DeltaChunk.getSlicesContainingPoint(at)) {
             Object c = idc.getController();
             if (c instanceof ColossusController) {
                 ColossusController controller = (ColossusController) c;

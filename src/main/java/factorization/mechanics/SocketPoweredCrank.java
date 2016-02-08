@@ -5,11 +5,16 @@ import factorization.api.datahelpers.DataHelper;
 import factorization.api.datahelpers.IDataSerializable;
 import factorization.api.datahelpers.Share;
 import factorization.common.FactoryType;
+import factorization.fzds.BasicTransformOrder;
 import factorization.fzds.DeltaChunk;
 import factorization.fzds.DimensionSliceEntity;
+import factorization.fzds.NullOrder;
+import factorization.fzds.interfaces.DimensionSliceEntityBase;
 import factorization.fzds.interfaces.IDCController;
-import factorization.fzds.interfaces.IDeltaChunk;
+import factorization.fzds.interfaces.IDimensionSlice;
 import factorization.fzds.interfaces.Interpolation;
+import factorization.fzds.interfaces.transform.Pure;
+import factorization.fzds.interfaces.transform.TransformData;
 import factorization.servo.ServoMotor;
 import factorization.shared.Core;
 import factorization.shared.EntityReference;
@@ -31,7 +36,7 @@ import java.io.IOException;
 
 public class SocketPoweredCrank extends TileEntitySocketBase implements IChargeConductor, IDCController, ITickable {
     private Charge charge = new Charge(this);
-    final EntityReference<IDeltaChunk> hookedIdc = MechanicsController.autoJoin(this);
+    final EntityReference<DimensionSliceEntityBase> hookedIdc = MechanicsController.autoJoin(this);
     Vec3 hookLocation = SpaceUtil.newVec();
     DeltaCoord hookDelta = new DeltaCoord();
     byte powerTime = 0;
@@ -55,7 +60,7 @@ public class SocketPoweredCrank extends TileEntitySocketBase implements IChargeC
     }
 
     @Override
-    public boolean onAttacked(IDeltaChunk idc, DamageSource damageSource, float damage) { return false; }
+    public boolean onAttacked(IDimensionSlice idc, DamageSource damageSource, float damage) { return false; }
 
     @Override
     public IDataSerializable serialize(String prefix, DataHelper data) throws IOException {
@@ -125,7 +130,7 @@ public class SocketPoweredCrank extends TileEntitySocketBase implements IChargeC
         if (worldObj.isRemote) {
             return;
         }
-        IDeltaChunk idc = hookedIdc.getEntity();
+        IDimensionSlice idc = hookedIdc.getEntity();
         if (idc == null) return;
         if (chainLen > BROKEN_CHAIN_LENGTH) {
             breakChain();
@@ -140,7 +145,7 @@ public class SocketPoweredCrank extends TileEntitySocketBase implements IChargeC
         if (powered && powerTime >= 0) {
             if (charge.tryTake(10) == 0) {
                 if (powerTime > 5) {
-                    idc.cancelOrderedRotation();
+                    NullOrder.give(idc);
                     powerTime = 4;
                     return;
                 }
@@ -155,7 +160,7 @@ public class SocketPoweredCrank extends TileEntitySocketBase implements IChargeC
             } else if (powerTime > 0 && powerTime != -1) {
                 // Long pulse has been interrupted
                 // powerTime == -1 --> already cancelled, so another one should not be done.
-                idc.cancelOrderedRotation();
+                NullOrder.give(idc);
             }
             powerTime = 0;
         } else if (powerTime == 5) {
@@ -163,7 +168,7 @@ public class SocketPoweredCrank extends TileEntitySocketBase implements IChargeC
             yankChain(socket, idc, false);
             powerTime++;
         } else if (powered && powerTime >= 0) {
-            if (powerTime > 5 && !idc.hasOrderedRotation()) {
+            if (powerTime > 5 && !idc.hasOrders()) {
                 // Rotation completed; stop so that we aren't irrelevantly canceling rotation
                 powerTime = -1;
                 return;
@@ -172,13 +177,13 @@ public class SocketPoweredCrank extends TileEntitySocketBase implements IChargeC
         }
     }
 
-    private void yoinkChain(ISocketHolder socket, IDeltaChunk idc, double targetSpeed) {
+    private void yoinkChain(ISocketHolder socket, IDimensionSlice idc, double targetSpeed) {
         Vec3 force = getForce(idc, socket, targetSpeed);
         Coord at = new Coord(DeltaChunk.getServerShadowWorld(), hookLocation);
         MechanicsController.push(idc, at, force);
     }
 
-    private void yankChain(ISocketHolder socket, IDeltaChunk idc, boolean singleBlock) {
+    private void yankChain(ISocketHolder socket, IDimensionSlice idc, boolean singleBlock) {
         TileEntityHinge hinge = getHinge(idc);
         if (hinge == null) {
             yoinkChain(socket, idc, 1.0 / 16.0);
@@ -189,10 +194,11 @@ public class SocketPoweredCrank extends TileEntitySocketBase implements IChargeC
             return;
         }
         Vec3 rotationAxis = hinge.getRotationAxis();
-        Quaternion rot = idc.getRotation();
+        TransformData<Pure> transform = idc.getTransform();
+        Quaternion rot = transform.getRot();
         Quaternion min = getMinimizedRotation(idc, hinge, rotationAxis);
         double dtheta = rot.getAngleBetween(min);
-        double r = SpaceUtil.subtract(idc.shadow2real(hookLocation), SpaceUtil.fromEntPos(idc)).lengthVector();
+        double r = SpaceUtil.subtract(idc.shadow2real(hookLocation), transform.getPos()).lengthVector();
         double deltaC = dtheta * r;
         double totalC = deltaC;
         if (singleBlock && deltaC > 1) {
@@ -207,10 +213,10 @@ public class SocketPoweredCrank extends TileEntitySocketBase implements IChargeC
         int ticks = (int) (deltaC / radiansPerTick);
         ticks = NumUtil.clip(ticks, 10, (int) (20 * 10 * totalC));
         Interpolation interp = singleBlock ? Interpolation.SMOOTH : Interpolation.LINEAR;
-        idc.orderTargetRotation(target, ticks, interp);
+        BasicTransformOrder.give(idc, target, ticks, interp);
     }
 
-    private TileEntityHinge getHinge(IDeltaChunk idc) {
+    private TileEntityHinge getHinge(IDimensionSlice idc) {
         IDCController controller = idc.getController();
         if (controller instanceof MechanicsController) {
             MechanicsController mc = (MechanicsController) controller;
@@ -225,18 +231,18 @@ public class SocketPoweredCrank extends TileEntitySocketBase implements IChargeC
         return null;
     }
 
-    private Quaternion getMinimizedRotation(IDeltaChunk idc, TileEntityHinge hinge, Vec3 rotationAxis) {
+    private Quaternion getMinimizedRotation(IDimensionSlice idc, TileEntityHinge hinge, Vec3 rotationAxis) {
         // Return the rotation that happens when the anchor point is pointing at us as much as possible.
+        Vec3 idcPos = idc.getTransform().getPos();
         Vec3 anchorVec;
         {
-            Vec3 com = idc.real2shadow(SpaceUtil.fromEntPos(idc));
+            Vec3 com = idc.real2shadow(idcPos);
             anchorVec = SpaceUtil.subtract(hookLocation, com).normalize();
         }
         Vec3 minVec;
         {
-            Vec3 you = SpaceUtil.fromEntPos(idc);
             Vec3 me = new Coord(this).toMiddleVector();
-            Vec3 vec = SpaceUtil.subtract(me, you);
+            Vec3 vec = SpaceUtil.subtract(me, idcPos);
             Vec3 mask = new Vec3(
                     rotationAxis.xCoord == 0 ? 1 : 0,
                     rotationAxis.yCoord == 0 ? 1 : 0,
@@ -249,14 +255,14 @@ public class SocketPoweredCrank extends TileEntitySocketBase implements IChargeC
         return Quaternion.getRotationQuaternionRadians(angle, rotationAxis);
     }
 
-    private Vec3 getForce(IDeltaChunk idc, ISocketHolder socket, double targetSpeed) {
+    private Vec3 getForce(IDimensionSlice idc, ISocketHolder socket, double targetSpeed) {
         Vec3 realHookLocation = idc.shadow2real(hookLocation);
         Vec3 selfPos = socket.getServoPos();
         Vec3 chainVec = SpaceUtil.subtract(realHookLocation, selfPos).normalize();
         return SpaceUtil.scale(chainVec, -targetSpeed);
     }
 
-    private Vec3 limitForce(IDeltaChunk idc, Vec3 force, double targetSpeed) {
+    private Vec3 limitForce(IDimensionSlice idc, Vec3 force, double targetSpeed) {
         DimensionSliceEntity dse = (DimensionSliceEntity) idc;
         Vec3 realHookLocation = idc.shadow2real(hookLocation);
         Vec3 inst = dse.getInstantaneousRotationalVelocityAtPointInCornerSpace(realHookLocation);
@@ -282,11 +288,11 @@ public class SocketPoweredCrank extends TileEntitySocketBase implements IChargeC
         }
     }
 
-    public void setChain(IDeltaChunk idc, Vec3 hookLocation, Coord hookedBlock) {
+    public void setChain(IDimensionSlice idc, Vec3 hookLocation, Coord hookedBlock) {
         if (hookedIdc.trackingEntity()) {
             getCoord().spawnItem(Core.registry.darkIronChain);
         }
-        hookedIdc.trackEntity(idc);
+        hookedIdc.trackEntity(idc.getEntity());
         this.hookLocation = hookLocation;
         hookDelta = hookedBlock.asDeltaCoord();
         getCoord().syncTE();
@@ -300,7 +306,7 @@ public class SocketPoweredCrank extends TileEntitySocketBase implements IChargeC
 
     public boolean breakChain() {
         if (!isChained()) return false;
-        IDeltaChunk idc = hookedIdc.getEntity();
+        IDimensionSlice idc = hookedIdc.getEntity();
         if (idc == null) {
             return true;
         }
@@ -357,7 +363,7 @@ public class SocketPoweredCrank extends TileEntitySocketBase implements IChargeC
     byte spinSign = +1;
 
     void updateChain(ISocketHolder socket) {
-        IDeltaChunk idc = hookedIdc.getEntity();
+        IDimensionSlice idc = hookedIdc.getEntity();
         if (idc == null) return;
         Vec3 realHookLocation = idc.shadow2real(hookLocation);
         Vec3 selfPos = socket.getServoPos();
@@ -456,19 +462,19 @@ public class SocketPoweredCrank extends TileEntitySocketBase implements IChargeC
     }
 
     Coord getAnchorBlock() {
-        IDeltaChunk idc = hookedIdc.getEntity();
+        IDimensionSlice idc = hookedIdc.getEntity();
         if (idc == null) return null;
-        return new Coord(idc.getCorner().w, 0, 0, 0).add(hookDelta);
+        return new Coord(idc.getMinCorner().w, 0, 0, 0).add(hookDelta);
     }
 
     @Override
-    public boolean placeBlock(IDeltaChunk idc, EntityPlayer player, Coord at) {
+    public boolean placeBlock(IDimensionSlice idc, EntityPlayer player, Coord at) {
         InertiaCalculator.dirty(idc);
         return false;
     }
 
     @Override
-    public boolean breakBlock(IDeltaChunk idc, EntityPlayer player, Coord at, EnumFacing sideHit) {
+    public boolean breakBlock(IDimensionSlice idc, EntityPlayer player, Coord at, EnumFacing sideHit) {
         Coord anchorPoint = getAnchorBlock();
         if (anchorPoint == null) return false;
         if (anchorPoint.equals(at)) {
@@ -479,28 +485,28 @@ public class SocketPoweredCrank extends TileEntitySocketBase implements IChargeC
     }
 
     @Override
-    public boolean hitBlock(IDeltaChunk idc, EntityPlayer player, Coord at, EnumFacing sideHit) {
+    public boolean hitBlock(IDimensionSlice idc, EntityPlayer player, Coord at, EnumFacing sideHit) {
         return false;
     }
 
     @Override
-    public boolean useBlock(IDeltaChunk idc, EntityPlayer player, Coord at, EnumFacing sideHit) {
+    public boolean useBlock(IDimensionSlice idc, EntityPlayer player, Coord at, EnumFacing sideHit) {
         return false;
     }
 
     @Override
-    public void idcDied(IDeltaChunk idc) {
+    public void idcDied(IDimensionSlice idc) {
 
     }
 
     @Override
-    public void beforeUpdate(IDeltaChunk idc) {
+    public void beforeUpdate(IDimensionSlice idc) {
 
     }
 
     @Override
-    public void afterUpdate(IDeltaChunk idc) {
-        if (idc.hasOrderedRotation() || !idc.getRotationalVelocity().isZero() || idc.motionX != 0 || idc.motionY != 0 || idc.motionZ != 0) {
+    public void afterUpdate(IDimensionSlice idc) {
+        if (idc.hasOrders() || !idc.getVel().isZero()) {
             updateComparator();
         }
     }

@@ -190,6 +190,11 @@ public class NetworkFactorization {
         broadcastPacket(who, src, toSend);
     }
 
+    public void broadcastMessageToEntity(EntityPlayer who, Entity src, Enum messageType, Object... msg) {
+        FMLProxyPacket toSend = entityPacket(src, messageType, msg);
+        broadcastPacket(who, new Coord(src), toSend);
+    }
+
     public void broadcastPacket(EntityPlayer who, Coord src, FMLProxyPacket toSend) {
         if (who != null) {
             FzNetDispatch.addPacket(toSend, who);

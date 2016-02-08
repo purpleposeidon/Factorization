@@ -9,10 +9,16 @@ import factorization.common.FactoryType;
 import factorization.fzds.DeltaChunk;
 import factorization.fzds.TransferLib;
 import factorization.fzds.interfaces.DeltaCapability;
+import factorization.fzds.interfaces.DimensionSliceEntityBase;
 import factorization.fzds.interfaces.IDCController;
-import factorization.fzds.interfaces.IDeltaChunk;
+import factorization.fzds.interfaces.IDimensionSlice;
+import factorization.fzds.interfaces.transform.Pure;
+import factorization.fzds.interfaces.transform.TransformData;
 import factorization.net.StandardMessageType;
-import factorization.shared.*;
+import factorization.shared.BlockClass;
+import factorization.shared.Core;
+import factorization.shared.EntityReference;
+import factorization.shared.TileEntityCommon;
 import factorization.util.FzUtil;
 import factorization.util.NumUtil;
 import factorization.util.PlayerUtil;
@@ -36,7 +42,7 @@ public class TileEntityWindMill extends TileEntityCommon implements IRotationalE
     double power_per_tick, power_this_tick, target_velocity, velocity;
     double wind_strength = 0, efficiency = 0;
     double radius = 0;
-    final EntityReference<IDeltaChunk> idcRef = new EntityReference<IDeltaChunk>().whenFound(new IDCController.AutoControl(this));
+    final EntityReference<DimensionSliceEntityBase> idcRef = new EntityReference<DimensionSliceEntityBase>().whenFound(new IDCController.AutoControl(this));
 
     @Override
     public void setWorldObj(World w) {
@@ -89,8 +95,8 @@ public class TileEntityWindMill extends TileEntityCommon implements IRotationalE
     protected boolean removedByPlayer(EntityPlayer player, boolean willHarvest) {
         if (!willHarvest) return super.removedByPlayer(player, willHarvest);
         if (PlayerUtil.isPlayerCreative(player) && player.isSneaking()) {
-            IDeltaChunk idc = idcRef.getEntity();
-            if (idc != null) idc.setDead();
+            IDimensionSlice idc = idcRef.getEntity();
+            if (idc != null) idc.killIDS();
             return super.removedByPlayer(player, willHarvest);
         }
         if (idcRef.trackedAndAlive()) return false;
@@ -109,23 +115,23 @@ public class TileEntityWindMill extends TileEntityCommon implements IRotationalE
     }
 
     @Override
-    public boolean placeBlock(IDeltaChunk idc, EntityPlayer player, Coord at) {
+    public boolean placeBlock(IDimensionSlice idc, EntityPlayer player, Coord at) {
         dirty = true;
         return false;
     }
 
     @Override
-    public boolean breakBlock(IDeltaChunk idc, EntityPlayer player, Coord at, EnumFacing sideHit) {
+    public boolean breakBlock(IDimensionSlice idc, EntityPlayer player, Coord at, EnumFacing sideHit) {
         dirty = true;
         return false;
     }
 
-    @Override public boolean hitBlock(IDeltaChunk idc, EntityPlayer player, Coord at, EnumFacing sideHit) { return false; }
-    @Override public boolean useBlock(IDeltaChunk idc, EntityPlayer player, Coord at, EnumFacing sideHit) { return false; }
-    @Override public void idcDied(IDeltaChunk idc) { }
-    @Override public void beforeUpdate(IDeltaChunk idc) { }
-    @Override public void afterUpdate(IDeltaChunk idc) { }
-    @Override public boolean onAttacked(IDeltaChunk idc, DamageSource damageSource, float damage) { return false; }
+    @Override public boolean hitBlock(IDimensionSlice idc, EntityPlayer player, Coord at, EnumFacing sideHit) { return false; }
+    @Override public boolean useBlock(IDimensionSlice idc, EntityPlayer player, Coord at, EnumFacing sideHit) { return false; }
+    @Override public void idcDied(IDimensionSlice idc) { }
+    @Override public void beforeUpdate(IDimensionSlice idc) { }
+    @Override public void afterUpdate(IDimensionSlice idc) { }
+    @Override public boolean onAttacked(IDimensionSlice idc, DamageSource damageSource, float damage) { return false; }
     @Override public CollisionAction collidedWithWorld(World realWorld, AxisAlignedBB realBox, World shadowWorld, AxisAlignedBB shadowBox) { return CollisionAction.STOP_BEFORE; }
 
     @Override
@@ -195,7 +201,7 @@ public class TileEntityWindMill extends TileEntityCommon implements IRotationalE
         if (!isFenceish(fenceLocation)) return false;
         DeltaCoord idcSize = new DeltaCoord(MAX_RADIUS * 2, MAX_OUT + MAX_IN, MAX_RADIUS * 2);
         DeltaCoord offset = new DeltaCoord(MAX_RADIUS, MAX_OUT, MAX_RADIUS);
-        IDeltaChunk idc = DeltaChunk.allocateSlice(worldObj, channel_id, idcSize);
+        IDimensionSlice idc = DeltaChunk.allocateSlice(worldObj, channel_id, idcSize);
         idc.permit(DeltaCapability.BLOCK_PLACE,
                 DeltaCapability.BLOCK_MINE,
                 DeltaCapability.INTERACT,
@@ -206,30 +212,28 @@ public class TileEntityWindMill extends TileEntityCommon implements IRotationalE
                 DeltaCapability.COLLIDE,
                 DeltaCapability.VIOLENT_COLLISIONS,
                 DeltaCapability.DRAG);
-        idc.setRotationalCenterOffset(offset.toVector().addVector(0.5, 0.5, 0.5));
+        TransformData<Pure> transform = idc.getTransform();
+        transform.setOffset(offset.toVector().addVector(0.5, 0.5, 0.5));
         final EnumFacing normal = sailDirection.getOpposite();
         Coord at = new Coord(this).add(sailDirection);
-        at.setAsEntityLocation(idc);
+        idc.getTransform().setPos(at.toMiddleVector());
         if (normal.getDirectionVec().getY() == 0) {
             Vec3 up = SpaceUtil.fromDirection(EnumFacing.UP);
             Vec3 vnorm = SpaceUtil.fromDirection(normal);
             Vec3 axis = up.crossProduct(vnorm);
             Quaternion rot = Quaternion.getRotationQuaternionRadians(-Math.PI / 2, axis);
-            idc.setRotation(rot);
-            idc.posY += 0.5;
+            transform.setRot(rot);
+            transform.addPos(0, 0.5, 0);
         } else {
             double a = .5;
-            idc.posX += sailDirection.getDirectionVec().getX() * a;
-            idc.posY += sailDirection.getDirectionVec().getY() * a;
-            idc.posZ += sailDirection.getDirectionVec().getZ() * a;
+            transform.addPos(SpaceUtil.scale(SpaceUtil.fromDirection(sailDirection), a));
             if (normal.getDirectionVec().getY() == 1) {
-                idc.posY += 1;
+                transform.addPos(0, 1, 0);
             }
         }
         TransferLib.move(fenceLocation, idc.getCenter(), false /* We'll do it this way to synchronize them */, true);
         fenceLocation.setAir();
-        worldObj.spawnEntityInWorld(idc);
-        idcRef.trackEntity(idc);
+        idcRef.spawnAndTrack(idc.getEntity());
         updateWindStrength(true);
         idc.setPartName("Windmill");
         updateRedstoneState();
@@ -270,9 +274,9 @@ public class TileEntityWindMill extends TileEntityCommon implements IRotationalE
             if (error > 0.9999) {
                 velocity = target_velocity;
             }
-            IDeltaChunk idc = idcRef.getEntity();
+            IDimensionSlice idc = idcRef.getEntity();
             if (idc != null) {
-                idc.setRotationalVelocity(Quaternion.getRotationQuaternionRadians(velocity, sailDirection));
+                idc.getVel().setRot(Quaternion.getRotationQuaternionRadians(velocity, sailDirection));
             }
             sendVelocity();
         }
@@ -291,7 +295,7 @@ public class TileEntityWindMill extends TileEntityCommon implements IRotationalE
     static double WIND_POWER_SCALE = 1.0 / 10.0; // Boosts the power output (and does not influence velocity)
 
     void calculate() {
-        IDeltaChunk idc = idcRef.getEntity();
+        IDimensionSlice idc = idcRef.getEntity();
         if (idc == null) return;
         dirty = false;
         int score = 0;
