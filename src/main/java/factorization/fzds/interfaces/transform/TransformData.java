@@ -146,8 +146,12 @@ public class TransformData<Kind extends Any> implements IDataSerializable {
     }
 
     public void validate() {
-        rot = rot.cleanAbnormalNumbers();
-        if (scale == 0) scale = 1.0;
+        if (rot != null) {
+            rot = rot.cleanAbnormalNumbers();
+        }
+        if (scale != null && scale == 0) {
+            scale = 1.0;
+        }
     }
 
     public void multiply(TransformData data) {

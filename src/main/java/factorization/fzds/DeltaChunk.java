@@ -110,14 +110,10 @@ public class DeltaChunk {
     public static IDimensionSlice allocateSlice(World spawnWorld, int channel, DeltaCoord size) {
         if (spawnWorld.isRemote) throw new IllegalArgumentException("Attempted client-side DSE allocation!");
         Coord base, end;
-        if (NORELEASE.off) {
-            base = new Coord(getServerShadowWorld(), 0, 4, 0);
-            end = base.add(size);
-        } else {
-            base = Hammer.hammerInfo.takeCell(channel, size);
-            end = base.add(size);
-            wipeRegion(base, end);
-        }
+        //base = new Coord(getServerShadowWorld(), 0, 4, 0);
+        base = Hammer.hammerInfo.takeCell(channel, size);
+        end = base.add(size);
+        wipeRegion(base, end);
         return new DimensionSliceEntity(spawnWorld, base, end);
     }
     
