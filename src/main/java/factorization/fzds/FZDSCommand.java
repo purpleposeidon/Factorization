@@ -841,7 +841,7 @@ public class FZDSCommand extends CommandBase {
                 TransformData<Pure> s = selected.getTransform();
                 TransformData<Pure> v = selected.getVel();
                 if (args[0].equals("+")) {
-                    if (type == 'd' || type == 's') {
+                    if (type == 'd') {
                         s.addPos(x, y, z);
                     } else if (type == 'v') {
                         v.addPos(x / 20, y / 20, z / 20);
@@ -908,14 +908,27 @@ public class FZDSCommand extends CommandBase {
                     }
                 }
             }}, Requires.SLICE_SELECTED, Requires.OP);
-        add(new SubCommand("incrScale", "newScale") {
+        add(new SubCommand("scale|grow", "scaleValue") {
+            @Override
+            String details() {
+                return "Sets the scale or the scale velocity";
+            }
+
             @Override
             void call(String[] args) {
-                if (!selected.can(DeltaCapability.SCALE)) {
+                /*if (!selected.can(DeltaCapability.SCALE)) {
                     sendChat("Selection doesn't have the SCALE cap");
                     return;
+                }*/
+                TransformData<Pure> trans;
+                double scale = Double.parseDouble(args[0]);
+                if (arg0.equals("grow")) {
+                    trans = selected.getVel();
+                    scale /= 20;
+                } else {
+                    trans = selected.getTransform();
                 }
-                selected.getTransform().setScale(Double.parseDouble(args[0]));
+                trans.setScale(scale);
             }}, Requires.SLICE_SELECTED, Requires.CREATIVE);
         add(new SubCommand("alpha", "newOpacity") {
             @Override

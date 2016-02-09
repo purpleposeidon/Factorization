@@ -2,8 +2,11 @@ package factorization.fzds;
 
 import factorization.aabbdebug.AabbDebugger;
 import factorization.api.Coord;
+import factorization.api.Mat;
 import factorization.fzds.interfaces.DeltaCapability;
 import factorization.fzds.interfaces.IFzdsShenanigans;
+import factorization.fzds.interfaces.transform.Pure;
+import factorization.fzds.interfaces.transform.TransformData;
 import factorization.shared.Core;
 import factorization.util.NORELEASE;
 import factorization.util.NumUtil;
@@ -211,10 +214,23 @@ public class RenderDimensionSliceEntity extends Render<DimensionSliceEntity> imp
                 end = -1;
                 step = -1;
             }
+            Minecraft mc = Minecraft.getMinecraft();
+            RenderGlobal rg = mc.renderGlobal;
+            boolean any = false;
             for (int i = start; i != end; i += step) {
                 RenderChunk rc = renderers[i];
+                if (rc.isNeedsUpdate() && drawMode == EnumWorldBlockLayer.SOLID) {
+                    rg.renderDispatcher.updateChunkNow(rc);
+                    rc.setNeedsUpdate(false);
+                    any = true;
+                }
                 if (rc.getCompiledChunk().isLayerEmpty(drawMode)) continue;
                 chunkBox.addRenderChunk(rc, drawMode);
+            }
+            if (any) {
+                NORELEASE.fixme("Not the best. This should be done through the thread?");
+                long dueBy = System.nanoTime() + 1000;
+                rg.renderDispatcher.runChunkUploads(dueBy);
             }
             chunkBox.renderChunkLayer(drawMode);
         }
@@ -397,16 +413,15 @@ public class RenderDimensionSliceEntity extends Render<DimensionSliceEntity> imp
 
     static void chunkNeedsRedraw(RenderGlobal rg, RenderChunk wr) {
         wr.setNeedsUpdate(true);
-        if (NORELEASE.off) {
-            rg.renderDispatcher.updateChunkLater(wr);
-        } else {
+        rg.renderDispatcher.updateChunkLater(wr);
+        NORELEASE.fixme("rm?"); /* {
             rg.renderDispatcher.updateChunkNow(wr);
             wr.setNeedsUpdate(false);
             long dueBy = System.nanoTime() + 1000;
             //rg.renderDispatcher.uploadChunk()
             rg.renderDispatcher.runChunkUploads(dueBy);
             NORELEASE.fixme("This is bad. Multiple block updates could potentially cause thrashing.");
-        }
+        }*/
     }
     
     DSRenderInfo getRenderInfo(DimensionSliceEntity dse) {
@@ -440,57 +455,56 @@ public class RenderDimensionSliceEntity extends Render<DimensionSliceEntity> imp
         EntityPlayer real_player = Minecraft.getMinecraft().thePlayer;
         
         nest++;
+        GL11.glPushMatrix();
+        GL11.glTranslated(x - dse.posX, y - dse.posY, z - dse.posZ);
+        // Puts us at the world's origin
+        if (dse.opacity != 1) {
+            GL11.glColor4f(1, 1, 1, dse.opacity);
+        }
         try {
+            NORELEASE.fixme("Don't interpolate the position");
             final boolean oracle = dse.can(DeltaCapability.ORACLE);
-            GL11.glPushMatrix();
-            try {
-                GL11.glTranslated(x, y, z);
-                //dse.getTransform().interpolateBy(dse.transformPrevTick, partialTicks);
-                dse.getReal2Shadow(partialTicks).glMul();
-                if (dse.opacity != 1) {
-                    GL11.glColor4f(1, 1, 1, dse.opacity);
-                }
-                if (nest == 1) {
-                    renderInfo.updateRelativeEyePosition();
-                }
-                Coord c = dse.getMinCorner().add(2, 2, 2);
-                GL11.glTranslated(-c.x, -c.y, -c.z);
-                Core.profileStart("renderTerrain");
-                {
-                    renderInfo.renderTerrain(partialTicks);
-                }
-                Core.profileEnd();
-                RenderUtil.checkGLError("FZDS terrain display list render");
-                GL11.glTranslated(dse.posX - x, dse.posY - y, dse.posZ - z);
-                if (nest == 1) {
-                    // renderBreakingBlocks needs to happen before renderEntities due to gl state nonsense.
-                    if (oracle) {
+            TransformData<Pure> transform = dse.getTransform(partialTicks);
+            transform = transform.copy();
+            transform.setPos(dse.getTransform().getPos());
+            Mat mat = transform.compile();
+            mat.invert().glMul();
+            if (nest == 1) {
+                renderInfo.updateRelativeEyePosition();
+            }
+
+            Core.profileStart("renderTerrain");
+            renderInfo.renderTerrain(partialTicks);
+            Core.profileEnd();
+            RenderUtil.checkGLError("FZDS terrain display list render");
+
+            GL11.glTranslated(dse.posX - x, dse.posY - y, dse.posZ - z); // This should be the translational component! :O
+            if (nest == 1) {
+                // renderBreakingBlocks needs to happen before renderEntities due to gl state nonsense.
+                if (oracle) {
+                    renderInfo.renderBreakingBlocks(real_player, partialTicks);
+                    renderInfo.renderEntities(partialTicks);
+                } else {
+                    Hammer.proxy.setShadowWorld();
+                    try {
                         renderInfo.renderBreakingBlocks(real_player, partialTicks);
                         renderInfo.renderEntities(partialTicks);
-                    } else {
-                        Hammer.proxy.setShadowWorld();
-                        try {
-                            renderInfo.renderBreakingBlocks(real_player, partialTicks);
-                            renderInfo.renderEntities(partialTicks);
-                        } finally {
-                            Hammer.proxy.restoreRealWorld();
-                        }
+                    } finally {
+                        Hammer.proxy.restoreRealWorld();
                     }
-                } else {
-                    renderInfo.renderEntities(partialTicks);
                 }
-                RenderUtil.checkGLError("FZDS entity render");
-            } finally {
-                if (dse.opacity != 1) {
-                    GL11.glColor4f(1, 1, 1, 1);
-                }
-                glPopMatrix();
+            } else {
+                renderInfo.renderEntities(partialTicks);
             }
+            RenderUtil.checkGLError("FZDS entity render");
         } catch (Exception e) {
             Core.logSevere("FZDS failed to render");
             e.printStackTrace(System.err);
-        }
-        finally {
+        } finally {
+            if (dse.opacity != 1) {
+                GL11.glColor4f(1, 1, 1, 1);
+            }
+            glPopMatrix();
             nest--;
             if (nest == 0) {
                 RenderUtil.checkGLError("FZDS after render");

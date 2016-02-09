@@ -5,6 +5,7 @@ import factorization.api.Quaternion;
 import factorization.api.datahelpers.DataHelper;
 import factorization.api.datahelpers.IDataSerializable;
 import factorization.shared.Core;
+import factorization.util.NORELEASE;
 import factorization.util.NumUtil;
 import factorization.util.SpaceUtil;
 import net.minecraft.util.Vec3;
@@ -139,12 +140,18 @@ public class TransformData<Kind extends Any> implements IDataSerializable {
         }
         dirty |= data.isReader();
         if (data.isReader()) {
-            rot = rot.cleanAbnormalNumbers();
+            validate();
         }
         return this;
     }
 
+    public void validate() {
+        rot = rot.cleanAbnormalNumbers();
+        if (scale == 0) scale = 1.0;
+    }
+
     public void multiply(TransformData data) {
+        NORELEASE.fixme("Badly named. Adjust? multiplyDelta?");
         byte flag = (byte) (flags() & data.flags());
         if (on(flag, FLAG_POS)) {
             assert pos != null;
@@ -164,7 +171,7 @@ public class TransformData<Kind extends Any> implements IDataSerializable {
         if (on(flag, FLAG_SCALE)) {
             assert scale != null;
             assert data.scale != null;
-            scale += data.scale;
+            scale *= data.scale;
         }
         dirty |= flag != 0;
     }
@@ -252,9 +259,9 @@ public class TransformData<Kind extends Any> implements IDataSerializable {
 
         double error = 0;
         if (pos != null) error = pos.distanceTo(that.pos);
-        if (rot != null) error += rot.distance(that.rot);
+        if (rot != null) error += Math.abs(rot.dotProduct(that.rot));
         if (offset != null) error += offset.distanceTo(that.offset);
-        if (scale != null) error += (scale - that.scale);
+        if (scale != null) error += Math.abs(scale - that.scale);
         return error;
 
     }
@@ -285,5 +292,12 @@ public class TransformData<Kind extends Any> implements IDataSerializable {
 
     public TransformData<Kind> mulPos(Vec3 vec3) {
         return setPos(SpaceUtil.componentMultiply(pos, vec3));
+    }
+
+    public Mat compile() {
+        return Mat.mul(Mat.trans(offset),
+                Mat.scale(1.0 / scale),
+                Mat.rotate(rot),
+                Mat.trans(pos).invert());
     }
 }

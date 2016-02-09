@@ -5,8 +5,11 @@ import factorization.api.DeltaCoord;
 import factorization.api.ICoordFunction;
 import factorization.coremodhooks.IExtraChunkData;
 import factorization.fzds.interfaces.IDimensionSlice;
+import factorization.fzds.interfaces.transform.Pure;
+import factorization.fzds.interfaces.transform.TransformData;
 import factorization.fzds.network.InteractionLiason;
 import factorization.fzds.network.PacketProxyingPlayer;
+import factorization.util.NORELEASE;
 import gnu.trove.set.hash.THashSet;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
@@ -23,6 +26,7 @@ import java.util.*;
 
 public class DeltaChunk {
     public static boolean enabled() {
+        NORELEASE.fixme("Rename this class to FZDS?");
         return HammerEnabled.ENABLED;
     }
 
@@ -106,9 +110,14 @@ public class DeltaChunk {
     public static IDimensionSlice allocateSlice(World spawnWorld, int channel, DeltaCoord size) {
         if (spawnWorld.isRemote) throw new IllegalArgumentException("Attempted client-side DSE allocation!");
         Coord base, end;
-        base = Hammer.hammerInfo.takeCell(channel, size);
-        end = base.add(size);
-        wipeRegion(base, end);
+        if (NORELEASE.off) {
+            base = new Coord(getServerShadowWorld(), 0, 4, 0);
+            end = base.add(size);
+        } else {
+            base = Hammer.hammerInfo.takeCell(channel, size);
+            end = base.add(size);
+            wipeRegion(base, end);
+        }
         return new DimensionSliceEntity(spawnWorld, base, end);
     }
     
@@ -202,6 +211,12 @@ public class DeltaChunk {
         final IDimensionSlice dse = allocateSlice(min.w, channel, size);
         Vec3 vrm = min.centerVec(max);
         dse.getTransform().setPos(vrm);
+        TransformData<Pure> t = dse.getTransform();
+        NORELEASE.println(t);
+        NORELEASE.println("Shadow min corner:", dse.getMinCorner());
+        NORELEASE.println("Real Min corner:", min);
+        NORELEASE.println("Shadow2real min:", dse.shadow2real(dse.getMinCorner()));
+        NORELEASE.println("Real2shadow min:", dse.real2shadow(min));
         final HashSet<Chunk> chunks = new HashSet<Chunk>();
         for (Coord real : coords) {
             Coord shadow = dse.real2shadow(real);

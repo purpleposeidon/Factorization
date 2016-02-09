@@ -20,6 +20,7 @@ public enum DeltaCapability {
     /** The DSE will self-destruct if it is empty. */
     DIE_WHEN_EMPTY,
     /** The DSE can be rescaled. (Collisions/interactions unlikely to ever be implemented?) */
+    @Deprecated // Always on
     SCALE,
     /** The DSE will render with a custom opacity. (Not implemented) */
     TRANSPARENT,

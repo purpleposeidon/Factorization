@@ -107,20 +107,9 @@ public final class DimensionSliceEntity extends DimensionSliceFussyDetails {
         Coord.sort(lowerCorner, upperCorner);
         this.cornerMin = lowerCorner;
         this.cornerMax = upperCorner;
-        if (NORELEASE.on) {
-            Chunk chunk = cornerMin.getChunk();
-            int cx = cornerMin.x / 16;
-            int cz = cornerMin.z / 16;
-            if (cx != chunk.xPosition || cz != chunk.zPosition) {
-                Core.logSevere("Chunk positioning fail. " + cx + "," + cz + " vs " + chunk);
-                Core.logSevere("Chunk positioning fail. " + cornerMin.x + "," + cornerMin.z + " vs " + chunk);
-            }
-        }
         DeltaCoord dc = upperCorner.difference(lowerCorner);
-        transform.setOffset(new Vec3(
-                dc.x / 2,
-                dc.y / 2,
-                dc.z / 2));
+        Vec3 center = cornerMin.centerVec(cornerMax);
+        transform.setOffset(center);
     }
 
     transient Mat _transform_S2R = null, _transform_R2S = null;
@@ -141,17 +130,15 @@ public final class DimensionSliceEntity extends DimensionSliceFussyDetails {
         return _transform_R2S = compileTransform(partial);
     }
 
+    @Override
+    public TransformData<Pure> getTransform(float partial) {
+        if (partial == 1) return transform;
+        if (partial == 0) return transformPrevTick;
+        return TransformData.interpolate(transformPrevTick, transform, partial);
+    }
+
     private Mat compileTransform(float partial) {
-        return Mat.mul(
-                Mat.trans(cornerMin.toVector()),
-                Mat.trans(NumUtil.interp(transform.getOffset(), transformPrevTick.getOffset(), partial)),
-                Mat.scale(NumUtil.interp(transform.getScale(), transformPrevTick.getScale(), partial)),
-                Mat.rotate(slerpRotation(partial)),
-                Mat.trans(NumUtil.interp(transform.getPos(), transformPrevTick.getPos(), partial)).invert()
-        );
-        // shadow2real more likely to be called? Worst case we just implement the other side.
-        // real = rotate($shadow - corner - centerOffset) + DSE position
-        // shadow = rotate⁻¹(real - DSE) + centerOffset + corner
+        return getTransform(partial).compile();
     }
 
     private Quaternion slerpRotation(float partial) {
@@ -217,7 +204,7 @@ public final class DimensionSliceEntity extends DimensionSliceFussyDetails {
     @Override
     public String toString() {
         NORELEASE.fixme("Update Entity.pos/motion");
-        String ret = "[DSE " + nameOrInfo() + " <" + getMinCorner().toBlockPos() + " -> " + getMaxCorner().toBlockPos() + ">]";
+        String ret = "[DSE " + nameOrInfo() + " <" + cornerMin.x + "," + cornerMin.y + "," + cornerMin.z + " -> " + cornerMin.x + "," + cornerMin.y + "," + cornerMin.z + ">]";
         if (getParent() != null) {
             ret += " parent=" + ((DimensionSliceEntity) getParent()).nameOrInfo();
         }
@@ -306,6 +293,9 @@ public final class DimensionSliceEntity extends DimensionSliceFussyDetails {
 
     void updateRealArea() {
         NORELEASE.fixme("Move to MotionUpdater?");
+        if (shadowArea == null) {
+            return;
+        }
         Vec3[] corners = SpaceUtil.getCorners(shadowArea);
         for (int i = 0; i < corners.length; i++) {
             corners[i] = shadow2real(corners[i]);

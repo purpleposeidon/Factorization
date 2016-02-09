@@ -3,6 +3,7 @@ package factorization.api;
 import com.google.common.io.ByteArrayDataOutput;
 import factorization.api.datahelpers.DataHelper;
 import factorization.api.datahelpers.IDataSerializable;
+import factorization.util.NORELEASE;
 import factorization.util.SpaceUtil;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.client.renderer.GlStateManager;
@@ -24,6 +25,7 @@ public class Quaternion implements IDataSerializable {
     //Data functions
     public Quaternion() {
         this(1, 0, 0, 0);
+        NORELEASE.fixme("Should we make this class pure?");
     }
     
     public Quaternion(double w, double x, double y, double z) {

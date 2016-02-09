@@ -13,6 +13,7 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityList;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.init.Blocks;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.management.ServerConfigurationManager;
 import net.minecraft.util.AxisAlignedBB;
@@ -64,9 +65,11 @@ public class TransportAreaUpdater {
         }
     }
 
-    private void updateShadowArea() {
+    void updateShadowArea() {
         Coord s = dse.getMinCorner();
         Coord e = dse.getMaxCorner();
+        s.setId(Blocks.stone);
+        e.setId(Blocks.stone);
         double start_minX = 0, start_minY = 0, start_minZ = 0, start_maxX = 0, start_maxY = 0, start_maxZ = 0;
         // NORELEASE omfg slow!
         // :( Can't use chunk.heightMap here! It's actually just the non-opaque blocks,

@@ -5,6 +5,7 @@ import net.minecraft.util.Vec3;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL11;
 
 import javax.vecmath.Matrix4d;
@@ -104,20 +105,18 @@ public final class Mat {
 
     private static final DoubleBuffer matrixBuffer;
     static {
-        matrixBuffer = ByteBuffer.allocateDirect(16 * 4)
-                .order(ByteOrder.nativeOrder())
-                .asDoubleBuffer();
-        assert matrixBuffer.isDirect();
+        int n = 16;
+        matrixBuffer = BufferUtils.createDoubleBuffer(16);
+        matrixBuffer.limit(n);
+        if (!matrixBuffer.isDirect()) throw new AssertionError("Buffer is not direct");
     }
 
     private DoubleBuffer toBuffer() {
-        final double[] buff = matrixBuffer.array();
-        int row = 3;
-        while (true) {
+        matrixBuffer.clear();
+        final double[] buff = new double[4];
+        for (int row = 0; row < 4; row++) {
             matrix.getColumn(row, buff);
-            row--;
-            if (row == 0) break;
-            System.arraycopy(buff, 0, buff, row * 4, 4);
+            matrixBuffer.put(buff);
         }
         matrixBuffer.flip();
         return matrixBuffer;

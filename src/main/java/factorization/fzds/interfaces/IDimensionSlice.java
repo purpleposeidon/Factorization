@@ -64,6 +64,8 @@ public interface IDimensionSlice {
     Mat getShadow2Real(float partial);
     Mat getReal2Shadow(float partial);
 
+    TransformData<Pure> getTransform(float partial);
+
     boolean hasOrders();
 
     /**
