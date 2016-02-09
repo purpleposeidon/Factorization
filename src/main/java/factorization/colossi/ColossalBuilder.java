@@ -24,6 +24,7 @@ public class ColossalBuilder {
     int body_arm_padding, body_back_padding, body_front_padding;
     int shoulder_start;
     int face_width, face_height, face_depth;
+    MaskTemplate mask1, mask2;
 
     private static ColossusBuilderBlock get(ColossalBlock.Md... md) {
         return new ColossusBuilderBlock(md);
@@ -195,8 +196,8 @@ public class ColossalBuilder {
         arm_end.adjust(armDelta);
         fill(arm_start, arm_end, ARM);
         
-        paintMask(EnumFacing.UP);
-        paintMask(EnumFacing.DOWN);
+        mask1 = paintMask(EnumFacing.UP);
+        mask2 = paintMask(EnumFacing.DOWN);
         
         Coord standard_eyeball = start.add(leg_size + body_front_padding + 1, leg_height + 1 + body_height + (face_height / 2), 1 + leg_size + leg_spread / 2);
         fill(standard_eyeball, standard_eyeball, EYE_ANY);
@@ -249,9 +250,10 @@ public class ColossalBuilder {
         return leg_height + 1 + body_height + face_height + 4;
     }
     
-    void paintMask(EnumFacing dir) {
-        MaskTemplate mask = MaskLoader.pickMask(rand, dir, face_width + 1, face_width + 1);
-        if (mask == null) return;
+    MaskTemplate paintMask(EnumFacing dir) {
+        Random maskRand = new Random(seed + dir.ordinal());
+        MaskTemplate mask = MaskLoader.pickMask(maskRand, dir, face_width + 1, face_width + 1);
+        if (mask == null) return null;
         int mask_start = ((leg_spread + leg_size * 2) - face_width + 1) / 2;
         Coord mask_anchor = start.add(body_front_padding + leg_size + 1, leg_height + 1 + body_height - 1, mask_start);
         if (dir == EnumFacing.DOWN) {
@@ -260,6 +262,7 @@ public class ColossalBuilder {
         Brush maskBrush = new Brush(MASK_ANY.getState(), BrushMask.ALL, rand);
         Brush eyeBrush = new Brush(EYE_ANY.getState(), BrushMask.ALL, rand);
         mask.paint(mask_anchor, maskBrush, eyeBrush);
+        return mask;
     }
     
     class Drawer implements ICoordFunction {

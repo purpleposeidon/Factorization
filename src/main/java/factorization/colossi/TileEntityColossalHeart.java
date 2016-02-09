@@ -16,9 +16,16 @@ public class TileEntityColossalHeart extends TileEntity {
     public static final UUID noController = UUID.fromString("00000000-0000-0000-0000-000000000000");
     int seed = -1;
     UUID controllerUuid = noController;
+    String lore1, lore2;
     
     void loadInfoFromBuilder(ColossalBuilder builder) {
         seed = builder.seed;
+        if (builder.mask1 != null) {
+            lore1 = builder.mask1.lore;
+        }
+        if (builder.mask2 != null) {
+            lore2 = builder.mask2.lore;
+        }
     }
     
     void showInfo(EntityPlayer player) {
@@ -28,6 +35,8 @@ public class TileEntityColossalHeart extends TileEntity {
     void putData(DataHelper data) throws IOException {
         seed = data.as(Share.PRIVATE, "gen_seed").putInt(seed);
         controllerUuid = data.as(Share.PRIVATE, "controller").putUUID(controllerUuid);
+        lore1 = data.as(Share.PRIVATE, "lore1").putString(lore1);
+        lore2 = data.as(Share.PRIVATE, "lore2").putString(lore2);
     }
     
     @Override

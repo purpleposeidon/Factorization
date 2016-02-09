@@ -9,6 +9,7 @@ public class MaskTemplate {
     EnumFacing anchor = null;
     int anchor_points = 0;
     int anchor_x, anchor_y;
+    String lore;
     
     int weight = 100;
     char MASK = '#', AIR = '.', EYE = '@';

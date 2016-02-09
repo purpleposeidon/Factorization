@@ -6,12 +6,14 @@ import net.minecraft.crash.CrashReport;
 import net.minecraft.crash.CrashReportCategory;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ReportedException;
+import net.minecraft.util.StringUtils;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Random;
 
 public class MaskLoader {
@@ -42,8 +44,9 @@ public class MaskLoader {
         return null;
     }
     
-    public static void mask(int weight, String... template) {
+    public static void mask(String lore, int weight, String... template) {
         MaskTemplate original = new MaskTemplate(template);
+        original.lore = lore;
         String[] flipped = new String[template.length];
         boolean any = false;
         for (int i = 0; i < template.length; i++) {
@@ -57,6 +60,7 @@ public class MaskLoader {
             MaskTemplate reversedMask = new MaskTemplate(flipped);
             original.weight = weight / 2;
             reversedMask.weight = weight / 2;
+            reversedMask.lore = lore;
             addMask(original);
             addMask(reversedMask);
         } else {
@@ -75,8 +79,26 @@ public class MaskLoader {
         try {
             InputStream is = ColossalBuilder.class.getResourceAsStream(resource_name);
             readMasks(is);
+            shareLore();
         } catch (IOException e) {
             throw new RuntimeException("Failed to load masks", e);
+        }
+    }
+
+    private static void shareLore() {
+        HashSet<String> loreSet = new HashSet<String>();
+        for (MaskTemplate mask : mask_templates) {
+            if (StringUtils.isNullOrEmpty(mask.lore)) continue;
+            loreSet.add(mask.lore);
+        }
+        if (loreSet.isEmpty()) return;
+        ArrayList<String> lores = new ArrayList<String>(loreSet.size());
+        lores.addAll(loreSet);
+        Random random = new Random(88888888);
+        for (MaskTemplate mask : mask_templates) {
+            if (StringUtils.isNullOrEmpty((mask.lore))) {
+                mask.lore = lores.get(random.nextInt(lores.size()));
+            }
         }
     }
     
@@ -88,17 +110,23 @@ public class MaskLoader {
         try {
             int lineNumber = 0;
             BufferedReader br = new BufferedReader(new InputStreamReader(is));
-            ArrayList<String> set = new ArrayList();
+            ArrayList<String> set = new ArrayList<String>();
+            String lore = "";
             while (true) {
                 String line = br.readLine();
                 lineNumber++;
                 if (line == null) {
-                    emitMask(lineNumber, set);
+                    emitMask(lineNumber, set, lore);
+                    lore = "";
                     break;
                 }
                 line = line.replace("\n", "").replace("\r", "");
+                if (line.startsWith("!")) {
+                    lore += line.replaceFirst("!", "");
+                }
                 if (line.length() == 0) {
-                    emitMask(lineNumber, set);
+                    emitMask(lineNumber, set, lore);
+                    lore = "";
                     continue;
                 }
                 if (line.startsWith("'")) {
@@ -115,11 +143,11 @@ public class MaskLoader {
         }
     }
     
-    private static void emitMask(int lineNumber, ArrayList<String> template) {
+    private static void emitMask(int lineNumber, ArrayList<String> template, String lore) {
         if (!template.isEmpty()) {
             String[] mask = template.toArray(new String[template.size()]);
             try {
-                mask(weight, mask);
+                mask(lore, weight, mask);
             } catch (Throwable t) {
                 if (Core.dev_environ) {
                     Core.logSevere("Near line " + lineNumber);
