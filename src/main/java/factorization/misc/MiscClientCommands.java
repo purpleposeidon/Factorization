@@ -9,6 +9,7 @@ import factorization.notify.Style;
 import factorization.shared.Core;
 import factorization.util.DataUtil;
 import factorization.util.FzUtil;
+import factorization.util.NORELEASE;
 import factorization.util.RenderUtil;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityPlayerSP;
@@ -349,8 +350,11 @@ public class MiscClientCommands implements ICommand {
         public static void setupSterileTestWorld() {
             player.sendChatMessage("/gamerule doDaylightCycle false");
             player.sendChatMessage("/gamerule doMobSpawning false");
+            player.sendChatMessage("/gamerule keepInventory true");
             player.sendChatMessage("/weather clear 999999");
             player.sendChatMessage("/time set " + 20*60);
+            NORELEASE.fixme("There's commands to do this now.");
+            NORELEASE.fixme("Also add stuff for per-entity murder in docbook?");
             MinecraftServer ms = MinecraftServer.getServer();
             if (ms == null) {
                 return;
