@@ -641,9 +641,9 @@ public final class DimensionSliceEntity extends DimensionSliceFussyDetails {
         return order;
     }
 
-    private DseRayTarget rayTarget = null;
-    private Entity[] raypart = null;
-    private boolean rayOutOfDate = true;
+    private transient DseRayTarget rayTarget = null;
+    private transient Entity[] raypart = new Entity[1];
+    private transient boolean rayOutOfDate = true;
     
     Entity[] getRayParts() {
         if (!worldObj.isRemote) {
@@ -653,8 +653,7 @@ public final class DimensionSliceEntity extends DimensionSliceFussyDetails {
             return null;
         }
         if (rayOutOfDate) {
-            if (raypart == null) {
-                raypart = new Entity[1];
+            if (rayTarget == null) {
                 raypart[0] = rayTarget = new DseRayTarget(this);
             }
             rayOutOfDate = false;

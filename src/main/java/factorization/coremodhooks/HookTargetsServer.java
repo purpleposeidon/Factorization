@@ -50,7 +50,6 @@ public class HookTargetsServer {
     
     public static void addConstantColliders(Object me, Entity collider, AxisAlignedBB box, List<Entity> found, Predicate<? super Entity> filter) {
         Entity[] constant_colliders = ((IExtraChunkData) me).getConstantColliders();
-        if (constant_colliders == null) return;
         for (Entity ent : constant_colliders) {
             if (ent == collider) continue;
             if (filter == null || filter.apply(ent)) {

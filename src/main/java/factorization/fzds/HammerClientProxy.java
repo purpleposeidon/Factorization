@@ -573,6 +573,9 @@ public class HammerClientProxy extends HammerProxy {
     
     @Override
     void updateRayPosition(DseRayTarget ray) {
+        if (ray == null || ray.parent == null) {
+            NORELEASE.breakpoint();
+        }
         if (ray.parent.metaAABB == null) return;
         // If we didn't care about entities, we could call:
         //    mc.renderViewEntity.rayTrace(reachDistance, partialTicks)
@@ -623,22 +626,11 @@ public class HammerClientProxy extends HammerProxy {
                 return;
             }
             // Create a realbox that contains the entirety of the shadowbox
-            Vec3 min, max;
-            {
-                final DimensionSliceEntity rayParent = ray.parent;
-                Vec3 corners[] = SpaceUtil.getCorners(mopBox);
-                for (int i = 0; i < corners.length; i++) {
-                    corners[i] = rayParent.shadow2real(corners[i]);
-                }
-                min = SpaceUtil.getLowest(corners);
-                max = SpaceUtil.getHighest(corners);
-            }
-            ray.setPosition((min.xCoord + max.xCoord) / 2, (min.yCoord + max.yCoord) / 2, (min.zCoord + max.zCoord) / 2);
-            AxisAlignedBB newBox;
-            newBox = SpaceUtil.setMin(ray.getEntityBoundingBox(), min);
-            newBox = SpaceUtil.setMax(newBox, max);
-            ray.setEntityBoundingBox(newBox);
-            AabbDebugger.addBox(newBox); // It's always nice to see this.
+            final DimensionSliceEntity rayParent = ray.parent;
+            AxisAlignedBB realBox = rayParent.shadow2real(mopBox);
+            ray.setEntityBoundingBox(realBox);
+            SpaceUtil.toEntPos(ray, SpaceUtil.getMiddle(realBox));
+            AabbDebugger.addBox(realBox); // It's always nice to see this.
             offerHit(mop, ray, mopBox);
             got_hit = true;
         } finally {

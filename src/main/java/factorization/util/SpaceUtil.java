@@ -83,10 +83,16 @@ public final class SpaceUtil {
         }
     }
 
+    /** Sets the entity's position directly. Does *NOT* update the bounding box! */
     public static void toEntPos(Entity ent, Vec3 pos) {
         ent.posX = pos.xCoord;
         ent.posY = pos.yCoord;
         ent.posZ = pos.zCoord;
+    }
+
+    /** Sets the entity's position using its setter. Will (presumably) update the bounding box. */
+    public static void setEntPos(Entity ent, Vec3 pos) {
+        ent.setPosition(pos.xCoord, pos.yCoord, pos.zCoord);
     }
 
     public static AxisAlignedBB setMin(AxisAlignedBB aabb, Vec3 v) {
