@@ -254,7 +254,7 @@ public class TransformData<Kind extends Any> implements IDataSerializable {
         return (pos == null || SpaceUtil.isZero(pos))
                 && (rot == null || rot.isZero())
                 && (offset == null || SpaceUtil.isZero(offset))
-                && (scale == null || scale == 0.0);
+                && (scale == null || scale == 1.0);
     }
 
     public double getGrandUnifiedDistance(TransformData that) {
