@@ -25,35 +25,40 @@
 '
 '
 ' Quantity is pretty important, but similar variants should have their weight reduced.
-' No friendly masks. They can be weird, mysterious, angry, terrifying, or boring.
+' No friendly masks. They can be weird, mysterious, angry, or terrifying.
 ' No familiar masks, either! Avoid the mickey mouse & teletubbies look
 ' Animal/plant designs are quite fine.
 ' The colossi are guards.
 ' Don't be a stranger to the eyeball.
 '
-' *** IMPORTANT *** The font isn't square. So these images aren't going to look square,
+' *** IMPORTANT *** Fonts usually aren't square. So these images aren't going to look square,
 ' and the proportions will be bad if you edit them here.
 ' Design them in minecraft, and copy them in.
 '
 ' Throw in a bunch of http://en.wikipedia.org/wiki/File:Geweihe_Pierer.jpg ?
-
+' TODO: Add lore; ! is the lore-marker, and is put before a mask.
+' Masks that don't have lore set pick a random one.
 
 
 
 'Upper-mask that droops down
-##...##
-#VVVVV#
-#.....#
+.#.....#.
+###...###
+.#VVVVV#.
+##.....##
+.#.....#.
 
 .#...#.
 #VVVVV#
 #.....#
 
 'Overrides the face
-vvvvvv
-#@##@#
+.vvvvvv.
+.#@##@#.
+#......#
 
-.#####.
+.#.#.#.
+#######
 #VVVVV#
 #.....#
 
@@ -62,13 +67,14 @@ vvvvvv
 #VVV#
 #...#
 
-^^^
-###
-###
-.#.
+#^^^#
+.#@#.
+.###.
+##.##
 
 ^^^^^
 #####
+##@##
 .###.
 ..#..
 
@@ -80,15 +86,15 @@ vvvvvv
 #.#
 #..
 
-.#.
-###
-vvv
+#####
+.#@#.
+#vvv#
 
-.#.
-###
-###
-###
-VVV
+#######
+..#@#..
+#######
+.#@#@#.
+##VVV##
 
 .###.
 #####
@@ -98,67 +104,73 @@ VVVVV
 #####
 vvvvv
 
-#######
-#######
-#######
-vvvvvvv
+.....#.....
+.#..###..#.
+#@#.#@#.#@#
+###########
+.#vvvvvvv#.
 
-##...##
-##...##
-##...##
-vvvvvvv
+.#..#.#..#.
+.#.#####.#.
+####.#.####
+..###@###..
+####.#.####
+#.vvvvvvv.#
 
-.#...#.
-#.....#
-#.....#
-#.....#
-.#vvv#.
-#.....#
-
-###vvv###
-#@#...#@#
-###...###
+.#.....#.
+##..#..##
+.#..#..#.
+##vvvvv##
+.#.....#.
 
 ^^^^^^^
 .#...#.
-.#...#.
-.#...#.
+.##.##.
 ##...##
+###.###
+.#...#.
+.##.##.
+.#...#.
 
 ^^^^^
 .#.#.
 .#.#.
 ##.##
 
-^^^^^^^
-##...##
-##...##
-##...##
-.#...#.
+#^^^^^^^#
+.##.#.##.
+###.#.###
+#.#...#.#
+#.......#
 
 ^^^^^^^
 ##...##
 ##...##
+###.###
 .#...#.
+.##.##.
 .#...#.
 
 ^^^^^
-##.##
-##.##
+##@##
+.###.
 .#.#.
 
-weight 20
-..###...###..
-.###.....###.
-.##.......##.
-###.......###
-##.........##
-##.........##
-##.........##
-###.......###
-.###vvvvv###.
+...#.........#...
+..###.......###..
+...####...####...
+..#.##.....##.#..
+....###...###....
+..####.....####..
+...##.......##...
+#.####.....####.#
+.###.........###.
+.####.......####.
+####...#.#...####
+..###.##.##.###..
+.#.##vvvvvvv##.#.
 
-weight 5
+....#...#....
 ...##.#.##...
 ..###.#.###..
 .###..#..###.
@@ -182,7 +194,6 @@ weight 5
 .#vvvvv#.
 
 #.#
-#.#
 vvv
 
 ##.##
@@ -193,13 +204,14 @@ vvv
 ###
 vvv
 
-.#...#.
-#.....#
 ##...##
-#.....#
-#.....#
-.#...#.
-#.vvv.#
+.##.##.
+.#####.
+##...##
+#..@..#
+###.###
+.#####.
+#vvvvv#
 
 #..#..#
 .##@##.
@@ -386,7 +398,7 @@ VVV
 #...#
 .#.#.
 
-weight 20
+weight 50
 .###.....###.
 ###.......###
 #@#.......#@#
@@ -394,34 +406,6 @@ weight 20
 ###.......###
 #####...#####
 ..#vvvvvvv#..
-
-weight 20
-.###.....###.
-.###.....#@#.
-###.......###
-#@#.......###
-###.......#@#
-#####...#####
-..##vvvvv##..
-
-weight 5
-.###....@###.
-#@@.......###
-###.......#@#
-#@#.......###
-###.......#@#
-#####...#####
-..#vvvvvvv#..
-....@........
-
-weight 5
-.###....@###.
-#@@.......###
-###.......#@#
-#@#.......###
-###.......#@#
-#####...#####
-..#@vvvvv##..
 
 weight 25
 .............
@@ -458,7 +442,6 @@ weight 33
 #####
 #@#@#
 #####
-.###.
 .vvv.
 
 weight 33
@@ -466,7 +449,6 @@ weight 33
 #####
 ##@##
 #####
-.###.
 .vvv.
 
 ^^^^^
