@@ -30,6 +30,16 @@ class UniversalCollider extends Entity implements IFzdsEntryControl {
     }
 
     @Override
+    public AxisAlignedBB getCollisionBox(Entity entityIn) {
+        return this.dimensionSliceEntity.metaAABB;
+    }
+
+    @Override
+    public AxisAlignedBB getCollisionBoundingBox() {
+        return this.dimensionSliceEntity.metaAABB;
+    }
+
+    @Override
     public Entity[] getParts() {
         return this.dimensionSliceEntity.getRayParts();
     }
