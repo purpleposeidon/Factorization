@@ -48,6 +48,7 @@ import net.minecraft.world.storage.WorldInfo;
 import net.minecraftforge.client.ForgeHooksClient;
 import net.minecraftforge.client.event.DrawBlockHighlightEvent;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
+import net.minecraftforge.event.world.WorldEvent;
 import net.minecraftforge.fml.client.registry.IRenderFactory;
 import net.minecraftforge.fml.client.registry.RenderingRegistry;
 import net.minecraftforge.fml.common.FMLCommonHandler;
@@ -267,7 +268,7 @@ public class HammerClientProxy extends HammerProxy {
         }
     }
 
-    private final WeakHashMap<World, RenderGlobal> renderglobal_cache = new WeakHashMap<World, RenderGlobal>();
+    private final HashMap<World, RenderGlobal> renderglobal_cache = new HashMap<World, RenderGlobal>();
     private RenderGlobal getRenderGlobalForWorld(WorldClient wc) {
         RenderGlobal cached = renderglobal_cache.get(wc);
         if (cached != null) return cached;
@@ -275,6 +276,11 @@ public class HammerClientProxy extends HammerProxy {
         ret.setWorldAndLoadRenderers(wc);
         renderglobal_cache.put(wc, ret);
         return ret;
+    }
+
+    @SubscribeEvent
+    public void removeRgCache(WorldEvent.Unload event) {
+        renderglobal_cache.remove(event.world);
     }
 
     public static RenderGlobal getRealRenderGlobal() {
