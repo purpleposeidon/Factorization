@@ -73,8 +73,6 @@ public class TransportAreaUpdater {
     void updateShadowArea() {
         Coord s = dse.getMinCorner();
         Coord e = dse.getMaxCorner();
-        s.setId(Blocks.stone);
-        e.setId(Blocks.stone);
         double start_minX = 0, start_minY = 0, start_minZ = 0, start_maxX = 0, start_maxY = 0, start_maxZ = 0;
         // NORELEASE omfg slow!
         // :( Can't use chunk.heightMap here! It's actually just the non-opaque blocks,

@@ -624,8 +624,13 @@ public final class DimensionSliceEntity extends DimensionSliceFussyDetails {
             return null;
         }
         if (rayOutOfDate) {
-            if (rayTarget == null) {
+            if (rayTarget == null || NORELEASE.on) {
+                if (rayTarget != null) {
+                    rayTarget.setDead();
+                }
                 raypart[0] = rayTarget = new DseRayTarget(this);
+                rayTarget.setPosition(posX, -100, posZ);
+                getRealWorld().spawnEntityInWorld(rayTarget);
             }
             rayOutOfDate = false;
             Hammer.proxy.updateRayPosition(rayTarget);

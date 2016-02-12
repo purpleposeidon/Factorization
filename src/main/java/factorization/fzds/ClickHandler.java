@@ -4,6 +4,7 @@ import factorization.api.Coord;
 import factorization.fzds.interfaces.DeltaCapability;
 import factorization.fzds.network.HammerNet;
 import factorization.fzds.network.HammerNet.HammerNetType;
+import factorization.util.NORELEASE;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.client.Minecraft;
@@ -98,6 +99,7 @@ public class ClickHandler {
     @SubscribeEvent
     public void tick(ClientTickEvent event) {
         // NORELEASE: Just move everything to the proxy?
+        // NORELEASE: Can't this be done in DseRayTarget?
         if (event.phase != Phase.START) return;
         if (current_attacking_target == null) {
             resetProgress();
