@@ -24,8 +24,6 @@ import java.io.IOException;
  */
 @SuppressWarnings("Convert2Diamond")
 public class TransformData<Kind extends Any> implements IDataSerializable {
-    private int y;
-
     public static TransformData<Pure> newPure() {
         TransformData<Pure> ret = new TransformData<Pure>(false);
         ret.setPos(SpaceUtil.newVec());
@@ -122,23 +120,44 @@ public class TransformData<Kind extends Any> implements IDataSerializable {
     @Override
     public IDataSerializable serialize(String prefix, DataHelper data) throws IOException {
         byte flag = data.asSameShare(prefix + ":flags").putByte(flags());
+        boolean dirtyCheck = data.isReader();
         if (on(flag, FLAG_POS)) {
             if (pos == null) pos = SpaceUtil.newVec();
-            pos = data.asSameShare(prefix + ":pos").putVec3(pos);
+            Vec3 p = data.asSameShare(prefix + ":pos").putVec3(pos);
+            if (dirtyCheck && !SpaceUtil.equals(p, pos)) {
+                dirty = true;
+                dirtyCheck = false;
+            }
+            pos = p;
         }
         if (on(flag, FLAG_ROT)) {
             if (rot == null) rot = new Quaternion();
-            rot = data.asSameShare(prefix + ":rot").putIDS(rot);
+            Quaternion r = data.asSameShare(prefix + ":rot").putIDS(rot);
+            if (dirtyCheck && !r.equals(rot)) {
+                dirty = true;
+                dirtyCheck = false;
+            }
+            rot = r;
+
         }
         if (on(flag, FLAG_OFFSET)) {
             if (offset == null) offset = SpaceUtil.newVec();
-            offset = data.asSameShare(prefix + ":offset").putVec3(offset);
+            Vec3 o = data.asSameShare(prefix + ":offset").putVec3(offset);
+            if (dirtyCheck && !SpaceUtil.equals(o, offset)) {
+                dirty = true;
+                dirtyCheck = false;
+            }
+            offset = o;
         }
         if (on(flag, FLAG_SCALE)) {
             if (scale == null) scale = 0.0;
-            scale = data.asSameShare(prefix + ":scale").putDouble(scale);
+            double s = data.asSameShare(prefix + ":scale").putDouble(scale);
+            if (dirtyCheck && s != scale) {
+                dirty = true;
+                dirtyCheck = false;
+            }
+            scale = s;
         }
-        dirty |= data.isReader();
         if (data.isReader()) {
             validate();
         }

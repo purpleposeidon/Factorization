@@ -6,6 +6,7 @@ import factorization.fzds.interfaces.DeltaCapability;
 import factorization.fzds.interfaces.IFzdsCustomTeleport;
 import factorization.fzds.interfaces.IFzdsEntryControl;
 import factorization.shared.Core;
+import factorization.util.NORELEASE;
 import factorization.util.SpaceUtil;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
@@ -35,11 +36,15 @@ public class TransportAreaUpdater {
         return new TransportAreaUpdater(dse);
     }
 
+    transient boolean needsRealAreaUpdate = true;
+    transient boolean needsShadowAreaUpdate = true;
+
     void update() {
-        if (dse.needsShadowAreaUpdate || dse.shadowArea == null) {
+        if (needsShadowAreaUpdate || dse.shadowArea == null) {
             updateShadowArea();
-            dse.updateRealArea();
-            dse.updateUniversalCollisions();
+        }
+        if (needsRealAreaUpdate) {
+            updateRealArea();
         }
         if (dse.worldObj.isRemote) {
             return;
@@ -50,7 +55,7 @@ public class TransportAreaUpdater {
                 dse.setDead();
                 Core.logFine("%s destroyed due to empty area", this.toString());
             } else {
-                dse.needsShadowAreaUpdate = true; //Hopefully it will load up soon...
+                needsShadowAreaUpdate = true; //Hopefully it will load up soon...
             }
         } else {
             if (dse.can(DeltaCapability.TAKE_INTERIOR_ENTITIES)) {
@@ -125,7 +130,10 @@ public class TransportAreaUpdater {
             return;
         }
 
-        dse.shadowArea = new AxisAlignedBB(start_minX, start_minY, start_minZ, start_maxX, start_maxY, start_maxZ);
+        AxisAlignedBB newShadowArea = new AxisAlignedBB(start_minX, start_minY, start_minZ, start_maxX, start_maxY, start_maxZ);
+        needsRealAreaUpdate = !SpaceUtil.equals(dse.shadowArea, newShadowArea);
+        dse.shadowArea = newShadowArea;
+        needsShadowAreaUpdate = false;
     }
 
     private void takeInteriorEntities() {
@@ -242,5 +250,23 @@ public class TransportAreaUpdater {
             phoenix.setPosition(newPosition.xCoord, newPosition.yCoord, newPosition.zCoord);
             newWorld.spawnEntityInWorld(phoenix);
         }
+    }
+
+    void updateRealArea() {
+        NORELEASE.fixme("Move to MotionUpdater?");
+        if (dse.shadowArea == null) {
+            return;
+        }
+        Vec3[] corners = SpaceUtil.getCorners(dse.shadowArea);
+        for (int i = 0; i < corners.length; i++) {
+            corners[i] = dse.shadow2real(corners[i]);
+        }
+        Vec3 min = SpaceUtil.getLowest(corners);
+        Vec3 max = SpaceUtil.getHighest(corners);
+        dse.realArea = SpaceUtil.newBox(min, max);
+        dse.setEntityBoundingBox(dse.realArea);
+        dse.metaAABB = new MetaAxisAlignedBB(dse, dse.getShadowWorld(), dse.realArea);
+        needsRealAreaUpdate = false;
+        dse.updateUniversalCollisions();
     }
 }

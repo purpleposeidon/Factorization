@@ -2,7 +2,9 @@ package factorization.fzds;
 
 import factorization.aabbdebug.AabbDebugger;
 import factorization.algos.TortoiseAndHare;
-import factorization.api.*;
+import factorization.api.Coord;
+import factorization.api.ICoordFunction;
+import factorization.api.Mat;
 import factorization.api.datahelpers.DataHelper;
 import factorization.api.datahelpers.DataInByteBuf;
 import factorization.api.datahelpers.DataOutByteBuf;
@@ -18,7 +20,6 @@ import factorization.fzds.network.PacketProxyingPlayer;
 import factorization.shared.Core;
 import factorization.shared.EntityReference;
 import factorization.util.NORELEASE;
-import factorization.util.NumUtil;
 import factorization.util.SpaceUtil;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
@@ -52,9 +53,7 @@ public final class DimensionSliceEntity extends DimensionSliceFussyDetails {
     
     AxisAlignedBB realArea = SpaceUtil.newBox();
     MetaAxisAlignedBB metaAABB = null;
-    
     AxisAlignedBB shadowArea = null;
-    boolean needsShadowAreaUpdate = true;
 
     /** The current transformation. */
     TransformData<Pure> transform = TransformData.newPure();
@@ -107,7 +106,6 @@ public final class DimensionSliceEntity extends DimensionSliceFussyDetails {
         Coord.sort(lowerCorner, upperCorner);
         this.cornerMin = lowerCorner;
         this.cornerMax = upperCorner;
-        DeltaCoord dc = upperCorner.difference(lowerCorner);
         Vec3 center = cornerMin.centerVec(cornerMax);
         transform.setOffset(center);
     }
@@ -115,19 +113,17 @@ public final class DimensionSliceEntity extends DimensionSliceFussyDetails {
     transient Mat _transform_S2R = null, _transform_R2S = null;
 
     @Override
-    public Mat getShadow2Real(float partial) {
+    public Mat getShadow2Real() {
         cleanTransforms();
-        if (partial != 1) return compileTransform(partial).invert();
         if (_transform_S2R != null) return _transform_S2R;
-        return _transform_S2R = getReal2Shadow(partial).invert();
+        return _transform_S2R = getReal2Shadow().invert();
     }
 
     @Override
-    public Mat getReal2Shadow(float partial) {
+    public Mat getReal2Shadow() {
         cleanTransforms();
-        if (partial != 1) return compileTransform(partial);
         if (_transform_R2S != null) return _transform_R2S;
-        return _transform_R2S = compileTransform(partial);
+        return _transform_R2S = compileTransform(1);
     }
 
     @Override
@@ -141,22 +137,11 @@ public final class DimensionSliceEntity extends DimensionSliceFussyDetails {
         return getTransform(partial).compile();
     }
 
-    private Quaternion slerpRotation(float partial) {
-        Quaternion current = transform.getRot();
-        if (partial == 1) return current;
-        Quaternion prev = transformPrevTick.getRot();
-        if (partial == 0) return prev;
-        return prev.slerp(current, partial).incrNormalize();
-    }
-
-    private void dirty() {
-        _transform_S2R = null;
-        _transform_R2S = null;
-    }
-
     private void cleanTransforms() {
         if (transform.clean()) {
-            dirty();
+            _transform_S2R = null;
+            _transform_R2S = null;
+            transportAreaUpdater.needsRealAreaUpdate = true;
         }
     }
 
@@ -291,23 +276,6 @@ public final class DimensionSliceEntity extends DimensionSliceFussyDetails {
         return velocity;
     }
 
-    void updateRealArea() {
-        NORELEASE.fixme("Move to MotionUpdater?");
-        if (shadowArea == null) {
-            return;
-        }
-        Vec3[] corners = SpaceUtil.getCorners(shadowArea);
-        for (int i = 0; i < corners.length; i++) {
-            corners[i] = shadow2real(corners[i]);
-        }
-        Vec3 min = SpaceUtil.getLowest(corners);
-        Vec3 max = SpaceUtil.getHighest(corners);
-        realArea = SpaceUtil.newBox(min, max);
-        setEntityBoundingBox(realArea);
-        metaAABB = new MetaAxisAlignedBB(this, cornerMin.w, realArea);
-        needsShadowAreaUpdate = false;
-    }
-
     void updateUniversalCollisions() {
         NORELEASE.fixme("Move to MotionUpdater?");
         if (realArea == null) return;
@@ -354,34 +322,36 @@ public final class DimensionSliceEntity extends DimensionSliceFussyDetails {
         }
     }
 
-    static {
-        class ChunkLoadHandler {
-            @SubscribeEvent
-            public void load(ChunkEvent.Load event) {
-                AxisAlignedBB chunkBox = null;
-                for (IDimensionSlice idc : DeltaChunk.getAllSlices(event.world)) {
-                    DimensionSliceEntity dse = (DimensionSliceEntity) idc;
-                    if (dse.needsShadowAreaUpdate) continue;
-                    if (chunkBox == null) {
-                        chunkBox = SpaceUtil.getBox(event.getChunk());
-                    }
-                    if (chunkBox.intersectsWith(dse.realArea)) {
-                        dse.needsShadowAreaUpdate = true;
-                    }
+    /** Marks affected DSEs as needing to rebuild their collision areas. */
+    public static class ChunkLoadHandler {
+        @SubscribeEvent
+        public void load(ChunkEvent.Load event) {
+            AxisAlignedBB chunkBox = null;
+            for (IDimensionSlice idc : DeltaChunk.getAllSlices(event.world)) {
+                DimensionSliceEntity dse = (DimensionSliceEntity) idc;
+                if (dse.realArea == null) continue;
+                if (dse.transportAreaUpdater.needsRealAreaUpdate) continue; // Can skip the check
+                if (chunkBox == null) {
+                    chunkBox = SpaceUtil.getBox(event.getChunk());
                 }
-            }
-
-            @SubscribeEvent
-            public void unload(ChunkEvent.Unload event) {
-                IExtraChunkData data = (IExtraChunkData) event.getChunk();
-                for (Entity ent : data.getConstantColliders()) {
-                    if (ent instanceof UniversalCollider) {
-                        UniversalCollider uc = (UniversalCollider) ent;
-                        uc.dimensionSliceEntity.needsShadowAreaUpdate = true;
-                    }
+                if (chunkBox.intersectsWith(dse.realArea)) {
+                    dse.transportAreaUpdater.needsRealAreaUpdate = true;
                 }
             }
         }
+
+        @SubscribeEvent
+        public void unload(ChunkEvent.Unload event) {
+            IExtraChunkData data = (IExtraChunkData) event.getChunk();
+            for (Entity ent : data.getConstantColliders()) {
+                if (ent instanceof UniversalCollider) {
+                    UniversalCollider uc = (UniversalCollider) ent;
+                    uc.dimensionSliceEntity.transportAreaUpdater.needsRealAreaUpdate = true;
+                }
+            }
+        }
+    }
+    static {
         Core.loadBus(new ChunkLoadHandler());
     }
     
@@ -410,10 +380,11 @@ public final class DimensionSliceEntity extends DimensionSliceFussyDetails {
     
     public void blocksChanged(int x, int y, int z) {
         if (shadowArea == null) {
-            needsShadowAreaUpdate = true;
+            transportAreaUpdater.needsShadowAreaUpdate = true;
             return;
         }
-        needsShadowAreaUpdate |= x <= shadowArea.minX
+        transportAreaUpdater.needsShadowAreaUpdate = transportAreaUpdater.needsShadowAreaUpdate
+                || x <= shadowArea.minX
                 || y <= shadowArea.minY
                 || z <= shadowArea.minZ
                 || x >= shadowArea.maxX
@@ -602,7 +573,7 @@ public final class DimensionSliceEntity extends DimensionSliceFussyDetails {
                         DeltaCapability.BLOCK_MINE,
                         DeltaCapability.REMOVE_ITEM_ENTITIES,
                         DeltaCapability.REMOVE_ALL_ENTITIES);
-                permit(DeltaCapability.SCALE, DeltaCapability.TRANSPARENT);
+                permit(DeltaCapability.TRANSPARENT);
             }
         }
         return this;

@@ -2,6 +2,7 @@ package factorization.fzds;
 
 import factorization.api.Coord;
 import factorization.fzds.interfaces.IDimensionSlice;
+import factorization.util.NORELEASE;
 import org.apache.commons.lang3.ArrayUtils;
 
 import java.util.HashMap;
@@ -20,6 +21,9 @@ public class DeltaChunkMap {
     }
     
     private static final IDimensionSlice[] EMPTY_ARRAY = new IDimensionSlice[0];
+    static {
+        NORELEASE.fixme("Rename: DimensionSliceMap");
+    }
     
     private IDimensionSlice[] normalize(IDimensionSlice[] val) {
         return val == null ? EMPTY_ARRAY : val;

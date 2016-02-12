@@ -59,8 +59,7 @@ class MotionUpdater {
             if (dse.can(DeltaCapability.DRAG)) {
                 dragEntities(dse.accumVelocity, blurredBounds, motion);
             }
-            dse.updateRealArea();
-            dse.updateUniversalCollisions();
+            dse.transportAreaUpdater.needsRealAreaUpdate = true;
         }
         updateVanilla();
         moveChildren(dse.accumVelocity);
@@ -109,30 +108,32 @@ class MotionUpdater {
     }
 
     private void dragEntities(TransformData<Pure> trans, AxisAlignedBB blur, Mat mat) {
+        Vec3 vel = trans.getPos();
+        boolean movingUp = vel.yCoord > 0;
+        boolean movingSideways = vel.xCoord != 0 || vel.zCoord != 0;
+        double speed = vel.lengthVector();
+        double expansion = 0;
+        double friction_expansion = 0.05 * speed;
+        if (movingSideways | movingUp) {
+            expansion = friction_expansion;
+        }
+        if (expansion < 0.1 && expansion > 0) {
+            expansion = 0.1;
+        }
+
+
+
+        blur = blur.expand(expansion, expansion, expansion);
         List<Entity> ents = dse.worldObj.getEntitiesInAABBexcluding(dse, blur, excludeDseRelatedEntities);
         blur = null; // We must use the metaAABB from now on.
         float dyaw = (float) Math.toDegrees(-trans.getRot().toRotationVector().yCoord);
         if (Float.isNaN(dyaw)) dyaw = 0;
         long now = dse.worldObj.getTotalWorldTime() + 100 /* Hack around MixinEntityKinematicsTracker.kinematics_last_change not being initialized */;
 
-        Vec3 vel = trans.getPos();
-        boolean movingUp = vel.yCoord > 0;
-        boolean movingSideways = vel.xCoord != 0 || vel.zCoord != 0;
-        double speed = vel.lengthVector();
         Vec3 origin = dse.transform.getPos();
 
         for (Entity ent : ents) {
             AxisAlignedBB ebb = ent.getEntityBoundingBox();
-            double expansion = 0;
-            {
-                double friction_expansion = 0.05 * speed;
-                if (movingSideways | movingUp) {
-                    expansion = friction_expansion;
-                }
-            }
-            if (expansion < 0.1 && expansion > 0) {
-                expansion = 0.1;
-            }
             if (expansion != 0) {
                 ebb = ebb.expand(expansion, expansion, expansion);
             }
@@ -179,14 +180,40 @@ class MotionUpdater {
                 }
             }
         }
-        impulse = new Vec3(clipVelocity(impulse.xCoord, ent.motionX),
-                clipVelocity(impulse.yCoord, ent.motionY),
-                clipVelocity(impulse.zCoord, ent.motionZ));
-        ent.moveEntity(impulse.xCoord, impulse.yCoord, impulse.zCoord);
+        /*if (ent.isAirBorne) {
+            // 1: This should be using clipVelocity or something
+            // 2: The player is always air-born client-side. :/
+            // Or maybe an 'isJumping'? We've only got EntityLivingBase.isJumping, requires AT.
+            if (impulse.xCoord > 0 && ent.motionX < impulse.xCoord
+                    || impulse.xCoord < 0 && ent.motionX > impulse.xCoord) {
+                ent.motionX = impulse.xCoord;
+            }
+            if (impulse.yCoord > 0 && ent.motionY < impulse.yCoord
+                    || impulse.yCoord < 0 && ent.motionY > impulse.yCoord) {
+                ent.motionY = impulse.yCoord;
+            }
+            if (impulse.zCoord > 0 && ent.motionZ < impulse.zCoord
+                    || impulse.zCoord < 0 && ent.motionZ > impulse.zCoord) {
+                ent.motionZ = impulse.zCoord;
+            }
+        } else*/ {
+            ent.moveEntity(impulse.xCoord, impulse.yCoord, impulse.zCoord);
+        }
+        /*
+        double impulseX = clipVelocity(impulse.xCoord, ent.motionX);
+        double impulseY = clipVelocity(impulse.yCoord, ent.motionY);
+        double impulseZ = clipVelocity(impulse.zCoord, ent.motionZ);
+        if (ent.isAirBorne) {
+            ent.motionX += impulseX;
+            ent.motionY += impulseY;
+            ent.motionZ += impulseZ;
+        } else {
+            ent.moveEntity(impulseX, impulseY, impulseZ);
+        }*/
         // Hrm. Is it needed or not? Seems to cause jitterings with it on
-        //ent.prevPosX += impulse.xCoord;
-        //ent.prevPosY += impulse.yCoord;
-        //ent.prevPosZ += impulse.zCoord;
+        //ent.prevPosX += impulseX;
+        //ent.prevPosY += impulseY;
+        //ent.prevPosZ += impulseZ;
         // TODO FIXME: Jittering rotation when the player is standing on top! Argh! PLEASE FIX!
         double origYaw = ent.rotationYaw;
         ent.rotationYaw = (float) addLimitedDelta(kine.getKinematics_yaw(), ent.rotationYaw, dyaw);

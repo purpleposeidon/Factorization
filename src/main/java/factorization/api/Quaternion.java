@@ -49,6 +49,7 @@ public class Quaternion implements IDataSerializable {
     
     @Override
     public boolean equals(Object obj) {
+        if (obj == this) return true;
         if (obj instanceof Quaternion) {
             Quaternion other = (Quaternion) obj;
             return w == other.w && x == other.x && y == other.y && z == other.z;

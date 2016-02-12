@@ -657,4 +657,15 @@ public final class SpaceUtil {
         int minZ = chunk.zPosition << 4;
         return AxisAlignedBB.fromBounds(minX, 0, minZ, minX + 16, 0xFF, minZ + 16);
     }
+
+    public static boolean equals(AxisAlignedBB a, AxisAlignedBB b) {
+        if (a == b) return true;
+        if (a == null || b == null) return false;
+        return a.minX == b.minX && a.minY == b.minY && a.minZ == b.minZ
+                && a.maxX == b.maxX && a.maxY == b.maxY && a.maxZ == b.maxZ;
+    }
+
+    public static boolean equals(Vec3 a, Vec3 b) {
+        return a.xCoord == b.xCoord && a.yCoord == b.yCoord && a.zCoord == b.zCoord;
+    }
 }

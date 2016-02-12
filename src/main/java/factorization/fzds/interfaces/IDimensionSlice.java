@@ -54,15 +54,8 @@ public interface IDimensionSlice {
 
     TransformData<Pure> getVel();
 
-    default Mat getShadow2Real() {
-        return getShadow2Real(1);
-    }
-
-    default Mat getReal2Shadow() {
-        return getReal2Shadow(1);
-    }
-    Mat getShadow2Real(float partial);
-    Mat getReal2Shadow(float partial);
+    Mat getShadow2Real();
+    Mat getReal2Shadow();
 
     TransformData<Pure> getTransform(float partial);
 
