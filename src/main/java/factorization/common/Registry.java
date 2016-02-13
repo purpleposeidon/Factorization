@@ -14,6 +14,7 @@ import factorization.ceramics.TileEntityGreenware.ClayState;
 import factorization.charge.*;
 import factorization.colossi.*;
 import factorization.crafting.BlockCompressionCrafter;
+import factorization.crafting.ItemFakeBlock;
 import factorization.darkiron.BlockDarkIronOre;
 import factorization.fzds.DeltaChunk;
 import factorization.fzds.HammerEnabled;
@@ -174,7 +175,7 @@ public class Registry {
     public ItemStack legendarium;
     public ItemBrokenArtifact brokenTool;
     public ItemManSandwich manSandwich;
-    public ItemBlock waterBlockItem, lavaBlockItem;
+    public ItemFakeBlock waterBlockItem, lavaBlockItem;
 
     public Material materialMachine = new Material(MapColor.ironColor);
 
@@ -332,7 +333,7 @@ public class Registry {
                 }
                 for (FactoryType ft : FactoryType.values()) {
                     if (ft.getFactoryTypeClass() == te.getClass()) {
-                        if (ft.block != null) throw new RuntimeException("Block already assigned to FactoryType!");
+                        if (ft.block != null && ft.block != block) throw new RuntimeException("Block already assigned to FactoryType!");
                         ft.block = block;
                     }
                 }
@@ -404,18 +405,6 @@ public class Registry {
         diamond_shard = new ItemCraftingComponent("diamond_shard");
         dark_iron_ingot = new ItemCraftingComponent("dark_iron_ingot");
         copper_ingot = new ItemCraftingComponent("copper_ingot");
-
-        OreDictionary.registerOre("ingotCopper", copper_ingot);
-        OreDictionary.registerOre("blockCopper", copper_block_item);
-        OreDictionary.registerOre("oreCopper", copper_ore_item);
-        OreDictionary.registerOre("oreFzDarkIron", dark_iron_ore);
-        OreDictionary.registerOre("ingotFzDarkIron", dark_iron_ingot);
-        OreDictionary.registerOre("ingotDankIron", dark_iron_ingot);
-        OreDictionary.registerOre("blockFzDarkIron", dark_iron_block_item);
-        OreDictionary.registerOre("blockDankIron", dark_iron_block_item);
-
-        OreDictionary.registerOre("blockWater", waterBlockItem);
-        OreDictionary.registerOre("blockLava", lavaBlockItem);
 
 
         logicMatrixProgrammer = new ItemMatrixProgrammer();
@@ -499,9 +488,20 @@ public class Registry {
         item_potency = new ItemPotency();
         brokenTool = new ItemBrokenArtifact();
 
-        waterBlockItem = new ItemBlock(Blocks.water);
-        lavaBlockItem = new ItemBlock(Blocks.lava);
+        waterBlockItem = new ItemFakeBlock("waterTile", TabType.MATERIALS, Blocks.flowing_water);
+        lavaBlockItem = new ItemFakeBlock("lavaTile", TabType.MATERIALS, Blocks.flowing_lava);
         postMakeItems();
+
+        OreDictionary.registerOre("ingotCopper", copper_ingot);
+        OreDictionary.registerOre("blockCopper", copper_block_item);
+        OreDictionary.registerOre("oreCopper", copper_ore_item);
+        OreDictionary.registerOre("oreFzDarkIron", dark_iron_ore);
+        OreDictionary.registerOre("ingotFzDarkIron", dark_iron_ingot);
+        OreDictionary.registerOre("ingotDankIron", dark_iron_ingot);
+        OreDictionary.registerOre("blockFzDarkIron", dark_iron_block_item);
+        OreDictionary.registerOre("blockDankIron", dark_iron_block_item);
+        OreDictionary.registerOre("blockWater", waterBlockItem);
+        OreDictionary.registerOre("blockLava", lavaBlockItem);
     }
 
     private boolean checkInput(ItemStack res, Object... params) {
@@ -614,18 +614,48 @@ public class Registry {
                 'X', logicMatrixProgrammer);
         GameRegistry.addSmelting(logicMatrixIdentifier, new ItemStack(logicMatrix), 0);
         oreRecipe(new ItemStack(logicMatrix),
-                "CLC",
+                "#L#",
                 "WRW",
-                "CLC",
-                'C', Blocks.cobblestone,
+                "#L#",
+                '#', Blocks.glass,
                 'L', "blockLava",
                 'W', "blockWater",
                 'R', Blocks.redstone_block);
         oreRecipe(new ItemStack(Blocks.hardened_clay, 3),
                 "WWW",
                 "CCC",
+                "WWW",
                 'W', "blockWater",
                 'C', ItemUtil.makeWildcard(Blocks.stained_hardened_clay));
+        oreRecipe(new ItemStack(Blocks.sea_lantern),
+                "Q~Q",
+                "~G~",
+                "Q~Q",
+                '~', "blockWater",
+                'Q', Blocks.quartz_block,
+                'G', Blocks.glowstone);
+        ItemStack podzol = new ItemStack(Blocks.dirt, 1, 2);
+        oreRecipe(new ItemStack(Blocks.dirt, 8),
+                "G#G",
+                "#P#",
+                "G#G",
+                'G', Blocks.grass,
+                '#', "treeLeaves",
+                'P', podzol);
+        oreRecipe(podzol.copy(),
+                "W",
+                "#",
+                "D",
+                'W', "blockWater",
+                '#', "treeLeaves",
+                'D', Blocks.dirt);
+        oreRecipe(new ItemStack(Items.clay_ball, 4),
+                "~D~",
+                "D#D",
+                "~D~",
+                '~', "blockWater",
+                'D', Blocks.dirt,
+                '#', Blocks.gravel);
         oreRecipe(new ItemStack(logicMatrixController),
                 "MiX",
                 'M', logicMatrix,
@@ -934,10 +964,13 @@ public class Registry {
 
         //Compression Crafter
         oreRecipe(compression_crafter_item,
-                "C",
-                "P",
+                "#C#",
+                "#P#",
+                "#r#",
                 'C', Blocks.crafting_table,
-                'P', Blocks.piston);
+                'P', Blocks.piston,
+                '#', Blocks.stone,
+                'r', Items.redstone);
 
         // Wrath lamp
         oreRecipe(lamp_item,

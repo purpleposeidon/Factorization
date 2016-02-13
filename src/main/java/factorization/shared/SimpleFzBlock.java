@@ -23,6 +23,9 @@ public class SimpleFzBlock extends BlockFactorization {
         setUnlocalizedName("factorization.factoryBlock." + ft.toString());
         this.factoryType = ft;
         this.blockClass = ft.makeTileEntity().getBlockClass();
+        if (ft.block == null) {
+            ft.block = this;
+        }
     }
 
     @Override

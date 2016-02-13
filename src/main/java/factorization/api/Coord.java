@@ -720,7 +720,7 @@ public final class Coord implements IDataSerializable, ISaneCoord, Comparable<Co
         w.setBlockToAir(toBlockPos());
     }
 
-    @Deprecated
+    // Nah, not deprecated; this is still a reasonable thing to do!
     public boolean setId(Block id) {
         return setId(id, true);
     }

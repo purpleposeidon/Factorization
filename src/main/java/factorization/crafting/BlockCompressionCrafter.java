@@ -16,7 +16,7 @@ public class BlockCompressionCrafter extends SimpleFzBlockCutout {
     public static final PropertyDirection FACING = PropertyDirection.create("facing");
 
     public BlockCompressionCrafter() {
-        super(Material.iron, FactoryType.COMPRESSIONCRAFTER);
+        super(Material.rock, FactoryType.COMPRESSIONCRAFTER);
     }
 
     @Override
