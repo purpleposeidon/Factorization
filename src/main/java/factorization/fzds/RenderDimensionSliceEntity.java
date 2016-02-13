@@ -309,7 +309,7 @@ public class RenderDimensionSliceEntity extends Render<DimensionSliceEntity> imp
         }
         
         void renderBreakingBlocks(EntityPlayer player, float partial) {
-            Map<Integer, DestroyBlockProgress> damagedBlocks = HammerClientProxy.shadowRenderGlobal.damagedBlocks;
+            Map<Integer, DestroyBlockProgress> damagedBlocks = NORELEASE.just(new HashMap<>()); //HammerClientProxy.shadowRenderGlobal.damagedBlocks;
             if (damagedBlocks.isEmpty()) return;
             Coord a = dse.getMinCorner();
             Coord b = dse.getMaxCorner();
