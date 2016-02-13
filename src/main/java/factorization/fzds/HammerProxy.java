@@ -17,7 +17,7 @@ import net.minecraftforge.fml.common.network.handshake.NetworkDispatcher;
 import net.minecraftforge.fml.common.network.internal.FMLProxyPacket;
 import net.minecraftforge.fml.relauncher.Side;
 
-public class HammerProxy {
+public abstract class HammerProxy {
     // Clients should use DeltaChunk
     public World getClientRealWorld() { return null; }
 
@@ -46,6 +46,8 @@ public class HammerProxy {
     IDimensionSlice getHitIDC() { return null; }
 
     public void createClientShadowWorld() { }
+
+    public EntityPlayer getRealPlayer() { return null; }
 
     public void cleanupClientWorld() { }
 

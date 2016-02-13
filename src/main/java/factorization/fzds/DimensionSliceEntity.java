@@ -626,7 +626,7 @@ public final class DimensionSliceEntity extends DimensionSliceFussyDetails {
         if (rayOutOfDate) {
             if (rayTarget == null || NORELEASE.on) {
                 if (rayTarget != null) {
-                    rayTarget.setDead();
+                    rayTarget.setDead(); // NORELEASE: Lame. Can't we re-use this guy?
                 }
                 raypart[0] = rayTarget = new DseRayTarget(this);
                 rayTarget.setPosition(posX, -100, posZ);

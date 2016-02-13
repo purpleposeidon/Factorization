@@ -44,6 +44,7 @@ import org.lwjgl.opengl.GL11;
 
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Map;
 
 import static org.lwjgl.opengl.GL11.glPopMatrix;
 
@@ -308,7 +309,7 @@ public class RenderDimensionSliceEntity extends Render<DimensionSliceEntity> imp
         }
         
         void renderBreakingBlocks(EntityPlayer player, float partial) {
-            HashMap<Integer, DestroyBlockProgress> damagedBlocks = HammerClientProxy.shadowRenderGlobal.damagedBlocks;
+            Map<Integer, DestroyBlockProgress> damagedBlocks = HammerClientProxy.shadowRenderGlobal.damagedBlocks;
             if (damagedBlocks.isEmpty()) return;
             Coord a = dse.getMinCorner();
             Coord b = dse.getMaxCorner();

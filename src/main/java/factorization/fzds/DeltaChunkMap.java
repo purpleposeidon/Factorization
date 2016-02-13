@@ -12,8 +12,7 @@ import java.util.Map;
  * Map<Chunk, IDeltaChunk[]>
  */
 public class DeltaChunkMap {
-    //private TLongObjectHashMap<IDeltaChunk[]> values = new TLongObjectHashMap<IDeltaChunk[]>(32);
-    private Map<Long, IDimensionSlice[]> values = new HashMap();
+    private Map<Long, IDimensionSlice[]> values = new HashMap<Long, IDimensionSlice[]>();
     
     private long hash(int chunkX, int chunkZ) {
         long ret = chunkX | (((long) chunkZ) << 32);
@@ -34,7 +33,7 @@ public class DeltaChunkMap {
     }
     
     public IDimensionSlice[] get(Coord at) {
-        return normalize(values.get(hash(at.x/16, at.z/16)));
+        return normalize(values.get(hash(at.x / 16, at.z / 16)));
     }
     
     public boolean remove(IDimensionSlice dse) {

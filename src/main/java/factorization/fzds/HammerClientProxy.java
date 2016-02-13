@@ -60,6 +60,7 @@ import net.minecraftforge.fml.common.network.FMLNetworkEvent.ClientDisconnection
 import net.minecraftforge.fml.relauncher.Side;
 import org.lwjgl.opengl.GL11;
 
+import javax.annotation.Nonnull;
 import java.util.*;
 
 public class HammerClientProxy extends HammerProxy {
@@ -80,18 +81,26 @@ public class HammerClientProxy extends HammerProxy {
         public HammerWorldClient(NetHandlerPlayClient netHandler, WorldSettings worldSettings, int dimension, EnumDifficulty difficulty, Profiler profiler) {
             super(netHandler, worldSettings, dimension, difficulty, profiler);
         }
-        
-        @Override
-        public void playSoundAtEntity(Entity ent, String name, float volume, float pitch) {
-            super.playSoundAtEntity(ent, name, volume, pitch);
-        }
-        
+
         public void clearAccesses() {
             worldAccesses.clear();
         }
-        
+
         public void shadowTick() {
             clientChunkProvider.unloadQueuedChunks();
+        }
+
+        @Override
+        public void playSound(double x, double y, double z, String soundName, float volume, float pitch, boolean distanceDelay) {
+            NORELEASE.fixme("Here");
+            Entity player = Hammer.proxy.getRealPlayer();
+            Coord at = new Coord(Hammer.worldClient, x, y, z);
+            IDimensionSlice ids = DeltaChunk.findClosest(player, at);
+            if (ids == null) return;
+            Vec3 shadow = new Vec3(x, y, z);
+            Vec3 real = ids.shadow2real(shadow);
+            super.playSound(real.xCoord, real.yCoord, real.zCoord, soundName, volume, pitch, distanceDelay);
+            // TODO: It'd be kinda awesome to have the pitch change depending on the distance, right?
         }
     }
     
@@ -104,7 +113,7 @@ public class HammerClientProxy extends HammerProxy {
     }
     
     private static World lastWorld = null;
-    static ShadowRenderGlobal shadowRenderGlobal = null;
+    static RenderGlobal shadowRenderGlobal;
     void checkForWorldChange() {
         WorldClient currentWorld = mc.theWorld;
         if (currentWorld == null) {
@@ -113,9 +122,8 @@ public class HammerClientProxy extends HammerProxy {
         }
         if (currentWorld != lastWorld) {
             lastWorld = currentWorld;
-            if (Hammer.worldClient != null) {
+            if (Hammer.worldClient instanceof HammerWorldClient) {
                 ((HammerWorldClient)Hammer.worldClient).clearAccesses();
-                Hammer.worldClient.addWorldAccess(shadowRenderGlobal = new ShadowRenderGlobal(currentWorld));
             }
         }
     }
@@ -126,7 +134,7 @@ public class HammerClientProxy extends HammerProxy {
         checkForWorldChange(); // Is there an event for this?
         runShadowTick();
         if (shadowRenderGlobal != null) {
-            shadowRenderGlobal.removeStaleDamage();
+            shadowRenderGlobal.updateClouds();
         }
     }
 
@@ -186,10 +194,63 @@ public class HammerClientProxy extends HammerProxy {
         } finally {
             HookTargetsClient.clientWorldLoadEventAbort.remove();
         }
-        Hammer.worldClient.addWorldAccess(shadowRenderGlobal = new ShadowRenderGlobal(mc.theWorld));
+        addShadowRenderGlobal(Hammer.worldClient);
     }
-    
-    
+
+    private static void addShadowRenderGlobal(World world) {
+        if (shadowRenderGlobal == null) {
+            shadowRenderGlobal = new RenderGlobal(mc) {
+                @Override
+                public void spawnParticle(int particleID, boolean ignoreRange, double xCoord, double yCoord, double zCoord, double xOffset, double yOffset, double zOffset, int... parameters) {
+                    if (mc == null || mc.getRenderViewEntity() == null || mc.effectRenderer == null) {
+                        return;
+                    }
+                    int particleSettings = mc.gameSettings.particleSetting;
+
+                    if (particleSettings == 1 && theWorld.rand.nextInt(3) == 0) {
+                        particleSettings = 2;
+                    }
+
+                    Entity player = Hammer.proxy.getRealPlayer();
+                    IDimensionSlice ids = DeltaChunk.findClosest(player, new Coord(Hammer.worldClient, xCoord, yCoord, zCoord));
+                    if (ids == null) return;
+                    Vec3 shadow = new Vec3(xCoord, yCoord, zCoord);
+                    Vec3 real = ids.shadow2real(shadow);
+                    xCoord = real.xCoord;
+                    yCoord = real.yCoord;
+                    zCoord = real.zCoord;
+
+                    if (!ignoreRange) {
+                        if (particleSettings > 1) return;
+                        double dx = mc.getRenderViewEntity().posX - xCoord;
+                        double dy = mc.getRenderViewEntity().posY - yCoord;
+                        double dz = mc.getRenderViewEntity().posZ - zCoord;
+                        if (dx * dx + dy * dy + dz * dz > 256.0D) return;
+                    }
+                    mc.effectRenderer.spawnEffectParticle(particleID, xCoord, yCoord, zCoord, xOffset, yOffset, zOffset, parameters);
+                }
+
+                protected void markBlocksForUpdate(int minX, int minY, int minZ, int maxX, int maxY, int maxZ) {
+                    World w = Hammer.proxy.getClientRealWorld();
+                    for (IDimensionSlice ids : DeltaChunk.getSlicesInRange(w, minX, minY, minZ, maxX, maxY, maxZ)) {
+                        DimensionSliceEntity dse = (DimensionSliceEntity) ids;
+                        dse.blocksChanged(minX, minY, minZ);
+                        dse.blocksChanged(maxX, maxY, maxZ);
+                    }
+                }
+            };
+            shadowRenderGlobal.theWorld = (WorldClient) world;
+        }
+        world.addWorldAccess(shadowRenderGlobal);
+    }
+
+    @Override
+    public EntityPlayer getRealPlayer() {
+        if (real_player != null) return real_player;
+        return mc.thePlayer;
+    }
+
+
     @SubscribeEvent
     public void onClientLogout(ClientDisconnectionFromServerEvent event) {
         cleanupClientWorld();

@@ -4,7 +4,6 @@ import factorization.api.Coord;
 import factorization.fzds.interfaces.DeltaCapability;
 import factorization.fzds.network.HammerNet;
 import factorization.fzds.network.HammerNet.HammerNetType;
-import factorization.util.NORELEASE;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.client.Minecraft;
