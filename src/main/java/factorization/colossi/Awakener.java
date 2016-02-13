@@ -129,7 +129,7 @@ public class Awakener {
     }
     
     int ground_level = -1;
-    ColossusBuilderBlock valid_natural_blocks = new ColossusBuilderBlock(null) {
+    ColossusBuilderBlock valid_natural_blocks = new ColossusBuilderBlock() {
         @Override
         public boolean matches(Coord at) {
             if (at.y <= ground_level) return false;
@@ -140,7 +140,7 @@ public class Awakener {
         }
     };
     
-    ColossusBuilderBlock BODY_ANY = new ColossusBuilderBlock(null) {
+    ColossusBuilderBlock BODY_ANY = new ColossusBuilderBlock() {
         @Override
         public boolean matches(Coord at) {
             return at.has(ColossalBlock.VARIANT, ColossalBlock.Md.BODY, ColossalBlock.Md.BODY_CRACKED, ColossalBlock.Md.BODY_COVERED);
