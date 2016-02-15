@@ -140,8 +140,8 @@ public final class CraftUtil {
     public static IRecipe findMatchingRecipe(InventoryCrafting inv, World world) {
         if (Core.serverStarted) {
             List<IRecipe> craftingManagerRecipes = CraftingManager.getInstance().getRecipeList();
-            cache_fear--;
             if (cache_fear > 0) {
+                cache_fear--;
                 return lookupRecipeUncached(inv, world);
             }
             if (craftingManagerRecipes.size() != recipeCache.size()) {
@@ -156,15 +156,28 @@ public final class CraftUtil {
             for (int i = 0; i < recipeCache.size(); i++) {
                 IRecipe recipe = recipeCache.get(i);
                 if (recipe == null) continue;
-                if (recipe.matches(inv, world)) {
-                    if (i > 50) {
-                        int j = i/3;
-                        IRecipe swapeh = recipeCache.get(j);
-                        recipeCache.set(j, recipe);
-                        recipeCache.set(i, swapeh);
+                boolean matches = false;
+                try {
+                    matches = recipe.matches(inv, world);
+                } catch (Throwable t) {
+                    Core.logSevere("Recipe crashed during match!");
+                    t.printStackTrace();
+                    Core.logSevere("Crafting table inventory:");
+                    for (int j = 0; j < inv.getSizeInventory(); j++) {
+                        ItemStack is = inv.getStackInSlot(j);
+                        Core.logSevere("Slot " + j + " = " + is);
                     }
-                    return recipe;
+                    Core.logSevere("Recipe: " + recipe.getClass() + ": " + recipe.toString());
+                    recipeCache.set(i, null);
                 }
+                if (!matches) continue;
+                if (i > 50) {
+                    int j = i/3;
+                    IRecipe swapeh = recipeCache.get(j);
+                    recipeCache.set(j, recipe);
+                    recipeCache.set(i, swapeh);
+                }
+                return recipe;
             }
         } else {
             return lookupRecipeUncached(inv, world);
