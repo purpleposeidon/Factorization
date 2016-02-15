@@ -649,13 +649,20 @@ public class Registry {
                 'W', "blockWater",
                 '#', "treeLeaves",
                 'D', Blocks.dirt);
-        oreRecipe(new ItemStack(Items.clay_ball, 4),
+        oreRecipe(new ItemStack(Items.clay_ball, 4 * 4),
                 "~D~",
                 "D#D",
                 "~D~",
                 '~', "blockWater",
                 'D', Blocks.dirt,
                 '#', Blocks.gravel);
+        oreRecipe(new ItemStack(Items.clay_ball, 4 * 5),
+                "~H~",
+                "HCH",
+                "~H~",
+                '~', "blockWater",
+                'H', Blocks.hardened_clay,
+                'C', Blocks.clay);
         oreRecipe(new ItemStack(logicMatrixController),
                 "MiX",
                 'M', logicMatrix,
@@ -964,13 +971,12 @@ public class Registry {
 
         //Compression Crafter
         oreRecipe(compression_crafter_item,
-                "#C#",
-                "#P#",
-                "#r#",
+                "-",
+                "C",
+                "P",
+                '-', Blocks.stone_slab,
                 'C', Blocks.crafting_table,
-                'P', Blocks.piston,
-                '#', Blocks.stone,
-                'r', Items.redstone);
+                'P', Blocks.piston);
 
         // Wrath lamp
         oreRecipe(lamp_item,
