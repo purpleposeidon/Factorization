@@ -55,12 +55,12 @@ sourceSets {
     }
 }
 
-repositories {
-    maven {
-        name = "ic2"
-        url = "http://maven.ic2.player.to/"
-    }   
-}
+// repositories {
+//     maven {
+//         name = "ic2"
+//         url = "http://maven.ic2.player.to/"
+//     }   
+// }
 
 configurations {
     api
@@ -75,7 +75,7 @@ targetCompatibility = '1.8'
 sourceCompatibility = '1.8'
 
 dependencies {
-    api 'net.industrial-craft:industrialcraft-2:2.2.767-experimental:dev'
+    // api 'net.industrial-craft:industrialcraft-2:2.2.767-experimental:dev'
     // you may put jars on which you depend on in ./libs
     // or you may define them like so..
     //compile "some.group:artifact:version:classifier"
