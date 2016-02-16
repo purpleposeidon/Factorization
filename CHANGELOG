@@ -1,3 +1,6 @@
+0.8.107
+  Disabled RenderSorter. This fixes a crash involving Ars Magica. Credit to jjtParadox!
+  
 0.8.106
   Fixed previous fix using up stupid amounts of memory -_-
 

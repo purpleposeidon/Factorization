@@ -85,9 +85,13 @@ public class FactorizationClientProxy extends FactorizationProxy {
 
     public FactorizationClientProxy() {
         Core.loadBus(this);
-        if (FzConfig.sort_renderers) {
+        // NORELEASE: Disabled due to:
+        // 1) this is too early access FzConfig
+        // 2) Has issue w/ anonymous classes that Ars Magica uses.
+        // These are easy to fix, but this is 1.7.
+        /*if (FzConfig.sort_renderers) {
             Core.loadBus(renderSorter = new RenderSorter());
-        }
+        }*/
     }
 
     @Override
