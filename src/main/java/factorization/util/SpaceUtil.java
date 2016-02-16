@@ -424,7 +424,8 @@ public final class SpaceUtil {
     }
 
     public static int sign(EnumFacing dir) {
-        return dir.getDirectionVec().getX() + dir.getDirectionVec().getY() + dir.getDirectionVec().getZ();
+        if (dir == null) return 0;
+        return dir.getAxisDirection().getOffset();
     }
 
     public static double sum(Vec3 vec) {

@@ -1,5 +1,6 @@
 package factorization.coremodhooks;
 
+import factorization.flat.FlatChunkLayer;
 import net.minecraft.entity.Entity;
 import net.minecraft.world.chunk.Chunk;
 
@@ -27,6 +28,15 @@ public class MixinExtraChunkData extends Chunk implements IExtraChunkData {
             constants = null;
         }
         constant_colliders = constants;
+    }
+
+    FlatChunkLayer flatLayer;
+
+    public FlatChunkLayer getFlatLayer() {
+        if (flatLayer == null) {
+            flatLayer = new FlatChunkLayer();
+        }
+        return flatLayer;
     }
 
 }
