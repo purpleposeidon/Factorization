@@ -91,6 +91,7 @@ abstract class AbstractAsmMethodTransform {
         }
 
         private String find_notch_owner, find_mcp_owner, find_mcp_name, find_mcp_descr, find_srg_name, find_notch_name, find_notch_desc, find_mcp_desc;
+        private int which = -1;
 
         public MutateCall setOwner(String owner) {
             this.find_mcp_owner = owner.replace(".", "/");
@@ -114,11 +115,17 @@ abstract class AbstractAsmMethodTransform {
             return this;
         }
 
+        public MutateCall setOccurance(int which) {
+            this.which = which;
+            return this;
+        }
+
 
         @Override
         void apply(MethodNode base, MethodNode addition) {
             boolean any = false;
             InsnList instructions = base.instructions;
+            int found = 0;
             for (AbstractInsnNode insn = instructions.getFirst(); insn != null; insn = insn.getNext()) {
                 int op = insn.getOpcode();
                 if (op != Opcodes.INVOKEVIRTUAL && op != Opcodes.INVOKESTATIC) {
@@ -131,6 +138,7 @@ abstract class AbstractAsmMethodTransform {
                 if (!match) {
                     continue;
                 }
+                if (which != -1 && found++ != which) continue;
                 meth.setOpcode(Opcodes.INVOKESTATIC);
                 meth.owner = "factorization/coremod/MethodSplices";
                 meth.name = addition.name;
