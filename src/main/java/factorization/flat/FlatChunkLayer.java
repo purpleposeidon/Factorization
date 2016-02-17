@@ -47,6 +47,7 @@ public class FlatChunkLayer {
 
     static abstract class Data {
         static final int FULL_SIZE = 16 * 16 * 16 * 3;
+        transient int set = 0;
 
         @Nullable
         abstract FlatFace get(short index);
@@ -55,9 +56,17 @@ public class FlatChunkLayer {
         abstract Data set(short index, @Nullable FlatFace face, Coord at);
 
         final void replaced(@Nullable FlatFace orig, @Nullable Coord at, short index) {
-            if (orig == null || at == null) return;
+            if (orig == null && at != null) set++;
+            if (orig != null && at == null) set--;
+            if (orig == null || at == null) {
+                return;
+            }
             EnumFacing face = FlatFeature.byte2side(index);
             orig.onReplaced(at, face);
+        }
+
+        public final boolean isEmpty() {
+            return set == 0;
         }
 
         public abstract void iterate(IterateContext visitor);
@@ -182,8 +191,7 @@ public class FlatChunkLayer {
                 return null;
             }
             if (id == FlatFeature.DYNAMIC_SENTINEL) {
-                //noinspection UnnecessaryBoxing
-                return dynamic.get(Integer.valueOf(index));
+                return dynamic.get((int) index);
             }
             return registry.getObjectById(id);
         }
@@ -207,8 +215,7 @@ public class FlatChunkLayer {
                 FlatFace oldFace = lookup(data[index], index);
                 replaced(oldFace, at, index);
                 if (oldFace.isDynamic() && (face == null || face.isStatic())) {
-                    //noinspection UnnecessaryBoxing
-                    dynamic.remove(Integer.valueOf(index));
+                    dynamic.remove((int) index);
                 }
             }
             if (face == null) {
@@ -217,8 +224,7 @@ public class FlatChunkLayer {
                 data[index] = face.staticId;
             } else {
                 data[index] = FlatFeature.DYNAMIC_SENTINEL;
-                //noinspection UnnecessaryBoxing
-                dynamic.put(Integer.valueOf(index), face);
+                dynamic.put((int) index, face);
                 if (dynamic.size() > MAX_DYNAMIC) {
                     return upsize();
                 }
@@ -336,5 +342,10 @@ public class FlatChunkLayer {
             Data slab = slabs[slabY];
             slab.iterate(new IterateContext(chunk, slabY, visitor));
         }
+    }
+
+    transient int set = 0;
+    public boolean isEmpty() {
+        return set == 0;
     }
 }

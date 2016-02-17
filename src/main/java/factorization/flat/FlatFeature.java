@@ -2,6 +2,7 @@ package factorization.flat;
 
 import factorization.api.Coord;
 import factorization.api.datahelpers.DataInNBT;
+import factorization.api.datahelpers.DataOutNBT;
 import factorization.coremodhooks.IExtraChunkData;
 import factorization.shared.Core;
 import net.minecraft.nbt.NBTTagCompound;
@@ -11,11 +12,14 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraftforge.common.util.Constants;
 import net.minecraftforge.event.world.ChunkDataEvent;
+import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.registry.FMLControlledNamespacedRegistry;
 import net.minecraftforge.fml.common.registry.PersistentRegistryManager;
+import net.minecraftforge.fml.relauncher.Side;
 
 import javax.annotation.Nonnull;
+import java.io.IOException;
 
 public enum FlatFeature implements FMLControlledNamespacedRegistry.AddCallback<FlatFace> {
     INSTANCE;
@@ -25,6 +29,9 @@ public enum FlatFeature implements FMLControlledNamespacedRegistry.AddCallback<F
         if (initialized) return;
         initialized = true;
         Core.loadBus(this);
+        if (FMLCommonHandler.instance().getEffectiveSide() == Side.CLIENT) {
+            Core.loadBus(new FlatRender());
+        }
     }
 
     static final ResourceLocation FLATS = new ResourceLocation("factorization:flats");
@@ -78,10 +85,23 @@ public enum FlatFeature implements FMLControlledNamespacedRegistry.AddCallback<F
         final Chunk chunk = event.getChunk();
         final FlatChunkLayer layer = ((IExtraChunkData) chunk).getFlatLayer();
         final NBTTagList out = new NBTTagList();
-        layer.iterate(new IFlatVisitor() {
+        layer.iterate(chunk, new IFlatVisitor() {
             @Override
-            public void visit(int index, @Nonnull FlatFace face) {
-
+            public void visit(Coord at, EnumFacing side, @Nonnull FlatFace face) {
+                NBTTagCompound tag = new NBTTagCompound();
+                if (face.isStatic()) {
+                    tag.setInteger("static", face.staticId);
+                } else {
+                    try {
+                        face.serialize("", new DataOutNBT(tag));
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+                tag.setInteger("x", at.x);
+                tag.setInteger("y", at.y);
+                tag.setInteger("z", at.z);
+                tag.setByte("side", (byte) side.ordinal());
             }
         });
         event.getData().setTag(NBT_KEY, out);
