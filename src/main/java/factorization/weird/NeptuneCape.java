@@ -21,6 +21,7 @@ import java.util.List;
 public class NeptuneCape {
     {
         Core.loadBus(this);
+        LmpMaskRenderer.init();
     }
     
     static boolean hideMask(EntityPlayer player) {
@@ -94,6 +95,7 @@ public class NeptuneCape {
     static class LmpMaskRenderer extends ModelRenderer {
         static FzModel LMP = new FzModel("lmpMask");
         static AbstractClientPlayer rendering_player;
+        static void init() { }
 
         public LmpMaskRenderer(ModelBase base) {
             super(base);
