@@ -26,6 +26,7 @@ apis/
 /json_block
 /json_item
 /mcasset
+/raf
 
 #Symlinked files
 at.cfg
