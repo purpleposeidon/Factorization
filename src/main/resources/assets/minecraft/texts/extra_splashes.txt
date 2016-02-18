@@ -58,6 +58,10 @@ Seeing the bouncing splash text fills you with determination!
 # This one is from 1.9!
 # They seem to be adding splashes with pretty much every release.
 More Digital!
+doot doot
+Falling with Style!
+There's no stopping the Trollmaso
+Throw yourself at the ground and miss
 
 #Hey! You! If you want to add your own extra splashes, just add your own minecraft:texts/extra_splashes.txt to your resource pack!
 #FZ'll take care of things!
