@@ -351,6 +351,7 @@ public class FactorizationClientProxy extends FactorizationProxy {
     public void afterLoad() {
         Core.logInfo("Reloading game settings");
         Minecraft.getMinecraft().gameSettings.loadOptions();
+        FzModel.ModelWrangler.hasLoaded = true;
     }
 
     @Override

@@ -53,9 +53,7 @@ public class FzModel {
         this.blend = blend;
         if (FMLCommonHandler.instance().getEffectiveSide() != Side.CLIENT) return;
         instances.add(this);
-        if (ModelWrangler.hasLoaded) {
-            Core.logSevere("FzModel was constructed too late: " + name);
-        }
+        Core.logInfo("Added FzModel: " + name);
     }
 
     private static final ArrayList<FzModel> instances = new ArrayList<FzModel>();
@@ -110,10 +108,9 @@ public class FzModel {
 
     @SideOnly(Side.CLIENT)
     public static class ModelWrangler {
-        static boolean hasLoaded = false;
+        public static boolean hasLoaded = false;
         @SubscribeEvent
-        public void loadModels(TextureStitchEvent event) {
-            hasLoaded = true;
+        public void loadModels(TextureStitchEvent.Pre event) {
             //event.modelBakery.reg
             Minecraft mc = Minecraft.getMinecraft();
 
