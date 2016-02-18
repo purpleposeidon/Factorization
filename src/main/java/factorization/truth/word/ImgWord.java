@@ -57,7 +57,7 @@ public class ImgWord extends Word {
     @Override
     public int draw(int x, int y, boolean hover, FontRenderer font) {
         int z = 0;
-        Minecraft.getMinecraft().renderEngine.bindTexture(resource); // memleak goes here! :|
+        Minecraft.getMinecraft().renderEngine.bindTexture(resource); // NORELEASE memleak goes here! :|
         double u0 = 0;
         double v0 = 0;
         double u1 = 1;
@@ -67,10 +67,10 @@ public class ImgWord extends Word {
         WorldRenderer tess = tessI.getWorldRenderer();
         GL11.glColor4f(1, 1, 1, 1);
         tess.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX);
-        tess.tex(u0, v0).putPosition(x + 0, y + 0, z);
-        tess.tex(u0, v1).putPosition(x + 0, y + height, z);
-        tess.tex(u1, v1).putPosition(x + width, y + height, z);
-        tess.tex(u1, v0).putPosition(x + width, y + 0, z);
+        tess.pos(x + 0, y + 0, z         ).tex(u0, v0).endVertex();
+        tess.pos(x + 0, y + height, z    ).tex(u0, v1).endVertex();
+        tess.pos(x + width, y + height, z).tex(u1, v1).endVertex();
+        tess.pos(x + width, y + 0, z     ).tex(u1, v0).endVertex();
         tessI.draw();
         return 16;
     }
