@@ -4,10 +4,7 @@ import factorization.api.IActOnCraft;
 import factorization.artifact.BlockForge;
 import factorization.artifact.ItemBrokenArtifact;
 import factorization.artifact.ItemPotency;
-import factorization.beauty.BlockAnthroGen;
-import factorization.beauty.BlockShaftGen;
-import factorization.beauty.ItemGrossFood;
-import factorization.beauty.ItemLeafBomb;
+import factorization.beauty.*;
 import factorization.ceramics.ItemGlazeBucket;
 import factorization.ceramics.ItemSculptingTool;
 import factorization.ceramics.TileEntityGreenware;
@@ -115,6 +112,8 @@ public class Registry {
     public BlockGeyser geyser;
     public BlockOreExtruder extruder;
     public BlockShaftGen shaftGen;
+    public BlockWaterwheel waterwheel;
+    public BlockWindmill windmill;
 
     public ItemStack servorail_item;
     public ItemStack empty_socket_item, socket_lacerator, socket_robot_hand, socket_shifter;
@@ -218,6 +217,8 @@ public class Registry {
         compression_crafter = new BlockCompressionCrafter();
         socket = new BlockSocket();
         shaftGen = new BlockShaftGen();
+        waterwheel = new BlockWaterwheel();
+        windmill = new BlockWindmill();
         for (BlockClass bc : BlockClass.values()) {
             if (bc == BlockClass.Barrel) {
                 bc.block = factory_block_barrel;
@@ -269,6 +270,8 @@ public class Registry {
         GameRegistry.registerBlock(compression_crafter, ItemFactorizationBlock.class, "CompressionCrafter");
         GameRegistry.registerBlock(socket, ItemFactorizationBlock.class, "Socket");
         GameRegistry.registerBlock(shaftGen, ItemFactorizationBlock.class, "ShaftGen");
+        GameRegistry.registerBlock(waterwheel, ItemFactorizationBlock.class, "WaterWheelBase");
+        GameRegistry.registerBlock(windmill, ItemFactorizationBlock.class, "WindMillBase");
         if (DeltaChunk.enabled()) {
             GameRegistry.registerBlock(colossal_block, ColossalBlockItem.class, "ColossalBlock");
             GameRegistry.registerTileEntity(TileEntityColossalHeart.class, "fz_colossal_heart");
