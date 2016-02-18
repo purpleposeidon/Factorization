@@ -27,7 +27,6 @@ import net.minecraftforge.client.event.GuiScreenEvent.ActionPerformedEvent;
 import net.minecraftforge.client.event.GuiScreenEvent.InitGuiEvent;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
 import net.minecraftforge.client.event.sound.PlaySoundEvent;
-import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import org.apache.commons.io.Charsets;
@@ -37,6 +36,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Random;
 
@@ -200,6 +200,8 @@ public class MiscClientProxy extends MiscProxy {
         sampler.preGive(359); // NORELEASE: Verify this number each MC version, including minor versions. (Or we could just count it. Hmm.)
         // Err, should that be <number of lines> - 1? Or maybe even -2 for the hashCode thing?
         sampler.give(""); // !!!! The secret EMPTY splash text! :O
+        HashSet<String> alreadySeen = new HashSet<String>();
+        int dupes = 0;
         try {
             @SuppressWarnings("unchecked")
             List<IResource> resources = mc.getResourceManager().getAllResources(new ResourceLocation("minecraft:texts/extra_splashes.txt"));
@@ -216,6 +218,10 @@ public class MiscClientProxy extends MiscProxy {
                         if (s.isEmpty()) continue;
                         if (s.hashCode() == 125780783) continue; // Probably "This message will never appear on the splash screen, isn't that weird?".hashCode()
                         if (s.startsWith("#")) continue;
+                        if (!alreadySeen.add(s)) {
+                            dupes++;
+                            continue;
+                        }
                         sampler.give(s);
                     }
                 } finally {
@@ -224,6 +230,9 @@ public class MiscClientProxy extends MiscProxy {
             }
         } catch (IOException e) {
             e.printStackTrace();
+        }
+        if (dupes > 0) {
+            Core.logWarning("Extra splashes had duplicated lines: " + dupes);
         }
         if (sampler.size() < 1) return;
         menu.splashText = sampler.getSamples().get(0);

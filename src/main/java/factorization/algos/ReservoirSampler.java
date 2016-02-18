@@ -1,7 +1,5 @@
 package factorization.algos;
 
-import net.minecraft.potion.PotionEffect;
-
 import java.util.*;
 
 public class ReservoirSampler<E> implements Iterable<E> {
