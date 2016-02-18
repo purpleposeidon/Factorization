@@ -94,32 +94,7 @@ public class TileEntityCompressionCrafterRenderer extends TileEntitySpecialRende
         GL11.glEnable(GL11.GL_LIGHTING);
     }
 
-    static HashMap<String, FzModel> shrouds = new HashMap<String, FzModel>();
-    static {
-        for (int x = 1; x < 4; x++) {
-            for (int z = 1; z < 4; z++) {
-                if (z > x) continue;
-                String a = x + "x" + z;
-                String b = z + "x" + x;
-                if (shrouds.containsKey(a) || shrouds.containsKey(b)) continue;
-                shrouds.put(a, new FzModel("compact/shroud_" + a)); // static
-            }
-        }
-    }
-
-    FzModel getShrould(int x, int z) {
-        if (x < 1) x = 1;
-        if (z < 1) z = 1;
-        if (x > 3) x = 3;
-        if (z > 3) z = 3;
-        if (z > x) {
-            final int x0 = x;
-            final int z0 = z;
-            x = z0;
-            z = x0;
-        }
-        return shrouds.get(x + "x" + z);
-    }
+    FzModel shroud = new FzModel("compact/shroud");
 
     private void drawObscurringBox() {
         //contentSize is determined by _drawSquishingBlocks
@@ -128,7 +103,8 @@ public class TileEntityCompressionCrafterRenderer extends TileEntitySpecialRende
         }
 
         bindTexture(Core.blockAtlas);
-        NORELEASE.fixme("Implement shroud");
+        NORELEASE.fixme("draw the shroud model at each block; needs to be scaled down or something");
+        // Shroud'll be a cube w/ textures on all sides being the front face of the CompACT model
     }
 
     private void drawSquishingBlocks(Coord upperCorner, Coord lowerCorner, float partial) {
