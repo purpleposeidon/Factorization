@@ -501,18 +501,14 @@ public class HammerClientProxy extends HammerProxy {
                 for (Packet<INetHandlerPlayClient> packet : packetQueue) {
                     if (packet == null) continue;
                     try {
-                            NORELEASE.println(packet);
+                        NORELEASE.println(packet);
                         packet.processPacket(send_queue);
-                        if (NORELEASE.on) {
-                            packetQueue.remove(packet);
-                            break;
-                        }
                     } catch (RuntimeException t) {
                         t.printStackTrace();
                         throw t;
                     }
                 }
-                if (NORELEASE.off) packetQueue.clear();
+                packetQueue.clear();
             }
             if (NORELEASE_misdirect_packet) setShadowWorld();
             //Inspired by Minecraft.runTick()

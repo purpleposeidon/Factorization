@@ -5,6 +5,7 @@ import factorization.artifact.BlockForge;
 import factorization.artifact.ItemBrokenArtifact;
 import factorization.artifact.ItemPotency;
 import factorization.beauty.BlockAnthroGen;
+import factorization.beauty.BlockShaftGen;
 import factorization.beauty.ItemGrossFood;
 import factorization.beauty.ItemLeafBomb;
 import factorization.ceramics.ItemGlazeBucket;
@@ -113,6 +114,7 @@ public class Registry {
     public SimpleFzBlock anthrogen;
     public BlockGeyser geyser;
     public BlockOreExtruder extruder;
+    public BlockShaftGen shaftGen;
 
     public ItemStack servorail_item;
     public ItemStack empty_socket_item, socket_lacerator, socket_robot_hand, socket_shifter;
@@ -215,6 +217,7 @@ public class Registry {
         extruder.setUnlocalizedName("factorization:extruder");
         compression_crafter = new BlockCompressionCrafter();
         socket = new BlockSocket();
+        shaftGen = new BlockShaftGen();
         for (BlockClass bc : BlockClass.values()) {
             if (bc == BlockClass.Barrel) {
                 bc.block = factory_block_barrel;
@@ -265,6 +268,7 @@ public class Registry {
         GameRegistry.registerBlock(extruder, "OreExtruder");
         GameRegistry.registerBlock(compression_crafter, ItemFactorizationBlock.class, "CompressionCrafter");
         GameRegistry.registerBlock(socket, ItemFactorizationBlock.class, "Socket");
+        GameRegistry.registerBlock(shaftGen, ItemFactorizationBlock.class, "ShaftGen");
         if (DeltaChunk.enabled()) {
             GameRegistry.registerBlock(colossal_block, ColossalBlockItem.class, "ColossalBlock");
             GameRegistry.registerTileEntity(TileEntityColossalHeart.class, "fz_colossal_heart");

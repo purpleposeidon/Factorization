@@ -1,0 +1,37 @@
+{
+    "forge_marker": 1,
+    "defaults": {
+        "model": "factorization:top_side_bot",
+        "transform": "forge:default-block",
+        "textures": {
+            "top": "factorization:blocks/beauty/shaft_gen_top",
+            "side":"factorization:blocks/beauty/shaft_gen_side_on",
+            "bot": "factorization:blocks/beauty/shaft_gen_bottom_on"
+        }
+    },
+    "variants": {
+        "normal": [
+            {}
+        ],
+        "inventory": [
+            {"x": 90}
+        ],
+        "facing": {
+            "down": {"x": 180},
+            "up": {},
+            "north": {"x": 90},
+            "east": {"x": 90, "y": 90},
+            "south": {"x": 90, "y": 180},
+            "west": {"x": 90, "y": 270}
+        },
+        "powered": {
+            "true": {},
+            "false": {
+                "textures": {
+                    "side":"factorization:blocks/beauty/shaft_gen_side",
+                    "bot": "factorization:blocks/beauty/shaft_gen_bottom"
+                }
+            }
+        }
+    }
+}
