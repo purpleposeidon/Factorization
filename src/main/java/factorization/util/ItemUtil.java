@@ -312,5 +312,23 @@ public final class ItemUtil {
         if (is == null) return new ArrayList<ItemStack>();
         return getSubItems(is.getItem());
     }
+
+    public static ItemStack getPackedItem(ItemStack is, String tagKey, ItemStack defaultItem) {
+        NBTTagCompound tag = is.getTagCompound();
+        if (tag == null) {
+            return defaultItem.copy();
+        }
+        tag = tag.getCompoundTag(tagKey);
+        if (tag == null) {
+            return defaultItem.copy();
+        }
+        return DataUtil.tag2item(tag, defaultItem);
+    }
+
+    public static void packItem(ItemStack is, String tagKey, ItemStack toPack) {
+        if (toPack == null) return;
+        NBTTagCompound tag = ItemUtil.getTag(is);
+        tag.setTag(tagKey, DataUtil.item2tag(toPack));
+    }
 }
 

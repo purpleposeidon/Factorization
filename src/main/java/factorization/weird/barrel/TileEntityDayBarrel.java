@@ -54,7 +54,9 @@ public class TileEntityDayBarrel extends TileEntityFactorization  {
     private static final ItemStack DEFAULT_LOG = new ItemStack(Blocks.log);
     private static final ItemStack DEFAULT_SLAB = new ItemStack(Blocks.planks);
     public ItemStack woodLog = DEFAULT_LOG.copy(), woodSlab = DEFAULT_SLAB.copy();
-    int display_list = -1;
+    {
+        NORELEASE.fixme("Dynamic barrel sizes!");
+    }
 
     public FzOrientation orientation = FzOrientation.FACE_UP_POINT_NORTH;
     public Type type = Type.NORMAL;
@@ -887,9 +889,8 @@ public class TileEntityDayBarrel extends TileEntityFactorization  {
     public static ItemStack makeBarrel(Type type, ItemStack log, ItemStack slab) {
         ItemStack barrel_item = new ItemStack(Core.registry.daybarrel);
         barrel_item = addUpgrade(barrel_item, type);
-        NBTTagCompound tag = ItemUtil.getTag(barrel_item);
-        tag.setTag("log", DataUtil.item2tag(log));
-        tag.setTag("slab", DataUtil.item2tag(slab));
+        ItemUtil.packItem(barrel_item, "log", log);
+        ItemUtil.packItem(barrel_item, "slab", slab);
         int dmg = DataUtil.getName(log).hashCode() * 16 + log.getItemDamage();
         dmg %= 1000;
         dmg *= 10;
@@ -963,15 +964,7 @@ public class TileEntityDayBarrel extends TileEntityFactorization  {
     }
     
     private static ItemStack get(ItemStack is, String name, ItemStack default_) {
-        NBTTagCompound tag = is.getTagCompound();
-        if (tag == null) {
-            return default_.copy();
-        }
-        tag = tag.getCompoundTag(name);
-        if (tag == null) {
-            return default_.copy();
-        }
-        return DataUtil.tag2item(tag, default_);
+        return ItemUtil.getPackedItem(is, name, default_);
     }
     
     static ItemStack addUpgrade(ItemStack barrel, Type upgrade) {
