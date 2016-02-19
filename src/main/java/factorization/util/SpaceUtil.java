@@ -669,4 +669,10 @@ public final class SpaceUtil {
     public static boolean equals(Vec3 a, Vec3 b) {
         return a.xCoord == b.xCoord && a.yCoord == b.yCoord && a.zCoord == b.zCoord;
     }
+
+    public static double lengthSquare(Vec3 vec) {
+        return vec.xCoord * vec.xCoord
+                + vec.yCoord * vec.yCoord
+                + vec.zCoord * vec.zCoord;
+    }
 }

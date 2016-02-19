@@ -38,10 +38,10 @@ import java.util.List;
 public class FzModel {
     // Don't SideOnly this class.
 
-    final String name;
+    public final String name;
     @SideOnly(Side.CLIENT)
-    IBakedModel model;
-    final boolean blend;
+    public IBakedModel model;
+    public final boolean blend;
 
     public FzModel(String name) {
         // Really ought to use a factory method instead.

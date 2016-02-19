@@ -2,6 +2,7 @@ package factorization.util;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import net.minecraft.block.Block;
 import net.minecraft.entity.Entity;
@@ -155,17 +156,21 @@ public final class ItemUtil {
         return ret;
     }
 
-    public static long getItemHash(ItemStack is) {
+    public static int getItemHash(ItemStack is) {
         if (is == null) {
-            return Long.MIN_VALUE;
+            return 0;
         }
-        long ih = DataUtil.getId(is);
-        long md = is.getItemDamage();
-        long tg = 0;
+        int ih = DataUtil.getId(is);
+        int md = is.getItemDamage();
+        int tg = 1;
         if (is.hasTagCompound()) {
             tg = is.getTagCompound().hashCode();
         }
-        return (ih << 48) + (md << 32) + tg + is.stackSize*100;
+        int r = 1;
+        r = r * 31 + ih;
+        r = r * 31 + md;
+        r = r * 31 + tg;
+        return r;
     }
 
     public static String getCustomItemName(ItemStack is) {

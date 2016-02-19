@@ -3,17 +3,6 @@
         {   "from": [ 6, 0, 6 ],
             "to": [ 10, 16, 10 ],
             "faces": {
-                "down":  { "texture": "#ring" },
-                "up":    { "texture": "#ring" },
-                "north": { "texture": "#bark" },
-                "south": { "texture": "#bark" },
-                "west":  { "texture": "#bark" },
-                "east":  { "texture": "#bark" }
-            }
-        },
-        {   "from": [ 6, 0, 6 ],
-            "to": [ 10, 16, 10 ],
-            "faces": {
                 "down":  { "texture": "factorization:blocks/beauty/shaft_overlay", "uv": [12,0, 16,4] },
                 "up":    { "texture": "factorization:blocks/beauty/shaft_overlay", "uv": [12,0, 16,4] },
                 "north": { "texture": "factorization:blocks/beauty/shaft_overlay", "uv": [0,0, 4,16] },
@@ -24,7 +13,7 @@
         }
     ],
     "textures": {
-        "particle": "#bark"
+        "particle": "minecraft:blocks/planks_oak"
     }
 }
 

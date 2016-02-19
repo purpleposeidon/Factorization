@@ -63,6 +63,7 @@ public final class NumUtil {
     }
 
     public static Random dirtyRandomCache() {
+        NORELEASE.fixme("No. Remove.");
         Random ret = random_cache.get();
         if (ret == null) {
             ret = new Random();
@@ -87,5 +88,18 @@ public final class NumUtil {
         if (v < min) return min;
         if (v > max) return max;
         return v;
+    }
+
+    /**
+     * @param x0 Line start point
+     * @param x1 Line end point
+     * @param s A point not necessarily on the line
+     * @return How far along the point on the lien closest to s is between x0 and x1.
+     * Will return NaN if x0 and x1 are the same.
+     */
+    public static double uninterpGradient(Vec3 x0, Vec3 x1, Vec3 s) {
+        Vec3 sO = s.subtract(x0);
+        Vec3 bO = x1.subtract(x0);
+        return sO.dotProduct(bO) / SpaceUtil.lengthSquare(bO);
     }
 }

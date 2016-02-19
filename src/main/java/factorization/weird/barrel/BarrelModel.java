@@ -46,7 +46,7 @@ public class BarrelModel implements ISmartBlockModel, ISmartItemModel, IPerspect
 
     @Override
     public IBakedModel handleItemState(ItemStack stack) {
-        return get(CacheInfo.from(stack));
+        return get(BarrelCacheInfo.from(stack));
     }
 
     @Override
@@ -64,10 +64,10 @@ public class BarrelModel implements ISmartBlockModel, ISmartItemModel, IPerspect
         public TextureAtlasSprite front, top, side, top_metal;
     }
 
-    private final HashMap<CacheInfo, IBakedModel> modelCache = new HashMap<CacheInfo, IBakedModel>();
+    private final HashMap<BarrelCacheInfo, IBakedModel> modelCache = new HashMap<BarrelCacheInfo, IBakedModel>();
     public static IRetexturableModel template;
 
-    IBakedModel get(CacheInfo info) {
+    IBakedModel get(BarrelCacheInfo info) {
         IBakedModel ret = modelCache.get(info);
         if (ret != null) return ret;
         ret = build(info);
@@ -77,7 +77,7 @@ public class BarrelModel implements ISmartBlockModel, ISmartItemModel, IPerspect
         return ret;
     }
 
-    IBakedModel build(CacheInfo info) {
+    IBakedModel build(BarrelCacheInfo info) {
         TextureAtlasSprite log = info.log;
         TextureAtlasSprite plank = info.plank;
         BarrelGroup group = normal;
@@ -161,7 +161,7 @@ public class BarrelModel implements ISmartBlockModel, ISmartItemModel, IPerspect
         Minecraft mc = Minecraft.getMinecraft();
         if (state instanceof IExtendedBlockState) {
             IExtendedBlockState bs = (IExtendedBlockState) state;
-            CacheInfo info = bs.getValue(BlockBarrel.BARREL_INFO);
+            BarrelCacheInfo info = bs.getValue(BlockBarrel.BARREL_INFO);
             return get(info);
         }
 

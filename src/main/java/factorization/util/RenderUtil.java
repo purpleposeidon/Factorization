@@ -6,10 +6,13 @@ import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.ItemModelMesher;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
+import net.minecraft.client.resources.model.IBakedModel;
+import net.minecraft.client.resources.model.ModelResourceLocation;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.client.event.TextureStitchEvent;
+import net.minecraftforge.client.model.IModel;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import org.lwjgl.opengl.GL11;
@@ -70,6 +73,11 @@ public final class RenderUtil {
         }
         IBlockState bs = b.getStateFromMeta(log.getItemDamage());
         return mc.getBlockRendererDispatcher().getBlockModelShapes().getTexture(bs);
+    }
+
+    public static IBakedModel getModel(ModelResourceLocation name) {
+        Minecraft mc = Minecraft.getMinecraft();
+        return mc.getBlockRendererDispatcher().getBlockModelShapes().getModelManager().getModel(name);
     }
 
     /**

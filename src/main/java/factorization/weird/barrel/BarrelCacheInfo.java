@@ -2,15 +2,14 @@ package factorization.weird.barrel;
 
 import factorization.api.FzOrientation;
 import factorization.common.FactoryType;
-import factorization.shared.Core;
 import factorization.util.DataUtil;
+import factorization.util.ItemUtil;
 import factorization.util.RenderUtil;
 import net.minecraft.block.Block;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.item.ItemStack;
-import net.minecraftforge.common.property.IExtendedBlockState;
 
-public class CacheInfo {
+public class BarrelCacheInfo {
     final TextureAtlasSprite log, plank;
     final TileEntityDayBarrel.Type type;
     final FzOrientation orientation;
@@ -21,7 +20,7 @@ public class CacheInfo {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
-        CacheInfo cacheInfo = (CacheInfo) o;
+        BarrelCacheInfo cacheInfo = (BarrelCacheInfo) o;
 
         if (isMetal != cacheInfo.isMetal) return false;
         if (!log.equals(cacheInfo.log)) return false;
@@ -33,6 +32,7 @@ public class CacheInfo {
 
     @Override
     public int hashCode() {
+        // log & plank don't have hashCode(), but they're unique.
         int result = log.hashCode();
         result = 31 * result + plank.hashCode();
         result = 31 * result + type.hashCode();
@@ -41,7 +41,7 @@ public class CacheInfo {
         return result;
     }
 
-    private CacheInfo(TextureAtlasSprite log, TextureAtlasSprite plank, TileEntityDayBarrel.Type type, FzOrientation orientation, boolean isMetal) {
+    private BarrelCacheInfo(TextureAtlasSprite log, TextureAtlasSprite plank, TileEntityDayBarrel.Type type, FzOrientation orientation, boolean isMetal) {
         this.log = log;
         this.plank = plank;
         this.type = type;
@@ -50,21 +50,21 @@ public class CacheInfo {
 
     }
 
-    public static CacheInfo from(TileEntityDayBarrel barrel) {
+    public static BarrelCacheInfo from(TileEntityDayBarrel barrel) {
         TextureAtlasSprite log = RenderUtil.getSprite(barrel.woodLog);
         TextureAtlasSprite slab = RenderUtil.getSprite(barrel.woodSlab);
         FzOrientation fzo = barrel.orientation;
         TileEntityDayBarrel.Type type = barrel.type;
-        return new CacheInfo(log, slab, type, fzo, isMetal(barrel.woodLog));
+        return new BarrelCacheInfo(log, slab, type, fzo, isMetal(barrel.woodLog));
     }
 
 
-    public static CacheInfo from(ItemStack is) {
+    public static BarrelCacheInfo from(ItemStack is) {
         TileEntityDayBarrel barrel = (TileEntityDayBarrel) FactoryType.DAYBARREL.getRepresentative();
         assert barrel != null;
         barrel.loadFromStack(is);
         barrel.orientation = FzOrientation.FACE_WEST_POINT_UP;
-        return CacheInfo.from(barrel);
+        return BarrelCacheInfo.from(barrel);
     }
 
     static boolean isMetal(ItemStack it) {

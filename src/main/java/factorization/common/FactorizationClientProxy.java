@@ -291,6 +291,15 @@ public class FactorizationClientProxy extends FactorizationProxy {
                 return barrelInv;
             }
         });
+
+        final ModelResourceLocation shaftInv = new ModelResourceLocation("factorization:Shaft#inventory");
+        event.modelRegistry.putObject(shaftInv, new ShaftModel());
+        ModelLoader.setCustomMeshDefinition(DataUtil.getItem(Core.registry.shaft), new ItemMeshDefinition() {
+            @Override
+            public ModelResourceLocation getModelLocation(ItemStack stack) {
+                return shaftInv;
+            }
+        });
     }
 
     @Override
@@ -331,11 +340,6 @@ public class FactorizationClientProxy extends FactorizationProxy {
             BarrelModel.template = (IRetexturableModel) ModelLoaderRegistry.getModel(new ResourceLocation("factorization:block/barrel_template"));
         } catch (IOException e) {
             throw new RuntimeException(e);
-        }
-        try {
-            ShaftModel.template = (IRetexturableModel) ModelLoaderRegistry.getModel(new ResourceLocation("factorization:block/beauty/shaft_template"));
-        } catch (IOException e) {
-            e.printStackTrace();
         }
     }
 

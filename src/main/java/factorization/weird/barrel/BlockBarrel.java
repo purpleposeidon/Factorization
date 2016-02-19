@@ -63,7 +63,7 @@ public class BlockBarrel extends BlockFactorization {
         return new TileEntityDayBarrel();
     }
 
-    public static final IUnlistedProperty<CacheInfo> BARREL_INFO = new DumbExtendedProperty<CacheInfo>("info", CacheInfo.class);
+    public static final IUnlistedProperty<BarrelCacheInfo> BARREL_INFO = new DumbExtendedProperty<BarrelCacheInfo>("info", BarrelCacheInfo.class);
 
     @Override
     protected BlockState createBlockState() {
@@ -79,7 +79,7 @@ public class BlockBarrel extends BlockFactorization {
             assert barrel != null;
             barrel.cleanBarrel();
         }
-        return extendedBS.withProperty(BARREL_INFO, CacheInfo.from(barrel));
+        return extendedBS.withProperty(BARREL_INFO, BarrelCacheInfo.from(barrel));
     }
 
     @Override

@@ -8,7 +8,10 @@ import factorization.common.FactoryType;
 import factorization.shared.BlockClass;
 import factorization.shared.Core;
 import factorization.shared.TileEntityCommon;
-import factorization.util.*;
+import factorization.util.FzUtil;
+import factorization.util.ItemUtil;
+import factorization.util.NumUtil;
+import factorization.util.SpaceUtil;
 import net.minecraft.block.Block;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
@@ -25,15 +28,23 @@ public class TileEntityShaft extends TileEntityCommon implements IRotationalEner
     IRotationalEnergySource _src = null;
     Coord srcPos = null;
     double angle = 0, prev_angle = 0;
-    EnumFacing srcConnection = null;
+    EnumFacing srcConnection = EnumFacing.UP;
     boolean useCustomVelocity = false;
     double customVelocity = 0;
     byte velocitySign = 1;
-    ItemStack shaftItem = NORELEASE.just(null);
+    public static final ItemStack defaultLog = new ItemStack(Blocks.log);
+    ItemStack shaftItem = defaultLog.copy();
 
     @Override
     public BlockClass getBlockClass() {
         return BlockClass.Machine;
+    }
+
+    @Override
+    public void loadFromStack(ItemStack is) {
+        super.loadFromStack(is);
+        shaftItem = is.copy();
+        shaftItem.stackSize = 1;
     }
 
     @Override
