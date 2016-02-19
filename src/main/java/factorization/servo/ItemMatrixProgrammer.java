@@ -6,10 +6,13 @@ import factorization.notify.Notice;
 import factorization.notify.Style;
 import factorization.shared.Core;
 import factorization.shared.Core.TabType;
+import factorization.shared.ISensitiveMesh;
 import factorization.shared.ItemFactorization;
 import factorization.util.FzUtil;
+import factorization.util.ItemUtil;
 import factorization.util.PlayerUtil;
 import factorization.util.StatUtil;
+import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityList;
 import net.minecraft.entity.item.EntityPainting;
@@ -30,8 +33,14 @@ import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.PlayerEvent;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
-public class ItemMatrixProgrammer extends ItemFactorization {
+import javax.annotation.Nonnull;
+import java.util.Arrays;
+import java.util.List;
+
+public class ItemMatrixProgrammer extends ItemFactorization implements ISensitiveMesh {
     public ItemMatrixProgrammer() {
         super("tool.matrix_programmer", TabType.TOOLS);
         setMaxStackSize(1);
@@ -226,5 +235,23 @@ public class ItemMatrixProgrammer extends ItemFactorization {
         if (is.getItemDamage() == 2) return false;
         is.setItemDamage(2);
         return true;
+    }
+
+    @Override
+    public String getMeshName(@Nonnull ItemStack is) {
+        EntityPlayer player = Core.proxy.getClientPlayer();
+        if (player != null) {
+            if (ItemUtil.is(player.getHeldItem(), this) && isBowed(player)) return "lmpMask";
+            if (ItemUtil.is(player.getCurrentArmor(0), this)) return "lmpMask";
+        }
+        if (is.getItemDamage() == 1) return "lmpMask";
+        if (isAuthenticated(is)) return "lmpAuthenticated";
+        return "lmp";
+    }
+
+    @Nonnull
+    @Override
+    public List<ItemStack> getMeshSamples() {
+        return Arrays.asList(new ItemStack(this, 1, 0), new ItemStack(this, 1, 1));
     }
 }
