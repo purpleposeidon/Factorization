@@ -99,6 +99,8 @@ public class WorldgenManager {
         gen.generate(fmlRandom, chunkX, chunkZ, world, chunkProvider, chunkProvider);
     }
 
+    boolean checkInhabitedTime = false;
+
     public void tickRetrogenQueue() {
         if (retrogenQueue.isEmpty()) return;
         retrogen_active.set(Boolean.TRUE);
@@ -116,7 +118,7 @@ public class WorldgenManager {
         for (int i = 0; i < retrogenQueue.size(); i++) {
             Chunk chunk = retrogenQueue.get(i);
             chunk.setModified(true);
-            if (chunk.getInhabitedTime() > max_inhabited_time) {
+            if (checkInhabitedTime && chunk.getInhabitedTime() > max_inhabited_time) {
                 skipped++;
                 continue;
             }
