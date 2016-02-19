@@ -332,6 +332,11 @@ public class FactorizationClientProxy extends FactorizationProxy {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+        try {
+            ShaftModel.template = (IRetexturableModel) ModelLoaderRegistry.getModel(new ResourceLocation("factorization:block/beauty/shaft_template"));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override

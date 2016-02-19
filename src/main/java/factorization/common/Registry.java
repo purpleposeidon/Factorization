@@ -114,6 +114,7 @@ public class Registry {
     public BlockShaftGen shaftGen;
     public BlockWaterwheel waterwheel;
     public BlockWindmill windmill;
+    public BlockShaft shaft;
 
     public ItemStack servorail_item;
     public ItemStack empty_socket_item, socket_lacerator, socket_robot_hand, socket_shifter;
@@ -219,6 +220,7 @@ public class Registry {
         shaftGen = new BlockShaftGen();
         waterwheel = new BlockWaterwheel();
         windmill = new BlockWindmill();
+        shaft = new BlockShaft();
         for (BlockClass bc : BlockClass.values()) {
             if (bc == BlockClass.Barrel) {
                 bc.block = factory_block_barrel;
@@ -272,6 +274,7 @@ public class Registry {
         GameRegistry.registerBlock(shaftGen, ItemFactorizationBlock.class, "ShaftGen");
         GameRegistry.registerBlock(waterwheel, ItemFactorizationBlock.class, "WaterWheelBase");
         GameRegistry.registerBlock(windmill, ItemFactorizationBlock.class, "WindMillBase");
+        GameRegistry.registerBlock(shaft, ShaftItem.class, "Shaft");
         if (DeltaChunk.enabled()) {
             GameRegistry.registerBlock(colossal_block, ColossalBlockItem.class, "ColossalBlock");
             GameRegistry.registerTileEntity(TileEntityColossalHeart.class, "fz_colossal_heart");
@@ -908,16 +911,15 @@ public class Registry {
 
         final ItemStack oakLog = new ItemStack(Blocks.log);
         final ItemStack oakPlank = new ItemStack(Blocks.wooden_slab);
-        final ItemStack oakBarrel = TileEntityDayBarrel.makeBarrel(TileEntityDayBarrel.Type.NORMAL, oakLog, oakPlank);
         for (int i = 0; i < 4; i++) {
             ItemStack log = new ItemStack(Blocks.log, 1, i);
             ItemStack slab = new ItemStack(Blocks.wooden_slab, 1, i);
-            TileEntityDayBarrel.makeRecipe(log, slab);
+            makeMaterialsRecipes(log, slab);
         }
         for (int i = 0; i < 2; i++) {
             ItemStack log = new ItemStack(Blocks.log2, 1, i);
             ItemStack slab = new ItemStack(Blocks.wooden_slab, 1, 4 + i);
-            TileEntityDayBarrel.makeRecipe(log, slab);
+            makeMaterialsRecipes(log, slab);
         }
 
         IRecipe barrel_cart_recipe = new IRecipe() {
@@ -1541,12 +1543,17 @@ public class Registry {
                     slab = plank;
                 }
             }
-            TileEntityDayBarrel.makeRecipe(log, slab.copy());
+            makeMaterialsRecipes(log, slab.copy());
         }
     }
 
     public void registerItemVariantNames() {
         NORELEASE.fixme("Move to proxy");
+    }
+
+    private void makeMaterialsRecipes(ItemStack log, ItemStack slab) {
+        TileEntityDayBarrel.makeRecipe(log, slab);
+        TileEntityShaft.makeRecipe(log, slab);
     }
 
 }

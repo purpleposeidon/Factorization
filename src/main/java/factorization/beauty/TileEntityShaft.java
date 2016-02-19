@@ -8,11 +8,10 @@ import factorization.common.FactoryType;
 import factorization.shared.BlockClass;
 import factorization.shared.Core;
 import factorization.shared.TileEntityCommon;
-import factorization.util.FzUtil;
-import factorization.util.NumUtil;
-import factorization.util.SpaceUtil;
+import factorization.util.*;
 import net.minecraft.block.Block;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.*;
@@ -30,6 +29,7 @@ public class TileEntityShaft extends TileEntityCommon implements IRotationalEner
     boolean useCustomVelocity = false;
     double customVelocity = 0;
     byte velocitySign = 1;
+    ItemStack shaftItem = NORELEASE.just(null);
 
     @Override
     public BlockClass getBlockClass() {
@@ -48,6 +48,7 @@ public class TileEntityShaft extends TileEntityCommon implements IRotationalEner
         useCustomVelocity = data.as(Share.VISIBLE, "useCustom").putBoolean(useCustomVelocity);
         customVelocity = data.as(Share.VISIBLE, "customVel").putDouble(customVelocity);
         velocitySign = data.as(Share.VISIBLE, "velocitySign").putByte(velocitySign);
+        shaftItem = data.as(Share.VISIBLE, "shaftItem").putItemStack(shaftItem);
         if (velocitySign == 0) velocitySign = 1;
     }
 
@@ -363,5 +364,24 @@ public class TileEntityShaft extends TileEntityCommon implements IRotationalEner
         invalidateConnections();
         this.axis = axis;
         return true;
+    }
+
+    private static ItemStack makeShaft(ItemStack log, ItemStack slab) {
+        ItemStack ret = new ItemStack(Core.registry.shaft);
+        ItemUtil.packItem(ret, "log", log);
+        return ret;
+    }
+
+    static ArrayList<ItemStack> instances = new ArrayList<ItemStack>();
+    public static void makeRecipe(ItemStack log, ItemStack slab) {
+        ItemStack shaft = makeShaft(log, slab);
+        Core.registry.oreRecipe(shaft,
+                "#L#",
+                " I ",
+                "#L#",
+                '#', Blocks.iron_bars,
+                'L', log,
+                'I', Core.registry.dark_iron_ingot);
+        instances.add(shaft.copy());
     }
 }

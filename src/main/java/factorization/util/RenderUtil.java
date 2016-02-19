@@ -72,7 +72,6 @@ public final class RenderUtil {
         return mc.getBlockRendererDispatcher().getBlockModelShapes().getTexture(bs);
     }
 
-
     /**
      * Classes that have this annotation may be have sprites recursively loaded.
      * @see RenderUtil#loadSprites(String, Object, String, TextureStitchEvent.Pre)
@@ -135,5 +134,9 @@ public final class RenderUtil {
 
     private static boolean canVisit(Class<?> type) {
         return type.getAnnotation(LoadSprite.class) != null;
+    }
+
+    public static void scale3(double s) {
+        GL11.glScaled(s, s, s);
     }
 }

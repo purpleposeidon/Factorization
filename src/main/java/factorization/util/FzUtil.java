@@ -10,6 +10,7 @@ import net.minecraft.block.properties.IProperty;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
+import net.minecraft.client.resources.model.IBakedModel;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.entity.ai.attributes.AttributeModifier;
@@ -23,6 +24,7 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.BlockPos;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
+import net.minecraftforge.client.model.IModel;
 import net.minecraftforge.common.DimensionManager;
 import net.minecraftforge.common.property.IUnlistedProperty;
 import net.minecraftforge.fml.common.Loader;
@@ -242,7 +244,13 @@ public class FzUtil {
 
     @SideOnly(Side.CLIENT)
     public static TextureAtlasSprite getIcon(ItemStack it) {
+        NORELEASE.fixme("These belong in RenderUtil");
         return Minecraft.getMinecraft().getRenderItem().getItemModelMesher().getItemModel(it).getParticleTexture();
+    }
+
+    @SideOnly(Side.CLIENT)
+    public static IBakedModel getModel(ItemStack is) {
+        return Minecraft.getMinecraft().getRenderItem().getItemModelMesher().getItemModel(is);
     }
 
     @SideOnly(Side.CLIENT)

@@ -10,7 +10,7 @@ import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL12;
 
 public class TileEntitySteamShaftRenderer extends TileEntitySpecialRenderer {
-    static FzModel whirligig = new FzModel("beauty/whirligig");
+    public static FzModel whirligig = new FzModel("beauty/whirligig");
 
     @Override
     public void renderTileEntityAt(TileEntity te, double dx, double dy, double dz, float partial, int destroy) {
