@@ -1,8 +1,11 @@
 package factorization.weird;
 
+import factorization.beauty.TileEntitySteamShaft;
+import factorization.beauty.TileEntitySteamShaftRenderer;
 import factorization.shared.Core;
 import factorization.shared.FzModel;
 import factorization.shared.PatreonRewards;
+import factorization.util.NORELEASE;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.AbstractClientPlayer;
 import net.minecraft.client.model.ModelBase;
@@ -16,6 +19,7 @@ import net.minecraftforge.client.event.TextureStitchEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import org.lwjgl.opengl.GL11;
 
+import java.util.Iterator;
 import java.util.List;
 
 public class NeptuneCape {
@@ -79,8 +83,12 @@ public class NeptuneCape {
         RenderPlayer playerRenderer = (RenderPlayer) (Render) pr;
         ModelRenderer head = playerRenderer.getMainModel().bipedHead;
         if (head.childModels != null) {
-            for (ModelRenderer child : head.childModels) {
-                if (child instanceof LmpMaskRenderer) return;
+            for (Iterator<ModelRenderer> it = head.childModels.iterator(); it.hasNext(); ) {
+                ModelRenderer child = it.next();
+                if (child instanceof LmpMaskRenderer) {
+                    it.remove();
+                }
+
             }
         }
         head.addChild(new LmpMaskRenderer(playerRenderer.getMainModel()));
@@ -104,22 +112,19 @@ public class NeptuneCape {
         
         @Override
         public void render(float partial) {
-            if (!should_render_mask) return;
             if (rendering_player == null) return; // Model may be rendered twice for the hurt animation
+            if (!should_render_mask) {
+                rendering_player = null;
+                return;
+            }
             GL11.glPushMatrix();
             
-            float s = 12F/16F; GL11.glScalef(s, s, s);
-            
+            GL11.glTranslatef(0, -7F/16F, -4.5F/16F);
             GL11.glRotatef(-90, 0, 0, 1);
-            
-            GL11.glTranslatef(3.5F/16F, -7.5F/16F, -5.5F/16F);
-            
-            GL11.glTranslatef(0.9375F, 0.0625F, -0.0F);
-            GL11.glRotatef(-335.0F, 0.0F, 0.0F, 1.0F);
-            GL11.glRotatef(-50.0F, 0.0F, 1.0F, 0.0F);
-            
-            
+            GL11.glRotatef(-90, 1, 0, 0);
+
             LMP.draw();
+            //TileEntitySteamShaftRenderer.whirligig.draw();
             GL11.glPopMatrix();
             Minecraft.getMinecraft().renderEngine.bindTexture(rendering_player.getLocationSkin());
             rendering_player = null;
