@@ -91,7 +91,9 @@ public class FzModel {
             // This state is inconsistently enabled, and this is what it's
             // "supposed" to be, so not re-enabling.
         }
+        GlStateManager.disableLighting();
         tessI.draw();
+        GlStateManager.enableLighting();
         if (blend) {
             GlStateManager.disableBlend();
         }
@@ -102,7 +104,7 @@ public class FzModel {
     public void putQuads(WorldRenderer tess, List<BakedQuad> quads, int color) {
         for (BakedQuad quad : quads) {
             tess.addVertexData(quad.getVertexData());
-            tess.putColor4(color);
+            //tess.putColor4(color);
         }
     }
 
@@ -140,7 +142,7 @@ public class FzModel {
                 @Override
                 public TextureAtlasSprite apply(@Nullable ResourceLocation input) {
                     if (input == null) return map.getAtlasSprite(null);
-                    return map.getAtlasSprite(input.toString());
+                    return map.registerSprite(input);
                 }
             };
             IModelState identityMatrix = new TRSRTransformation(null, null, null, null);
