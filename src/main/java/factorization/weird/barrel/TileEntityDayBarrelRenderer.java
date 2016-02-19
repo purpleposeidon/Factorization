@@ -37,7 +37,7 @@ public class TileEntityDayBarrelRenderer extends TileEntitySpecialRenderer<TileE
         quat.glRotate();
         GlStateManager.rotate(90, 0, 1, 0);
         GlStateManager.translate(0.25, 0.25 - 1.0/16.0, -1.0/128.0);
-        if (barrel.type == TileEntityDayBarrel.Type.HOPPING) {
+        if (barrel.type.isHopping()) {
             double time = barrel.getWorld().getTotalWorldTime();
             if (Math.sin(time/20) > 0) {
                 double delta = Math.max(0, Math.sin(time/2)/16);

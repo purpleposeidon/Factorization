@@ -41,6 +41,7 @@ import net.minecraftforge.fml.common.gameevent.TickEvent.ClientTickEvent;
 import net.minecraftforge.fml.common.network.internal.FMLProxyPacket;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraftforge.oredict.OreDictionary;
 import org.lwjgl.opengl.GL11;
 
 import java.io.IOException;
@@ -73,6 +74,10 @@ public class TileEntityDayBarrel extends TileEntityFactorization  {
                 return NORMAL;
             }
             return value_list[ordinal];
+        }
+
+        public boolean isHopping() {
+            return this == HOPPING || this == CREATIVE;
         }
         
         public static final int TYPE_COUNT = values().length;
@@ -125,7 +130,7 @@ public class TileEntityDayBarrel extends TileEntityFactorization  {
 
     @Override
     protected void doLogic() {
-        if (type != Type.HOPPING) {
+        if (!type.isHopping()) {
             return;
         }
         needLogic();
@@ -190,7 +195,7 @@ public class TileEntityDayBarrel extends TileEntityFactorization  {
     @Override
     public void neighborChanged() {
         super.neighborChanged();
-        if (type == Type.HOPPING) {
+        if (type.isHopping()) {
             needLogic();
         }
     }
@@ -423,7 +428,7 @@ public class TileEntityDayBarrel extends TileEntityFactorization  {
             }
             last_mentioned_count = c;
         }
-        if (type == Type.HOPPING) {
+        if (type.isHopping()) {
             needLogic();
         }
     }
@@ -896,6 +901,9 @@ public class TileEntityDayBarrel extends TileEntityFactorization  {
         dmg *= 10;
         dmg += type.ordinal();
         barrel_item.setItemDamage(dmg);
+        if (type != Type.CREATIVE) {
+            OreDictionary.registerOre("barrelAll", barrel_item);
+        }
         return barrel_item;
     }
     

@@ -82,7 +82,7 @@ public class BarrelModel implements ISmartBlockModel, ISmartItemModel, IPerspect
         TextureAtlasSprite plank = info.plank;
         BarrelGroup group = normal;
         TileEntityDayBarrel.Type type = info.type;
-        if (type == TileEntityDayBarrel.Type.HOPPING) {
+        if (type.isHopping()) {
             group = hopping;
         } else if (type == TileEntityDayBarrel.Type.SILKY) {
             group = silky;
