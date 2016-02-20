@@ -274,7 +274,7 @@ public class Registry {
         GameRegistry.registerBlock(shaftGen, ItemFactorizationBlock.class, "ShaftGen");
         GameRegistry.registerBlock(waterwheel, ItemFactorizationBlock.class, "WaterWheelBase");
         GameRegistry.registerBlock(windmill, ItemFactorizationBlock.class, "WindMillBase");
-        GameRegistry.registerBlock(shaft, ShaftItem.class, "Shaft");
+        GameRegistry.registerBlock(shaft, ItemShaft.class, "Shaft");
         if (DeltaChunk.enabled()) {
             GameRegistry.registerBlock(colossal_block, ColossalBlockItem.class, "ColossalBlock");
             GameRegistry.registerTileEntity(TileEntityColossalHeart.class, "fz_colossal_heart");
@@ -977,6 +977,7 @@ public class Registry {
         vanillaShapelessRecipe(new ItemStack(Items.minecart), barrelCart);
 
         BarrelUpgradeRecipes.addUpgradeRecipes();
+        ShaftManipulationRecipe.addManipulationRecipes();
 
         //Compression Crafter
         oreRecipe(compression_crafter_item,
@@ -1328,14 +1329,6 @@ public class Registry {
                 '-', Blocks.heavy_weighted_pressure_plate,
                 'I', dark_iron_ingot,
                 'B', "blockIron");
-        ItemStack shaft8 = wooden_shaft.copy();
-        shaft8.stackSize = 8;
-        oreRecipe(shaft8,
-                "LIL",
-                "LIL",
-                "LIL",
-                'L', "logWood",
-                'I', dark_iron_ingot);
         oreRecipe(shaft_generator_item,
                 "IDI",
                 "CMC",

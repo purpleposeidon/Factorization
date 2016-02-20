@@ -10,6 +10,7 @@ import net.minecraft.client.renderer.block.model.BakedQuad;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.renderer.texture.TextureMap;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
+import net.minecraft.client.renderer.vertex.VertexFormat;
 import net.minecraft.client.resources.IResourceManager;
 import net.minecraft.client.resources.model.IBakedModel;
 import net.minecraft.util.EnumFacing;
@@ -19,7 +20,6 @@ import net.minecraftforge.client.model.IModel;
 import net.minecraftforge.client.model.IModelState;
 import net.minecraftforge.client.model.ModelLoaderRegistry;
 import net.minecraftforge.client.model.TRSRTransformation;
-import net.minecraftforge.client.model.obj.OBJModel;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.relauncher.Side;
@@ -27,8 +27,6 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 import org.lwjgl.opengl.GL11;
 
 import javax.annotation.Nullable;
-import javax.vecmath.Matrix4f;
-import javax.vecmath.Vector3f;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -42,6 +40,7 @@ public class FzModel {
     @SideOnly(Side.CLIENT)
     public IBakedModel model;
     public final boolean blend;
+    public final VertexFormat format;
 
     public FzModel(String name) {
         // Really ought to use a factory method instead.
@@ -49,8 +48,13 @@ public class FzModel {
     }
 
     public FzModel(String name, boolean blend) {
+        this(name, blend, DefaultVertexFormats.BLOCK);
+    }
+
+    public FzModel(String name, boolean blend, VertexFormat format) {
         this.name = "fzmodel/" + name;
         this.blend = blend;
+        this.format = format;
         if (FMLCommonHandler.instance().getEffectiveSide() != Side.CLIENT) return;
         instances.add(this);
         Core.logInfo("Added FzModel: " + name);
@@ -152,7 +156,7 @@ public class FzModel {
                     fzm.model = null;
                     continue;
                 }
-                fzm.model = rawModel.bake(identityMatrix, DefaultVertexFormats.BLOCK, lookup);
+                fzm.model = rawModel.bake(identityMatrix, fzm.format, lookup);
             }
 
         }

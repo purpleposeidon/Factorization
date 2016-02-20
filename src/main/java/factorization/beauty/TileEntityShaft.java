@@ -378,14 +378,13 @@ public class TileEntityShaft extends TileEntityCommon implements IRotationalEner
     }
 
     private static ItemStack makeShaft(ItemStack log, ItemStack slab) {
-        ItemStack ret = new ItemStack(Core.registry.shaft);
-        ItemUtil.packItem(ret, "log", log);
-        return ret;
+        return new ShaftItemCache(log, false).pack();
     }
 
     static ArrayList<ItemStack> instances = new ArrayList<ItemStack>();
     public static void makeRecipe(ItemStack log, ItemStack slab) {
         ItemStack shaft = makeShaft(log, slab);
+        shaft.stackSize = 8;
         Core.registry.oreRecipe(shaft,
                 "#L#",
                 " I ",

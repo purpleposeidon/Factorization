@@ -26,7 +26,8 @@ import java.util.*;
 
 public class ShaftModel implements ISmartItemModel {
     final HashMap<ShaftItemCache, IBakedModel> modelCache = new HashMap<ShaftItemCache, IBakedModel>();
-    static FzModel template = new FzModel("shaft_template");
+    static FzModel template_sheared = new FzModel("beauty/shaft_overlay_sheared", false, DefaultVertexFormats.ITEM);
+    static FzModel template = new FzModel("beauty/shaft_overlay", false, DefaultVertexFormats.ITEM);
 
     ShaftItemCache buildCacheKey(ItemStack stack) {
         return new ShaftItemCache(stack);
@@ -52,9 +53,12 @@ public class ShaftModel implements ISmartItemModel {
         IBakedModel log = FzUtil.getModel(info.log);
         Shrink shrinker = new Shrink(log);
         shrinker.apply();
-        shrinker.quads.addAll(template.model.getGeneralQuads());
+        IBakedModel mod = (info.sheared ? template_sheared : template).model;
+        //IBakedModel mod = template.model;
+        //IBakedModel mod = (info.sheared ? TileEntitySteamShaftRenderer.whirligig : template).model;
+        shrinker.quads.addAll(mod.getGeneralQuads());
         for (EnumFacing face : EnumFacing.VALUES) {
-            shrinker.quads.addAll(template.model.getFaceQuads(face));
+            shrinker.quads.addAll(mod.getFaceQuads(face));
         }
         return shrinker.bake();
     }
