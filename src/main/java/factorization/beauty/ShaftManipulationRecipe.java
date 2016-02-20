@@ -2,6 +2,7 @@ package factorization.beauty;
 
 import factorization.shared.Core;
 import factorization.util.DataUtil;
+import net.minecraft.block.Block;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
 import net.minecraft.inventory.InventoryCrafting;
@@ -47,6 +48,11 @@ public class ShaftManipulationRecipe implements IRecipe {
                 found_manip = is;
                 shear_it = true;
             } else if (it instanceof ItemBlock) {
+                Block b = DataUtil.getBlock(it);
+                if (b.hasTileEntity(b.getDefaultState())) return null;
+                if (!b.isOpaqueCube()) return null;
+                if (b.getRenderType() != Blocks.stone.getRenderType()) return null;
+                if (!b.getMaterial().blocksMovement()) return null;
                 found_manip = is;
             } else {
                 return null;
@@ -73,7 +79,7 @@ public class ShaftManipulationRecipe implements IRecipe {
         return output;
     }
 
-    Random rng = new Random();
+    private Random rng = new Random();
     @Override
     public ItemStack[] getRemainingItems(InventoryCrafting inv) {
         ItemStack[] ret = new ItemStack[inv.getSizeInventory()];
