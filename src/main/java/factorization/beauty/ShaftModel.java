@@ -26,8 +26,8 @@ import java.util.*;
 
 public class ShaftModel implements ISmartItemModel {
     final HashMap<ShaftItemCache, IBakedModel> modelCache = new HashMap<ShaftItemCache, IBakedModel>();
-    static FzModel template_sheared = new FzModel("beauty/shaft_overlay_sheared", false, DefaultVertexFormats.ITEM);
-    static FzModel template = new FzModel("beauty/shaft_overlay", false, DefaultVertexFormats.ITEM);
+    static FzModel template_sheared = new FzModel("beauty/shaft_overlay_sheared", false, FzModel.FORMAT_ITEM);
+    static FzModel template = new FzModel("beauty/shaft_overlay", false, FzModel.FORMAT_ITEM);
 
     ShaftItemCache buildCacheKey(ItemStack stack) {
         return new ShaftItemCache(stack);

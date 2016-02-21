@@ -40,7 +40,9 @@ public class FzModel {
     @SideOnly(Side.CLIENT)
     public IBakedModel model;
     public final boolean blend;
-    public final VertexFormat format;
+    private final int format_id;
+
+    public static final int FORMAT_BLOCK = 1, FORMAT_ITEM = 2;
 
     public FzModel(String name) {
         // Really ought to use a factory method instead.
@@ -48,13 +50,13 @@ public class FzModel {
     }
 
     public FzModel(String name, boolean blend) {
-        this(name, blend, DefaultVertexFormats.BLOCK);
+        this(name, blend, FORMAT_BLOCK);
     }
 
-    public FzModel(String name, boolean blend, VertexFormat format) {
+    public FzModel(String name, boolean blend, int format_id) {
         this.name = "fzmodel/" + name;
         this.blend = blend;
-        this.format = format;
+        this.format_id = format_id;
         if (FMLCommonHandler.instance().getEffectiveSide() != Side.CLIENT) return;
         instances.add(this);
         Core.logInfo("Added FzModel: " + name);
@@ -65,6 +67,13 @@ public class FzModel {
         if (FMLCommonHandler.instance().getSide() == Side.CLIENT) {
             Core.loadBus(new ModelWrangler());
         }
+    }
+
+    @SideOnly(Side.CLIENT)
+    public VertexFormat getFormat() {
+        if (format_id == FORMAT_BLOCK) return DefaultVertexFormats.BLOCK;
+        if (format_id == FORMAT_ITEM) return DefaultVertexFormats.ITEM;
+        return null;
     }
 
     @SideOnly(Side.CLIENT)
@@ -156,7 +165,7 @@ public class FzModel {
                     fzm.model = null;
                     continue;
                 }
-                fzm.model = rawModel.bake(identityMatrix, fzm.format, lookup);
+                fzm.model = rawModel.bake(identityMatrix, fzm.getFormat(), lookup);
             }
 
         }
