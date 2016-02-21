@@ -20,6 +20,8 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent.ClientTickEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent.Phase;
+import org.lwjgl.opengl.Display;
+import org.lwjgl.opengl.DisplayMode;
 
 import java.text.DateFormat;
 import java.util.*;
@@ -232,7 +234,12 @@ public class MiscClientTickHandler {
         if (now == old_now || now == -1) return;
         old_now = now;
         Minecraft mc = Minecraft.getMinecraft();
-        if (!mc.isFullScreen()) return;
+        if (!mc.isFullScreen()) {
+            DisplayMode desktop = Display.getDesktopDisplayMode();
+            if (desktop.getWidth() != mc.displayWidth || desktop.getHeight() != mc.displayHeight) {
+                return;
+            }
+        }
         DateFormat df = DateFormat.getTimeInstance(DateFormat.SHORT);
         String msg = df.format(new Date());
         if (!mentioned_disabling) {
