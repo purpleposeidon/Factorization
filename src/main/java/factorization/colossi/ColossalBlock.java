@@ -1,8 +1,16 @@
 package factorization.colossi;
 
-import java.util.*;
-
+import factorization.api.Coord;
+import factorization.fzds.DeltaChunk;
+import factorization.fzds.TransferLib;
+import factorization.fzds.interfaces.IDimensionSlice;
+import factorization.oreprocessing.ItemOreProcessing;
+import factorization.shared.Core;
+import factorization.shared.Core.TabType;
 import factorization.util.DataUtil;
+import factorization.util.PlayerUtil;
+import factorization.weird.poster.EntityPoster;
+import factorization.weird.poster.ItemSpawnPoster;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.MapColor;
 import net.minecraft.block.material.Material;
@@ -12,38 +20,16 @@ import net.minecraft.block.state.IBlockState;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.*;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
-
 import net.minecraftforge.common.ChestGenHooks;
 
-import factorization.api.Coord;
-import factorization.citizen.EntityCitizen;
-import factorization.fzds.DeltaChunk;
-import factorization.fzds.TransferLib;
-import factorization.fzds.interfaces.IDimensionSlice;
-import factorization.oreprocessing.ItemOreProcessing;
-import factorization.servo.ItemMatrixProgrammer;
-import factorization.shared.Core;
-import factorization.shared.Core.TabType;
-import factorization.util.PlayerUtil;
-import factorization.weird.poster.EntityPoster;
-import factorization.weird.poster.ItemSpawnPoster;
+import java.util.*;
 
-import static factorization.colossi.ColossalBlock.Md.ARM;
-import static factorization.colossi.ColossalBlock.Md.BODY;
-import static factorization.colossi.ColossalBlock.Md.BODY_COVERED;
-import static factorization.colossi.ColossalBlock.Md.BODY_CRACKED;
-import static factorization.colossi.ColossalBlock.Md.CORE;
-import static factorization.colossi.ColossalBlock.Md.EYE;
-import static factorization.colossi.ColossalBlock.Md.EYE_OPEN;
-import static factorization.colossi.ColossalBlock.Md.MASK;
-import static factorization.colossi.ColossalBlock.Md.MASK_CRACKED;
-import static factorization.colossi.ColossalBlock.Md.values;
+import static factorization.colossi.ColossalBlock.Md.*;
 
 public class ColossalBlock extends Block {
     public enum Md implements IStringSerializable, Comparable<Md> {
@@ -254,23 +240,6 @@ public class ColossalBlock extends Block {
             return true;
         }
         Awakener.awaken(at);
-        return true;
-    }
-
-    private boolean giveUserAuthentication(ItemStack held, EntityPlayer player, Coord at) {
-        if (player == null) return true;
-        if (player.worldObj == DeltaChunk.getServerShadowWorld()) return true;
-        if (!(player instanceof EntityPlayerMP)) return true;
-        if (ItemMatrixProgrammer.isUserAuthenticated((EntityPlayerMP) player)) {
-            Core.registry.logicMatrixProgrammer.setAuthenticated(held);
-        } else {
-            ColossusController controller = findController(at);
-            if (controller == null) return true;
-            if (controller.getHealth() <= 0) return true;
-            controller.ai_controller.forceState(Technique.HACKED);
-            placePoster(held, player, at);
-            EntityCitizen.spawnOn((EntityPlayerMP) player);
-        }
         return true;
     }
 

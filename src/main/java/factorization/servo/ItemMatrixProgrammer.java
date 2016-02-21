@@ -146,30 +146,20 @@ public class ItemMatrixProgrammer extends ItemFactorization implements ISensitiv
 
     @Override
     public boolean isValidArmor(ItemStack stack, int armorType, Entity entity) {
-        return armorType == 0;
+        return armorType == 0 /* Should be head slot */ && entity instanceof EntityPlayer;
+        // Our rendering code only works on players!
     }
 
-    // NORELEASE: Change icon when sneaking, etc
-    /*@Override
-    @SideOnly(Side.CLIENT)
-    public IIcon getIconIndex(ItemStack stack) {
-        final Minecraft mc = Minecraft.getMinecraft();
-        final EntityClientPlayerMP me = mc.thePlayer;
-        if (me != null && stack != null) {
-            final ItemStack hat = me.getCurrentArmor(3);
-            if (stack == hat || (me.getHeldItem() == stack && isBowed(me) && hat == null)) {
-                return ItemIcons.tool$matrix_programmer_tilted;
-            }
-        }
-        return super.getIconIndex(stack);
-    }*/
+    // I vaguely want to be able to do: onArmorTick: set MD = 1, on other tick if not armor: set MD = 0.
+    // And this would control the mask-mode.
+    // But there's no, like, 'onArmorRemoved' event.
 
     @Override
     public ItemStack onItemRightClick(ItemStack stack, World world, EntityPlayer player) {
-        if (!world.isRemote && player.getCurrentArmor(3) == null) {
+        if (!world.isRemote && player.getCurrentArmor(3 /* Should also be head slot. Notice how it's different from the 0 above? */) == null) {
             if (isBowed(player)) {
                 ItemStack mask = stack.splitStack(1);
-                player.setCurrentItemOrArmor(4, mask);
+                player.setCurrentItemOrArmor(4 /* Oh, look at that! An entirely different number for the head slot! */, mask);
                 return stack;
             }
         }
@@ -197,61 +187,22 @@ public class ItemMatrixProgrammer extends ItemFactorization implements ISensitiv
         return player.rotationPitch > 75 && player.isSneaking();
     }
 
-
-    private static final String authTagName = "fzLmpAuthenticated";
-    private static StatBase authStat = new StatBase("factorization.lmpAuthenticated", new ChatComponentTranslation("factorization.lmpAuthenticated")).registerStat();
-
-    public static boolean isUserAuthenticated(EntityPlayerMP player) {
-        if (PlayerUtil.isPlayerCreative(player)) return true;
-        if (Core.dev_environ) return false;
-        StatUtil.IFzStat stat = StatUtil.loadWithBackup(player, authStat, authTagName);
-        return stat.get() > 0;
-    }
-
-    public static void setUserAuthenticated(EntityPlayerMP player) {
-        StatUtil.IFzStat stat = StatUtil.loadWithBackup(player, authStat, authTagName);
-        stat.set(1);
-        stat.sync();
-    }
-
-    @SubscribeEvent
-    public void preserveAuthState(PlayerEvent.PlayerLoggedInEvent event) {
-        final EntityPlayer player = event.player;
-        if (player instanceof EntityPlayerMP) {
-            if (isUserAuthenticated((EntityPlayerMP) player)) {
-                setUserAuthenticated((EntityPlayerMP) player);
-            }
-        }
-    }
-
-    public boolean isAuthenticated(ItemStack is) {
-        if (is == null) return false;
-        return is.getItem() == this && is.getItemDamage() == 2;
-    }
-
-    public boolean setAuthenticated(ItemStack is) {
-        if (is == null) return false;
-        if (is.getItem() != this) return false;
-        if (is.getItemDamage() == 2) return false;
-        is.setItemDamage(2);
-        return true;
-    }
-
     @Override
     public String getMeshName(@Nonnull ItemStack is) {
+        int itemDamage = is.getItemDamage();
+        if (itemDamage == 101) return "tool/matrix_programmer_mask";
+        if (itemDamage == 100) return "tool/matrix_programmer";
         EntityPlayer player = Core.proxy.getClientPlayer();
         if (player != null) {
-            if (ItemUtil.is(player.getHeldItem(), this) && isBowed(player)) return "lmpMask";
-            if (ItemUtil.is(player.getCurrentArmor(0), this)) return "lmpMask";
+            if (ItemUtil.is(player.getHeldItem(), this) && isBowed(player)) return "tool/matrix_programmer_mask";
+            if (ItemUtil.is(player.getCurrentArmor(0), this)) return "tool/matrix_programmer_mask";
         }
-        if (is.getItemDamage() == 1) return "lmpMask";
-        if (isAuthenticated(is)) return "lmpAuthenticated";
-        return "lmp";
+        return "tool/matrix_programmer";
     }
 
     @Nonnull
     @Override
     public List<ItemStack> getMeshSamples() {
-        return Arrays.asList(new ItemStack(this, 1, 0), new ItemStack(this, 1, 1));
+        return Arrays.asList(new ItemStack(this, 1, 100), new ItemStack(this, 1, 101));
     }
 }

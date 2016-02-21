@@ -6,7 +6,6 @@ import factorization.api.Coord;
 import factorization.api.DeltaCoord;
 import factorization.api.ICoordFunction;
 import factorization.api.Quaternion;
-import factorization.citizen.EntityCitizen;
 import factorization.colossi.ColossalBlock.Md;
 import factorization.colossi.ColossusController.BodySide;
 import factorization.colossi.ColossusController.LimbType;
@@ -1045,7 +1044,7 @@ public enum Technique implements IStateMachine<Technique> {
                 }
             });
 
-            int target_time = EntityCitizen.SURRENDER_TIME;
+            int target_time = SURRENDER_TIME;
             for (LimbInfo limb : controller.limbs) {
                 IDimensionSlice idc = limb.idc.getEntity();
                 if (idc == null) continue;
@@ -1085,7 +1084,7 @@ public enum Technique implements IStateMachine<Technique> {
 
         @Override
         public Technique tick(ColossusController controller, int age) {
-            if (age >= EntityCitizen.EXPLODE_TIME) {
+            if (age >= EXPLODE_TIME) {
                 Coord min = null, max = null;
                 for (LimbInfo limb : controller.limbs) {
                     IDimensionSlice idc = limb.idc.getEntity();
@@ -1264,4 +1263,9 @@ public enum Technique implements IStateMachine<Technique> {
             }
         });
     }
+
+    static final int WAIT_TIME = 20 * 5;
+    static final int SURRENDER_TIME = 20 * 2;
+    static final int EXPLODE_TIME = WAIT_TIME - SURRENDER_TIME;
+
 }

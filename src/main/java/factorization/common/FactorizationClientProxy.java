@@ -11,8 +11,6 @@ import factorization.charge.TileEntityHeater;
 import factorization.charge.TileEntityHeaterRenderer;
 import factorization.charge.TileEntityLeydenJar;
 import factorization.charge.TileEntityLeydenJarRender;
-import factorization.citizen.EntityCitizen;
-import factorization.citizen.RenderCitizen;
 import factorization.colossi.ColossusController;
 import factorization.colossi.ColossusControllerRenderer;
 import factorization.crafting.TileEntityCompressionCrafter;
@@ -326,7 +324,6 @@ public class FactorizationClientProxy extends FactorizationProxy {
         RenderingRegistry.registerEntityRenderingHandler(StepperEngine.class, new RenderStepperEngine(rm));
         RenderingRegistry.registerEntityRenderingHandler(ColossusController.class, new ColossusControllerRenderer(rm));
         RenderingRegistry.registerEntityRenderingHandler(EntityPoster.class, new RenderPoster(rm));
-        RenderingRegistry.registerEntityRenderingHandler(EntityCitizen.class, new RenderCitizen(rm));
         RenderingRegistry.registerEntityRenderingHandler(EntityMinecartDayBarrel.class, new RenderMinecartDayBarrel(rm));
         RenderingRegistry.registerEntityRenderingHandler(EntityLeafBomb.class, new RenderSnowball<EntityLeafBomb>(rm, Core.registry.leafBomb, Minecraft.getMinecraft().getRenderItem()));
         RenderingRegistry.registerEntityRenderingHandler(EntitySteamGeyser.class, new EmptyRender(rm));
