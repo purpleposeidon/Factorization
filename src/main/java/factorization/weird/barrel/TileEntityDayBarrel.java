@@ -19,7 +19,6 @@ import net.minecraft.block.Block;
 import net.minecraft.block.BlockRailBase;
 import net.minecraft.block.material.Material;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.GLAllocation;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
@@ -28,16 +27,12 @@ import net.minecraft.init.Blocks;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.*;
 import net.minecraftforge.client.event.RenderWorldLastEvent;
 import net.minecraftforge.common.ForgeHooks;
 import net.minecraftforge.common.util.FakePlayer;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
-import net.minecraftforge.event.world.ChunkEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
-import net.minecraftforge.fml.common.gameevent.TickEvent;
-import net.minecraftforge.fml.common.gameevent.TickEvent.ClientTickEvent;
 import net.minecraftforge.fml.common.network.internal.FMLProxyPacket;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
@@ -68,19 +63,17 @@ public class TileEntityDayBarrel extends TileEntityFactorization  {
     public enum Type {
         NORMAL, SILKY, HOPPING, LARGER, STICKY, CREATIVE;
         
-        private static Type[] value_list = values();
+        public static final Type[] VALUES = values();
         public static Type valueOf(int ordinal) {
-            if (ordinal < 0 || ordinal >= value_list.length) {
+            if (ordinal < 0 || ordinal >= VALUES.length) {
                 return NORMAL;
             }
-            return value_list[ordinal];
+            return VALUES[ordinal];
         }
 
         public boolean isHopping() {
             return this == HOPPING || this == CREATIVE;
         }
-        
-        public static final int TYPE_COUNT = values().length;
     }
     private int last_mentioned_count = -1;
     
@@ -418,6 +411,13 @@ public class TileEntityDayBarrel extends TileEntityFactorization  {
         super.markDirty();
         cleanBarrel();
         updateStacks();
+        sync();
+        if (type.isHopping()) {
+            needLogic();
+        }
+    }
+
+    void sync() {
         int c = getItemCount();
         if (c != last_mentioned_count) {
             if (last_mentioned_count*c <= 0) {
@@ -427,9 +427,6 @@ public class TileEntityDayBarrel extends TileEntityFactorization  {
                 updateClients(BarrelMessage.BarrelCount);
             }
             last_mentioned_count = c;
-        }
-        if (type.isHopping()) {
-            needLogic();
         }
     }
     
@@ -512,6 +509,7 @@ public class TileEntityDayBarrel extends TileEntityFactorization  {
             }
         }
         worldObj.markChunkDirty(pos, this);
+        sync();
     }
 
     @Override
