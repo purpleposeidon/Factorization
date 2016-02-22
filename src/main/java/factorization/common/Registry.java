@@ -115,6 +115,7 @@ public class Registry {
     public BlockWaterwheel waterwheel;
     public BlockWindmill windmill;
     public BlockShaft shaft;
+    public SimpleFzBlock bibliogen;
 
     public ItemStack servorail_item;
     public ItemStack empty_socket_item, socket_lacerator, socket_robot_hand, socket_shifter;
@@ -128,7 +129,7 @@ public class Registry {
             parasieve_item,
             compression_crafter_item,
             sap_generator_item, anthro_generator_item,
-            shaft_generator_item, steam_to_shaft, wooden_shaft, bibliogen, wind_mill, water_wheel;
+            shaft_generator_item, steam_to_shaft, wooden_shaft, bibliogen_item, wind_mill, water_wheel;
     public ItemStack dark_iron_block_item, copper_block_item;
     public ItemStack is_factory, is_lightair;
     public ItemPocketTable pocket_table;
@@ -221,6 +222,7 @@ public class Registry {
         waterwheel = new BlockWaterwheel();
         windmill = new BlockWindmill();
         shaft = new BlockShaft();
+        bibliogen = new SimpleFzBlock(Material.rock, FactoryType.BIBLIO_GEN);
         for (BlockClass bc : BlockClass.values()) {
             if (bc == BlockClass.Barrel) {
                 bc.block = factory_block_barrel;
@@ -275,6 +277,7 @@ public class Registry {
         GameRegistry.registerBlock(waterwheel, ItemFactorizationBlock.class, "WaterWheelBase");
         GameRegistry.registerBlock(windmill, ItemFactorizationBlock.class, "WindMillBase");
         GameRegistry.registerBlock(shaft, ItemShaft.class, "Shaft");
+        GameRegistry.registerBlock(bibliogen, ItemFactorizationBlock.class, "Bibliogen");
         if (DeltaChunk.enabled()) {
             GameRegistry.registerBlock(colossal_block, ColossalBlockItem.class, "ColossalBlock");
             GameRegistry.registerTileEntity(TileEntityColossalHeart.class, "fz_colossal_heart");
@@ -394,7 +397,7 @@ public class Registry {
         shaft_generator_item = FactoryType.SHAFT_GEN.itemStack();
         steam_to_shaft = FactoryType.STEAM_SHAFT.itemStack();
         wooden_shaft = FactoryType.SHAFT.itemStack();
-        bibliogen = FactoryType.BIBLIO_GEN.itemStack();
+        bibliogen_item = FactoryType.BIBLIO_GEN.itemStack();
         heater_item = FactoryType.HEATER.itemStack();
         mirror_item_hidden = FactoryType.MIRROR.itemStack();
         greenware_item = FactoryType.CERAMIC.itemStack();
@@ -1338,7 +1341,7 @@ public class Registry {
                 'C', insulated_coil,
                 'M', motor,
                 'L', copper_ingot);
-        oreRecipe(bibliogen,
+        oreRecipe(bibliogen_item,
                 "I",
                 "O",
                 "Y",

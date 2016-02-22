@@ -252,7 +252,8 @@ public class FactorizationClientProxy extends FactorizationProxy {
                 Core.registry.extruder,
                 Core.registry.shaftGen,
                 Core.registry.waterwheel,
-                Core.registry.windmill
+                Core.registry.windmill,
+                Core.registry.bibliogen
         }) {
             setItemBlockModel(b, 0, "inventory");
         }

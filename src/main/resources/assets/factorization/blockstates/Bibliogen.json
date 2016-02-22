@@ -1,0 +1,11 @@
+{
+    "forge_marker": 1,
+    "defaults": {
+        "model": "minecraft:enchanting_table_base",
+        "transform": "forge:default-block"
+    },
+    "variants": {
+        "inventory": [{}],
+        "normal": [{}]
+    }
+}
