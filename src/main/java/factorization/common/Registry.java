@@ -588,6 +588,8 @@ public class Registry {
     }
 
     public void makeRecipes() {
+        /*
+        // 1.8 has broken these poor guys :(
         vanillaRecipe(ItemUtil.nameItemStack(new ItemStack(Blocks.double_stone_slab), "Double Half Slab"),
                 "-",
                 "-",
@@ -599,13 +601,8 @@ public class Registry {
         vanillaRecipe(ItemUtil.nameItemStack(new ItemStack(Blocks.double_stone_slab, 2, 9), "Flat Sandstone"),
                 "#",
                 "#",
-                '#', new ItemStack(Blocks.sandstone, 1, 2));
-        vanillaShapelessRecipe(ItemUtil.nameItemStack(new ItemStack(Blocks.dirt, 4, 1), "Dry Dirt"),
-                Blocks.dirt,
-                Blocks.dirt,
-                Blocks.dirt,
-                Blocks.dirt);
-        
+                '#', new ItemStack(Blocks.sandstone, 1, 2)); */
+
         shapelessOreRecipe(new ItemStack(dark_iron_ingot, 9), dark_iron_block_item);
         oreRecipe(dark_iron_block_item,
                 "III",
