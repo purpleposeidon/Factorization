@@ -5,12 +5,12 @@
         "transform": "forge:default-block"
     },
     "variants": {
-        "inventory": [{
+        "inventory": {
             "submodel": {
                 "model": "factorization:fzmodel/book.obj",
                 "transform": "identity"
             }
-        }],
+        },
         "normal": [{}]
     }
 }
