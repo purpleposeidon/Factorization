@@ -1,3 +1,9 @@
+PORTING INSTRUCTIONS:
+  0. Make a backup, including of world, mods, and config files.
+  1. Incompletely processed metals (eg, crystallized dark iron) will be lost, so smelt that.
+  2. Barrels and their contents should survive.
+  (Not sure about this...) 3. 'Double Half Slabs', 'Flat Stone', and 'Flat Sandstone' in item form cause crashes. Destroy any of those items you have.
+
 0.8.100
   IMPORTANT: Back up your world before applying this update! Visit all FZ machines in the world with this update before moving to 1.8!
     (Improvements have been made to serialization code, which may possibly break worlds. Please alert me to any issues so that I can fix them if needed.)
