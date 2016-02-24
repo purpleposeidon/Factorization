@@ -24,7 +24,7 @@ import java.util.Iterator;
 import java.util.List;
 
 public class RenderMessages extends RenderMessagesProxy {
-    static List<ClientMessage> messages = Collections.synchronizedList(new ArrayList<ClientMessage>());
+    static final List<ClientMessage> messages = Collections.synchronizedList(new ArrayList<ClientMessage>());
     
     {
         NotifyImplementation.loadBus(this);
@@ -33,7 +33,9 @@ public class RenderMessages extends RenderMessagesProxy {
 
     @Override
     public void addMessage(Object locus, ItemStack item, String format, String... args) {
-        addMessage0(locus, item, format, args);
+        synchronized (messages) {
+            addMessage0(locus, item, format, args);
+        }
     }
 
     private void addMessage0(Object locus, ItemStack item, String format, String... args) {
@@ -72,8 +74,14 @@ public class RenderMessages extends RenderMessagesProxy {
         }
         messages.add(msg);
     }
-    
+
     private void updateMessage(ClientMessage update) {
+        synchronized (messages) {
+            updateMessage0(update);
+        }
+    }
+
+    private void updateMessage0(ClientMessage update) {
         for (ClientMessage msg : messages) {
             if (!msg.locus.equals(update.locus)) {
                 continue;
@@ -91,11 +99,11 @@ public class RenderMessages extends RenderMessagesProxy {
     @SubscribeEvent
     public void renderMessages(RenderWorldLastEvent event) {
         synchronized (messages) {
-            doRenderMessages(event);
+            renderMessages0(event);
         }
     }
     
-    void doRenderMessages(RenderWorldLastEvent event) {
+    void renderMessages0(RenderWorldLastEvent event) {
         World w = Minecraft.getMinecraft().theWorld;
         if (w == null) {
             return;
