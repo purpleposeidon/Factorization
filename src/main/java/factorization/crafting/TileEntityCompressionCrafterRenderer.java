@@ -24,7 +24,6 @@ import net.minecraftforge.client.ForgeHooksClient;
 import org.lwjgl.opengl.GL11;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Random;
 
 public class TileEntityCompressionCrafterRenderer extends TileEntitySpecialRenderer<TileEntityCompressionCrafter> {
@@ -37,12 +36,18 @@ public class TileEntityCompressionCrafterRenderer extends TileEntitySpecialRende
         float perc = cc.getProgressPerc();
         float p = perc*squishy;
 
+        GL11.glPushMatrix();
+        GL11.glTranslated(x, y, z);
         drawContents(partial, cc, extraAxialSquish, perc, p);
+        GL11.glPopMatrix();
     }
 
     private void drawContents(float partial, TileEntityCompressionCrafter cc, float extraAxialSquish, float perc, float p) {
-        if (!cc.isPrimaryCrafter() || cc.upperCorner == null || cc.lowerCorner == null
-                || !Minecraft.getMinecraft().gameSettings.fancyGraphics) {
+        if (!cc.isPrimaryCrafter()) {
+            return;
+        }
+        if (cc.upperCorner == null || cc.lowerCorner == null) {
+            // || !Minecraft.getMinecraft().gameSettings.fancyGraphics
             return;
         }
         GL11.glPushMatrix();
@@ -73,7 +78,6 @@ public class TileEntityCompressionCrafterRenderer extends TileEntitySpecialRende
 
         GL11.glScalef(sx, sy, sz);
         drawSquishingBlocks(up, lo, partial);
-        GL11.glPopMatrix();
 
         sx = sy = sz = 1;
         float s = 17F / 16F;
@@ -94,7 +98,7 @@ public class TileEntityCompressionCrafterRenderer extends TileEntitySpecialRende
         GL11.glEnable(GL11.GL_LIGHTING);
     }
 
-    FzModel shroud = new FzModel("compact/shroud");
+    FzModel shroud = new FzModel("compact_shroud");
 
     private void drawObscurringBox() {
         //contentSize is determined by _drawSquishingBlocks
@@ -161,13 +165,13 @@ public class TileEntityCompressionCrafterRenderer extends TileEntitySpecialRende
                                 }
                             }
                             TileEntity te = w.getTileEntity(pos);
+                            if (te instanceof TileEntityCompressionCrafter) continue; // Avoid strange derps
                             if (te != null) {
                                 tileEntities.add(te);
                             }
                         }
                         if (b == Blocks.air || b == null) continue;
                         if (b.canRenderInLayer(pass)) {
-                            System.out.println("? " + b.getUnlocalizedName());
                             ForgeHooksClient.setRenderLayer(pass);
                             br.renderBlock(bs, pos, w, tess);
                         }

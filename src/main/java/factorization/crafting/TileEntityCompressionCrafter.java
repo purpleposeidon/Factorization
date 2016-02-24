@@ -83,16 +83,18 @@ public class TileEntityCompressionCrafter extends TileEntityCommon implements IT
     @Override
     public void update() {
         if (progress != 0 && progress++ == 20) {
-            if (!worldObj.isRemote && facing != null && isCrafterRoot) {
+            if (isCrafterRoot && !worldObj.isRemote) {
+                if (facing == null) {
+                    facing = EnumFacing.UP;
+                }
                 getStateHelper().craft(false, this);
                 isCrafterRoot = false;
                 boolean signal = worldObj.isBlockPowered(pos); // NORELEASE: Indirect?
                 if (!signal) {
                     powered = false;
                 }
-            } else {
-                upperCorner = lowerCorner = null;
             }
+            upperCorner = lowerCorner = null;
             progress = -10;
         }
         
@@ -162,7 +164,7 @@ public class TileEntityCompressionCrafter extends TileEntityCommon implements IT
         }
         powered = signal;
     }
-    
+
     
     @Override
     public boolean handleMessageFromServer(Enum messageType, ByteBuf input) throws IOException {
@@ -188,7 +190,7 @@ public class TileEntityCompressionCrafter extends TileEntityCommon implements IT
         }
         return false;
     }
-    
+
     void informClient() {
         broadcastMessage(null, StandardMessageType.DoAction);
         progress = 1;
@@ -252,13 +254,13 @@ public class TileEntityCompressionCrafter extends TileEntityCommon implements IT
         getStateHelper().showTutorial(entityplayer, this);
         return false;
     }
-    
+
     @Override
     @SideOnly(Side.CLIENT)
     public AxisAlignedBB getRenderBoundingBox() {
         if (isPrimaryCrafter()) {
             int d = 7;
-            return super.getRenderBoundingBox().offset(d, d, d);
+            return super.getRenderBoundingBox().expand(d, d, d);
         }
         return super.getRenderBoundingBox();
     }
