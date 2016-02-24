@@ -1,13 +1,14 @@
 package factorization.beauty;
 
 import factorization.shared.FzModel;
+import factorization.util.NORELEASE;
 import factorization.util.NumUtil;
 import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
 import org.lwjgl.opengl.GL11;
-import org.lwjgl.opengl.GL12;
 
 public class TileEntityBiblioGenRenderer extends TileEntitySpecialRenderer<TileEntityBiblioGen> {
-    private static FzModel bookModel = new FzModel("beauty/book");
+    public static FzModel bookModel = new FzModel("beauty/book");
+    public static FzModel test = NORELEASE.just(new FzModel("fancy_fence")); /* Remove the two stolen assets */
 
     @Override
     public void renderTileEntityAt(TileEntityBiblioGen gen, double x, double y, double z, float partialTicks, int destroyStage) {
