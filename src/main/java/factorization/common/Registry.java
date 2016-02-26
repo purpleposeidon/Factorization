@@ -17,8 +17,6 @@ import factorization.darkiron.BlockDarkIronOre;
 import factorization.fzds.DeltaChunk;
 import factorization.fzds.HammerEnabled;
 import factorization.mechanics.ItemDarkIronChain;
-import factorization.oreprocessing.ItemOreProcessing;
-import factorization.oreprocessing.ItemOreProcessing.OreType;
 import factorization.oreprocessing.TileEntityGrinder;
 import factorization.redstone.BlockMatcher;
 import factorization.redstone.BlockParasieve;
@@ -142,7 +140,6 @@ public class Registry {
     public ItemChargeMeter charge_meter;
     public ItemBlockProxy mirror;
     public ItemBattery battery;
-    public ItemOreProcessing ore_dirty_gravel, ore_clean_gravel, ore_reduced, ore_crystal;
     public ItemCraftingComponent sludge;
     public ItemSculptingTool sculpt_tool;
     public ItemGlazeBucket glaze_bucket;
@@ -372,10 +369,6 @@ public class Registry {
     }
 
     public void makeItems() {
-        ore_dirty_gravel = new ItemOreProcessing("gravel");
-        ore_clean_gravel = new ItemOreProcessing("clean");
-        ore_reduced = new ItemOreProcessing("reduced");
-        ore_crystal = new ItemOreProcessing("crystal");
         sludge = new ItemCraftingComponent("sludge");
         NORELEASE.fixme("Delete these guys");
         //ItemBlocks
@@ -1474,13 +1467,6 @@ public class Registry {
                 "factorization slag furnace recipes@fz.slagging"
         }) {
             FMLInterModComms.sendRuntimeMessage(Core.instance, "NEIPlugins", "register-crafting-handler", Core.name + "@" + msg);
-        }
-        //Disables the Thaumcraft infernal furnace nugget bonus for crystalline metal
-        for (OreType ot : ItemOreProcessing.OreType.values()) {
-            if (!ot.enabled) {
-                continue;
-            }
-            FMLInterModComms.sendMessage("Thaumcraft", "smeltBonusExclude", new ItemStack(ore_crystal, 1, ot.ID));
         }
     }
     

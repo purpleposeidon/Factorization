@@ -4,7 +4,6 @@ import factorization.api.Coord;
 import factorization.fzds.DeltaChunk;
 import factorization.fzds.TransferLib;
 import factorization.fzds.interfaces.IDimensionSlice;
-import factorization.oreprocessing.ItemOreProcessing;
 import factorization.shared.Core;
 import factorization.shared.Core.TabType;
 import factorization.util.DataUtil;
@@ -135,7 +134,7 @@ public class ColossalBlock extends Block {
         // No LMP: only the core drops the LMP.
         fractureChest.addItem(new WeightedRandomChestContent(new ItemStack(Core.registry.logicMatrixIdentifier), 1, 1, 6));
         fractureChest.addItem(new WeightedRandomChestContent(new ItemStack(Core.registry.logicMatrixController), 1, 1, 6));
-        fractureChest.addItem(new WeightedRandomChestContent(new ItemStack(Core.registry.ore_crystal, 1, ItemOreProcessing.OreType.DARKIRON.ID), 1, 2, 12));
+        fractureChest.addItem(new WeightedRandomChestContent(new ItemStack(Core.registry.dark_iron_ingot), 1, 2, 12));
         fractureChest.addItem(new WeightedRandomChestContent(Core.registry.dark_iron_sprocket.copy(), 2, 4, 1));
 
         return fractureChest;
