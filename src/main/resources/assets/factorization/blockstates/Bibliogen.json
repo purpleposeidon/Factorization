@@ -7,7 +7,7 @@
     "variants": {
         "inventory": {
             "submodel": {
-                "model": "factorization:fzmodel/book.obj",
+                "model": "factorization:../fzmodel/book.obj",
                 "transform": "identity"
             }
         },
