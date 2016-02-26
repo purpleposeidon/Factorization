@@ -9,7 +9,9 @@
     },
     "variants": {
         "normal": [{}],
-        "inventory": [{}]
+        "inventory": [{
+            "submodel": "factorization:../fzmodel/furnaceHeaterHeat"
+        }]
     }
 }
 
