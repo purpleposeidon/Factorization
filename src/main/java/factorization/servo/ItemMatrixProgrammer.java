@@ -194,8 +194,9 @@ public class ItemMatrixProgrammer extends ItemFactorization implements ISensitiv
         if (itemDamage == 100) return "tool/matrix_programmer";
         EntityPlayer player = Core.proxy.getClientPlayer();
         if (player != null) {
-            if (ItemUtil.is(player.getHeldItem(), this) && isBowed(player)) return "tool/matrix_programmer_mask";
-            if (ItemUtil.is(player.getCurrentArmor(0), this)) return "tool/matrix_programmer_mask";
+            // We do in fact want Object identity here; there could be multiple LMPs floating around.
+            if (is == player.getHeldItem() && isBowed(player)) return "tool/matrix_programmer_mask";
+            if (is == player.getCurrentArmor(3)) return "tool/matrix_programmer_mask";
         }
         return "tool/matrix_programmer";
     }
