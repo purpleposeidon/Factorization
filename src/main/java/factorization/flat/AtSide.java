@@ -6,6 +6,8 @@ import factorization.util.SpaceUtil;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.world.chunk.Chunk;
 
+import java.util.Iterator;
+
 final class AtSide {
     final Coord at;
     final EnumFacing side;
@@ -41,5 +43,53 @@ final class AtSide {
 
     void set(FlatFace face) {
         getLayer().set(at, side, face);
+    }
+
+    public Iterable<AtSide> iterateConnected() {
+        return new Connected();
+    }
+
+    private class Connected implements Iterable<AtSide>, Iterator<AtSide> {
+        @Override
+        public Iterator<AtSide> iterator() {
+            return this;
+        }
+
+        byte proj = -1, visited = 0;
+        EnumFacing[] aplanarSides = new EnumFacing[4];
+
+        Connected() {
+            int i = 0;
+            for (EnumFacing face : EnumFacing.VALUES) {
+                if (face.getAxis() == side.getAxis()) continue;
+                aplanarSides[i++] = face;
+            }
+        }
+
+        @Override
+        public boolean hasNext() {
+            return proj != 1 && visited < 4;
+        }
+
+        @Override
+        public AtSide next() {
+            try {
+                if (proj == -1 || proj == +1) {
+                    Coord neighborBase = at.add(proj == -1 ? side.getOpposite() : side);
+                    EnumFacing neighborSide = aplanarSides[visited];
+                    return new AtSide(neighborBase, neighborSide);
+                } else if (proj == 0) {
+                    return new AtSide(at.add(aplanarSides[visited]), side);
+                } else {
+                    throw new IllegalStateException("Stop iterating");
+                }
+            } finally {
+                visited++;
+                if (visited == 4) {
+                    visited = 0;
+                    proj++;
+                }
+            }
+        }
     }
 }

@@ -25,7 +25,8 @@ public enum StandardMessageType {
 
     // I don't have any where to put these ones
     UtilityGooState,
-    ArtifactForgeName, ArtifactForgeError;
+    ArtifactForgeName, ArtifactForgeError,
+    FlatspaceHit, FlatspaceUse;
 
     public static final StandardMessageType[] VALUES = values();
     static {

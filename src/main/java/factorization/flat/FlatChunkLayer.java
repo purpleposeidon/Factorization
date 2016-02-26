@@ -321,10 +321,17 @@ public class FlatChunkLayer {
         int localZ = at.z >> 4;
         Data slab = slabIndex(localY);
         short index = index(localX, localY, localZ, dir);
-        return slab.get(index);
+        FlatFace ret = slab.get(index);
+        if (ret == null) {
+            ret = FlatFaceAir.INSTANCE;
+        }
+        return ret;
     }
 
     FlatFace set(Coord at, EnumFacing dir, FlatFace face) {
+        if (face == FlatFaceAir.INSTANCE) {
+            face = null;
+        }
         int localY = at.y;
         int localX = at.x >> 4;
         int localZ = at.z >> 4;

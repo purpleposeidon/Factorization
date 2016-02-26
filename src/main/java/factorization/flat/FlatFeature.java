@@ -88,6 +88,7 @@ public enum FlatFeature implements FMLControlledNamespacedRegistry.AddCallback<F
         layer.iterate(chunk, new IFlatVisitor() {
             @Override
             public void visit(Coord at, EnumFacing side, @Nonnull FlatFace face) {
+                if (face == FlatFaceAir.INSTANCE) return;
                 NBTTagCompound tag = new NBTTagCompound();
                 if (face.isStatic()) {
                     tag.setInteger("static", face.staticId);
