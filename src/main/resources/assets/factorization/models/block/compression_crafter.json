@@ -1,37 +1,9 @@
 {
-    "elements": [
-        {   "from": [ 0, 0, 0 ],
-            "to": [ 16, 16, 16 ],
-            "faces": {
-                "down":  { "texture": "#bottom", "cullface": "down" },
-                "up":    { "texture": "#top", "cullface": "up" },
-                "north": { "texture": "#side", "cullface": "north" },
-                "south": { "texture": "#side", "cullface": "south" },
-                "west":  { "texture": "#side", "cullface": "west" },
-                "east":  { "texture": "#side", "cullface": "east" }
-            }
-        },
-        {   "from": [ 0, 0, 0.01 ],
-            "to": [ 16, 16, 15.99 ],
-            "faces": {
-                "north": { "texture": "#slide", "cullface": "north" },
-                "south": { "texture": "#slide", "cullface": "south" }
-            }
-        },
-        {   "from": [ 0.01, 0, 0 ],
-            "to": [ 15.99, 16, 16 ],
-            "faces": {
-                "west":  { "texture": "#slide", "cullface": "west" },
-                "east":  { "texture": "#slide", "cullface": "east" }
-            }
-        }
-    ],
+    "parent": "factorization:block/top_side_bot",
     "textures": {
-        "particle": "factorization:blocks/machine/compactFace",
-        "top": "factorization:blocks/machine/compactFace",
-        "bottom": "factorization:blocks/machine/compactBack",
-        "side": "factorization:blocks/machine/compactSide",
-        "slide": "factorization:blocks/machine/compactSideSlide"
+        "top": "factorization:blocks/craft/compact_top",
+        "side": "factorization:blocks/craft/compact_side",
+        "bot": "factorization:blocks/craft/compact_bottom"
     }
 }
 
