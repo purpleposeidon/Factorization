@@ -48,6 +48,11 @@ public class TileEntityShaft extends TileEntityCommon implements IRotationalEner
     }
 
     @Override
+    public ItemStack getDroppedBlock() {
+        return shaftItem;
+    }
+
+    @Override
     public void putData(DataHelper data) throws IOException {
         axis = data.as(Share.VISIBLE, "axis").putEnum(axis);
         if (srcPos == null) srcPos = getCoord();
