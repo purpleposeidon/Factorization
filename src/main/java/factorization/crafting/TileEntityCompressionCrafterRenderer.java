@@ -8,6 +8,7 @@ import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.BlockRendererDispatcher;
+import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.WorldRenderer;
 import net.minecraft.client.renderer.tileentity.TileEntityRendererDispatcher;
@@ -46,12 +47,12 @@ public class TileEntityCompressionCrafterRenderer extends TileEntitySpecialRende
         if (!cc.isPrimaryCrafter()) {
             return;
         }
-        if (cc.upperCorner == null || cc.lowerCorner == null) {
-            // || !Minecraft.getMinecraft().gameSettings.fancyGraphics
+        if (cc.upperCorner == null || cc.lowerCorner == null
+            || (!Minecraft.getMinecraft().gameSettings.fancyGraphics && !Core.dev_environ)) {
             return;
         }
-        GL11.glPushMatrix();
         GL11.glTranslatef(-cc.getPos().getX(), -cc.getPos().getY(), -cc.getPos().getZ());
+        GL11.glPushMatrix();
         if (perc > 0.75F) {
             float jiggle = perc - 0.75F;
             jiggle /= 32; //this gets us 1 pixel of jiggle room
@@ -66,59 +67,60 @@ public class TileEntityCompressionCrafterRenderer extends TileEntitySpecialRende
         float sx, sy, sz;
         EnumFacing fd = cc.craftingAxis;
         sx = sy = sz = 1 - p;
-        if (fd.getDirectionVec().getX() != 0) sx = 1 + perc * extraAxialSquish;
-        if (fd.getDirectionVec().getY() != 0) sy = 1 + perc * extraAxialSquish;
-        if (fd.getDirectionVec().getZ() != 0) sz = 1 + perc * extraAxialSquish;
+        if (fd.getFrontOffsetX() != 0) sx = 1 + perc * extraAxialSquish;
+        if (fd.getFrontOffsetY() != 0) sy = 1 + perc * extraAxialSquish;
+        if (fd.getFrontOffsetZ() != 0) sz = 1 + perc * extraAxialSquish;
+
+        NORELEASE.fixme("s/getDirectionVec().getX()/getFrontOffsetX()");
 
         //Unfortunately, the transformed origin is equal to the world's origin.
         //So it scales towards the origin instead of the center of the compression area.
         //We need to translate some amount to make up for it.
         //Actual position: cx*sx; desired is cx. So translate cx - cx*sx
+
         GL11.glTranslatef(cx - cx * sx, cy - cy * sy, cz - cz * sz);
 
         GL11.glScalef(sx, sy, sz);
-        drawSquishingBlocks(up, lo, partial);
-
-        sx = sy = sz = 1;
-        float s = 17F / 16F;
-        if (fd.getDirectionVec().getX() != 0) sx = s;
-        if (fd.getDirectionVec().getY() != 0) sy = s;
-        if (fd.getDirectionVec().getZ() != 0) sz = s;
-        GL11.glScalef(sx, sy, sz);
-        GL11.glTranslatef(lo.x - cc.getPos().getX(), lo.y - cc.getPos().getY(), lo.z - cc.getPos().getZ());
-        sx -= 1;
-        sy -= 1;
-        sz -= 1;
-        sx /= -2;
-        sy /= -2;
-        sz /= -2;
-        GL11.glTranslatef(sx, sy, sz);
-        drawObscurringBox();
+        AxisAlignedBB bounds = drawSquishingBlocks(up, lo, partial);
         GL11.glPopMatrix();
-        GL11.glEnable(GL11.GL_LIGHTING);
+
+
+        drawObscurringBox(bounds);
     }
 
     FzModel shroud = new FzModel("compact_shroud");
 
-    private void drawObscurringBox() {
-        //contentSize is determined by _drawSquishingBlocks
-        if (contentSize == null) {
-            return;
+    private void drawObscurringBox(AxisAlignedBB bounds) {
+        // Note usage of "<" rather than "<="
+        //GL11.glTranslated(bounds.minX - 1, bounds.minY - 1, bounds.minZ - 1);
+        GL11.glTranslated(bounds.minX + 1, bounds.minY, bounds.minZ);
+        int dx = 0, dy, dz;
+        for (double xD = bounds.minX; xD < bounds.maxX; xD++) {
+            dy = 0;
+            for (double yD = bounds.minY; yD < bounds.maxY; yD++) {
+                dz = 0;
+                for (double zD = bounds.minZ; zD < bounds.maxZ; zD++) {
+                    GL11.glTranslated(dx, dy, dz);
+                    shroud.draw();
+                    GL11.glTranslated(-dx, -dy, -dz);
+                    dz++;
+                }
+                dy++;
+            }
+            dx++;
         }
-
-        bindTexture(Core.blockAtlas);
         NORELEASE.fixme("draw the shroud model at each block; needs to be scaled down or something");
         // Shroud'll be a cube w/ textures on all sides being the front face of the CompACT model
     }
 
-    private void drawSquishingBlocks(Coord upperCorner, Coord lowerCorner, float partial) {
+    private AxisAlignedBB drawSquishingBlocks(Coord upperCorner, Coord lowerCorner, float partial) {
         double spx, spy, spz;
         spx = TileEntityRendererDispatcher.staticPlayerX;
         spy = TileEntityRendererDispatcher.staticPlayerY;
         spz = TileEntityRendererDispatcher.staticPlayerZ;
         TileEntityRendererDispatcher.staticPlayerX = TileEntityRendererDispatcher.staticPlayerY = TileEntityRendererDispatcher.staticPlayerZ = 0;
         try {
-            _drawSquishingBlocks(upperCorner, lowerCorner, partial);
+            return _drawSquishingBlocks(upperCorner, lowerCorner, partial);
         } finally {
             TileEntityRendererDispatcher.staticPlayerX = spx;
             TileEntityRendererDispatcher.staticPlayerY = spy;
@@ -126,16 +128,15 @@ public class TileEntityCompressionCrafterRenderer extends TileEntitySpecialRende
         }
     }
     
-    AxisAlignedBB contentSize;
-    private void _drawSquishingBlocks(Coord upperCorner, Coord lowerCorner, float partial) {
+    private AxisAlignedBB _drawSquishingBlocks(Coord upperCorner, Coord lowerCorner, float partial) {
         Tessellator tessI = Tessellator.getInstance();
         WorldRenderer tess = tessI.getWorldRenderer();
         tess.begin(GL11.GL_QUADS, DefaultVertexFormats.BLOCK);
-        contentSize = null;
+        AxisAlignedBB contentSize = null;
         bindTexture(Core.blockAtlas);
         World w = upperCorner.w;
-        GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
-        GL11.glEnable(GL11.GL_BLEND);
+        GlStateManager.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
+        GlStateManager.enableBlend();
         ArrayList<TileEntity> tileEntities = new ArrayList<TileEntity>();
         EnumWorldBlockLayer any = EnumWorldBlockLayer.SOLID;
         BlockRendererDispatcher br = Minecraft.getMinecraft().getBlockRendererDispatcher();
@@ -185,6 +186,8 @@ public class TileEntityCompressionCrafterRenderer extends TileEntitySpecialRende
         for (TileEntity te : tileEntities) {
             TileEntityRendererDispatcher.instance.renderTileEntity(te, partial, 0);
         }
+
+        return contentSize;
     }
 
 }
