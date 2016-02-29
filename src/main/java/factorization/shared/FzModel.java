@@ -17,7 +17,6 @@ import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.client.event.TextureStitchEvent;
 import net.minecraftforge.client.model.IModel;
-import net.minecraftforge.client.model.IModelState;
 import net.minecraftforge.client.model.ModelLoaderRegistry;
 import net.minecraftforge.client.model.TRSRTransformation;
 import net.minecraftforge.fml.common.FMLCommonHandler;
@@ -36,7 +35,7 @@ import java.util.List;
 public class FzModel {
     // Don't SideOnly this class.
 
-    public final String name;
+    public final ResourceLocation url;
     @SideOnly(Side.CLIENT)
     public IBakedModel model;
     public final boolean blend;
@@ -46,7 +45,7 @@ public class FzModel {
 
     public FzModel(String name) {
         // Really ought to use a factory method instead.
-        this(name, false);
+        this(name, false, FORMAT_BLOCK);
     }
 
     public FzModel(String name, boolean blend) {
@@ -54,12 +53,20 @@ public class FzModel {
     }
 
     public FzModel(String name, boolean blend, int format_id) {
-        this.name = "fzmodel/" + name;
+        this(new ResourceLocation("factorization:models/fzmodel/" + name), blend, format_id);
+    }
+
+    public FzModel(ResourceLocation url) {
+        this(url, false, FORMAT_BLOCK);
+    }
+
+    public FzModel(ResourceLocation url, boolean blend, int format_id) {
+        this.url = url;
         this.blend = blend;
         this.format_id = format_id;
         if (FMLCommonHandler.instance().getEffectiveSide() != Side.CLIENT) return;
         instances.add(this);
-        Core.logInfo("Added FzModel: " + name);
+        Core.logInfo("Added FzModel: " + url);
     }
 
     private static final ArrayList<FzModel> instances = new ArrayList<FzModel>();
@@ -158,22 +165,23 @@ public class FzModel {
                     return map.registerSprite(input);
                 }
             };
-            IModelState identityMatrix = new TRSRTransformation(null, null, null, null);
             for (FzModel fzm : instances) {
                 IModel rawModel = raws.get(fzm);
                 if (rawModel == null) {
                     fzm.model = null;
                     continue;
                 }
-                fzm.model = rawModel.bake(identityMatrix, fzm.getFormat(), lookup);
+                fzm.model = rawModel.bake(fzm.trsrt, fzm.getFormat(), lookup);
             }
 
         }
     }
 
+    public TRSRTransformation trsrt = new TRSRTransformation(null, null, null, null);
+
     @Override
     public String toString() {
-        return "FzModel " + name;
+        return "FzModel(" + url + ")";
     }
 
     public static final ArrayList<String> extensions = new ArrayList<String>();
@@ -182,21 +190,18 @@ public class FzModel {
         extensions.add("json");
     }
     protected ResourceLocation getLocation(IResourceManager irm) {
-        String basename = "factorization:models/" + name;
         for (String ext : extensions) {
-            String path = basename + "." + ext;
-            ResourceLocation location = new ResourceLocation(path);
             try {
-                irm.getResource(location);
+                irm.getResource(url);
                 if (ext.equalsIgnoreCase("json")) {
-                    return new ResourceLocation("factorization:" + name);
+                    return url;
                 }
-                return new ResourceLocation("factorization:" + name + "." + ext);
+                return new ResourceLocation(url.toString() + "." + ext);
             } catch (IOException e) {
                 // ignored
             }
         }
-        Core.logSevere("Failed to load model: " + basename);
+        Core.logSevere("Failed to load model: " + url);
         return null;
     }
 }

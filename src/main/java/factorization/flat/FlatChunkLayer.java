@@ -16,31 +16,33 @@ public class FlatChunkLayer {
         if (slabX < 0 || slabY < 0 || slabZ < 0) return -1;
         if (slabX > 0xF || slabY > 0xF || slabZ > 0xF) return -1;
         if (SpaceUtil.sign(face) != 1) return -1;
-        int ret = (slabX << 2) | (slabY << 6) | (slabZ << 10) | FlatFeature.side2byte(face);
+        int ret = (slabX << 2) | (slabY << 6) | (slabZ << 10) | FlatMod.side2byte(face);
         return (short) ret;
     }
 
     class IterateContext {
         final Chunk chunk;
-        final int slabYHeight;
         final IFlatVisitor visitor;
         final Coord at;
+        final int minX, minY, minZ;
 
         IterateContext(Chunk chunk, int slabY, IFlatVisitor visitor) {
             this.chunk = chunk;
-            this.slabYHeight = slabY << 4;
             this.visitor = visitor;
             this.at = new Coord(chunk.getWorld(), 0, 0, 0);
+            this.minX = chunk.xPosition << 4;
+            this.minY = slabY << 4;
+            this.minZ = chunk.zPosition << 4;
         }
 
         void visit(int index, @Nonnull FlatFace face) {
-            EnumFacing side = FlatFeature.byte2side(index);
+            EnumFacing side = FlatMod.byte2side(index);
             int slX = (index >> 2) & 0xF;
             int slY = (index >> 6) & 0xF;
             int slZ = (index >> 10) & 0xF;
-            at.x = (chunk.xPosition << 4) + slX;
-            at.y = slabYHeight + slY;
-            at.z = (chunk.zPosition << 4) + slZ;
+            at.x = minX + slX;
+            at.y = minY + slY;
+            at.z = minZ + slZ;
             visitor.visit(at, side, face);
         }
     }
@@ -61,7 +63,7 @@ public class FlatChunkLayer {
             if (orig == null || at == null) {
                 return;
             }
-            EnumFacing face = FlatFeature.byte2side(index);
+            EnumFacing face = FlatMod.byte2side(index);
             orig.onReplaced(at, face);
         }
 
@@ -69,10 +71,10 @@ public class FlatChunkLayer {
             return set == 0;
         }
 
-        public abstract void iterate(IterateContext visitor);
+        public abstract void iterate(IterateContext context);
     }
 
-    static final FMLControlledNamespacedRegistry<FlatFace> registry = FlatFeature.registry;
+    static final FMLControlledNamespacedRegistry<FlatFace> registry = FlatMod.staticReg;
 
     static class NoData extends Data {
         static final Data INSTANCE = new NoData();
@@ -89,7 +91,7 @@ public class FlatChunkLayer {
         }
 
         @Override
-        public void iterate(IterateContext visitor) {
+        public void iterate(IterateContext context) {
         }
     }
 
@@ -139,11 +141,11 @@ public class FlatChunkLayer {
         }
 
         @Override
-        public void iterate(IterateContext visitor) {
+        public void iterate(IterateContext context) {
             for (int i = 0; i < indices.length; i++) {
                 int index = indices[i];
                 FlatFace face = faces[i];
-                visitor.visit(index, face);
+                context.visit(index, face);
             }
         }
 
@@ -178,6 +180,7 @@ public class FlatChunkLayer {
 
     static class LargeData extends Data {
         /*
+        Vanilla-style.
         1 cache miss for static; not sure for dynamic; maybe 5.
         The IDs of static faces are stored.
         Dynamic faces have a sentinel value, and are stored in a hashmap.
@@ -187,10 +190,10 @@ public class FlatChunkLayer {
         static final int MAX_DYNAMIC = 16 * 16 * 16 / 4;
 
         FlatFace lookup(char id, short index) {
-            if (id == FlatFeature.NO_FACE) {
+            if (id == FlatMod.NO_FACE) {
                 return null;
             }
-            if (id == FlatFeature.DYNAMIC_SENTINEL) {
+            if (id == FlatMod.DYNAMIC_SENTINEL) {
                 return dynamic.get((int) index);
             }
             return registry.getObjectById(id);
@@ -219,11 +222,11 @@ public class FlatChunkLayer {
                 }
             }
             if (face == null) {
-                data[index] = FlatFeature.NO_FACE;
+                data[index] = FlatMod.NO_FACE;
             } else if (face.isStatic()) {
                 data[index] = face.staticId;
             } else {
-                data[index] = FlatFeature.DYNAMIC_SENTINEL;
+                data[index] = FlatMod.DYNAMIC_SENTINEL;
                 dynamic.put((int) index, face);
                 if (dynamic.size() > MAX_DYNAMIC) {
                     return upsize();
@@ -233,18 +236,18 @@ public class FlatChunkLayer {
         }
 
         @Override
-        public void iterate(IterateContext visitor) {
+        public void iterate(IterateContext context) {
             for (int i = 0; i < FULL_SIZE; i++) {
                 int index = data[i];
-                if (index == FlatFeature.NO_FACE) continue;
-                if (index == FlatFeature.DYNAMIC_SENTINEL) continue;
+                if (index == FlatMod.NO_FACE) continue;
+                if (index == FlatMod.DYNAMIC_SENTINEL) continue;
                 FlatFace face = registry.getObjectById(index);
-                visitor.visit(index, face);
+                context.visit(index, face);
             }
             for (Map.Entry<Integer, FlatFace> e : dynamic.entrySet()) {
                 int index = e.getKey();
                 FlatFace face = e.getValue();
-                visitor.visit(index, face);
+                context.visit(index, face);
             }
         }
 
@@ -252,7 +255,7 @@ public class FlatChunkLayer {
             Data ret = new JumboData();
             for (short index = 0; index < data.length; index++) {
                 int id = data[index];
-                if (id == FlatFeature.NO_FACE || id == FlatFeature.DYNAMIC_SENTINEL) {
+                if (id == FlatMod.NO_FACE || id == FlatMod.DYNAMIC_SENTINEL) {
                     continue;
                 }
                 ret.set(index, registry.getObjectById(id), null);
@@ -292,16 +295,18 @@ public class FlatChunkLayer {
         }
 
         @Override
-        public void iterate(IterateContext visitor) {
+        public void iterate(IterateContext context) {
             for (int index = 0; index < data.length; index++) {
                 FlatFace face = data[index];
                 if (face == null) continue;
-                visitor.visit(index, face);
+                if (face.isNull()) continue;
+                context.visit(index, face);
             }
         }
     }
 
     final Data[] slabs = new Data[16];
+    final IFlatRenderInfo renderInfo = FlatMod.proxy.constructRenderInfo();
 
     public FlatChunkLayer() {
         for (int i = 0; i < slabs.length; i++) {
@@ -341,18 +346,25 @@ public class FlatChunkLayer {
         if (slab != newSlab) {
             slabs[localY >> 4] = newSlab;
         }
-        return slab.get(index);
+        FlatFace ret = slab.get(index);
+        renderInfo.markDirty(at);
+        return ret;
     }
 
     public void iterate(Chunk chunk, IFlatVisitor visitor) {
         for (int slabY = 0; slabY < slabs.length; slabY++) {
             Data slab = slabs[slabY];
-            slab.iterate(new IterateContext(chunk, slabY, visitor));
+            IterateContext context = new IterateContext(chunk, slabY, visitor);
+            slab.iterate(context);
         }
     }
 
     transient int set = 0;
     public boolean isEmpty() {
         return set == 0;
+    }
+
+    void discard() {
+        renderInfo.discard();
     }
 }

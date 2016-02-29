@@ -1,36 +1,98 @@
 package factorization.flat;
 
+import com.google.common.collect.Maps;
 import factorization.api.Coord;
 import factorization.api.datahelpers.DataInNBT;
 import factorization.api.datahelpers.DataOutNBT;
 import factorization.coremodhooks.IExtraChunkData;
 import factorization.shared.Core;
+import factorization.weird.barrel.BarrelModel;
+import net.minecraft.client.model.ModelMagmaCube;
+import net.minecraft.client.renderer.entity.Render;
+import net.minecraft.client.renderer.entity.RenderManager;
+import net.minecraft.client.resources.model.ModelManager;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.chunk.Chunk;
+import net.minecraftforge.client.event.ModelBakeEvent;
+import net.minecraftforge.client.event.TextureStitchEvent;
+import net.minecraftforge.client.model.IRetexturableModel;
+import net.minecraftforge.client.model.ModelLoaderRegistry;
 import net.minecraftforge.common.util.Constants;
 import net.minecraftforge.event.world.ChunkDataEvent;
+import net.minecraftforge.event.world.ChunkEvent;
+import net.minecraftforge.fml.client.registry.IRenderFactory;
+import net.minecraftforge.fml.client.registry.RenderingRegistry;
 import net.minecraftforge.fml.common.FMLCommonHandler;
+import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.fml.common.SidedProxy;
+import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.registry.FMLControlledNamespacedRegistry;
 import net.minecraftforge.fml.common.registry.PersistentRegistryManager;
 import net.minecraftforge.fml.relauncher.Side;
+import org.apache.logging.log4j.Logger;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.io.IOException;
+import java.util.HashMap;
 
-public enum FlatFeature implements FMLControlledNamespacedRegistry.AddCallback<FlatFace> {
-    INSTANCE;
+public class FlatMod implements FMLControlledNamespacedRegistry.AddCallback<FlatFace> {
+    @Mod.Instance
+    public static FlatMod INSTANCE;
 
-    private boolean initialized = false;
-    public void init() {
-        if (initialized) return;
-        initialized = true;
+    public static Logger log;
+
+    @Mod.EventHandler
+    public void init(FMLPreInitializationEvent event) {
+        log = event.getModLog();
         Core.loadBus(this);
-        if (FMLCommonHandler.instance().getEffectiveSide() == Side.CLIENT) {
-            Core.loadBus(new FlatRender());
+        Core.loadBus(proxy);
+        Flat.registerDynamic(new ResourceLocation("flat:air"), FlatFaceAir.class);
+        proxy.initClient();
+    }
+
+    @SidedProxy
+    public static ServerProxy proxy;
+
+    static class ServerProxy {
+        void initClient() { }
+        IFlatRenderInfo constructRenderInfo() {
+            return IFlatRenderInfo.NULL;
+        }
+
+        @SubscribeEvent
+        public void loadModels(TextureStitchEvent.Pre event) {
+            for (FlatFace face : Flat.getAll()) {
+                face.loadModels(new IModelMaker() {
+                    @Nullable
+                    @Override
+                    public IFlatModel getModel(ResourceLocation url) {
+                        return new FlatModel(url);
+                    }
+                });
+            }
+        }
+    }
+
+    static class ClientProxy extends ServerProxy {
+        @Override
+        void initClient() {
+            RenderingRegistry.registerEntityRenderingHandler(EntityHack.class, new IRenderFactory<EntityHack>() {
+                @Override
+                public Render<? super EntityHack> createRenderFor(RenderManager manager) {
+                    return new EntityHackRender(manager);
+                }
+            });
+        }
+
+        @Override
+        IFlatRenderInfo constructRenderInfo() {
+            if (FMLCommonHandler.instance().getEffectiveSide() == Side.SERVER) return IFlatRenderInfo.NULL;
+            return super.constructRenderInfo();
         }
     }
 
@@ -39,7 +101,9 @@ public enum FlatFeature implements FMLControlledNamespacedRegistry.AddCallback<F
     static final int DYNAMIC_SENTINEL = 1;
     static final char MAX_ID = Character.MAX_VALUE;
     static final char MIN_ID = DYNAMIC_SENTINEL + 1;
-    static final FMLControlledNamespacedRegistry<FlatFace> registry = PersistentRegistryManager.createRegistry(FLATS, FlatFace.class, null /* default flat value */, MAX_ID, MIN_ID, false, INSTANCE);
+    static final FMLControlledNamespacedRegistry<FlatFace> staticReg = PersistentRegistryManager.createRegistry(FLATS, FlatFace.class, null /* default flat value */, MAX_ID, MIN_ID, false, INSTANCE);
+    static final HashMap<ResourceLocation, Class<? extends FlatFace>> dynamicReg = Maps.newHashMap();
+    static final HashMap<ResourceLocation, FlatFace> dynamicSamples = Maps.newHashMap();
     static final String NBT_KEY = "fz:flats";
 
     static byte side2byte(EnumFacing side) {
@@ -88,7 +152,7 @@ public enum FlatFeature implements FMLControlledNamespacedRegistry.AddCallback<F
         layer.iterate(chunk, new IFlatVisitor() {
             @Override
             public void visit(Coord at, EnumFacing side, @Nonnull FlatFace face) {
-                if (face == FlatFaceAir.INSTANCE) return;
+                if (face.isNull()) return;
                 NBTTagCompound tag = new NBTTagCompound();
                 if (face.isStatic()) {
                     tag.setInteger("static", face.staticId);
@@ -111,10 +175,10 @@ public enum FlatFeature implements FMLControlledNamespacedRegistry.AddCallback<F
     private FlatFace construct(NBTTagCompound tag) {
         if (tag.hasKey("static")) {
             byte id = tag.getByte("static");
-            return registry.getObjectById(id);
+            return staticReg.getObjectById(id);
         }
         String name = tag.getString("dynamic");
-        Class<? extends FlatFace> c = Flat.dynamicReg.get(new ResourceLocation(name));
+        Class<? extends FlatFace> c = dynamicReg.get(new ResourceLocation(name));
         try {
             FlatFace ret = c.newInstance();
             DataInNBT dataInNBT = new DataInNBT(tag);
@@ -135,5 +199,11 @@ public enum FlatFeature implements FMLControlledNamespacedRegistry.AddCallback<F
             throw new IllegalArgumentException("ID is too low!");
         }
         face.staticId = (char) id;
+    }
+
+    @SubscribeEvent
+    public void discardChunkRenderInfo(ChunkEvent.Unload event) {
+        IExtraChunkData cd = (IExtraChunkData) event.getChunk();
+        cd.getFlatLayer().discard();
     }
 }

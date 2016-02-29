@@ -23,7 +23,7 @@ final class AtSide {
     }
 
     AtSide(Chunk c, int index) {
-        side = FlatFeature.byte2side(index);
+        side = FlatMod.byte2side(index);
         int slabX = (index >> 2) & 0xF;
         int slabY = (index >> 6) & 0xF;
         int slabZ = (index >> 10) & 0xF;

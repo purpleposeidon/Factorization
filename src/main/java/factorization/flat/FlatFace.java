@@ -1,31 +1,24 @@
 package factorization.flat;
 
 import factorization.api.Coord;
+import factorization.api.datahelpers.DataHelper;
 import factorization.api.datahelpers.IDataSerializable;
-import net.minecraft.client.renderer.WorldRenderer;
-import net.minecraft.client.resources.model.IBakedModel;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumFacing;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
 
 import javax.annotation.Nullable;
+import java.io.IOException;
 
+/** This class contains internal things. */
 public abstract class FlatFace implements IDataSerializable {
-    @SideOnly(Side.CLIENT)
     @Nullable
-    public abstract IBakedModel getModel(Coord at, EnumFacing side);
+    public abstract IFlatModel getModel(Coord at, EnumFacing side);
+    public abstract void loadModels(IModelMaker maker);
 
-    public final boolean isStatic() {
-        return staticId != 0;
+    public int getColor(Coord at, EnumFacing side) {
+        return 0xFFFFFFFF;
     }
-
-    public final boolean isDynamic() {
-        return staticId == 0;
-    }
-
-    transient char staticId = FlatFeature.DYNAMIC_SENTINEL;
 
     public void onReplaced(Coord at, EnumFacing side) {
     }
@@ -41,21 +34,40 @@ public abstract class FlatFace implements IDataSerializable {
         return false;
     }
 
-    public void onBlockNeighborChanged(Coord at, EnumFacing side) {
+    public void onNeighborBlockChanged(Coord at, EnumFacing side) {
 
     }
 
-    public void onFaceNeighborChanged(Coord at, EnumFacing side) {
+    public void onNeighborFaceChanged(Coord at, EnumFacing side) {
 
+    }
+
+    @Override
+    public IDataSerializable serialize(String prefix, DataHelper data) throws IOException {
+        return this;
+    }
+
+    /** @return a FlatFace that is alike this one, but whose fields can be safely modified. */
+    public FlatFace cloneDynamic() {
+        return this;
     }
 
     public final FlatFace dupe() {
         if (isStatic()) return this;
         return cloneDynamic();
     }
+    public final boolean isStatic() {
+        return staticId != 0;
+    }
 
-    /** @return a FlatFace that is alike this one, but whose fields can be safely modified. */
-    protected FlatFace cloneDynamic() {
-        return this;
+    public final boolean isDynamic() {
+        return staticId == 0;
+    }
+
+    transient char staticId = FlatMod.DYNAMIC_SENTINEL;
+
+    /** Like Block.isAir, but even more dangerous. */
+    public boolean isNull() {
+        return false;
     }
 }

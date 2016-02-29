@@ -55,6 +55,8 @@ import factorization.shared.TileEntityCommon;
 import factorization.util.FzUtil;
 import factorization.util.ItemUtil;
 
+import javax.annotation.Nullable;
+
 // Note: The rules for holding on to references to Coord are the same as for holding on to World.
 // Don't keep references to them outside of things that are in worlds to avoid mem-leaks; or be careful about it.
 public final class Coord implements IDataSerializable, ISaneCoord, Comparable<Coord> {
@@ -62,8 +64,7 @@ public final class Coord implements IDataSerializable, ISaneCoord, Comparable<Co
     public World w;
     public int x, y, z;
     private static final Random rand = new Random();
-    private static final ThreadLocal<Coord> staticCoord = new ThreadLocal<Coord>();
-    
+
     public static final Coord ZERO = new Coord(null, 0, 0, 0);
 
     public Coord(World w, int x, int y, int z) {
@@ -109,46 +110,9 @@ public final class Coord implements IDataSerializable, ISaneCoord, Comparable<Co
     }
     
     @Override public World w() { return w; }
-    public int x() { return x; }
-    public int y() { return y; }
-    public int z() { return z; }
-    
-    public static Coord tryLoad(World world, Object o) {
-        if (o instanceof Coord) {
-            return (Coord) o;
-        }
-        if (o instanceof Vec3) {
-            Vec3 vec = (Vec3) o;
-            return new Coord(world, vec.xCoord, vec.yCoord, vec.zCoord);
-        }
-        if (o instanceof Entity) {
-            Entity e = (Entity) o;
-            return new Coord(e);
-        }
-        if (o instanceof TileEntity) {
-            TileEntity te = (TileEntity) o;
-            return new Coord(te);
-        }
-        return null;
-    }
-    
-    public static Coord of(int x, int y, int z) {
-        return of((World) null, x, y, z);
-    }
-    
-    public static Coord of(double x, double y, double z) {
-        return of((World) null, (int) x, (int) y, (int) z);
-    }
-    
-    public static Coord of(World w, int x, int y, int z) {
-        Coord ret = staticCoord.get();
-        if (ret == null) {
-            ret = new Coord(w, x, y, z);
-            staticCoord.set(ret);
-            return ret;
-        }
-        ret.set(w, x, y, z);
-        return ret;
+    @Override
+    public BlockPos toBlockPos() {
+        return new BlockPos(x, y, z);
     }
 
     @Override
@@ -531,6 +495,7 @@ public final class Coord implements IDataSerializable, ISaneCoord, Comparable<Co
     }
 
     @SuppressWarnings("unchecked")
+    @Nullable
     public <T> T getTE(Class<T> clazz) {
         TileEntity te = getTE();
         if (clazz.isInstance(te)) {
@@ -795,17 +760,19 @@ public final class Coord implements IDataSerializable, ISaneCoord, Comparable<Co
     public boolean local() {
         return !w.isRemote;
     }
-    
+
+    @Nullable
     public Entity spawnItem(ItemStack is) {
         Entity ent = new EntityItem(w, x + 0.5, y + 0.5, z + 0.5, is);
         Item item = is.getItem();
-        if (item.hasCustomEntity(is)) {
+        if (item.hasCustomEntity(is)) { // TODO: Resolve the possible NPE when is.getItem() == null (or is == null)
             ent = item.createEntity(w, ent, is);
         }
         w.spawnEntityInWorld(ent);
         return ent;
     }
 
+    @Nullable
     public Entity spawnItem(Item it) {
         return spawnItem(new ItemStack(it));
     }
@@ -875,11 +842,6 @@ public final class Coord implements IDataSerializable, ISaneCoord, Comparable<Co
         return new Vec3(x + 0.5, y + 0.5, z + 0.5);
     }
 
-    @Override
-    public BlockPos toBlockPos() {
-        return new BlockPos(x, y, z);
-    }
-    
     public static void sort(Coord lower, Coord upper) {
         Coord a = lower.copy();
         Coord b = upper.copy();

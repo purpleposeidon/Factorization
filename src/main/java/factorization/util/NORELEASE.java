@@ -67,6 +67,13 @@ public class NORELEASE {
     }
 
     public static PrintStream trace;
+    static {
+        try {
+            trace = new PrintStream(new FileOutputStream(new File("/dev/stderr")));
+        } catch (FileNotFoundException e) {
+            trace = System.err;
+        }
+    }
 
     /**
      * A compiler-enforced "to do".
@@ -83,14 +90,6 @@ public class NORELEASE {
      * </code>
      */
     public static void breakpoint() {
-    }
-
-    static {
-        try {
-            trace = new PrintStream(new FileOutputStream(new File("/dev/stderr")));
-        } catch (FileNotFoundException e) {
-            trace = System.err;
-        }
     }
 
     // Free variables for use when hotswapping code

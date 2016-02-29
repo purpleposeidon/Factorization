@@ -17,7 +17,7 @@ public class MixinExtraChunkData extends Chunk implements IExtraChunkData {
     @Nonnull
     public Entity[] getConstantColliders() {
         if (constant_colliders == null) {
-            return IExtraChunkData.empty;
+            return IExtraChunkData.empty_array_of_entities;
         }
         return constant_colliders;
     }

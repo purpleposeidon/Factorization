@@ -9,6 +9,9 @@ import net.minecraft.util.BlockPos;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.world.World;
 
+/**
+ * This Item is kind of FZ-specific, but it's easy to make your own.
+ */
 public class ItemFlat extends ItemFactorization {
     public final FlatFace face;
 
