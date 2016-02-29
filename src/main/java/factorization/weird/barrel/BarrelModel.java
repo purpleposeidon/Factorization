@@ -72,6 +72,7 @@ public class BarrelModel implements ISmartBlockModel, ISmartItemModel, IPerspect
         if (ret != null) return ret;
         ret = build(info);
         if (NORELEASE.off) { // delete this if statement
+            // ACTUALLY: No, that doesn't work! We need a per-layer cache!
             modelCache.put(info, ret);
         }
         return ret;
