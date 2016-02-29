@@ -10,7 +10,7 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 public interface ITransformOrder extends IDataSerializable {
-    class Registry {
+    class TransformRegistry {
         public static final RegisteredDataUnion registry = new RegisteredDataUnion();
         static {
             register("basic", BasicTransformOrder.class);
