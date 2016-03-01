@@ -14,7 +14,9 @@ import net.minecraft.client.gui.GuiMainMenu;
 import net.minecraft.client.gui.GuiOptions;
 import net.minecraft.client.gui.GuiSelectWorld;
 import net.minecraft.client.gui.inventory.GuiContainer;
+import net.minecraft.client.resources.AbstractResourcePack;
 import net.minecraft.client.resources.IResource;
+import net.minecraft.client.resources.IResourcePack;
 import net.minecraft.client.settings.GameSettings;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.Slot;
@@ -32,21 +34,24 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import org.apache.commons.io.Charsets;
 import org.lwjgl.input.Keyboard;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
 
 public class MiscClientProxy extends MiscProxy {
     static final Minecraft mc = Minecraft.getMinecraft();
     MiscClientTickHandler cth = new MiscClientTickHandler();
+
+    static {
+        Minecraft.memoryReserve = new byte[0]; // Frees 10MB. Used for OOM screen. It does actually happen now tho....
+        // We could make up for this by pre-constructing an OOM screen? At least class-loading it?
+        dedupeResourcePacks();
+    }
     
     @Override
     void initializeClient() {
-        Minecraft.memoryReserve = new byte[0]; // Frees 10MB. Used for OOM screen, but that *never* happens.
         Core.loadBus(this);
         ClientCommandHandler.instance.registerCommand(new MiscClientCommands());
         Core.loadBus(cth);
@@ -55,8 +60,7 @@ public class MiscClientProxy extends MiscProxy {
         GameSettings gameSettings = Minecraft.getMinecraft().gameSettings;
         gameSettings.setOptionValue(GameSettings.Options.REALMS_NOTIFICATIONS, 0);
     }
-    
-    
+
     @Override
     void handleTpsReport(float newTps) {
         if (Float.isInfinite(newTps) || Float.isNaN(newTps)) {
@@ -262,5 +266,26 @@ public class MiscClientProxy extends MiscProxy {
             return;
         }
         command.call(event.player, slot.slotNumber);
+    }
+
+    private static void dedupeResourcePacks() {
+        Minecraft mc = Minecraft.getMinecraft();
+        HashSet<File> seen = new HashSet<File>();
+        int removed = 0;
+        for (Iterator<IResourcePack> iter = mc.defaultResourcePacks.iterator(); iter.hasNext(); ) {
+            IResourcePack pack = iter.next();
+            File packFile = null;
+            if (pack instanceof AbstractResourcePack) {
+                AbstractResourcePack arp = (AbstractResourcePack) pack;
+                packFile = arp.resourcePackFile;
+            }
+            if (packFile == null) continue;
+            if (seen.add(packFile)) continue;
+            iter.remove();
+            removed++;
+        }
+        if (removed == 0) return;
+        String thx = removed >= 10 ? " #you'rewelcome" : "";
+        Core.logWarning(removed + " duplicated resourcepacks were removed." + thx);
     }
 }
