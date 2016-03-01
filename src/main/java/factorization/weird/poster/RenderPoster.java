@@ -22,19 +22,18 @@ public class RenderPoster extends Render<EntityPoster> {
     }
 
     @Override
-    public void doRender(EntityPoster ent, double x, double y, double z, float yaw, float partial) {
-        EntityPoster poster = (EntityPoster) ent;
+    public void doRender(EntityPoster poster, double x, double y, double z, float yaw, float partial) {
         final Minecraft mc = Minecraft.getMinecraft();
         final MovingObjectPosition mop = mc.objectMouseOver;
-        boolean selected = mop != null && mop.entityHit == ent;
+        boolean selected = mop != null && mop.entityHit == poster;
         GL11.glPushMatrix();
         GL11.glTranslated(x, y, z);
         if (selected && !mc.gameSettings.hideGUI) {
             GL11.glPushMatrix();
             // They ordinarily don't move, so no need to bother w/ interpolation
-            GL11.glTranslated(-ent.posX, -ent.posY, -ent.posZ + 1 / 16.0);
+            GL11.glTranslated(-poster.posX, -poster.posY, -poster.posZ + 1 / 16.0);
             GL11.glDisable(GL11.GL_TEXTURE_2D);
-            RenderGlobal.drawSelectionBoundingBox(ent.getEntityBoundingBox());
+            RenderGlobal.drawSelectionBoundingBox(poster.getEntityBoundingBox());
             GL11.glEnable(GL11.GL_TEXTURE_2D);
             GL11.glPopMatrix();
         }
