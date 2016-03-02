@@ -436,7 +436,7 @@ public class ItemGoo extends ItemFactorization implements ISensitiveMesh {
         if (!data.isPlayerOutOfDate(player)) return;
         NBTTagCompound dataTag = new NBTTagCompound();
         data.writeToNBT(dataTag);
-        FMLProxyPacket toSend = Core.network.entityPacket(player, StandardMessageType.UtilityGooState, dataTag);
+        FMLProxyPacket toSend = Core.network.playerMessagePacket(StandardMessageType.UtilityGooState, dataTag);
         Core.network.broadcastPacket((EntityPlayer) player, new Coord(player), toSend);
     }
     
