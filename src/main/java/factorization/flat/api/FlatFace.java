@@ -13,7 +13,6 @@ import net.minecraft.util.EnumFacing;
 
 import javax.annotation.Nullable;
 import java.io.IOException;
-import java.util.List;
 
 /** This class contains internal things. */
 public abstract class FlatFace implements IDataSerializable {
@@ -56,11 +55,12 @@ public abstract class FlatFace implements IDataSerializable {
     }
 
     protected static AxisAlignedBB getBounds(Coord at, EnumFacing side, double width, double height) {
-        boolean off = false;
         if (SpaceUtil.sign(side) == -1) {
-            off = true;
+            // This usually won't happen.
+            at = at.add(side);
+            side = side.getOpposite();
         }
-        final double x = at.z;
+        final double x = at.x;
         final double y = at.y;
         final double z = at.z;
         final double w = width;
@@ -69,23 +69,15 @@ public abstract class FlatFace implements IDataSerializable {
         final double h = 0.5 + w;
         switch (side) {
             default:
-            case EAST:  return move(off, side, x + 1, y + l, z + l, x+1+I, y + h, z + h);
-            case UP:    return move(off, side, x + l, y + 1, z + l, x + h, y+1+I, z + h);
-            case SOUTH: return move(off, side, x + l, y + l, z + 1, x + h, y + h, z+1+I);
+            case EAST:  return new AxisAlignedBB(x+1-I, y + l, z + l, x+1+I, y + h, z + h);
+            case UP:    return new AxisAlignedBB(x + l, y+1-I, z + l, x + h, y+1+I, z + h);
+            case SOUTH: return new AxisAlignedBB(x + l, y + l, z+1-I, x + h, y + h, z+1+I);
         }
-    }
-
-
-    protected static AxisAlignedBB move(boolean off, EnumFacing side, double x0, double y0, double z0, double x1, double y1, double z1) {
-        AxisAlignedBB ret = new AxisAlignedBB(x0, y0, z0, x1, y1, z1);
-        if (off) {
-            return ret.offset(side.getFrontOffsetX(), side.getFrontOffsetY(), side.getFrontOffsetZ());
-        }
-        return ret;
     }
 
     public void listSelectionBounds(Coord at, EnumFacing side, Entity player, IBoxList list) {
-        list.add(getBounds(at, side, 0.5, 1.0 / 16.0));
+        list.add(getBounds(at, side, 0.5, 0.25));
+        //list.add(getBounds(at, side, 0.5, 1.0 / 16.0));
     }
 
     /**
