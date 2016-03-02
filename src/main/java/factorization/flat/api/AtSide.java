@@ -1,14 +1,17 @@
-package factorization.flat;
+package factorization.flat.api;
 
 import factorization.api.Coord;
 import factorization.coremodhooks.IExtraChunkData;
+import factorization.flat.FlatChunkLayer;
+import factorization.flat.FlatMod;
 import factorization.util.SpaceUtil;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.world.chunk.Chunk;
 
 import java.util.Iterator;
 
-final class AtSide {
+/** This class is internal. */
+class AtSide {
     final Coord at;
     final EnumFacing side;
 

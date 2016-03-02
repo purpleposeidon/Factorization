@@ -1,4 +1,4 @@
-package factorization.flat;
+package factorization.flat.render;
 
 import factorization.api.Coord;
 import factorization.util.NORELEASE;

@@ -1,6 +1,6 @@
 package factorization.charge;
 
-import factorization.flat.Flat;
+import factorization.flat.api.Flat;
 import net.minecraft.util.ResourceLocation;
 
 public class ChargeFeature {

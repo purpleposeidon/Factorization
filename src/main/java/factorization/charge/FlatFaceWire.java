@@ -1,10 +1,11 @@
 package factorization.charge;
 
 import factorization.api.Coord;
-import factorization.flat.Flat;
-import factorization.flat.FlatFace;
-import factorization.flat.IFlatModel;
-import factorization.flat.IModelMaker;
+import factorization.flat.api.Flat;
+import factorization.flat.api.FlatFace;
+import factorization.flat.api.IFlatModel;
+import factorization.flat.api.IModelMaker;
+import factorization.shared.Core;
 import factorization.util.NORELEASE;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ResourceLocation;
@@ -82,5 +83,19 @@ public class FlatFaceWire extends FlatFace {
 
     private static String bin(int i) {
         return Integer.toString(0x10 + i, 2).substring(1);
+    }
+
+    @Override
+    public void onNeighborBlockChanged(Coord at, EnumFacing side) {
+        if (at.w.isRemote) return;
+        if (at.isSolidOnSide(side)) {
+            return;
+        }
+        Coord op = at.add(side);
+        if (op.isSolidOnSide(side.getOpposite()) || !op.blockExists()) {
+            return;
+        }
+        Flat.setAir(at, side);
+        at.spawnItem(Core.registry.wirePlacer);
     }
 }

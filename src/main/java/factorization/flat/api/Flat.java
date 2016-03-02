@@ -1,6 +1,8 @@
-package factorization.flat;
+package factorization.flat.api;
 
 import factorization.api.Coord;
+import factorization.flat.FlatFaceAir;
+import factorization.flat.FlatMod;
 import factorization.util.PlayerUtil;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
@@ -88,5 +90,9 @@ public final class Flat {
     private static int SPECIES = 0;
     public static int nextSpeciesId() {
         return ++SPECIES;
+    }
+
+    public static void setAir(Coord at, EnumFacing side) {
+        set(at, side, FlatFaceAir.INSTANCE);
     }
 }

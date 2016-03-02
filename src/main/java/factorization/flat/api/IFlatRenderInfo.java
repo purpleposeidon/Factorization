@@ -1,4 +1,4 @@
-package factorization.flat;
+package factorization.flat.api;
 
 import factorization.api.Coord;
 

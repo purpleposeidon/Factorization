@@ -1,8 +1,9 @@
-package factorization.flat;
+package factorization.flat.api;
 
 import factorization.api.Coord;
 import factorization.api.datahelpers.DataHelper;
 import factorization.api.datahelpers.IDataSerializable;
+import factorization.flat.FlatMod;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumFacing;
@@ -72,7 +73,8 @@ public abstract class FlatFace implements IDataSerializable {
         return staticId == 0;
     }
 
-    transient char staticId = FlatMod.DYNAMIC_SENTINEL;
+    /** This field is internal. */
+    public transient char staticId = FlatMod.DYNAMIC_SENTINEL;
 
     /** Like Block.isAir, but even more dangerous. */
     public boolean isNull() {

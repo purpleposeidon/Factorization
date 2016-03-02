@@ -1,6 +1,8 @@
 package factorization.flat;
 
 import factorization.api.Coord;
+import factorization.flat.api.Flat;
+import factorization.flat.api.FlatFace;
 import factorization.shared.Core;
 import factorization.shared.ItemFactorization;
 import factorization.util.NORELEASE;
@@ -8,7 +10,6 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.EnumFacing;
-import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
 
 /**

@@ -1,6 +1,9 @@
 package factorization.flat;
 
 import factorization.api.Coord;
+import factorization.flat.api.FlatFace;
+import factorization.flat.api.IFlatModel;
+import factorization.flat.api.IModelMaker;
 import net.minecraft.util.EnumFacing;
 
 import javax.annotation.Nullable;

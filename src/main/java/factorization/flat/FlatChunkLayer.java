@@ -1,6 +1,9 @@
 package factorization.flat;
 
 import factorization.api.Coord;
+import factorization.flat.api.FlatFace;
+import factorization.flat.api.IFlatRenderInfo;
+import factorization.flat.api.IFlatVisitor;
 import factorization.util.SpaceUtil;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.world.chunk.Chunk;
@@ -306,7 +309,7 @@ public class FlatChunkLayer {
     }
 
     final Data[] slabs = new Data[16];
-    final IFlatRenderInfo renderInfo = FlatMod.proxy.constructRenderInfo();
+    public final IFlatRenderInfo renderInfo = FlatMod.proxy.constructRenderInfo();
 
     public FlatChunkLayer() {
         for (int i = 0; i < slabs.length; i++) {
@@ -320,7 +323,7 @@ public class FlatChunkLayer {
         return slabs[y];
     }
 
-    FlatFace get(Coord at, EnumFacing dir) {
+    public FlatFace get(Coord at, EnumFacing dir) {
         int localY = at.y & 0xF;
         int localX = at.x & 0xF;
         int localZ = at.z & 0xF;
@@ -334,7 +337,7 @@ public class FlatChunkLayer {
         return ret;
     }
 
-    FlatFace set(Coord at, EnumFacing dir, FlatFace face) {
+    public FlatFace set(Coord at, EnumFacing dir, FlatFace face) {
         if (face == FlatFaceAir.INSTANCE) {
             face = null;
         }

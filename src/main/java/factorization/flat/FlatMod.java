@@ -7,32 +7,30 @@ import factorization.api.Coord;
 import factorization.api.datahelpers.DataInNBT;
 import factorization.api.datahelpers.DataOutNBT;
 import factorization.coremodhooks.IExtraChunkData;
+import factorization.flat.api.*;
+import factorization.flat.render.ClientRenderInfo;
+import factorization.flat.render.EntityHack;
+import factorization.flat.render.EntityHackRender;
+import factorization.flat.render.FlatModel;
 import factorization.shared.Core;
-import factorization.util.FzUtil;
-import factorization.util.NORELEASE;
-import factorization.weird.barrel.BarrelModel;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.model.ModelMagmaCube;
 import net.minecraft.client.multiplayer.ChunkProviderClient;
 import net.minecraft.client.renderer.entity.Render;
 import net.minecraft.client.renderer.entity.RenderManager;
 import net.minecraft.client.resources.IResourceManager;
 import net.minecraft.client.resources.IResourceManagerReloadListener;
 import net.minecraft.client.resources.SimpleReloadableResourceManager;
-import net.minecraft.client.resources.model.ModelManager;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.chunk.IChunkProvider;
-import net.minecraftforge.client.event.ModelBakeEvent;
 import net.minecraftforge.client.event.TextureStitchEvent;
-import net.minecraftforge.client.model.IRetexturableModel;
-import net.minecraftforge.client.model.ModelLoaderRegistry;
 import net.minecraftforge.common.util.Constants;
 import net.minecraftforge.event.world.ChunkDataEvent;
 import net.minecraftforge.event.world.ChunkEvent;
+import net.minecraftforge.event.world.WorldEvent;
 import net.minecraftforge.fml.client.registry.IRenderFactory;
 import net.minecraftforge.fml.client.registry.RenderingRegistry;
 import net.minecraftforge.fml.common.FMLCommonHandler;
@@ -85,6 +83,10 @@ public class FlatMod implements FMLControlledNamespacedRegistry.AddCallback<Flat
         IFlatRenderInfo constructRenderInfo() {
             return IFlatRenderInfo.NULL;
         }
+    }
+
+    public static class ClientProxy extends ServerProxy {
+        final Minecraft mc = Minecraft.getMinecraft();
 
         @SubscribeEvent
         public void loadModels(TextureStitchEvent.Pre event) {
@@ -98,18 +100,14 @@ public class FlatMod implements FMLControlledNamespacedRegistry.AddCallback<Flat
                 });
             }
         }
-    }
 
-    public static class ClientProxy extends ServerProxy {
         @Override
         void initClient() {
-            RenderingRegistry.registerEntityRenderingHandler(EntityHack.class, new IRenderFactory<EntityHack>() {
-                @Override
-                public Render<? super EntityHack> createRenderFor(RenderManager manager) {
-                    return new EntityHackRender(manager);
-                }
-            });
-            final Minecraft mc = Minecraft.getMinecraft();
+            setupEntityHack();
+            redrawWhenSettingsChange();
+        }
+
+        private void redrawWhenSettingsChange() {
             IResourceManagerReloadListener redrawFlats = new IResourceManagerReloadListener() {
                 @Override
                 public void onResourceManagerReload(IResourceManager resourceManager) {
@@ -127,28 +125,37 @@ public class FlatMod implements FMLControlledNamespacedRegistry.AddCallback<Flat
             ((SimpleReloadableResourceManager) mc.getResourceManager()).registerReloadListener(redrawFlats);
         }
 
+        private void setupEntityHack() {
+            RenderingRegistry.registerEntityRenderingHandler(EntityHack.class, new IRenderFactory<EntityHack>() {
+                @Override
+                public Render<? super EntityHack> createRenderFor(RenderManager manager) {
+                    return new EntityHackRender(manager);
+                }
+            });
+        }
+
         @Override
         IFlatRenderInfo constructRenderInfo() {
             if (FMLCommonHandler.instance().getEffectiveSide() == Side.SERVER) return IFlatRenderInfo.NULL;
-            return new EntityHackRender.ClientRenderInfo();
+            return new ClientRenderInfo();
         }
     }
 
     static final ResourceLocation FLATS = new ResourceLocation("factorization:flats");
     static final int NO_FACE = 0;
-    static final int DYNAMIC_SENTINEL = 1;
+    public static final int DYNAMIC_SENTINEL = 1;
     static final char MAX_ID = Character.MAX_VALUE;
     static final char MIN_ID = DYNAMIC_SENTINEL + 1;
-    static final FMLControlledNamespacedRegistry<FlatFace> staticReg = PersistentRegistryManager.createRegistry(FLATS, FlatFace.class, null /* default flat value */, MAX_ID, MIN_ID, false, INSTANCE);
-    static final BiMap<ResourceLocation, Class<? extends FlatFace>> dynamicReg = HashBiMap.create();
-    static final HashMap<ResourceLocation, FlatFace> dynamicSamples = Maps.newHashMap();
+    public static final FMLControlledNamespacedRegistry<FlatFace> staticReg = PersistentRegistryManager.createRegistry(FLATS, FlatFace.class, null /* default flat value */, MAX_ID, MIN_ID, false, INSTANCE);
+    public static final BiMap<ResourceLocation, Class<? extends FlatFace>> dynamicReg = HashBiMap.create();
+    public static final HashMap<ResourceLocation, FlatFace> dynamicSamples = Maps.newHashMap();
     static final String NBT_KEY = "fz:flats";
 
-    static byte side2byte(EnumFacing side) {
+    public static byte side2byte(EnumFacing side) {
         return (byte) side.getAxis().ordinal();
     }
 
-    static EnumFacing byte2side(int b) {
+    public static EnumFacing byte2side(int b) {
         return sideLookup[b & 0x3];
     }
 
@@ -243,5 +250,10 @@ public class FlatMod implements FMLControlledNamespacedRegistry.AddCallback<Flat
     public void discardChunkRenderInfo(ChunkEvent.Unload event) {
         IExtraChunkData cd = (IExtraChunkData) event.getChunk();
         cd.getFlatLayer().discard();
+    }
+
+    @SubscribeEvent
+    public void addWorldEventListener(WorldEvent.Load event) {
+        event.world.addWorldAccess(new FlatWorldEventListener(event.world));
     }
 }
