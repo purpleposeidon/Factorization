@@ -162,7 +162,7 @@ public class FlatChunkLayer {
             int L = indices.length;
             for (int i = 0; i < L; i++) {
                 int indexI = indices[i];
-                if (indexI != 0 || indexI == index) continue;
+                if (indexI != 0 && indexI != index) continue;
                 indices[i] = index;
                 replaced(faces[i], at, index);
                 faces[i] = face;

@@ -86,15 +86,21 @@ public class FlatFaceWire extends FlatFace {
     }
 
     @Override
-    public void onNeighborBlockChanged(Coord at, EnumFacing side) {
-        if (at.w.isRemote) return;
+    public boolean isValidAt(Coord at, EnumFacing side) {
         if (at.isSolidOnSide(side)) {
-            return;
+            return true;
         }
         Coord op = at.add(side);
         if (op.isSolidOnSide(side.getOpposite()) || !op.blockExists()) {
-            return;
+            return true;
         }
+        return false;
+    }
+
+    @Override
+    public void onNeighborBlockChanged(Coord at, EnumFacing side) {
+        if (at.w.isRemote) return;
+        if (isValidAt(at, side)) return;
         Flat.setAir(at, side);
         at.spawnItem(Core.registry.wirePlacer);
     }

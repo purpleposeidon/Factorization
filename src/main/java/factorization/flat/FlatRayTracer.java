@@ -132,6 +132,7 @@ public enum FlatRayTracer {
     }
 
     void interact(boolean useElseHit) {
+        if (target == null) return;
         MovingObjectPosition mop = mc.objectMouseOver;
         if (mop == null || mop.entityHit != target) return;
         FlatNet.playerInteract(mc.thePlayer, target.at, target.side, useElseHit);
