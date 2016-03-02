@@ -1,5 +1,6 @@
 package factorization.charge;
 
+import com.google.common.collect.Maps;
 import factorization.api.Coord;
 import factorization.flat.api.Flat;
 import factorization.flat.api.FlatFace;
@@ -11,6 +12,8 @@ import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ResourceLocation;
 
 import javax.annotation.Nullable;
+
+import java.util.HashMap;
 
 import static net.minecraft.util.EnumFacing.*;
 
@@ -33,16 +36,32 @@ public class FlatFaceWire extends FlatFace {
 
 
     public final byte powerLevel;
-    IFlatModel[] permutations;
+    public static class WireModelGroup {
+        static HashMap<String, WireModelGroup> instances = Maps.newHashMap();
+        IFlatModel[] permutations;
+
+        public static WireModelGroup get(String name, IModelMaker maker) {
+            WireModelGroup ret = instances.get(name);
+            if (ret != null) return ret;
+            ret = new WireModelGroup();
+            instances.put(name, ret);
+            ret.permutations = new IFlatModel[0x10];
+            for (int i = 0x0; i < ret.permutations.length; i++) {
+                ret.permutations[i] = maker.getModel(new ResourceLocation("factorization:flat/" + name + bin(i)));
+            }
+            return ret;
+        }
+    }
 
     public FlatFaceWire(int powerLevel) {
         this.powerLevel = (byte) powerLevel;
     }
 
+    protected WireModelGroup models;
+
     @Nullable
     @Override
     public IFlatModel getModel(Coord at, EnumFacing side) {
-        if (NORELEASE.on) return permutations[0];
         // Construct a 4-bit number representing the connections. This number then indexes into the permutations array.
         int connections = 0; // Look at keyboard numpad. First it stores (8???) (68??) (268?) (4268)
         for (int hour = 0; hour < 4; hour++) {
@@ -52,10 +71,12 @@ public class FlatFaceWire extends FlatFace {
             }
             connections >>= 1;
         }
-        return permutations[connections];
+        return models.permutations[connections];
     }
 
-    public static final int SPECIES = Flat.nextSpeciesId();
+    /** If two FlatFaces have the same species, then the wire'll try to connect. If you're subclassing you may want to
+     * change the species so things correct appropriately. */
+    protected static transient int SPECIES = Flat.nextSpeciesId();
 
     @Override
     public int getSpecies() {
@@ -75,10 +96,7 @@ public class FlatFaceWire extends FlatFace {
 
     @Override
     public void loadModels(IModelMaker maker) {
-        permutations = new IFlatModel[0x10];
-        for (int i = 0x0; i < permutations.length; i++) {
-            permutations[i] = maker.getModel(new ResourceLocation("factorization:flat/wire/m" + bin(i)));
-        }
+        models = WireModelGroup.get("wire/m", maker);
     }
 
     private static String bin(int i) {
