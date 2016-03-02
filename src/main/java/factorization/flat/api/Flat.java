@@ -5,7 +5,6 @@ import factorization.api.ICoordFunction;
 import factorization.coremodhooks.IExtraChunkData;
 import factorization.flat.FlatFaceAir;
 import factorization.flat.FlatMod;
-import factorization.flat.FlatRayTracer;
 import factorization.util.PlayerUtil;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;

@@ -53,7 +53,7 @@ import java.util.HashMap;
         name = FlatMod.name,
         version = Core.version
 )
-public class FlatMod implements FMLControlledNamespacedRegistry.AddCallback<FlatFace> {
+public class FlatMod {
     public static final String modId = Core.modId + ".flat";
     public static final String name = "Factorization Miscellaneous Nonsense";
 
@@ -67,6 +67,7 @@ public class FlatMod implements FMLControlledNamespacedRegistry.AddCallback<Flat
         Core.loadBus(proxy);
         Flat.registerDynamic(new ResourceLocation("flat:air"), FlatFaceAir.class);
         proxy.initClient();
+        FlatNet.instance.init();
     }
 
     @Mod.EventHandler
@@ -144,10 +145,24 @@ public class FlatMod implements FMLControlledNamespacedRegistry.AddCallback<Flat
 
     static final ResourceLocation FLATS = new ResourceLocation("factorization:flats");
     static final int NO_FACE = 0;
-    public static final int DYNAMIC_SENTINEL = 1;
+    public static final char DYNAMIC_SENTINEL = 1;
     static final char MAX_ID = Character.MAX_VALUE;
     static final char MIN_ID = DYNAMIC_SENTINEL + 1;
-    public static final FMLControlledNamespacedRegistry<FlatFace> staticReg = PersistentRegistryManager.createRegistry(FLATS, FlatFace.class, null /* default flat value */, MAX_ID, MIN_ID, false, INSTANCE);
+    public static final FMLControlledNamespacedRegistry<FlatFace> staticReg = PersistentRegistryManager.createRegistry(FLATS, FlatFace.class, null /* default flat value */, MAX_ID, MIN_ID, false, new FMLControlledNamespacedRegistry.AddCallback<FlatFace>() {
+        @Override
+        public void onAdd(FlatFace face, int id) {
+            if (id == DYNAMIC_SENTINEL) {
+                throw new IllegalArgumentException("Tried to register FlatFace over DYNAMIC_SENTINEL id");
+            }
+            if (id == 0) {
+                throw new IllegalStateException("Tried to register FlatFace over null id");
+            }
+            if (id >= MAX_ID) {
+                throw new IllegalArgumentException("ID is too high!");
+            }
+            face.staticId = (char) id;
+        }
+    });
     public static final BiMap<ResourceLocation, Class<? extends FlatFace>> dynamicReg = HashBiMap.create();
     public static final HashMap<ResourceLocation, FlatFace> dynamicSamples = Maps.newHashMap();
     static final String NBT_KEY = "fz:flats";
@@ -234,17 +249,6 @@ public class FlatMod implements FMLControlledNamespacedRegistry.AddCallback<Flat
             t.printStackTrace();
             return null;
         }
-    }
-
-    @Override
-    public void onAdd(FlatFace face, int id) {
-        if (id >= MAX_ID) {
-            throw new IllegalArgumentException("ID is too high!");
-        }
-        if (id < MIN_ID) {
-            throw new IllegalArgumentException("ID is too low!");
-        }
-        face.staticId = (char) id;
     }
 
     @SubscribeEvent

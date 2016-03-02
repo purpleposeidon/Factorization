@@ -37,8 +37,9 @@ import java.util.Set;
 public class FlatNet {
     static final String channelName = "fzFlat";
     static FMLEventChannel channel;
+    static final FlatNet instance = new FlatNet();
 
-    public FlatNet() {
+    public void init() {
         channel = NetworkRegistry.INSTANCE.newEventDrivenChannel(channelName);
         channel.register(this);
         Core.loadBus(this);
@@ -116,7 +117,7 @@ public class FlatNet {
             buff.writeByte(1);
             at.writeToStream(buff);
             buff.writeByte(side.ordinal());
-            buff.writeByte(face.staticId);
+            buff.writeChar(face.staticId);
             if (face.isDynamic()) {
                 ByteBufUtils.writeUTF8String(buff, Flat.getName(face).toString());
                 try {
@@ -151,7 +152,7 @@ public class FlatNet {
 
     @Nullable
     private static FlatFace readFace(ByteBuf buff) {
-        byte staticId = buff.readByte();
+        char staticId = buff.readChar();
         if (staticId != FlatMod.DYNAMIC_SENTINEL) {
             return FlatMod.staticReg.getObjectById(staticId);
         }

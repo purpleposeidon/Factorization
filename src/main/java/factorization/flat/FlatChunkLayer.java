@@ -484,6 +484,7 @@ public class FlatChunkLayer {
             }
         }
         changed.clear();
+        sw.finish();
         FzNetDispatch.addPacketFrom(FlatNet.build(sw.buff), chunk);
     }
 }

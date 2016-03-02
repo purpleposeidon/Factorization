@@ -102,11 +102,11 @@ public abstract class FlatFace implements IDataSerializable {
         return cloneDynamic();
     }
     public final boolean isStatic() {
-        return staticId != 0;
+        return staticId != FlatMod.DYNAMIC_SENTINEL;
     }
 
     public final boolean isDynamic() {
-        return staticId == 0;
+        return staticId == FlatMod.DYNAMIC_SENTINEL;
     }
 
     /** This field is internal. */
