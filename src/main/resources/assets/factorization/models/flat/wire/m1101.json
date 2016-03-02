@@ -1,0 +1,6 @@
+{
+    "parent": "factorization:flat",
+    "textures": {
+        "face": "factorization:blocks/charge/wire/fork"
+    }
+}
