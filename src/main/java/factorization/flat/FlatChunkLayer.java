@@ -1,6 +1,7 @@
 package factorization.flat;
 
 import factorization.api.Coord;
+import factorization.api.ICoordFunction;
 import factorization.flat.api.FlatFace;
 import factorization.flat.api.IFlatRenderInfo;
 import factorization.flat.api.IFlatVisitor;
@@ -27,7 +28,9 @@ public class FlatChunkLayer {
         final Chunk chunk;
         final IFlatVisitor visitor;
         final Coord at;
+        EnumFacing side;
         final int minX, minY, minZ;
+        final int maxX, maxY, maxZ;
 
         IterateContext(Chunk chunk, int slabY, IFlatVisitor visitor) {
             this.chunk = chunk;
@@ -36,25 +39,41 @@ public class FlatChunkLayer {
             this.minX = chunk.xPosition << 4;
             this.minY = slabY << 4;
             this.minZ = chunk.zPosition << 4;
+            this.maxX = minX + 0xF;
+            this.maxY = minY + 0xF;
+            this.maxZ = minZ + 0xF;
         }
 
         void visit(int index, @Nullable FlatFace face) {
-            if (face == null) return;
-            if (face.isNull()) return;
-            EnumFacing side = FlatMod.byte2side(index);
+            if (unpack(index, face)) return;
+            doVisit(face);
+        }
+
+        void doVisit(FlatFace face) {
+            visitor.visit(at, side, face);
+        }
+
+        boolean unpack(int index, @Nullable FlatFace face) {
+            if (face == null) return true;
+            if (face.isNull()) return true;
+            side = FlatMod.byte2side(index);
             int slX = (index >> 2) & 0xF;
             int slY = (index >> 6) & 0xF;
             int slZ = (index >> 10) & 0xF;
             at.x = minX + slX;
             at.y = minY + slY;
             at.z = minZ + slZ;
-            visitor.visit(at, side, face);
+            return false;
         }
     }
 
     static abstract class Data {
         static final int FULL_SIZE = 16 * 16 * 16 * 3;
         transient int set = 0;
+
+        boolean isIndirect(int index) {
+            return false;
+        }
 
         @Nullable
         abstract FlatFace get(short index);
@@ -77,6 +96,8 @@ public class FlatChunkLayer {
         }
 
         public abstract void iterate(IterateContext context);
+
+        public abstract void iterateBounded(Coord min, Coord max, IterateContext context);
     }
 
     static final FMLControlledNamespacedRegistry<FlatFace> registry = FlatMod.staticReg;
@@ -97,6 +118,11 @@ public class FlatChunkLayer {
 
         @Override
         public void iterate(IterateContext context) {
+        }
+
+        @Override
+        public void iterateBounded(Coord min, Coord max, IterateContext context) {
+
         }
     }
 
@@ -154,6 +180,17 @@ public class FlatChunkLayer {
             }
         }
 
+        @Override
+        public void iterateBounded(Coord min, Coord max, IterateContext context) {
+            for (int i = 0; i < indices.length; i++) {
+                int index = indices[i];
+                FlatFace face = faces[i];
+                if (context.unpack(index, face)) continue;
+                if (!context.at.inside(min, max)) continue;
+                context.doVisit(face);
+            }
+        }
+
         Data upsize() {
             Data ret = nextSize();
             int L = indices.length;
@@ -202,6 +239,14 @@ public class FlatChunkLayer {
                 return dynamic.get((int) index);
             }
             return registry.getObjectById(id);
+        }
+
+        @Override
+        boolean isIndirect(int index) {
+            if (index < 0) return false;
+            if (index >= data.length) return false;
+            char id = data[index];
+            return id == FlatMod.DYNAMIC_SENTINEL;
         }
 
         @Nullable
@@ -256,6 +301,11 @@ public class FlatChunkLayer {
             }
         }
 
+        @Override
+        public void iterateBounded(Coord min, Coord max, IterateContext context) {
+            dumbIterate(this, min, max, context);
+        }
+
         Data upsize() {
             Data ret = new JumboData();
             for (short index = 0; index < data.length; index++) {
@@ -306,7 +356,38 @@ public class FlatChunkLayer {
                 context.visit(index, face);
             }
         }
+
+        @Override
+        public void iterateBounded(Coord min, Coord max, IterateContext context) {
+            dumbIterate(this, min, max, context);
+        }
     }
+
+    static void dumbIterate(final Data data, Coord min, Coord max, final IterateContext context) {
+        min = min.copy();
+        max = max.copy();
+        if (min.x < context.minX) min.x = context.minX;
+        if (min.y < context.minY) min.y = context.minY;
+        if (min.z < context.minZ) min.z = context.minZ;
+        if (max.x > context.maxX) max.x = context.maxX;
+        if (max.y > context.maxY) max.y = context.maxY;
+        if (max.z > context.maxZ) max.z = context.maxZ;
+        Coord.iterateCube(min, max, new ICoordFunction() {
+            @Override
+            public void handle(Coord at) {
+                int localY = at.y & 0xF;
+                int localX = at.x & 0xF;
+                int localZ = at.z & 0xF;
+                for (EnumFacing dir : POS_FACES) {
+                    short index = index(localX, localY, localZ, dir);
+                    FlatFace face = data.get(index);
+                    context.visit(index, face);
+                }
+            }
+        });
+    }
+
+    public static final EnumFacing[] POS_FACES = new EnumFacing[] { EnumFacing.UP, EnumFacing.SOUTH, EnumFacing.EAST };
 
     final Data[] slabs = new Data[16];
     public final IFlatRenderInfo renderInfo = FlatMod.proxy.constructRenderInfo();
@@ -363,6 +444,18 @@ public class FlatChunkLayer {
             Data slab = slabs[slabY];
             IterateContext context = new IterateContext(chunk, slabY, visitor);
             slab.iterate(context);
+        }
+    }
+
+    public void iterateBounded(Chunk chunk, Coord min, Coord max, IFlatVisitor visitor) {
+        int minSlab = min.y >> 4;
+        int maxSlab = 1 + ((max.y + 0xF) >> 4);
+        if (minSlab < 0) minSlab = 0;
+        if (maxSlab > slabs.length) maxSlab = slabs.length;
+        for (int slabY = minSlab; slabY < maxSlab; slabY++) {
+            Data slab = slabs[slabY];
+            IterateContext context = new IterateContext(chunk, slabY, visitor);
+            slab.iterateBounded(min, max, context);
         }
     }
 

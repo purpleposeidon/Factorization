@@ -1,13 +1,17 @@
 package factorization.flat.api;
 
 import factorization.api.Coord;
+import factorization.api.ICoordFunction;
+import factorization.coremodhooks.IExtraChunkData;
 import factorization.flat.FlatFaceAir;
 import factorization.flat.FlatMod;
+import factorization.flat.FlatRayTracer;
 import factorization.util.PlayerUtil;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.world.chunk.Chunk;
 
 import java.util.ArrayList;
 
@@ -103,5 +107,16 @@ public final class Flat {
 
     public static void setAir(Coord at, EnumFacing side) {
         set(at, side, FlatFaceAir.INSTANCE);
+    }
+
+    public static void iterateRegion(final Coord min, final Coord max, final IFlatVisitor visitor) {
+        Coord.iterateCube(min, max, new ICoordFunction() {
+            @Override
+            public void handle(Coord here) {
+                Chunk chunk = here.getChunk();
+                IExtraChunkData ecd = (IExtraChunkData) chunk;
+                ecd.getFlatLayer().iterateBounded(chunk, min, max, visitor);
+            }
+        });
     }
 }

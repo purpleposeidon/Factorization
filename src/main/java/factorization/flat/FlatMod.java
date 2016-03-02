@@ -105,6 +105,7 @@ public class FlatMod implements FMLControlledNamespacedRegistry.AddCallback<Flat
         void initClient() {
             setupEntityHack();
             redrawWhenSettingsChange();
+            FlatRayTracer.INSTANCE.init();
         }
 
         private void redrawWhenSettingsChange() {

@@ -2,8 +2,10 @@ package factorization.flat;
 
 import factorization.api.Coord;
 import factorization.flat.api.FlatFace;
+import factorization.flat.api.IBoxList;
 import factorization.flat.api.IFlatModel;
 import factorization.flat.api.IModelMaker;
+import net.minecraft.entity.Entity;
 import net.minecraft.util.EnumFacing;
 
 import javax.annotation.Nullable;
@@ -29,5 +31,9 @@ public final class FlatFaceAir extends FlatFace {
     @Override
     public boolean isNull() {
         return true;
+    }
+
+    @Override
+    public void listSelectionBounds(Coord at, EnumFacing side, Entity player, IBoxList list) {
     }
 }
