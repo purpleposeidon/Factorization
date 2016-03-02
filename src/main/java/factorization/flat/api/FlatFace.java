@@ -76,8 +76,7 @@ public abstract class FlatFace implements IDataSerializable {
     }
 
     public void listSelectionBounds(Coord at, EnumFacing side, Entity player, IBoxList list) {
-        list.add(getBounds(at, side, 0.5, 0.25));
-        //list.add(getBounds(at, side, 0.5, 1.0 / 16.0));
+        list.add(getBounds(at, side, 0.5 - 1.0 / 16.0, 1.0 / 64.0));
     }
 
     /**

@@ -21,7 +21,12 @@ public class FlatRayTarget extends Entity {
         return true;
     }
 
-    Coord at;
-    EnumFacing side;
-    AxisAlignedBB box;
+    @Override
+    public float getCollisionBorderSize() {
+        return 0;
+    }
+
+    public Coord at;
+    public EnumFacing side;
+    public AxisAlignedBB box;
 }
