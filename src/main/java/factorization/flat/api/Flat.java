@@ -115,7 +115,7 @@ public final class Flat {
             public void handle(Coord here) {
                 Chunk chunk = here.getChunk();
                 IExtraChunkData ecd = (IExtraChunkData) chunk;
-                ecd.getFlatLayer().iterateBounded(chunk, min, max, visitor);
+                ecd.getFlatLayer().iterateBounded(min, max, visitor);
             }
         });
     }

@@ -34,7 +34,7 @@ public class MixinExtraChunkData extends Chunk implements IExtraChunkData {
 
     public FlatChunkLayer getFlatLayer() {
         if (flatLayer == null) {
-            flatLayer = new FlatChunkLayer();
+            flatLayer = new FlatChunkLayer((Chunk) (Object) /* Probably not necessary. */ this);
         }
         return flatLayer;
     }

@@ -11,17 +11,15 @@ import factorization.shared.Core;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.network.NetHandlerPlayClient;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.network.NetHandlerPlayServer;
 import net.minecraft.network.PacketBuffer;
-import net.minecraft.network.play.INetHandlerPlayClient;
-import net.minecraft.network.play.INetHandlerPlayServer;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.fml.common.gameevent.TickEvent;
 import net.minecraftforge.fml.common.network.ByteBufUtils;
 import net.minecraftforge.fml.common.network.FMLEventChannel;
 import net.minecraftforge.fml.common.network.FMLNetworkEvent;
@@ -32,6 +30,9 @@ import net.minecraftforge.fml.relauncher.Side;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.io.IOException;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
 
 public class FlatNet {
     static final String channelName = "fzFlat";
@@ -40,6 +41,7 @@ public class FlatNet {
     public FlatNet() {
         channel = NetworkRegistry.INSTANCE.newEventDrivenChannel(channelName);
         channel.register(this);
+        Core.loadBus(this);
     }
 
     @SubscribeEvent
@@ -97,11 +99,10 @@ public class FlatNet {
     }
 
     static FMLProxyPacket syncChunk(EntityPlayer player, Coord at) {
-        Chunk chunk = at.getChunk();
-        IExtraChunkData ecd = (IExtraChunkData) chunk;
+        IExtraChunkData ecd = (IExtraChunkData) at.getChunk();
         FlatChunkLayer data = ecd.getFlatLayer();
         SyncWrite writer = new SyncWrite();
-        data.iterate(chunk, writer);
+        data.iterate(writer);
         writer.finish();
         return build(writer.buff);
     }
@@ -177,7 +178,22 @@ public class FlatNet {
         }
     }
 
+    static void sendAround(Chunk chunk, FMLProxyPacket toSend) {
+
+    }
+
     static void log(String msg) {
         Core.logWarning(msg);
+    }
+
+    public static final Set<FlatChunkLayer> pending = Collections.synchronizedSet(new HashSet<FlatChunkLayer>());
+    @SubscribeEvent
+    public void updateClients(TickEvent.ServerTickEvent event) {
+        synchronized (pending) {
+            for (FlatChunkLayer flat : pending) {
+                flat.updateClients();
+            }
+            pending.clear();
+        }
     }
 }

@@ -195,7 +195,7 @@ public class FlatMod implements FMLControlledNamespacedRegistry.AddCallback<Flat
         final Chunk chunk = event.getChunk();
         final FlatChunkLayer layer = ((IExtraChunkData) chunk).getFlatLayer();
         final NBTTagList out = new NBTTagList();
-        layer.iterate(chunk, new IFlatVisitor() {
+        layer.iterate(new IFlatVisitor() {
             @Override
             public void visit(Coord at, EnumFacing side, @Nonnull FlatFace face) {
                 if (face.isNull()) return;

@@ -52,7 +52,7 @@ public final class ClientRenderInfo implements IFlatRenderInfo {
         if (!dirty) return;
         dirty = false;
         Drawer visitor = new Drawer(this);
-        layer.iterate(chunk, visitor);
+        layer.iterate(visitor);
         visitor.finish();
     }
 }

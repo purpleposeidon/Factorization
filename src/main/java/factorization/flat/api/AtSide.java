@@ -10,12 +10,12 @@ import net.minecraft.world.chunk.Chunk;
 
 import java.util.Iterator;
 
-/** This class is internal. */
-class AtSide {
-    final Coord at;
-    final EnumFacing side;
+/** This class is internal and is not for general use. */
+public class AtSide {
+    public final Coord at;
+    public final EnumFacing side;
 
-    AtSide(Coord at, EnumFacing side) {
+    public AtSide(Coord at, EnumFacing side) {
         if (SpaceUtil.sign(side) == -1) {
             this.at = at.add(side);
             this.side = side.getOpposite();

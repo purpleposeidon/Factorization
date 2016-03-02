@@ -2,9 +2,11 @@ package factorization.flat;
 
 import factorization.api.Coord;
 import factorization.api.ICoordFunction;
+import factorization.flat.api.AtSide;
 import factorization.flat.api.FlatFace;
 import factorization.flat.api.IFlatRenderInfo;
 import factorization.flat.api.IFlatVisitor;
+import factorization.net.FzNetDispatch;
 import factorization.util.SpaceUtil;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.world.chunk.Chunk;
@@ -12,6 +14,7 @@ import net.minecraftforge.fml.common.registry.FMLControlledNamespacedRegistry;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -24,7 +27,7 @@ public class FlatChunkLayer {
         return (short) ret;
     }
 
-    class IterateContext {
+    static class IterateContext {
         final Chunk chunk;
         final IFlatVisitor visitor;
         final Coord at;
@@ -70,10 +73,6 @@ public class FlatChunkLayer {
     static abstract class Data {
         static final int FULL_SIZE = 16 * 16 * 16 * 3;
         transient int set = 0;
-
-        boolean isIndirect(int index) {
-            return false;
-        }
 
         @Nullable
         abstract FlatFace get(short index);
@@ -241,14 +240,6 @@ public class FlatChunkLayer {
             return registry.getObjectById(id);
         }
 
-        @Override
-        boolean isIndirect(int index) {
-            if (index < 0) return false;
-            if (index >= data.length) return false;
-            char id = data[index];
-            return id == FlatMod.DYNAMIC_SENTINEL;
-        }
-
         @Nullable
         @Override
         FlatFace get(short index) {
@@ -389,13 +380,19 @@ public class FlatChunkLayer {
 
     public static final EnumFacing[] POS_FACES = new EnumFacing[] { EnumFacing.UP, EnumFacing.SOUTH, EnumFacing.EAST };
 
+    final Chunk chunk;
     final Data[] slabs = new Data[16];
+    @Nullable
+    final ArrayList<AtSide> changed; // Might've packed bits into an int[], but too difficult to be certain w/ Java
+    public static final int MAX_CHANGES = 32;
     public final IFlatRenderInfo renderInfo = FlatMod.proxy.constructRenderInfo();
 
-    public FlatChunkLayer() {
+    public FlatChunkLayer(Chunk chunk) {
+        this.chunk = chunk;
         for (int i = 0; i < slabs.length; i++) {
             slabs[i] = NoData.INSTANCE;
         }
+        changed = chunk.getWorld().isRemote ? null : new ArrayList<AtSide>();
     }
 
     private Data slabIndex(int localY) {
@@ -436,10 +433,11 @@ public class FlatChunkLayer {
         }
         FlatFace ret = slab.get(index);
         renderInfo.markDirty(at);
+        addChange(at, dir);
         return ret;
     }
 
-    public void iterate(Chunk chunk, IFlatVisitor visitor) {
+    public void iterate(IFlatVisitor visitor) {
         for (int slabY = 0; slabY < slabs.length; slabY++) {
             Data slab = slabs[slabY];
             IterateContext context = new IterateContext(chunk, slabY, visitor);
@@ -447,7 +445,7 @@ public class FlatChunkLayer {
         }
     }
 
-    public void iterateBounded(Chunk chunk, Coord min, Coord max, IFlatVisitor visitor) {
+    public void iterateBounded(Coord min, Coord max, IFlatVisitor visitor) {
         int minSlab = min.y >> 4;
         int maxSlab = 1 + ((max.y + 0xF) >> 4);
         if (minSlab < 0) minSlab = 0;
@@ -466,5 +464,26 @@ public class FlatChunkLayer {
 
     void discard() {
         renderInfo.discard();
+    }
+
+    void addChange(Coord at, EnumFacing side) {
+        if (changed == null) return;
+        if (changed.size() > MAX_CHANGES) return;
+        changed.add(new AtSide(at, side));
+        FlatNet.pending.add(this);
+    }
+
+    void updateClients() {
+        if (changed == null) return;
+        FlatNet.SyncWrite sw = new FlatNet.SyncWrite();
+        if (changed.size() > MAX_CHANGES) {
+            iterate(sw);
+        } else {
+            for (AtSide as : changed) {
+                sw.visit(as.at, as.side, get(as.at, as.side));
+            }
+        }
+        changed.clear();
+        FzNetDispatch.addPacketFrom(FlatNet.build(sw.buff), chunk);
     }
 }

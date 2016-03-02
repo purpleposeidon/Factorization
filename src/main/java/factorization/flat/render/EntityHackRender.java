@@ -28,6 +28,7 @@ import javax.annotation.Nonnull;
 public final class EntityHackRender extends Render<EntityHack> {
     public EntityHackRender(RenderManager renderManager) {
         super(renderManager);
+        NORELEASE.fixme("Static entity renderer?");
     }
 
     @Override
