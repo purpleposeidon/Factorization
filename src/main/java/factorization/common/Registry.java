@@ -14,6 +14,7 @@ import factorization.colossi.*;
 import factorization.crafting.BlockCompressionCrafter;
 import factorization.crafting.ItemFakeBlock;
 import factorization.darkiron.BlockDarkIronOre;
+import factorization.flat.ItemFlat;
 import factorization.fzds.DeltaChunk;
 import factorization.fzds.HammerEnabled;
 import factorization.mechanics.ItemDarkIronChain;
@@ -176,6 +177,7 @@ public class Registry {
     public ItemBrokenArtifact brokenTool;
     public ItemManSandwich manSandwich;
     public ItemFakeBlock waterBlockItem, lavaBlockItem;
+    public ItemFlat wirePlacer;
 
     public Material materialMachine = new Material(MapColor.ironColor);
 
@@ -422,9 +424,6 @@ public class Registry {
         acid = new ItemAcidBottle();
         sulfuric_acid = new ItemStack(acid, 1);
         aqua_regia = new ItemStack(acid, 1, 1);
-        OreDictionary.registerOre("sulfuricAcid", sulfuric_acid);
-        OreDictionary.registerOre("bottleSulfuricAcid", sulfuric_acid);
-        OreDictionary.registerOre("aquaRegia", aqua_regia);
         insulated_coil = new ItemCraftingComponent("insulated_coil");
         motor = new ItemCraftingComponent("motor");
         giant_scissors = new ItemCraftingComponent("socket/scissors");
@@ -496,8 +495,15 @@ public class Registry {
 
         waterBlockItem = new ItemFakeBlock("waterTile", TabType.MATERIALS, Blocks.flowing_water);
         lavaBlockItem = new ItemFakeBlock("lavaTile", TabType.MATERIALS, Blocks.flowing_lava);
+        wirePlacer = new ItemFlat(ChargeFeature.INSTANCE.wire0, TabType.CHARGE);
         postMakeItems();
+        registerOres();
+    }
 
+    public void registerOres() {
+        OreDictionary.registerOre("sulfuricAcid", sulfuric_acid);
+        OreDictionary.registerOre("bottleSulfuricAcid", sulfuric_acid);
+        OreDictionary.registerOre("aquaRegia", aqua_regia);
         OreDictionary.registerOre("ingotCopper", copper_ingot);
         OreDictionary.registerOre("blockCopper", copper_block_item);
         OreDictionary.registerOre("oreCopper", copper_ore_item);

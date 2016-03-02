@@ -1,21 +1,31 @@
 package factorization.flat;
 
+import com.google.common.collect.BiMap;
+import com.google.common.collect.HashBiMap;
 import com.google.common.collect.Maps;
 import factorization.api.Coord;
 import factorization.api.datahelpers.DataInNBT;
 import factorization.api.datahelpers.DataOutNBT;
 import factorization.coremodhooks.IExtraChunkData;
 import factorization.shared.Core;
+import factorization.util.FzUtil;
+import factorization.util.NORELEASE;
 import factorization.weird.barrel.BarrelModel;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.model.ModelMagmaCube;
+import net.minecraft.client.multiplayer.ChunkProviderClient;
 import net.minecraft.client.renderer.entity.Render;
 import net.minecraft.client.renderer.entity.RenderManager;
+import net.minecraft.client.resources.IResourceManager;
+import net.minecraft.client.resources.IResourceManagerReloadListener;
+import net.minecraft.client.resources.SimpleReloadableResourceManager;
 import net.minecraft.client.resources.model.ModelManager;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.chunk.Chunk;
+import net.minecraft.world.chunk.IChunkProvider;
 import net.minecraftforge.client.event.ModelBakeEvent;
 import net.minecraftforge.client.event.TextureStitchEvent;
 import net.minecraftforge.client.model.IRetexturableModel;
@@ -40,25 +50,37 @@ import javax.annotation.Nullable;
 import java.io.IOException;
 import java.util.HashMap;
 
+@Mod(
+        modid = FlatMod.modId,
+        name = FlatMod.name,
+        version = Core.version
+)
 public class FlatMod implements FMLControlledNamespacedRegistry.AddCallback<FlatFace> {
-    @Mod.Instance
+    public static final String modId = Core.modId + ".flat";
+    public static final String name = "Factorization Miscellaneous Nonsense";
+
     public static FlatMod INSTANCE;
 
     public static Logger log;
 
-    @Mod.EventHandler
-    public void init(FMLPreInitializationEvent event) {
-        log = event.getModLog();
+    public FlatMod() {
+        INSTANCE = this; // @Mod.Instance doesn't work.
         Core.loadBus(this);
         Core.loadBus(proxy);
         Flat.registerDynamic(new ResourceLocation("flat:air"), FlatFaceAir.class);
         proxy.initClient();
     }
 
+    @Mod.EventHandler
+    public void init(FMLPreInitializationEvent event) {
+        log = event.getModLog();
+        //FzUtil.setCoreParent(event);
+    }
+
     @SidedProxy
     public static ServerProxy proxy;
 
-    static class ServerProxy {
+    public static class ServerProxy {
         void initClient() { }
         IFlatRenderInfo constructRenderInfo() {
             return IFlatRenderInfo.NULL;
@@ -78,7 +100,7 @@ public class FlatMod implements FMLControlledNamespacedRegistry.AddCallback<Flat
         }
     }
 
-    static class ClientProxy extends ServerProxy {
+    public static class ClientProxy extends ServerProxy {
         @Override
         void initClient() {
             RenderingRegistry.registerEntityRenderingHandler(EntityHack.class, new IRenderFactory<EntityHack>() {
@@ -87,12 +109,28 @@ public class FlatMod implements FMLControlledNamespacedRegistry.AddCallback<Flat
                     return new EntityHackRender(manager);
                 }
             });
+            final Minecraft mc = Minecraft.getMinecraft();
+            IResourceManagerReloadListener redrawFlats = new IResourceManagerReloadListener() {
+                @Override
+                public void onResourceManagerReload(IResourceManager resourceManager) {
+                    if (mc.theWorld == null) return;
+                    IChunkProvider cp = mc.theWorld.getChunkProvider();
+                    if (cp instanceof ChunkProviderClient) {
+                        ChunkProviderClient cpc = (ChunkProviderClient) cp;
+                        for (Chunk chunk : cpc.chunkListing) {
+                            FlatChunkLayer fcl = ((IExtraChunkData) chunk).getFlatLayer();
+                            fcl.renderInfo.markDirty(null);
+                        }
+                    }
+                }
+            };
+            ((SimpleReloadableResourceManager) mc.getResourceManager()).registerReloadListener(redrawFlats);
         }
 
         @Override
         IFlatRenderInfo constructRenderInfo() {
             if (FMLCommonHandler.instance().getEffectiveSide() == Side.SERVER) return IFlatRenderInfo.NULL;
-            return super.constructRenderInfo();
+            return new EntityHackRender.ClientRenderInfo();
         }
     }
 
@@ -102,7 +140,7 @@ public class FlatMod implements FMLControlledNamespacedRegistry.AddCallback<Flat
     static final char MAX_ID = Character.MAX_VALUE;
     static final char MIN_ID = DYNAMIC_SENTINEL + 1;
     static final FMLControlledNamespacedRegistry<FlatFace> staticReg = PersistentRegistryManager.createRegistry(FLATS, FlatFace.class, null /* default flat value */, MAX_ID, MIN_ID, false, INSTANCE);
-    static final HashMap<ResourceLocation, Class<? extends FlatFace>> dynamicReg = Maps.newHashMap();
+    static final BiMap<ResourceLocation, Class<? extends FlatFace>> dynamicReg = HashBiMap.create();
     static final HashMap<ResourceLocation, FlatFace> dynamicSamples = Maps.newHashMap();
     static final String NBT_KEY = "fz:flats";
 

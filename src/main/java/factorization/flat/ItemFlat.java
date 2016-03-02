@@ -3,10 +3,12 @@ package factorization.flat;
 import factorization.api.Coord;
 import factorization.shared.Core;
 import factorization.shared.ItemFactorization;
+import factorization.util.NORELEASE;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.EnumFacing;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
 
 /**
@@ -15,9 +17,15 @@ import net.minecraft.world.World;
 public class ItemFlat extends ItemFactorization {
     public final FlatFace face;
 
-    public ItemFlat(String name, Core.TabType tabType, FlatFace face) {
-        super(name, tabType);
+    public ItemFlat(FlatFace face, Core.TabType tabType) {
+        super(getName(face), tabType);
         this.face = face;
+        NORELEASE.fixme("This package should NOT contain FZ-specific things");
+    }
+
+    static String getName(FlatFace face) {
+        if (face == null) throw new NullPointerException();
+        return Flat.getName(face).getResourcePath();
     }
 
     @Override

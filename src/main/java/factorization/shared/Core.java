@@ -2,6 +2,7 @@ package factorization.shared;
 
 import factorization.artifact.InspirationManager;
 import factorization.beauty.EntityLeafBomb;
+import factorization.charge.ChargeFeature;
 import factorization.charge.TileEntitySolarBoiler;
 import factorization.colossi.BuildColossusCommand;
 import factorization.colossi.ColossusController;
@@ -191,6 +192,7 @@ public class Core {
         checkForge();
         Core.loadBus(registry);
         fzconfig.loadConfig(event.getSuggestedConfigurationFile());
+        ChargeFeature.INSTANCE.init();
         registry.makeBlocks();
 
         NetworkRegistry.INSTANCE.registerGuiHandler(this, proxy);

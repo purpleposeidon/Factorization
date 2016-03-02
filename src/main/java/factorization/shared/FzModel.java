@@ -1,6 +1,7 @@
 package factorization.shared;
 
 import com.google.common.base.Function;
+import factorization.util.NORELEASE;
 import factorization.util.RenderUtil;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.GlStateManager;
@@ -13,6 +14,8 @@ import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.client.renderer.vertex.VertexFormat;
 import net.minecraft.client.resources.IResourceManager;
 import net.minecraft.client.resources.model.IBakedModel;
+import net.minecraft.client.resources.model.ModelManager;
+import net.minecraft.client.resources.model.ModelResourceLocation;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.client.event.TextureStitchEvent;
@@ -27,10 +30,7 @@ import org.lwjgl.opengl.GL11;
 
 import javax.annotation.Nullable;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.IdentityHashMap;
-import java.util.List;
+import java.util.*;
 
 public class FzModel {
     // Don't SideOnly this class.
@@ -53,7 +53,7 @@ public class FzModel {
     }
 
     public FzModel(String name, boolean blend, int format_id) {
-        this(new ResourceLocation("factorization:models/fzmodel/" + name), blend, format_id);
+        this(new ResourceLocation("factorization:fzmodel/" + name), blend, format_id);
     }
 
     public FzModel(ResourceLocation url) {
@@ -131,38 +131,47 @@ public class FzModel {
     @SideOnly(Side.CLIENT)
     public static class ModelWrangler {
         public static boolean hasLoaded = false;
+        IdentityHashMap<FzModel, IModel> raws = new IdentityHashMap<FzModel, IModel>();
         @SubscribeEvent
         public void loadModels(TextureStitchEvent.Pre event) {
+            raws.clear();
             //event.modelBakery.reg
             Minecraft mc = Minecraft.getMinecraft();
 
             IResourceManager irm = mc.getResourceManager();
             HashSet<ResourceLocation> textures = new HashSet<ResourceLocation>();
-            IdentityHashMap<FzModel, IModel> raws = new IdentityHashMap<FzModel, IModel>();
             for (FzModel fzm : instances) {
                 fzm.model = null;
                 ResourceLocation location = fzm.getLocation(irm);
-                if (location == null) continue;
                 IModel rawModel = null;
                 try {
-                    rawModel = ModelLoaderRegistry.getModel(location);
+                    if (location != null) {
+                        rawModel = ModelLoaderRegistry.getModel(location);
+                    }
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
-                if (rawModel == null) continue;
+                if (rawModel == null) {
+                    rawModel = ModelLoaderRegistry.getMissingModel();
+                }
                 raws.put(fzm, rawModel);
-                textures.addAll(rawModel.getTextures());
+                Collection<ResourceLocation> modelTextures = rawModel.getTextures();
+                textures.addAll(modelTextures);
             }
             for (ResourceLocation texture : textures) {
                 event.map.registerSprite(texture);
             }
+        }
+
+        @SubscribeEvent
+        public void bakeModels(TextureStitchEvent.Post event) {
             final TextureMap map = event.map;
             Function<ResourceLocation,TextureAtlasSprite> lookup = new Function<ResourceLocation, TextureAtlasSprite>() {
                 @Nullable
                 @Override
                 public TextureAtlasSprite apply(@Nullable ResourceLocation input) {
                     if (input == null) return map.getAtlasSprite(null);
-                    return map.registerSprite(input);
+                    return map.getAtlasSprite(input.toString());
                 }
             };
             for (FzModel fzm : instances) {
@@ -173,7 +182,7 @@ public class FzModel {
                 }
                 fzm.model = rawModel.bake(fzm.trsrt, fzm.getFormat(), lookup);
             }
-
+            raws.clear();
         }
     }
 
@@ -190,18 +199,23 @@ public class FzModel {
         extensions.add("json");
     }
     protected ResourceLocation getLocation(IResourceManager irm) {
+        IOException lastError = null;
         for (String ext : extensions) {
             try {
-                irm.getResource(url);
+                ResourceLocation testLocation = new ResourceLocation(url.getResourceDomain(), "models/" + url.getResourcePath() + "." + ext);
+                irm.getResource(testLocation);
                 if (ext.equalsIgnoreCase("json")) {
                     return url;
                 }
-                return new ResourceLocation(url.toString() + "." + ext);
+                return new ResourceLocation(url.getResourceDomain(), url.getResourcePath() + "." + ext);
             } catch (IOException e) {
-                // ignored
+                lastError = e;
             }
         }
         Core.logSevere("Failed to load model: " + url);
+        if (lastError != null) {
+            lastError.printStackTrace();
+        }
         return null;
     }
 }

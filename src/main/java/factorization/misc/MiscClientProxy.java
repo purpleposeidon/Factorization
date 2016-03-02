@@ -269,6 +269,7 @@ public class MiscClientProxy extends MiscProxy {
     }
 
     private static void dedupeResourcePacks() {
+        if (Boolean.getBoolean("fz.misc.dupedpacks")) return;
         Minecraft mc = Minecraft.getMinecraft();
         HashSet<File> seen = new HashSet<File>();
         int removed = 0;

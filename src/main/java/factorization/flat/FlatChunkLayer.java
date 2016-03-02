@@ -35,7 +35,9 @@ public class FlatChunkLayer {
             this.minZ = chunk.zPosition << 4;
         }
 
-        void visit(int index, @Nonnull FlatFace face) {
+        void visit(int index, @Nullable FlatFace face) {
+            if (face == null) return;
+            if (face.isNull()) return;
             EnumFacing side = FlatMod.byte2side(index);
             int slX = (index >> 2) & 0xF;
             int slY = (index >> 6) & 0xF;
@@ -298,8 +300,6 @@ public class FlatChunkLayer {
         public void iterate(IterateContext context) {
             for (int index = 0; index < data.length; index++) {
                 FlatFace face = data[index];
-                if (face == null) continue;
-                if (face.isNull()) continue;
                 context.visit(index, face);
             }
         }
@@ -321,11 +321,12 @@ public class FlatChunkLayer {
     }
 
     FlatFace get(Coord at, EnumFacing dir) {
-        int localY = at.y;
-        int localX = at.x >> 4;
-        int localZ = at.z >> 4;
-        Data slab = slabIndex(localY);
+        int localY = at.y & 0xF;
+        int localX = at.x & 0xF;
+        int localZ = at.z & 0xF;
+        Data slab = slabIndex(at.y >> 4);
         short index = index(localX, localY, localZ, dir);
+        if (index == -1) return FlatFaceAir.INSTANCE;
         FlatFace ret = slab.get(index);
         if (ret == null) {
             ret = FlatFaceAir.INSTANCE;
@@ -337,11 +338,14 @@ public class FlatChunkLayer {
         if (face == FlatFaceAir.INSTANCE) {
             face = null;
         }
-        int localY = at.y;
-        int localX = at.x >> 4;
-        int localZ = at.z >> 4;
-        Data slab = slabIndex(localY);
+        int localY = at.y & 0xF;
+        int localX = at.x & 0xF;
+        int localZ = at.z & 0xF;
+        Data slab = slabIndex(at.y >> 4);
         short index = index(localX, localY, localZ, dir);
+        if (index == -1) {
+            return FlatFaceAir.INSTANCE;
+        }
         Data newSlab = slab.set(index, face, at);
         if (slab != newSlab) {
             slabs[localY >> 4] = newSlab;

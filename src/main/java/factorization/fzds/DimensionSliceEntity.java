@@ -221,7 +221,7 @@ public final class DimensionSliceEntity extends DimensionSliceFussyDetails {
         transform = data.as(Share.VISIBLE, "s").putIDS(transform);
         velocity = data.as(Share.VISIBLE, "v").putIDS(velocity);
 
-        order = (ITransformOrder) data.as(Share.VISIBLE, "order").putRegisteredUnion(ITransformOrder.Registry.registry, order);
+        order = (ITransformOrder) data.as(Share.VISIBLE, "order").putRegisteredUnion(ITransformOrder.TransformRegistry.registry, order);
     }
     
     private AxisAlignedBB offsetAABB(AxisAlignedBB orig, double dx, double dy, double dz) {

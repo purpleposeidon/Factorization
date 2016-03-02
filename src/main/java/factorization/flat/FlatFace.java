@@ -42,6 +42,14 @@ public abstract class FlatFace implements IDataSerializable {
 
     }
 
+    /**
+     *
+     * @return The species. This method is provided as a way to avoid instanceof checks. Use with {@link Flat#nextSpeciesId()}
+     */
+    public int getSpecies() {
+        return -1;
+    }
+
     @Override
     public IDataSerializable serialize(String prefix, DataHelper data) throws IOException {
         return this;

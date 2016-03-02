@@ -10,11 +10,14 @@ import net.minecraft.util.ResourceLocation;
 import java.util.ArrayList;
 
 public final class Flat {
-    public static void registerStatic(ResourceLocation name, FlatFace flat) {
+    public static FlatFace registerStatic(ResourceLocation name, FlatFace flat) {
         if (flat.staticId != FlatMod.DYNAMIC_SENTINEL) {
             throw new IllegalArgumentException(name + " was already registered");
         }
-        FlatMod.staticReg.putObject(name, flat);
+        //noinspection deprecation -- Yes cpw, I'll just hack this into GameRegistry
+        FlatMod.staticReg.register(-1 /* The registry should pick a proper ID */, name, flat);
+        if (!getName(flat).equals(name)) throw new AssertionError("registration failed");
+        return flat;
     }
 
     public static void registerDynamic(ResourceLocation name, Class<? extends FlatFace> flatClass) {
@@ -28,6 +31,14 @@ public final class Flat {
             throw new IllegalArgumentException(t);
         }
         FlatMod.dynamicReg.put(name, flatClass);
+    }
+
+    public static ResourceLocation getName(FlatFace flat) {
+        if (flat.isStatic()) {
+            return FlatMod.staticReg.getNameForObject(flat);
+        } else {
+            return FlatMod.dynamicReg.inverse().get(flat.getClass());
+        }
     }
 
     public static FlatFace get(Coord at, EnumFacing side) {
@@ -72,5 +83,10 @@ public final class Flat {
         }
         ret.addAll(FlatMod.dynamicSamples.values());
         return ret;
+    }
+
+    private static int SPECIES = 0;
+    public static int nextSpeciesId() {
+        return ++SPECIES;
     }
 }
