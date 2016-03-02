@@ -43,6 +43,15 @@ public final class Flat {
         }
     }
 
+    public static FlatFace getDynamic(ResourceLocation name) {
+        try {
+            return FlatMod.dynamicReg.get(name).newInstance();
+        } catch (Throwable e) {
+            e.printStackTrace();
+            return FlatFaceAir.INSTANCE;
+        }
+    }
+
     public static FlatFace get(Coord at, EnumFacing side) {
         return new AtSide(at, side).get();
     }

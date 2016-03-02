@@ -43,6 +43,14 @@ public abstract class FlatFace implements IDataSerializable {
 
     }
 
+    public void onActivate(Coord at, EnumFacing side, EntityPlayer player) {
+
+    }
+
+    public void onHit(Coord at, EnumFacing side, EntityPlayer player) {
+
+    }
+
     /**
      *
      * @return The species. This method is provided as a way to avoid instanceof checks. Use with {@link Flat#nextSpeciesId()}
