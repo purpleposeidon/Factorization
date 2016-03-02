@@ -1,15 +1,24 @@
 {
     "elements": [
-        {   "from": [ -0.125, -0.125, -0.125 ],
-            "to":   [ 16.125, 16.125, 16.125 ],
-            "__comment": "TODO: Should use 1 element per face instead; also probably shrink the box a bit",
+        {   "from": [ 0, -0.03124, 0 ],
+            "to":   [ 16, 16.03124, 16 ],
             "faces": {
-                "down":  { "texture": "#face", "cullface": "down" },
-                "up":    { "texture": "#face", "cullface": "up" },
-                "north": { "texture": "#face", "cullface": "north" },
-                "south": { "texture": "#face", "cullface": "south" },
-                "west":  { "texture": "#face", "cullface": "west" },
-                "east":  { "texture": "#face", "cullface": "east" }
+                "down":  { "texture": "#face", "uv": [0, 0, 16, 16], "cullface": "down" },
+                "up":    { "texture": "#face", "uv": [0, 0, 16, 16], "cullface": "up" }
+            }
+        },
+        {   "from": [ 0, 0, -0.03124 ],
+            "to":   [ 16, 16, 16.03124 ],
+            "faces": {
+                "north": { "texture": "#face", "uv": [0, 0, 16, 16], "cullface": "north" },
+                "south": { "texture": "#face", "uv": [0, 0, 16, 16], "cullface": "south" }
+            }
+        },
+        {   "from": [ -0.03124, 0, 0 ],
+            "to":   [ 16.03124, 16, 16 ],
+            "faces": {
+                "west":  { "texture": "#face", "uv": [0, 0, 16, 16], "cullface": "west"  },
+                "east":  { "texture": "#face", "uv": [0, 0, 16, 16], "cullface": "east" }
             }
         }
     ],
