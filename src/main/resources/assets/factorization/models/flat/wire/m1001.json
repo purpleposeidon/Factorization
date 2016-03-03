@@ -1,5 +1,5 @@
 {
-    "parent": "factorization:flat270",
+    "parent": "factorization:flat270a",
     "textures": {
         "face": "factorization:blocks/charge/wire/bend"
     }
