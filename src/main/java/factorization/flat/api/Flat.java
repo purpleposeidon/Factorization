@@ -6,6 +6,7 @@ import factorization.coremodhooks.IExtraChunkData;
 import factorization.flat.FlatFaceAir;
 import factorization.flat.FlatMod;
 import factorization.shared.Core;
+import factorization.util.NORELEASE;
 import factorization.util.PlayerUtil;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
@@ -95,6 +96,8 @@ public final class Flat {
         // Notifies all 'adjacent' faces. There are 3 sets of 4 faces: the 4 in-plane, and the 8 on both blocks
         for (AtSide as : new AtSide(at, side).iterateConnected()) {
             as.get().onNeighborFaceChanged(as.at, as.side);
+            as.getLayer().renderInfo.markDirty(as.at);
+            NORELEASE.fixme("This doesn't fix updates across curves+chunkboundaries; see screenshot 18.43.13");
         }
     }
 
