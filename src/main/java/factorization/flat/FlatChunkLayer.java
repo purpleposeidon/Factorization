@@ -7,10 +7,13 @@ import factorization.flat.api.FlatFace;
 import factorization.flat.api.IFlatRenderInfo;
 import factorization.flat.api.IFlatVisitor;
 import factorization.net.FzNetDispatch;
+import factorization.shared.Core;
 import factorization.util.NORELEASE;
 import factorization.util.SpaceUtil;
 import net.minecraft.util.EnumFacing;
+import net.minecraft.world.World;
 import net.minecraft.world.chunk.Chunk;
+import net.minecraft.world.chunk.EmptyChunk;
 import net.minecraftforge.fml.common.registry.FMLControlledNamespacedRegistry;
 
 import javax.annotation.Nonnull;
@@ -24,8 +27,39 @@ public class FlatChunkLayer {
         if (slabX < 0 || slabY < 0 || slabZ < 0) return -1;
         if (slabX > 0xF || slabY > 0xF || slabZ > 0xF) return -1;
         if (SpaceUtil.sign(face) != 1) return -1;
-        int ret = (slabX << 2) | (slabY << 6) | (slabZ << 10) | FlatMod.side2byte(face);
+        int ret = (slabX) | (slabY << 4) | (slabZ << 8);
+        ret *= 3;
+        ret += FlatMod.side2byte(face);
         return (short) ret;
+    }
+
+    public static void main(String args[]) {
+        NORELEASE.println("Starting");
+        testIndices();
+        NORELEASE.println("Done");
+    }
+    static void testIndices() {
+        Chunk c = new Chunk((World) null, 0, 0);
+        IterateContext ic = new IterateContext(c, 0, null);
+        for (int x = 0; x < 0xF; x++) {
+            for (int y = 0; y < 0xF; y++) {
+                for (int z = 0; z < 0xF; z++) {
+                    for (EnumFacing f : FlatMod.sideLookup) {
+                        int index = index(x, y, z, f);
+                        ic.unpackIndex(index);
+                        Coord expect = new Coord(c).add(x, y, z);
+                        if (f != ic.side || !ic.at.equals(expect)) {
+                            NORELEASE.println("Fail!");
+                        }
+                    }
+                }
+            }
+        }
+
+        for (int i = 0; i < LargeData.FULL_SIZE; i++) {
+            ic.unpackIndex(i);
+            NORELEASE.println(ic.at.x, ic.at.y, ic.at.z, ic.side);
+        }
     }
 
     static class IterateContext {
@@ -60,14 +94,19 @@ public class FlatChunkLayer {
         boolean unpack(int index, @Nullable FlatFace face) {
             if (face == null) return true;
             if (face.isNull()) return true;
+            unpackIndex(index);
+            return false;
+        }
+
+        void unpackIndex(int index) {
             side = FlatMod.byte2side(index);
-            int slX = (index >> 2) & 0xF;
-            int slY = (index >> 6) & 0xF;
-            int slZ = (index >> 10) & 0xF;
+            final int i = (index - FlatMod.side2byte(side)) / 3;
+            int slX = (i) & 0xF;
+            int slY = (i >> 4) & 0xF;
+            int slZ = (i >> 8) & 0xF;
             at.x = minX + slX;
             at.y = minY + slY;
             at.z = minZ + slZ;
-            return false;
         }
     }
 
@@ -294,11 +333,11 @@ public class FlatChunkLayer {
         @Override
         public void iterate(IterateContext context) {
             for (int i = 0; i < FULL_SIZE; i++) {
-                int index = data[i];
-                if (index == FlatMod.NO_FACE) continue;
-                if (index == FlatMod.DYNAMIC_SENTINEL) continue;
-                FlatFace face = registry.getObjectById(index);
-                context.visit(index, face);
+                int id = data[i];
+                if (id == FlatMod.NO_FACE) continue;
+                if (id == FlatMod.DYNAMIC_SENTINEL) continue;
+                FlatFace face = registry.getObjectById(id);
+                context.visit(i, face);
             }
             for (Map.Entry<Integer, FlatFace> e : dynamic.entrySet()) {
                 int index = e.getKey();
@@ -441,6 +480,15 @@ public class FlatChunkLayer {
         short index = index(localX, localY, localZ, dir);
         if (index == -1) {
             return FlatFaceAir.INSTANCE;
+        }
+        if (NORELEASE.just(Core.dev_environ)) {
+            IterateContext ic = new IterateContext(chunk, at.y >> 4, null);
+            ic.unpackIndex(index);
+            if (!ic.at.equals(at) || ic.side != dir) {
+                if (!(chunk instanceof EmptyChunk)) {
+                    NORELEASE.println("Index fail! ", index, at);
+                }
+            }
         }
         int oSet = slab.set;
         Data newSlab = slab.set(index, face, at);
