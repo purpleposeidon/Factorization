@@ -20,8 +20,10 @@ import net.minecraft.entity.ai.attributes.ServersideAttributeMap;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.BlockPos;
+import net.minecraft.world.GameRules;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import net.minecraftforge.client.model.IModel;
@@ -268,5 +270,13 @@ public class FzUtil {
 
     public static Block getTraceHelper() {
         return new Block(Material.rock);
+    }
+
+    public static GameRules getRules(World world) {
+        return world.getGameRules();
+    }
+
+    public static boolean doTileDrops(World world) {
+        return getRules(world).getBoolean("doTileDrops");
     }
 }

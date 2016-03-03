@@ -7,9 +7,13 @@ import factorization.flat.api.FlatFace;
 import factorization.flat.api.IFlatModel;
 import factorization.flat.api.IModelMaker;
 import factorization.notify.Notice;
+import factorization.notify.Style;
 import factorization.shared.Core;
+import factorization.util.FzUtil;
 import factorization.util.NORELEASE;
+import factorization.util.PlayerUtil;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ResourceLocation;
 
@@ -72,21 +76,21 @@ public class FlatFaceWire extends FlatFace {
     protected int connectionInfo(Coord at, EnumFacing side) {
         int connections = 0; // Look at keyboard numpad. First it stores (8???) (68??) (268?) (4268)
         for (int hour = 0; hour < 4; hour++) {
+            connections >>= 1;
             EnumFacing hand = getEdgeOfFace(side, hour);
             if (hasAnyWire(at, side, hand)) {
                 connections |= 0x8;
             }
-            connections >>= 1;
         }
         return connections;
     }
 
     @Override
     public void onActivate(Coord at, EnumFacing side, EntityPlayer player) {
-        NORELEASE.println(at);
         if (Core.dev_environ) {
+            if (at.w.isRemote) return;
             if (player.getHeldItem() == null) {
-                new Notice(at, bin(connectionInfo(at, side))).sendTo(player);
+                new Notice(at, bin(connectionInfo(at, side))).withStyle(Style.FORCE).sendTo(player);
             }
         }
     }
@@ -132,11 +136,29 @@ public class FlatFaceWire extends FlatFace {
         return false;
     }
 
+    public ItemStack getItem(Coord at, EnumFacing side) {
+        return new ItemStack(Core.registry.wirePlacer);
+    }
+
+    public void dropItem(Coord at, EnumFacing side) {
+        if (FzUtil.doTileDrops(at.w)) {
+            at.spawnItem(getItem(at, side));
+        }
+    }
+
     @Override
     public void onNeighborBlockChanged(Coord at, EnumFacing side) {
         if (at.w.isRemote) return;
         if (isValidAt(at, side)) return;
+        dropItem(at, side);
         Flat.setAir(at, side);
-        at.spawnItem(Core.registry.wirePlacer);
+    }
+
+    @Override
+    public void onHit(Coord at, EnumFacing side, EntityPlayer player) {
+        if (!PlayerUtil.isPlayerCreative(player)) {
+            dropItem(at, side);
+        }
+        Flat.setAir(at, side);
     }
 }
