@@ -38,9 +38,21 @@ public enum FlatRayTracer {
 
     @SubscribeEvent
     public void updateRayPosition(TickEvent.ClientTickEvent event) {
-        if (event.phase != TickEvent.Phase.START) return;
         if (mc.theWorld == null || mc.thePlayer == null) {
             target = null;
+            return;
+        }
+        if (event.phase != TickEvent.Phase.START) {
+            if (resetAttackKey && mc.leftClickCounter <= 0) {
+                resetAttackKey = false;
+                mc.gameSettings.keyBindAttack.pressTime = 1;
+            } else {
+                if (mc.objectMouseOver.entityHit == target && target != null) {
+                    if (mc.gameSettings.keyBindAttack.isKeyDown()) {
+                        mc.gameSettings.keyBindAttack.pressTime = 1;
+                    }
+                }
+            }
             return;
         }
         if (target != null) {
@@ -74,25 +86,33 @@ public enum FlatRayTracer {
 
     @SubscribeEvent
     public void interceptAttack(HandleAttackKeyEvent event) {
-        interact(false);
+        NORELEASE.println("Stab");
+        if (interact(false)) {
+            event.setCanceled(true);
+            mc.leftClickCounter = 5;
+        }
     }
 
-    void interact(boolean useElseHit) {
+    boolean interact(boolean useElseHit) {
         MovingObjectPosition mop = mc.objectMouseOver;
-        if (target == null) return;
-        if (target.at == null) return;
-        if (mc.thePlayer == null) return;
-        if (mop == null) return;
-        if (mop.entityHit != target) return;
-        if (mop.typeOfHit != MovingObjectPosition.MovingObjectType.ENTITY) return;
+        if (target == null) return false;
+        if (target.at == null) return false;
+        if (mc.thePlayer == null) return false;
+        if (mop == null) return false;
+        if (mop.entityHit != target) return false;
+        if (mop.typeOfHit != MovingObjectPosition.MovingObjectType.ENTITY) return false;
         FlatFace face = Flat.get(target.at, target.side);
-        if (face.isNull()) return;
+        if (face.isNull()) return false;
         if (useElseHit) {
             face.onActivate(target.at, target.side, mc.thePlayer);
         } else {
             face.onHit(target.at, target.side, mc.thePlayer);
+            resetAttackKey = true;
         }
         FMLProxyPacket p = FlatNet.playerInteract(mc.thePlayer, target.at, target.side, useElseHit);
         FlatNet.send(mc.thePlayer, p);
+        return true;
     }
+
+    boolean resetAttackKey = false;
 }
