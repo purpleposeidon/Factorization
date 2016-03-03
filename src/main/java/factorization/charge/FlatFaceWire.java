@@ -36,6 +36,17 @@ public class FlatFaceWire extends FlatFace {
     };
 
     public static EnumFacing getEdgeOfFace(EnumFacing dir, int hour) {
+        if (NORELEASE.on) {
+            edgesOfDirection = new EnumFacing[][]{
+                    {NORTH, EAST, SOUTH, WEST},
+                    {NORTH, EAST, SOUTH, WEST},
+                    {UP, WEST, DOWN, EAST},
+                    {UP, EAST, DOWN, WEST},
+                    {UP, SOUTH, DOWN, NORTH},
+                    {UP, NORTH, DOWN, SOUTH}
+            /* Actually only half of these can ever be used; getModel()'s caused only w/ positive faces */
+            };
+        }
         return edgesOfDirection[dir.ordinal()][hour];
     }
 
@@ -126,6 +137,7 @@ public class FlatFaceWire extends FlatFace {
 
     @Override
     public boolean isValidAt(Coord at, EnumFacing side) {
+        if (NORELEASE.on) return true;
         if (at.isSolidOnSide(side)) {
             return true;
         }
@@ -141,7 +153,14 @@ public class FlatFaceWire extends FlatFace {
     }
 
     public void dropItem(Coord at, EnumFacing side) {
+        if (at.w.isRemote) return;
         if (FzUtil.doTileDrops(at.w)) {
+            if (at.isSolid()) {
+                Coord n = at.add(side);
+                if (!n.isSolid()) {
+                    at = n;
+                }
+            }
             at.spawnItem(getItem(at, side));
         }
     }
@@ -156,6 +175,7 @@ public class FlatFaceWire extends FlatFace {
 
     @Override
     public void onHit(Coord at, EnumFacing side, EntityPlayer player) {
+        if (at.w.isRemote) return;
         if (!PlayerUtil.isPlayerCreative(player)) {
             dropItem(at, side);
         }
