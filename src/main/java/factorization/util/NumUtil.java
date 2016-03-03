@@ -102,4 +102,8 @@ public final class NumUtil {
         Vec3 bO = x1.subtract(x0);
         return sO.dotProduct(bO) / SpaceUtil.lengthSquare(bO);
     }
+
+    public static double randRange(Random rand, double min, double max) {
+        return interp(min, max, rand.nextDouble());
+    }
 }

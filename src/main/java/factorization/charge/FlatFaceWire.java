@@ -2,10 +2,8 @@ package factorization.charge;
 
 import com.google.common.collect.Maps;
 import factorization.api.Coord;
-import factorization.flat.api.Flat;
-import factorization.flat.api.FlatFace;
-import factorization.flat.api.IFlatModel;
-import factorization.flat.api.IModelMaker;
+import factorization.flat.FlatNet;
+import factorization.flat.api.*;
 import factorization.notify.Notice;
 import factorization.notify.Style;
 import factorization.shared.Core;
@@ -14,39 +12,28 @@ import factorization.util.NORELEASE;
 import factorization.util.PlayerUtil;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.world.World;
 
 import javax.annotation.Nullable;
-
 import java.util.HashMap;
 
 import static net.minecraft.util.EnumFacing.*;
 
 public class FlatFaceWire extends FlatFace {
-    /* DOWN UP NORTH SOUTH WEST EAST */
-    private static EnumFacing[][] edgesOfDirection = new EnumFacing[][]{
-            {NORTH, EAST, SOUTH, WEST},
-            {NORTH, EAST, SOUTH, WEST},
-            {UP, WEST, DOWN, EAST},
-            {UP, EAST, DOWN, WEST},
-            {UP, SOUTH, DOWN, NORTH},
-            {UP, NORTH, DOWN, SOUTH}
-            /* Actually only half of these can ever be used; getModel()'s caused only w/ positive faces */
+    private static final EnumFacing[][] edgesOfDirection = new EnumFacing[][]{
+            {NORTH, EAST, SOUTH, WEST}, // DOWN
+            {NORTH, EAST, SOUTH, WEST}, // UP
+            {UP, WEST, DOWN, EAST}, // NORTH
+            {UP, EAST, DOWN, WEST}, // SOUTH
+            {UP, SOUTH, DOWN, NORTH}, // WEST
+            {UP, NORTH, DOWN, SOUTH} // EAST
+            /* Actually only half of these can ever be used; we pretty much use only positive faces */
     };
 
     public static EnumFacing getEdgeOfFace(EnumFacing dir, int hour) {
-        if (NORELEASE.on) {
-            edgesOfDirection = new EnumFacing[][]{
-                    {NORTH, EAST, SOUTH, WEST},
-                    {NORTH, EAST, SOUTH, WEST},
-                    {UP, WEST, DOWN, EAST},
-                    {UP, EAST, DOWN, WEST},
-                    {UP, SOUTH, DOWN, NORTH},
-                    {UP, NORTH, DOWN, SOUTH}
-            /* Actually only half of these can ever be used; getModel()'s caused only w/ positive faces */
-            };
-        }
         return edgesOfDirection[dir.ordinal()][hour];
     }
 
@@ -174,11 +161,13 @@ public class FlatFaceWire extends FlatFace {
     }
 
     @Override
-    public void onHit(Coord at, EnumFacing side, EntityPlayer player) {
+    public void onHit(final Coord at, EnumFacing side, EntityPlayer player) {
         if (at.w.isRemote) return;
         if (!PlayerUtil.isPlayerCreative(player)) {
             dropItem(at, side);
         }
         Flat.setAir(at, side);
+        Flat.playSound(at, side, this);
+        Flat.emitParticle(at, side, this);
     }
 }

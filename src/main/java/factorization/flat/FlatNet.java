@@ -8,6 +8,7 @@ import factorization.coremodhooks.IExtraChunkData;
 import factorization.flat.api.Flat;
 import factorization.flat.api.FlatFace;
 import factorization.flat.api.IFlatVisitor;
+import factorization.net.FzNetDispatch;
 import factorization.shared.Core;
 import factorization.util.NORELEASE;
 import io.netty.buffer.ByteBuf;
@@ -20,7 +21,6 @@ import net.minecraft.network.PacketBuffer;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.chunk.Chunk;
-import net.minecraftforge.event.world.ChunkEvent;
 import net.minecraftforge.event.world.ChunkWatchEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
@@ -35,8 +35,10 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.io.IOException;
-import java.util.*;
-import java.util.concurrent.ConcurrentLinkedDeque;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Queue;
+import java.util.Set;
 
 public class FlatNet {
     static final String channelName = "fzFlat";
@@ -56,9 +58,8 @@ public class FlatNet {
         NetHandlerPlayServer handler = (NetHandlerPlayServer) event.handler;
         EntityPlayerMP player = handler.playerEntity;
         if (kind == INTERACT_HIT || kind == INTERACT_USE) {
-            Coord at = new Coord(player.worldObj, 0, 0, 0);
-            at.readFromStream(buf);
-            EnumFacing side = EnumFacing.getFront(buf.readByte());
+            Coord at = readCoord(buf, player);
+            EnumFacing side = readSide(buf);
             if (!at.blockExists()) return;
             double reachSq = 6 * 6; // FIXME: There's no way to get this properly on the server?
             if (at.distanceSq(player) > reachSq) {
@@ -94,13 +95,33 @@ public class FlatNet {
             byte kind = buf.readByte();
             if (kind == SYNC) {
                 syncRead(buf, mc.thePlayer);
+            } else if (kind == FX_BREAK || kind == FX_PLACE) {
+                Coord at = readCoord(buf, mc.thePlayer);
+                EnumFacing side = readSide(buf);
+                FlatFace face = readFace(buf);
+                if (face == null) continue;
+                if (kind == FX_BREAK) {
+                    face.spawnParticle(at, side);
+                    face.playSound(at, side, true);
+                } else {
+                    face.playSound(at, side, false);
+                }
             } else {
                 log("Invalid packet ID " + kind);
             }
         }
     }
 
-    static byte INTERACT_HIT = 1, INTERACT_USE = 2, SYNC = 3;
+    public static byte INTERACT_HIT = 1, INTERACT_USE = 2, SYNC = 3, FX_PLACE = 4, FX_BREAK = 5;
+
+    public static void fx(Coord at, EnumFacing side, FlatFace face, byte type) {
+        ByteBuf buff = prepare(type);
+        writeCoord(buff, at);
+        writeSide(buff, side);
+        writeFace(buff, face);
+        FMLProxyPacket packet = build(buff);
+        sendAround(at.getChunk(), packet);
+    }
 
     static ByteBuf prepare(byte packetType) {
         ByteBuf ret = Unpooled.buffer();
@@ -131,17 +152,9 @@ public class FlatNet {
         public void visit(Coord at, EnumFacing side, @Nonnull FlatFace face) {
             // It's sort of terrible to use C-style strings instead of pascal-style, but I'd have to count them...
             buff.writeByte(1);
-            at.writeToStream(buff);
-            buff.writeByte(side.ordinal());
-            buff.writeChar(face.staticId);
-            if (face.isDynamic()) {
-                ByteBufUtils.writeUTF8String(buff, Flat.getName(face).toString());
-                try {
-                    face.serialize("", new DataOutByteBuf(buff, Side.SERVER));
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
+            writeCoord(buff, at);
+            writeSide(buff, side);
+            writeFace(buff, face);
         }
 
         public ByteBuf finish() {
@@ -150,8 +163,38 @@ public class FlatNet {
         }
     }
 
-    static void syncRead(ByteBuf buff, EntityPlayer player) {
+    private static Coord readCoord(ByteBuf buf, EntityPlayer player) {
         Coord at = new Coord(player);
+        at.readFromStream(buf);
+        return at;
+    }
+
+    private static EnumFacing readSide(ByteBuf buf) {
+        int ord = buf.readByte();
+        return EnumFacing.getFront(ord);
+    }
+
+    private static void writeCoord(ByteBuf buff, Coord at) {
+        at.writeToStream(buff);
+    }
+
+    private static void writeSide(ByteBuf buff, EnumFacing side) {
+        buff.writeByte(side.ordinal());
+    }
+
+    private static void writeFace(ByteBuf buff, FlatFace face) {
+        buff.writeChar(face.staticId);
+        if (face.isDynamic()) {
+            ByteBufUtils.writeUTF8String(buff, Flat.getName(face).toString());
+            try {
+                face.serialize("", new DataOutByteBuf(buff, Side.SERVER));
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    static void syncRead(ByteBuf buff, EntityPlayer player) {
         while (true) {
             byte state = buff.readByte();
             if (state == 0) return;
@@ -159,8 +202,8 @@ public class FlatNet {
                 log("Corrupt data sync packet!?");
                 return;
             }
-            at.readFromStream(buff);
-            EnumFacing side = EnumFacing.getFront(buff.readByte());
+            Coord at = readCoord(buff, player);
+            EnumFacing side = readSide(buff);
             FlatFace face = readFace(buff);
             if (face == null) continue;
             Flat.set(at, side, face);
@@ -197,7 +240,7 @@ public class FlatNet {
     }
 
     static void sendAround(Chunk chunk, FMLProxyPacket toSend) {
-
+        FzNetDispatch.addPacketFrom(toSend, chunk);
     }
 
     static void log(String msg) {

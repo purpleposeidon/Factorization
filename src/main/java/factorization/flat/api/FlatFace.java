@@ -4,12 +4,17 @@ import factorization.api.Coord;
 import factorization.api.datahelpers.DataHelper;
 import factorization.api.datahelpers.IDataSerializable;
 import factorization.flat.FlatMod;
+import factorization.flat.FlatNet;
 import factorization.util.SpaceUtil;
+import net.minecraft.block.Block;
+import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.EnumFacing;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 import javax.annotation.Nullable;
 import java.io.IOException;
@@ -28,6 +33,9 @@ public abstract class FlatFace implements IDataSerializable {
     }
 
     public void onPlaced(Coord at, EnumFacing side, EntityPlayer player, ItemStack is) {
+        if (!at.w.isRemote) {
+            FlatNet.fx(at, side, this, FlatNet.FX_PLACE);
+        }
     }
 
     public boolean isValidAt(Coord at, EnumFacing side) {
@@ -115,5 +123,46 @@ public abstract class FlatFace implements IDataSerializable {
     /** Like Block.isAir, but even more dangerous. */
     public boolean isNull() {
         return false;
+    }
+
+    @SideOnly(Side.CLIENT)
+    public void spawnParticle(final Coord at, EnumFacing side) {
+        // Yikes, this is too much work!
+        // ...for now.
+        // FIXME: Implement breaking particles
+        /*final Minecraft mc = Minecraft.getMinecraft();
+        IFlatModel fm = getModel(at, side);
+        if (fm == null) return;
+        IBakedModel model = fm.getModel(at, side);
+        if (model == null) return;
+        final TextureAtlasSprite particle = model.getParticleTexture();
+        final IParticleFactory factory = new EntityBreakingFX.Factory();
+        this.listSelectionBounds(at, side, mc.thePlayer, new IBoxList() {
+            @Override
+            public void add(AxisAlignedBB box) {
+                int particles = (int) box.getAverageEdgeLength();
+                for (int i = 0; i < particles; i++) {
+                    double x = NumUtil.randRange(at.w.rand, box.minX, box.maxX);
+                    double y = NumUtil.randRange(at.w.rand, box.minY, box.maxY);
+                    double z = NumUtil.randRange(at.w.rand, box.minZ, box.maxZ);
+                    factory.getEntityFX(0, at.w, x, y, z, )
+                }
+            }
+        });*/
+    }
+
+    @SideOnly(Side.CLIENT)
+    public void playSound(Coord at, EnumFacing side, boolean placed) {
+        Block.SoundType sound = getSoundType();
+        if (sound == null) return;
+        at.w.playSound(at.x + 0.5, at.y + 0.5, at.z + 0.5,
+                sound.getPlaceSound(),
+                (sound.getVolume() + 1F) / 2F,
+                sound.getFrequency() * 0.8F,
+                false /* distance delay */);
+    }
+
+    public Block.SoundType getSoundType() {
+        return Block.soundTypeStone;
     }
 }

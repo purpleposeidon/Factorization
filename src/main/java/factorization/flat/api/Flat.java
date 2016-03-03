@@ -5,6 +5,7 @@ import factorization.api.ICoordFunction;
 import factorization.coremodhooks.IExtraChunkData;
 import factorization.flat.FlatFaceAir;
 import factorization.flat.FlatMod;
+import factorization.flat.FlatNet;
 import factorization.shared.Core;
 import factorization.util.NORELEASE;
 import factorization.util.PlayerUtil;
@@ -128,5 +129,13 @@ public final class Flat {
                 ecd.getFlatLayer().iterateBounded(min, max, visitor);
             }
         });
+    }
+
+    public static void playSound(Coord at, EnumFacing side, FlatFace face) {
+        FlatNet.fx(at, side, face, FlatNet.FX_PLACE);
+    }
+
+    public static void emitParticle(Coord at, EnumFacing side, FlatFace face) {
+        FlatNet.fx(at, side, face, FlatNet.FX_BREAK);
     }
 }
