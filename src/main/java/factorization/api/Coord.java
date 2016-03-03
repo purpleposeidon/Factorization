@@ -362,7 +362,7 @@ public final class Coord implements IDataSerializable, ISaneCoord, Comparable<Co
     }
     
     public Coord add(EnumFacing d) {
-        return add(d.getDirectionVec().getX(), d.getDirectionVec().getY(), d.getDirectionVec().getZ());
+        return add(d.getFrontOffsetX(), d.getFrontOffsetY(), d.getFrontOffsetZ());
     }
 
     public Coord add(int x, int y, int z) {
