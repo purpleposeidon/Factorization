@@ -25,16 +25,6 @@ public class AtSide {
         }
     }
 
-    AtSide(Chunk c, int index) {
-        side = FlatMod.byte2side(index);
-        int slabX = (index >> 2) & 0xF;
-        int slabY = (index >> 6) & 0xF;
-        int slabZ = (index >> 10) & 0xF;
-        int x = c.xPosition << 4;
-        int z = c.zPosition << 4;
-        at = new Coord(c.getWorld(), x, slabY, z);
-    }
-
     FlatChunkLayer getLayer() {
         Chunk chunk = at.getChunk();
         return ((IExtraChunkData) chunk).getFlatLayer();
