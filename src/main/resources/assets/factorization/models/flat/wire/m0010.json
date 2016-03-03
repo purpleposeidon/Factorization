@@ -1,5 +1,5 @@
 {
-    "parent": "factorization:flat",
+    "parent": "factorization:flat90",
     "textures": {
         "face": "factorization:blocks/charge/wire/end"
     }
