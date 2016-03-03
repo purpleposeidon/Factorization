@@ -427,13 +427,16 @@ public class FlatChunkLayer {
         if (index == -1) {
             return FlatFaceAir.INSTANCE;
         }
+        int oSet = slab.set;
         Data newSlab = slab.set(index, face, at);
         if (slab != newSlab) {
             slabs[localY >> 4] = newSlab;
         }
+        set += newSlab.set - oSet;
         FlatFace ret = slab.get(index);
         renderInfo.markDirty(at);
         addChange(at, dir);
+        chunk.setChunkModified();
         return ret;
     }
 
@@ -484,7 +487,6 @@ public class FlatChunkLayer {
             }
         }
         changed.clear();
-        sw.finish();
-        FzNetDispatch.addPacketFrom(FlatNet.build(sw.buff), chunk);
+        FzNetDispatch.addPacketFrom(FlatNet.build(sw.finish()), chunk);
     }
 }

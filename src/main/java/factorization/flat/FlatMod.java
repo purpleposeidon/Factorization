@@ -13,6 +13,7 @@ import factorization.flat.render.EntityHack;
 import factorization.flat.render.EntityHackRender;
 import factorization.flat.render.FlatModel;
 import factorization.shared.Core;
+import factorization.util.NORELEASE;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ChunkProviderClient;
 import net.minecraft.client.renderer.entity.Render;
@@ -203,6 +204,7 @@ public class FlatMod {
                 layer.set(at, face, flat);
             }
         }
+        NORELEASE.println(chunk + " has " + tagEnd);
     }
 
     @SubscribeEvent
@@ -228,6 +230,7 @@ public class FlatMod {
                 tag.setInteger("y", at.y);
                 tag.setInteger("z", at.z);
                 tag.setByte("side", (byte) side.ordinal());
+                out.appendTag(tag);
             }
         });
         event.getData().setTag(NBT_KEY, out);
@@ -235,7 +238,7 @@ public class FlatMod {
 
     private FlatFace construct(NBTTagCompound tag) {
         if (tag.hasKey("static")) {
-            byte id = tag.getByte("static");
+            int id = tag.getInteger("static");
             return staticReg.getObjectById(id);
         }
         String name = tag.getString("dynamic");

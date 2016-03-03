@@ -1,5 +1,6 @@
 package factorization.flat;
 
+import com.google.common.collect.Queues;
 import factorization.api.Coord;
 import factorization.api.datahelpers.DataInByteBuf;
 import factorization.api.datahelpers.DataOutByteBuf;
@@ -8,6 +9,7 @@ import factorization.flat.api.Flat;
 import factorization.flat.api.FlatFace;
 import factorization.flat.api.IFlatVisitor;
 import factorization.shared.Core;
+import factorization.util.NORELEASE;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import net.minecraft.client.Minecraft;
@@ -18,6 +20,8 @@ import net.minecraft.network.PacketBuffer;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.chunk.Chunk;
+import net.minecraftforge.event.world.ChunkEvent;
+import net.minecraftforge.event.world.ChunkWatchEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
 import net.minecraftforge.fml.common.network.ByteBufUtils;
@@ -26,13 +30,13 @@ import net.minecraftforge.fml.common.network.FMLNetworkEvent;
 import net.minecraftforge.fml.common.network.NetworkRegistry;
 import net.minecraftforge.fml.common.network.internal.FMLProxyPacket;
 import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.io.IOException;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
+import java.util.concurrent.ConcurrentLinkedDeque;
 
 public class FlatNet {
     static final String channelName = "fzFlat";
@@ -74,13 +78,25 @@ public class FlatNet {
 
     @SubscribeEvent
     public void packetToClient(FMLNetworkEvent.ClientCustomPacketEvent event) {
-        ByteBuf buf = event.packet.payload();
-        byte kind = buf.readByte();
-        if (kind == SYNC) {
-            Minecraft mc = Minecraft.getMinecraft();
-            syncRead(buf, mc.thePlayer);
-        } else {
-            log("Invalid packet ID " + kind);
+        clientBuff.add(event.packet.payload());
+    }
+
+    final Queue<ByteBuf> clientBuff = Queues.newConcurrentLinkedQueue();
+    @SubscribeEvent
+    @SideOnly(Side.CLIENT)
+    public void readClientPackets(TickEvent.ClientTickEvent event) {
+        if (event.phase != TickEvent.Phase.START) return;
+        final Minecraft mc = Minecraft.getMinecraft();
+        if (mc.thePlayer == null) return;
+        while (true) {
+            ByteBuf buf = clientBuff.poll();
+            if (buf == null) return;
+            byte kind = buf.readByte();
+            if (kind == SYNC) {
+                syncRead(buf, mc.thePlayer);
+            } else {
+                log("Invalid packet ID " + kind);
+            }
         }
     }
 
@@ -109,7 +125,7 @@ public class FlatNet {
     }
 
     static class SyncWrite implements IFlatVisitor {
-        final ByteBuf buff = prepare(SYNC);
+        private final ByteBuf buff = prepare(SYNC);
 
         @Override
         public void visit(Coord at, EnumFacing side, @Nonnull FlatFace face) {
@@ -128,8 +144,9 @@ public class FlatNet {
             }
         }
 
-        public void finish() {
+        public ByteBuf finish() {
             buff.writeByte(0);
+            return buff;
         }
     }
 
@@ -196,5 +213,17 @@ public class FlatNet {
             }
             pending.clear();
         }
+    }
+
+    @SubscribeEvent
+    public void playerWatchesChunk(ChunkWatchEvent.Watch event) {
+        Chunk chunk = event.player.worldObj.getChunkFromChunkCoords(event.chunk.chunkXPos, event.chunk.chunkZPos);
+        IExtraChunkData ecd = (IExtraChunkData) chunk;
+        FlatChunkLayer layer = ecd.getFlatLayer();
+        NORELEASE.println("Watching " + chunk + " who has " + layer.set);
+        if (layer.isEmpty()) return;
+        SyncWrite sw = new SyncWrite();
+        layer.iterate(sw);
+        send(event.player, build(sw.finish()));
     }
 }
