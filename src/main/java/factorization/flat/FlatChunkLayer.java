@@ -7,6 +7,7 @@ import factorization.flat.api.FlatFace;
 import factorization.flat.api.IFlatRenderInfo;
 import factorization.flat.api.IFlatVisitor;
 import factorization.net.FzNetDispatch;
+import factorization.util.NORELEASE;
 import factorization.util.SpaceUtil;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.world.chunk.Chunk;
@@ -445,6 +446,7 @@ public class FlatChunkLayer {
         Data newSlab = slab.set(index, face, at);
         if (slab != newSlab) {
             slabs[localY >> 4] = newSlab;
+            NORELEASE.println("Upgraded " + slab + " to " + newSlab);
         }
         set += newSlab.set - oSet;
         FlatFace ret = slab.get(index);
