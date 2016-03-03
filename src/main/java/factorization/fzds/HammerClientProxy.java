@@ -102,6 +102,14 @@ public class HammerClientProxy extends HammerProxy {
             super.playSound(real.xCoord, real.yCoord, real.zCoord, soundName, volume, pitch, distanceDelay);
             // TODO: It'd be kinda awesome to have the pitch change depending on the distance, right?
         }
+
+        @Override
+        public WorldInfo getWorldInfo() {
+            // This is a work-around for a threading derp that was causing world difficulty to reset all the time.
+            World rw = Hammer.proxy.getClientRealWorld();
+            if (rw == null) return super.getWorldInfo();
+            return rw.getWorldInfo();
+        }
     }
     
     @Override
