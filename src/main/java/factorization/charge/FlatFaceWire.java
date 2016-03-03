@@ -6,8 +6,10 @@ import factorization.flat.api.Flat;
 import factorization.flat.api.FlatFace;
 import factorization.flat.api.IFlatModel;
 import factorization.flat.api.IModelMaker;
+import factorization.notify.Notice;
 import factorization.shared.Core;
 import factorization.util.NORELEASE;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ResourceLocation;
 
@@ -63,6 +65,11 @@ public class FlatFaceWire extends FlatFace {
     @Override
     public IFlatModel getModel(Coord at, EnumFacing side) {
         // Construct a 4-bit number representing the connections. This number then indexes into the permutations array.
+        int connections = connectionInfo(at, side);
+        return models.permutations[connections];
+    }
+
+    protected int connectionInfo(Coord at, EnumFacing side) {
         int connections = 0; // Look at keyboard numpad. First it stores (8???) (68??) (268?) (4268)
         for (int hour = 0; hour < 4; hour++) {
             EnumFacing hand = getEdgeOfFace(side, hour);
@@ -71,7 +78,17 @@ public class FlatFaceWire extends FlatFace {
             }
             connections >>= 1;
         }
-        return models.permutations[connections];
+        return connections;
+    }
+
+    @Override
+    public void onActivate(Coord at, EnumFacing side, EntityPlayer player) {
+        NORELEASE.println(at);
+        if (Core.dev_environ) {
+            if (player.getHeldItem() == null) {
+                new Notice(at, bin(connectionInfo(at, side))).sendTo(player);
+            }
+        }
     }
 
     /** If two FlatFaces have the same species, then the wire'll try to connect. If you're subclassing you may want to

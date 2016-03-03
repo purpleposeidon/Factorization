@@ -1,32 +1,23 @@
 package factorization.flat;
 
-import factorization.aabbdebug.AabbDebugger;
-import factorization.api.Coord;
 import factorization.coremodhooks.HandleAttackKeyEvent;
 import factorization.coremodhooks.HandleUseKeyEvent;
 import factorization.flat.api.Flat;
 import factorization.flat.api.FlatFace;
-import factorization.flat.api.IBoxList;
-import factorization.flat.api.IFlatVisitor;
 import factorization.flat.render.FlatRayTargetRender;
 import factorization.shared.Core;
 import factorization.util.FzUtil;
-import factorization.util.SpaceUtil;
+import factorization.util.NORELEASE;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.entity.Render;
 import net.minecraft.client.renderer.entity.RenderManager;
-import net.minecraft.entity.Entity;
-import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.MovingObjectPosition;
-import net.minecraft.util.Vec3;
-import net.minecraft.world.World;
 import net.minecraftforge.fml.client.registry.IRenderFactory;
 import net.minecraftforge.fml.client.registry.RenderingRegistry;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
-
-import javax.annotation.Nonnull;
+import net.minecraftforge.fml.common.network.internal.FMLProxyPacket;
 
 public enum FlatRayTracer {
     INSTANCE;
@@ -65,80 +56,15 @@ public enum FlatRayTracer {
         if (tracer.bestAt == null) return;
         if (target == null || target.worldObj != mc.theWorld || target.isDead) {
             target = new FlatRayTarget(mc.theWorld);
-            tracer.at.setAsEntityLocation(target);
+            tracer.bestAt.setAsEntityLocation(target);
             FzUtil.spawn(target);
         }
-        tracer.at.setAsEntityLocation(target);
-        target.at = tracer.bestAt;
+        tracer.bestAt.setAsEntityLocation(target);
+        target.at = tracer.bestAt.copy();
         target.side = tracer.bestSide;
         target.box = tracer.bestBox;
         target.setEntityBoundingBox(target.box);
-    }
-
-    static class Tracer implements IFlatVisitor, IBoxList {
-        final Entity player;
-        final Vec3 start, end;
-
-        double closestDistSq = Double.POSITIVE_INFINITY;
-        double closestDist = closestDistSq;
-        Coord bestAt = null;
-        EnumFacing bestSide = null;
-        AxisAlignedBB bestBox = null;
-
-        Tracer(Entity player, float partial) {
-            this.player = player;
-            start = player.getPositionEyes(partial);
-            Vec3 look = player.getLook(partial);
-            double reach = 5;
-            end = start.add(SpaceUtil.scale(look, reach));
-        }
-
-        void run() {
-            World w = player.worldObj;
-            Coord min = new Coord(w, start);
-            Coord max = new Coord(w, end);
-            Coord.sort(min, max);
-            min.adjust(-1, -1, -1);
-            max.adjust(+1, +1, +1);
-            Flat.iterateRegion(min, max, this);
-            if (bestBox != null) {
-                closestDist = Math.sqrt(closestDistSq);
-            }
-        }
-
-
-        protected Coord at;
-        protected EnumFacing side;
-
-        @Override
-        public void visit(Coord at, EnumFacing side, @Nonnull FlatFace face) {
-            this.at = at;
-            this.side = side;
-            double origD = closestDistSq;
-            face.listSelectionBounds(at, side, player, this);
-            if (origD != closestDistSq) {
-                bestAt = at;
-                bestSide = side;
-            }
-        }
-
-        @Override
-        public void add(AxisAlignedBB box) {
-            AabbDebugger.addBox(box);
-            if (box.isVecInside(start)) {
-                // Uh, vanilla has this check. Don't ask me! :p
-                closestDistSq = 0;
-                bestBox = box;
-                return;
-            }
-            MovingObjectPosition mop = box.calculateIntercept(start, end);
-            if (mop == null) return;
-            double d = start.distanceTo(mop.hitVec);
-            if (d < closestDistSq) {
-                closestDistSq = d;
-                bestBox = box;
-            }
-        }
+        //NORELEASE.println(target.at);
     }
 
     @SubscribeEvent
@@ -159,6 +85,14 @@ public enum FlatRayTracer {
         if (mop == null) return;
         if (mop.entityHit != target) return;
         if (mop.typeOfHit != MovingObjectPosition.MovingObjectType.ENTITY) return;
-        FlatNet.playerInteract(mc.thePlayer, target.at, target.side, useElseHit);
+        FlatFace face = Flat.get(target.at, target.side);
+        if (face.isNull()) return;
+        if (useElseHit) {
+            face.onActivate(target.at, target.side, mc.thePlayer);
+        } else {
+            face.onHit(target.at, target.side, mc.thePlayer);
+        }
+        FMLProxyPacket p = FlatNet.playerInteract(mc.thePlayer, target.at, target.side, useElseHit);
+        FlatNet.send(mc.thePlayer, p);
     }
 }
