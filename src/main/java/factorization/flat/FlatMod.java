@@ -173,10 +173,10 @@ public class FlatMod {
     }
 
     public static EnumFacing byte2side(int b) {
-        return sideLookup[b & 0x3];
+        return sideLookup[b % 3];
     }
 
-    private static final EnumFacing sideLookup[] = new EnumFacing[] {
+    static final EnumFacing sideLookup[] = new EnumFacing[] {
             EnumFacing.EAST,
             EnumFacing.UP,
             EnumFacing.SOUTH
