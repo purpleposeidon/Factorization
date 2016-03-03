@@ -159,15 +159,29 @@ public class FlatChunkLayer {
         @Override
         Data set(short index, FlatFace face, Coord at) {
             int L = indices.length;
+            int iFirstBlank = -1;
             for (int i = 0; i < L; i++) {
                 int indexI = indices[i];
-                if (indexI != 0 && indexI != index) continue;
-                indices[i] = index;
-                replaced(faces[i], at, index);
-                faces[i] = face;
+                if (indexI != index) {
+                    if (indexI == 0 && iFirstBlank == -1) {
+                        iFirstBlank = i;
+                    }
+                    continue;
+                }
+                doSet(index, face, at, i);
+                return this;
+            }
+            if (iFirstBlank != -1) {
+                doSet(index, face, at, iFirstBlank);
                 return this;
             }
             return upsize().set(index, face, at);
+        }
+
+        private void doSet(short index, FlatFace face, Coord at, int i) {
+            indices[i] = index;
+            replaced(faces[i], at, index);
+            faces[i] = face;
         }
 
         @Override

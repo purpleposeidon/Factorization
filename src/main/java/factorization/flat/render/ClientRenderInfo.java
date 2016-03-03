@@ -48,7 +48,7 @@ public final class ClientRenderInfo implements IFlatRenderInfo {
     }
 
     public void update(Chunk chunk, FlatChunkLayer layer) {
-        if (NORELEASE.on && Core.dev_environ) dirty = true;
+        //if (NORELEASE.on && Core.dev_environ) dirty = true;
         if (!dirty) return;
         dirty = false;
         Drawer visitor = new Drawer(this);

@@ -5,6 +5,7 @@ import factorization.api.ICoordFunction;
 import factorization.coremodhooks.IExtraChunkData;
 import factorization.flat.FlatFaceAir;
 import factorization.flat.FlatMod;
+import factorization.shared.Core;
 import factorization.util.PlayerUtil;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
@@ -60,7 +61,14 @@ public final class Flat {
     }
 
     public static void set(Coord at, EnumFacing side, FlatFace face) {
-        new AtSide(at, side).set(face);
+        AtSide atSide = new AtSide(at, side);
+        atSide.set(face);
+        if (Core.dev_environ) {
+            FlatFace got = atSide.get();
+            if (got != face) {
+                Core.logSevere("Face.set failed!");
+            }
+        }
         onFaceChanged(at, side);
     }
 
