@@ -3,7 +3,7 @@
         {   "from": [ 0, -0.03124, 0 ],
             "to":   [ 16, 16.03124, 16 ],
             "faces": {
-                "down":  { "texture": "#face", "uv": [0, 0, 16, 16], "cullface": "down", "rotation": 180 },
+                "down":  { "texture": "#face", "uv": [0, 0, 16, 16], "cullface": "down", "rotation": 0 },
                 "up":    { "texture": "#face", "uv": [0, 0, 16, 16], "cullface": "up",   "rotation": 180 }
             }
         },
