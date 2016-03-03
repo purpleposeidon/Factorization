@@ -3,9 +3,12 @@ package factorization.flat.api;
 import factorization.api.Coord;
 import factorization.api.ICoordFunction;
 import factorization.coremodhooks.IExtraChunkData;
+import factorization.flat.FlatChunkLayer;
 import factorization.flat.FlatFaceAir;
 import factorization.flat.FlatMod;
 import factorization.flat.FlatNet;
+import factorization.notify.Notice;
+import factorization.notify.Style;
 import factorization.shared.Core;
 import factorization.util.NORELEASE;
 import factorization.util.PlayerUtil;
@@ -86,16 +89,19 @@ public final class Flat {
         return true;
     }
 
-    public static void onBlockChanged(Coord at) {
+    public static void onBlockChanged(Coord standardBlock) {
         for (EnumFacing side : EnumFacing.VALUES) {
-            AtSide as = new AtSide(at, side);
-            as.get().onNeighborBlockChanged(as.at, as.side);
+            AtSide as = new AtSide(standardBlock, side);
+            FlatChunkLayer layer = as.getLayer();
+            FlatFace flatFace = layer.get(as.at, as.side);
+            flatFace.onNeighborBlockChanged(as.at, as.side);
+            layer.renderInfo.markDirty(as.at);
         }
     }
 
-    public static void onFaceChanged(Coord at, EnumFacing side) {
+    public static void onFaceChanged(Coord standardBlock, EnumFacing side) {
         // Notifies all 'adjacent' faces. There are 3 sets of 4 faces: the 4 in-plane, and the 8 on both blocks
-        for (AtSide as : new AtSide(at, side).iterateConnected()) {
+        for (AtSide as : new AtSide(standardBlock, side).iterateConnected()) {
             as.get().onNeighborFaceChanged(as.at, as.side);
             as.getLayer().renderInfo.markDirty(as.at);
             NORELEASE.fixme("This doesn't fix updates across curves+chunkboundaries; see screenshot 18.43.13");
