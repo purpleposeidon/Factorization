@@ -2,20 +2,19 @@ package factorization.charge;
 
 import com.google.common.collect.Maps;
 import factorization.api.Coord;
-import factorization.flat.FlatNet;
-import factorization.flat.api.*;
+import factorization.flat.api.Flat;
+import factorization.flat.api.FlatFace;
+import factorization.flat.api.IFlatModel;
+import factorization.flat.api.IModelMaker;
 import factorization.notify.Notice;
 import factorization.notify.Style;
 import factorization.shared.Core;
 import factorization.util.FzUtil;
-import factorization.util.NORELEASE;
 import factorization.util.PlayerUtil;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ResourceLocation;
-import net.minecraft.world.World;
 
 import javax.annotation.Nullable;
 import java.util.HashMap;
@@ -124,7 +123,6 @@ public class FlatFaceWire extends FlatFace {
 
     @Override
     public boolean isValidAt(Coord at, EnumFacing side) {
-        if (NORELEASE.on) return true;
         if (at.isSolidOnSide(side)) {
             return true;
         }
