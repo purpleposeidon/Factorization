@@ -8,6 +8,7 @@ import factorization.flat.api.IFlatModel;
 import factorization.flat.api.IFlatVisitor;
 import factorization.shared.Core;
 import factorization.util.NORELEASE;
+import factorization.util.RenderUtil;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.client.Minecraft;
@@ -43,6 +44,7 @@ public final class EntityHackRender extends Render<EntityHack> {
         GL11.glTranslated(-entity.posX, -entity.posY, -entity.posZ);
         Chunk chunk = new Coord(entity).getChunk();
         FlatChunkLayer layer = ((IExtraChunkData) chunk).getFlatLayer();
+        bindTexture(Core.blockAtlas);
         ClientRenderInfo cri = (ClientRenderInfo) layer.renderInfo;
         cri.update(chunk, layer);
         {
