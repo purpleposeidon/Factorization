@@ -1,6 +1,29 @@
 {
-    "parent": "factorization:flat180a",
+    "elements": [
+        {   "from": [ 0, -0.03124, 0 ],
+            "to":   [ 16, 16.03124, 16 ],
+            "faces": {
+                "down":  { "texture": "#face", "uv": [0, 0, 16, 16], "cullface": "down", "rotation": 180 },
+                "up":    { "texture": "#face", "uv": [0, 0, 16, 16], "cullface": "up",   "rotation": 180 }
+            }
+        },
+        {   "from": [ 0, 0, -0.03124 ],
+            "to":   [ 16, 16, 16.03124 ],
+            "faces": {
+                "north": { "texture": "#face", "uv": [0, 0, 16, 16], "cullface": "north", "rotation": 180 },
+                "south": { "texture": "#face", "uv": [0, 0, 16, 16], "cullface": "south", "rotation": 180 }
+            }
+        },
+        {   "from": [ -0.03124, 0, 0 ],
+            "to":   [ 16.03124, 16, 16 ],
+            "faces": {
+                "west":  { "texture": "#face", "uv": [0, 0, 16, 16], "cullface": "west", "rotation": 180 },
+                "east":  { "texture": "#face", "uv": [0, 0, 16, 16], "cullface": "east", "rotation": 180 }
+            }
+        }
+    ],
     "textures": {
+        "particle": "#face",
         "face": "factorization:blocks/charge/wire/end"
     }
 }
