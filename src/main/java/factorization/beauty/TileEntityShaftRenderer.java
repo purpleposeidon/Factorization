@@ -5,6 +5,7 @@ import factorization.shared.FzModel;
 import factorization.util.NumUtil;
 import factorization.util.RenderUtil;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.entity.RenderItem;
 import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
 import net.minecraft.client.resources.model.IBakedModel;
@@ -17,9 +18,9 @@ import org.lwjgl.opengl.GL12;
 public class TileEntityShaftRenderer extends TileEntitySpecialRenderer<TileEntityShaft> {
     @Override
     public void renderTileEntityAt(TileEntityShaft shaft, double dx, double dy, double dz, float partial, int destroyingStage) {
-        GL11.glEnable(GL11.GL_TEXTURE_2D);
-        GL11.glPushAttrib(GL11.GL_TRANSFORM_BIT);
-        GL11.glEnable(GL12.GL_RESCALE_NORMAL);
+        GlStateManager.enableTexture2D();
+        GlStateManager.enableRescaleNormal();
+        GlStateManager.enableBlend();
         Minecraft.getMinecraft().getTextureManager().bindTexture(Core.blockAtlas);
         GL11.glPushMatrix();
         GL11.glTranslated(dx + 0.5, dy + 0.5, dz + 0.5);
