@@ -32,11 +32,11 @@ class Drawer implements IFlatVisitor {
         final EnumFacing opposite = side.getOpposite();
         NORELEASE.fixme("Use IBlockAccess instead");
         NORELEASE.fixme("Consider using BlockPos instead of Coord throughout the flats. Maybe later.");
-        boolean oppositeObscured = at.isSolid();
+        boolean oppositeObscured = at.getBlock().isVisuallyOpaque();
         boolean normalObscured;
         {
             at.adjust(side);
-            normalObscured = at.isSolid();
+            normalObscured = at.getBlock().isVisuallyOpaque();
             at.adjust(opposite);
         }
         if (normalObscured && oppositeObscured) return;

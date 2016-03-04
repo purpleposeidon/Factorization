@@ -49,7 +49,10 @@ public final class EntityHackRender extends Render<EntityHack> {
         cri.update(chunk, layer);
         {
             GlStateManager.disableLighting();
+            GL11.glEnable(GL11.GL_POLYGON_OFFSET_FILL);
+            GlStateManager.doPolygonOffset(-3, -3);
             cri.draw();
+            GL11.glDisable(GL11.GL_POLYGON_OFFSET_FILL);
             GlStateManager.enableLighting();
         }
 
