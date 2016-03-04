@@ -46,6 +46,7 @@ public enum FlatRayTracer {
             if (resetAttackKey && mc.leftClickCounter <= 0) {
                 resetAttackKey = false;
                 mc.gameSettings.keyBindAttack.pressTime = 1;
+                mc.leftClickCounter = 10;
             } else {
                 if (mc.objectMouseOver.entityHit == target && target != null) {
                     if (mc.gameSettings.keyBindAttack.isKeyDown()) {
@@ -90,6 +91,8 @@ public enum FlatRayTracer {
         if (interact(false)) {
             event.setCanceled(true);
             mc.leftClickCounter = 5;
+            mc.thePlayer.swingItem();
+            resetAttackKey = true;
         }
     }
 
@@ -107,7 +110,6 @@ public enum FlatRayTracer {
             face.onActivate(target.at, target.side, mc.thePlayer);
         } else {
             face.onHit(target.at, target.side, mc.thePlayer);
-            resetAttackKey = true;
         }
         FMLProxyPacket p = FlatNet.playerInteract(mc.thePlayer, target.at, target.side, useElseHit);
         FlatNet.send(mc.thePlayer, p);
