@@ -10,7 +10,6 @@ import factorization.flat.api.FlatFace;
 import factorization.flat.api.IFlatVisitor;
 import factorization.net.FzNetDispatch;
 import factorization.shared.Core;
-import factorization.util.NORELEASE;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import net.minecraft.client.Minecraft;
@@ -257,13 +256,11 @@ public class FlatNet {
             pending.clear();
         }
     }
-
     @SubscribeEvent
     public void playerWatchesChunk(ChunkWatchEvent.Watch event) {
         Chunk chunk = event.player.worldObj.getChunkFromChunkCoords(event.chunk.chunkXPos, event.chunk.chunkZPos);
         IExtraChunkData ecd = (IExtraChunkData) chunk;
         FlatChunkLayer layer = ecd.getFlatLayer();
-        NORELEASE.println("Watching " + chunk + " who has " + layer.set);
         if (layer.isEmpty()) return;
         SyncWrite sw = new SyncWrite();
         layer.iterate(sw);

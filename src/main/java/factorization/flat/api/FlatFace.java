@@ -5,6 +5,7 @@ import factorization.api.datahelpers.DataHelper;
 import factorization.api.datahelpers.IDataSerializable;
 import factorization.flat.FlatMod;
 import factorization.flat.FlatNet;
+import factorization.util.NORELEASE;
 import factorization.util.SpaceUtil;
 import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
@@ -30,6 +31,7 @@ public abstract class FlatFace implements IDataSerializable {
     }
 
     public void onReplaced(Coord at, EnumFacing side) {
+        NORELEASE.fixme("Gets called during Slab upgrading");
     }
 
     public void onPlaced(Coord at, EnumFacing side, EntityPlayer player, ItemStack is) {

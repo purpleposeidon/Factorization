@@ -1,5 +1,6 @@
 package factorization.flat;
 
+import com.google.common.collect.Lists;
 import factorization.api.Coord;
 import factorization.api.ICoordFunction;
 import factorization.flat.api.AtSide;
@@ -7,13 +8,9 @@ import factorization.flat.api.FlatFace;
 import factorization.flat.api.IFlatRenderInfo;
 import factorization.flat.api.IFlatVisitor;
 import factorization.net.FzNetDispatch;
-import factorization.shared.Core;
-import factorization.util.NORELEASE;
 import factorization.util.SpaceUtil;
 import net.minecraft.util.EnumFacing;
-import net.minecraft.world.World;
 import net.minecraft.world.chunk.Chunk;
-import net.minecraft.world.chunk.EmptyChunk;
 import net.minecraftforge.fml.common.registry.FMLControlledNamespacedRegistry;
 
 import javax.annotation.Nonnull;
@@ -31,35 +28,6 @@ public class FlatChunkLayer {
         ret *= 3;
         ret += FlatMod.side2byte(face);
         return (short) ret;
-    }
-
-    public static void main(String args[]) {
-        NORELEASE.println("Starting");
-        testIndices();
-        NORELEASE.println("Done");
-    }
-    static void testIndices() {
-        Chunk c = new Chunk((World) null, 0, 0);
-        IterateContext ic = new IterateContext(c, 0, null);
-        for (int x = 0; x < 0xF; x++) {
-            for (int y = 0; y < 0xF; y++) {
-                for (int z = 0; z < 0xF; z++) {
-                    for (EnumFacing f : FlatMod.sideLookup) {
-                        int index = index(x, y, z, f);
-                        ic.unpackIndex(index);
-                        Coord expect = new Coord(c).add(x, y, z);
-                        if (f != ic.side || !ic.at.equals(expect)) {
-                            NORELEASE.println("Fail!");
-                        }
-                    }
-                }
-            }
-        }
-
-        for (int i = 0; i < LargeData.FULL_SIZE; i++) {
-            ic.unpackIndex(i);
-            NORELEASE.println(ic.at.x, ic.at.y, ic.at.z, ic.side);
-        }
     }
 
     static class IterateContext {
@@ -110,7 +78,7 @@ public class FlatChunkLayer {
         }
     }
 
-    static abstract class Data {
+    static abstract class Slab {
         static final int FULL_SIZE = 16 * 16 * 16 * 3;
         transient int set = 0;
 
@@ -118,11 +86,11 @@ public class FlatChunkLayer {
         abstract FlatFace get(short index);
 
         @Nonnull
-        abstract Data set(short index, @Nullable FlatFace face, Coord at);
+        abstract Slab set(short index, @Nullable FlatFace face, Coord at);
 
-        final void replaced(@Nullable FlatFace orig, @Nullable Coord at, short index) {
-            if (orig == null && at != null) set++;
-            if (orig != null && at == null) set--;
+        final void replaced(@Nullable FlatFace orig, @Nullable FlatFace repl, @Nullable Coord at, short index) {
+            if (orig == null && repl != null) set++;
+            if (orig != null && repl == null) set--;
             if (orig == null || at == null) {
                 return;
             }
@@ -141,8 +109,8 @@ public class FlatChunkLayer {
 
     static final FMLControlledNamespacedRegistry<FlatFace> registry = FlatMod.staticReg;
 
-    static class NoData extends Data {
-        static final Data INSTANCE = new NoData();
+    static class NoSlab extends Slab {
+        static final Slab INSTANCE = new NoSlab();
         // 0 cache misses.
         @Override
         FlatFace get(short index) {
@@ -151,8 +119,8 @@ public class FlatChunkLayer {
 
         @Nonnull
         @Override
-        Data set(short index, FlatFace face, Coord at) {
-            return new TinyData().set(index, face, at);
+        Slab set(short index, FlatFace face, Coord at) {
+            return new TinySlab().set(index, face, at);
         }
 
         @Override
@@ -165,7 +133,7 @@ public class FlatChunkLayer {
         }
     }
 
-    static class TinyData extends Data {
+    static class TinySlab extends Slab {
         /*
         ~2 cache misses.
         The goal: Fit indices into a cacheline. My CPU is conservatively crappy; /proc/cpuinfo says 'cache_alignment: 64',
@@ -197,7 +165,7 @@ public class FlatChunkLayer {
 
         @Nonnull
         @Override
-        Data set(short index, FlatFace face, Coord at) {
+        Slab set(short index, FlatFace face, Coord at) {
             int L = indices.length;
             int iFirstBlank = -1;
             for (int i = 0; i < L; i++) {
@@ -219,9 +187,10 @@ public class FlatChunkLayer {
         }
 
         private void doSet(short index, FlatFace face, Coord at, int i) {
+            FlatFace orig = faces[i];
             indices[i] = index;
-            replaced(faces[i], at, index);
             faces[i] = face;
+            replaced(orig, face, at, index);
         }
 
         @Override
@@ -244,8 +213,8 @@ public class FlatChunkLayer {
             }
         }
 
-        Data upsize() {
-            Data ret = nextSize();
+        Slab upsize() {
+            Slab ret = nextSize();
             int L = indices.length;
             for (int i = 0; i < L; i++) {
                 short index = indices[i];
@@ -255,25 +224,56 @@ public class FlatChunkLayer {
             return ret;
         }
 
-        Data nextSize() {
-            return new SmallData();
+        Slab nextSize() {
+            return new SmallSlab();
         }
     }
 
-    static class SmallData extends TinyData {
+    static class SmallSlab extends TinySlab {
         @Override
         int size() {
             return 16 * 4;
         }
 
         @Override
-        Data nextSize() {
-            return new LargeData();
+        Slab nextSize() {
+            return new LargeSlab();
+        }
+    }
+
+    static class PaletteSlab extends Slab {
+        final byte[] data = new byte[FULL_SIZE / 4];
+        final ArrayList<Palette> palletes = Lists.newArrayList();
+
+        static class Palette {
+
+        }
+
+        @Nullable
+        @Override
+        FlatFace get(short index) {
+            return null;
+        }
+
+        @Nonnull
+        @Override
+        Slab set(short index, @Nullable FlatFace face, Coord at) {
+            return null;
+        }
+
+        @Override
+        public void iterate(IterateContext context) {
+
+        }
+
+        @Override
+        public void iterateBounded(Coord min, Coord max, IterateContext context) {
+
         }
     }
 
 
-    static class LargeData extends Data {
+    static class LargeSlab extends Slab {
         /*
         Vanilla-style.
         1 cache miss for static; not sure for dynamic; maybe 5.
@@ -305,17 +305,17 @@ public class FlatChunkLayer {
 
         @Nonnull
         @Override
-        Data set(short index, @Nullable FlatFace face, Coord at) {
+        Slab set(short index, @Nullable FlatFace face, Coord at) {
             if (index < 0) return this;
             if (index >= data.length) return this;
             char oldId = data[index];
+            FlatFace oldFace = lookup(data[index], index);
             if (oldId != 0) {
-                FlatFace oldFace = lookup(data[index], index);
-                replaced(oldFace, at, index);
                 if (oldFace.isDynamic() && (face == null || face.isStatic())) {
                     dynamic.remove((int) index);
                 }
             }
+            boolean checkDynamic = false;
             if (face == null) {
                 data[index] = FlatMod.NO_FACE;
             } else if (face.isStatic()) {
@@ -323,9 +323,11 @@ public class FlatChunkLayer {
             } else {
                 data[index] = FlatMod.DYNAMIC_SENTINEL;
                 dynamic.put((int) index, face);
-                if (dynamic.size() > MAX_DYNAMIC) {
-                    return upsize();
-                }
+                checkDynamic = true;
+            }
+            replaced(oldFace, face, at, index);
+            if (checkDynamic && dynamic.size() > MAX_DYNAMIC) {
+                return upsize();
             }
             return this;
         }
@@ -351,8 +353,8 @@ public class FlatChunkLayer {
             dumbIterate(this, min, max, context);
         }
 
-        Data upsize() {
-            Data ret = new JumboData();
+        Slab upsize() {
+            Slab ret = new JumboSlab();
             for (short index = 0; index < data.length; index++) {
                 int id = data[index];
                 if (id == FlatMod.NO_FACE || id == FlatMod.DYNAMIC_SENTINEL) {
@@ -371,7 +373,7 @@ public class FlatChunkLayer {
         }
     }
 
-    static class JumboData extends Data {
+    static class JumboSlab extends Slab {
         // 32kb. Please don't use this.
         // On the plus side: Only 1 cache miss! :D
         final FlatFace[] data = new FlatFace[FULL_SIZE];
@@ -386,11 +388,12 @@ public class FlatChunkLayer {
 
         @Nonnull
         @Override
-        Data set(short index, @Nullable FlatFace face, Coord at) {
+        Slab set(short index, @Nullable FlatFace face, Coord at) {
             if (index < 0) return this;
             if (index >= FULL_SIZE) return this;
-            replaced(data[index], at, index);
+            FlatFace orig = data[index];
             data[index] = face;
+            replaced(orig, face, at, index);
             return this;
         }
 
@@ -408,7 +411,7 @@ public class FlatChunkLayer {
         }
     }
 
-    static void dumbIterate(final Data data, Coord min, Coord max, final IterateContext context) {
+    static void dumbIterate(final Slab slab, Coord min, Coord max, final IterateContext context) {
         min = min.copy();
         max = max.copy();
         if (min.x < context.minX) min.x = context.minX;
@@ -425,7 +428,7 @@ public class FlatChunkLayer {
                 int localZ = at.z & 0xF;
                 for (EnumFacing dir : POS_FACES) {
                     short index = index(localX, localY, localZ, dir);
-                    FlatFace face = data.get(index);
+                    FlatFace face = slab.get(index);
                     context.visit(index, face);
                 }
             }
@@ -435,7 +438,7 @@ public class FlatChunkLayer {
     public static final EnumFacing[] POS_FACES = new EnumFacing[] { EnumFacing.UP, EnumFacing.SOUTH, EnumFacing.EAST };
 
     final Chunk chunk;
-    final Data[] slabs = new Data[16];
+    final Slab[] slabs = new Slab[16];
     @Nullable
     final ArrayList<AtSide> changed; // Might've packed bits into an int[], but too difficult to be certain w/ Java
     public static final int MAX_CHANGES = 32;
@@ -444,14 +447,14 @@ public class FlatChunkLayer {
     public FlatChunkLayer(Chunk chunk) {
         this.chunk = chunk;
         for (int i = 0; i < slabs.length; i++) {
-            slabs[i] = NoData.INSTANCE;
+            slabs[i] = NoSlab.INSTANCE;
         }
         changed = chunk.getWorld().isRemote ? null : new ArrayList<AtSide>();
     }
 
-    private Data slabIndex(int localY) {
+    private Slab slabIndex(int localY) {
         int y = localY >> 4;
-        if (y < 0 || y >= slabs.length) return NoData.INSTANCE;
+        if (y < 0 || y >= slabs.length) return NoSlab.INSTANCE;
         return slabs[y];
     }
 
@@ -459,7 +462,7 @@ public class FlatChunkLayer {
         int localY = at.y & 0xF;
         int localX = at.x & 0xF;
         int localZ = at.z & 0xF;
-        Data slab = slabIndex(at.y >> 4);
+        Slab slab = slabIndex(at.y >> 4);
         short index = index(localX, localY, localZ, dir);
         if (index == -1) return FlatFaceAir.INSTANCE;
         FlatFace ret = slab.get(index);
@@ -476,25 +479,15 @@ public class FlatChunkLayer {
         int localY = at.y & 0xF;
         int localX = at.x & 0xF;
         int localZ = at.z & 0xF;
-        Data slab = slabIndex(at.y >> 4);
+        Slab slab = slabIndex(at.y >> 4);
         short index = index(localX, localY, localZ, dir);
         if (index == -1) {
             return FlatFaceAir.INSTANCE;
         }
-        if (NORELEASE.just(Core.dev_environ)) {
-            IterateContext ic = new IterateContext(chunk, at.y >> 4, null);
-            ic.unpackIndex(index);
-            if (!ic.at.equals(at) || ic.side != dir) {
-                if (!(chunk instanceof EmptyChunk)) {
-                    NORELEASE.println("Index fail! ", index, at);
-                }
-            }
-        }
         int oSet = slab.set;
-        Data newSlab = slab.set(index, face, at);
+        Slab newSlab = slab.set(index, face, at);
         if (slab != newSlab) {
             slabs[localY >> 4] = newSlab;
-            NORELEASE.println("Upgraded " + slab + " to " + newSlab);
         }
         set += newSlab.set - oSet;
         FlatFace ret = slab.get(index);
@@ -506,7 +499,7 @@ public class FlatChunkLayer {
 
     public void iterate(IFlatVisitor visitor) {
         for (int slabY = 0; slabY < slabs.length; slabY++) {
-            Data slab = slabs[slabY];
+            Slab slab = slabs[slabY];
             IterateContext context = new IterateContext(chunk, slabY, visitor);
             slab.iterate(context);
         }
@@ -518,7 +511,7 @@ public class FlatChunkLayer {
         if (minSlab < 0) minSlab = 0;
         if (maxSlab > slabs.length) maxSlab = slabs.length;
         for (int slabY = minSlab; slabY < maxSlab; slabY++) {
-            Data slab = slabs[slabY];
+            Slab slab = slabs[slabY];
             IterateContext context = new IterateContext(chunk, slabY, visitor);
             slab.iterateBounded(min, max, context);
         }

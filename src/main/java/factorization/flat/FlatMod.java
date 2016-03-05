@@ -204,7 +204,6 @@ public class FlatMod {
                 layer.set(at, face, flat);
             }
         }
-        NORELEASE.println(chunk + " has " + tagEnd);
     }
 
     @SubscribeEvent
