@@ -2,6 +2,7 @@ package factorization.api.energy;
 
 
 import com.google.common.base.Preconditions;
+import net.minecraft.util.ResourceLocation;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -13,7 +14,7 @@ import javax.annotation.Nullable;
  * <p/>
  * There are no fractional work actions. (Well, there may be fractional work actions internal to a machine, for, eg,
  * transferring a liquid between tanks.) In general there should be a one-to-one correspondence between receiving a
- * WorkUnit and something happening that the player can see. It may also be reasonable for a machine to use multiple
+ * WorkUnit and something useful & significant happening. It is reasonable for a machine to use multiple
  * WorkUnits (possibly of different kinds!) for different steps, such as to spin up, warm up, and fire.
  * <p/>
  * WorkUnit converters should have some inefficiency, such as using 1 input unit for each 16 units converted.
@@ -30,25 +31,23 @@ public class WorkUnit {
      * The name of the energy type, namespaced by some particular mod's modid.
      */
     @Nonnull
-    public final String name;
+    public final ResourceLocation name;
 
     /**
      * Creates a new WorkUnit. Duplicate instances of an already existing WorkUnit should usually be made using
      * {@link WorkUnit#produce()}.
      *
      * @param category The {@link EnergyCategory}.
-     * @param ownerMod The modid of the classical owner of the WorkUnit. The mod need not be installed.
-     * @param name     The name of the energy type.
+     * @param name     The name of the energy type, presumably with the same domain as the creating mod.
      */
-    public WorkUnit(@Nonnull EnergyCategory category, @Nonnull String ownerMod, @Nonnull String name) {
+    public WorkUnit(@Nonnull EnergyCategory category, @Nonnull ResourceLocation name) {
         Preconditions.checkNotNull(category, "null energy class");
-        Preconditions.checkNotNull(ownerMod, "null owner modid");
         Preconditions.checkNotNull(name, "null name");
         this.category = category;
-        this.name = (ownerMod + ":" + name).intern();
+        this.name = name;
     }
 
-    protected WorkUnit(@Nonnull WorkUnit self) {
+    protected WorkUnit(WorkUnit self) {
         this.category = self.category;
         this.name = self.name;
     }

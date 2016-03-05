@@ -2,8 +2,8 @@ package factorization.api.adapter;
 
 /**
  * This is the interface used for adapters.
- * @param <IN_TYPE> The type to be converted to InterfaceAdapter#SOURCE.
- * @param <OUT_TYPE> Must be the same type as InterfaceAdapter#TARGET.
+ * @param <IN_TYPE> The type to be converted to {@link InterfaceAdapter#SRC}
+ * @param <OUT_TYPE> Must be the same type as {@link InterfaceAdapter#DST}.
  */
 public interface Adapter<IN_TYPE, OUT_TYPE> {
     /**
@@ -13,7 +13,8 @@ public interface Adapter<IN_TYPE, OUT_TYPE> {
 
     /**
      * @param valClass The class.
-     * @return true if this adapter can handle valClass. The answer is cached. You might want 'valClass instanceof OUT_TYPE'
+     * @return true if this adapter can handle valClass. The return value will be cached.
+     * You probably want {@code return valClass.isAssignableFrom(OUT_TYPE.class)}
      */
     boolean canAdapt(Class<?> valClass);
 

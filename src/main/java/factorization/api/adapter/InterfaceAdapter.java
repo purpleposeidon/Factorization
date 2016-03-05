@@ -1,33 +1,40 @@
 package factorization.api.adapter;
 
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
+import factorization.api.energy.ContextBlock;
+import factorization.api.energy.IWorker;
+import net.minecraft.block.Block;
+
 import java.util.*;
 
 /**
  * Ascribes an interface to a type that might not actually implement it.
  * The implementation's a bit hairy; @see AdapterExample for a warm & fuzzy example.
- * @param <SOURCE> The input type
- * @param <TARGET> The class that the type shall be cast to.
+ * @param <SRC> The input type
+ * @param <DST> The class that the type shall be cast to.
  */
+// Lots and lots of unchecked warnings :(
 @SuppressWarnings("unused")
-public class InterfaceAdapter<SOURCE, TARGET> implements Comparator<Adapter>, Adapter<SOURCE, TARGET> {
-    public final Class<TARGET> targetInterface;
+public final class InterfaceAdapter<SRC, DST> {
+    public final Class<DST> targetInterface;
 
     /**
      * @param targetInterface The class object of the interface that will be adapted.
      * @param <S> The adaption source
-     * @param <T> The adaption target, and class of {@code targetInterface}.
+     * @param <D> The adaption target, and class of {@code targetInterface}.
      * @return a globally shared InterfaceAdapter associated with the interface.
      */
-    public static <S, T> InterfaceAdapter<S, T> get(Class<T> targetInterface) {
-        InterfaceAdapter ret = common_adapters.get(targetInterface);
+    public static <S, D> InterfaceAdapter<S, D> get(Class<D> targetInterface) {
+        InterfaceAdapter<?, ?> ret = default_adapters.get(targetInterface);
         if (ret == null) {
-            ret = getExtra(targetInterface);
-            common_adapters.put(targetInterface, ret);
+            ret = makeAdapter(targetInterface);
+            default_adapters.put(targetInterface, ret);
         }
         if (ret.targetInterface != targetInterface) {
             throw new ClassCastException("targetInterfaces don't match");
         }
-        return (InterfaceAdapter<S, T>) ret;
+        return (InterfaceAdapter<S, D>) ret;
     }
 
     /**
@@ -36,7 +43,7 @@ public class InterfaceAdapter<SOURCE, TARGET> implements Comparator<Adapter>, Ad
      * @param <T> The adaption target, and class of {@code targetInterface}.
      * @return an anonymous adapter
      */
-    public static <S, T> InterfaceAdapter<S, T> getExtra(Class<T> targetInterface) {
+    public static <S, T> InterfaceAdapter<S, T> makeAdapter(Class<T> targetInterface) {
         return new InterfaceAdapter<S, T>(targetInterface);
     }
 
@@ -45,9 +52,10 @@ public class InterfaceAdapter<SOURCE, TARGET> implements Comparator<Adapter>, Ad
      * @param inClass the class used for outInterface
      * @param outInterface the value that will be returned by cast() if the input is of type inClass.
      */
-    public <OBJ extends SOURCE> void register(Class<OBJ> inClass, TARGET outInterface) {
-        Adapter<OBJ, TARGET> ret = new GenericAdapter<OBJ, TARGET>(inClass, outInterface);
+    public <OBJ extends SRC> InterfaceAdapter<SRC, DST> register(Class<OBJ> inClass, DST outInterface) {
+        Adapter<OBJ, DST> ret = new GenericAdapter<OBJ, DST>(inClass, outInterface);
         register(ret);
+        return this;
     }
 
     /**
@@ -55,7 +63,7 @@ public class InterfaceAdapter<SOURCE, TARGET> implements Comparator<Adapter>, Ad
      * @param adapter The adapter to register
      * @return this
      */
-    public <REGISTERED_SOURCE extends SOURCE> InterfaceAdapter<SOURCE, TARGET> register(Adapter<REGISTERED_SOURCE, TARGET> adapter) {
+    public <REG extends SRC> InterfaceAdapter<SRC, DST> register(Adapter<REG, DST> adapter) {
         adapters.add(adapter);
         adapterCache.clear();
         return this;
@@ -65,12 +73,13 @@ public class InterfaceAdapter<SOURCE, TARGET> implements Comparator<Adapter>, Ad
      * @param fallbackAdapter the adapter to be used if no other adapter is suitable. canCast is *not* called.
      *                        The default behavior is to return null.
      */
-    public void setFallbackAdapter(Adapter<? extends SOURCE, TARGET> fallbackAdapter) {
+    public InterfaceAdapter<SRC, DST> setFallbackAdapter(Adapter<? extends SRC, DST> fallbackAdapter) {
         adapterCache.clear();
         this.fallbackAdapter = fallbackAdapter;
+        return this;
     }
 
-    public Adapter<? extends SOURCE, TARGET> getFallbackAdapter() {
+    public Adapter<? extends SRC, DST> getFallbackAdapter() {
         return fallbackAdapter;
     }
 
@@ -78,19 +87,19 @@ public class InterfaceAdapter<SOURCE, TARGET> implements Comparator<Adapter>, Ad
      * @param nullAdapter the adapter to be used to handle null values. canCast is *not* called.
      *                    The default behavior is to return null.
      */
-    public void setNullAdapter(Adapter<SOURCE, TARGET> nullAdapter) {
+    public void setNullAdapter(Adapter<SRC, DST> nullAdapter) {
         adapterCache.clear();
         this.null_adapter = nullAdapter;
     }
 
-    public Adapter<? extends SOURCE, TARGET> getNullAdapter() {
+    public Adapter<? extends SRC, DST> getNullAdapter() {
         return null_adapter;
     }
 
     /**
      * @return the list of adapters, for doing whatever with. Don't call this regularly.
      */
-    public List<Adapter<? extends SOURCE, TARGET>> getAdapters() {
+    public List<Adapter<? extends SRC, DST>> getAdapters() {
         adapterCache.clear();
         return adapters;
     }
@@ -99,11 +108,11 @@ public class InterfaceAdapter<SOURCE, TARGET> implements Comparator<Adapter>, Ad
      * @param obj The value to be converted. May be null.
      * @return The value, converted. Returns null if the null_adapter does not convert the input.
      */
-    public <OBJ extends SOURCE> TARGET cast(OBJ obj) {
+    public <OBJ extends SRC> DST cast(OBJ obj) {
         if (obj == null) return null_adapter.adapt(null);
-        Class<OBJ> objClass = (Class<OBJ>) obj.getClass(); // The docs claim the cast isn't necessary :|
+        Class<? extends OBJ> objClass = (Class<? extends OBJ>) obj.getClass(); // The docs claim the cast isn't necessary :|
         // (Might be a lang level thing.)
-        Adapter<OBJ, TARGET> adapter = (Adapter<OBJ, TARGET>) adapterCache.get(objClass);
+        Adapter<OBJ, DST> adapter = (Adapter<OBJ, DST>) adapterCache.get(objClass);
         if (adapter == null) {
             adapter = findAdapter(objClass);
             adapterCache.put(objClass, adapter);
@@ -111,58 +120,44 @@ public class InterfaceAdapter<SOURCE, TARGET> implements Comparator<Adapter>, Ad
         return adapter.adapt(obj);
     }
 
-    private InterfaceAdapter(Class<TARGET> targetInterface) {
+    private InterfaceAdapter(Class<DST> targetInterface) {
         this.targetInterface = targetInterface;
     }
 
-    private <OBJ extends SOURCE> Adapter<OBJ, TARGET> findAdapter(Class<OBJ> objClass) {
+    private <OBJ extends SRC> Adapter<OBJ, DST> findAdapter(Class<? extends OBJ> objClass) {
         if (adapterCache.isEmpty()) {
-            Collections.sort(adapters, this);
+            Collections.sort(adapters, ADAPTER_COMPARATOR);
         }
         if (targetInterface.isAssignableFrom(objClass)) {
-            return (Adapter<OBJ, TARGET>) this; // the self adapter
+            return (Adapter<OBJ, DST>) SELF_ADAPTER;
         }
-        for (Adapter<? extends SOURCE, TARGET> a : adapters) {
+        for (Adapter<? extends SRC, DST> a : adapters) {
             if (a.canAdapt(objClass)) {
-                return (Adapter<OBJ, TARGET>) a;
+                return (Adapter<OBJ, DST>) a;
             }
         }
-        return (Adapter<OBJ, TARGET>) fallbackAdapter;
+        return (Adapter<OBJ, DST>) fallbackAdapter;
     }
 
-    private final HashMap<Class<? extends SOURCE>, Adapter<? extends SOURCE, TARGET>> adapterCache = new HashMap<Class<? extends SOURCE>, Adapter<? extends SOURCE, TARGET>>();
-    private final ArrayList<Adapter<? extends SOURCE, TARGET>> adapters = new ArrayList<Adapter<? extends SOURCE, TARGET>>();
-    private Adapter<SOURCE, TARGET> null_adapter = this;
-    private Adapter<? extends SOURCE, TARGET> fallbackAdapter = (Adapter<? extends SOURCE, TARGET>) nullAdapter;
-    private static final HashMap<Class, InterfaceAdapter> common_adapters = new HashMap<Class, InterfaceAdapter>();
+    private final HashMap<Class<? extends SRC>, Adapter<? extends SRC, DST>> adapterCache = Maps.newHashMap();
+    private final ArrayList<Adapter<? extends SRC, DST>> adapters = Lists.newArrayList();
+    private Adapter<SRC, DST> null_adapter = (Adapter<SRC, DST>) NULL_ADAPTER;
+    private Adapter<? extends SRC, DST> fallbackAdapter = (Adapter<? extends SRC, DST>) NULL_ADAPTER;
+    private static final HashMap<Class, InterfaceAdapter<?, ?>> default_adapters = Maps.newHashMap();
 
-    private static final Adapter<?, ?> nullAdapter = new GenericAdapter<Object, Object>(null /* rely on canCast() not being called */, null);
-
-    // Comparator implementation; fewer classes! :D
-    @Override
-    @Deprecated
-    public int compare(Adapter o1, Adapter o2) {
-        int p1 = o1.priority();
-        int p2 = o2.priority();
-        return p1 - p2;
-    }
-
-    // 'self adapter' implementation; even fewer classes! :DD
-    @Override
-    @Deprecated
-    public TARGET adapt(SOURCE val) {
-        return (TARGET) val;
-    }
-
-    @Override
-    @Deprecated
-    public boolean canAdapt(Class<?> valClass) {
-        return targetInterface.isAssignableFrom(valClass);
-    }
-
-    @Override
-    @Deprecated
-    public int priority() {
-        return 0;
-    }
+    // These two adapters rely on canAdapt() not being called!
+    private static final Adapter<?, ?> NULL_ADAPTER = new GenericAdapter<Object, Object>(null, null);
+    private static final Adapter<?, ?> SELF_ADAPTER = new Adapter<Object, Object>() {
+        @Override public Object adapt(Object val) { return val; }
+        @Override public int priority() { return 0; }
+        @Override public boolean canAdapt(Class<?> valClass) { throw new IllegalArgumentException("Don't ask me!"); }
+    };
+    private static final Comparator<Adapter> ADAPTER_COMPARATOR = new Comparator<Adapter>() {
+        @Override
+        public int compare(Adapter o1, Adapter o2) {
+            int p1 = o1.priority();
+            int p2 = o2.priority();
+            return p1 - p2;
+        }
+    };
 }
