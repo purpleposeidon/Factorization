@@ -763,6 +763,8 @@ public final class Coord implements IDataSerializable, ISaneCoord, Comparable<Co
 
     @Nullable
     public Entity spawnItem(ItemStack is) {
+        if (is == null) return null;
+        if (is.getItem() == null) return null;
         Entity ent = new EntityItem(w, x + 0.5, y + 0.5, z + 0.5, is);
         Item item = is.getItem();
         if (item.hasCustomEntity(is)) { // TODO: Resolve the possible NPE when is.getItem() == null (or is == null)

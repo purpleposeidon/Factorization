@@ -73,7 +73,6 @@ public abstract class FlatFace implements IDataSerializable {
 
 
     public boolean canInteract(Coord at, EnumFacing side, EntityPlayer player) {
-        if (NORELEASE.on) return true;
         if (player.isSneaking()) return true;
         ItemStack item = getItem(at, side);
         if (item == null) return true;
@@ -200,7 +199,10 @@ public abstract class FlatFace implements IDataSerializable {
                     at = n;
                 }
             }
-            at.spawnItem(getItem(at, side));
+            ItemStack item = getItem(at, side);
+            if (item != null) {
+                at.spawnItem(item);
+            }
         }
     }
 }
