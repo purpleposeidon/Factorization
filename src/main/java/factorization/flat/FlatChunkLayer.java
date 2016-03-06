@@ -8,9 +8,11 @@ import factorization.flat.api.FlatFace;
 import factorization.flat.api.IFlatRenderInfo;
 import factorization.flat.api.IFlatVisitor;
 import factorization.net.FzNetDispatch;
+import factorization.shared.Core;
 import factorization.util.SpaceUtil;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.world.chunk.Chunk;
+import net.minecraft.world.chunk.EmptyChunk;
 import net.minecraftforge.fml.common.registry.FMLControlledNamespacedRegistry;
 
 import javax.annotation.Nonnull;
@@ -35,6 +37,7 @@ public class FlatChunkLayer {
         final IFlatVisitor visitor;
         final Coord at;
         EnumFacing side;
+        final int slabX, slabY, slabZ;
         final int minX, minY, minZ;
         final int maxX, maxY, maxZ;
 
@@ -42,9 +45,9 @@ public class FlatChunkLayer {
             this.chunk = chunk;
             this.visitor = visitor;
             this.at = new Coord(chunk.getWorld(), 0, 0, 0);
-            this.minX = chunk.xPosition << 4;
-            this.minY = slabY << 4;
-            this.minZ = chunk.zPosition << 4;
+            this.slabX = this.minX = chunk.xPosition << 4;
+            this.slabY = this.minY = slabY << 4;
+            this.slabZ = this.minZ = chunk.zPosition << 4;
             this.maxX = minX + 0xF;
             this.maxY = minY + 0xF;
             this.maxZ = minZ + 0xF;
@@ -54,14 +57,15 @@ public class FlatChunkLayer {
             this.chunk = chunk;
             this.visitor = visitor;
             this.at = new Coord(chunk.getWorld(), 0, 0, 0);
-            int cx = chunk.xPosition << 4;
-            int cz = chunk.zPosition << 4;
-            this.minX = Math.max(min.x, cx);
-            this.minY = Math.max(slabY << 4, min.y);
-            this.minZ = Math.max(min.z, cz);
-            this.maxX = Math.min(max.x, cx + 0xF);
+            this.slabX = chunk.xPosition << 4;
+            this.slabY = slabY << 4;
+            this.slabZ = chunk.zPosition << 4;
+            this.minX = Math.max(min.x, slabX);
+            this.minY = Math.max(this.slabY, min.y);
+            this.minZ = Math.max(min.z, slabZ);
+            this.maxX = Math.min(max.x, slabX + 0xF);
             this.maxY = max.y;
-            this.maxZ = Math.min(max.z, cx + 0xF);
+            this.maxZ = Math.min(max.z, slabZ + 0xF);
         }
 
         void visit(int index, @Nullable FlatFace face) {
@@ -86,9 +90,9 @@ public class FlatChunkLayer {
             int slX = (i) & 0xF;
             int slY = (i >> 4) & 0xF;
             int slZ = (i >> 8) & 0xF;
-            at.x = minX + slX;
-            at.y = minY + slY;
-            at.z = minZ + slZ;
+            at.x = slabX + slX;
+            at.y = slabY + slY;
+            at.z = slabZ + slZ;
         }
     }
 
@@ -202,7 +206,7 @@ public class FlatChunkLayer {
 
         private void doSet(short index, FlatFace face, Coord at, int i) {
             FlatFace orig = faces[i];
-            indices[i] = index;
+            indices[i] = face == null ? 0 : index;
             faces[i] = face;
             replaced(orig, face, at, index);
         }
@@ -218,7 +222,7 @@ public class FlatChunkLayer {
 
         @Override
         public void iterateBounded(Coord min, Coord max, IterateContext context) {
-           for (int i = 0; i < indices.length; i++) {
+            for (int i = 0; i < indices.length; i++) {
                 int index = indices[i];
                 FlatFace face = faces[i];
                 if (context.unpack(index, face)) continue;
@@ -487,6 +491,9 @@ public class FlatChunkLayer {
     }
 
     public FlatFace set(Coord at, EnumFacing dir, FlatFace face) {
+        if (chunk instanceof EmptyChunk) {
+            Core.logWarning("FlatLayer.set called on empty chunk", chunk);
+        }
         if (face == FlatFaceAir.INSTANCE) {
             face = null;
         }
