@@ -1,13 +1,12 @@
 package factorization.flat;
 
-import factorization.aabbdebug.AabbDebugger;
 import factorization.api.Coord;
 import factorization.flat.api.Flat;
 import factorization.flat.api.FlatFace;
 import factorization.flat.api.IBoxList;
 import factorization.flat.api.IFlatVisitor;
 import factorization.util.SpaceUtil;
-import net.minecraft.entity.Entity;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.MovingObjectPosition;
@@ -17,7 +16,7 @@ import net.minecraft.world.World;
 import javax.annotation.Nonnull;
 
 class Tracer implements IFlatVisitor, IBoxList {
-    final Entity player;
+    final EntityPlayer player;
     final Vec3 start, end;
 
     double bestDistSq = Double.POSITIVE_INFINITY;
@@ -25,7 +24,7 @@ class Tracer implements IFlatVisitor, IBoxList {
     EnumFacing bestSide = null;
     AxisAlignedBB bestBox = null;
 
-    Tracer(Entity player, float partial) {
+    Tracer(EntityPlayer player, float partial) {
         this.player = player;
         start = player.getPositionEyes(partial);
         Vec3 look = player.getLook(partial);
@@ -46,6 +45,7 @@ class Tracer implements IFlatVisitor, IBoxList {
 
     @Override
     public void visit(Coord at, EnumFacing side, @Nonnull FlatFace face) {
+        if (!face.canInteract(at, side, player)) return;
         subBestDSq = Double.POSITIVE_INFINITY;
         face.listSelectionBounds(at, side, player, this);
         if (subBestDSq < bestDistSq) {
@@ -61,7 +61,6 @@ class Tracer implements IFlatVisitor, IBoxList {
 
     @Override
     public void add(AxisAlignedBB box) {
-        AabbDebugger.addBox(box);
         if (box.isVecInside(start)) {
             // Uh, vanilla has this check. Don't ask me! :p
             subBestDSq = 0;

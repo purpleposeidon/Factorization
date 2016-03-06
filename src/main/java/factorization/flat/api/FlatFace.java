@@ -5,10 +5,8 @@ import factorization.api.datahelpers.DataHelper;
 import factorization.api.datahelpers.IDataSerializable;
 import factorization.flat.FlatMod;
 import factorization.flat.FlatNet;
-import factorization.util.NORELEASE;
-import factorization.util.SpaceUtil;
+import factorization.util.*;
 import net.minecraft.block.Block;
-import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
@@ -49,7 +47,10 @@ public abstract class FlatFace implements IDataSerializable {
     }
 
     public void onNeighborBlockChanged(Coord at, EnumFacing side) {
-
+        if (at.w.isRemote) return;
+        if (isValidAt(at, side)) return;
+        dropItem(at, side);
+        Flat.setAir(at, side);
     }
 
     public void onNeighborFaceChanged(Coord at, EnumFacing side) {
@@ -61,7 +62,27 @@ public abstract class FlatFace implements IDataSerializable {
     }
 
     public void onHit(Coord at, EnumFacing side, EntityPlayer player) {
+        if (at.w.isRemote) return;
+        if (!PlayerUtil.isPlayerCreative(player)) {
+            dropItem(at, side);
+        }
+        Flat.setAir(at, side);
+        Flat.playSound(at, side, this);
+        Flat.emitParticle(at, side, this);
+    }
 
+
+    public boolean canInteract(Coord at, EnumFacing side, EntityPlayer player) {
+        ItemStack item = getItem(at, side);
+        if (item == null) return true;
+        if (ItemUtil.identical(player.getHeldItem(), item)) {
+            return true;
+        }
+        return false;
+    }
+
+    public ItemStack getItem(Coord at, EnumFacing side) {
+        return null;
     }
 
     protected static AxisAlignedBB getBounds(Coord at, EnumFacing side, double width, double height) {
@@ -166,5 +187,18 @@ public abstract class FlatFace implements IDataSerializable {
 
     public Block.SoundType getSoundType() {
         return Block.soundTypeStone;
+    }
+
+    public void dropItem(Coord at, EnumFacing side) {
+        if (at.w.isRemote) return;
+        if (FzUtil.doTileDrops(at.w)) {
+            if (at.isSolid()) {
+                Coord n = at.add(side);
+                if (!n.isSolid()) {
+                    at = n;
+                }
+            }
+            at.spawnItem(getItem(at, side));
+        }
     }
 }

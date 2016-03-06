@@ -9,8 +9,6 @@ import factorization.flat.api.IModelMaker;
 import factorization.notify.Notice;
 import factorization.notify.Style;
 import factorization.shared.Core;
-import factorization.util.FzUtil;
-import factorization.util.PlayerUtil;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumFacing;
@@ -135,37 +133,5 @@ public class FlatFaceWire extends FlatFace {
 
     public ItemStack getItem(Coord at, EnumFacing side) {
         return new ItemStack(Core.registry.wirePlacer);
-    }
-
-    public void dropItem(Coord at, EnumFacing side) {
-        if (at.w.isRemote) return;
-        if (FzUtil.doTileDrops(at.w)) {
-            if (at.isSolid()) {
-                Coord n = at.add(side);
-                if (!n.isSolid()) {
-                    at = n;
-                }
-            }
-            at.spawnItem(getItem(at, side));
-        }
-    }
-
-    @Override
-    public void onNeighborBlockChanged(Coord at, EnumFacing side) {
-        if (at.w.isRemote) return;
-        if (isValidAt(at, side)) return;
-        dropItem(at, side);
-        Flat.setAir(at, side);
-    }
-
-    @Override
-    public void onHit(final Coord at, EnumFacing side, EntityPlayer player) {
-        if (at.w.isRemote) return;
-        if (!PlayerUtil.isPlayerCreative(player)) {
-            dropItem(at, side);
-        }
-        Flat.setAir(at, side);
-        Flat.playSound(at, side, this);
-        Flat.emitParticle(at, side, this);
     }
 }
