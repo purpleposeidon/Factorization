@@ -50,6 +50,20 @@ public class FlatChunkLayer {
             this.maxZ = minZ + 0xF;
         }
 
+        IterateContext(Chunk chunk, int slabY, IFlatVisitor visitor, Coord min, Coord max) {
+            this.chunk = chunk;
+            this.visitor = visitor;
+            this.at = new Coord(chunk.getWorld(), 0, 0, 0);
+            int cx = chunk.xPosition << 4;
+            int cz = chunk.zPosition << 4;
+            this.minX = Math.max(min.x, cx);
+            this.minY = Math.max(slabY << 4, min.y);
+            this.minZ = Math.max(min.z, cz);
+            this.maxX = Math.min(max.x, cx + 0xF);
+            this.maxY = max.y;
+            this.maxZ = Math.min(max.z, cx + 0xF);
+        }
+
         void visit(int index, @Nullable FlatFace face) {
             if (unpack(index, face)) return;
             doVisit(face);
@@ -204,7 +218,7 @@ public class FlatChunkLayer {
 
         @Override
         public void iterateBounded(Coord min, Coord max, IterateContext context) {
-            for (int i = 0; i < indices.length; i++) {
+           for (int i = 0; i < indices.length; i++) {
                 int index = indices[i];
                 FlatFace face = faces[i];
                 if (context.unpack(index, face)) continue;
@@ -414,12 +428,12 @@ public class FlatChunkLayer {
     static void dumbIterate(final Slab slab, Coord min, Coord max, final IterateContext context) {
         min = min.copy();
         max = max.copy();
-        if (min.x < context.minX) min.x = context.minX;
-        if (min.y < context.minY) min.y = context.minY;
-        if (min.z < context.minZ) min.z = context.minZ;
-        if (max.x > context.maxX) max.x = context.maxX;
-        if (max.y > context.maxY) max.y = context.maxY;
-        if (max.z > context.maxZ) max.z = context.maxZ;
+        min.x = context.minX;
+        min.y = context.minY;
+        min.z = context.minZ;
+        max.x = context.maxX;
+        max.y = context.maxY;
+        max.z = context.maxZ;
         Coord.iterateCube(min, max, new ICoordFunction() {
             @Override
             public void handle(Coord at) {
@@ -512,7 +526,8 @@ public class FlatChunkLayer {
         if (maxSlab > slabs.length) maxSlab = slabs.length;
         for (int slabY = minSlab; slabY < maxSlab; slabY++) {
             Slab slab = slabs[slabY];
-            IterateContext context = new IterateContext(chunk, slabY, visitor);
+            if (slab.isEmpty()) continue;
+            IterateContext context = new IterateContext(chunk, slabY, visitor, min, max);
             slab.iterateBounded(min, max, context);
         }
     }

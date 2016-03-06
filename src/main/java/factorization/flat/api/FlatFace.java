@@ -73,6 +73,8 @@ public abstract class FlatFace implements IDataSerializable {
 
 
     public boolean canInteract(Coord at, EnumFacing side, EntityPlayer player) {
+        if (NORELEASE.on) return true;
+        if (player.isSneaking()) return true;
         ItemStack item = getItem(at, side);
         if (item == null) return true;
         if (ItemUtil.identical(player.getHeldItem(), item)) {
