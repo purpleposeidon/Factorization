@@ -182,7 +182,7 @@ public class FlatNet {
     }
 
     private static void writeFace(ByteBuf buff, FlatFace face) {
-        buff.writeChar(face.staticId);
+        buff.writeByte(face.staticId);
         if (face.isDynamic()) {
             ByteBufUtils.writeUTF8String(buff, Flat.getName(face).toString());
             try {
@@ -211,7 +211,7 @@ public class FlatNet {
 
     @Nullable
     private static FlatFace readFace(ByteBuf buff) {
-        char staticId = buff.readChar();
+        byte staticId = buff.readByte();
         if (staticId != FlatMod.DYNAMIC_SENTINEL) {
             return FlatMod.staticReg.getObjectById(staticId);
         }

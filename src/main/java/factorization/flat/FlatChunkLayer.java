@@ -1,6 +1,6 @@
 package factorization.flat;
 
-import com.google.common.collect.Lists;
+import factorization.algos.ToothArray;
 import factorization.api.Coord;
 import factorization.api.ICoordFunction;
 import factorization.flat.api.AtSide;
@@ -21,7 +21,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
-public class FlatChunkLayer {
+public final class FlatChunkLayer {
     public static short index(int slabX, int slabY, int slabZ, EnumFacing face) {
         if (slabX < 0 || slabY < 0 || slabZ < 0) return -1;
         if (slabX > 0xF || slabY > 0xF || slabZ > 0xF) return -1;
@@ -97,7 +97,7 @@ public class FlatChunkLayer {
     }
 
     static abstract class Slab {
-        static final int FULL_SIZE = 16 * 16 * 16 * 3;
+        static final short FULL_SIZE = 16 * 16 * 16 * 3;
         transient int set = 0;
 
         @Nullable
@@ -255,41 +255,139 @@ public class FlatChunkLayer {
 
         @Override
         Slab nextSize() {
-            return new LargeSlab();
+            return new PaletteSlab();
         }
     }
 
     static class PaletteSlab extends Slab {
-        final byte[] data = new byte[FULL_SIZE / 4];
-        final ArrayList<Palette> palletes = Lists.newArrayList();
+        static final int COLUMNS = 16 * 16;
+        static final int COL_LENGTH = FULL_SIZE / COLUMNS;
+        static {
+            //noinspection ConstantConditions
+            assert FULL_SIZE % COLUMNS == 0;
+        }
+        private static class Palette {
+            final ToothArray data = new ToothArray(COL_LENGTH);
+            final FlatFace[] faces = new FlatFace[3];
+            final byte DYNAMIC_SENTINEL = 0x3;
 
-        static class Palette {
+            @Nullable
+            FlatFace get(Map<Integer, FlatFace> dynamics, short slabIndex) {
+                int index = slabIndex % COL_LENGTH;
+                int tooth = data.get(index);
+                if (tooth == DYNAMIC_SENTINEL) {
+                    return dynamics.get((int) slabIndex);
+                }
+                return faces[tooth];
+            }
 
+            /** Return true if setable, else false. */
+            void set(Map<Integer, FlatFace> dynamics, short slabIndex, @Nullable FlatFace face) {
+                int index = slabIndex % COL_LENGTH;
+                if (face != null && face.isDynamic()) {
+                    data.set(index, DYNAMIC_SENTINEL);
+                    dynamics.put((int) slabIndex, face);
+                    return;
+                }
+                byte first_empty = -1;
+                for (byte tooth = 0; tooth < 4; tooth++) {
+                    FlatFace knownType = faces[tooth];
+                    if (knownType == face) {
+                        data.set(index, tooth);
+                    } else if (knownType == null && first_empty == -1) {
+                        first_empty = tooth;
+                    }
+                }
+                if (first_empty == -1) {
+                    data.set(index, DYNAMIC_SENTINEL);
+                    dynamics.put((int) slabIndex, face);
+                    return;
+                }
+                faces[first_empty] = face;
+                data.set(index, first_empty);
+            }
+        }
+
+        final Palette[] data = new Palette[COLUMNS];
+        final HashMap<Integer, FlatFace> dynamics = new HashMap<Integer, FlatFace>(0);
+        transient int true_dynamic_count = 0;
+        static final int MAX_DYNAMIFIED_STATIC = 16 * 16 * 4;
+
+        Palette getPalette(int index, boolean create) {
+            int col = index / COL_LENGTH;
+            if (data[col] == null) {
+                if (!create) return null;
+                return data[col] = new Palette();
+            }
+            return data[col];
         }
 
         @Nullable
         @Override
         FlatFace get(short index) {
-            return null;
+            Palette p = getPalette(index, false);
+            if (p == null) return null;
+            return p.get(dynamics, index);
         }
 
         @Nonnull
         @Override
         Slab set(short index, @Nullable FlatFace face, Coord at) {
-            return null;
+            dynamics.remove((int) index);
+            Palette p = getPalette(index, true);
+            FlatFace orig = p.get(dynamics, index);
+            p.set(dynamics, index, face);
+            replaced(orig, face, at, index);
+            boolean oldDynamic = orig != null && orig.isDynamic();
+            boolean newDynamic = face != null && face.isDynamic();
+            if (oldDynamic && !newDynamic) true_dynamic_count--;
+            if (!oldDynamic && newDynamic) true_dynamic_count++;
+
+            int spare_dynamic = dynamics.size() - true_dynamic_count;
+            if (spare_dynamic > MAX_DYNAMIFIED_STATIC) {
+                return upsize(); // Note that we don't call upsize.set because this slab already knows
+            }
+            return this;
+        }
+
+        private Slab upsize() {
+            Slab ret = new LargeSlab();
+            short index = 0;
+            while (index < FULL_SIZE) {
+                Palette p = getPalette(index, false);
+                if (p == null) {
+                    index += COL_LENGTH;
+                    continue;
+                }
+                FlatFace face = get(index);
+                if (face != null) {
+                    ret = ret.set(index, face, null);
+                }
+                index++;
+            }
+            return ret;
         }
 
         @Override
         public void iterate(IterateContext context) {
-
+            short index = 0;
+            while (index < FULL_SIZE) {
+                Palette p = getPalette(index, false);
+                if (p == null) {
+                    index += COL_LENGTH;
+                    continue;
+                }
+                FlatFace face = get(index);
+                context.visit(index, face);
+                index++;
+            }
         }
 
         @Override
         public void iterateBounded(Coord min, Coord max, IterateContext context) {
-
+            dumbIterate(this, min, max, context);
         }
     }
-
 
     static class LargeSlab extends Slab {
         /*
@@ -298,11 +396,11 @@ public class FlatChunkLayer {
         The IDs of static faces are stored.
         Dynamic faces have a sentinel value, and are stored in a hashmap.
          */
-        final char[] data = new char[FULL_SIZE];
+        final byte[] data = new byte[FULL_SIZE];
         HashMap<Integer, FlatFace> dynamic = new HashMap<>();
         static final int MAX_DYNAMIC = 16 * 16 * 16 / 4;
 
-        FlatFace lookup(char id, short index) {
+        FlatFace lookup(byte id, short index) {
             if (id == FlatMod.NO_FACE) {
                 return null;
             }
@@ -317,7 +415,7 @@ public class FlatChunkLayer {
         FlatFace get(short index) {
             if (index < 0) return null;
             if (index >= data.length) return null;
-            char id = data[index];
+            byte id = data[index];
             return lookup(id, index);
         }
 
@@ -326,7 +424,7 @@ public class FlatChunkLayer {
         Slab set(short index, @Nullable FlatFace face, Coord at) {
             if (index < 0) return this;
             if (index >= data.length) return this;
-            char oldId = data[index];
+            byte oldId = data[index];
             FlatFace oldFace = lookup(data[index], index);
             if (oldId != 0) {
                 if (oldFace.isDynamic() && (face == null || face.isStatic())) {
@@ -429,7 +527,7 @@ public class FlatChunkLayer {
         }
     }
 
-    static void dumbIterate(final Slab slab, Coord min, Coord max, final IterateContext context) {
+    private static void dumbIterate(final Slab slab, Coord min, Coord max, final IterateContext context) {
         min = min.copy();
         max = max.copy();
         min.x = context.minX;
@@ -535,6 +633,7 @@ public class FlatChunkLayer {
             Slab slab = slabs[slabY];
             if (slab.isEmpty()) continue;
             IterateContext context = new IterateContext(chunk, slabY, visitor, min, max);
+            // FIXME: Check if we are entirely contained within min & max. If so, use unbounded iterate.
             slab.iterateBounded(min, max, context);
         }
     }
@@ -568,4 +667,5 @@ public class FlatChunkLayer {
         changed.clear();
         FzNetDispatch.addPacketFrom(FlatNet.build(sw.finish()), chunk);
     }
+
 }

@@ -144,11 +144,11 @@ public class FlatMod {
         }
     }
 
-    static final ResourceLocation FLATS = new ResourceLocation("factorization:flats");
-    static final int NO_FACE = 0;
-    public static final char DYNAMIC_SENTINEL = 1;
-    static final char MAX_ID = Character.MAX_VALUE;
-    static final char MIN_ID = DYNAMIC_SENTINEL + 1;
+    public static final ResourceLocation FLATS = new ResourceLocation("factorization:flats");
+    public static final byte NO_FACE = 0;
+    public static final byte DYNAMIC_SENTINEL = 1;
+    public static final byte MAX_ID = Byte.MAX_VALUE; // We lose usage of a bit :(
+    public static final byte MIN_ID = DYNAMIC_SENTINEL + 1;
     public static final FMLControlledNamespacedRegistry<FlatFace> staticReg = PersistentRegistryManager.createRegistry(FLATS, FlatFace.class, null /* default flat value */, MAX_ID, MIN_ID, false, new FMLControlledNamespacedRegistry.AddCallback<FlatFace>() {
         @Override
         public void onAdd(FlatFace face, int id) {
@@ -161,7 +161,7 @@ public class FlatMod {
             if (id >= MAX_ID) {
                 throw new IllegalArgumentException("ID is too high!");
             }
-            face.staticId = (char) id;
+            face.staticId = (byte) id;
         }
     });
     public static final BiMap<ResourceLocation, Class<? extends FlatFace>> dynamicReg = HashBiMap.create();
@@ -217,7 +217,7 @@ public class FlatMod {
                 if (face.isNull()) return;
                 NBTTagCompound tag = new NBTTagCompound();
                 if (face.isStatic()) {
-                    tag.setInteger("static", face.staticId);
+                    tag.setByte("static", face.staticId);
                 } else {
                     try {
                         face.serialize("", new DataOutNBT(tag));
@@ -237,7 +237,7 @@ public class FlatMod {
 
     private FlatFace construct(NBTTagCompound tag) {
         if (tag.hasKey("static")) {
-            int id = tag.getInteger("static");
+            byte id = tag.getByte("static");
             return staticReg.getObjectById(id);
         }
         String name = tag.getString("dynamic");

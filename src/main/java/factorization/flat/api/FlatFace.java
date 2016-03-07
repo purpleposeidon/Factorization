@@ -142,7 +142,7 @@ public abstract class FlatFace implements IDataSerializable {
     }
 
     /** This field is internal. */
-    public transient char staticId = FlatMod.DYNAMIC_SENTINEL;
+    public transient byte staticId = FlatMod.DYNAMIC_SENTINEL;
 
     /** Like Block.isAir, but even more dangerous. */
     public boolean isNull() {
