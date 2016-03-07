@@ -1,7 +1,5 @@
 package factorization.flat;
 
-import com.google.common.collect.Lists;
-import factorization.algos.ToothArray;
 import factorization.api.Coord;
 import factorization.api.ICoordFunction;
 import factorization.flat.api.AtSide;
@@ -18,8 +16,10 @@ import net.minecraftforge.fml.common.registry.FMLControlledNamespacedRegistry;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import java.util.*;
-import java.util.concurrent.SynchronousQueue;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Queue;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 public final class FlatChunkLayer {
     public static short index(int slabX, int slabY, int slabZ, EnumFacing face) {
@@ -618,7 +618,7 @@ public final class FlatChunkLayer {
         for (int i = 0; i < slabs.length; i++) {
             slabs[i] = NoSlab.INSTANCE;
         }
-        changed = chunk.getWorld().isRemote ? null : new SynchronousQueue<AtSide>();
+        changed = chunk.getWorld().isRemote ? null : new ConcurrentLinkedQueue<AtSide>();
     }
 
     private Slab slabIndex(int localY) {
