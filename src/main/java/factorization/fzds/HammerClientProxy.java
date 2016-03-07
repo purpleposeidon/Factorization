@@ -246,6 +246,13 @@ public class HammerClientProxy extends HammerProxy {
                         dse.blocksChanged(maxX, maxY, maxZ);
                     }
                 }
+
+                // 'super.viewFrustum' is unset. The following overrides are to prevent invocation of a private method.
+                @Override public void markBlockForUpdate(BlockPos pos) { }
+                @Override public void notifyLightSet(BlockPos pos) { }
+                @Override public void markBlockRangeForRenderUpdate(int x1, int y1, int z1, int x2, int y2, int z2) { }
+
+
             };
             shadowRenderGlobal.theWorld = (WorldClient) world;
         }
