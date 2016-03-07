@@ -1,5 +1,6 @@
 package factorization.flat;
 
+import com.google.common.collect.Lists;
 import factorization.algos.ToothArray;
 import factorization.api.Coord;
 import factorization.api.ICoordFunction;
@@ -17,9 +18,8 @@ import net.minecraftforge.fml.common.registry.FMLControlledNamespacedRegistry;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
+import java.util.concurrent.SynchronousQueue;
 
 public final class FlatChunkLayer {
     public static short index(int slabX, int slabY, int slabZ, EnumFacing face) {
@@ -255,10 +255,11 @@ public final class FlatChunkLayer {
 
         @Override
         Slab nextSize() {
-            return new PaletteSlab();
+            return new LargeSlab();
         }
     }
 
+    /*
     static class PaletteSlab extends Slab {
         static final int COLUMNS = 16 * 16;
         static final int COL_LENGTH = FULL_SIZE / COLUMNS;
@@ -269,7 +270,7 @@ public final class FlatChunkLayer {
         private static class Palette {
             final ToothArray data = new ToothArray(COL_LENGTH);
             final FlatFace[] faces = new FlatFace[3];
-            final byte DYNAMIC_SENTINEL = 0x3;
+            private static final byte DYNAMIC_SENTINEL = 0x3;
 
             @Nullable
             FlatFace get(Map<Integer, FlatFace> dynamics, short slabIndex) {
@@ -281,7 +282,7 @@ public final class FlatChunkLayer {
                 return faces[tooth];
             }
 
-            /** Return true if setable, else false. */
+            // Return true if setable, else false.
             void set(Map<Integer, FlatFace> dynamics, short slabIndex, @Nullable FlatFace face) {
                 int index = slabIndex % COL_LENGTH;
                 if (face != null && face.isDynamic()) {
@@ -289,8 +290,11 @@ public final class FlatChunkLayer {
                     dynamics.put((int) slabIndex, face);
                     return;
                 }
+                if (data.get(index) == DYNAMIC_SENTINEL) {
+                    dynamics.remove((int) slabIndex);
+                }
                 byte first_empty = -1;
-                for (byte tooth = 0; tooth < 4; tooth++) {
+                for (byte tooth = 0; tooth < DYNAMIC_SENTINEL; tooth++) {
                     FlatFace knownType = faces[tooth];
                     if (knownType == face) {
                         data.set(index, tooth);
@@ -333,7 +337,6 @@ public final class FlatChunkLayer {
         @Nonnull
         @Override
         Slab set(short index, @Nullable FlatFace face, Coord at) {
-            dynamics.remove((int) index);
             Palette p = getPalette(index, true);
             FlatFace orig = p.get(dynamics, index);
             p.set(dynamics, index, face);
@@ -343,15 +346,18 @@ public final class FlatChunkLayer {
             if (oldDynamic && !newDynamic) true_dynamic_count--;
             if (!oldDynamic && newDynamic) true_dynamic_count++;
 
-            int spare_dynamic = dynamics.size() - true_dynamic_count;
-            if (spare_dynamic > MAX_DYNAMIFIED_STATIC) {
-                return upsize(); // Note that we don't call upsize.set because this slab already knows
+            // Note that we don't call upsize.set because this slab already knows
+            if (true_dynamic_count > MAX_DYNAMIFIED_STATIC) {
+                return upsize(new LargeSlab());
+            }
+            int true_dynamic = dynamics.size() - true_dynamic_count;
+            if (true_dynamic > MAX_DYNAMIFIED_STATIC) {
+                return upsize(new JumboSlab());
             }
             return this;
         }
 
-        private Slab upsize() {
-            Slab ret = new LargeSlab();
+        private Slab upsize(Slab ret) {
             short index = 0;
             while (index < FULL_SIZE) {
                 Palette p = getPalette(index, false);
@@ -387,7 +393,7 @@ public final class FlatChunkLayer {
         public void iterateBounded(Coord min, Coord max, IterateContext context) {
             dumbIterate(this, min, max, context);
         }
-    }
+    }*/
 
     static class LargeSlab extends Slab {
         /*
@@ -527,6 +533,53 @@ public final class FlatChunkLayer {
         }
     }
 
+    static class TestSlab extends Slab {
+        Slab[] all = new Slab[] {
+                new JumboSlab(),
+                new LargeSlab(),
+                //new PaletteSlab(),
+                new SmallSlab(),
+                new TinySlab(),
+        };
+
+        @Nullable
+        @Override
+        FlatFace get(short index) {
+            FlatFace b = null;
+            boolean first = true;
+            for (Slab slab : all) {
+                if (first) {
+                    b = slab.get(index);
+                    first = false;
+                } else {
+                    if (b != slab.get(index)) {
+                        throw new AssertionError("Mismatch! >:O");
+                    }
+                }
+            }
+            return b;
+        }
+
+        @Nonnull
+        @Override
+        Slab set(short index, @Nullable FlatFace face, Coord at) {
+            for (int i = 0; i < all.length; i++) {
+                all[i] = all[i].set(index, face, at);
+            }
+            return this;
+        }
+
+        @Override
+        public void iterate(IterateContext context) {
+            all[0].iterate(context);
+        }
+
+        @Override
+        public void iterateBounded(Coord min, Coord max, IterateContext context) {
+            all[0].iterateBounded(min, max, context);
+        }
+    }
+
     private static void dumbIterate(final Slab slab, Coord min, Coord max, final IterateContext context) {
         min = min.copy();
         max = max.copy();
@@ -556,7 +609,7 @@ public final class FlatChunkLayer {
     final Chunk chunk;
     final Slab[] slabs = new Slab[16];
     @Nullable
-    final ArrayList<AtSide> changed; // Might've packed bits into an int[], but too difficult to be certain w/ Java
+    final Queue<AtSide> changed; // Might've packed bits into an int[], but too difficult to be certain w/ Java
     public static final int MAX_CHANGES = 32;
     public final IFlatRenderInfo renderInfo = FlatMod.proxy.constructRenderInfo();
 
@@ -565,7 +618,7 @@ public final class FlatChunkLayer {
         for (int i = 0; i < slabs.length; i++) {
             slabs[i] = NoSlab.INSTANCE;
         }
-        changed = chunk.getWorld().isRemote ? null : new ArrayList<AtSide>();
+        changed = chunk.getWorld().isRemote ? null : new SynchronousQueue<AtSide>();
     }
 
     private Slab slabIndex(int localY) {
@@ -660,7 +713,9 @@ public final class FlatChunkLayer {
         if (changed.size() > MAX_CHANGES) {
             iterate(sw);
         } else {
-            for (AtSide as : changed) {
+            while (true) {
+                AtSide as = changed.poll();
+                if (as == null) return;
                 sw.visit(as.at, as.side, get(as.at, as.side));
             }
         }
