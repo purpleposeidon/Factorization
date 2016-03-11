@@ -17,7 +17,10 @@ public class ContextTileEntity implements IContext {
     @Nonnull
     public final TileEntity te;
     @Nullable
-    public final EnumFacing side, edge;
+    public final EnumFacing side;
+    /** Must be null unless side isn't. Can't be parallel to side. */
+    @Nullable
+    public final EnumFacing edge;
 
     public ContextTileEntity(@Nonnull TileEntity te, @Nullable EnumFacing side, @Nullable EnumFacing edge) {
         this.te = te;
@@ -32,6 +35,7 @@ public class ContextTileEntity implements IContext {
     @Override
     public IWorker.Accepted give(@Nonnull WorkUnit unit, boolean simulate) {
         IWorker cast = adaptTileEntity.cast(te);
+        // TODO: Forge capabilities?
         return cast.accept(this, unit, simulate);
     }
 

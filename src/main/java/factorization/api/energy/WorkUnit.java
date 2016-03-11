@@ -14,7 +14,7 @@ import javax.annotation.Nullable;
  * <p/>
  * There are no fractional work actions. (Well, there may be fractional work actions internal to a machine, for, eg,
  * transferring a liquid between tanks.) In general there should be a one-to-one correspondence between receiving a
- * WorkUnit and something useful & significant happening. It is reasonable for a machine to use multiple
+ * WorkUnit and something useful/significant/meaningful happening. It is reasonable for a machine to use multiple
  * WorkUnits (possibly of different kinds!) for different steps, such as to spin up, warm up, and fire.
  * <p/>
  * WorkUnit converters should have some inefficiency, such as using 1 input unit for each 16 units converted.
@@ -27,33 +27,65 @@ public class WorkUnit {
     @Nonnull
     public final EnergyCategory category;
 
-    /**
-     * The name of the energy type, namespaced by some particular mod's modid.
-     */
     @Nonnull
     public final ResourceLocation name;
 
+    @Nonnull
+    final Manager.ListenerList listener;
+
     /**
-     * Creates a new WorkUnit. Duplicate instances of an already existing WorkUnit should usually be made using
-     * {@link WorkUnit#produce()}.
+     * Gets or creates the prototype WorkUnit of the given name & category.
+     * @param category The EnergyCategory.
+     * @param name The name.
+     * @return A WorkUnit (that may or may not be of WorkUnit.class)
+     */
+    @Nonnull
+    public static WorkUnit get(@Nonnull EnergyCategory category, @Nonnull ResourceLocation name) {
+        WorkUnit unit = find(category, name);
+        if (unit != null) return unit;
+        return new WorkUnit(category, name);
+    }
+
+    /**
+     * @param category The EnergyCategory.
+     * @param name The name.
+     * @return a WorkUnit that has already been registered.
+     * @see WorkUnit#get(EnergyCategory, ResourceLocation)
+     */
+    @Nullable
+    public static WorkUnit find(@Nonnull EnergyCategory category, @Nonnull ResourceLocation name) {
+        WorkUnit unit = Manager.prototypesByName.get(name);
+        if (unit.category != category) {
+            throw new IllegalArgumentException("WorkUnits have mismatched categories: " + category + "/" + name + " vs prototype " + unit);
+        }
+        return unit;
+    }
+
+    /**
+     * Creates a prototype WorkUnit. If a 'new' instance is needed (eg for custom fields), {@link WorkUnit#produce()}
+     * should be used.
+     * Use {@link WorkUnit#find(EnergyCategory, ResourceLocation)} if you are looking for the WorkUnit of another mod.
      *
      * @param category The {@link EnergyCategory}.
      * @param name     The name of the energy type, presumably with the same domain as the creating mod.
      */
-    public WorkUnit(@Nonnull EnergyCategory category, @Nonnull ResourceLocation name) {
+    protected WorkUnit(@Nonnull EnergyCategory category, @Nonnull ResourceLocation name) {
         Preconditions.checkNotNull(category, "null energy class");
         Preconditions.checkNotNull(name, "null name");
         this.category = category;
         this.name = name;
+        this.listener = new Manager.ListenerList();
+        Manager.registerUnitPrototype(this);
     }
 
-    protected WorkUnit(WorkUnit self) {
-        this.category = self.category;
-        this.name = self.name;
+    protected WorkUnit(WorkUnit orig) {
+        this.category = orig.category;
+        this.name = orig.name;
+        this.listener = orig.listener;
     }
 
     /**
-     * Makes a clone; typically used on a template WorkUnit instance.
+     * Makes a clone; used on prototype WorkUnit instance.
      *
      * @return A WorkUnit instance that equals() this WorkUnit. All properties must be in their default state.
      * @see WorkUnit#WorkUnit(WorkUnit)
@@ -65,7 +97,8 @@ public class WorkUnit {
 
     /**
      * Used to synchronize with some property, such as rotational speed, or the glowing of heat.
-     * It's pretty abstract. Ignoring this must always be acceptable, but may possibly give ugly visuals.
+     * It's pretty abstract. Ignoring this must always be acceptable from a conservation of energy standpoint,
+     * but may cause ugly rendering.
      *
      * @param parameterType The class of the type of the return value.
      * @param <T>           Also the type of the return value.
@@ -78,7 +111,7 @@ public class WorkUnit {
     }
 
     /**
-     * Set a property.
+     * Set a property. This should <b>NOT</b> be called on a prototype; use {@link WorkUnit#produce()}.
      *
      * @param type The class of the property.
      * @param val  The value of the property.
@@ -96,5 +129,15 @@ public class WorkUnit {
         if (!(obj instanceof WorkUnit)) return false;
         WorkUnit other = (WorkUnit) obj;
         return other.name.equals(name);
+    }
+
+    @Override
+    public int hashCode() {
+        return name.hashCode();
+    }
+
+    @Override
+    public String toString() {
+        return category + "/" + name;
     }
 }

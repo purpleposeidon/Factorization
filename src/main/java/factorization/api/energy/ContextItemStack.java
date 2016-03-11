@@ -19,6 +19,7 @@ public class ContextItemStack implements IContext {
     @Override
     public IWorker.Accepted give(@Nonnull WorkUnit unit, boolean simulate) {
         IWorker cast = adaptItem.cast(is.getItem());
+        // TODO: Forge capabilities?
         return cast.accept(this, unit, simulate);
     }
 

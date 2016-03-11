@@ -26,13 +26,13 @@ public class ChargeEnetSubsys implements IEnergyNet {
     public static final ChargeEnetSubsys instance = new ChargeEnetSubsys();
 
     public static final ResourceLocation FZ_CHARGE = new ResourceLocation("factorization:charge");
-    public static final WorkUnit CHARGE = new WorkUnit(EnergyCategory.ELECTRIC, FZ_CHARGE);
+    public static final WorkUnit CHARGE = WorkUnit.get(EnergyCategory.ELECTRIC, FZ_CHARGE);
     public FlatFaceWire wire0;
     public WireLeader wireLeader;
 
     public void setup() {
         Core.loadBus(this);
-        IEnergyNet.register(this, CHARGE);
+        IEnergyNet.register(this);
         wire0 = new FlatFaceWire();
         Flat.registerStatic(new ResourceLocation("factorization:charge/wire"), wire0);
         wireLeader = new WireLeader();
@@ -40,17 +40,27 @@ public class ChargeEnetSubsys implements IEnergyNet {
     }
 
     @Override
-    public void add(IContext context, WorkUnit unit) {
+    public boolean canHandlePower(WorkUnit unit) {
+        return CHARGE.equals(unit);
+    }
+
+    @Override
+    public boolean propagatePower(IContext generator, WorkUnit unit) {
+        return false;
+    }
+
+    @Override
+    public void workerAdded(IContext context, WorkUnit unit) {
 
     }
 
     @Override
-    public void destroyed(IContext context) {
+    public void workerDestroyed(IContext context) {
 
     }
 
     @Override
-    public void needsPower(IContext context) {
+    public void workerNeedsPower(IContext context) {
 
     }
 

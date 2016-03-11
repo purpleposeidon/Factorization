@@ -14,7 +14,10 @@ public class ContextBlock implements IContext {
 
     public final Coord at;
     @Nullable
-    public final EnumFacing side, edge;
+    public final EnumFacing side;
+    /** Must be null unless side isn't. Can't be parallel to side. */
+    @Nullable
+    public final EnumFacing edge;
 
     public ContextBlock(Coord at, @Nullable EnumFacing side, @Nullable EnumFacing edge) {
         this.at = at;
@@ -25,6 +28,7 @@ public class ContextBlock implements IContext {
     @Override
     public IWorker.Accepted give(@Nonnull WorkUnit unit, boolean simulate) {
         IWorker cast = adaptBlock.cast(at.getBlock());
+        // TODO: Forge capabilities?
         return cast.accept(this, unit, simulate);
     }
 

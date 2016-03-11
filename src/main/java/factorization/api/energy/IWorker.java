@@ -13,7 +13,22 @@ package factorization.api.energy;
  * @param <T> An {@link IContext}, such as {@link ContextBlock}, {@link ContextEntity}, {@link ContextItemStack},
  *           or {@link ContextTileEntity}.
  */
+@SuppressWarnings("UnnecessaryInterfaceModifier")
 public interface IWorker<T extends IContext> {
+    /**
+     * Call this when an IWorker instance has been constructed. This is safe to do with TileEntities.
+     */
+    public static void construct(IContext context) {
+        Manager.addWorker(context);
+    }
+
+    /**
+     * Call this when the IWorker needs power.
+     */
+    public static void requestPower(IContext context) {
+        Manager.needsPower(context);
+    }
+
     /**
      * Call this when the IWorker has been removed from the world.
      * This need not be the same IContext object as used with {@link IWorker#construct(IContext)}, but it must
@@ -22,24 +37,10 @@ public interface IWorker<T extends IContext> {
      * If the units that an IWorker needs changes, then invalidate() followed by {@link IWorker#construct(IContext)}.
      */
     public static void invalidate(IContext context) {
-        WorkerBoss.invalidateWorker(context);
+        Manager.invalidateWorker(context);
     }
 
-    /**
-     * Call this when the IWorker has been constructed. This is safe to do with TileEntities.
-     */
-    public static void construct(IContext context) {
-        WorkerBoss.addWorker(context);
-    }
-
-    /**
-     * Call this when the IWorker needs power.
-     */
-    public static void requestPower(IContext context) {
-        WorkerBoss.needsPower(context);
-    }
-
-    enum Accepted {
+    public enum Accepted {
         /**
          * The worker can not accept the unit because it is incompatible.
          */

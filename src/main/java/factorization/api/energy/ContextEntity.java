@@ -19,6 +19,7 @@ public class ContextEntity implements IContext {
     @Override
     public IWorker.Accepted give(@Nonnull WorkUnit unit, boolean simulate) {
         IWorker cast = adaptEntity.cast(ent);
+        // TODO: Forge capabilities?
         return cast.accept(this, unit, simulate);
     }
 
