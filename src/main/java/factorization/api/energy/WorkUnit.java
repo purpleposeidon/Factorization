@@ -55,7 +55,7 @@ public class WorkUnit {
     @Nullable
     public static WorkUnit find(@Nonnull EnergyCategory category, @Nonnull ResourceLocation name) {
         WorkUnit unit = Manager.prototypesByName.get(name);
-        if (unit.category != category) {
+        if (unit != null && unit.category != category) {
             throw new IllegalArgumentException("WorkUnits have mismatched categories: " + category + "/" + name + " vs prototype " + unit);
         }
         return unit;
