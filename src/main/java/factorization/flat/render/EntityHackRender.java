@@ -46,7 +46,7 @@ public final class EntityHackRender extends Render<EntityHack> {
         FlatChunkLayer layer = ((IExtraChunkData) chunk).getFlatLayer();
         bindTexture(Core.blockAtlas);
         ClientRenderInfo cri = (ClientRenderInfo) layer.renderInfo;
-        cri.update(chunk, layer);
+        cri.update(chunk, layer, entity.slabY);
         {
             GlStateManager.disableLighting();
             GL11.glEnable(GL11.GL_POLYGON_OFFSET_FILL);

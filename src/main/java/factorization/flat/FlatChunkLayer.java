@@ -100,9 +100,9 @@ public final class FlatChunkLayer {
         }
     }
 
-    static abstract class Slab {
+    public static abstract class Slab {
         static final short FULL_SIZE = 16 * 16 * 16 * 3;
-        transient int set = 0;
+        public transient int set = 0;
 
         @Nullable
         abstract FlatFace get(short index);
@@ -638,7 +638,7 @@ public final class FlatChunkLayer {
         changed = chunk.getWorld().isRemote ? null : new ConcurrentLinkedQueue<AtSide>();
     }
 
-    private Slab slabIndex(int slabY) {
+    public Slab slabIndex(int slabY) {
         if (slabY < 0 || slabY >= slabs.length) return NoSlab.INSTANCE;
         return slabs[slabY];
     }
@@ -691,11 +691,15 @@ public final class FlatChunkLayer {
         return ret;
     }
 
+    public void iterateSlab(IFlatVisitor visitor, int slabY) {
+        Slab slab = slabs[slabY];
+        IterateContext context = new IterateContext(chunk, slabY, visitor);
+        slab.iterate(context);
+    }
+
     public void iterate(IFlatVisitor visitor) {
         for (int slabY = 0; slabY < slabs.length; slabY++) {
-            Slab slab = slabs[slabY];
-            IterateContext context = new IterateContext(chunk, slabY, visitor);
-            slab.iterate(context);
+            iterateSlab(visitor, slabY);
         }
     }
 

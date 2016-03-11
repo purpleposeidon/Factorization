@@ -13,20 +13,28 @@ import net.minecraft.world.chunk.EmptyChunk;
 import org.lwjgl.opengl.GL11;
 
 public final class ClientRenderInfo implements IFlatRenderInfo {
-    boolean dirty = true;
-    boolean entitySpawned = false;
+    int dirty = ~0;
+    int entitySpawned = 0;
 
     @Override
     public void markDirty(Coord at) {
-        dirty = true;
-        if (!entitySpawned && at != null) {
+        if (at == null) return;
+        int slabY = at.y >> 4;
+        if (slabY < 0 || slabY >= 16) return;
+        int slabMask = 1 << slabY;
+        dirty |= slabMask;
+        if ((entitySpawned & slabMask) == 0) {
             Chunk chunk = at.getChunk();
             IExtraChunkData ecd = (IExtraChunkData) chunk;
-            if (ecd.getFlatLayer().isEmpty()) {
+            FlatChunkLayer flatLayer = ecd.getFlatLayer();
+            if (flatLayer.isEmpty()) {
                 return;
             }
-            entitySpawned = true;
-            EntityHack hack = new EntityHack(chunk);
+            if (flatLayer.slabIndex(slabY).set == 0) {
+                return;
+            }
+            entitySpawned |= slabMask;
+            EntityHack hack = new EntityHack(chunk, slabY);
             at.w.spawnEntityInWorld(hack);
         }
     }
@@ -55,12 +63,12 @@ public final class ClientRenderInfo implements IFlatRenderInfo {
         GL11.glCallList(displayList);
     }
 
-    public void update(Chunk chunk, FlatChunkLayer layer) {
-        //if (NORELEASE.on && Core.dev_environ) dirty = true;
-        if (!dirty) return;
-        dirty = false;
+    public void update(Chunk chunk, FlatChunkLayer layer, int slabY) {
+        int slabFlag = 1 << slabY;
+        if ((dirty & slabFlag) == 0) return;
+        dirty &= ~slabFlag;
         Drawer visitor = new Drawer(this);
-        layer.iterate(visitor);
+        layer.iterateSlab(visitor, slabY);
         visitor.finish();
     }
 }

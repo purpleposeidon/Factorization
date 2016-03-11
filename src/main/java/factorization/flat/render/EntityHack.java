@@ -9,12 +9,14 @@ import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.world.chunk.Chunk;
 
 public class EntityHack extends Entity {
-    public EntityHack(Chunk chunk) {
+    final int slabY;
+    public EntityHack(Chunk chunk, int slabY) {
         super(chunk.getWorld());
-        Coord me = new Coord(chunk);
+        Coord me = new Coord(chunk).add(0, slabY * 16, 0);
         SpaceUtil.setEntPos(this, me.toVector());
-        AxisAlignedBB b = SpaceUtil.newBox(me, me.add(0xF, 0xFF, 0xF));
+        AxisAlignedBB b = SpaceUtil.newBox(me, me.add(0x10, 0x10, 0x10));
         setEntityBoundingBox(b);
+        this.slabY = slabY;
     }
 
     @Override protected void entityInit() { }
