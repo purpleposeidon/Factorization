@@ -235,10 +235,6 @@ public class BlockFactorization extends BlockContainer {
         Registry reg = Core.registry;
         //electric
         //put(itemList, reg.battery_item_hidden);
-        if (reg.battery != null) {
-            //These checks are for buildcraft, which is hatin'.
-            put(itemList, new ItemStack(reg.battery, 1, 2));
-        }
         put(itemList, reg.leydenjar_item);
         put(itemList, reg.leydenjar_item_full);
         put(itemList, reg.sap_generator_item);

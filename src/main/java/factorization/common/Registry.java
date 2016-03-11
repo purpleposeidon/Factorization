@@ -9,7 +9,10 @@ import factorization.ceramics.ItemGlazeBucket;
 import factorization.ceramics.ItemSculptingTool;
 import factorization.ceramics.TileEntityGreenware;
 import factorization.ceramics.TileEntityGreenware.ClayState;
-import factorization.charge.*;
+import factorization.charge.BlockFurnaceHeater;
+import factorization.charge.ItemAcidBottle;
+import factorization.charge.ItemChargeMeter;
+import factorization.charge.TileEntityLeydenJar;
 import factorization.charge.enet.ChargeEnetSubsys;
 import factorization.colossi.*;
 import factorization.crafting.BlockCompressionCrafter;
@@ -123,7 +126,7 @@ public class Registry {
     
     public ItemStack
             lamp_item,
-            battery_item_hidden, leydenjar_item, leydenjar_item_full, heater_item, solarboiler_item, caliometric_burner_item,
+            leydenjar_item, leydenjar_item_full, heater_item, solarboiler_item, caliometric_burner_item,
             mirror_item_hidden,
             greenware_item,
             parasieve_item,
@@ -141,7 +144,6 @@ public class Registry {
     public ItemStack sulfuric_acid, aqua_regia;
     public ItemChargeMeter charge_meter;
     public ItemBlockProxy mirror;
-    public ItemBattery battery;
     public ItemCraftingComponent sludge;
     public ItemSculptingTool sculpt_tool;
     public ItemGlazeBucket glaze_bucket;
@@ -384,7 +386,6 @@ public class Registry {
         parasieve_item = FactoryType.PARASIEVE.itemStack();
         compression_crafter_item = FactoryType.COMPRESSIONCRAFTER.itemStack();
         lamp_item = FactoryType.LAMP.itemStack();
-        battery_item_hidden = FactoryType.BATTERY.itemStack();
         leydenjar_item = FactoryType.LEYDENJAR.itemStack();
         solarboiler_item = FactoryType.SOLARBOILER.itemStack();
         caliometric_burner_item = FactoryType.CALIOMETRIC_BURNER.itemStack();
@@ -433,7 +434,6 @@ public class Registry {
         diamond_cutting_head = new ItemCraftingComponent("diamond_cutting_head");
         charge_meter = new ItemChargeMeter();
         mirror = new ItemBlockProxy(mirror_item_hidden, "mirror", TabType.CHARGE);
-        battery = new ItemBattery();
         leydenjar_item_full = ItemStack.copyItemStack(leydenjar_item);
         NBTTagCompound tag = new NBTTagCompound();
         tag.setInteger("storage", TileEntityLeydenJar.max_storage);
@@ -551,19 +551,6 @@ public class Registry {
         GameRegistry.addRecipe(new ShapelessOreRecipe(res, params));
     }
 
-    void batteryRecipe(ItemStack res, Object... params) {
-        for (int damage : new int[] { 1, 2 }) {
-            ArrayList<Object> items = new ArrayList<Object>(params.length);
-            for (Object p : params) {
-                if (p == battery) {
-                    p = new ItemStack(battery, 1, damage);
-                }
-                items.add(p);
-            }
-            oreRecipe(res, items.toArray());
-        }
-    }
-    
     private void convertOreItems(Object[] params) {
         for (int i = 0; i < params.length; i++) {
             if (params[i].equals("ingotSilver")) {
@@ -1069,13 +1056,6 @@ public class Registry {
                 '|', Items.stick,
                 'L', "ingotCopper",
                 'I', Items.iron_ingot);
-        oreRecipe(new ItemStack(battery, 1, 2),
-                "ILI",
-                "LAL",
-                "ILI",
-                'I', Items.iron_ingot,
-                'L', "ingotCopper",
-                'A', acid);
         oreRecipe(leydenjar_item,
                 "#G#",
                 "#L#",
@@ -1096,12 +1076,12 @@ public class Registry {
                 "LLL",
                 'L', "ingotCopper",
                 'C', Blocks.clay);
-        batteryRecipe(new ItemStack(motor),
+        oreRecipe(new ItemStack(motor),
                 "CIC",
                 "CIC",
                 "LBL",
                 'C', insulated_coil,
-                'B', battery,
+                'B', NORELEASE.just("ingotIron" /* Magnets again? */),
                 'L', "ingotCopper",
                 'I', Items.iron_ingot);
         if (FzConfig.enable_solar_steam) { //NOTE: This'll probably cause a bug should we use mirrors for other things
@@ -1387,7 +1367,7 @@ public class Registry {
                 "D D",
                 " D ",
                 'D', dark_iron_ingot);
-        batteryRecipe(servo_motor,
+        oreRecipe(servo_motor,
                 "qCL",
                 "SIB",
                 "rCL",
@@ -1396,7 +1376,7 @@ public class Registry {
                 'S', dark_iron_sprocket,
                 'C', insulated_coil,
                 'I', Items.iron_ingot,
-                'B', battery,
+                'B', NORELEASE.just("ingotIron" /* magnets? */),
                 'L', "ingotCopper");
         oreRecipe(new ItemStack(servo_placer),
                 "M#P",

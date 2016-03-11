@@ -35,7 +35,7 @@ public enum FactoryType {
     //9 -- This used to be SENTRYDEMON
     //10 -- This used to be WRATHFIRE
     //11 - This used to be SLAGFURNACE
-    BATTERY(12, false, TileEntityBattery.class, "factory_battery"),
+    //12 -- This used to be BATTERY
     //13 -- This used to be SOLARTURBINE
     //14 -- This used to be LEADWIRE (factory_solder)
     HEATER(15, false, TileEntityHeater.class, "factory_heater"), //work furnaces without fuel
