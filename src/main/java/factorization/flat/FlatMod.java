@@ -13,7 +13,6 @@ import factorization.flat.render.EntityHack;
 import factorization.flat.render.EntityHackRender;
 import factorization.flat.render.FlatModel;
 import factorization.shared.Core;
-import factorization.util.NORELEASE;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ChunkProviderClient;
 import net.minecraft.client.renderer.entity.Render;
@@ -66,7 +65,7 @@ public class FlatMod {
         INSTANCE = this; // @Mod.Instance doesn't work.
         Core.loadBus(this);
         Core.loadBus(proxy);
-        Flat.registerDynamic(new ResourceLocation("flat:air"), FlatFaceAir.class);
+        Flat.registerDynamic(new ResourceLocation("flat:air"), FlatFaceAir.INSTANCE);
         proxy.initClient();
         FlatNet.instance.init();
     }
@@ -92,7 +91,7 @@ public class FlatMod {
 
         @SubscribeEvent
         public void loadModels(TextureStitchEvent.Pre event) {
-            for (FlatFace face : Flat.getAll()) {
+            for (FlatFace face : Flat.getAllSamples()) {
                 face.loadModels(new IModelMaker() {
                     @Nullable
                     @Override
@@ -201,7 +200,7 @@ public class FlatMod {
             EnumFacing face = EnumFacing.VALUES[faceOrdinal];
             FlatFace flat = construct(tag);
             if (flat != null) {
-                layer.set(at, face, flat);
+                layer.set(at, face, flat, FlatChunkLayer.FLAGS_SEAMLESS);
             }
         }
     }
@@ -219,6 +218,7 @@ public class FlatMod {
                 if (face.isStatic()) {
                     tag.setByte("static", face.staticId);
                 } else {
+                    tag.setString("dynamic", Flat.getName(face).toString());
                     try {
                         face.serialize("", new DataOutNBT(tag));
                     } catch (IOException e) {

@@ -17,11 +17,9 @@ import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.Mod.EventHandler;
 import net.minecraftforge.fml.common.SidedProxy;
-import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
-import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
-import net.minecraftforge.fml.common.event.FMLServerStartingEvent;
-import net.minecraftforge.fml.common.event.FMLServerStoppingEvent;
+import net.minecraftforge.fml.common.event.*;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.fml.common.gameevent.TickEvent;
 import net.minecraftforge.fml.common.network.FMLNetworkEvent;
 import net.minecraftforge.fml.common.registry.EntityRegistry;
 import net.minecraftforge.fml.relauncher.Side;
@@ -113,29 +111,41 @@ public class Hammer {
         if (!DeltaChunk.enabled()) return;
         hammerInfo.saveChannelConfig();
     }
-    
+
     @EventHandler
-    public void serverStart(FMLServerStartingEvent event) {
+    public void registerCommands(FMLServerStartingEvent event) {
         if (!DeltaChunk.enabled()) return;
         event.registerServerCommand(new FZDSCommand());
-        DimensionManager.initDimension(DeltaChunk.getDimensionId());
-        if (!DimensionManager.shouldLoadSpawn(DeltaChunk.getDimensionId())) {
-            throw new RuntimeException("hammerWorld is not loaded");
-        }
-        if (!DimensionManager.isDimensionRegistered(DeltaChunk.getDimensionId())) {
-            throw new RuntimeException("Hammer dimension was not registered!?");
-        }
-        World hammerWorld = DimensionManager.getWorld(DeltaChunk.getDimensionId());
-        if (!(hammerWorld.provider instanceof HammerWorldProvider)) {
-            throw new RuntimeException("Expected HammerWorldProvider for HammerWorld; is there a dimension ID conflict? Actual provider: " + hammerWorld.provider.getClass());
-        }
-        hammerWorld.addWorldAccess(new ServerShadowWorldAccess());
-        int view_distance = MinecraftServer.getServer().getConfigurationManager().getViewDistance();
-        //the undeobfed method comes after "isPlayerWatchingChunk", also in uses of ServerConfigurationManager.getViewDistance()
-        //It returns how many blocks are visible.
-        DSE_ChunkUpdateRangeSquared = Math.pow(PlayerManager.getFurthestViewableBlock(view_distance) + 16*2, 2);
+        Core.loadBus(new HackRegisterDimensionLate());
     }
-    
+
+    static class HackRegisterDimensionLate {
+        @SubscribeEvent
+        public void registerDimension(TickEvent.ServerTickEvent event) {
+            if (event.phase == TickEvent.Phase.END) {
+                throw new IllegalStateException("I should be gone.");
+            }
+            DimensionManager.initDimension(DeltaChunk.getDimensionId());
+            if (!DimensionManager.shouldLoadSpawn(DeltaChunk.getDimensionId())) {
+                throw new RuntimeException("hammerWorld is not loaded");
+            }
+            if (!DimensionManager.isDimensionRegistered(DeltaChunk.getDimensionId())) {
+                throw new RuntimeException("Hammer dimension was not registered!?");
+            }
+            World hammerWorld = DimensionManager.getWorld(DeltaChunk.getDimensionId());
+            if (!(hammerWorld.provider instanceof HammerWorldProvider)) {
+                throw new RuntimeException("Expected HammerWorldProvider for HammerWorld; is there a dimension ID conflict? Actual provider: " + hammerWorld.provider.getClass());
+            }
+            hammerWorld.addWorldAccess(new ServerShadowWorldAccess());
+            int view_distance = MinecraftServer.getServer().getConfigurationManager().getViewDistance();
+            //the undeobfed method comes after "isPlayerWatchingChunk", also in uses of ServerConfigurationManager.getViewDistance()
+            //It returns how many blocks are visible.
+            DSE_ChunkUpdateRangeSquared = Math.pow(PlayerManager.getFurthestViewableBlock(view_distance) + 16*2, 2);
+            Core.unloadBus(this);
+        }
+    }
+
+
     @EventHandler
     public void saveInfo(FMLServerStoppingEvent event) {
         if (!DeltaChunk.enabled()) return;

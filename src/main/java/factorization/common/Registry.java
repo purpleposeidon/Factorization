@@ -10,6 +10,7 @@ import factorization.ceramics.ItemSculptingTool;
 import factorization.ceramics.TileEntityGreenware;
 import factorization.ceramics.TileEntityGreenware.ClayState;
 import factorization.charge.*;
+import factorization.charge.enet.ChargeEnetSubsys;
 import factorization.colossi.*;
 import factorization.crafting.BlockCompressionCrafter;
 import factorization.crafting.ItemFakeBlock;
@@ -495,7 +496,7 @@ public class Registry {
 
         waterBlockItem = new ItemFakeBlock("waterTile", TabType.MATERIALS, Blocks.flowing_water);
         lavaBlockItem = new ItemFakeBlock("lavaTile", TabType.MATERIALS, Blocks.flowing_lava);
-        wirePlacer = new ItemFlat(ChargeFeature.INSTANCE.wire0, TabType.CHARGE);
+        wirePlacer = new ItemFlat(ChargeEnetSubsys.instance.wireLeader, TabType.CHARGE);
         postMakeItems();
         registerOres();
     }

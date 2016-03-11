@@ -10,6 +10,7 @@ import factorization.flat.api.FlatFace;
 import factorization.flat.api.IFlatVisitor;
 import factorization.net.FzNetDispatch;
 import factorization.shared.Core;
+import factorization.util.NORELEASE;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import net.minecraft.client.Minecraft;
@@ -150,6 +151,7 @@ public class FlatNet {
         @Override
         public void visit(Coord at, EnumFacing side, @Nonnull FlatFace face) {
             // It's sort of terrible to use C-style strings instead of pascal-style, but I'd have to count them...
+            face = face.getForClient();
             buff.writeByte(1);
             writeCoord(buff, at);
             writeSide(buff, side);
@@ -205,7 +207,7 @@ public class FlatNet {
             EnumFacing side = readSide(buff);
             FlatFace face = readFace(buff);
             if (face == null) continue;
-            Flat.set(at, side, face);
+            Flat.setWithNotification(at, side, face, FlatChunkLayer.FLAGS_SEAMLESS);
         }
     }
 

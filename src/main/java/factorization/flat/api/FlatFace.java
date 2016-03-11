@@ -8,6 +8,7 @@ import factorization.flat.FlatNet;
 import factorization.util.*;
 import net.minecraft.block.Block;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.AxisAlignedBB;
@@ -18,7 +19,7 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 import javax.annotation.Nullable;
 import java.io.IOException;
 
-/** This class contains internal things. */
+/** Warning: The symmetry of this class with Block's may be deceptive! */
 public abstract class FlatFace implements IDataSerializable {
     @Nullable
     public abstract IFlatModel getModel(Coord at, EnumFacing side);
@@ -28,10 +29,15 @@ public abstract class FlatFace implements IDataSerializable {
         return 0xFFFFFFFF;
     }
 
+    /** Called once <pre>Flat.get(at, side) != this</pre> */
     public void onReplaced(Coord at, EnumFacing side) {
-        NORELEASE.fixme("Gets called during Slab upgrading");
     }
 
+    /** Called after orig.onReplaced(); thus <pre>Flat.get(at, side) == this</pre>*/
+    public void onSet(Coord at, EnumFacing side) {
+    }
+
+    /** Called when placed by a (fake?) player. Invoked by the item that places it. */
     public void onPlaced(Coord at, EnumFacing side, EntityPlayer player, ItemStack is) {
         if (!at.w.isRemote) {
             FlatNet.fx(at, side, this, FlatNet.FX_PLACE);
@@ -125,13 +131,13 @@ public abstract class FlatFace implements IDataSerializable {
     }
 
     /** @return a FlatFace that is alike this one, but whose fields can be safely modified. */
-    public FlatFace cloneDynamic() {
-        return this;
+    public FlatFace cloneDynamic(Coord at, EnumFacing side) {
+        throw new AbstractMethodError("cloneDynamic not implemented!");
     }
 
-    public final FlatFace dupe() {
+    public final FlatFace dupe(Coord at, EnumFacing side) {
         if (isStatic()) return this;
-        return cloneDynamic();
+        return cloneDynamic(at, side);
     }
     public final boolean isStatic() {
         return staticId != FlatMod.DYNAMIC_SENTINEL;
@@ -139,6 +145,10 @@ public abstract class FlatFace implements IDataSerializable {
 
     public final boolean isDynamic() {
         return staticId == FlatMod.DYNAMIC_SENTINEL;
+    }
+
+    public FlatFace getForClient() {
+        return this;
     }
 
     /** This field is internal. */
@@ -192,17 +202,30 @@ public abstract class FlatFace implements IDataSerializable {
 
     public void dropItem(Coord at, EnumFacing side) {
         if (at.w.isRemote) return;
-        if (FzUtil.doTileDrops(at.w)) {
-            if (at.isSolid()) {
-                Coord n = at.add(side);
-                if (!n.isSolid()) {
-                    at = n;
-                }
-            }
-            ItemStack item = getItem(at, side);
-            if (item != null) {
-                at.spawnItem(item);
-            }
+        if (!FzUtil.doTileDrops(at.w)) {
+            return;
         }
+        ItemStack item = getItem(at, side);
+        if (item == null) {
+            return;
+        }
+        Entity ei = at.spawnItem(item);
+        if (ei == null) return;
+        // Move the EI to be at the face rather than the center of the block.
+        // And offset a tad more to make it not intersect a solid block.
+        double half = 0.5;
+        double punch = 0.05; // Maybe this should be ei.width?
+
+        boolean i = at.isSolid();
+        boolean u = at.add(side).isSolid();
+
+        if (i && !u) {
+            half += punch;
+        } else if (!i && u) {
+            half -= punch;
+        }
+        ei.posX += side.getFrontOffsetX() / half;
+        ei.posY += side.getFrontOffsetY() / half;
+        ei.posZ += side.getFrontOffsetZ() / half;
     }
 }

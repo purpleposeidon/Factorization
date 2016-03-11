@@ -7,6 +7,8 @@ import java.util.ArrayList;
  */
 @SuppressWarnings("unused")
 public final class EnergyCategory {
+    public static final ArrayList<EnergyCategory> VALUES = new ArrayList<EnergyCategory>();
+
     /**
      * Mass moving in a straight line. Anvils fall; a camshaft drives a reciprocating follower.
      */
@@ -78,7 +80,6 @@ public final class EnergyCategory {
         this.name = name;
     }
 
-    public static final ArrayList<EnergyCategory> VALUES = new ArrayList<EnergyCategory>();
     public static EnergyCategory get(String name) {
         name = name.intern();
         for (EnergyCategory cat : VALUES) {

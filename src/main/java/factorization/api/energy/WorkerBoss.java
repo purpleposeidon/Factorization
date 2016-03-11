@@ -56,6 +56,9 @@ enum WorkerBoss {
     }
 
     static void registerNet(IEnergyNet watcher, WorkUnit[] units) {
+        if (units.length == 0) {
+            throw new IllegalArgumentException("An energynet must accept some kind of work unit!");
+        }
         for (WorkUnit unit : units) {
             WorkerBoss.watchers.put(unit.name, watcher);
             if (!WorkerBoss.knownNames.contains(unit.name)) {

@@ -36,4 +36,12 @@ public final class FlatFaceAir extends FlatFace {
     @Override
     public void listSelectionBounds(Coord at, EnumFacing side, Entity player, IBoxList list) {
     }
+
+    @Override
+    public void spawnParticle(Coord at, EnumFacing side) {
+    }
+
+    @Override
+    public void playSound(Coord at, EnumFacing side, boolean placed) {
+    }
 }

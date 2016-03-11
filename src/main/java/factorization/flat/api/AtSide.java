@@ -34,8 +34,8 @@ public class AtSide {
         return getLayer().get(at, side);
     }
 
-    void set(FlatFace face) {
-        getLayer().set(at, side, face);
+    void set(FlatFace face, byte flags) {
+        getLayer().set(at, side, face, flags);
     }
 
     public Iterable<AtSide> iterateConnected() {

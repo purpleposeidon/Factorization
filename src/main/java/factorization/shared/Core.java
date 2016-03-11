@@ -2,8 +2,8 @@ package factorization.shared;
 
 import factorization.artifact.InspirationManager;
 import factorization.beauty.EntityLeafBomb;
-import factorization.charge.ChargeFeature;
 import factorization.charge.TileEntitySolarBoiler;
+import factorization.charge.enet.ChargeEnetSubsys;
 import factorization.colossi.BuildColossusCommand;
 import factorization.colossi.ColossusController;
 import factorization.colossi.ColossusFeature;
@@ -192,7 +192,7 @@ public class Core {
         checkForge();
         Core.loadBus(registry);
         fzconfig.loadConfig(event.getSuggestedConfigurationFile());
-        ChargeFeature.INSTANCE.init();
+        ChargeEnetSubsys.instance.setup();
         registry.makeBlocks();
 
         NetworkRegistry.INSTANCE.registerGuiHandler(this, proxy);
@@ -502,8 +502,8 @@ public class Core {
             list.add(StatCollector.translateToLocal(s));
         }
     }
-    
-    
+
+
     public enum TabType {
         ART, CHARGE, OREP, SERVOS, ROCKETRY, TOOLS, BLOCKS, MATERIALS, COLOSSAL, ARTIFACT;
     }
@@ -547,5 +547,9 @@ public class Core {
     public static void loadBus(Object obj) {
         //@SubscribeEvent is the annotation the eventbus, *NOT* @EventHandler; that one is for mod containers.
         MinecraftForge.EVENT_BUS.register(obj);
+    }
+
+    public static void unloadBus(Object obj) {
+        MinecraftForge.EVENT_BUS.unregister(obj);
     }
 }

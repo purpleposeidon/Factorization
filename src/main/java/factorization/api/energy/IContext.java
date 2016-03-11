@@ -1,6 +1,7 @@
 package factorization.api.energy;
 
 import factorization.api.adapter.Adapter;
+import net.minecraft.world.World;
 
 import javax.annotation.Nonnull;
 

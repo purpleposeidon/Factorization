@@ -32,6 +32,8 @@ public class ItemFlat extends ItemFactorization {
     @Override
     public boolean onItemUse(ItemStack stack, EntityPlayer playerIn, World worldIn, BlockPos pos, EnumFacing side,
                              float hitX, float hitY, float hitZ) {
-        return Flat.tryUsePlacer(playerIn, stack, face.dupe(), new Coord(worldIn, pos), side);
+        Coord at = new Coord(worldIn, pos);
+        FlatFace dupe = face.dupe(at, side);
+        return Flat.tryUsePlacer(playerIn, stack, dupe, at, side);
     }
 }

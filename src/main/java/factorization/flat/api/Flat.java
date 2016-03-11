@@ -7,8 +7,6 @@ import factorization.flat.FlatChunkLayer;
 import factorization.flat.FlatFaceAir;
 import factorization.flat.FlatMod;
 import factorization.flat.FlatNet;
-import factorization.notify.Notice;
-import factorization.notify.Style;
 import factorization.shared.Core;
 import factorization.util.NORELEASE;
 import factorization.util.PlayerUtil;
@@ -31,11 +29,18 @@ public final class Flat {
         return flat;
     }
 
+
+    public static void registerDynamic(ResourceLocation name, FlatFace sample) {
+        registerDynamic(name, sample.getClass());
+        FlatMod.dynamicSamples.put(name, sample);
+    }
+
     public static void registerDynamic(ResourceLocation name, Class<? extends FlatFace> flatClass) {
         if (FlatMod.dynamicReg.containsKey(name)) {
             throw new IllegalArgumentException("Already registered: " + name);
         }
         try {
+            // This happens even through registerDynamic to verify the class is instantiable.
             FlatFace sample = flatClass.newInstance();
             FlatMod.dynamicSamples.put(name, sample);
         } catch (Throwable t) {
@@ -66,15 +71,12 @@ public final class Flat {
     }
 
     public static void set(Coord at, EnumFacing side, FlatFace face) {
+        setWithNotification(at, side, face, FlatChunkLayer.FLAGS_ALL);
+    }
+
+    public static void setWithNotification(Coord at, EnumFacing side, FlatFace face, byte flags) {
         AtSide atSide = new AtSide(at, side);
-        atSide.set(face);
-        if (Core.dev_environ) {
-            FlatFace got = atSide.get();
-            if (got != face) {
-                Core.logSevere("Face.set failed!");
-            }
-        }
-        onFaceChanged(at, side);
+        atSide.set(face, flags);
     }
 
     public static boolean tryUsePlacer(EntityPlayer player, ItemStack is, FlatFace face, Coord at, EnumFacing side) {
@@ -82,7 +84,7 @@ public final class Flat {
         FlatFace orig = as.get();
         if (!orig.isReplaceable(at, side)) return false;
         if (!face.isValidAt(at, side)) return false;
-        as.set(face);
+        as.set(face, FlatChunkLayer.FLAGS_ALL);
         face.onPlaced(at, side, player, is);
         onFaceChanged(at, side);
         PlayerUtil.cheatDecr(player, is);
@@ -108,7 +110,7 @@ public final class Flat {
         }
     }
 
-    public static Iterable<FlatFace> getAll() {
+    public static Iterable<FlatFace> getAllSamples() {
         ArrayList<FlatFace> ret = new ArrayList<FlatFace>();
         for (FlatFace ff : FlatMod.staticReg) {
             ret.add(ff);
@@ -131,17 +133,27 @@ public final class Flat {
             @Override
             public void handle(Coord here) {
                 Chunk chunk = here.getChunk();
-                IExtraChunkData ecd = (IExtraChunkData) chunk;
-                ecd.getFlatLayer().iterateBounded(min, max, visitor);
+                getLayer(chunk).iterateBounded(min, max, visitor);
             }
         });
     }
 
     public static void playSound(Coord at, EnumFacing side, FlatFace face) {
         FlatNet.fx(at, side, face, FlatNet.FX_PLACE);
+        NORELEASE.println("sound", face);
     }
 
     public static void emitParticle(Coord at, EnumFacing side, FlatFace face) {
         FlatNet.fx(at, side, face, FlatNet.FX_BREAK);
+        NORELEASE.println("particle", face);
+    }
+
+    static FlatChunkLayer getLayer(Chunk chunk) {
+        IExtraChunkData ecd = (IExtraChunkData) chunk;
+        return ecd.getFlatLayer();
+    }
+
+    public static void iterateDynamics(Chunk at, IFlatVisitor visitor) {
+        getLayer(at).iterateDynamic(visitor);
     }
 }

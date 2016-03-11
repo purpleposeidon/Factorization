@@ -87,7 +87,6 @@ public enum FlatRayTracer {
 
     @SubscribeEvent
     public void interceptAttack(HandleAttackKeyEvent event) {
-        NORELEASE.println("Stab");
         if (interact(false)) {
             event.setCanceled(true);
             mc.leftClickCounter = 5;

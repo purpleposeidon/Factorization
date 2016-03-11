@@ -3,13 +3,18 @@ package factorization.api;
 import factorization.api.datahelpers.DataHelper;
 import factorization.api.datahelpers.IDataSerializable;
 import factorization.api.datahelpers.Share;
+import factorization.util.NORELEASE;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.world.World;
 
 import java.io.IOException;
 
+@Deprecated
 public class Charge implements IDataSerializable {
+    static {
+        NORELEASE.fixme("Delete these classes.");
+    }
     ConductorSet conductorSet = null;
     IChargeConductor conductor = null;
     boolean isConductorSetLeader = false;

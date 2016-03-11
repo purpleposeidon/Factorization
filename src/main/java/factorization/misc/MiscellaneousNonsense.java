@@ -108,6 +108,7 @@ public class MiscellaneousNonsense {
         if (FzConfig.blockundo) {
             Core.loadBus(BlockUndo.instance);
         }
+        WorldNuller.init();
     }
     
     public static class TickSynchronizer {

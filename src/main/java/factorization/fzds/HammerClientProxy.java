@@ -107,7 +107,9 @@ public class HammerClientProxy extends HammerProxy {
         public WorldInfo getWorldInfo() {
             // This is a work-around for a threading derp that was causing world difficulty to reset all the time.
             World rw = Hammer.proxy.getClientRealWorld();
-            if (rw == null) return super.getWorldInfo();
+            if (rw == null) {
+                return super.getWorldInfo();
+            }
             return rw.getWorldInfo();
         }
     }
@@ -356,7 +358,11 @@ public class HammerClientProxy extends HammerProxy {
 
     @SubscribeEvent
     public void removeRgCache(WorldEvent.Unload event) {
-        renderglobal_cache.remove(event.world);
+        if (event.world.isRemote) {
+            if (renderglobal_cache.remove(event.world) == null) {
+                renderglobal_cache.clear();
+            }
+        }
     }
 
     public static RenderGlobal getRealRenderGlobal() {
