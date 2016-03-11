@@ -67,18 +67,26 @@ class MemberPos {
     }
 
     FlatFace get(FlatCoord world) {
-        return Flat.get(getCoord(world.at.w), EnumFacing.getFront(side));
+        return Flat.get(getCoord(world.at.w), getSide(), true);
     }
 
     FlatFace get(Coord world) {
-        return Flat.get(getCoord(world.w), EnumFacing.getFront(side));
+        return Flat.get(getCoord(world.w), getSide(), true);
     }
 
     public void set(World world, FlatFace face) {
-        Flat.set(getCoord(world), EnumFacing.getFront(side), face);
+        Flat.set(getCoord(world), getSide(), face);
     }
 
     public void set(World world, FlatFace face, byte flags) {
-        Flat.setWithNotification(getCoord(world), EnumFacing.getFront(side), face, flags);
+        Flat.setWithNotification(getCoord(world), getSide(), face, flags);
+    }
+
+    public FlatCoord getFlatCoord(FlatCoord at) {
+        return new FlatCoord(getCoord(at.at.w), getSide());
+    }
+
+    public EnumFacing getSide() {
+        return EnumFacing.getFront(side);
     }
 }

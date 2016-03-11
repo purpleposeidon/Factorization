@@ -1,6 +1,7 @@
 package factorization.util;
 
 import com.google.common.collect.Multimap;
+import com.google.common.collect.Sets;
 import factorization.api.Coord;
 import factorization.shared.Core;
 import factorization.weird.barrel.TileEntityDayBarrel;
@@ -40,6 +41,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Set;
 
 public class FzUtil {
 
@@ -278,5 +280,29 @@ public class FzUtil {
 
     public static boolean doTileDrops(World world) {
         return getRules(world).getBoolean("doTileDrops");
+    }
+
+    public static <E> E chooseOne(Collection<E> collection) {
+        //noinspection LoopStatementThatDoesntLoop
+        for (E e : collection) {
+            return e;
+        }
+        return null;
+    }
+
+    public static <E> boolean intersects(Set<E> a, Set<E> b) {
+        // I was able to use a.removeAll(b) instead of this.
+        if (!(a.size() < b.size())) {
+            // The documentation for Sets.intersection() suggests that it's best that the first set be smaller.
+            // Hopefully they actually tested that! :D
+            // (Could just use that. But, uh, this code is already written...)
+            Set<E> c = a;
+            a = b;
+            b = c;
+        }
+        for (E e : a) {
+            if (b.contains(e)) return true;
+        }
+        return false;
     }
 }

@@ -12,28 +12,25 @@ import factorization.flat.api.FlatFace;
 import factorization.shared.Core;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
-import net.minecraftforge.event.world.ChunkEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
 
-import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 public class ChargeEnetSubsys implements IEnergyNet {
     public static final ChargeEnetSubsys instance = new ChargeEnetSubsys();
 
     public static final ResourceLocation FZ_CHARGE = new ResourceLocation("factorization:charge");
     public static final WorkUnit CHARGE = WorkUnit.get(EnergyCategory.ELECTRIC, FZ_CHARGE);
-    public FlatFaceWire wire0;
+    public WireCharge wire0;
     public WireLeader wireLeader;
 
     public void setup() {
         Core.loadBus(this);
         IEnergyNet.register(this);
-        wire0 = new FlatFaceWire();
+        wire0 = new WireCharge();
         Flat.registerStatic(new ResourceLocation("factorization:charge/wire"), wire0);
         wireLeader = new WireLeader();
         Flat.registerDynamic(new ResourceLocation("factorization:charge/wire_leader"), wireLeader);

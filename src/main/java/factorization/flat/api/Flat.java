@@ -70,6 +70,14 @@ public final class Flat {
         return new AtSide(at, side).get();
     }
 
+    public static FlatFace get(Coord at, EnumFacing side, boolean noLoad) {
+        AtSide atSide = new AtSide(at, side);
+        if (noLoad && !atSide.at.blockExists()) {
+            return null;
+        }
+        return atSide.get();
+    }
+
     public static void set(Coord at, EnumFacing side, FlatFace face) {
         setWithNotification(at, side, face, FlatChunkLayer.FLAGS_ALL);
     }

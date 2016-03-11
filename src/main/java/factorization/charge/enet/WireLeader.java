@@ -5,6 +5,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import factorization.api.Coord;
+import factorization.api.ICoordFunction;
 import factorization.api.datahelpers.DataHelper;
 import factorization.api.datahelpers.IDataSerializable;
 import factorization.api.datahelpers.Share;
@@ -12,7 +13,10 @@ import factorization.flat.FlatChunkLayer;
 import factorization.flat.api.Flat;
 import factorization.flat.api.FlatCoord;
 import factorization.flat.api.FlatFace;
+import factorization.flat.api.IFlatVisitor;
 import factorization.shared.Core;
+import factorization.util.FzUtil;
+import factorization.util.NORELEASE;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.util.EnumFacing;
@@ -20,10 +24,12 @@ import net.minecraft.world.ChunkCoordIntPair;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.Constants;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.io.IOException;
 import java.util.*;
 
-public class WireLeader extends FlatFaceWire {
+public class WireLeader extends WireCharge {
     @Override
     public IDataSerializable serialize(String prefix, DataHelper data) throws IOException {
         super.serialize(prefix, data);
@@ -61,7 +67,7 @@ public class WireLeader extends FlatFaceWire {
     final Set<MemberPos> members = Sets.newHashSet();
     final List<MemberPos> neighbors = Lists.newArrayList();
     int powerSum = 0;
-    boolean disturbed = true;
+    boolean disturbed = true; // Recalculate neighbors on load. Our neighbors may have broken themselves.
 
     boolean isFull() {
         return members.size() >= MAX_SIZE;
@@ -96,17 +102,18 @@ public class WireLeader extends FlatFaceWire {
         disturbed = true;
     }
 
-    static boolean working = false;
     void tick(FlatCoord at) {
         if (members.isEmpty()) {
             Core.logSevere("I'm not in my own network! " + at);
             return;
         }
+        if (disturbed) {
+            recalculateNeighbors(at);
+        }
         boolean anyEating = false;
         World w = at.at.w;
         Random rng = w.rand;
         ChunkCoordIntPair chunkPos = at.at.getChunk().getChunkCoordIntPair();
-        working = true;
         for (Iterator<MemberPos> iter = neighbors.iterator(); iter.hasNext(); ) {
             MemberPos npos = iter.next();
             Coord nat = npos.getCoord(w);
@@ -139,7 +146,104 @@ public class WireLeader extends FlatFaceWire {
             neighbor.powerSum = yours;
         }
         disturbed = anyEating;
-        working = false;
+    }
+
+
+    private void recalculateNeighbors(FlatCoord at) {
+        final MemberPos me = new MemberPos(at);
+        final List<MemberPos> oldNeighbors = ImmutableList.copyOf(neighbors);
+        NORELEASE.println("Recalculate neighbors", at);
+
+        if (!neighbors.isEmpty()) {
+            // Unlink ourselves from the neighbor lists
+            for (MemberPos npos : neighbors) {
+                FlatFace ff = npos.get(at);
+                if (ff.getSpecies() != SPECIES || !(ff instanceof WireLeader)) {
+                    continue;
+                }
+                ((WireLeader) ff).neighbors.remove(me);
+            }
+            neighbors.clear();
+        }
+
+        // Check every member for unknown coordinates
+        Set<MemberPos> foreigners = Sets.newHashSet();
+        for (MemberPos member : members) {
+            iterateConnectable(member.getFlatCoord(at), new Function<FlatCoord, Void>() {
+                @Override
+                public Void apply(FlatCoord input) {
+                    FlatFace ff = input.get();
+                    if (ff.getSpecies() != SPECIES) return null;
+                    MemberPos e = new MemberPos(input);
+                    if (!members.contains(e)) return null;
+                    foreigners.add(e);
+                    return null;
+                }
+            });
+        }
+
+        // Locality suggests that neighbors rarely move
+        for (MemberPos npos : oldNeighbors) {
+            FlatFace ff = npos.get(at);
+            if (ff instanceof WireLeader) {
+                WireLeader neighbor = (WireLeader) ff;
+                if (foreigners.removeAll(neighbor.members)) {
+                    neighbors.add(npos);
+                }
+            }
+        }
+        if (foreigners.isEmpty()) return;
+
+        // Check all neighbors in the region for ownership of the foreigners
+        { // visit-all-dynamics
+            final IFlatVisitor checkLeaders = new IFlatVisitor() {
+                @Override
+                public void visit(Coord at, EnumFacing side, @Nonnull FlatFace face) {
+                    if (face.getSpecies() != SPECIES) return;
+                    if (!(face instanceof WireLeader)) return;
+                    WireLeader nl = (WireLeader) face;
+                    if (foreigners.removeAll(nl.members)) {
+                        neighbors.add(new MemberPos(at, side));
+                    }
+                }
+            };
+            Coord min = at.at.add(-16, 0, -16); // dy'd really be MAX_SIZE * 2, if we had iterateDynamicsBounded
+            Coord max = at.at.add(+16, 0, +16);
+            Coord.iterateChunks(min, max, new ICoordFunction() {
+                @Override
+                public void handle(Coord here) {
+                    Flat.iterateDynamics(here.getChunk(), checkLeaders);
+                }
+            });
+        }
+        // An alternative implementation of the above block:
+        // It's, like, O(1) vs O(N^2) or something. But is f(MAX_SIZE) anyways.
+        // So what are the constants? FIXME: Profile the two?
+        // Could also choose based on the complexity of the slabs. Blegh.
+        // visit-all-dynamics would probably have terrible performance on JumboSlabs.
+        /*{ // search-for-leaders
+            while (!foreigners.isEmpty()) {
+                MemberPos foreigner = FzUtil.chooseOne(foreigners);
+                assert foreigner != null;
+                FlatCoord fat = foreigner.getFlatCoord(at);
+                new LeaderSearch(fat.at, fat.side) {
+                    @Override
+                    boolean onFound(WireLeader leader, FlatCoord input) {
+                        neighbors.add(new MemberPos(input));
+                        foreigners.removeAll(leader.members);
+                        return true;
+                    }
+                };
+            }
+        }*/
+
+        // And complete the reverse-linkage
+        for (MemberPos n : neighbors) {
+            FlatFace ff = n.get(at.at);
+            if (!(ff instanceof WireLeader)) continue;
+            WireLeader neighbor = (WireLeader) ff;
+            neighbor.neighbors.add(me);
+        }
     }
 
     private boolean eatNeighbor(World world, ChunkCoordIntPair chunkPos, MemberPos npos, WireLeader neighbor, FlatCoord mypos) {
