@@ -175,7 +175,7 @@ public class WireLeader extends WireCharge {
                     FlatFace ff = input.get();
                     if (ff.getSpecies() != SPECIES) return null;
                     MemberPos e = new MemberPos(input);
-                    if (!members.contains(e)) return null;
+                    if (members.contains(e)) return null;
                     foreigners.add(e);
                     return null;
                 }
