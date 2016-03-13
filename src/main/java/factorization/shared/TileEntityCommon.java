@@ -22,10 +22,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.AxisAlignedBB;
-import net.minecraft.util.EnumFacing;
-import net.minecraft.util.MovingObjectPosition;
-import net.minecraft.util.Vec3;
+import net.minecraft.util.*;
 import net.minecraftforge.common.util.Constants;
 import net.minecraftforge.fml.common.event.FMLModIdMappingEvent;
 import net.minecraftforge.fml.common.network.internal.FMLProxyPacket;
@@ -102,6 +99,9 @@ public abstract class TileEntityCommon extends TileEntity implements ICoord, IFa
             putData(data);
         } catch (IOException e) {
             e.printStackTrace();
+        }
+        if (pos != null && pos.getClass() != BlockPos.class) {
+            Core.logSevere(this + " is not the base BlockPos! It is a " + pos.getClass() + ": " + pos.toString());
         }
     }
 
