@@ -6,6 +6,8 @@ import net.minecraft.util.ResourceLocation;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import java.util.Collection;
+import java.util.List;
 
 /**
  * A single unit of some kind of power, with energy sufficient to do one 'work action'.
@@ -139,5 +141,9 @@ public class WorkUnit {
     @Override
     public String toString() {
         return category + "/" + name;
+    }
+
+    public static Iterable<WorkUnit> getPrototypes() {
+        return Manager.prototypesByName.values();
     }
 }

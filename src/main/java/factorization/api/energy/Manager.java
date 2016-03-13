@@ -68,7 +68,7 @@ enum Manager {
 
     static boolean offer(IContext source, WorkUnit unit) {
         for (IEnergyNet net : unit.listener.nets) {
-            if (net.propagatePower(source, unit)) {
+            if (net.injectPower(source, unit)) {
                 return true;
             }
         }

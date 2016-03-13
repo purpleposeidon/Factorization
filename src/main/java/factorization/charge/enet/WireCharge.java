@@ -7,7 +7,6 @@ import factorization.flat.api.Flat;
 import factorization.flat.api.FlatCoord;
 import factorization.flat.api.FlatFace;
 import factorization.notify.Notice;
-import factorization.notify.Style;
 import factorization.shared.Core;
 import factorization.util.ItemUtil;
 import factorization.util.NORELEASE;
@@ -44,14 +43,12 @@ public class WireCharge extends AbstractFlatWire {
         if (Core.dev_environ) {
             FlatFace newVal = Flat.get(at, side);
             if (newVal == this) {
-                NORELEASE.println("I'm not gone");
+                NORELEASE.println("I'm not gone", at, side);
                 return;
-            } else {
-                NORELEASE.println("I've been replaced properly!", newVal);
             }
         }
-        final MemberPos me = new MemberPos(at, side);
-        new LeaderSearch(at, side) {
+        ChargeEnetSubsys.instance.dirtyCache(at.w, new MemberPos(at, side));
+        new LeaderSearch(this, at, side) {
             @Override
             boolean onFound(WireLeader leader, FlatCoord input) {
                 leader.scatter(input.at, input.side);
@@ -76,7 +73,7 @@ public class WireCharge extends AbstractFlatWire {
     @Override
     public void onActivate(final Coord at, final EnumFacing side, final EntityPlayer player) {
         if (!isMeter(player.getHeldItem())) return;
-        new LeaderSearch(at, side) {
+        new LeaderSearch(this, at, side) {
             @Override
             boolean onFound(WireLeader leader, FlatCoord input) {
                 int memberCount = leader.members.size();
@@ -88,12 +85,12 @@ public class WireCharge extends AbstractFlatWire {
         };
     }
 
-    protected abstract class LeaderSearch implements Function<FlatCoord, Boolean> {
+    public static abstract class LeaderSearch implements Function<FlatCoord, Boolean> {
         private final MemberPos me;
 
-        public LeaderSearch(Coord at, EnumFacing side) {
+        public LeaderSearch(WireCharge me, Coord at, EnumFacing side) {
             this.me = new MemberPos(at, side);
-            WireLeader.probe(WireCharge.this, at, side, SEARCH_SIZE, this);
+            WireLeader.probe(me, at, side, SEARCH_SIZE, this);
         }
 
         @Override

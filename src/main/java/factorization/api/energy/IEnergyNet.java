@@ -16,7 +16,7 @@ public interface IEnergyNet {
      * @return true if the power was taken. Do not return true if the energynet can't handle the unit; wasting unused
      * power is the generator's job.
      */
-    boolean propagatePower(IContext generator, WorkUnit unit);
+    boolean injectPower(IContext generator, WorkUnit unit);
 
     /**
      * A worker has been created. Note that this may be called multiple times with differing units.

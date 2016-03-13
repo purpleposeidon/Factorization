@@ -152,7 +152,7 @@ public class WireLeader extends WireCharge {
     private void recalculateNeighbors(FlatCoord at) {
         final MemberPos me = new MemberPos(at);
         final List<MemberPos> oldNeighbors = ImmutableList.copyOf(neighbors);
-        NORELEASE.println("Recalculate neighbors", at);
+        //NORELEASE.println("Recalculate neighbors", at);
 
         if (!neighbors.isEmpty()) {
             // Unlink ourselves from the neighbor lists
@@ -270,17 +270,21 @@ public class WireLeader extends WireCharge {
 
     public void scatter(Coord at, EnumFacing side) {
         // Not the most efficient operation, but probably the simplest way of implementing it.
+        int size = members.size();
         List<MemberPos> membersCopy = ImmutableList.copyOf(members);
         members.clear();
         for (MemberPos pos : membersCopy) {
             if (pos.get(at).getSpecies() != SPECIES) continue;
-            WireLeader toSet = new WireLeader();
             Coord pat = pos.getCoord(at.w);
             EnumFacing pside = EnumFacing.getFront(pos.side);
+            WireLeader toSet = new WireLeader();
             if (toSet.isValidAt(pat, pside)) {
+                toSet.powerSum = powerSum / size;
                 int flags = ~(FlatChunkLayer.FLAG_SYNC | FlatChunkLayer.FLAG_CALL_REPLACE);
                 Flat.setWithNotification(pat, pside, toSet, (byte) flags);
+                ChargeEnetSubsys.instance.dirtyCache(at.w, pos);
             }
+            size--;
         }
         MemberPos myPos = new MemberPos(at, side);
         for (MemberPos npos : neighbors) {
@@ -307,5 +311,11 @@ public class WireLeader extends WireCharge {
     @Override
     public FlatFace getForClient() {
         return ChargeEnetSubsys.instance.wire0;
+    }
+
+    public boolean injectPower() {
+        if (powerSum >= members.size() * 3) return false;
+        powerSum++;
+        return true;
     }
 }
