@@ -111,12 +111,6 @@ public class BlockOreExtruder extends Block {
     }
 
     @Override
-    public IBlockState onBlockPlaced(World world, BlockPos pos, EnumFacing facing, float hitX, float hitY, float hitZ, int meta, EntityLivingBase placer) {
-        scheduleTick(world, pos);
-        return super.onBlockPlaced(world, pos, facing, hitX, hitY, hitZ, meta, placer);
-    }
-
-    @Override
     public void onBlockAdded(World world, BlockPos pos, IBlockState state) {
         scheduleTick(world, pos);
     }
