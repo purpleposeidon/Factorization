@@ -64,13 +64,13 @@ class Drawer implements IFlatVisitor {
         modelRenderer.renderModelStandard(at.w, model, SideSelectors.get(side), at.toBlockPos(), tess, true);
     }
 
-    public void finish() {
+    public void finish(EntityHack hack) {
         if (!started) {
-            info.discardList();
+            info.discard(hack);
             return;
         }
         tess.setTranslation(0, 0, 0);
-        GL11.glNewList(info.getList(), GL11.GL_COMPILE);
+        GL11.glNewList(info.getList(hack), GL11.GL_COMPILE);
         tessI.draw();
         GL11.glEndList();
     }

@@ -42,16 +42,15 @@ public final class EntityHackRender extends Render<EntityHack> {
         GL11.glPushMatrix();
         GL11.glTranslated(x, y, z);
         GL11.glTranslated(-entity.posX, -entity.posY, -entity.posZ);
-        Chunk chunk = new Coord(entity).getChunk();
-        FlatChunkLayer layer = ((IExtraChunkData) chunk).getFlatLayer();
+        FlatChunkLayer layer = ((IExtraChunkData) entity.chunk).getFlatLayer();
         bindTexture(Core.blockAtlas);
         ClientRenderInfo cri = (ClientRenderInfo) layer.renderInfo;
-        cri.update(chunk, layer, entity.slabY);
+        cri.update(entity, entity.chunk, layer, entity.slabY);
         {
             GlStateManager.disableLighting();
             GL11.glEnable(GL11.GL_POLYGON_OFFSET_FILL);
             GlStateManager.doPolygonOffset(-3, -3);
-            cri.draw();
+            cri.draw(entity);
             GL11.glDisable(GL11.GL_POLYGON_OFFSET_FILL);
             GlStateManager.enableLighting();
         }

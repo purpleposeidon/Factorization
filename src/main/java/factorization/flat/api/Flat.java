@@ -148,12 +148,10 @@ public final class Flat {
 
     public static void playSound(Coord at, EnumFacing side, FlatFace face) {
         FlatNet.fx(at, side, face, FlatNet.FX_PLACE);
-        NORELEASE.println("sound", face);
     }
 
     public static void emitParticle(Coord at, EnumFacing side, FlatFace face) {
         FlatNet.fx(at, side, face, FlatNet.FX_BREAK);
-        NORELEASE.println("particle", face);
     }
 
     static FlatChunkLayer getLayer(Chunk chunk) {

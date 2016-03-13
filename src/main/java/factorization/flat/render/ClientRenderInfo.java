@@ -1,20 +1,21 @@
 package factorization.flat.render;
 
+import com.google.common.collect.Lists;
 import factorization.api.Coord;
 import factorization.coremodhooks.IExtraChunkData;
 import factorization.flat.FlatChunkLayer;
-import factorization.flat.api.Flat;
 import factorization.flat.api.IFlatRenderInfo;
-import factorization.shared.Core;
 import factorization.util.NORELEASE;
 import net.minecraft.client.renderer.GLAllocation;
 import net.minecraft.world.chunk.Chunk;
-import net.minecraft.world.chunk.EmptyChunk;
 import org.lwjgl.opengl.GL11;
 
+import java.util.List;
+
 public final class ClientRenderInfo implements IFlatRenderInfo {
-    int dirty = ~0;
+    int dirty = Math.abs(~0);
     int entitySpawned = 0;
+    final List<EntityHack> hacks = Lists.newArrayList();
 
     @Override
     public void markDirty(Coord at) {
@@ -23,6 +24,7 @@ public final class ClientRenderInfo implements IFlatRenderInfo {
         if (slabY < 0 || slabY >= 16) return;
         int slabMask = 1 << slabY;
         dirty |= slabMask;
+        NORELEASE.println("Dirty", Integer.toString(dirty, 2));
         if ((entitySpawned & slabMask) == 0) {
             Chunk chunk = at.getChunk();
             IExtraChunkData ecd = (IExtraChunkData) chunk;
@@ -36,14 +38,19 @@ public final class ClientRenderInfo implements IFlatRenderInfo {
             entitySpawned |= slabMask;
             EntityHack hack = new EntityHack(chunk, slabY);
             at.w.spawnEntityInWorld(hack);
+            hacks.add(hack);
         }
     }
 
-    int displayList = -1;
-
     void discardList() {
-        if (displayList == -1) return;
-        GLAllocation.deleteDisplayLists(displayList);
+        for (EntityHack hack : hacks) {
+            if (hack.displayList != -1) {
+                GLAllocation.deleteDisplayLists(hack.displayList);
+                hack.displayList = -1;
+            }
+            hack.setDead();
+        }
+        hacks.clear();
     }
 
     @Override
@@ -51,24 +58,32 @@ public final class ClientRenderInfo implements IFlatRenderInfo {
         discardList();
     }
 
-    int getList() {
-        if (displayList == -1) {
-            displayList = GLAllocation.generateDisplayLists(1);
+    public void discard(EntityHack hack) {
+        if (hack.displayList != -1) {
+            GLAllocation.deleteDisplayLists(hack.displayList);
+            hack.displayList = -1;
         }
-        return displayList;
     }
 
-    public void draw() {
-        if (displayList == -1) return;
-        GL11.glCallList(displayList);
+    public void draw(EntityHack hack) {
+        if (hack.displayList == -1) return;
+        GL11.glCallList(hack.displayList);
     }
 
-    public void update(Chunk chunk, FlatChunkLayer layer, int slabY) {
+    public void update(EntityHack entity, Chunk chunk, FlatChunkLayer layer, int slabY) {
         int slabFlag = 1 << slabY;
         if ((dirty & slabFlag) == 0) return;
         dirty &= ~slabFlag;
         Drawer visitor = new Drawer(this);
         layer.iterateSlab(visitor, slabY);
-        visitor.finish();
+        visitor.finish(entity);
+        NORELEASE.println(this, slabY);
+    }
+
+    public int getList(EntityHack hack) {
+        if (hack.displayList == -1) {
+            hack.displayList = GLAllocation.generateDisplayLists(1);
+        }
+        return hack.displayList;
     }
 }

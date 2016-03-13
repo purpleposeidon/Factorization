@@ -10,6 +10,9 @@ import net.minecraft.world.chunk.Chunk;
 
 public class EntityHack extends Entity {
     final int slabY;
+    final Chunk chunk;
+    int displayList = -1;
+
     public EntityHack(Chunk chunk, int slabY) {
         super(chunk.getWorld());
         Coord me = new Coord(chunk).add(0, slabY * 16, 0);
@@ -17,6 +20,7 @@ public class EntityHack extends Entity {
         AxisAlignedBB b = SpaceUtil.newBox(me, me.add(0x10, 0x10, 0x10));
         setEntityBoundingBox(b);
         this.slabY = slabY;
+        this.chunk = chunk;
     }
 
     @Override protected void entityInit() { }
