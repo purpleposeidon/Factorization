@@ -17,6 +17,7 @@ import net.minecraft.init.Blocks;
 import net.minecraft.item.EnumDyeColor;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.EnumFacing;
+import net.minecraft.util.EnumParticleTypes;
 import net.minecraft.world.World;
 
 import java.util.Random;
@@ -34,13 +35,13 @@ public class BlockOreExtruder extends Block {
     public int delay_min = 24, delay_rng_add = 8;
     public Object[] extrudeInfo = new Object[] {
             // BlockState                       yield  delay
-            copper(),                           8,     0, // Oooh, copper! And *more* copper?
+            copper(),                           6,     0, // Oooh, copper! And *more* copper?
             clay(null),                         6,     0, // Now it gives clay?
-            copper(),                           8,     1, // Copper again!
-            clay(EnumDyeColor.WHITE),           4,     8, // Gasp! *White clay*!?
-            copper(),                           16,    4, // Ah, more of what I really want.
-            clay(null),                         24,    16, //This stupid clay is slow.
-            copper(),                           32,    12, // Hey, is the copper slowing as well?
+            copper(),                           4,     10, // Copper again!
+            clay(EnumDyeColor.WHITE),           4,     18, // Gasp! *White clay*!?
+            copper(),                           6,     19, // Ah, more of what I really want.
+            clay(null),                         24,    25, //This stupid clay is slow.
+            copper(),                           16,    25, // Hey, is the copper slowing as well?
             clay(EnumDyeColor.LIME),            18,    20 * 2, // Jeeze this clay is slow
             copper(),                           48,    20 * 4, // This is boring.
             clay(EnumDyeColor.BROWN),           18,    20 * 5, // I'll mine a different extruder
@@ -108,6 +109,7 @@ public class BlockOreExtruder extends Block {
         int i = world.getBlockState(pos).getValue(EXTRUSIONS);
         int delay = world.rand.nextInt(delay_rng_add) + delay_min + getDelay(i);
         world.scheduleBlockUpdate(pos, this, delay, 0);
+        world.addBlockEvent(pos, this, 0, 1);
     }
 
     @Override
@@ -172,10 +174,17 @@ public class BlockOreExtruder extends Block {
     }
 
     @Override
-    public boolean onBlockEventReceived(World worldIn, BlockPos pos, IBlockState state, int extrusions, int eventParam) {
-        if (!worldIn.isRemote) return true;
-        Coord at = new Coord(worldIn, pos);
+    public boolean onBlockEventReceived(World world, BlockPos pos, IBlockState state, int extrusions, int eventParam) {
+        if (!world.isRemote) return true;
+        Coord at = new Coord(world, pos);
         Coord up = at.add(0, 1, 0);
+        if (eventParam == 1) {
+            int n = world.rand.nextInt(3) + 2;
+            for (int i = 0; i < n; i++) {
+                world.spawnParticle(EnumParticleTypes.LAVA, at.x + 0.5, at.y + 1.125, at.z + 0.5, 0, 0, 0);
+            }
+            return true;
+        }
         extrudeBlock(up, extrusions);
         return true;
     }
