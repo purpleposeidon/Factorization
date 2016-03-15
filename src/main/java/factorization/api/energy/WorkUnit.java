@@ -70,8 +70,9 @@ public class WorkUnit {
      *
      * @param category The {@link EnergyCategory}.
      * @param name     The name of the energy type, presumably with the same domain as the creating mod.
+     * @throws IllegalArgumentException if a WorkUnit with the same name has already been registered.
      */
-    protected WorkUnit(@Nonnull EnergyCategory category, @Nonnull ResourceLocation name) {
+    protected WorkUnit(@Nonnull EnergyCategory category, @Nonnull ResourceLocation name) throws IllegalArgumentException {
         Preconditions.checkNotNull(category, "null energy class");
         Preconditions.checkNotNull(name, "null name");
         this.category = category;
@@ -113,12 +114,12 @@ public class WorkUnit {
     }
 
     /**
-     * Set a property. This should <b>NOT</b> be called on a prototype; use {@link WorkUnit#produce()}.
+     * Creates a (potentially) new WorkUnit with the property set.
      *
      * @param type The class of the property.
      * @param val  The value of the property.
      * @param <T>  The type of the property.
-     * @return a new WorkUnit with the property set, or else the same WorkUnit if the property is unsupported.
+     * @return a WorkUnit with the property set, or else the same WorkUnit if the property is unsupported.
      * @see WorkUnit#get(Class)
      */
     @Nonnull
