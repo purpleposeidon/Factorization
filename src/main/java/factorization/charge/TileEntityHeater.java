@@ -1,11 +1,14 @@
 package factorization.charge;
 
-import factorization.api.*;
+import factorization.api.Coord;
+import factorization.api.HeatConverters;
+import factorization.api.IFurnaceHeatable;
 import factorization.api.datahelpers.DataHelper;
 import factorization.api.datahelpers.Share;
+import factorization.api.energy.*;
 import factorization.common.FactoryType;
-import factorization.shared.BlockClass;
 import factorization.net.StandardMessageType;
+import factorization.shared.BlockClass;
 import factorization.shared.TileEntityCommon;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.block.Block;
@@ -13,15 +16,16 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.ITickable;
+import net.minecraft.util.ResourceLocation;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class TileEntityHeater extends TileEntityCommon implements IChargeConductor, ITickable {
-    Charge charge = new Charge(this);
-    public byte heat = 0;
-    public static final byte maxHeat = 32;
+public class TileEntityHeater extends TileEntityCommon implements IWorker, ITickable {
+    public int heat = 0;
+    public static final int HEAT_PER_UNIT = 200; // 1600 ticks per coal; 8 smelts per coal.
+    public static final int maxHeat = HEAT_PER_UNIT;
 
     @Override
     public FactoryType getFactoryType() {
@@ -33,27 +37,31 @@ public class TileEntityHeater extends TileEntityCommon implements IChargeConduct
         return BlockClass.Machine;
     }
 
-    @Override
-    public Charge getCharge() {
-        return charge;
+    {
+        IWorker.construct(new ContextTileEntity(this));
     }
 
+    static WorkUnit HEATING = WorkUnit.get(EnergyCategory.THERMAL, new ResourceLocation("factorization:heating"));
+
     @Override
-    public String getInfo() {
-        return null;
+    public Accepted accept(IContext context, WorkUnit unit, boolean simulate) {
+        if (unit.category != EnergyCategory.ELECTRIC && unit.category != EnergyCategory.THERMAL) {
+            return Accepted.NEVER;
+        }
+        if (unit == HEATING) return Accepted.NEVER;
+        if (heat > maxHeat) return Accepted.LATER;
+        if (!simulate) {
+            heat += HEAT_PER_UNIT;
+        }
+        return Accepted.NOW;
     }
 
     @Override
     public void putData(DataHelper data) throws IOException {
-        charge.serialize("", data);
-        heat = data.as(Share.VISIBLE, "heat").putByte(heat);
-    }
-    
-    int charge2heat(int i) {
-        return (int) (i / 1.5);
+        heat = data.as(Share.VISIBLE, "heat").putInt(heat);
     }
 
-    byte last_heat = -99;
+    int last_heat = -99;
 
     void updateClient() {
         int delta = Math.abs(heat - last_heat);
@@ -69,7 +77,7 @@ public class TileEntityHeater extends TileEntityCommon implements IChargeConduct
             return true;
         }
         if (messageType == StandardMessageType.SetHeat) {
-            heat = input.readByte();
+            heat = input.readInt();
             return true;
         }
         return false;
@@ -83,22 +91,11 @@ public class TileEntityHeater extends TileEntityCommon implements IChargeConduct
         updateClient();
         Coord here = getCoord();
         if (here.isPowered()) {
-            charge.update();
             return;
         }
-        long now = worldObj.getTotalWorldTime() + here.seed();
-        int rate = 4;
-        if (now % rate == 0) {
-            int heatToRemove = maxHeat - heat;
-            int avail = Math.min(heatToRemove, charge.getValue());
-            if (avail > 0 && charge2heat(heatToRemove) > 0) {
-                heat += charge2heat(charge.deplete(heatToRemove));
-            }
-        }
-        charge.update();
 
-        if (!canSendHeat()) return;
-        int recurs = 0, action = 0;
+        if (!hasHeat()) return;
+        int action = 0;
         ArrayList<Coord> randomNeighbors = here.getRandomNeighborsAdjacent();
         ArrayList<TileEntityHeater> heaters = null;
         for (Coord c : randomNeighbors) {
@@ -110,7 +107,7 @@ public class TileEntityHeater extends TileEntityCommon implements IChargeConduct
             IFurnaceHeatable furnace = HeatConverters.convert(c.w, c.toBlockPos());
             if (furnace != null && sendHeat(furnace)) {
                 action++;
-                if (!canSendHeat()) return;
+                if (!hasHeat()) return;
             }
         }
         if (action == 0 && heaters != null) {
@@ -135,29 +132,21 @@ public class TileEntityHeater extends TileEntityCommon implements IChargeConduct
         }
     }
 
-    boolean shouldHeat(int cookTime) {
-        if (heat >= maxHeat * 0.5) {
-            return true;
-        }
-        return cookTime > 0;
-    }
-
-    boolean canSendHeat() {
-        return heat > maxHeat / 2;
+    boolean hasHeat() {
+        return heat > 0;
     }
 
     boolean sendHeat(IFurnaceHeatable furnace) {
+        if (heat <= 0) return false;
         if (!furnace.acceptsHeat()) return false;
         if (furnace.hasLaggyStart()) {
             boolean can_jumpstart = heat >= maxHeat * 0.95;
             if (!can_jumpstart && !furnace.isStarted()) return false;
         }
-        boolean any = false;
         for (int i = 1; i <= 2; i++) {
             furnace.giveHeat();
-            heat -= i;
-            any = true;
-            if (!canSendHeat()) return true;
+            heat -= 1;
+            if (!hasHeat()) break;
         }
         return true;
     }
