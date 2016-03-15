@@ -29,6 +29,7 @@ public final class NumUtil {
     }
 
     public static double interp(double oldValue, double newValue, double partial) {
+        // Only 1 multiplication: oldValue + partial * (newValue - oldValue);
         return oldValue * (1 - partial) + newValue * partial;
     }
 

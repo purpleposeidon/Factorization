@@ -993,7 +993,9 @@ public class Registry {
 
         //Electricity
 
-        
+        oreRecipe(new ItemStack(wirePlacer, 8),
+                "---",
+                '-', "ingotCopper");
         shapelessOreRecipe(sulfuric_acid, Items.gunpowder, Items.gunpowder, Items.coal, Items.potionitem);
         shapelessOreRecipe(sulfuric_acid, "dustSulfur", Items.coal, Items.potionitem);
         shapelessOreRecipe(aqua_regia, sulfuric_acid, nether_powder, Items.fire_charge);
