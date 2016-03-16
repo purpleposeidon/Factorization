@@ -21,6 +21,7 @@ import net.minecraft.network.PacketBuffer;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.chunk.Chunk;
+import net.minecraft.world.chunk.EmptyChunk;
 import net.minecraftforge.event.world.ChunkWatchEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
@@ -35,10 +36,7 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.io.IOException;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Queue;
-import java.util.Set;
+import java.util.*;
 
 public class FlatNet {
     static final String channelName = "fzFlat";
@@ -89,12 +87,16 @@ public class FlatNet {
         if (event.phase != TickEvent.Phase.START) return;
         final Minecraft mc = Minecraft.getMinecraft();
         if (mc.thePlayer == null) return;
+        ArrayList<ByteBuf> failed = new ArrayList<ByteBuf>();
         while (true) {
             ByteBuf buf = clientBuff.poll();
-            if (buf == null) return;
+            if (buf == null) break;
             byte kind = buf.readByte();
             if (kind == SYNC) {
-                syncRead(buf, mc.thePlayer);
+                if (!syncRead(buf, mc.thePlayer)) {
+                    buf.resetReaderIndex();
+                    failed.add(buf);
+                }
             } else if (kind == FX_BREAK || kind == FX_PLACE) {
                 Coord at = readCoord(buf, mc.thePlayer);
                 EnumFacing side = readSide(buf);
@@ -110,6 +112,12 @@ public class FlatNet {
                 log("Invalid packet ID " + kind);
             }
         }
+        if (failed.size() > 128) {
+            log("Too may packets to chunks I don't have! Declaring bankruptcy!");
+            failed.clear();
+            return;
+        }
+        clientBuff.addAll(failed);
     }
 
     public static byte INTERACT_HIT = 1, INTERACT_USE = 2, SYNC = 3, FX_PLACE = 4, FX_BREAK = 5;
@@ -195,15 +203,20 @@ public class FlatNet {
         }
     }
 
-    static void syncRead(ByteBuf buff, EntityPlayer player) {
+    static boolean syncRead(ByteBuf buff, EntityPlayer player) {
+        boolean first = true;
         while (true) {
             byte state = buff.readByte();
-            if (state == 0) return;
+            if (state == 0) return true;
             if (state != 1) {
                 log("Corrupt data sync packet!?");
-                return;
+                return true;
             }
             Coord at = readCoord(buff, player);
+            if (first && at.getChunk() instanceof EmptyChunk) {
+                return false;
+            }
+            first = false;
             EnumFacing side = readSide(buff);
             FlatFace face = readFace(buff);
             if (face == null) continue;
