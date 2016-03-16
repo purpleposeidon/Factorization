@@ -369,7 +369,7 @@ public class DocumentationModule implements factorization.truth.api.IDocModule {
     }
 
     public static class DocKeyListener {
-        boolean hasNei = Loader.isModLoaded("NotEnoughItems");
+        boolean hasNei = Loader.isModLoaded("NotEnoughItems") || Loader.isModLoaded("JEI");
 
         @SubscribeEvent
         public void keyPress(UnhandledGuiKeyEvent event) {
