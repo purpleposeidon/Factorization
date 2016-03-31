@@ -6,6 +6,7 @@ import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityLiving;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.Item;
 import net.minecraft.util.BlockPos;
@@ -61,5 +62,10 @@ public class BlastedBedrock extends Block {
     @Override
     public boolean isReplaceableOreGen(World world, BlockPos pos, Predicate<IBlockState> target) {
         return target.apply(Blocks.bedrock.getDefaultState());
+    }
+
+    @Override
+    public boolean canCreatureSpawn(IBlockAccess world, BlockPos pos, EntityLiving.SpawnPlacementType type) {
+        return false;
     }
 }
