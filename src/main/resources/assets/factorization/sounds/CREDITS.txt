@@ -74,3 +74,29 @@ legendarium_insert.ogg
     Creative Commons, Zero License
         http://creativecommons.org/publicdomain/zero/1.0/
     Cropped and pitch changed
+
+sparkle_spawn.ogg
+    "Electrical Shock (Zap)", by BigKahuna360
+        http://www.freesound.org/people/BigKahuna360/sounds/160421/
+    Creative Commons, Zero License
+        http://creativecommons.org/publicdomain/zero/1.0/
+    Normalized and equalized.
+
+sparkle_say.ogg
+    "ELECTRIC_ZAP_001.wav", by JoelAudio
+        http://www.freesound.org/people/JoelAudio/sounds/136542/
+    Creative Commons, Zero License
+        http://creativecommons.org/publicdomain/zero/1.0/
+
+sparkle_hurt.ogg
+    "Civilian Stun Gun 1/10s zap", by AnthonyChan0
+        http://www.freesound.org/people/AnthonyChan0/sounds/264779/
+    Creative Commons, Zero License
+        http://creativecommons.org/publicdomain/zero/1.0/
+
+sparkle_death.ogg
+    "Gama laser.wav", by AndreOnate
+        http://www.freesound.org/people/AndreOnate/sounds/135885/
+    Creative Commons, Zero License
+        http://creativecommons.org/publicdomain/zero/1.0/
+

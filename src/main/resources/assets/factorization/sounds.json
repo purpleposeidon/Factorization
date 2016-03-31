@@ -13,5 +13,10 @@
     "winch.powered": {"category": "block", "sounds": ["winch_powered1", "winch_powered2", "winch_powered3"]},
     "winch.unwind": {"category": "block", "sounds": ["winch_unwind1", "winch_unwind2", "winch_unwind3"]},
 
-    "legendarium.insert": {"category": "block", "sounds": ["legendarium_insert"]}
+    "legendarium.insert": {"category": "block", "sounds": ["legendarium_insert"]},
+
+    "mob.sparkling.say": {"category": "hostile", "sounds": ["sparkle_say"]},
+    "mob.sparkling.hurt": {"category": "hostile", "sounds": ["sparkle_hurt"]},
+    "mob.sparkling.death": {"category": "hostile", "sounds": ["sparkle_death"]},
+    "mob.sparkling.spawn": {"category": "hostile", "sounds": ["sparkle_spawn"]}
 }
