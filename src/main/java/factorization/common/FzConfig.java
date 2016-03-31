@@ -65,6 +65,7 @@ public class FzConfig {
     public static double region_volcanism_chance = 0.75;
     public static int average_extra_geysers = 2;
     public static int volcanism_region_size_in_chunks = 8;
+    public static boolean spawn_sparklings = true;
     public static String f = "f";
 
     public static boolean enable_retrogen = false;
@@ -230,6 +231,7 @@ public class FzConfig {
         getStringConfig("README", "fzds", "See hammerChannels.cfg for FZDS-related configuration", "");
         legendarium_delay_hours = getIntConfig("legendariumDelayHours", "server", legendarium_delay_hours, "How many hours must pass before the legendarium can be used again");
         legendarium_queue_size = getIntConfig("legendariumQueueSize", "server", legendarium_queue_size, "The legendarium must have this many items before an artifact can be reforged.");
+        spawn_sparklings = getBoolConfig("spawnSparklings", "general", spawn_sparklings, "If false, sparklings will never be spawned.");
 
         if (!DeltaChunk.enabled()) {
             gen_colossi = false;

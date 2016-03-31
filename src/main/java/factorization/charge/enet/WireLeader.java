@@ -12,6 +12,7 @@ import factorization.api.datahelpers.DataHelper;
 import factorization.api.datahelpers.IDataSerializable;
 import factorization.api.datahelpers.Share;
 import factorization.charge.sparkling.EntitySparkling;
+import factorization.common.FzConfig;
 import factorization.flat.FlatChunkLayer;
 import factorization.flat.api.*;
 import factorization.shared.Core;
@@ -348,7 +349,7 @@ public class WireLeader extends WireCharge {
     private transient EntitySparkling last_spark_cache = null;
     private transient MemberPos last_spark_pos = null;
     private boolean injectSparkling(Coord at, EnumFacing dir) {
-        if (at.w.getDifficulty() == EnumDifficulty.PEACEFUL) return false;
+        if (at.w.getDifficulty() == EnumDifficulty.PEACEFUL || !FzConfig.spawn_sparklings) return false;
         if (members.isEmpty()) return false;
 
         if (last_spark_cache != null && last_spark_pos != null && members.contains(last_spark_pos)) {
