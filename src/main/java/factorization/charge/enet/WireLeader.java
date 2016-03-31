@@ -1,28 +1,30 @@
 package factorization.charge.enet;
 
 import com.google.common.base.Function;
+import com.google.common.base.Predicate;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
+import factorization.algos.FastBag;
 import factorization.api.Coord;
 import factorization.api.ICoordFunction;
 import factorization.api.datahelpers.DataHelper;
 import factorization.api.datahelpers.IDataSerializable;
 import factorization.api.datahelpers.Share;
+import factorization.charge.sparkling.EntitySparkling;
 import factorization.flat.FlatChunkLayer;
-import factorization.flat.api.Flat;
-import factorization.flat.api.FlatCoord;
-import factorization.flat.api.FlatFace;
-import factorization.flat.api.IFlatVisitor;
+import factorization.flat.api.*;
 import factorization.shared.Core;
-import factorization.util.FzUtil;
 import factorization.util.NORELEASE;
+import factorization.util.SpaceUtil;
+import net.minecraft.client.particle.EntitySpellParticleFX;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.nbt.NBTTagList;
+import net.minecraft.nbt.NBTTagIntArray;
+import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.world.ChunkCoordIntPair;
+import net.minecraft.world.EnumDifficulty;
 import net.minecraft.world.World;
-import net.minecraftforge.common.util.Constants;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -48,24 +50,42 @@ public class WireLeader extends WireCharge {
     }
 
     private static void writeCollection(NBTTagCompound out, String key, Collection<MemberPos> list) {
-        NBTTagList membersTag = new NBTTagList();
+        int[] data = new int[4 * list.size()];
+        int i = 0;
         for (MemberPos member : list) {
-            membersTag.appendTag(member.toArray());
+            data[i++] = member.x;
+            data[i++] = member.y;
+            data[i++] = member.z;
+            data[i++] = member.side;
         }
-        out.setTag(key, membersTag);
+        out.setTag(key, new NBTTagIntArray(data));
     }
 
     private static void readCollection(NBTTagCompound in, String key, Collection<MemberPos> list) {
-        NBTTagList membersTag = in.getTagList(key, Constants.NBT.TAG_INT_ARRAY);
-        int mlen = membersTag.tagCount();
-        for (int i = 0; i < mlen; i++) {
-            int t[] = membersTag.getIntArrayAt(i);
-            list.add(new MemberPos(t));
+        int[] data = in.getIntArray(key);
+        int i = 0;
+        while (i < data.length) {
+            int x = data[i++];
+            int y = data[i++];
+            int z = data[i++];
+            int side = data[i++];
+            list.add(new MemberPos(x, y, z, side));
         }
     }
 
+    static void connect(WireLeader a, MemberPos aPos, WireLeader b, MemberPos bPos) {
+        a.neighbors.add(bPos);
+        b.neighbors.add(aPos);
+    }
+
+    static void disconnect(WireLeader a, MemberPos aPos, WireLeader b, MemberPos bPos) {
+        a.neighbors.remove(bPos);
+        b.neighbors.remove(aPos);
+    }
+
+
     final Set<MemberPos> members = Sets.newHashSet();
-    final List<MemberPos> neighbors = Lists.newArrayList();
+    final List<MemberPos> neighbors = new FastBag<MemberPos>();
     int powerSum = 0;
     boolean disturbed = true; // Recalculate neighbors on load. Our neighbors may have broken themselves.
 
@@ -79,8 +99,9 @@ public class WireLeader extends WireCharge {
     }
 
     @Override
-    public void onSet(Coord at, EnumFacing side) {
+    public void onSet(final Coord at, final EnumFacing side) {
         addMember(at, side);
+        final MemberPos myPos = new MemberPos(at, side);
         iterateConnectable(new FlatCoord(at, side), new Function<FlatCoord, Void>() {
             @Override
             public Void apply(FlatCoord input) {
@@ -88,7 +109,9 @@ public class WireLeader extends WireCharge {
                 if (face.getSpecies() == SPECIES) {
                     if (face instanceof WireLeader) {
                         if (face == WireLeader.this) return null;
-                        neighbors.add(new MemberPos(input));
+                        WireLeader neighbor = (WireLeader) face;
+                        MemberPos neighborPos = new MemberPos(input);
+                        connect(WireLeader.this, myPos, neighbor, neighborPos);
                     }
                 }
                 return null;
@@ -150,20 +173,19 @@ public class WireLeader extends WireCharge {
 
 
     private void recalculateNeighbors(FlatCoord at) {
-        final MemberPos me = new MemberPos(at);
         final List<MemberPos> oldNeighbors = ImmutableList.copyOf(neighbors);
-        //NORELEASE.println("Recalculate neighbors", at);
 
+        final MemberPos myPos = new MemberPos(at);
         if (!neighbors.isEmpty()) {
             // Unlink ourselves from the neighbor lists
-            for (MemberPos npos : neighbors) {
+            while (!neighbors.isEmpty()) {
+                MemberPos npos = neighbors.remove(0);
                 FlatFace ff = npos.get(at);
                 if (ff.getSpecies() != SPECIES || !(ff instanceof WireLeader)) {
                     continue;
                 }
-                ((WireLeader) ff).neighbors.remove(me);
+                disconnect(this, myPos, (WireLeader) ff, npos);
             }
-            neighbors.clear();
         }
 
         // Check every member for unknown coordinates
@@ -188,7 +210,7 @@ public class WireLeader extends WireCharge {
             if (ff instanceof WireLeader) {
                 WireLeader neighbor = (WireLeader) ff;
                 if (foreigners.removeAll(neighbor.members)) {
-                    neighbors.add(npos);
+                    connect(this, myPos, neighbor, npos);
                 }
             }
         }
@@ -203,7 +225,7 @@ public class WireLeader extends WireCharge {
                     if (!(face instanceof WireLeader)) return;
                     WireLeader nl = (WireLeader) face;
                     if (foreigners.removeAll(nl.members)) {
-                        neighbors.add(new MemberPos(at, side));
+                        connect(WireLeader.this, myPos, nl, new MemberPos(at, side));
                     }
                 }
             };
@@ -217,7 +239,7 @@ public class WireLeader extends WireCharge {
             });
         }
         // An alternative implementation of the above block:
-        // It's, like, O(1) vs O(N^2) or something. But is f(MAX_SIZE) anyways.
+        // It's, like, O(1) vs O(N^2) or something [What? -neptune, a month later]. But is f(MAX_SIZE) anyways.
         // So what are the constants? FIXME: Profile the two?
         // Could also choose based on the complexity of the slabs. Blegh.
         // visit-all-dynamics would probably have terrible performance on JumboSlabs.
@@ -236,14 +258,6 @@ public class WireLeader extends WireCharge {
                 };
             }
         }*/
-
-        // And complete the reverse-linkage
-        for (MemberPos n : neighbors) {
-            FlatFace ff = n.get(at.at);
-            if (!(ff instanceof WireLeader)) continue;
-            WireLeader neighbor = (WireLeader) ff;
-            neighbor.neighbors.add(me);
-        }
     }
 
     private boolean eatNeighbor(World world, ChunkCoordIntPair chunkPos, MemberPos npos, WireLeader neighbor, FlatCoord mypos) {
@@ -261,11 +275,21 @@ public class WireLeader extends WireCharge {
         neighbors.clear();
         neighbors.addAll(newNeighbors);
         members.addAll(neighbor.members);
-        neighbor.neighbors.clear();
+        neighbor.disconnectAll(world, npos);
         neighbor.members.clear();
         powerSum += neighbor.powerSum;
         npos.set(world, ChargeEnetSubsys.instance.wire0, FlatChunkLayer.FLAGS_SEAMLESS);
         return true;
+    }
+
+    void disconnectAll(World w, MemberPos myPos) {
+        for (MemberPos neighborPos : neighbors) {
+            FlatFace ff = neighborPos.get(w);
+            if (ff instanceof WireLeader) {
+                WireLeader neighbor = (WireLeader) ff;
+                disconnect(this, myPos, neighbor, neighborPos);
+            }
+        }
     }
 
     public void scatter(Coord at, EnumFacing side) {
@@ -279,7 +303,9 @@ public class WireLeader extends WireCharge {
             EnumFacing pside = EnumFacing.getFront(pos.side);
             WireLeader toSet = new WireLeader();
             if (toSet.isValidAt(pat, pside)) {
-                toSet.powerSum = powerSum / size;
+                int toGive = powerSum / size;
+                toSet.powerSum = toGive;
+                powerSum -= toGive;
                 int flags = ~(FlatChunkLayer.FLAG_SYNC | FlatChunkLayer.FLAG_CALL_REPLACE);
                 Flat.setWithNotification(pat, pside, toSet, (byte) flags);
                 ChargeEnetSubsys.instance.dirtyCache(at.w, pos);
@@ -292,7 +318,7 @@ public class WireLeader extends WireCharge {
             if (nface.getSpecies() != SPECIES) continue;
             if (!(nface instanceof WireLeader)) continue;
             WireLeader neighbor = (WireLeader) nface;
-            neighbor.neighbors.remove(myPos);
+            disconnect(this, myPos, neighbor, npos);
         }
         neighbors.clear();
     }
@@ -313,9 +339,94 @@ public class WireLeader extends WireCharge {
         return ChargeEnetSubsys.instance.wire0;
     }
 
-    public boolean injectPower() {
-        if (powerSum >= members.size() * 3) return false;
+    public boolean injectPower(Coord at, EnumFacing dir) {
+        if (powerSum >= members.size() * 3) return injectSparkling(at, dir);
         powerSum++;
         return true;
+    }
+
+    private transient EntitySparkling last_spark_cache = null;
+    private transient MemberPos last_spark_pos = null;
+    private boolean injectSparkling(Coord at, EnumFacing dir) {
+        if (at.w.getDifficulty() == EnumDifficulty.PEACEFUL) return false;
+        if (members.isEmpty()) return false;
+
+        if (last_spark_cache != null && last_spark_pos != null && members.contains(last_spark_pos)) {
+            if (last_spark_cache.getHealth() >= 0 && expand(at).intersectsWith(last_spark_cache.getEntityBoundingBox())) {
+                feed(last_spark_cache);
+                return true;
+            } else {
+                last_spark_cache = null;
+                last_spark_pos = null;
+            }
+        }
+
+        ArrayList<MemberPos> shuffled = new ArrayList<MemberPos>(members);
+        Collections.shuffle(shuffled);
+        for (MemberPos mp : shuffled) {
+            if (mp == last_spark_pos) continue;
+            Coord mat = mp.getCoord(at.w);
+            EnumFacing md = mp.getSide();
+            if (injectAt(mat, md)) {
+                last_spark_pos = mp;
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    AxisAlignedBB expand(Coord at) {
+        int d = 2;
+        Coord min = at.add(-d, -d, -d);
+        Coord max = at.add(+d, +d, +d);
+        AxisAlignedBB box = SpaceUtil.newBox(min, max);
+        return box;
+    }
+
+    private boolean injectAt(Coord at, EnumFacing dir) {
+        class Findit implements Predicate<EntitySparkling> {
+            boolean found = false;
+            @Override
+            public boolean apply(EntitySparkling input) {
+                if (found) return false;
+                feed(input);
+                found = true;
+                last_spark_cache = input;
+                return false;
+            }
+        }
+        Findit findit = new Findit();
+        AxisAlignedBB box = expand(at);
+        at.w.getEntitiesWithinAABB(EntitySparkling.class, box, findit);
+        if (findit.found) return true;
+
+        {
+            if (at.isSolid()) {
+                at = at.add(dir);
+                if (at.isSolid()) {
+                    return false; // Hrm. :/
+                }
+            }
+            last_spark_cache = new EntitySparkling(at.w);
+            at.setAsEntityLocation(last_spark_cache);
+            last_spark_cache.setSurgeLevel(1);
+            at.w.spawnEntityInWorld(last_spark_cache);
+        }
+        return true;
+    }
+
+    void feed(EntitySparkling spark) {
+        spark.setSurgeLevel(spark.getSurgeLevel() + 1);
+    }
+
+    @Nullable
+    @Override
+    public IFlatModel getModel(Coord at, EnumFacing side) {
+        return ChargeEnetSubsys.instance.wire0.getModel(at, side);
+    }
+
+    @Override
+    public void loadModels(IModelMaker maker) {
     }
 }

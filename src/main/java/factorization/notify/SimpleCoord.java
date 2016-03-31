@@ -20,4 +20,10 @@ public class SimpleCoord implements ISaneCoord {
         return pos;
     }
 
+    @Override
+    public boolean equals(Object obj) {
+        if (!(obj instanceof SimpleCoord)) return false;
+        SimpleCoord o = (SimpleCoord) obj;
+        return w == o.w && pos.equals(o.pos);
+    }
 }

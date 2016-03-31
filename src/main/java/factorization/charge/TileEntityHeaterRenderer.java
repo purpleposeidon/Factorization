@@ -20,7 +20,7 @@ public class TileEntityHeaterRenderer extends TileEntitySpecialRenderer<TileEnti
 
     private int getColor(TileEntityHeater heater) {
         float color = 0.1F;
-        color += (heater.heat / (float) TileEntityHeater.maxHeat) * (1 - color);
+        color += (heater.heat / (float) TileEntityHeater.MAX_HEAT) * (1 - color);
         color = Math.max(color, 0);
         color = Math.min(1, color);
         int c = (int) (color * 0xFF);

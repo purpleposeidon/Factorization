@@ -12,7 +12,7 @@ import factorization.ceramics.TileEntityGreenware.ClayState;
 import factorization.charge.BlockFurnaceHeater;
 import factorization.charge.ItemAcidBottle;
 import factorization.charge.ItemChargeMeter;
-import factorization.charge.TileEntityLeydenJar;
+import factorization.charge.enet.TileEntityLeydenJar;
 import factorization.charge.enet.ChargeEnetSubsys;
 import factorization.colossi.*;
 import factorization.crafting.BlockCompressionCrafter;
@@ -436,7 +436,7 @@ public class Registry {
         mirror = new ItemBlockProxy(mirror_item_hidden, "mirror", TabType.CHARGE);
         leydenjar_item_full = ItemStack.copyItemStack(leydenjar_item);
         NBTTagCompound tag = new NBTTagCompound();
-        tag.setInteger("storage", TileEntityLeydenJar.max_storage);
+        tag.setInteger("storage", TileEntityLeydenJar.MAX_STORAGE);
         leydenjar_item_full.setTagCompound(tag);
 
         //ceramics

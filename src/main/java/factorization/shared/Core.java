@@ -4,6 +4,7 @@ import factorization.artifact.InspirationManager;
 import factorization.beauty.EntityLeafBomb;
 import factorization.charge.TileEntitySolarBoiler;
 import factorization.charge.enet.ChargeEnetSubsys;
+import factorization.charge.sparkling.EntitySparkling;
 import factorization.colossi.BuildColossusCommand;
 import factorization.colossi.ColossusController;
 import factorization.colossi.ColossusFeature;
@@ -244,6 +245,7 @@ public class Core {
         regEnt(StepperEngine.class,                   "fz_stepper_engine",      7, 100, always,  moves);
         regEnt(EntityGrabController.class,            "fz_grab_controller",     8, 100, always,  moves);
         regEnt(EntitySteamGeyser.class,               "fz_steam_geyser",        9, 160, 60,      still);
+        regEnt(EntitySparkling.class,                 "fz_sparkling",          10, 80,  3,       moves);
         // The "fz_" prefix isn't necessary these days; FML adds a prefix.
     }
 

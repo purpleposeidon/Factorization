@@ -1,14 +1,16 @@
 package factorization.beauty;
 
-import factorization.api.Charge;
-import factorization.api.Coord;
-import factorization.api.IChargeConductor;
-import factorization.api.IRotationalEnergySource;
+import factorization.api.*;
 import factorization.api.datahelpers.DataHelper;
 import factorization.api.datahelpers.Share;
+import factorization.api.energy.ContextTileEntity;
+import factorization.api.energy.IEnergyNet;
+import factorization.api.energy.WorkUnit;
+import factorization.charge.enet.ChargeEnetSubsys;
 import factorization.common.FactoryType;
 import factorization.net.StandardMessageType;
 import factorization.shared.BlockClass;
+import factorization.shared.Core;
 import factorization.shared.TileEntityCommon;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.entity.player.EntityPlayer;
@@ -18,23 +20,21 @@ import net.minecraft.util.ITickable;
 
 import java.io.IOException;
 
-public class TileEntityShaftGen extends TileEntityCommon implements IChargeConductor, ITickable {
-    final Charge charge = new Charge(this);
-    double rotor_angle;
+public class TileEntityShaftGen extends TileEntityCommon implements ITickable, IMeterInfo {
     EnumFacing shaft_direction = EnumFacing.DOWN;
     IRotationalEnergySource shaft;
-    transient double last_power;
-    public static double MAX_POWER = 1024, CHARGE_PER_POWER = 180 * 4;
+    double received_power = 0;
+    public static double MAX_POWER = 1024;
+    public static int UNITS_PER_POWER = 8;
+    public static WorkUnit CHARGE = ChargeEnetSubsys.CHARGE;
     boolean on;
-
-    @Override
-    public Charge getCharge() {
-        return charge;
-    }
 
     @Override
     public String getInfo() {
         if (shaftIsBroken()) return "Missing shaft";
+        if (Core.dev_environ) {
+            return received_power + "/" + UNITS_PER_POWER;
+        }
         return "";
     }
 
@@ -74,10 +74,9 @@ public class TileEntityShaftGen extends TileEntityCommon implements IChargeCondu
 
     @Override
     public void putData(DataHelper data) throws IOException {
-        charge.serialize("", data);
-        rotor_angle = data.as(Share.VISIBLE, "rotorAngle").putDouble(rotor_angle);
         shaft_direction = data.as(Share.VISIBLE, "shaft_direction").putEnum(shaft_direction);
         on = data.as(Share.VISIBLE, "on").putBoolean(on);
+        received_power = data.as(Share.PRIVATE, "receivedPower").putDouble(received_power);
     }
 
     @Override
@@ -113,7 +112,6 @@ public class TileEntityShaftGen extends TileEntityCommon implements IChargeCondu
     @Override
     public void update() {
         if (worldObj.isRemote) return;
-        charge.update();
         if (shaftIsBroken()) {
             if (worldObj.getTotalWorldTime() % 5 == 0) {
                 shaft = IRotationalEnergySource.adapter.cast(getCoord().add(shaft_direction).getTE());
@@ -123,11 +121,13 @@ public class TileEntityShaftGen extends TileEntityCommon implements IChargeCondu
         EnumFacing shaftOutputDirection = shaft_direction.getOpposite();
         double avail = shaft.availableEnergy(shaftOutputDirection);
         double usable = Math.min(MAX_POWER, avail);
-        last_power = shaft.takeEnergy(shaftOutputDirection, usable);
-        int line = (int) (last_power * CHARGE_PER_POWER);
-        charge.raiseValue(line);
-        rotor_angle += shaft.getVelocity(shaftOutputDirection);
-        boolean is_on = line > 0;
+        double got = shaft.takeEnergy(shaftOutputDirection, usable);
+        received_power += got;
+        if (received_power > UNITS_PER_POWER) {
+            IEnergyNet.offer(new ContextTileEntity(this), CHARGE);
+            received_power -= UNITS_PER_POWER;
+        }
+        boolean is_on = got > 0;
         if (is_on != on) {
             on = is_on;
             broadcastMessage(null, StandardMessageType.SetWorking, on);

@@ -1,5 +1,6 @@
-package factorization.charge;
+package factorization.charge.enet;
 
+import factorization.charge.enet.TileEntityLeydenJar;
 import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
 import net.minecraft.tileentity.TileEntity;
 import org.lwjgl.opengl.GL11;

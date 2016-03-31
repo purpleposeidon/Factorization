@@ -3,7 +3,7 @@ package factorization.shared;
 import factorization.api.Coord;
 import factorization.ceramics.TileEntityGreenware;
 import factorization.ceramics.TileEntityGreenware.ClayState;
-import factorization.charge.TileEntityLeydenJar;
+import factorization.charge.enet.TileEntityLeydenJar;
 import factorization.common.FactoryType;
 import factorization.util.ItemUtil;
 import net.minecraft.block.Block;

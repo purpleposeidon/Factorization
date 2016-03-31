@@ -9,8 +9,10 @@ import factorization.ceramics.TileEntityGreenware;
 import factorization.ceramics.TileEntityGreenwareRender;
 import factorization.charge.TileEntityHeater;
 import factorization.charge.TileEntityHeaterRenderer;
-import factorization.charge.TileEntityLeydenJar;
-import factorization.charge.TileEntityLeydenJarRender;
+import factorization.charge.enet.TileEntityLeydenJar;
+import factorization.charge.enet.TileEntityLeydenJarRender;
+import factorization.charge.sparkling.EntitySparkling;
+import factorization.charge.sparkling.RenderSparkling;
 import factorization.colossi.ColossusController;
 import factorization.colossi.ColossusControllerRenderer;
 import factorization.crafting.TileEntityCompressionCrafter;
@@ -328,6 +330,7 @@ public class FactorizationClientProxy extends FactorizationProxy {
         RenderingRegistry.registerEntityRenderingHandler(EntityMinecartDayBarrel.class, new RenderMinecartDayBarrel(rm));
         RenderingRegistry.registerEntityRenderingHandler(EntityLeafBomb.class, new RenderSnowball<EntityLeafBomb>(rm, Core.registry.leafBomb, Minecraft.getMinecraft().getRenderItem()));
         RenderingRegistry.registerEntityRenderingHandler(EntitySteamGeyser.class, new EmptyRender(rm));
+        RenderingRegistry.registerEntityRenderingHandler(EntitySparkling.class, new RenderSparkling(rm));
     }
 
     @SubscribeEvent

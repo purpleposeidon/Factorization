@@ -4,6 +4,7 @@ import factorization.artifact.TileEntityLegendarium;
 import factorization.beauty.*;
 import factorization.ceramics.TileEntityGreenware;
 import factorization.charge.*;
+import factorization.charge.enet.TileEntityLeydenJar;
 import factorization.crafting.TileEntityCompressionCrafter;
 import factorization.fzds.DeltaChunk;
 import factorization.mechanics.SocketPoweredCrank;

@@ -66,39 +66,56 @@ public class ChargeEnetSubsys implements IEnergyNet {
         return false;
     }
 
-    boolean inject(Coord at, EnumFacing dir) {
-        FlatFace ff = Flat.get(at, dir);
-        if (ff.getSpecies() != WireCharge.SPECIES) return false;
-        WireCharge wc = (WireCharge) ff;
-        final MemberPos mp = new MemberPos(at, dir);
-        final Map<MemberPos, WireLeader> cache = getCache(at);
-        WireLeader leader = cache.get(mp);
-        if (leader == null) {
-            class Holder extends WireCharge.LeaderSearch {
-                WireLeader found = null;
-                public Holder(WireCharge me, Coord at, EnumFacing side) {
-                    super(me, at, side);
-                }
-
-                @Override
-                boolean onFound(WireLeader leader, FlatCoord input) {
-                    cache.put(mp, leader);
-                    found = leader;
-                    return true;
-                }
-            }
-            Holder h = new Holder(wc, at, dir);
-            leader = h.found;
+    public WireLeader getLeader(ContextTileEntity context) {
+        if (context.side == null) {
+            throw new NullPointerException("context.side");
         }
-        if (leader== null) return false;
-        return leader.injectPower();
+        Coord at = new Coord(context.te);
+        MemberPos memberPos = new MemberPos(at, context.side);
+        return getLeader(memberPos, at, context.side);
     }
 
-    private Map<MemberPos, WireLeader> getCache(Coord at) {
-        Map<MemberPos, WireLeader> cache = injectionCache.get(at.w);
+    WireLeader getLeader(MemberPos mp, Coord at, EnumFacing dir) {
+        final Map<MemberPos, WireLeader> cache = getCache(at.w);
+        WireLeader leader = cache.get(mp);
+        if (leader != null) {
+            return leader;
+        }
+        if (cache.containsKey(mp)) {
+            return null;
+        } //cache.clear();
+        FlatFace ff = Flat.get(at, dir);
+        if (ff.getSpecies() != WireCharge.SPECIES) return null;
+        WireCharge wc = (WireCharge) ff;
+        class Holder extends WireCharge.LeaderSearch {
+            WireLeader found = null;
+            public Holder(WireCharge me, Coord at, EnumFacing side) {
+                super(me, at, side);
+            }
+
+            @Override
+            boolean onFound(WireLeader leader, FlatCoord input) {
+                cache.put(mp, leader);
+                found = leader;
+                return true;
+            }
+        }
+        Holder h = new Holder(wc, at, dir);
+        h.search();
+        return h.found;
+    }
+
+    boolean inject(Coord at, EnumFacing dir) {
+        WireLeader leader = getLeader(new MemberPos(at, dir), at, dir);
+        if (leader == null) return false;
+        return leader.injectPower(at, dir);
+    }
+
+    private Map<MemberPos, WireLeader> getCache(World w) {
+        Map<MemberPos, WireLeader> cache = injectionCache.get(w);
         if (cache == null) {
             cache = Maps.newHashMap();
-            injectionCache.put(at.w, cache);
+            injectionCache.put(w, cache);
         }
         return cache;
     }
@@ -115,7 +132,38 @@ public class ChargeEnetSubsys implements IEnergyNet {
 
     @Override
     public void workerNeedsPower(IContext context) {
+        Coord at;
+        EnumFacing side;
+        if (context instanceof ContextTileEntity) {
+            ContextTileEntity te = (ContextTileEntity) context;
+            at = new Coord(te.te);
+            side = te.side;
+        } else if (context instanceof ContextBlock) {
+            ContextBlock block = (ContextBlock) context;
+            at = block.at;
+            side = block.side;
+        } else {
+            return;
+        }
+        if (side != null) {
+            tryGive(context, at, side);
+        } else {
+            for (EnumFacing dir : EnumFacing.VALUES) {
+                if (tryGive(context, at, dir)) {
+                    return;
+                }
+            }
+        }
+    }
 
+    boolean tryGive(IContext context, Coord at, EnumFacing side) {
+        MemberPos mp = new MemberPos(at, side);
+        WireLeader myLeader = getLeader(mp, at, side);
+        if (myLeader == null) return false;
+        if (myLeader.powerSum <= 0) return false;
+        myLeader.powerSum--;
+        context.give(CHARGE, false);
+        return true;
     }
 
     int deathCount = 0;
@@ -123,7 +171,7 @@ public class ChargeEnetSubsys implements IEnergyNet {
         Map<MemberPos, WireLeader> fc = injectionCache.get(w);
         if (fc == null) return;
         if (deathCount++ > 16) {
-            // Makes math die-off more efficient
+            // Makes mass die-off more efficient
             fc.clear();
             return;
         }

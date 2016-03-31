@@ -125,7 +125,7 @@ public class Notice {
      * <p>
      * <code>{ITEM_NAME}</code>
      * will be replaced with the name of the item, and is gotten by calling
-     * {@link ItemStack.getDisplayName}. <code>{ITEM_INFOS}</code> and <code>{ITEM_INFOS_NEWLINE</code> are
+     * {@link ItemStack#getDisplayName}. <code>{ITEM_INFOS}</code> and <code>{ITEM_INFOS_NEWLINE</code> are
      * gotten via Item.addInformation. ITEM_INFOS_NEWLINE is prefixed
      * with a newline, unless the information list is empty.
      * </p>
@@ -167,7 +167,7 @@ public class Notice {
 
     /**
      * Schedules a recurring notification.
-     * <code>{@link NoticeUpdater.update}(this)</code> will be called until no
+     * <code>{@link NoticeUpdater#update}(this)</code> will be called until no
      * longer necessary.
      */
     @CheckReturnValue
@@ -202,7 +202,7 @@ public class Notice {
         if (a != null && b != null) {
             changed |= !a.equals(b);
         } else {
-            changed |= a == b;
+            changed = true;
         }
     }
     
@@ -211,7 +211,7 @@ public class Notice {
         if (a != null && b != null) {
             changed |= !a.isItemEqual(b);
         } else {
-            changed |= a == b;
+            changed = true;
         }
     }
 
@@ -222,7 +222,7 @@ public class Notice {
     }
     
     boolean isInvalid() {
-        int maxAge = 20 * (style.contains(Style.LONG) ? ClientMessage.LONG_TIME : ClientMessage.SHORT_TIME);
+        int maxAge = 20 * getLifetime();
         if (age++ > maxAge) {
             return true;
         }
@@ -255,12 +255,12 @@ public class Notice {
     }
 
     /**
-     * @see sendTo
+     * @see Notice#sendTo
      */
     @Deprecated
     public void send(EntityPlayer player) {
         sendTo(player);
-        NORELEASE.fixme("Delete");
+        NORELEASE.fixme("Delete. Easy to fix.");
     }
     
     /**
@@ -287,7 +287,7 @@ public class Notice {
 
     /**
      * Sends the Notice to everyone in the world.
-     * @see sendTo
+     * @see Notice#sendTo
      */
     public void sendToAll() {
         sendTo(null);
@@ -369,6 +369,10 @@ public class Notice {
             changed = changedItem = false;
         }
         return true;
+    }
+
+    public void cancel() {
+        age = getLifetime();
     }
 
 }

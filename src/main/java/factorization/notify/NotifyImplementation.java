@@ -153,7 +153,7 @@ public class NotifyImplementation {
         return ret;
     }
     
-    private static ArrayList<Notice> recuring_notifications = new ArrayList();
+    private static final ArrayList<Notice> recuring_notifications = new ArrayList<Notice>();
     
     @SubscribeEvent
     public void updateRecuringNotifications(ServerTickEvent event) {

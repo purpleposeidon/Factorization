@@ -7,6 +7,7 @@ import factorization.flat.api.Flat;
 import factorization.flat.api.FlatCoord;
 import factorization.flat.api.FlatFace;
 import factorization.notify.Notice;
+import factorization.notify.NoticeUpdater;
 import factorization.shared.Core;
 import factorization.util.ItemUtil;
 import factorization.util.NORELEASE;
@@ -40,6 +41,7 @@ public class WireCharge extends AbstractFlatWire {
 
     @Override
     public void onReplaced(Coord at, EnumFacing side) {
+        if (at.w.isRemote) return;
         if (Core.dev_environ) {
             FlatFace newVal = Flat.get(at, side);
             if (newVal == this) {
@@ -48,13 +50,19 @@ public class WireCharge extends AbstractFlatWire {
             }
         }
         ChargeEnetSubsys.instance.dirtyCache(at.w, new MemberPos(at, side));
+        if (this instanceof WireLeader) {
+            ((WireLeader) this).scatter(at, side);
+            return;
+        }
         new LeaderSearch(this, at, side) {
             @Override
             boolean onFound(WireLeader leader, FlatCoord input) {
                 leader.scatter(input.at, input.side);
                 return true;
             }
-        };
+        }.search();
+        // This should be more efficient than it looks. We only have to search for the leader once.
+        // This method does not get invoked when the other members are replaced with leaders.
     }
 
     boolean isMeter(ItemStack is) {
@@ -73,23 +81,78 @@ public class WireCharge extends AbstractFlatWire {
     @Override
     public void onActivate(final Coord at, final EnumFacing side, final EntityPlayer player) {
         if (!isMeter(player.getHeldItem())) return;
-        new LeaderSearch(this, at, side) {
+        class Noticer extends LeaderSearch {
+            boolean found = false;
+            Noticer() {
+                super(WireCharge.this, at, side);
+            }
+
             @Override
-            boolean onFound(WireLeader leader, FlatCoord input) {
-                int memberCount = leader.members.size();
-                int powerSum = leader.powerSum;
-                int neighborCount = leader.neighbors.size();
-                new Notice(input.at, String.format("Members: %s\nPower: %s\nNeighbors: %s\n", memberCount, powerSum, neighborCount)).sendTo(player);
+            boolean onFound(WireLeader leader, final FlatCoord input) {
+                if (Core.dev_environ) {
+                    new Notice(input.at, "Leader").sendTo(player);
+                }
+                new Notice(at, new NoticeUpdater() {
+                    @Override
+                    public void update(Notice msg) {
+                        int memberCount = leader.members.size();
+                        int powerSum = leader.powerSum;
+                        int neighborCount = leader.neighbors.size();
+                        if (memberCount == 0) {
+                            if (Core.dev_environ) {
+                                msg.setMessage("<removed>");
+                                return;
+                            }
+                            FlatFace replacement = input.get();
+                            if (replacement.getSpecies() == SPECIES) {
+                                replacement.onActivate(at, side, player);
+                                msg.cancel();
+                            }
+                            return;
+                        }
+
+                        int wirePower = powerSum / memberCount;
+                        if (powerSum % memberCount > 0) {
+                            wirePower++;
+                        }
+
+                        if (!Core.dev_environ) {
+                            msg.setMessage("factorization:charge/flat/measure", "" + wirePower);
+                            return;
+                        }
+
+                        msg.setMessage("Power: %s\n\nMembers: %s\nPowerSum: %s\nNeighbors: %s\n",
+                                "" + wirePower,
+                                "" + memberCount,
+                                "" + powerSum,
+                                "" + neighborCount);
+                    }
+                }).sendTo(player);
+                found = true;
                 return true;
             }
         };
+        Noticer noticer = new Noticer();
+        noticer.search();
+        if (!noticer.found) {
+            new Notice(at, "No leader!? Bug!\nReplace these wires.").sendTo(player);
+        }
     }
 
     public static abstract class LeaderSearch implements Function<FlatCoord, Boolean> {
-        private final MemberPos me;
+        private final MemberPos mePos;
+        private final Coord at;
+        private final EnumFacing side;
+        private final WireCharge me;
 
         public LeaderSearch(WireCharge me, Coord at, EnumFacing side) {
-            this.me = new MemberPos(at, side);
+            this.me = me;
+            this.mePos = new MemberPos(at, side);
+            this.at = at;
+            this.side = side;
+        }
+
+        public void search() {
             WireLeader.probe(me, at, side, SEARCH_SIZE, this);
         }
 
@@ -98,7 +161,7 @@ public class WireCharge extends AbstractFlatWire {
             FlatFace face = input.get();
             if (face instanceof WireLeader) {
                 WireLeader leader = (WireLeader) face;
-                if (leader.members.contains(me)) {
+                if (leader.members.contains(mePos)) {
                     return onFound(leader, input);
                 }
             }

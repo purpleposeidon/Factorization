@@ -141,7 +141,7 @@ public class WorkUnit {
 
     @Override
     public String toString() {
-        return category + "/" + name;
+        return category.name + "/" + name;
     }
 
     public static Iterable<WorkUnit> getPrototypes() {

@@ -25,7 +25,7 @@ import java.util.List;
 public class TileEntityHeater extends TileEntityCommon implements IWorker, ITickable {
     public int heat = 0;
     public static final int HEAT_PER_UNIT = 200; // 1600 ticks per coal; 8 smelts per coal.
-    public static final int maxHeat = HEAT_PER_UNIT;
+    public static final int MAX_HEAT = HEAT_PER_UNIT;
 
     @Override
     public FactoryType getFactoryType() {
@@ -37,8 +37,15 @@ public class TileEntityHeater extends TileEntityCommon implements IWorker, ITick
         return BlockClass.Machine;
     }
 
+    final ContextTileEntity context = new ContextTileEntity(this);
     {
-        IWorker.construct(new ContextTileEntity(this));
+        IWorker.construct(context);
+    }
+
+    @Override
+    public void invalidate() {
+        super.invalidate();
+        IWorker.invalidate(context);
     }
 
     static WorkUnit HEATING = WorkUnit.get(EnergyCategory.THERMAL, new ResourceLocation("factorization:heating"));
@@ -49,7 +56,7 @@ public class TileEntityHeater extends TileEntityCommon implements IWorker, ITick
             return Accepted.NEVER;
         }
         if (unit == HEATING) return Accepted.NEVER;
-        if (heat > maxHeat) return Accepted.LATER;
+        if (heat > MAX_HEAT) return Accepted.LATER;
         if (!simulate) {
             heat += HEAT_PER_UNIT;
         }
@@ -92,6 +99,10 @@ public class TileEntityHeater extends TileEntityCommon implements IWorker, ITick
         Coord here = getCoord();
         if (here.isPowered()) {
             return;
+        }
+
+        if (heat < MAX_HEAT) {
+            IWorker.requestPower(context);
         }
 
         if (!hasHeat()) return;
@@ -140,7 +151,7 @@ public class TileEntityHeater extends TileEntityCommon implements IWorker, ITick
         if (heat <= 0) return false;
         if (!furnace.acceptsHeat()) return false;
         if (furnace.hasLaggyStart()) {
-            boolean can_jumpstart = heat >= maxHeat * 0.95;
+            boolean can_jumpstart = heat >= MAX_HEAT * 0.95;
             if (!can_jumpstart && !furnace.isStarted()) return false;
         }
         for (int i = 1; i <= 2; i++) {
