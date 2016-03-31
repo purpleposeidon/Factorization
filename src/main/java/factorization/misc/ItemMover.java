@@ -1,6 +1,7 @@
 package factorization.misc;
 
 import factorization.util.ItemUtil;
+import factorization.util.PlayerUtil;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.entity.player.InventoryPlayer;
@@ -22,6 +23,7 @@ public class ItemMover {
 
     public static void moveItems(EntityPlayer player, int slotId, int motion) {
         if (player.worldObj.isRemote) return;
+        if (PlayerUtil.isSpectator(player)) return;
         Slot slot = player.openContainer.getSlot(slotId);
         if (slot == null) return;
         ItemStack search = ItemUtil.normalize(slot.getStack());

@@ -217,4 +217,8 @@ public final class PlayerUtil {
             player.setCurrentItemOrArmor(0, null);
         }
     }
+
+    public static boolean isSpectator(EntityPlayer player) {
+        return player.isSpectator();
+    }
 }
