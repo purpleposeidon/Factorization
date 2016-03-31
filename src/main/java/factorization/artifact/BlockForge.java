@@ -46,6 +46,7 @@ public class BlockForge extends BlockAnvil {
             player.openGui(Core.instance, FactoryType.ARTIFACTFORGEGUI.gui, w, pos.getX(), pos.getY(), pos.getZ());
         } else {
             player.addChatMessage(new ChatComponentTranslation("factorization.forge.wait").setChatStyle(InspirationManager.aqua));
+            InspirationManager.setWants(player);
         }
         return true;
     }

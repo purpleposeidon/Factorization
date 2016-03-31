@@ -1,8 +1,10 @@
 package factorization.artifact;
 
-import java.util.Calendar;
-import java.util.Locale;
-
+import factorization.api.Coord;
+import factorization.shared.Core;
+import factorization.shared.Sound;
+import factorization.util.PlayerUtil;
+import factorization.util.StatUtil;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.server.MinecraftServer;
@@ -12,21 +14,18 @@ import net.minecraft.util.ChatComponentTranslation;
 import net.minecraft.util.ChatStyle;
 import net.minecraft.util.EnumChatFormatting;
 import net.minecraft.util.IChatComponent;
-
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.PlayerEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
 
-import factorization.api.Coord;
-import factorization.shared.Core;
-import factorization.shared.Sound;
-import factorization.util.PlayerUtil;
-import factorization.util.StatUtil;
+import java.util.Calendar;
+import java.util.Locale;
 
 public class InspirationManager {
     static InspirationManager instance;
     static final StatBase lastArtifact = new StatBase("factorization.artifact.last", new ChatComponentTranslation("factorization.artifact.last.name")).registerStat();
     static final StatBase beenNotified = new StatBase("factorization.artifact.notified", new ChatComponentTranslation("factorization.artifact.notify.name")).registerStat();
+    static final StatBase wantsNotify = new StatBase("factorization.artifact.wanted", new ChatComponentTranslation("factorization.artifact.last.wanted")).registerStat();
     static final boolean DEBUG = false;
     private static final int days_per_artifact = DEBUG ? 1 : 30;
     private static final int check_tick_rate = DEBUG ? 20 : 20 * 60 * 15;
@@ -45,6 +44,15 @@ public class InspirationManager {
         return cal.get(Calendar.DAY_OF_YEAR) + cal.get(Calendar.YEAR) * 365; // Close enough?
     }
 
+    static boolean wantsNotify(EntityPlayer player) {
+        return StatUtil.load(player, wantsNotify).get() > 0;
+    }
+
+    static void setWants(EntityPlayer player) {
+        StatUtil.IFzStat load = StatUtil.load(player, wantsNotify);
+        load.set(1);
+    }
+
     static boolean canMakeArtifact(EntityPlayer player) {
         if (PlayerUtil.isPlayerCreative(player)) return true;
         int lastArtifactDay = StatUtil.load(player, lastArtifact).get();
@@ -56,6 +64,7 @@ public class InspirationManager {
 
     public void poke(EntityPlayer player, boolean isLogin) {
         if (PlayerUtil.isPlayerCreative(player)) return;
+        if (!wantsNotify(player)) return;
         if (!canMakeArtifact(player)) return;
         int lastNoticeSent = StatUtil.load(player, beenNotified).get();
         boolean update = false;
@@ -77,6 +86,7 @@ public class InspirationManager {
     public static void resetArtifactDelay(EntityPlayer player) {
         StatUtil.load(player, lastArtifact).set(today());
         StatUtil.load(player, beenNotified).set(0);
+        StatUtil.load(player, wantsNotify).set(0);
     }
 
     @SubscribeEvent
