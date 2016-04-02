@@ -81,7 +81,7 @@ public class FlatMod {
 
     public static class ServerProxy {
         void initClient() { }
-        IFlatRenderInfo constructRenderInfo() {
+        IFlatRenderInfo constructRenderInfo(Chunk chunk) {
             return IFlatRenderInfo.NULL;
         }
     }
@@ -137,9 +137,9 @@ public class FlatMod {
         }
 
         @Override
-        IFlatRenderInfo constructRenderInfo() {
+        IFlatRenderInfo constructRenderInfo(Chunk chunk) {
             if (FMLCommonHandler.instance().getEffectiveSide() == Side.SERVER) return IFlatRenderInfo.NULL;
-            return new ClientRenderInfo();
+            return new ClientRenderInfo(chunk);
         }
     }
 

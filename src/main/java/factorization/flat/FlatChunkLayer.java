@@ -628,10 +628,11 @@ public final class FlatChunkLayer {
     @Nullable
     final Queue<AtSide> changed; // Might've packed bits into an int[], but too difficult to be certain w/ Java
     public static final int MAX_CHANGES = 32;
-    public final IFlatRenderInfo renderInfo = FlatMod.proxy.constructRenderInfo();
+    public final IFlatRenderInfo renderInfo;
 
     public FlatChunkLayer(Chunk chunk) {
         this.chunk = chunk;
+        renderInfo = FlatMod.proxy.constructRenderInfo(chunk);
         for (int i = 0; i < slabs.length; i++) {
             slabs[i] = NoSlab.INSTANCE;
         }

@@ -15,6 +15,11 @@ public final class ClientRenderInfo implements IFlatRenderInfo {
     int dirty = Math.abs(~0);
     int entitySpawned = 0;
     final List<EntityHack> hacks = Lists.newArrayList();
+    final Chunk chunk;
+
+    public ClientRenderInfo(Chunk chunk) {
+        this.chunk = chunk;
+    }
 
     @Override
     public void markDirty(Coord at) {
@@ -24,7 +29,6 @@ public final class ClientRenderInfo implements IFlatRenderInfo {
         int slabMask = 1 << slabY;
         dirty |= slabMask;
         if ((entitySpawned & slabMask) == 0) {
-            Chunk chunk = at.getChunk();
             IExtraChunkData ecd = (IExtraChunkData) chunk;
             FlatChunkLayer flatLayer = ecd.getFlatLayer();
             if (flatLayer.isEmpty()) {
