@@ -29,6 +29,8 @@ import net.minecraft.world.World;
 
 public class EntitySparkling extends EntityMob {
     static final int MAX_SURGE = 50;
+    public static final String MOB_NAME = "fz_sparkling";
+
     public EntitySparkling(World world) {
         super(world);
         //this.targetTasks.addTask(1, new EntityAIHurtByTarget(this, true));
@@ -90,7 +92,7 @@ public class EntitySparkling extends EntityMob {
     @Override
     protected float getSoundPitch() {
         float r = getSurgeLevel() / (float) MAX_SURGE;
-        return 1 + r;
+        return 1 + r * 4;
     }
 
     @Override

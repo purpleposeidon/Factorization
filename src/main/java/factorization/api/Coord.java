@@ -369,6 +369,10 @@ public final class Coord implements IDataSerializable, ISaneCoord, Comparable<Co
         return new Coord(w, this.x + x, this.y + y, this.z + z);
     }
 
+    public Coord add3(int r) {
+        return add(r, r, r);
+    }
+
     public Coord add(Vec3 v) {
         return new Coord(w, this.x + v.xCoord, this.y + v.yCoord, this.z + v.zCoord);
     }

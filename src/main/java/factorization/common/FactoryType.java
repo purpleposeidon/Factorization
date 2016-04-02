@@ -85,6 +85,7 @@ public enum FactoryType {
     // 58 -- Stupid MISANTHROPIC_GEN
     // 59 -- And the stupid MISANTHROPIC_EGG
     LEGENDARIUM(60, false, TileEntityLegendarium.class, "factory_legendarium"),
+    LIGHTNING_ROD(61, false, TileEntityLIghtningRod.class, "factory_lightningrod"),
 
     POCKETCRAFTGUI(101, true),
     NONE(102, false),

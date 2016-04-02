@@ -5,6 +5,7 @@ import factorization.api.IMeterInfo;
 import factorization.api.datahelpers.DataHelper;
 import factorization.api.datahelpers.Share;
 import factorization.api.energy.ContextTileEntity;
+import factorization.charge.ISuperChargeable;
 import factorization.common.FactoryType;
 import factorization.net.StandardMessageType;
 import factorization.shared.BlockClass;
@@ -20,7 +21,7 @@ import net.minecraft.util.ITickable;
 
 import java.io.IOException;
 
-public class TileEntityLeydenJar extends TileEntityCommon implements IMeterInfo, ITickable {
+public class TileEntityLeydenJar extends TileEntityCommon implements IMeterInfo, ITickable, ISuperChargeable {
     int storage = 0;
     public static final int MAX_STORAGE = 64;
     transient byte last_light = -1;
@@ -161,5 +162,13 @@ public class TileEntityLeydenJar extends TileEntityCommon implements IMeterInfo,
     @Override
     public int getComparatorValue(EnumFacing side) {
         return (int) (getLevel()*0xF);
+    }
+
+    @Override
+    public void superCharge() {
+        storage = MAX_STORAGE;
+        updateLight(new Coord(this));
+        markDirty();
+        updateClients();
     }
 }

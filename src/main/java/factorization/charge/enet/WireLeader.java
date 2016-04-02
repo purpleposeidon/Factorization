@@ -11,6 +11,7 @@ import factorization.api.ICoordFunction;
 import factorization.api.datahelpers.DataHelper;
 import factorization.api.datahelpers.IDataSerializable;
 import factorization.api.datahelpers.Share;
+import factorization.charge.ISuperChargeable;
 import factorization.charge.sparkling.EntitySparkling;
 import factorization.common.FzConfig;
 import factorization.flat.FlatChunkLayer;
@@ -32,7 +33,7 @@ import javax.annotation.Nullable;
 import java.io.IOException;
 import java.util.*;
 
-public class WireLeader extends WireCharge {
+public class WireLeader extends WireCharge implements ISuperChargeable {
     @Override
     public IDataSerializable serialize(String prefix, DataHelper data) throws IOException {
         super.serialize(prefix, data);
@@ -429,5 +430,10 @@ public class WireLeader extends WireCharge {
 
     @Override
     public void loadModels(IModelMaker maker) {
+    }
+
+    @Override
+    public void superCharge() {
+        powerSum = members.size() * 3;
     }
 }

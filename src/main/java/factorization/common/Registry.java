@@ -119,6 +119,7 @@ public class Registry {
     public BlockWindmill windmill;
     public BlockShaft shaft;
     public SimpleFzBlock bibliogen;
+    public SimpleFzBlock lightningrod;
 
     public ItemStack servorail_item;
     public ItemStack empty_socket_item, socket_lacerator, socket_robot_hand, socket_shifter;
@@ -225,6 +226,7 @@ public class Registry {
         windmill = new BlockWindmill();
         shaft = new BlockShaft();
         bibliogen = new SimpleFzBlock(Material.rock, FactoryType.BIBLIO_GEN);
+        lightningrod = new SimpleFzBlock(Material.iron, FactoryType.LIGHTNING_ROD);
         for (BlockClass bc : BlockClass.values()) {
             if (bc == BlockClass.Barrel) {
                 bc.block = factory_block_barrel;
@@ -280,6 +282,7 @@ public class Registry {
         GameRegistry.registerBlock(windmill, ItemFactorizationBlock.class, "WindMillBase");
         GameRegistry.registerBlock(shaft, ItemShaft.class, "Shaft");
         GameRegistry.registerBlock(bibliogen, ItemFactorizationBlock.class, "Bibliogen");
+        GameRegistry.registerBlock(lightningrod, ItemFactorizationBlock.class, "LightningRod");
         if (DeltaChunk.enabled()) {
             GameRegistry.registerBlock(colossal_block, ColossalBlockItem.class, "ColossalBlock");
             GameRegistry.registerTileEntity(TileEntityColossalHeart.class, "fz_colossal_heart");
