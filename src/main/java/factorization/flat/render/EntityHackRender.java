@@ -1,30 +1,14 @@
 package factorization.flat.render;
 
-import factorization.api.Coord;
 import factorization.coremodhooks.IExtraChunkData;
 import factorization.flat.FlatChunkLayer;
-import factorization.flat.api.FlatFace;
-import factorization.flat.api.IFlatModel;
-import factorization.flat.api.IFlatVisitor;
 import factorization.shared.Core;
 import factorization.util.NORELEASE;
-import factorization.util.RenderUtil;
-import net.minecraft.block.Block;
-import net.minecraft.block.material.Material;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.*;
+import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.entity.Render;
 import net.minecraft.client.renderer.entity.RenderManager;
-import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
-import net.minecraft.client.resources.model.IBakedModel;
-import net.minecraft.util.BlockPos;
-import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ResourceLocation;
-import net.minecraft.world.IBlockAccess;
-import net.minecraft.world.chunk.Chunk;
 import org.lwjgl.opengl.GL11;
-
-import javax.annotation.Nonnull;
 
 public final class EntityHackRender extends Render<EntityHack> {
     public EntityHackRender(RenderManager renderManager) {

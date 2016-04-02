@@ -3,6 +3,7 @@ package factorization.flat.render;
 import factorization.beauty.TileEntitySteamShaftRenderer;
 import factorization.flat.FlatRayTarget;
 import factorization.shared.Core;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.RenderGlobal;
 import net.minecraft.client.renderer.entity.Render;
@@ -19,6 +20,8 @@ public class FlatRayTargetRender extends Render<FlatRayTarget> {
     @Override
     public void doRender(FlatRayTarget entity, double x, double y, double z, float entityYaw, float partialTicks) {
         if (entity.box == null) return;
+        final Minecraft mc = Minecraft.getMinecraft();
+        if (mc.objectMouseOver.entityHit != entity) return;
         GL11.glPushMatrix();
         GL11.glTranslated(x, y, z);
         AxisAlignedBB offBox = entity.box.offset(-entity.posX, -entity.posY, -entity.posZ);
