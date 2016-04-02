@@ -214,6 +214,10 @@ public class Registry {
         hall_of_legends = new SimpleFzBlock(Material.iron, FactoryType.LEGENDARIUM);
         lamp = new SimpleFzBlockCutout(Material.iron, FactoryType.LAMP);
         leyden_jar = new SimpleFzBlockCutout(Material.glass, FactoryType.LEYDENJAR);
+        {
+            float s = 2F / 16F;
+            leyden_jar.setBlockBounds(s, 0, s, 1 - s, 1, 1 - s);
+        }
         anthrogen = new BlockAnthroGen(Material.wood, FactoryType.ANTHRO_GEN);
         geyser = new BlockGeyser();
         geyser.setUnlocalizedName("factorization:geyser");

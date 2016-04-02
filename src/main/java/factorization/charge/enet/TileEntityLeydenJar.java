@@ -6,6 +6,7 @@ import factorization.api.datahelpers.DataHelper;
 import factorization.api.datahelpers.Share;
 import factorization.api.energy.ContextTileEntity;
 import factorization.charge.ISuperChargeable;
+import factorization.charge.sparkling.EntitySparkling;
 import factorization.common.FactoryType;
 import factorization.net.StandardMessageType;
 import factorization.shared.BlockClass;
@@ -18,6 +19,8 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ITickable;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 import java.io.IOException;
 
@@ -25,6 +28,8 @@ public class TileEntityLeydenJar extends TileEntityCommon implements IMeterInfo,
     int storage = 0;
     public static final int MAX_STORAGE = 64;
     transient byte last_light = -1;
+    @SideOnly(Side.CLIENT)
+    transient EntitySparkling sparkling_cache;
     // NORELEASE: Add ChargeSparks to the leyden jar.
 
     @Override
