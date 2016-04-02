@@ -5,7 +5,6 @@ import factorization.api.Coord;
 import factorization.coremodhooks.IExtraChunkData;
 import factorization.flat.FlatChunkLayer;
 import factorization.flat.api.IFlatRenderInfo;
-import factorization.util.NORELEASE;
 import net.minecraft.client.renderer.GLAllocation;
 import net.minecraft.world.chunk.Chunk;
 import org.lwjgl.opengl.GL11;
@@ -24,7 +23,6 @@ public final class ClientRenderInfo implements IFlatRenderInfo {
         if (slabY < 0 || slabY >= 16) return;
         int slabMask = 1 << slabY;
         dirty |= slabMask;
-        NORELEASE.println("Dirty", Integer.toString(dirty, 2));
         if ((entitySpawned & slabMask) == 0) {
             Chunk chunk = at.getChunk();
             IExtraChunkData ecd = (IExtraChunkData) chunk;
@@ -77,7 +75,6 @@ public final class ClientRenderInfo implements IFlatRenderInfo {
         Drawer visitor = new Drawer(this);
         layer.iterateSlab(visitor, slabY);
         visitor.finish(entity);
-        NORELEASE.println(this, slabY);
     }
 
     public int getList(EntityHack hack) {
