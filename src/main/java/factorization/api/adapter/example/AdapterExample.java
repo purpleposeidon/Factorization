@@ -1,5 +1,7 @@
-package factorization.api.adapter;
+package factorization.api.adapter.example;
 
+import factorization.api.adapter.Adapter;
+import factorization.api.adapter.InterfaceAdapter;
 import net.minecraft.block.Block;
 import net.minecraft.block.ITileEntityProvider;
 import net.minecraft.block.material.Material;
