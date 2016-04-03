@@ -15,7 +15,6 @@ import factorization.notify.Style;
 import factorization.shared.BlockClass;
 import factorization.shared.Core;
 import factorization.shared.TileEntityCommon;
-import factorization.util.NORELEASE;
 import factorization.util.PlayerUtil;
 import factorization.util.SpaceUtil;
 import net.minecraft.block.Block;
@@ -26,7 +25,6 @@ import net.minecraft.entity.effect.EntityLightningBolt;
 import net.minecraft.entity.passive.EntitySheep;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
-import net.minecraft.init.Items;
 import net.minecraft.item.EnumDyeColor;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.AxisAlignedBB;
@@ -36,10 +34,9 @@ import net.minecraft.util.Vec3;
 
 import javax.annotation.Nonnull;
 import java.io.IOException;
-import java.util.List;
 import java.util.Random;
 
-public class TileEntityLIghtningRod extends TileEntityCommon implements ITickable, IMeterInfo {
+public class TileEntityLightningRod extends TileEntityCommon implements ITickable, IMeterInfo {
     static int STATIC_PER_STRIKE = 200;
     static int SLOW_RATE = 100;
     int static_buildup = 0;
@@ -162,7 +159,7 @@ public class TileEntityLIghtningRod extends TileEntityCommon implements ITickabl
                 if (spot.isSolid()) continue;
                 EntitySparkling spark = new EntitySparkling(worldObj);
                 spot.setAsEntityLocation(spark);
-                spark.setSurgeLevel(50);
+                spark.setSurgeLevel(50, true);
                 worldObj.spawnEntityInWorld(spark);
             }
         }
