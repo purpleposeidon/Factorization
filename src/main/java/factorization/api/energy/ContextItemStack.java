@@ -30,7 +30,7 @@ public class ContextItemStack implements IContext {
 
     @Override
     public boolean isValid() {
-        return true;
+        return is.stackSize > 0;
     }
 
     @Override
