@@ -9,6 +9,7 @@ import net.minecraft.block.state.BlockState;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.BlockPos;
+import net.minecraft.util.EnumFacing;
 import net.minecraft.world.IBlockAccess;
 
 public class BlockShaftGen extends SimpleFzBlock {
@@ -32,5 +33,20 @@ public class BlockShaftGen extends SimpleFzBlock {
             return getDefaultState().withProperty(DIRECTION, sg.shaft_direction).withProperty(POWERED, sg.on);
         }
         return super.getActualState(state, world, pos);
+    }
+
+    @Override
+    public boolean isBlockSolid(IBlockAccess world, BlockPos pos, EnumFacing side) {
+        return false;
+    }
+
+    @Override
+    public boolean isOpaqueCube() {
+        return true;
+    }
+
+    @Override
+    public boolean isNormalCube() {
+        return true;
     }
 }
