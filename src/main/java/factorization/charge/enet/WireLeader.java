@@ -412,14 +412,14 @@ public class WireLeader extends WireCharge implements ISuperChargeable {
             }
             last_spark_cache = new EntitySparkling(at.w);
             at.setAsEntityLocation(last_spark_cache);
-            last_spark_cache.setSurgeLevel(1);
+            last_spark_cache.setSurgeLevel(1, true);
             at.w.spawnEntityInWorld(last_spark_cache);
         }
         return true;
     }
 
     void feed(EntitySparkling spark) {
-        spark.setSurgeLevel(spark.getSurgeLevel() + 1);
+        spark.setSurgeLevel(spark.getSurgeLevel() + 1, true);
     }
 
     @Nullable

@@ -1,18 +1,25 @@
 package factorization.charge.sparkling;
 
+import factorization.charge.enet.TileEntityLeydenJar;
 import factorization.common.BlockResource;
 import factorization.common.ResourceType;
+import factorization.fzds.interfaces.Interpolation;
+import factorization.net.FzNetDispatch;
+import factorization.net.INet;
+import factorization.net.NetworkFactorization;
+import factorization.net.StandardMessageType;
 import factorization.notify.Notice;
 import factorization.notify.NoticeUpdater;
 import factorization.shared.Core;
-import factorization.util.ItemUtil;
-import factorization.util.NORELEASE;
+import factorization.util.*;
+import io.netty.buffer.ByteBuf;
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.crash.CrashReport;
 import net.minecraft.crash.CrashReportCategory;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.entity.ai.*;
 import net.minecraft.entity.effect.EntityLightningBolt;
 import net.minecraft.entity.monster.EntityMob;
@@ -21,15 +28,20 @@ import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.network.Packet;
 import net.minecraft.pathfinding.PathNavigate;
 import net.minecraft.potion.Potion;
 import net.minecraft.potion.PotionEffect;
 import net.minecraft.util.*;
 import net.minecraft.world.World;
 
-public class EntitySparkling extends EntityMob {
-    static final int MAX_SURGE = 50;
+import java.io.IOException;
+
+public class EntitySparkling extends EntityMob implements INet {
+    static final int MAX_SURGE = TileEntityLeydenJar.MAX_STORAGE;
     public static final String MOB_NAME = "fz_sparkling";
+    int surge;
 
     public EntitySparkling(World world) {
         super(world);
@@ -38,7 +50,7 @@ public class EntitySparkling extends EntityMob {
         this.targetTasks.addTask(2, new EntityAINearestAttackableTarget<EntityPlayer>(this, EntityPlayer.class, true));
         this.experienceValue = 3;
         this.isImmuneToFire = true;
-        setSurgeLevel(4);
+        setSurgeLevel(4, false);
     }
 
     @Override
@@ -52,7 +64,7 @@ public class EntitySparkling extends EntityMob {
     }
 
     public int getSurgeLevel() {
-        int ret = (int) getHealth();
+        int ret = surge;
         if (ret > MAX_SURGE) return MAX_SURGE;
         return ret;
     }
@@ -60,23 +72,28 @@ public class EntitySparkling extends EntityMob {
     void updateSize() {
         // 0.35 min, 2 max...
         double s = getSurgeLevel() * 0.35;
-        if (s > 1) {
-            s = Math.min(2, 1 + Math.log(s)) / 3.6;
-        }
+        double min = 4.0 / 16.0;
+        s = Math.min(1.5 - min, (1 + Math.log(s)) / 3.6);
+        s += min;
         float f = (float) s;
         this.setSize(f, f);
     }
 
-    public void setSurgeLevel(int level) {
-        if (level > MAX_SURGE) return;
+    public void setSurgeLevel(int level, boolean sync) {
+        if (level >= MAX_SURGE) level = MAX_SURGE;
         setHealth(level);
+        getEntityAttribute(SharedMonsterAttributes.maxHealth).setBaseValue(level);
+        surge = level;
         updateSize();
+        if (sync && !worldObj.isRemote) {
+            Packet toSend = Core.network.entityPacket(this, StandardMessageType.SetAmount, level);
+            FzNetDispatch.addPacketFrom(toSend, this);
+        }
     }
 
 
     @Override
     public void onEntityUpdate() {
-        updateSize();
         super.onEntityUpdate();
         if (worldObj.isRemote) {
             if (lastSurge == -1) lastSurge = getSurgeLevel();
@@ -91,12 +108,22 @@ public class EntitySparkling extends EntityMob {
 
     @Override
     protected float getSoundPitch() {
-        float r = getSurgeLevel() / (float) MAX_SURGE;
-        return 1 + r * 4;
+        double r = Interpolation.SQUARE.scale(getSurgeLevel() / (float) MAX_SURGE);
+        double pitch = NumUtil.interp(2.0, 1.0 / 8.0, r);
+        NORELEASE.println("pitch", pitch);
+        return (float) pitch;
     }
 
     @Override
     public boolean attackEntityFrom(DamageSource source, float amount) {
+        if (doAttack(source, amount)) {
+            setSurgeLevel((int) (getSurgeLevel() - amount), true);
+            return true;
+        }
+        return false;
+    }
+
+    protected boolean doAttack(DamageSource source, float amount) {
         if (source == DamageSource.fall) {
             return false;
         }
@@ -146,7 +173,7 @@ public class EntitySparkling extends EntityMob {
 
     @Override
     public void onStruckByLightning(EntityLightningBolt lightningBolt) {
-        setSurgeLevel(MAX_SURGE);
+        setSurgeLevel(MAX_SURGE, true);
     }
 
     public static boolean isGrounded(EntityLivingBase player) {
@@ -175,7 +202,7 @@ public class EntitySparkling extends EntityMob {
 
     @Override
     public boolean attackEntityAsMob(Entity entity) {
-        setSurgeLevel(getSurgeLevel() - 1);
+        setSurgeLevel(getSurgeLevel() - 1, true);
         if (entity instanceof EntityLivingBase) {
             if (isGrounded((EntityLivingBase) entity)) {
                 return false;
@@ -217,7 +244,9 @@ public class EntitySparkling extends EntityMob {
 
     @Override
     public boolean interactAt(EntityPlayer player, Vec3 targetVec3) {
-        NORELEASE.fixme("Fill up leyden jars");
+        if (worldObj.isRemote) {
+            return true;
+        }
         if (ItemUtil.is(player.getHeldItem(), Core.registry.charge_meter)) {
             new Notice(this, new NoticeUpdater() {
                 @Override
@@ -226,6 +255,24 @@ public class EntitySparkling extends EntityMob {
                     msg.setMessage("factorization:entity.sparkling.info", "" + EntitySparkling.this.getSurgeLevel());
                 }
             }).sendTo(player);
+            return true;
+        }
+        if (ItemUtil.is(player.getHeldItem(), Core.registry.leydenjar_item.getItem())) {
+            TileEntityLeydenJar jar = new TileEntityLeydenJar();
+            jar.loadFromStack(player.getHeldItem());
+            if (jar.storage > 0) return false;
+            jar.storage = getSurgeLevel();
+            ItemStack is = jar.getDroppedBlock();
+            PlayerUtil.consumeHeldItem(player);
+            InvUtil.givePlayerItemIntoHand(player, is);
+            setDead();
+            return true;
+        }
+        if (Core.dev_environ) {
+            int surge = getSurgeLevel();
+            int level = surge + (player.isSneaking() ? -1 : +1);
+            setSurgeLevel(level, true);
+            NORELEASE.println("New surge level: " + level);
             return true;
         }
         return false;
@@ -274,11 +321,43 @@ public class EntitySparkling extends EntityMob {
         if (ent instanceof EntitySparkling) {
             EntitySparkling other = (EntitySparkling) ent;
             if (getSurgeLevel() >= other.getSurgeLevel()) {
-                setSurgeLevel(getSurgeLevel() + other.getSurgeLevel());
+                setSurgeLevel(getSurgeLevel() + other.getSurgeLevel(), true);
                 other.setDead();
                 return;
             }
         }
         super.collideWithEntity(ent);
+    }
+
+    @Override
+    public Enum[] getMessages() {
+        return new Enum[0];
+    }
+
+    @Override
+    public boolean handleMessageFromServer(Enum messageType, ByteBuf input) throws IOException {
+        if (messageType == StandardMessageType.SetAmount) {
+            setSurgeLevel(input.readInt(), false);
+        }
+        return false;
+    }
+
+    @Override
+    public boolean handleMessageFromClient(Enum messageType, ByteBuf input) throws IOException {
+        return false;
+    }
+
+    @Override
+    public void writeEntityToNBT(NBTTagCompound tagCompound) {
+        super.writeEntityToNBT(tagCompound);
+        tagCompound.setInteger("surge", surge);
+    }
+
+    @Override
+    public void readEntityFromNBT(NBTTagCompound tagCompund) {
+        super.readEntityFromNBT(tagCompund);
+        if (tagCompund.hasKey("surge")) {
+            surge = tagCompund.getInteger("surge");
+        }
     }
 }

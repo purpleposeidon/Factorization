@@ -25,6 +25,14 @@ import java.util.List;
  */
 public final class InvUtil {
 
+    public static void givePlayerItemIntoHand(EntityPlayer player, ItemStack is) {
+        if (player.getHeldItem() == null) {
+            player.setCurrentItemOrArmor(0, is);
+        } else {
+            givePlayerItem(player, is);
+        }
+    }
+
     public static void givePlayerItem(EntityPlayer player, ItemStack is) {
         FzInv inv = openInventory(player.inventory, EnumFacing.UP);
         ItemStack drop = inv.push(is);

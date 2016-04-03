@@ -25,7 +25,7 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 import java.io.IOException;
 
 public class TileEntityLeydenJar extends TileEntityCommon implements IMeterInfo, ITickable, ISuperChargeable {
-    int storage = 0;
+    public int storage = 0;
     public static final int MAX_STORAGE = 64;
     transient byte last_light = -1;
     @SideOnly(Side.CLIENT)

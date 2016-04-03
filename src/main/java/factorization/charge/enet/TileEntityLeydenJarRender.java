@@ -17,10 +17,19 @@ public class TileEntityLeydenJarRender extends TileEntitySpecialRenderer<TileEnt
         if (jar.sparkling_cache == null) {
             jar.sparkling_cache = new EntitySparkling(jar.getWorld());
         }
-        jar.sparkling_cache.setSurgeLevel(jar.storage);
+        jar.sparkling_cache.setSurgeLevel(jar.storage, false);
+        float p = jar.getWorld().getTotalWorldTime() + partialTicks;
+        float height = jar.sparkling_cache.height;
+        double base = 2.0 / 16.0 + height / 4;
+        double wiggleRoom = 1 - base - height / 2;
+        double h = (1 + Math.sin(p / 32 / height))*0.5 * wiggleRoom;
         GL11.glPushMatrix();
-        GL11.glTranslated(x + 0.5, y + 0.5, z + 0.5);
-        renderSparkling.doRender(jar.sparkling_cache, 0, 0, 0, 0, 0);
+        GL11.glTranslated(x + 0.5, y + base + h, z + 0.5);
+        GL11.glRotatef(p / 4, 0, 1, 0);
+        {
+            GL11.glTranslated(0, height / -2, 0);
+            renderSparkling.doRender(jar.sparkling_cache, 0, 0, 0, 0, 0);
+        }
         GL11.glPopMatrix();
     }
 }
