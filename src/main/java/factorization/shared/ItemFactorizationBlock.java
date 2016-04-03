@@ -80,7 +80,7 @@ public class ItemFactorizationBlock extends ItemBlock {
     }
 
     @Override
-    public void addInformation(ItemStack is, EntityPlayer player, List infoList, boolean verbose) {
+    public void addInformation(ItemStack is, EntityPlayer player, List<String> infoList, boolean verbose) {
         if (Core.registry.greenware_item != null && is.isItemEqual(Core.registry.greenware_item) /* required to not compare NBT here */) {
             NBTTagCompound tag = is.getTagCompound();
             if (tag != null) {
@@ -91,14 +91,13 @@ public class ItemFactorizationBlock extends ItemBlock {
                 infoList.add(state.toString());
             }
         }
-        if (ItemUtil.similar(is, Core.registry.leydenjar_item)) {
+        if (this == Core.registry.leydenjar_item.getItem()) {
             int perc = 0;
             if (is.hasTagCompound()) {
                 FactoryType ft = FactoryType.LEYDENJAR;
                 TileEntityLeydenJar jar = (TileEntityLeydenJar) ft.getRepresentative();
                 jar.loadFromStack(is);
                 perc = (int)(jar.getLevel()*100);
-                //infoList.add(( + "% charged"));
             }
             infoList.add(StatCollector.translateToLocalFormatted("factorization.factoryBlock.LEYDENJAR.perc", perc));
         }

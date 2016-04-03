@@ -12,8 +12,9 @@ import factorization.ceramics.TileEntityGreenware.ClayState;
 import factorization.charge.BlockFurnaceHeater;
 import factorization.charge.ItemAcidBottle;
 import factorization.charge.ItemChargeMeter;
-import factorization.charge.enet.TileEntityLeydenJar;
+import factorization.charge.enet.BlockLeydenJar;
 import factorization.charge.enet.ChargeEnetSubsys;
+import factorization.charge.enet.TileEntityLeydenJar;
 import factorization.colossi.*;
 import factorization.crafting.BlockCompressionCrafter;
 import factorization.crafting.ItemFakeBlock;
@@ -213,11 +214,7 @@ public class Registry {
         whirligig = new SimpleFzBlock(materialMachine, FactoryType.STEAM_SHAFT);
         hall_of_legends = new SimpleFzBlock(Material.iron, FactoryType.LEGENDARIUM);
         lamp = new SimpleFzBlockCutout(Material.iron, FactoryType.LAMP);
-        leyden_jar = new SimpleFzBlockCutout(Material.glass, FactoryType.LEYDENJAR);
-        {
-            float s = 2F / 16F;
-            leyden_jar.setBlockBounds(s, 0, s, 1 - s, 1, 1 - s);
-        }
+        leyden_jar = new BlockLeydenJar();
         anthrogen = new BlockAnthroGen(Material.wood, FactoryType.ANTHRO_GEN);
         geyser = new BlockGeyser();
         geyser.setUnlocalizedName("factorization:geyser");

@@ -253,7 +253,6 @@ public abstract class TileEntityCommon extends TileEntity implements ICoord, IFa
     }
 
     public void setBlockBounds(Block b) {
-        b.setBlockBounds(0, 0, 0, 1, 1, 1);
     }
 
     public boolean activate(EntityPlayer entityplayer, EnumFacing side) {

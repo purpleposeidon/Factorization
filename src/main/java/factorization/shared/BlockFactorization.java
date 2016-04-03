@@ -235,8 +235,6 @@ public class BlockFactorization extends BlockContainer {
         Registry reg = Core.registry;
         //electric
         //put(itemList, reg.battery_item_hidden);
-        put(itemList, reg.leydenjar_item);
-        put(itemList, reg.leydenjar_item_full);
         put(itemList, reg.sap_generator_item);
         put(itemList, reg.anthro_generator_item);
         put(itemList, reg.solarboiler_item);

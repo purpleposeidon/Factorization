@@ -256,7 +256,8 @@ public class FactorizationClientProxy extends FactorizationProxy {
                 Core.registry.waterwheel,
                 Core.registry.windmill,
                 Core.registry.bibliogen,
-                Core.registry.lightningrod
+                Core.registry.lightningrod,
+                Core.registry.leyden_jar
         }) {
             setItemBlockModel(b, 0, "inventory");
         }
