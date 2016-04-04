@@ -228,8 +228,4 @@ public enum FactoryType {
     public boolean connectRedstone() {
         return false;
     }
-    
-    public ItemStack asSocketItem() {
-        return new ItemStack(Core.registry.socket_part, 1, md);
-    }
 }

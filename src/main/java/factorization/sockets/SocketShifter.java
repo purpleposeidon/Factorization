@@ -51,7 +51,7 @@ public class SocketShifter extends TileEntitySocketBase {
     
     @Override
     public ItemStack getCreatingItem() {
-        return Core.registry.socket_shifter;
+        return new ItemStack(Core.registry.socket_shifter_item);
     }
     
     @Override

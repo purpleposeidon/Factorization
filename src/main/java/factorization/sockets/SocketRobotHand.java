@@ -47,7 +47,7 @@ public class SocketRobotHand extends TileEntitySocketBase {
     
     @Override
     public ItemStack getCreatingItem() {
-        return Core.registry.socket_robot_hand;
+        return new ItemStack(Core.registry.socket_robot_hand);
     }
 
     @Override

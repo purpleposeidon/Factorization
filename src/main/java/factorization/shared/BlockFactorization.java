@@ -238,8 +238,6 @@ public class BlockFactorization extends BlockContainer {
         put(itemList, reg.sap_generator_item);
         put(itemList, reg.anthro_generator_item);
         put(itemList, reg.solarboiler_item);
-        put(itemList, reg.wooden_shaft);
-        put(itemList, reg.bibliogen_item);
         if (reg.mirror != null) {
             put(itemList, new ItemStack(reg.mirror));
         }

@@ -123,7 +123,7 @@ public class Registry {
     public SimpleFzBlock lightningrod;
 
     public ItemStack servorail_item;
-    public ItemStack empty_socket_item, socket_lacerator, socket_robot_hand, socket_shifter;
+    public ItemStack empty_socket_item;
     public ItemStack hinge; //, anchor;
     
     public ItemStack
@@ -162,8 +162,6 @@ public class Registry {
     public ItemStack dark_iron_sprocket, servo_motor;
     public ItemCraftingComponent giant_scissors;
     public ItemDayBarrel daybarrel;
-    @Deprecated
-    public ItemSocketPart socket_part;
     public ItemCraftingComponent instruction_plate;
     public ItemCommenter servo_rail_comment_editor;
     public ItemDocBook docbook;
@@ -183,6 +181,7 @@ public class Registry {
     public ItemManSandwich manSandwich;
     public ItemFakeBlock waterBlockItem, lavaBlockItem;
     public ItemFlat wirePlacer;
+    public ItemSocketPart socket_shifter_item, socket_robot_hand;
 
     public Material materialMachine = new Material(MapColor.ironColor);
 
@@ -466,14 +465,11 @@ public class Registry {
         servo_widget_instruction.setMaxStackSize(1);
         dark_iron_sprocket = new ItemStack(new ItemCraftingComponent("servo/sprocket"));
         servo_motor = new ItemStack(new ItemCraftingComponent("servo/servo_motor"));
-        socket_part = new ItemSocketPart("socket/", TabType.SERVOS);
         instruction_plate = new ItemCraftingComponent("servo/instruction_plate", TabType.SERVOS);
         instruction_plate.setMaxStackSize(16);
         servo_rail_comment_editor = new ItemCommenter("servo/commenter");
-
-        socket_lacerator = FactoryType.SOCKET_LACERATOR.asSocketItem();
-        socket_robot_hand = FactoryType.SOCKET_ROBOTHAND.asSocketItem();
-        socket_shifter = FactoryType.SOCKET_SHIFTER.asSocketItem();
+        socket_robot_hand = new ItemSocketPart("socket/robotHand", TabType.SERVOS);
+        socket_shifter_item = new ItemSocketPart("socket/itemShifter", TabType.SERVOS);
 
         //Barrels
         daybarrel = (ItemDayBarrel) DataUtil.getItem(factory_block_barrel);
@@ -1176,14 +1172,14 @@ public class Registry {
                 "#",
                 '#', Blocks.iron_bars,
                 '-', "slabWood");
-        oreRecipe(FactoryType.SOCKET_SHIFTER.asSocketItem(),
+        oreRecipe(new ItemStack(socket_shifter_item),
                 "V",
                 "@",
                 "D",
                 'V', Blocks.hopper,
                 '@', logicMatrixController,
                 'D', Blocks.dropper);
-        oreRecipe(socket_robot_hand,
+        oreRecipe(new ItemStack(socket_robot_hand),
                 "+*P",
                 "+@+",
                 "P*+",
