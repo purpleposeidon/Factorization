@@ -6,12 +6,14 @@ import factorization.common.ResourceType;
 import factorization.fzds.interfaces.Interpolation;
 import factorization.net.FzNetDispatch;
 import factorization.net.INet;
-import factorization.net.NetworkFactorization;
 import factorization.net.StandardMessageType;
 import factorization.notify.Notice;
 import factorization.notify.NoticeUpdater;
 import factorization.shared.Core;
-import factorization.util.*;
+import factorization.util.InvUtil;
+import factorization.util.ItemUtil;
+import factorization.util.NumUtil;
+import factorization.util.PlayerUtil;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
@@ -20,7 +22,8 @@ import net.minecraft.crash.CrashReportCategory;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.SharedMonsterAttributes;
-import net.minecraft.entity.ai.*;
+import net.minecraft.entity.ai.EntityAIAttackOnCollide;
+import net.minecraft.entity.ai.EntityAINearestAttackableTarget;
 import net.minecraft.entity.effect.EntityLightningBolt;
 import net.minecraft.entity.monster.EntityMob;
 import net.minecraft.entity.player.EntityPlayer;
@@ -110,7 +113,6 @@ public class EntitySparkling extends EntityMob implements INet {
     protected float getSoundPitch() {
         double r = Interpolation.SQUARE.scale(getSurgeLevel() / (float) MAX_SURGE);
         double pitch = NumUtil.interp(2.0, 1.0 / 8.0, r);
-        NORELEASE.println("pitch", pitch);
         return (float) pitch;
     }
 
@@ -272,7 +274,6 @@ public class EntitySparkling extends EntityMob implements INet {
             int surge = getSurgeLevel();
             int level = surge + (player.isSneaking() ? -1 : +1);
             setSurgeLevel(level, true);
-            NORELEASE.println("New surge level: " + level);
             return true;
         }
         return false;
