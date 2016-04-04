@@ -4,6 +4,10 @@ import factorization.api.*;
 import factorization.api.datahelpers.DataHelper;
 import factorization.api.datahelpers.IDataSerializable;
 import factorization.api.datahelpers.Share;
+import factorization.api.energy.ContextTileEntity;
+import factorization.api.energy.EnergyCategory;
+import factorization.api.energy.IWorker;
+import factorization.api.energy.WorkUnit;
 import factorization.common.FactoryType;
 import factorization.fzds.BasicTransformOrder;
 import factorization.fzds.DeltaChunk;
@@ -26,7 +30,10 @@ import factorization.util.SpaceUtil;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.*;
+import net.minecraft.util.AxisAlignedBB;
+import net.minecraft.util.DamageSource;
+import net.minecraft.util.EnumFacing;
+import net.minecraft.util.Vec3;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
@@ -34,12 +41,14 @@ import org.lwjgl.opengl.GL11;
 
 import java.io.IOException;
 
-public class SocketPoweredCrank extends TileEntitySocketBase implements IChargeConductor, IDCController, ITickable {
-    private Charge charge = new Charge(this);
+public class SocketPoweredCrank extends TileEntitySocketBase implements IWorker<ContextTileEntity>, IDCController, IMeterInfo {
     final EntityReference<DimensionSliceEntityBase> hookedIdc = MechanicsController.autoJoin(this);
     Vec3 hookLocation = SpaceUtil.newVec();
     DeltaCoord hookDelta = new DeltaCoord();
     byte powerTime = 0;
+    short workTicks = 0;
+    static short WORK_TICKS_PER_UNIT = 20 * 30;
+
 
     static final float sprocketRadius = 8F / 16F;
 
@@ -60,11 +69,7 @@ public class SocketPoweredCrank extends TileEntitySocketBase implements IChargeC
     }
 
     @Override
-    public boolean onAttacked(IDimensionSlice idc, DamageSource damageSource, float damage) { return false; }
-
-    @Override
     public IDataSerializable serialize(String prefix, DataHelper data) throws IOException {
-        charge = data.as(Share.PRIVATE, "charge").putIDS(charge);
         data.as(Share.VISIBLE, "hookedEntity");
         hookedIdc.serialize(prefix, data);
         hookLocation = data.as(Share.VISIBLE, "hookLocation").putVec3(hookLocation);
@@ -75,12 +80,24 @@ public class SocketPoweredCrank extends TileEntitySocketBase implements IChargeC
         }
         hookDelta = data.as(Share.PRIVATE, "hookDelta").putIDS(hookDelta);
         powerTime = data.as(Share.PRIVATE, "powerTime").putByte(powerTime);
+        workTicks = data.as(Share.PRIVATE, "workTicks").putShort(workTicks);
         return this;
     }
 
     @Override
-    public Charge getCharge() {
-        return charge;
+    public void onLoaded(ISocketHolder holder) {
+        super.onLoaded(holder);
+        IWorker.construct(holder.getContext());
+    }
+
+    @Override
+    public Accepted accept(ContextTileEntity context, WorkUnit unit, boolean simulate) {
+        if (unit.category != EnergyCategory.ELECTRIC) return Accepted.NEVER;
+        if (workTicks < WORK_TICKS_PER_UNIT) {
+            if (!simulate) workTicks += WORK_TICKS_PER_UNIT;
+            return Accepted.NOW;
+        }
+        return Accepted.LATER;
     }
 
     @Override
@@ -96,33 +113,9 @@ public class SocketPoweredCrank extends TileEntitySocketBase implements IChargeC
         hookedIdc.setWorld(world);
     }
 
-    @Override
-    public void update() {
-        charge.update();
-    }
-
-    void shareCharge() {
-        Coord anchorPoint = getAnchorBlock();
-        if (anchorPoint == null) return;
-        IChargeConductor friendConductor = anchorPoint.getTE(IChargeConductor.class);
-        if (friendConductor == null) return;
-        final Charge friend = friendConductor.getCharge();
-        int total = charge.getValue() + friend.getValue();
-        int split = total / 2;
-        int rem = total % 2;
-        int mine = split + rem;
-        int his = split;
-        charge.setValue(mine);
-        friend.setValue(his);
-    }
-
     static final double MAX_CHAIN_LEN = 24;
     static final double MIN_CHAIN_LEN = 1;
     static final double BROKEN_CHAIN_LENGTH = MAX_CHAIN_LEN + 8;
-    static final int WINDING_CHARGE_COST = 16;
-    static final double FORCE_PER_TICK = 0.05;
-    static final double RESTORATIVE_FORCE_MIN = 0.05 / FORCE_PER_TICK;
-    static final double RESTORATIVE_FORCE_MAX = 0.10 / FORCE_PER_TICK;
 
     @Override
     public void genericUpdate(ISocketHolder socket, Coord coord, boolean powered) {
@@ -136,14 +129,14 @@ public class SocketPoweredCrank extends TileEntitySocketBase implements IChargeC
             breakChain();
             return;
         }
-        shareCharge();
         if (chainLen < MIN_CHAIN_LEN) return;
         if (chainLen >= MAX_CHAIN_LEN) {
             yoinkChain(socket, idc, 1.0 / 16.0);
             return;
         }
         if (powered && powerTime >= 0) {
-            if (charge.tryTake(10) == 0) {
+            workTicks--;
+            if (workTicks <= 0) {
                 if (powerTime > 5) {
                     NullOrder.give(idc);
                     powerTime = 4;
@@ -514,5 +507,10 @@ public class SocketPoweredCrank extends TileEntitySocketBase implements IChargeC
     @Override
     public CollisionAction collidedWithWorld(World realWorld, AxisAlignedBB realBox, World shadowWorld, AxisAlignedBB shadowBox) {
         return CollisionAction.STOP_BEFORE;
+    }
+
+    @Override
+    public boolean onAttacked(IDimensionSlice idc, DamageSource damageSource, float damage) {
+        return false;
     }
 }
