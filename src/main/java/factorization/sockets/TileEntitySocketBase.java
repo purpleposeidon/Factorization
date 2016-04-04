@@ -1,17 +1,21 @@
 package factorization.sockets;
 
 import factorization.api.Coord;
-import factorization.api.IChargeConductor;
 import factorization.api.datahelpers.*;
+import factorization.api.energy.ContextTileEntity;
+import factorization.api.energy.IWorkerContext;
 import factorization.common.FactoryType;
 import factorization.common.FzConfig;
 import factorization.net.FzNetDispatch;
+import factorization.net.StandardMessageType;
 import factorization.notify.Notice;
 import factorization.servo.LoggerDataHelper;
 import factorization.servo.RenderServoMotor;
 import factorization.servo.ServoMotor;
-import factorization.shared.*;
-import factorization.net.StandardMessageType;
+import factorization.shared.BlockClass;
+import factorization.shared.Core;
+import factorization.shared.Sound;
+import factorization.shared.TileEntityCommon;
 import factorization.util.*;
 import factorization.util.InvUtil.FzInv;
 import io.netty.buffer.ByteBuf;
@@ -55,6 +59,7 @@ public abstract class TileEntitySocketBase extends TileEntityCommon implements I
     }
 
     public void migrate1to2() {
+        // Could delete this?
         ArrayList<ItemStack> legacyParts = new ArrayList<ItemStack>(3);
         TileEntitySocketBase self = this;
         while (true) {
@@ -109,7 +114,7 @@ public abstract class TileEntitySocketBase extends TileEntityCommon implements I
     public final EnumFacing[] getValidRotations() {
         return full_rotation_array;
     }
-    
+
     @Override
     public final boolean rotate(EnumFacing axis) {
         if (getClass() != SocketEmpty.class) {
@@ -247,15 +252,6 @@ public abstract class TileEntitySocketBase extends TileEntityCommon implements I
         }
         return null;
     }
-    
-    @Override
-    public boolean extractCharge(int amount) {
-        if (this instanceof IChargeConductor) {
-            IChargeConductor cc = (IChargeConductor) this;
-            return cc.getCharge().tryTake(amount) >= amount;
-        }
-        return false;
-    }
 
     @Override
     public Vec3 getServoPos() {
@@ -361,11 +357,12 @@ public abstract class TileEntitySocketBase extends TileEntityCommon implements I
                         rep.mentionPrereq(this, player);
                         return false;
                     }
-                    TileEntityCommon upgrade = ft.makeTileEntity();
+                    TileEntitySocketBase upgrade = (TileEntitySocketBase) ft.makeTileEntity();
                     if (upgrade == null) continue;
                     
-                    replaceWith((TileEntitySocketBase) upgrade, this);
-                    if (!player.capabilities.isCreativeMode) held.stackSize--;
+                    replaceWith(upgrade, this);
+                    upgrade.installedOnSocket();
+                    PlayerUtil.cheatDecr(player, held);
                     Sound.socketInstall.playAt(this);
                     return true;
                 }
@@ -463,4 +460,21 @@ public abstract class TileEntitySocketBase extends TileEntityCommon implements I
     }
 
     public void installedOnServo(ServoMotor servoMotor) { }
+
+    public void installedOnSocket() { }
+
+    @Override
+    public IWorkerContext getContext() {
+        return new ContextTileEntity(this);
+    }
+
+    @Override
+    public void validate() {
+        super.validate();
+        onLoaded(this);
+    }
+
+    public void onLoaded(ISocketHolder holder) {
+
+    }
 }

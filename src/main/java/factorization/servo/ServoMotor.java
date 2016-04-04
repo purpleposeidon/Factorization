@@ -6,6 +6,8 @@ import factorization.api.datahelpers.DataHelper;
 import factorization.api.datahelpers.DataInByteBuf;
 import factorization.api.datahelpers.DataInByteBufClientEdited;
 import factorization.api.datahelpers.Share;
+import factorization.api.energy.ContextEntity;
+import factorization.api.energy.IWorkerContext;
 import factorization.common.FactoryType;
 import factorization.net.FzNetDispatch;
 import factorization.net.NetworkFactorization;
@@ -17,11 +19,8 @@ import factorization.sockets.GuiDataConfig;
 import factorization.sockets.ISocketHolder;
 import factorization.sockets.SocketEmpty;
 import factorization.sockets.TileEntitySocketBase;
-import factorization.util.DataUtil;
-import factorization.util.InvUtil;
+import factorization.util.*;
 import factorization.util.InvUtil.FzInv;
-import factorization.util.ItemUtil;
-import factorization.util.SpaceUtil;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
@@ -168,6 +167,14 @@ public class ServoMotor extends AbstractServoMachine implements IInventory, ISoc
         broadcastFullUpdate();
     }
 
+    @Override
+    public void onEntityUpdate() {
+        if (ticksExisted == 1 /* 1.8: This is incremented by World before this method is called; is not serialized */) {
+            // So it's appropriate for here. If only there was an Entity.onSpawn...
+            socket.onLoaded(this);
+        }
+        super.onEntityUpdate();
+    }
 
     @Override
     public void updateSocket() {
@@ -283,9 +290,7 @@ public class ServoMotor extends AbstractServoMachine implements IInventory, ISoc
             if (newColor != FzColor.NO_COLOR) {
                 motionHandler.color = newColor;
                 markDirty();
-                if (!player.capabilities.isCreativeMode) {
-                    player.setCurrentItemOrArmor(0, ItemUtil.normalDecr(is));
-                }
+                PlayerUtil.cheatDecr(player, is);
                 return true;
             }
         }
@@ -498,6 +503,11 @@ public class ServoMotor extends AbstractServoMachine implements IInventory, ISoc
     @Override
     public Vec3 getServoPos() {
         return SpaceUtil.fromEntPos(this);
+    }
+
+    @Override
+    public IWorkerContext getContext() {
+        return new ContextEntity(this);
     }
 
     @Override

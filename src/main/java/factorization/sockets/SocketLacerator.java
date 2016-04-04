@@ -1,13 +1,28 @@
 package factorization.sockets;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-
-import org.lwjgl.opengl.GL11;
+import factorization.api.Coord;
+import factorization.api.FzOrientation;
+import factorization.api.IMeterInfo;
+import factorization.api.Quaternion;
+import factorization.api.datahelpers.DataHelper;
+import factorization.api.datahelpers.IDataSerializable;
+import factorization.api.datahelpers.Share;
+import factorization.api.energy.*;
+import factorization.common.FactoryType;
+import factorization.common.FzConfig;
+import factorization.net.StandardMessageType;
+import factorization.notify.Notice;
+import factorization.oreprocessing.TileEntityGrinder;
+import factorization.oreprocessing.TileEntityGrinder.GrinderRecipe;
+import factorization.servo.RenderServoMotor;
+import factorization.servo.ServoMotor;
+import factorization.shared.*;
+import factorization.util.InvUtil;
+import factorization.util.ItemUtil;
+import factorization.util.NumUtil;
+import factorization.util.PlayerUtil;
+import factorization.weird.barrel.TileEntityDayBarrel;
 import io.netty.buffer.ByteBuf;
-
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
@@ -21,53 +36,20 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.BlockPos;
-import net.minecraft.util.ChatComponentTranslation;
-import net.minecraft.util.DamageSource;
-import net.minecraft.util.EnumFacing;
-import net.minecraft.util.IChatComponent;
-import net.minecraft.util.ITickable;
-import net.minecraft.util.MovingObjectPosition;
-import net.minecraft.util.StatCollector;
-import net.minecraft.util.Vec3;
+import net.minecraft.util.*;
 import net.minecraft.world.World;
-
 import net.minecraftforge.event.world.WorldEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+import org.lwjgl.opengl.GL11;
 
-import factorization.api.Charge;
-import factorization.api.Coord;
-import factorization.api.FzOrientation;
-import factorization.api.IChargeConductor;
-import factorization.api.Quaternion;
-import factorization.api.datahelpers.DataHelper;
-import factorization.api.datahelpers.IDataSerializable;
-import factorization.api.datahelpers.Share;
-import factorization.common.FactoryType;
-import factorization.common.FzConfig;
-import factorization.notify.Notice;
-import factorization.oreprocessing.TileEntityGrinder;
-import factorization.oreprocessing.TileEntityGrinder.GrinderRecipe;
-import factorization.servo.RenderServoMotor;
-import factorization.servo.ServoMotor;
-import factorization.shared.BlockFactorization;
-import factorization.shared.Core;
-import factorization.shared.DropCaptureHandler;
-import factorization.shared.FzModel;
-import factorization.shared.ICaptureDrops;
-import factorization.net.StandardMessageType;
-import factorization.util.InvUtil;
-import factorization.util.ItemUtil;
-import factorization.util.NumUtil;
-import factorization.util.PlayerUtil;
-import factorization.util.SpaceUtil;
-import factorization.weird.barrel.TileEntityDayBarrel;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 
-public class SocketLacerator extends TileEntitySocketBase implements IChargeConductor, ICaptureDrops, ITickable {
-    Charge charge = new Charge(this);
-    
+public class SocketLacerator extends TileEntitySocketBase implements IMeterInfo, ICaptureDrops, IWorker<ContextTileEntity>, ITickable {
     @Override
     public String getInfo() {
         int s = speed*100/max_speed;
@@ -77,12 +59,12 @@ public class SocketLacerator extends TileEntitySocketBase implements IChargeCond
         }
         return msg;
     }
-    
-    @Override
-    public Charge getCharge() {
-        return charge;
-    }
-    
+
+    short spinning_ticks = 0; // Maximum is SPIN_TICKS_PER_UNIT * 2 - 1
+    byte power_buffer = 0;
+    static final byte POWER_BUFFER_MAX = 2;
+    static final short SPIN_TICKS_PER_UNIT = 20 * 30;
+
     short speed = 0;
     short progress;
     short last_shared_speed = 0;
@@ -114,12 +96,7 @@ public class SocketLacerator extends TileEntitySocketBase implements IChargeCond
     public FactoryType getParentFactoryType() {
         return FactoryType.SOCKET_BARE_MOTOR;
     }
-    
-    @Override
-    public void update() {
-        charge.update();
-    }
-    
+
     @Override
     public boolean activate(EntityPlayer player, EnumFacing side) {
         if (worldObj.isRemote) {
@@ -193,7 +170,7 @@ public class SocketLacerator extends TileEntitySocketBase implements IChargeCond
         if (powered) {
             slowDown();
             progress = 0;
-        } else {
+        } else if (workTick(socket)) {
             RayTracer tracer = new RayTracer(this, socket, coord, orientation, powered).onlyFrontBlock().checkEnts();
             if (!tracer.trace()) {
                 slowDown();
@@ -212,7 +189,25 @@ public class SocketLacerator extends TileEntitySocketBase implements IChargeCond
             }
         }
     }
-    
+
+    boolean workTick(ISocketHolder socket) {
+        //Calls this in two places in handleRay because we may have unlacerable mops
+        if (!isPowered && spinning_ticks > 0) {
+            spinning_ticks--;
+            speed = (short) Math.min(max_speed, speed + 32);
+            if (speed == max_speed) {
+                return false;
+            }
+        } else {
+            slowDown();
+        }
+        return workCheck();
+    }
+
+    boolean workCheck() {
+        return speed > min_speed && worldObj.rand.nextInt(max_speed) < speed/4;
+    }
+
     @Override
     public boolean handleMessageFromServer(Enum messageType, ByteBuf input) throws IOException {
         if (super.handleMessageFromServer(messageType, input)) {
@@ -250,24 +245,7 @@ public class SocketLacerator extends TileEntitySocketBase implements IChargeCond
         }
         buffer.add(is);
     }
-    
-    boolean cantDoWork(ISocketHolder socket) {
-        //Calls this in two places in handleRay because we may have unlacerable mops
-        if (!isPowered && socket.extractCharge(8)) {
-            speed = (short) Math.min(max_speed, speed + 32);
-            if (speed == max_speed) {
-                return false;
-            }
-        } else if (speed > 0) {
-            speed--;
-        }
-        return !workCheck();
-    }
-    
-    boolean workCheck() {
-        return speed > min_speed && worldObj.rand.nextInt(max_speed) < speed/4;
-    }
-    
+
     public static final DamageSource laceration = new DamageSource("laceration") {
         @Override
         public IChatComponent getDeathMessage(EntityLivingBase victim) {
@@ -279,7 +257,7 @@ public class SocketLacerator extends TileEntitySocketBase implements IChargeCond
                 ret += "1";
             }
             
-            EntityLivingBase attacker = victim.func_94060_bK();
+            EntityLivingBase attacker = victim.func_94060_bK(); // combat tracker's attacking entity
             String fightingMessage = ret + ".player";
             if (attacker != null && StatCollector.canTranslate(fightingMessage)) {
                 return new ChatComponentTranslation(fightingMessage, victim.getDisplayName(), attacker.getDisplayName());
@@ -319,8 +297,6 @@ public class SocketLacerator extends TileEntitySocketBase implements IChargeCond
             }
             EntityLivingBase elb = (EntityLivingBase) mop.entityHit;
             if (elb.isDead || elb.getHealth() <= 0) return false;
-            if (cantDoWork(socket)) return !grab_items;
-            socket.extractCharge(1); //It's fine if it fails
             float damage = 4F*speed/max_speed;
             if (elb.getHealth() <= damage && worldObj.rand.nextInt(20) == 1) {
                 elb.recentlyHit = 100;
@@ -356,14 +332,12 @@ public class SocketLacerator extends TileEntitySocketBase implements IChargeCond
                     }
                 }
             }
-            if (cantDoWork(socket)) return true;
-            socket.extractCharge(1); //It's fine if it fails
-            
+
             //Below: A brief demonstration of why Coord exists
             long foundHash = mop.getBlockPos().hashCode();
             float hardness = block.getBlockHardness(mopWorld, mop.getBlockPos());
             if (hardness < 0) {
-                speed -= max_speed/5;
+                speed -= max_speed/5; // a bad case of the jitters!
                 return true;
             }
             foundHash = (foundHash << 4) + block.hashCode();
@@ -410,9 +384,7 @@ public class SocketLacerator extends TileEntitySocketBase implements IChargeCond
                     pick.addEnchantment(Enchantment.silkTouch, 1);
                     player.inventory.mainInventory[0] = pick;
                     {
-                        boolean canHarvest = false;
-                        canHarvest = block.canHarvestBlock(mopWorld, mop.getBlockPos(), player);
-                        canHarvest = true; //Hack-around for cobalt/ardite. Hmm.
+                        boolean canHarvest = block.canHarvestBlock(mopWorld, mop.getBlockPos(), player);
 
                         boolean didRemove = removeBlock(player, block, bs, mopWorld, mop.getBlockPos());
                         if (didRemove) {
@@ -440,7 +412,22 @@ public class SocketLacerator extends TileEntitySocketBase implements IChargeCond
             return false;
         }
     }
-    
+
+    @Override
+    public Accepted accept(ContextTileEntity context, WorkUnit unit, boolean simulate) {
+        if (unit.category != EnergyCategory.ELECTRIC && unit.category != EnergyCategory.ROTATIONAL) return Accepted.NEVER;
+        if (spinning_ticks < SPIN_TICKS_PER_UNIT) {
+            if (simulate) return Accepted.NOW;
+            spinning_ticks += SPIN_TICKS_PER_UNIT;
+            return Accepted.NOW;
+        }
+        if (power_buffer < POWER_BUFFER_MAX) {
+            if (simulate) return Accepted.NOW;
+            power_buffer++;
+        }
+        return Accepted.LATER;
+    }
+
     private boolean removeBlock(EntityPlayer thisPlayerMP, Block block, IBlockState bs, World mopWorld, BlockPos pos) {
         if (block == null) return false;
         block.onBlockHarvested(mopWorld, pos, bs, thisPlayerMP);
@@ -453,13 +440,15 @@ public class SocketLacerator extends TileEntitySocketBase implements IChargeCond
     
     @Override
     public IDataSerializable serialize(String prefix, DataHelper data) throws IOException {
-        charge = data.as(Share.PRIVATE, "charge").putIDS(charge);
         speed = data.as(Share.VISIBLE, "spd").putShort(speed);
         progress = data.as(Share.PRIVATE, "prg").putShort(progress);
         buffer = data.as(Share.PRIVATE, "buf").putItemList(buffer);
         grab_items = data.as(Share.PRIVATE, "grb").putBoolean(grab_items);
         targetHash = data.as(Share.PRIVATE, "hsh").putLong(targetHash);
         grind_items = data.as(Share.PRIVATE, "grn").putBoolean(grind_items);
+        // Why are those names short? To save NBT space? An unworthy goal. But not worth fixing.
+        spinning_ticks = data.as(Share.PRIVATE, "spinningTicks").putShort(spinning_ticks);
+        power_buffer = data.as(Share.PRIVATE, "powerBuffer").putByte(power_buffer);
         return this;
     }
     
@@ -516,7 +505,6 @@ public class SocketLacerator extends TileEntitySocketBase implements IChargeCond
         BlockPos forward = pos.offset(facing);
 
         EnumFacing op = facing.getOpposite();
-        Vec3 face = new Vec3(forward.add(0.5, 0.5, 0.5)).add(SpaceUtil.scale(new Vec3(op.getDirectionVec()), 0.5));
 
         Block b = worldObj.getBlockState(forward).getBlock();
         if (b == null) {
