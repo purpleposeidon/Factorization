@@ -11,7 +11,7 @@ import net.minecraftforge.fml.relauncher.Side;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-public class ContextTileEntity implements IContext {
+public class ContextTileEntity implements IWorkerContext {
     public static final InterfaceAdapter<TileEntity, IWorker> adaptTileEntity = InterfaceAdapter.makeAdapter(IWorker.class);
 
     @Nonnull

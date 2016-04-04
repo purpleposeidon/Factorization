@@ -6,7 +6,7 @@ import net.minecraft.entity.Entity;
 
 import javax.annotation.Nonnull;
 
-public class ContextEntity implements IContext {
+public class ContextEntity implements IWorkerContext {
     public static final InterfaceAdapter<Entity, IWorker> adaptEntity = InterfaceAdapter.makeAdapter(IWorker.class);
 
     @Nonnull

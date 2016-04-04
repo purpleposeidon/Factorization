@@ -51,7 +51,7 @@ public class TileEntityHeater extends TileEntityCommon implements IWorker, ITick
     static WorkUnit HEATING = WorkUnit.get(EnergyCategory.THERMAL, new ResourceLocation("factorization:heating"));
 
     @Override
-    public Accepted accept(IContext context, WorkUnit unit, boolean simulate) {
+    public Accepted accept(IWorkerContext context, WorkUnit unit, boolean simulate) {
         if (unit.category != EnergyCategory.ELECTRIC && unit.category != EnergyCategory.THERMAL) {
             return Accepted.NEVER;
         }

@@ -10,33 +10,33 @@ package factorization.api.energy;
  * (Eg, battery block items are not obliged to be chargable, and wires are not obliged to spark power over to adjacent
  * entities.)
  *
- * @param <T> An {@link IContext}, such as {@link ContextBlock}, {@link ContextEntity}, {@link ContextItemStack},
+ * @param <T> An {@link IWorkerContext}, such as {@link ContextBlock}, {@link ContextEntity}, {@link ContextItemStack},
  *           or {@link ContextTileEntity}.
  */
 @SuppressWarnings("UnnecessaryInterfaceModifier")
-public interface IWorker<T extends IContext> {
+public interface IWorker<T extends IWorkerContext> {
     /**
      * Call this when an IWorker instance has been constructed. This is safe to do with TileEntities.
      */
-    public static void construct(IContext context) {
+    public static void construct(IWorkerContext context) {
         Manager.addWorker(context);
     }
 
     /**
      * Call this when the IWorker needs power.
      */
-    public static void requestPower(IContext context) {
+    public static void requestPower(IWorkerContext context) {
         Manager.needsPower(context);
     }
 
     /**
      * Call this when the IWorker has been removed from the world.
-     * This need not be the same IContext object as used with {@link IWorker#construct(IContext)}, but it must
+     * This need not be the same IContext object as used with {@link IWorker#construct(IWorkerContext)}, but it must
      * have been constructed with the same arguments.
      * <p/>
-     * If the units that an IWorker needs changes, then invalidate() followed by {@link IWorker#construct(IContext)}.
+     * If the units that an IWorker needs changes, then invalidate() followed by {@link IWorker#construct(IWorkerContext)}.
      */
-    public static void invalidate(IContext context) {
+    public static void invalidate(IWorkerContext context) {
         Manager.invalidateWorker(context);
     }
 

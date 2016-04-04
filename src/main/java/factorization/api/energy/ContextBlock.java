@@ -9,7 +9,7 @@ import net.minecraft.util.EnumFacing;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-public class ContextBlock implements IContext {
+public class ContextBlock implements IWorkerContext {
     public static final InterfaceAdapter<Block, IWorker> adaptBlock = InterfaceAdapter.makeAdapter(IWorker.class);
 
     public final Coord at;

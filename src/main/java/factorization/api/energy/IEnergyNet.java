@@ -16,25 +16,25 @@ public interface IEnergyNet {
      * @return true if the power was taken. Do not return true if the energynet can't handle the unit; wasting unused
      * power is the generator's job.
      */
-    boolean injectPower(IContext generator, WorkUnit unit);
+    boolean injectPower(IWorkerContext generator, WorkUnit unit);
 
     /**
      * A worker has been created. Note that this may be called multiple times with differing units.
      * @param context The worker's context.
      * @param unit A unit that the worker accepts.
      */
-    void workerAdded(IContext context, WorkUnit unit);
+    void workerAdded(IWorkerContext context, WorkUnit unit);
 
     /**
      * @param context The machine that needs power.
      */
-    void workerNeedsPower(IContext context);
+    void workerNeedsPower(IWorkerContext context);
 
     /**
      * @param context The machine that was removed from the world. Note that callbacks will not be given when things are
      *                unloaded; enets must manage this themselves using {@link net.minecraftforge.event.world.ChunkEvent.Unload}.
      */
-    void workerDestroyed(IContext context);
+    void workerDestroyed(IWorkerContext context);
 
     /**
      * Registers a new class of energy net.
@@ -49,7 +49,7 @@ public interface IEnergyNet {
      * @param unit The unit
      * @return true if the unit was taken.
      */
-    public static boolean offer(IContext source, WorkUnit unit) {
+    public static boolean offer(IWorkerContext source, WorkUnit unit) {
         return Manager.offer(source, unit);
     }
 

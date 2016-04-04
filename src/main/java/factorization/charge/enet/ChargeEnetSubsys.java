@@ -1,7 +1,6 @@
 package factorization.charge.enet;
 
 import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
 import factorization.algos.FastBag;
 import factorization.api.Coord;
 import factorization.api.energy.*;
@@ -40,7 +39,7 @@ public class ChargeEnetSubsys implements IEnergyNet {
     }
 
     @Override
-    public boolean injectPower(IContext generator, WorkUnit unit) {
+    public boolean injectPower(IWorkerContext generator, WorkUnit unit) {
         if (unit != CHARGE) return false;
         Coord at = null;
         EnumFacing dir;
@@ -121,17 +120,17 @@ public class ChargeEnetSubsys implements IEnergyNet {
     }
 
     @Override
-    public void workerAdded(IContext context, WorkUnit unit) {
+    public void workerAdded(IWorkerContext context, WorkUnit unit) {
 
     }
 
     @Override
-    public void workerDestroyed(IContext context) {
+    public void workerDestroyed(IWorkerContext context) {
 
     }
 
     @Override
-    public void workerNeedsPower(IContext context) {
+    public void workerNeedsPower(IWorkerContext context) {
         Coord at;
         EnumFacing side;
         if (context instanceof ContextTileEntity) {
@@ -156,7 +155,7 @@ public class ChargeEnetSubsys implements IEnergyNet {
         }
     }
 
-    boolean tryGive(IContext context, Coord at, EnumFacing side) {
+    boolean tryGive(IWorkerContext context, Coord at, EnumFacing side) {
         MemberPos mp = new MemberPos(at, side);
         WireLeader myLeader = getLeader(mp, at, side);
         if (myLeader == null) return false;

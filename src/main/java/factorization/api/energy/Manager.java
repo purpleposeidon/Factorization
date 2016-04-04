@@ -23,7 +23,7 @@ enum Manager {
     public void tick(TickEvent.ServerTickEvent event) {
         if (event.phase != TickEvent.Phase.END) return;
         while (true) {
-            IContext context = queue.poll();
+            IWorkerContext context = queue.poll();
             if (context == null) break;
             if (!context.isValid()) return;
             for (WorkUnit unit : unitPrototypes) {
@@ -36,19 +36,19 @@ enum Manager {
     }
 
     private static WorkUnit[] unitPrototypes = new WorkUnit[0]; // Array for ease of iteration.
-    private static final Queue<IContext> queue = Queues.newConcurrentLinkedQueue();
+    private static final Queue<IWorkerContext> queue = Queues.newConcurrentLinkedQueue();
     private static final List<IEnergyNet> enets = Lists.newArrayList();
     static final Map<ResourceLocation, WorkUnit> prototypesByName = Maps.newHashMap();
     static {
         MinecraftForge.EVENT_BUS.register(INSTANCE);
     }
 
-    static void addWorker(IContext context) {
+    static void addWorker(IWorkerContext context) {
         if (!context.isManageable()) return;
         Manager.queue.add(context);
     }
 
-    static void invalidateWorker(IContext context) {
+    static void invalidateWorker(IWorkerContext context) {
         for (WorkUnit unit : unitPrototypes) {
             if (context.give(unit, true) == IWorker.Accepted.NEVER) continue;
             for (IEnergyNet net : unit.listener.nets) {
@@ -57,7 +57,7 @@ enum Manager {
         }
     }
 
-    static void needsPower(IContext context) {
+    static void needsPower(IWorkerContext context) {
         for (WorkUnit unit : unitPrototypes) {
             if (context.give(unit, true) == IWorker.Accepted.NEVER) continue;
             for (IEnergyNet net : unit.listener.nets) {
@@ -66,7 +66,7 @@ enum Manager {
         }
     }
 
-    static boolean offer(IContext source, WorkUnit unit) {
+    static boolean offer(IWorkerContext source, WorkUnit unit) {
         for (IEnergyNet net : unit.listener.nets) {
             if (net.injectPower(source, unit)) {
                 return true;

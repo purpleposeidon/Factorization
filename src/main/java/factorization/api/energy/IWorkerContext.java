@@ -1,12 +1,11 @@
 package factorization.api.energy;
 
 import factorization.api.adapter.Adapter;
-import net.minecraft.world.World;
 
 import javax.annotation.Nonnull;
 
 /**
- * Instances of this interface give a reference to the 'this' of {@link IWorker#accept(IContext, WorkUnit, boolean)},
+ * Instances of this interface give a reference to the 'this' of {@link IWorker#accept(IWorkerContext, WorkUnit, boolean)},
  * and includes things like what side was accessed from.
  * <p/>
  * Each ContextThing has public static {@link factorization.api.adapter.InterfaceAdapter} adaptThing.
@@ -16,7 +15,7 @@ import javax.annotation.Nonnull;
  * <p/>
  * See {@link ContextTileEntity} for an example implementation.
  */
-public interface IContext {
+public interface IWorkerContext {
     IWorker.Accepted give(@Nonnull WorkUnit unit, boolean simulate);
     boolean isManageable();
     boolean isValid();

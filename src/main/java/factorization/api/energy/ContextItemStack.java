@@ -7,7 +7,7 @@ import net.minecraft.item.ItemStack;
 
 import javax.annotation.Nonnull;
 
-public class ContextItemStack implements IContext {
+public class ContextItemStack implements IWorkerContext {
     public static final InterfaceAdapter<Item, IWorker> adaptItem = InterfaceAdapter.makeAdapter(IWorker.class);
 
     public final ItemStack is;
