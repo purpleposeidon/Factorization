@@ -2,6 +2,7 @@ package factorization.sockets.fanturpeller;
 
 import com.google.common.base.Predicate;
 import factorization.api.Coord;
+import factorization.api.IMeterInfo;
 import factorization.api.datahelpers.DataHelper;
 import factorization.api.datahelpers.IDataSerializable;
 import factorization.api.datahelpers.Share;
@@ -44,7 +45,7 @@ import org.lwjgl.opengl.GL11;
 import java.io.IOException;
 import java.util.ArrayList;
 
-public class BlowEntities extends SocketFanturpeller implements Predicate<Entity> {
+public class BlowEntities extends SocketFanturpeller implements Predicate<Entity>, IMeterInfo {
     short dropDelay = 0;
     ArrayList<ItemStack> buffer = new ArrayList<ItemStack>(1);
     
@@ -74,12 +75,7 @@ public class BlowEntities extends SocketFanturpeller implements Predicate<Entity
     protected boolean shouldFeedJuice() {
         return buffer.isEmpty();
     }
-    
-    @Override
-    int getRequiredCharge() {
-        return 1 + target_speed*target_speed;
-    }
-    
+
 
     @Override
     protected void fanturpellerUpdate(ISocketHolder socket, Coord coord, boolean powered) {

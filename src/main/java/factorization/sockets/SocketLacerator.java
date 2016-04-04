@@ -7,7 +7,10 @@ import factorization.api.Quaternion;
 import factorization.api.datahelpers.DataHelper;
 import factorization.api.datahelpers.IDataSerializable;
 import factorization.api.datahelpers.Share;
-import factorization.api.energy.*;
+import factorization.api.energy.EnergyCategory;
+import factorization.api.energy.IWorker;
+import factorization.api.energy.IWorkerContext;
+import factorization.api.energy.WorkUnit;
 import factorization.common.FactoryType;
 import factorization.common.FzConfig;
 import factorization.net.StandardMessageType;
@@ -49,17 +52,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-public class SocketLacerator extends TileEntitySocketBase implements IMeterInfo, ICaptureDrops, IWorker<ContextTileEntity>, ITickable {
-    @Override
-    public String getInfo() {
-        int s = speed*100/max_speed;
-        String msg = s + "% speed";
-        if (!buffer.isEmpty()) {
-            msg += "\nBuffered output";
-        }
-        return msg;
-    }
-
+public class SocketLacerator extends TileEntitySocketBase implements IMeterInfo, ICaptureDrops, IWorker<IWorkerContext> {
     short spinning_ticks = 0; // Maximum is SPIN_TICKS_PER_UNIT * 2 - 1
     byte power_buffer = 0;
     static final byte POWER_BUFFER_MAX = 2;
@@ -98,12 +91,22 @@ public class SocketLacerator extends TileEntitySocketBase implements IMeterInfo,
     }
 
     @Override
+    public String getInfo() {
+        int s = speed*100/max_speed;
+        String msg = s + "% speed";
+        if (!buffer.isEmpty()) {
+            msg += "\nBuffered output";
+        }
+        return msg;
+    }
+
+    @Override
     public boolean activate(EntityPlayer player, EnumFacing side) {
         if (worldObj.isRemote) {
             return false;
         }
         if (!buffer.isEmpty()) {
-            new Notice(this, "%s items buffered", "" + buffer.size()).send(player);
+            new Notice(this, "%s items buffered", "" + buffer.size()).sendTo(player);
             return false;
         }
         if (getBackingInventory(this) == null) {
@@ -170,7 +173,7 @@ public class SocketLacerator extends TileEntitySocketBase implements IMeterInfo,
         if (powered) {
             slowDown();
             progress = 0;
-        } else if (workTick(socket)) {
+        } else if (workTick()) {
             RayTracer tracer = new RayTracer(this, socket, coord, orientation, powered).onlyFrontBlock().checkEnts();
             if (!tracer.trace()) {
                 slowDown();
@@ -190,8 +193,7 @@ public class SocketLacerator extends TileEntitySocketBase implements IMeterInfo,
         }
     }
 
-    boolean workTick(ISocketHolder socket) {
-        //Calls this in two places in handleRay because we may have unlacerable mops
+    boolean workTick() {
         if (!isPowered && spinning_ticks > 0) {
             spinning_ticks--;
             speed = (short) Math.min(max_speed, speed + 32);
@@ -414,7 +416,7 @@ public class SocketLacerator extends TileEntitySocketBase implements IMeterInfo,
     }
 
     @Override
-    public Accepted accept(ContextTileEntity context, WorkUnit unit, boolean simulate) {
+    public Accepted accept(IWorkerContext context, WorkUnit unit, boolean simulate) {
         if (unit.category != EnergyCategory.ELECTRIC && unit.category != EnergyCategory.ROTATIONAL) return Accepted.NEVER;
         if (spinning_ticks < SPIN_TICKS_PER_UNIT) {
             if (simulate) return Accepted.NOW;
@@ -608,5 +610,10 @@ public class SocketLacerator extends TileEntitySocketBase implements IMeterInfo,
     public void installedOnServo(ServoMotor servoMotor) {
         super.installedOnServo(servoMotor);
         servoMotor.resizeInventory(4);
+    }
+
+    @Override
+    public void onLoaded(ISocketHolder holder) {
+        IWorker.construct(holder.getContext());
     }
 }

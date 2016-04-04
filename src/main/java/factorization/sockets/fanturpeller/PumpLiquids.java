@@ -2,6 +2,7 @@ package factorization.sockets.fanturpeller;
 
 import factorization.api.Coord;
 import factorization.api.FzOrientation;
+import factorization.api.IMeterInfo;
 import factorization.api.Quaternion;
 import factorization.api.datahelpers.DataHelper;
 import factorization.api.datahelpers.IDataSerializable;
@@ -40,7 +41,7 @@ import java.util.PriorityQueue;
 
 import static org.lwjgl.opengl.GL11.*;
 
-public class PumpLiquids extends SocketFanturpeller implements IFluidHandler {
+public class PumpLiquids extends SocketFanturpeller implements IFluidHandler, IMeterInfo {
     protected static final int BUCKET = FluidContainerRegistry.BUCKET_VOLUME;
     protected FluidTank buffer = new FluidTank(BUCKET);
     protected FluidTank auxBuffer = new FluidTank(BUCKET);
@@ -50,19 +51,6 @@ public class PumpLiquids extends SocketFanturpeller implements IFluidHandler {
     
     {
         super.isSucking = false;
-    }
-
-    public static final int CHARGE_DEPLETION = 10;
-
-    boolean depleteCharge(boolean simulate, int fluidAmount) {
-        if (simulate) {
-            if (fluidAmount < available_pumping_activity) return true;
-            return charge.getValue() > CHARGE_DEPLETION;
-        }
-        available_pumping_activity -= fluidAmount;
-        if (available_pumping_activity > 0) return true;
-        available_pumping_activity += BUCKET;
-        return charge.tryTake(CHARGE_DEPLETION) >= CHARGE_DEPLETION;
     }
 
     @Override
@@ -359,7 +347,6 @@ public class PumpLiquids extends SocketFanturpeller implements IFluidHandler {
         @Override
         public void pumpOut() {
             if (isSucking) return; //don't run backwards
-            if (!depleteCharge(false, buffer.getFluidAmount())) return;
             if (!foundContainers.isEmpty() && buffer.getFluidAmount() > 0) {
                 FoundFluidHandler foundIfh = foundContainers.poll();
                 FluidTank buff = auxBuffer.getFluidAmount() > 0 ? auxBuffer : buffer;
@@ -476,7 +463,6 @@ public class PumpLiquids extends SocketFanturpeller implements IFluidHandler {
         @Override
         public void pumpOut() {
             if (buffer.getFluidAmount() <= 0) return;
-            if (!depleteCharge(false, buffer.getFluidAmount())) return;
             Coord at = new Coord(PumpLiquids.this);
             at.adjust(destinationDirection);
             IFluidHandler te = at.getTE(IFluidHandler.class);
@@ -625,11 +611,6 @@ public class PumpLiquids extends SocketFanturpeller implements IFluidHandler {
         return sourceAction != null || destinationAction != null;
     }
 
-    @Override
-    int getRequiredCharge() {
-        return 2;
-    }
-    
     private static FzModel corkscrew = new FzModel("corkscrew");
 
     @Override
@@ -699,5 +680,21 @@ public class PumpLiquids extends SocketFanturpeller implements IFluidHandler {
             return true;
         }
         return super.activate(player, side);
+    }
+
+    boolean isLiquid(Coord at) {
+        final Block block = at.getBlock();
+        if (block == Blocks.water || block == Blocks.flowing_water || block == Blocks.lava || block == Blocks.flowing_lava) {
+            return at.getPropertyOr(BlockFluidBase.LEVEL, 0x10) == 0;
+        }
+        if (block instanceof IFluidBlock) {
+            IFluidBlock ifb = (IFluidBlock) block;
+            return ifb.canDrain(worldObj, at.toBlockPos());
+        }
+        return false;
+    }
+
+    boolean hasTank(Coord at) {
+        return at.getTE(IFluidHandler.class) != null;
     }
 }

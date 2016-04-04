@@ -3,6 +3,7 @@ package factorization.sockets;
 import factorization.api.energy.IWorkerContext;
 import factorization.net.StandardMessageType;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.EnumFacing;
 import net.minecraft.util.Vec3;
 
 import java.util.List;

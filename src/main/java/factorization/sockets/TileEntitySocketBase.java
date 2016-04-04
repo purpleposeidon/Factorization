@@ -465,7 +465,7 @@ public abstract class TileEntitySocketBase extends TileEntityCommon implements I
 
     @Override
     public IWorkerContext getContext() {
-        return new ContextTileEntity(this);
+        return new ContextTileEntity(this, facing.getOpposite(), null);
     }
 
     @Override
