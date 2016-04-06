@@ -9,7 +9,7 @@ import net.minecraft.block.Block;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.item.ItemStack;
 
-public class BarrelCacheInfo {
+class BarrelCacheInfo {
     final TextureAtlasSprite log, plank;
     final TileEntityDayBarrel.Type type;
     final FzOrientation orientation;

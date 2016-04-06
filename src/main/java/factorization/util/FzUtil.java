@@ -1,7 +1,6 @@
 package factorization.util;
 
 import com.google.common.collect.Multimap;
-import com.google.common.collect.Sets;
 import factorization.api.Coord;
 import factorization.shared.Core;
 import factorization.weird.barrel.TileEntityDayBarrel;
@@ -18,16 +17,13 @@ import net.minecraft.entity.ai.attributes.AttributeModifier;
 import net.minecraft.entity.ai.attributes.BaseAttributeMap;
 import net.minecraft.entity.ai.attributes.IAttributeInstance;
 import net.minecraft.entity.ai.attributes.ServersideAttributeMap;
-import net.minecraft.init.Blocks;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.server.MinecraftServer;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.BlockPos;
 import net.minecraft.world.GameRules;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
-import net.minecraftforge.client.model.IModel;
 import net.minecraftforge.common.DimensionManager;
 import net.minecraftforge.common.property.IUnlistedProperty;
 import net.minecraftforge.fml.common.Loader;

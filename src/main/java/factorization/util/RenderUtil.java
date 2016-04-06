@@ -1,5 +1,7 @@
 package factorization.util;
 
+import factorization.api.FzOrientation;
+import factorization.api.Quaternion;
 import factorization.shared.Core;
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
@@ -8,16 +10,21 @@ import net.minecraft.client.renderer.ItemModelMesher;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.resources.model.IBakedModel;
 import net.minecraft.client.resources.model.ModelResourceLocation;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.client.event.TextureStitchEvent;
 import net.minecraftforge.client.model.IModel;
+import net.minecraftforge.client.model.ModelLoaderRegistry;
+import net.minecraftforge.client.model.TRSRTransformation;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.util.glu.GLU;
 
+import javax.vecmath.AxisAngle4f;
+import java.io.IOException;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -78,6 +85,48 @@ public final class RenderUtil {
     public static IBakedModel getModel(ModelResourceLocation name) {
         Minecraft mc = Minecraft.getMinecraft();
         return mc.getBlockRendererDispatcher().getBlockModelShapes().getModelManager().getModel(name);
+    }
+
+    public static IBakedModel getBakedModel(ItemStack is) {
+        final Minecraft mc = Minecraft.getMinecraft();
+        return mc.getRenderItem().getItemModelMesher().getItemModel(is);
+    }
+
+    public static IModel getModel(ItemStack is) {
+        if (is == null) return null;
+        ResourceLocation name = Item.itemRegistry.getNameForObject(is.getItem());
+        try {
+            return ModelLoaderRegistry.getModel(name);
+        } catch (IOException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    public static TRSRTransformation getMatrix(FzOrientation fzo) {
+        Quaternion fzq = Quaternion.fromOrientation(fzo.getSwapped());
+        javax.vecmath.Matrix4f trans = newMat();
+        javax.vecmath.Matrix4f rot = newMat();
+        javax.vecmath.Matrix4f r90 = newMat();
+
+        r90.setRotation(new AxisAngle4f(0, 1, 0, (float) Math.PI / 2));
+
+        trans.setTranslation(new javax.vecmath.Vector3f(0.5F, 0.5F, 0.5F));
+        javax.vecmath.Matrix4f iTrans = new javax.vecmath.Matrix4f(trans);
+        iTrans.invert();
+        rot.setRotation(fzq.toJavax());
+        rot.mul(r90);
+
+        trans.mul(rot);
+        trans.mul(iTrans);
+
+        return new TRSRTransformation(trans);
+    }
+
+    public static javax.vecmath.Matrix4f newMat() {
+        javax.vecmath.Matrix4f ret = new javax.vecmath.Matrix4f();
+        ret.setIdentity();
+        return ret;
     }
 
     /**

@@ -2,8 +2,8 @@ package factorization.weird.barrel;
 
 import com.google.common.base.Function;
 import com.google.common.collect.ImmutableMap;
-import factorization.api.FzOrientation;
-import factorization.api.Quaternion;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import factorization.util.NORELEASE;
 import factorization.util.RenderUtil;
 import net.minecraft.block.Block;
@@ -26,11 +26,11 @@ import net.minecraftforge.common.property.IExtendedBlockState;
 import org.apache.commons.lang3.tuple.Pair;
 
 import javax.annotation.Nullable;
-import javax.vecmath.AxisAngle4f;
 import javax.vecmath.Matrix4f;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class BarrelModel implements ISmartBlockModel, ISmartItemModel, IPerspectiveAwareModel {
     public static BarrelGroup normal, hopping, silky, sticky;
@@ -64,24 +64,33 @@ public class BarrelModel implements ISmartBlockModel, ISmartItemModel, IPerspect
         public TextureAtlasSprite front, top, side, top_metal;
     }
 
-    private final HashMap<BarrelCacheInfo, IBakedModel> modelCache = new HashMap<BarrelCacheInfo, IBakedModel>();
+    private final List<Map<BarrelCacheInfo, IBakedModel>> modelCache = Lists.newArrayList();
+    {
+        for (EnumWorldBlockLayer layer : EnumWorldBlockLayer.values()) {
+            modelCache.add(Maps.newHashMap());
+        }
+        modelCache.add(Maps.newHashMap()); // null
+    }
+    private static final int NULL_INDEX = EnumWorldBlockLayer.values().length;
     public static IRetexturableModel template;
 
     IBakedModel get(BarrelCacheInfo info) {
-        IBakedModel ret = modelCache.get(info);
+        EnumWorldBlockLayer layer = isItem ? null : MinecraftForgeClient.getRenderLayer();
+        int layerIndex = layer == null ? NULL_INDEX : layer.ordinal();
+        Map<BarrelCacheInfo, IBakedModel> perLayer = modelCache.get(layerIndex);
+        IBakedModel ret = perLayer.get(info);
         if (ret != null) return ret;
-        ret = build(info);
+        ret = build(info, layer);
         if (NORELEASE.off) { // delete this if statement
-            // ACTUALLY: No, that doesn't work! We need a per-layer cache!
-            modelCache.put(info, ret);
+            perLayer.put(info, ret);
         }
         return ret;
     }
 
-    IBakedModel build(BarrelCacheInfo info) {
+    IBakedModel build(BarrelCacheInfo info, EnumWorldBlockLayer layer) {
         TextureAtlasSprite log = info.log;
         TextureAtlasSprite plank = info.plank;
-        BarrelGroup group = normal;
+        BarrelGroup group;
         TileEntityDayBarrel.Type type = info.type;
         if (type.isHopping()) {
             group = hopping;
@@ -89,13 +98,14 @@ public class BarrelModel implements ISmartBlockModel, ISmartItemModel, IPerspect
             group = silky;
         } else if (type == TileEntityDayBarrel.Type.STICKY) {
             group = sticky;
+        } else {
+            group = normal;
         }
         TextureAtlasSprite top = info.isMetal ? group.top_metal : group.top;
         TextureAtlasSprite front = group.front;
         TextureAtlasSprite side = group.side;
         HashMap<String, String> textures = new HashMap<String, String>();
         final HashMap<ResourceLocation, TextureAtlasSprite> map = new HashMap<ResourceLocation, TextureAtlasSprite>();
-        EnumWorldBlockLayer layer = isItem ? null : MinecraftForgeClient.getRenderLayer();
         if (isItem || layer == EnumWorldBlockLayer.SOLID) {
             textures.put("log", log.getIconName());
             textures.put("plank", plank.getIconName());
@@ -125,36 +135,16 @@ public class BarrelModel implements ISmartBlockModel, ISmartItemModel, IPerspect
             }
         };
 
-        IModelState state = getMatrix(info.orientation);
+        IModelState state = RenderUtil.getMatrix(info.orientation);
         ImmutableMap<String, String> textureMap = ImmutableMap.copyOf(textures);
         IModel retexture = template.retexture(textureMap);
-        return retexture.bake(state, DefaultVertexFormats.BLOCK, lookup);
-    }
-
-    private IModelState getMatrix(FzOrientation fzo) {
-        Quaternion fzq = Quaternion.fromOrientation(fzo.getSwapped());
-        javax.vecmath.Matrix4f trans = newMat();
-        javax.vecmath.Matrix4f rot = newMat();
-        javax.vecmath.Matrix4f r90 = newMat();
-
-        r90.setRotation(new AxisAngle4f(0, 1, 0, (float) Math.PI / 2));
-
-        trans.setTranslation(new javax.vecmath.Vector3f(0.5F, 0.5F, 0.5F));
-        javax.vecmath.Matrix4f iTrans = new javax.vecmath.Matrix4f(trans);
-        iTrans.invert();
-        rot.setRotation(fzq.toJavax());
-        rot.mul(r90);
-
-        trans.mul(rot);
-        trans.mul(iTrans);
-
-        return new TRSRTransformation(trans);
-    }
-
-    private static javax.vecmath.Matrix4f newMat() {
-        javax.vecmath.Matrix4f ret = new javax.vecmath.Matrix4f();
-        ret.setIdentity();
-        return ret;
+        final IFlexibleBakedModel bake = retexture.bake(state, DefaultVertexFormats.BLOCK, lookup);
+        return new IFlexibleBakedModel.Wrapper(bake, getFormat()) {
+            @Override
+            public ItemCameraTransforms getItemCameraTransforms() {
+                return BarrelModel.this.getItemCameraTransforms();
+            }
+        };
     }
 
     @Override
@@ -202,8 +192,12 @@ public class BarrelModel implements ISmartBlockModel, ISmartItemModel, IPerspect
         return mc.getBlockRendererDispatcher().getBlockModelShapes().getTexture(Blocks.planks.getDefaultState());
     }
 
+    ItemCameraTransforms itemCameraTransforms;
     @Override
     public ItemCameraTransforms getItemCameraTransforms() {
-        return ItemCameraTransforms.DEFAULT;
+        if (itemCameraTransforms == null) {
+            itemCameraTransforms = RenderUtil.getBakedModel(new ItemStack(Blocks.stone)).getItemCameraTransforms();
+        }
+        return itemCameraTransforms;
     }
 }

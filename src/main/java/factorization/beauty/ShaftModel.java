@@ -196,13 +196,17 @@ public class ShaftModel implements ISmartItemModel {
         protected final VertexFormat format;
         private UnpackedBakedQuad.Builder bakery;
 
-        UselesslyGenericModelTransformer(IBakedModel source, VertexFormat format) {
+        public UselesslyGenericModelTransformer(IBakedModel source, VertexFormat format) {
             this.source = source;
             this.format = format;
             reset();
         }
 
         public void apply() {
+            apply(source);
+        }
+
+        public void apply(IBakedModel source) {
             quadSide = null;
             for (BakedQuad quad : source.getGeneralQuads()) {
                 visit(quad);
@@ -216,6 +220,10 @@ public class ShaftModel implements ISmartItemModel {
         }
 
         public IBakedModel bake() {
+            return bake(source);
+        }
+
+        public IBakedModel bake(IBakedModel source) {
             return new SimpleBakedModel(quads, empty_faces, false, true, source.getParticleTexture(), source.getItemCameraTransforms());
         }
 
