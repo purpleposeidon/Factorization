@@ -2,9 +2,6 @@ package factorization.sockets;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
-import com.sun.media.sound.ModelTransform;
-import factorization.api.FzOrientation;
-import factorization.api.Quaternion;
 import factorization.shared.FzModel;
 import factorization.util.NORELEASE;
 import factorization.util.RenderUtil;
@@ -72,7 +69,7 @@ public class SocketModel implements ISmartItemModel, ISmartBlockModel, IPerspect
         IBakedModel ret = modelCache.get(info);
         if (ret != null) return ret;
         ret = build(info);
-        if (NORELEASE.off) { // delete this if statement
+        if (NORELEASE.disabledUntilRelease) {
             modelCache.put(info, ret);
         }
         return ret;
@@ -80,7 +77,6 @@ public class SocketModel implements ISmartItemModel, ISmartBlockModel, IPerspect
 
     IBakedModel build(SocketCacheInfo info) {
         TextureAtlasSprite particle = null;
-        ItemCameraTransforms camera = null;
         List<BakedQuad> general = Lists.newArrayList();
         List<List<BakedQuad>> sided = Lists.newArrayList();
         for (EnumFacing face : EnumFacing.VALUES) {
@@ -92,41 +88,21 @@ public class SocketModel implements ISmartItemModel, ISmartBlockModel, IPerspect
             transform = new QuadTransformer(TRSRTransformation.identity(), getFormat());
         } else {
             TRSRTransformation trsrt;
-            NORELEASE.fixme("Switch");
-            if (info.facing == EnumFacing.DOWN) {
-                trsrt = TRSRTransformation.identity();
-            } else if (info.facing == EnumFacing.UP) {
-                trsrt = new TRSRTransformation(ModelRotation.X180_Y0);
-            } else if (info.facing == EnumFacing.NORTH) {
-                trsrt = new TRSRTransformation(ModelRotation.X90_Y180);
-            } else if (info.facing == EnumFacing.SOUTH) {
-                trsrt = new TRSRTransformation(ModelRotation.X90_Y0);
-            } else if (info.facing == EnumFacing.WEST) {
-                trsrt = new TRSRTransformation(ModelRotation.X90_Y90);
-            } else if (info.facing == EnumFacing.EAST) {
-                trsrt = new TRSRTransformation(ModelRotation.X90_Y270);
-            } else {
-                trsrt = TRSRTransformation.identity();
+            switch (info.facing) {
+                default:
+                case DOWN: trsrt = TRSRTransformation.identity(); break;
+                case UP: trsrt = new TRSRTransformation(ModelRotation.X180_Y0); break;
+                case NORTH: trsrt = new TRSRTransformation(ModelRotation.X90_Y180); break;
+                case SOUTH: trsrt = new TRSRTransformation(ModelRotation.X90_Y0); break;
+                case WEST: trsrt = new TRSRTransformation(ModelRotation.X90_Y90); break;
+                case EAST: trsrt = new TRSRTransformation(ModelRotation.X90_Y270); break;
             }
-
-
-            /*{
-                float f = 0.5F;
-                Matrix4f m = new Matrix4f();
-                m.setIdentity();
-                m.setTranslation(new Vector3f(+f, +f, +f));
-                trsrt = new TRSRTransformation(m);
-            }*/
-
             transform = new QuadTransformer(trsrt, getFormat());
         }
         for (IBakedModel model : info.parts) {
             if (model == null) continue;
             if (particle == null) {
                 particle = model.getParticleTexture();
-            }
-            if (camera == null) {
-                camera = model.getItemCameraTransforms();
             }
             for (BakedQuad quad : model.getGeneralQuads()) {
                 general.add(transform.apply(quad));
@@ -140,10 +116,7 @@ public class SocketModel implements ISmartItemModel, ISmartBlockModel, IPerspect
         if (particle == null) {
             particle = getParticleTexture();
         }
-        if (camera == null) {
-            camera = getItemCameraTransforms();
-        }
-        camera = RenderUtil.getBakedModel(new ItemStack(Blocks.stone)).getItemCameraTransforms();
+        ItemCameraTransforms camera = RenderUtil.getBakedModel(new ItemStack(Blocks.stone)).getItemCameraTransforms();
         return new SimpleBakedModel(general, sided, false /* ao */, true /* gui 3D */, particle, camera);
     }
 

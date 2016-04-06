@@ -36,12 +36,12 @@ public class NORELEASE {
      * A false value that should be replaced with 'true' for release.
      *
      * <pre>
-     * if (NORELEASE.disabled) {
+     * if (NORELEASE.disabledUtilRelease) {
      *     cache.put(key, value);
      * }
      * </pre>
      */
-    public static boolean disabled = false;
+    public static boolean disabledUntilRelease = false;
 
     private static final Joiner joiner = Joiner.on(" ").useForNull("null");
 
