@@ -385,7 +385,7 @@ public class Registry {
 
         //BlockFactorization stuff
         servorail_item = FactoryType.SERVORAIL.itemStack();
-        empty_socket_item = FactoryType.SOCKET_EMPTY.itemStack();
+        empty_socket_item = new ItemStack(socket);
         parasieve_item = FactoryType.PARASIEVE.itemStack();
         compression_crafter_item = FactoryType.COMPRESSIONCRAFTER.itemStack();
         lamp_item = FactoryType.LAMP.itemStack();

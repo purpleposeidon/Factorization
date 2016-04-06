@@ -27,6 +27,7 @@ import factorization.servo.stepper.RenderStepperEngine;
 import factorization.servo.stepper.StepperEngine;
 import factorization.shared.*;
 import factorization.sockets.SocketLacerator;
+import factorization.sockets.SocketModel;
 import factorization.sockets.SocketScissors;
 import factorization.sockets.TileEntitySocketRenderer;
 import factorization.sockets.fanturpeller.SocketFanturpeller;
@@ -50,6 +51,7 @@ import net.minecraft.client.renderer.ItemMeshDefinition;
 import net.minecraft.client.renderer.entity.RenderManager;
 import net.minecraft.client.renderer.entity.RenderSnowball;
 import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
+import net.minecraft.client.resources.model.IBakedModel;
 import net.minecraft.client.resources.model.ModelBakery;
 import net.minecraft.client.resources.model.ModelResourceLocation;
 import net.minecraft.client.settings.GameSettings;
@@ -284,9 +286,8 @@ public class FactorizationClientProxy extends FactorizationProxy {
 
     @SubscribeEvent
     public void registerComplicatedModels(ModelBakeEvent event) {
-        final ModelResourceLocation barrelNormal = new ModelResourceLocation("factorization:FzBlockBarrel#normal");
-        event.modelRegistry.putObject(barrelNormal, new BarrelModel(false));
         final ModelResourceLocation barrelInv = new ModelResourceLocation("factorization:FzBlockBarrel#inventory");
+        event.modelRegistry.putObject(new ModelResourceLocation("factorization:FzBlockBarrel#normal"), new BarrelModel(false));
         event.modelRegistry.putObject(barrelInv, new BarrelModel(true));
         ModelLoader.setCustomMeshDefinition(DataUtil.getItem(Core.registry.factory_block_barrel), new ItemMeshDefinition() {
             @Override
@@ -303,6 +304,16 @@ public class FactorizationClientProxy extends FactorizationProxy {
                 return shaftInv;
             }
         });
+
+        event.modelRegistry.putObject(new ModelResourceLocation("factorization:Socket#normal"), new SocketModel(false));
+        ModelResourceLocation socketInv = new ModelResourceLocation("factorization:Socket#inventory");
+        event.modelRegistry.putObject(socketInv, new SocketModel(true));
+        ModelLoader.setCustomMeshDefinition(DataUtil.getItem(Core.registry.socket), new ItemMeshDefinition() {
+            @Override
+            public ModelResourceLocation getModelLocation(ItemStack stack) {
+                return socketInv;
+            }
+        });
     }
 
     @Override
@@ -315,8 +326,8 @@ public class FactorizationClientProxy extends FactorizationProxy {
         setTileEntityRendererDispatcher(SocketScissors.class, new TileEntitySocketRenderer());
         setTileEntityRendererDispatcher(SocketLacerator.class, new TileEntitySocketRenderer());
         setTileEntityRendererDispatcher(SocketFanturpeller.class, new TileEntitySocketRenderer());
-        setTileEntityRendererDispatcher(TileEntityHinge.class, new TileEntityHingeRenderer());
         setTileEntityRendererDispatcher(SocketPoweredCrank.class, new TileEntitySocketRenderer());
+        setTileEntityRendererDispatcher(TileEntityHinge.class, new TileEntityHingeRenderer());
         setTileEntityRendererDispatcher(TileEntitySteamShaft.class, new TileEntitySteamShaftRenderer());
         setTileEntityRendererDispatcher(TileEntityShaft.class, new TileEntityShaftRenderer());
         setTileEntityRendererDispatcher(TileEntityBiblioGen.class, new TileEntityBiblioGenRenderer());
@@ -341,6 +352,7 @@ public class FactorizationClientProxy extends FactorizationProxy {
         RenderUtil.loadSprites("factorization", BarrelModel.class, "blocks/storage/", event);
         try {
             BarrelModel.template = (IRetexturableModel) ModelLoaderRegistry.getModel(new ResourceLocation("factorization:block/barrel_template"));
+            IModel socketBase = ModelLoaderRegistry.getModel(new ResourceLocation("factorization:block/socket"));
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

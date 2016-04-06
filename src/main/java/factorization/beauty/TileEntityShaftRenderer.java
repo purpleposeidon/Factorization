@@ -1,7 +1,6 @@
 package factorization.beauty;
 
 import factorization.shared.Core;
-import factorization.shared.FzModel;
 import factorization.util.NumUtil;
 import factorization.util.RenderUtil;
 import net.minecraft.client.Minecraft;
@@ -9,11 +8,7 @@ import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.entity.RenderItem;
 import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
 import net.minecraft.client.resources.model.IBakedModel;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.ResourceLocation;
-import net.minecraftforge.client.model.IModel;
 import org.lwjgl.opengl.GL11;
-import org.lwjgl.opengl.GL12;
 
 public class TileEntityShaftRenderer extends TileEntitySpecialRenderer<TileEntityShaft> {
     @Override
