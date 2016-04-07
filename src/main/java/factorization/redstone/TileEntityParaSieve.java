@@ -523,6 +523,7 @@ public class TileEntityParaSieve extends TileEntityFactorization implements ISid
             if (item == null) {
                 continue;
             }
+            NORELEASE.fixme("Not ported propertly");
             UniqueIdentifier ui;
             try {
                 ui = GameRegistry.findUniqueIdentifierFor(item);
