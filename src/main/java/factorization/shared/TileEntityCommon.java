@@ -337,4 +337,9 @@ public abstract class TileEntityCommon extends TileEntity implements ICoord, IFa
     public Enum[] getMessages() {
         return null;
     }
+
+    @Override
+    public void setPos(BlockPos posIn) {
+        super.setPos(posIn.getImmutable());
+    }
 }

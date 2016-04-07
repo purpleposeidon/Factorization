@@ -1,6 +1,24 @@
 {
-    "parent": "factorization:item/base",
+    "elements": [{
+        "from": [4, 4, 4],
+        "to": [12, 12, 12],
+        "faces": {
+            "up":    { "texture": "#tex", "uv": [ 8,  8, 16, 16] },
+            "down":  { "texture": "#tex", "uv": [ 8,  8, 16, 16] },
+            "north": { "texture": "#tex", "uv": [ 0,  0,  8,  8] },
+            "south": { "texture": "#tex", "uv": [ 0,  0,  8,  8] },
+            "west":  { "texture": "#tex", "uv": [ 0,  0,  8,  8] },
+            "east":  { "texture": "#tex", "uv": [ 0,  0,  8,  8] }
+        }
+    }],
+    "display": {
+        "thirdperson": {
+            "rotation": [ 10, -45, 170 ],
+            "translation": [ 0, 1.5, -2.75 ],
+            "scale": [ 0.375, 0.375, 0.375 ]
+        }
+    },
     "textures": {
-        "layer0": "factorization:items/motor"
+        "tex": "factorization:items/motor"
     }
 }

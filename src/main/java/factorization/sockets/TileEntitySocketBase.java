@@ -45,7 +45,7 @@ public abstract class TileEntitySocketBase extends TileEntityCommon implements I
      * 		Some things might call this's ISocketHolder methods rather than the passed in ISocketHolder's methods
      */
     public EnumFacing facing = EnumFacing.UP;
-    protected ItemStack[] parts = new ItemStack[3];
+    public ItemStack[] parts = new ItemStack[3];
 
     @Override
     public final BlockClass getBlockClass() {
@@ -78,7 +78,7 @@ public abstract class TileEntitySocketBase extends TileEntityCommon implements I
     @Override
     public final void putData(DataHelper data) throws IOException {
         facing = data.as(Share.VISIBLE, "fc").putEnum(facing);
-        parts = data.as(Share.PRIVATE, "socketParts").putItemArray(parts);
+        parts = data.as(Share.VISIBLE, "socketParts").putItemArray(parts);
         serialize("", data);
     }
 
@@ -210,8 +210,17 @@ public abstract class TileEntitySocketBase extends TileEntityCommon implements I
         if (this instanceof SocketEmpty) {
             return FactoryType.SOCKET_EMPTY.itemStack();
         }
-        ItemStack is = getCreatingItem();
-        return is == null ? null : ItemStack.copyItemStack(is);
+        ItemStack ret = null;
+        for (ItemStack is : parts) {
+            if (is != null) {
+                ret = is;
+            }
+        }
+
+        if (ret == null) {
+            ret = getCreatingItem();
+        }
+        return ItemStack.copyItemStack(ret);
     }
     
     @Override
@@ -359,7 +368,7 @@ public abstract class TileEntitySocketBase extends TileEntityCommon implements I
                     }
                     TileEntitySocketBase upgrade = (TileEntitySocketBase) ft.makeTileEntity();
                     if (upgrade == null) continue;
-                    
+                    upgrade.addPart(this.parts, held);
                     replaceWith(upgrade, this);
                     upgrade.installedOnSocket();
                     PlayerUtil.cheatDecr(player, held);
@@ -372,6 +381,23 @@ public abstract class TileEntitySocketBase extends TileEntityCommon implements I
             }
         }
         return false;
+    }
+
+    public void addPart(ItemStack[] base, ItemStack next) {
+        int needed = next == null ? 0 : 1;
+        for (ItemStack is : base) {
+            if (is != null) needed++;
+        }
+        if (parts.length < needed) parts = new ItemStack[needed];
+        int i = 0;
+        for (ItemStack is : base) {
+            if (is != null) parts[i++] = is;
+        }
+        if (next != null) {
+            next = next.copy();
+            next.stackSize = 1;
+            parts[i++] = next;
+        }
     }
     
     public void mentionPrereq(ISocketHolder holder, EntityPlayer player) {
@@ -386,14 +412,15 @@ public abstract class TileEntitySocketBase extends TileEntityCommon implements I
     }
     
     protected void replaceWith(TileEntitySocketBase replacement, ISocketHolder socket) {
-        invalidate();
         replacement.facing = facing;
         if (socket == this) {
             Coord at = getCoord();
+            at.removeTE();
             at.setTE(replacement);
-            replacement.getBlockClass().enforce(at);
             at.syncAndRedraw();
+            System.out.println("Became " + at.getTE());
         } else if (socket instanceof ServoMotor) {
+            invalidate();
             ServoMotor motor = (ServoMotor) socket;
             motor.socket = replacement;
             motor.syncWithSpawnPacket();

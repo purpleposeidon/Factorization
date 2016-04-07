@@ -277,9 +277,11 @@ public class ServoMotor extends AbstractServoMachine implements IInventory, ISoc
                 }
                 TileEntityCommon upgrade = ft.makeTileEntity();
                 if (upgrade != null) {
+                    TileEntitySocketBase orig = socket;
                     socket = (TileEntitySocketBase) upgrade;
                     if (!player.capabilities.isCreativeMode) is.stackSize--;
                     Sound.servoInstall.playAt(new Coord(this));
+                    socket.addPart(orig.parts, is);
                     socket.installedOnServo(this);
                     return true;
                 }

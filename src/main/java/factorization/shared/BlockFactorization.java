@@ -80,6 +80,7 @@ public class BlockFactorization extends BlockContainer {
     }
 
     private static TileEntityCommon get(IBlockAccess w, BlockPos pos) {
+        pos = pos.getImmutable();
         TileEntity te = w.getTileEntity(pos);
         if (te instanceof TileEntityCommon) return (TileEntityCommon) te;
         return null;

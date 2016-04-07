@@ -471,7 +471,13 @@ public final class Coord implements IDataSerializable, ISaneCoord, Comparable<Co
     }
 
     public void setTE(TileEntity te) {
-        w.setTileEntity(toBlockPos(), te);
+        BlockPos pos = toBlockPos();
+        te.setPos(pos);
+        w.setTileEntity(pos, te);
+    }
+
+    public void removeTE() {
+        rmTE();
     }
     
     public void rmTE() {
@@ -1114,5 +1120,4 @@ public final class Coord implements IDataSerializable, ISaneCoord, Comparable<Co
         if (myBlock != otherState.getBlock()) return false;
         return myBlock.getMetaFromState(mine) == myBlock.getMetaFromState(otherState);
     }
-
 }
