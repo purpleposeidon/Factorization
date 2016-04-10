@@ -61,14 +61,18 @@ public class SocketLacerator extends TileEntitySocketBase implements IMeterInfo,
     short speed = 0;
     short progress;
     short last_shared_speed = 0;
+    short damage_ticks = 0; // Ticks of entity damage, OR ability to break block if >= DAMAGE_TICKS_PER_UNIT
+    static final short DAMAGE_TICKS_PER_UNIT = 20 * 5;
     boolean grab_items = false, grind_items = false;
     long targetHash = -1;
     boolean ticked = false;
     boolean isPowered = false;
+    boolean isStarted = false;
+    transient boolean couldWork = false;
     
     final static byte grind_time = 25;
     final static short max_speed = 200;
-    final static short min_speed = max_speed/10;
+    final static short min_speed = max_speed * 8 / 10;
     ArrayList<ItemStack> buffer = new ArrayList<ItemStack>();
     
     private float rotation = 0, prev_rotation = 0;
@@ -96,6 +100,10 @@ public class SocketLacerator extends TileEntitySocketBase implements IMeterInfo,
         String msg = s + "% speed";
         if (!buffer.isEmpty()) {
             msg += "\nBuffered output";
+        }
+        if (Core.dev_environ) {
+            msg += "\nSpin ticks: " + spinning_ticks;
+            msg += "\nDamage ticks: " + damage_ticks;
         }
         return msg;
     }
@@ -133,7 +141,7 @@ public class SocketLacerator extends TileEntitySocketBase implements IMeterInfo,
             return;
         }
         isPowered = powered;
-        genericUpdate_implementation(socket, coord, powered);
+        genericUpdate0(socket, coord, powered);
         if (NumUtil.significantChange(last_shared_speed, speed)) {
             socket.sendMessage(StandardMessageType.SetSpeed, speed);
             last_shared_speed = speed;
@@ -154,7 +162,7 @@ public class SocketLacerator extends TileEntitySocketBase implements IMeterInfo,
         }
     }
     
-    private void genericUpdate_implementation(ISocketHolder socket, Coord coord, boolean powered) {
+    private void genericUpdate0(ISocketHolder socket, Coord coord, boolean powered) {
         if (getBackingInventory(socket) == null) {
             slowDown();
             return;
@@ -169,21 +177,54 @@ public class SocketLacerator extends TileEntitySocketBase implements IMeterInfo,
             slowDown();
             return;
         }
-        FzOrientation orientation = FzOrientation.fromDirection(facing).getSwapped();
         if (powered) {
             slowDown();
             progress = 0;
-        } else if (workTick()) {
-            RayTracer tracer = new RayTracer(this, socket, coord, orientation, powered).onlyFrontBlock().checkEnts();
-            if (!tracer.trace()) {
-                slowDown();
-                progress = 0;
+            return;
+        }
+        boolean requestPower = false;
+        if (spinning_ticks <= 0) {
+            if (isStarted && speed == max_speed) {
+                requestPower = true;
+            }
+            slowDown();
+            if (speed < min_speed && isStarted) {
+                isStarted = false;
+                requestPower = true;
+            }
+        }
+        if (spinning_ticks <= 0 || damage_ticks <= DAMAGE_TICKS_PER_UNIT) {
+            requestPower = true;
+        }
+        if (requestPower) {
+            IWorker.requestPower(socket.getContext());
+        }
+        if (isStarted && spinning_ticks > 0) {
+            spinning_ticks--;
+            speed = (short) Math.min(max_speed, speed + 2);
+            if (speed < min_speed) {
+                // Wait until up to speed
+                return;
+            }
+        }
+        FzOrientation orientation = FzOrientation.fromDirection(facing).getSwapped();
+        couldWork = false;
+        RayTracer tracer = new RayTracer(this, socket, coord, orientation, powered).onlyFrontBlock().checkEnts();
+        if (!tracer.trace()) {
+            slowDown();
+            progress = 0;
+            isStarted = false;
+            return;
+        }
+        if (couldWork && !isStarted) {
+            if (spinning_ticks > 0) {
+                isStarted = true;
             }
         }
         if (grab_items) {
             grab_items = false;
             
-            for (EntityItem ei : (Iterable<EntityItem>)worldObj.getEntitiesWithinAABB(EntityItem.class, getEntityBox(socket, coord, orientation.top, 1.75))) {
+            for (EntityItem ei : worldObj.getEntitiesWithinAABB(EntityItem.class, getEntityBox(socket, coord, orientation.top, 1.75))) {
                 if (ei.isDead) continue;
                 if (ei.ticksExisted > 1) continue;
                 ItemStack is = ei.getEntityItem();
@@ -193,21 +234,14 @@ public class SocketLacerator extends TileEntitySocketBase implements IMeterInfo,
         }
     }
 
-    boolean workTick() {
-        if (!isPowered && spinning_ticks > 0) {
-            spinning_ticks--;
-            speed = (short) Math.min(max_speed, speed + 32);
-            if (speed == max_speed) {
-                return false;
-            }
-        } else {
-            slowDown();
-        }
-        return workCheck();
+    @Override
+    public void neighborChanged() {
+        super.neighborChanged();
     }
 
-    boolean workCheck() {
-        return speed > min_speed && worldObj.rand.nextInt(max_speed) < speed/4;
+    boolean canWorkAlsoCould() {
+        couldWork = true;
+        return speed > min_speed;
     }
 
     @Override
@@ -271,9 +305,11 @@ public class SocketLacerator extends TileEntitySocketBase implements IMeterInfo,
     
     @Override
     public boolean handleRay(ISocketHolder socket, MovingObjectPosition mop, World mopWorld, boolean mopIsThis, boolean powered) {
-        DropCaptureHandler.startCapture(this, new Coord(mopWorld, mop), 3);
+        if (mop == null || mop.typeOfHit == MovingObjectPosition.MovingObjectType.MISS) return false;
+        Coord c = Coord.fromMop(mopWorld, mop);
+        DropCaptureHandler.startCapture(this, c, 3);
         try {
-            return _handleRay(socket, mop, mopWorld, mopIsThis, powered);
+            return handleRay0(socket, mop, mopWorld, mopIsThis, powered);
         } finally {
             DropCaptureHandler.endCapture();
         }
@@ -289,7 +325,7 @@ public class SocketLacerator extends TileEntitySocketBase implements IMeterInfo,
         return true;
     }
     
-    private boolean _handleRay(ISocketHolder socket, MovingObjectPosition mop, World mopWorld, boolean mopIsThis, boolean powered) {
+    private boolean handleRay0(ISocketHolder socket, MovingObjectPosition mop, World mopWorld, boolean mopIsThis, boolean powered) {
         if (mop == null) return false;
         if (mopIsThis) return false;
         
@@ -299,6 +335,11 @@ public class SocketLacerator extends TileEntitySocketBase implements IMeterInfo,
             }
             EntityLivingBase elb = (EntityLivingBase) mop.entityHit;
             if (elb.isDead || elb.getHealth() <= 0) return false;
+            if (!canWorkAlsoCould()) return true;
+            if (damage_ticks <= 0) {
+                return true;
+            }
+            damage_ticks--;
             float damage = 4F*speed/max_speed;
             if (elb.getHealth() <= damage && worldObj.rand.nextInt(20) == 1) {
                 elb.recentlyHit = 100;
@@ -334,6 +375,10 @@ public class SocketLacerator extends TileEntitySocketBase implements IMeterInfo,
                     }
                 }
             }
+            if (!canWorkAlsoCould()) return true;
+            if (damage_ticks < DAMAGE_TICKS_PER_UNIT) {
+                return true;
+            }
 
             //Below: A brief demonstration of why Coord exists
             long foundHash = mop.getBlockPos().hashCode();
@@ -356,7 +401,7 @@ public class SocketLacerator extends TileEntitySocketBase implements IMeterInfo,
                     TileEntity partner = mopWorld.getTileEntity(mop.getBlockPos().offset(facing));
                     if (partner instanceof SocketLacerator) {
                         SocketLacerator pardner = (SocketLacerator) partner;
-                        if (pardner.workCheck()) {
+                        if (pardner.speed > min_speed) {
                             progress += 16;
                         }
                     }
@@ -376,6 +421,7 @@ public class SocketLacerator extends TileEntitySocketBase implements IMeterInfo,
                 }
             }
             if (doBreak) {
+                damage_ticks -= DAMAGE_TICKS_PER_UNIT;
                 grab_items = true;
                 grind_items = true;
                 if (barrel == null) {
@@ -418,6 +464,11 @@ public class SocketLacerator extends TileEntitySocketBase implements IMeterInfo,
     @Override
     public Accepted accept(IWorkerContext context, WorkUnit unit, boolean simulate) {
         if (unit.category != EnergyCategory.ELECTRIC && unit.category != EnergyCategory.ROTATIONAL) return Accepted.NEVER;
+        if (damage_ticks <= DAMAGE_TICKS_PER_UNIT) {
+            if (simulate) return Accepted.NOW;
+            damage_ticks += DAMAGE_TICKS_PER_UNIT;
+            return Accepted.NOW;
+        }
         if (spinning_ticks < SPIN_TICKS_PER_UNIT) {
             if (simulate) return Accepted.NOW;
             spinning_ticks += SPIN_TICKS_PER_UNIT;
@@ -451,6 +502,8 @@ public class SocketLacerator extends TileEntitySocketBase implements IMeterInfo,
         // Why are those names short? To save NBT space? An unworthy goal. But not worth fixing.
         spinning_ticks = data.as(Share.PRIVATE, "spinningTicks").putShort(spinning_ticks);
         power_buffer = data.as(Share.PRIVATE, "powerBuffer").putByte(power_buffer);
+        isStarted = data.as(Share.PRIVATE, "isStarted").putBoolean(isStarted);
+        damage_ticks = data.as(Share.PRIVATE, "damageTicks").putShort(damage_ticks);
         return this;
     }
     
