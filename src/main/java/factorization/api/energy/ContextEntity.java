@@ -12,14 +12,16 @@ public class ContextEntity implements IWorkerContext {
     @Nonnull
     public final Entity ent;
 
+    final IWorker<ContextEntity> cast;
+
     public ContextEntity(@Nonnull Entity ent) {
         this.ent = ent;
+        // TODO: Forge capabilities?
+        cast = adaptEntity.cast(ent);
     }
 
     @Override
     public IWorker.Accepted give(@Nonnull WorkUnit unit, boolean simulate) {
-        IWorker cast = adaptEntity.cast(ent);
-        // TODO: Forge capabilities?
         return cast.accept(this, unit, simulate);
     }
 
@@ -30,7 +32,7 @@ public class ContextEntity implements IWorkerContext {
 
     @Override
     public boolean isValid() {
-        return !ent.isDead;
+        return cast != null && !ent.isDead;
     }
 
     @Override

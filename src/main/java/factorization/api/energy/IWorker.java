@@ -67,6 +67,11 @@ public interface IWorker<T extends IWorkerContext> {
      * want you to send a packet to the client to keep your gears rendering in sync with the driver. Such details can be
      * made accessible to the Worker via a custom WorkUnit class.
      *
+     * (It shall always be the case that ignorance of the particulars of a WorkUnit not cause a significant bug;
+     * eg there may be visual flaws, or power may stop arriving, but there will never be a dupe bug)
+     * <p/>
+     * This method may be called fairly often depending on the energy net; keep it cheap.
+     *
      * @param context  The object containing information about what 'this' is and how it is being accessed. Often ignorable.
      * @param unit     The {@link WorkUnit}. You'll want to compare its category field to an {@link EnergyCategory} instance.
      * @param simulate if simulate is true, then this is a querying if the IWorker can handle the unit.

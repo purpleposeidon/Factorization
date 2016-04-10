@@ -19,16 +19,18 @@ public class ContextBlock implements IWorkerContext {
     @Nullable
     public final EnumFacing edge;
 
+    final IWorker<ContextBlock> cast;
+
     public ContextBlock(Coord at, @Nullable EnumFacing side, @Nullable EnumFacing edge) {
         this.at = at;
         this.side = side;
         this.edge = edge;
+        // TODO: Forge capabilities?
+        cast = adaptBlock.cast(at.getBlock());
     }
 
     @Override
     public IWorker.Accepted give(@Nonnull WorkUnit unit, boolean simulate) {
-        IWorker cast = adaptBlock.cast(at.getBlock());
-        // TODO: Forge capabilities?
         return cast.accept(this, unit, simulate);
     }
 
@@ -39,7 +41,7 @@ public class ContextBlock implements IWorkerContext {
 
     @Override
     public boolean isValid() {
-        return at.blockExists();
+        return cast != null && at.blockExists();
     }
 
 

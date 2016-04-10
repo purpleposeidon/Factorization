@@ -12,14 +12,16 @@ public class ContextItemStack implements IWorkerContext {
 
     public final ItemStack is;
 
+    final IWorker<ContextItemStack> cast;
+
     public ContextItemStack(ItemStack is) {
         this.is = is;
+        // TODO: Forge capabilities?
+        cast = adaptItem.cast(is.getItem());
     }
 
     @Override
     public IWorker.Accepted give(@Nonnull WorkUnit unit, boolean simulate) {
-        IWorker cast = adaptItem.cast(is.getItem());
-        // TODO: Forge capabilities?
         return cast.accept(this, unit, simulate);
     }
 
@@ -30,7 +32,7 @@ public class ContextItemStack implements IWorkerContext {
 
     @Override
     public boolean isValid() {
-        return is.stackSize > 0;
+        return cast != null && is.stackSize > 0;
     }
 
     @Override

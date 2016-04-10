@@ -22,10 +22,14 @@ public class ContextTileEntity implements IWorkerContext {
     @Nullable
     public final EnumFacing edge;
 
+    final IWorker<ContextTileEntity> cast;
+
     public ContextTileEntity(@Nonnull TileEntity te, @Nullable EnumFacing side, @Nullable EnumFacing edge) {
         this.te = te;
         this.side = side;
         this.edge = edge;
+        // TODO: Forge capabilities?
+        cast = adaptTileEntity.cast(te);
     }
 
     public ContextTileEntity(@Nonnull TileEntity te) {
@@ -34,8 +38,6 @@ public class ContextTileEntity implements IWorkerContext {
 
     @Override
     public IWorker.Accepted give(@Nonnull WorkUnit unit, boolean simulate) {
-        IWorker cast = adaptTileEntity.cast(te);
-        // TODO: Forge capabilities?
         return cast.accept(this, unit, simulate);
     }
 
@@ -50,7 +52,7 @@ public class ContextTileEntity implements IWorkerContext {
 
     @Override
     public boolean isValid() {
-        return !te.isInvalid();
+        return cast != null && !te.isInvalid();
     }
 
 
