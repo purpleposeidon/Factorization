@@ -107,7 +107,7 @@ public class FactorizationClientProxy extends FactorizationProxy {
 
         @Override
         public boolean accepts(ResourceLocation modelLocation) {
-            if (modelLocation.toString().toLowerCase().contains("anthro")) {
+            if (modelLocation.toString().toLowerCase().contains("cutting")) {
                 NORELEASE.breakpoint();
             }
             return super.accepts(modelLocation);
@@ -276,6 +276,18 @@ public class FactorizationClientProxy extends FactorizationProxy {
             setItemModel(it, 0, "inventory");
         }
         standardItems = null;
+        {
+            final ModelResourceLocation modelResourceLocation = new ModelResourceLocation("factorization:diamond_cutting_head#inventory");
+            ModelLoader.setCustomMeshDefinition(Core.registry.diamond_cutting_head, new ItemMeshDefinition() {
+                @Override
+                public ModelResourceLocation getModelLocation(ItemStack stack) {
+                    return modelResourceLocation;
+                }
+            });
+            ModelBakery.registerItemVariants(Core.registry.diamond_cutting_head,
+                    new ModelResourceLocation("factorization:diamond_cutting_head#normal"),
+                    new ModelResourceLocation("factorization:diamond_cutting_head#inventory"));
+        }
 
         NORELEASE.fixme("Glaze bucket");
         NORELEASE.fixme("Artifacts");

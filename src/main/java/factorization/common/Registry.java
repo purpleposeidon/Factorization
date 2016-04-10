@@ -434,7 +434,7 @@ public class Registry {
         giant_scissors = new ItemCraftingComponent("socket/scissors");
         fan = new ItemCraftingComponent("fan");
         corkscrew = new ItemCraftingComponent("corkscrew");
-        diamond_cutting_head = new ItemCraftingComponent("diamond_cutting_head");
+        diamond_cutting_head = new ItemCraftingComponent("diamond_cutting_head", TabType.SERVOS, false);
         charge_meter = new ItemChargeMeter();
         mirror = new ItemBlockProxy(mirror_item_hidden, "mirror", TabType.CHARGE);
         leydenjar_item_full = ItemStack.copyItemStack(leydenjar_item);

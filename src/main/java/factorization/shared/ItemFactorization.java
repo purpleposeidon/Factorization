@@ -12,8 +12,14 @@ import java.util.List;
 
 public class ItemFactorization extends Item {
     public ItemFactorization(String name, TabType tabType) {
+        this(name, tabType, true);
+    }
+
+    public ItemFactorization(String name, TabType tabType, boolean hasStandardItemModel) {
         FzUtil.initItem(this, name, tabType);
-        Core.proxy.standardItemModel(this);
+        if (hasStandardItemModel) {
+            Core.proxy.standardItemModel(this);
+        }
     }
 
     String accessableUnlocalizedName;

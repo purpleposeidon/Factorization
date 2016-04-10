@@ -13,7 +13,7 @@ for filename in $HAY; do
     #map_Kd factorization:blocks/resource/dark_iron_block
 
     cat $filename \
-       | sed "s/map_Kd \/.*\/factorization\/textures\//map_Kd factorization:/g" \
+       | sed -r "s/map_Kd \/.*\/([^/]+)\/textures\//map_Kd \1:/g" \
        | sed "s/\.png//g" > .tmp
     cat .tmp > $filename
     rm -rf .tmp

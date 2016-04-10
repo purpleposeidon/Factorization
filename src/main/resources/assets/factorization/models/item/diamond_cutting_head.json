@@ -1,6 +1,0 @@
-{
-    "parent": "factorization:item/base",
-    "textures": {
-        "layer0": "factorization:items/diamond_cutting_head"
-    }
-}
