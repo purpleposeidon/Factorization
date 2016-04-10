@@ -6,6 +6,10 @@
     },
     "variants": {
         "normal": [{}],
-        "inventory": [{}]
+        "inventory": [{
+            "transform": {
+                "translation": [1, 0.1875, 0]
+            }
+        }]
     }
 }
