@@ -492,6 +492,8 @@ public class SocketLacerator extends TileEntitySocketBase implements IMeterInfo,
         if (index == 1) {
             float turn = NumUtil.interp(prev_rotation, rotation, partial) / 5.0F;
             GL11.glRotatef(turn, 0, 1, 0);
+        } else {
+            super.stateForPart(index, is, partial);
         }
     }
 

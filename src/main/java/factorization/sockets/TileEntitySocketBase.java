@@ -463,13 +463,19 @@ public abstract class TileEntitySocketBase extends TileEntityCommon implements I
     public void renderTesr(@Nullable ServoMotor motor, float partial) {
         final Minecraft mc = Minecraft.getMinecraft();
         final RenderItem ri = mc.getRenderItem();
+        RenderUtil.scale3(2);
+        GL11.glPushMatrix();
+        GL11.glTranslated(0.25, 0.25, 0.25);
         for (int i = 0; i < parts.length; i++) {
             ItemStack part = parts[i];
             if (part == null) continue;
-            if (motor != null && isStaticPart(i, part)) continue;
+            if (motor == null && isStaticPart(i, part)) continue;
+            GL11.glPushMatrix();
             stateForPart(i, part, partial);
             ri.renderItem(part, ItemCameraTransforms.TransformType.NONE);
+            GL11.glPopMatrix();
         }
+        GL11.glPopMatrix();
     }
 
     @SideOnly(Side.CLIENT)
