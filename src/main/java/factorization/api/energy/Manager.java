@@ -27,9 +27,17 @@ enum Manager {
             if (context == null) break;
             if (!context.isValid()) return;
             for (WorkUnit unit : unitPrototypes) {
-                if (context.give(unit, true) == IWorker.Accepted.NEVER) continue;
+                IWorker.Accepted need = context.give(unit, true);
+                if (need == IWorker.Accepted.NEVER) continue;
                 for (IEnergyNet net : unit.listener.nets) {
                     net.workerAdded(context, unit);
+                }
+                if (need == IWorker.Accepted.NOW) {
+                    for (IEnergyNet net : unit.listener.nets) {
+                        if (need != IWorker.Accepted.NOW) break;
+                        net.workerNeedsPower(context);
+                        need = context.give(unit, true);
+                    }
                 }
             }
         }
