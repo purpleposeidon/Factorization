@@ -21,6 +21,8 @@ import factorization.util.InvUtil.FzInv;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.block.model.ItemCameraTransforms;
+import net.minecraft.client.renderer.entity.RenderItem;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
@@ -31,6 +33,7 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import org.lwjgl.opengl.GL11;
 
+import javax.annotation.Nullable;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -457,7 +460,20 @@ public abstract class TileEntitySocketBase extends TileEntityCommon implements I
     public void onEnterNewBlock() { }
     
     @SideOnly(Side.CLIENT)
-    public void renderTesr(ServoMotor motor, float partial) {}
+    public void renderTesr(@Nullable ServoMotor motor, float partial) {
+        final Minecraft mc = Minecraft.getMinecraft();
+        final RenderItem ri = mc.getRenderItem();
+        for (int i = 0; i < parts.length; i++) {
+            ItemStack part = parts[i];
+            if (part == null) continue;
+            if (motor != null && isStaticPart(i, part)) continue;
+            stateForPart(i, part, partial);
+            ri.renderItem(part, ItemCameraTransforms.TransformType.NONE);
+        }
+    }
+
+    @SideOnly(Side.CLIENT)
+    public void stateForPart(int index, ItemStack is, float partial) { }
 
     @SideOnly(Side.CLIENT)
     public void renderInServo(ServoMotor motor, float partial) {
@@ -503,5 +519,9 @@ public abstract class TileEntitySocketBase extends TileEntityCommon implements I
 
     public void onLoaded(ISocketHolder holder) {
 
+    }
+
+    public boolean isStaticPart(int index, ItemStack part) {
+        return true;
     }
 }

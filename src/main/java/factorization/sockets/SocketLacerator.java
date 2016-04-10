@@ -473,14 +473,7 @@ public class SocketLacerator extends TileEntitySocketBase implements IMeterInfo,
     @Override
     @SideOnly(Side.CLIENT)
     public void renderTesr(ServoMotor motor, float partial) {
-        float d = 0.5F;
-        GL11.glTranslatef(d, d, d);
-        Quaternion.fromOrientation(FzOrientation.fromDirection(facing.getOpposite())).glRotate();
-        float turn = NumUtil.interp(prev_rotation, rotation, partial) / 5.0F;
-        GL11.glRotatef(turn, 0, 1, 0);
-        float sd = motor == null ? 1F/16F : 3F/16F;
-        GL11.glTranslatef(0, -4F/16F + sd + (float) Math.abs(Math.sin(turn/800))/32F, 0);
-        diamondCuttingHead.draw();
+        super.renderTesr(motor, partial);
         if (ticked) {
             ticked = false;
             if (speed > max_speed/3) {
@@ -489,7 +482,18 @@ public class SocketLacerator extends TileEntitySocketBase implements IMeterInfo,
         }
     }
 
-    static FzModel diamondCuttingHead = new FzModel("socket/diamondCuttingHead");
+    @Override
+    public boolean isStaticPart(int index, ItemStack part) {
+        return index != 1;
+    }
+
+    @Override
+    public void stateForPart(int index, ItemStack is, float partial) {
+        if (index == 1) {
+            float turn = NumUtil.interp(prev_rotation, rotation, partial) / 5.0F;
+            GL11.glRotatef(turn, 0, 1, 0);
+        }
+    }
 
     @SideOnly(Side.CLIENT)
     static EffectRenderer particleTweaker, origER;

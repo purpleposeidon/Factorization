@@ -40,8 +40,9 @@ public class BlockSocket extends SimpleFzBlockCutout {
         IExtendedBlockState extendedBS = (IExtendedBlockState) super.getExtendedState(state, world, pos);
         if (socket == null) {
             socket = (TileEntitySocketBase) FactoryType.SOCKET_EMPTY.getRepresentative();
+            assert socket != null;
         }
-        EnumFacing facing = socket.facing.getOpposite();
-        return extendedBS.withProperty(SOCKET_INFO, SocketCacheInfo.from(socket));
+        EnumFacing facing = socket.facing;
+        return extendedBS.withProperty(SOCKET_INFO, SocketCacheInfo.from(socket, facing, true, false));
     }
 }

@@ -50,7 +50,7 @@ public class SocketModel implements ISmartItemModel, ISmartBlockModel, IPerspect
     @Override
     public IBakedModel handleItemState(ItemStack stack) {
         repr.loadFromStack(stack);
-        return get(SocketCacheInfo.from(repr));
+        return get(SocketCacheInfo.from(repr, EnumFacing.UP, false, false));
     }
 
     @Override
