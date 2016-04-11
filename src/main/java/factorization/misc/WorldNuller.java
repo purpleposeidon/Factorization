@@ -52,8 +52,7 @@ public class WorldNuller {
 
         UnloadEntry(World world) {
             this.worldRef = new WeakReference<World>(world);
-            name = "<" + world.toString() + " " + FzUtil.getWorldDimension(world) + " " + world.getProviderName() + ">";
-            timeOfUnload = System.currentTimeMillis();
+            name = "<" + world.toString() + " " + FzUtil.getWorldDimension(world) + " " + world.getChunkProvider().makeString() + ">";
         }
 
         static void log(String msg) {
