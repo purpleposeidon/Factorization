@@ -52,7 +52,7 @@ public class ContextTileEntity implements IWorkerContext {
 
     @Override
     public boolean isValid() {
-        return cast != null && !te.isInvalid();
+        return cast != null && !te.isInvalid() && te.getWorld() != null;
     }
 
 

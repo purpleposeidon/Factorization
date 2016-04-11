@@ -75,6 +75,7 @@ public class ChargeEnetSubsys implements IEnergyNet {
     }
 
     WireLeader getLeader(MemberPos mp, Coord at, EnumFacing dir) {
+        if (at == null || at.w == null) return null;
         final Map<MemberPos, WireLeader> cache = getCache(at.w);
         WireLeader leader = cache.get(mp);
         if (leader != null) {
