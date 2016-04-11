@@ -1,3 +1,6 @@
+0.8.108
+  Let the coremod accept certain patch failures for pseudo-compatibility w/ The Betweenlands.
+
 0.8.107
   Disabled RenderSorter. This fixes a crash involving Ars Magica. Credit to jjtParadox!
   

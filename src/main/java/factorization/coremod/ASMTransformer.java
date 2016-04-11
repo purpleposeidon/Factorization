@@ -58,12 +58,18 @@ public class ASMTransformer implements IClassTransformer {
             // Make the camera take UCs into account in 3rd-person view
             // (Could go in forge, but is implemented specifically for FZDS)
             if (transformedName.equals("net.minecraft.client.renderer.EntityRenderer") && HammerEnabled.ENABLED) {
-                return applyTransform(basicClass,
-                        new AbstractAsmMethodTransform.MutateCall(name, transformedName, "func_78467_g", "orientCamera")
-                                .setOwner("net.minecraft.client.multiplayer.WorldClient")
-                                .setName("rayTraceBlocks", "func_72933_a", "a")
-                                .setDescr("(Lnet/minecraft/util/Vec3;Lnet/minecraft/util/Vec3;)Lnet/minecraft/util/MovingObjectPosition;", "(Lazw;Lazw;)Lazu;")
-                );
+                try {
+                    return applyTransform(basicClass,
+                            new AbstractAsmMethodTransform.MutateCall(name, transformedName, "func_78467_g", "orientCamera")
+                                    .setOwner("net.minecraft.client.multiplayer.WorldClient")
+                                    .setName("rayTraceBlocks", "func_72933_a", "a")
+                                    .setDescr("(Lnet/minecraft/util/Vec3;Lnet/minecraft/util/Vec3;)Lnet/minecraft/util/MovingObjectPosition;", "(Lazw;Lazw;)Lazu;")
+                    );
+                } catch (RuntimeException e) {
+                    log("WARNING: Transformation to " + transformedName + " failed!");
+                    log("This is lame, but ignorable: the camera will pass through solid FZDS blocks in 3rd-person view.");
+                    e.printStackTrace();
+                }
             }
             // Add "Universal Colliders". Adds a list of entities to the chunk that are added to every collision query.
             // The alternative to this is setting World.MAX_ENTITY_RADIUS to a large value, and putting collodier-entities everywhere, which is slow & ugly
@@ -75,8 +81,14 @@ public class ASMTransformer implements IClassTransformer {
             }
             // Allow the player to stand on a UC without getting kicked from the server
             if (transformedName.equals("net.minecraft.world.World") && HammerEnabled.ENABLED) {
-                return applyTransform(basicClass,
-                        new AbstractAsmMethodTransform.Append(name, transformedName, "func_72829_c", "checkBlockCollision"));
+                try {
+                    return applyTransform(basicClass,
+                            new AbstractAsmMethodTransform.Append(name, transformedName, "func_72829_c", "checkBlockCollision"));
+                } catch (RuntimeException e) {
+                    log("WARNING: Transformation to " + transformedName + " failed!");
+                    log("This is lame, but (kind-of?) ignorable: you may be kicked for flying when standing on FZDS blocks ");
+                    e.printStackTrace();
+                }
             }
             // (This... might not be entirely necessary. I didn't test this problem enough!)
             // Something about limiting the velocity of an entity when it's being influenced by multiple IDCs moving in the same direction...
