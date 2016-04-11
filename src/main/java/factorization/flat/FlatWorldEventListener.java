@@ -17,7 +17,9 @@ public class FlatWorldEventListener implements IWorldAccess {
 
     @Override
     public void markBlockForUpdate(BlockPos pos) {
-        Flat.onBlockChanged(new Coord(world, pos));
+        Coord at = new Coord(world, pos);
+        if (!at.blockExists()) return;
+        Flat.onBlockChanged(at);
     }
 
     @Override public void notifyLightSet(BlockPos pos) { }
