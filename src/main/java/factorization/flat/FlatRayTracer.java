@@ -7,7 +7,6 @@ import factorization.flat.api.FlatFace;
 import factorization.flat.render.FlatRayTargetRender;
 import factorization.shared.Core;
 import factorization.util.FzUtil;
-import factorization.util.NORELEASE;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.entity.Render;
 import net.minecraft.client.renderer.entity.RenderManager;
@@ -48,7 +47,7 @@ public enum FlatRayTracer {
                 mc.gameSettings.keyBindAttack.pressTime = 1;
                 mc.leftClickCounter = 10;
             } else {
-                if (mc.objectMouseOver.entityHit == target && target != null) {
+                if (mc.objectMouseOver != null && mc.objectMouseOver.entityHit == target && target != null) {
                     if (mc.gameSettings.keyBindAttack.isKeyDown()) {
                         mc.gameSettings.keyBindAttack.pressTime = 1;
                     }
