@@ -85,6 +85,7 @@ public class ItemManSandwich extends ItemFood implements IManwich, ISensitiveMes
     @SubscribeEvent
     public void digestManwhich(PlayerEvent.Clone event) {
         if (!event.wasDeath) return;
+        if (event.original.worldObj.getGameRules().getBoolean("keepInventory")) return;
         EntityPlayer player = event.entityPlayer;
         StatisticsFile stats = StatUtil.getStatsFile(player);
         if (stats == null) return;
