@@ -412,6 +412,7 @@ public class TileEntityGreenware extends TileEntityCommon implements IFurnaceHea
         if (worldObj.isRemote) {
             return;
         }
+        // TODO: Ugh, laaaame. Schedule a block update?
         if (!partsValidated) {
             partsValidated = true;
             Iterator<ClayLump> it = parts.iterator();
@@ -456,6 +457,16 @@ public class TileEntityGreenware extends TileEntityCommon implements IFurnaceHea
         }
         Item heldId = held.getItem();
         boolean creative = player.capabilities.isCreativeMode;
+        if (heldId == Items.blaze_powder && state != ClayState.HIGHFIRED) {
+            PlayerUtil.cheatDecr(player, held);
+            // TODO: Untested. Blaze powder should just finish the thing. Should also play a noise + emit particles.
+            if (totalHeat < bisqueHeat) {
+                totalHeat = bisqueHeat;
+            } else if (totalHeat < highfireHeat) {
+                totalHeat = highfireHeat;
+            }
+            return true;
+        }
         if (heldId == Items.water_bucket && state == ClayState.DRY) {
             lastTouched = 0;
             if (creative) {
