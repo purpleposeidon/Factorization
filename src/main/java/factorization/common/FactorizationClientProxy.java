@@ -5,8 +5,6 @@ import factorization.api.Coord;
 import factorization.artifact.ContainerForge;
 import factorization.artifact.GuiArtifactForge;
 import factorization.beauty.*;
-import factorization.ceramics.TileEntityGreenware;
-import factorization.ceramics.TileEntityGreenwareRender;
 import factorization.charge.TileEntityHeater;
 import factorization.charge.TileEntityHeaterRenderer;
 import factorization.charge.enet.TileEntityLeydenJar;
@@ -51,7 +49,6 @@ import net.minecraft.client.renderer.ItemMeshDefinition;
 import net.minecraft.client.renderer.entity.RenderManager;
 import net.minecraft.client.renderer.entity.RenderSnowball;
 import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
-import net.minecraft.client.resources.model.IBakedModel;
 import net.minecraft.client.resources.model.ModelBakery;
 import net.minecraft.client.resources.model.ModelResourceLocation;
 import net.minecraft.client.settings.GameSettings;
@@ -289,9 +286,7 @@ public class FactorizationClientProxy extends FactorizationProxy {
                     new ModelResourceLocation("factorization:diamond_cutting_head#inventory"));
         }
 
-        NORELEASE.fixme("Glaze bucket");
         NORELEASE.fixme("Artifacts");
-        // MinecraftForgeClient.registerItemRenderer(Core.registry.glaze_bucket, new ItemRenderGlazeBucket());
         // MinecraftForgeClient.registerItemRenderer(Core.registry.brokenTool, new RenderBrokenArtifact());
         Core.loadBus(GooRenderer.INSTANCE);
     }
@@ -331,7 +326,6 @@ public class FactorizationClientProxy extends FactorizationProxy {
     @Override
     public void registerTesrs() {
         setTileEntityRendererDispatcher(TileEntityDayBarrel.class, new TileEntityDayBarrelRenderer());
-        setTileEntityRendererDispatcher(TileEntityGreenware.class, new TileEntityGreenwareRender());
         setTileEntityRendererDispatcher(TileEntityHeater.class, new TileEntityHeaterRenderer());
         setTileEntityRendererDispatcher(TileEntityLeydenJar.class, new TileEntityLeydenJarRender());
         setTileEntityRendererDispatcher(TileEntityCompressionCrafter.class, new TileEntityCompressionCrafterRenderer());

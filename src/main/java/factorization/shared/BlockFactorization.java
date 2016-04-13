@@ -246,8 +246,6 @@ public class BlockFactorization extends BlockContainer {
         put(itemList, reg.wind_mill);
         put(itemList, reg.water_wheel);
 
-        put(itemList, reg.greenware_item);
-
         if (reg.rocket_engine != null) {
             put(itemList, new ItemStack(reg.rocket_engine));
         }

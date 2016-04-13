@@ -5,10 +5,6 @@ import factorization.artifact.BlockForge;
 import factorization.artifact.ItemBrokenArtifact;
 import factorization.artifact.ItemPotency;
 import factorization.beauty.*;
-import factorization.ceramics.ItemGlazeBucket;
-import factorization.ceramics.ItemSculptingTool;
-import factorization.ceramics.TileEntityGreenware;
-import factorization.ceramics.TileEntityGreenware.ClayState;
 import factorization.charge.BlockFurnaceHeater;
 import factorization.charge.ItemAcidBottle;
 import factorization.charge.ItemChargeMeter;
@@ -52,7 +48,6 @@ import net.minecraft.init.Items;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.InventoryCrafting;
 import net.minecraft.item.Item;
-import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.FurnaceRecipes;
 import net.minecraft.item.crafting.IRecipe;
@@ -130,7 +125,6 @@ public class Registry {
             lamp_item,
             leydenjar_item, leydenjar_item_full, heater_item, solarboiler_item, caliometric_burner_item,
             mirror_item_hidden,
-            greenware_item,
             parasieve_item,
             compression_crafter_item,
             sap_generator_item, anthro_generator_item,
@@ -147,10 +141,6 @@ public class Registry {
     public ItemChargeMeter charge_meter;
     public ItemBlockProxy mirror;
     public ItemCraftingComponent sludge;
-    public ItemSculptingTool sculpt_tool;
-    public ItemGlazeBucket glaze_bucket;
-    public ItemStack empty_glaze_bucket;
-    public ItemStack base_common, glaze_base_mimicry;
     public ItemCraftingComponent logicMatrix, logicMatrixIdentifier, logicMatrixController;
     public ItemMatrixProgrammer logicMatrixProgrammer;
     public Fluid steamFluid;
@@ -400,7 +390,6 @@ public class Registry {
         bibliogen_item = FactoryType.BIBLIO_GEN.itemStack();
         heater_item = FactoryType.HEATER.itemStack();
         mirror_item_hidden = FactoryType.MIRROR.itemStack();
-        greenware_item = FactoryType.CERAMIC.itemStack();
         if (DeltaChunk.enabled()) {
             hinge = FactoryType.HINGE.itemStack();
             wind_mill = FactoryType.WIND_MILL_GEN.itemStack();
@@ -443,10 +432,6 @@ public class Registry {
         leydenjar_item_full.setTagCompound(tag);
 
         //ceramics
-        sculpt_tool = new ItemSculptingTool();
-        glaze_bucket = new ItemGlazeBucket();
-        empty_glaze_bucket = new ItemStack(glaze_bucket, 1, 100);
-        spawnPoster = new ItemSpawnPoster();
 
         //Misc
         pocket_table = new ItemPocketTable();
@@ -691,201 +676,6 @@ public class Registry {
                 '#', copper_ingot);
         FurnaceRecipes.instance().addSmeltingRecipe(copper_ore_item.copy(), new ItemStack(copper_ingot), 0.3F);
         FurnaceRecipes.instance().addSmeltingRecipe(new ItemStack(dark_iron_ore), new ItemStack(dark_iron_ingot), 0.5F);
-
-        //ceramics
-        oreRecipe(new ItemStack(sculpt_tool),
-                " c",
-                "/ ",
-                'c', Items.clay_ball,
-                '/', Items.stick);
-        ItemSculptingTool.addModeChangeRecipes();
-        oreRecipe(empty_glaze_bucket.copy(),
-                "_ _",
-                "# #",
-                "#_#",
-                '_', "slabWood",
-                '#', "plankWood");
-        
-        base_common = glaze_bucket.makeCraftingGlaze("base_common");
-        glaze_base_mimicry = glaze_bucket.makeCraftingGlaze("base_mimicry");
-        
-        ItemStack lapis = new ItemStack(Items.dye, 1, 4);
-        
-        shapelessOreRecipe(base_common, empty_glaze_bucket.copy(), Items.water_bucket, new ItemStack(Blocks.sand, 1, OreDictionary.WILDCARD_VALUE), Items.clay_ball);
-        shapelessOreRecipe(glaze_base_mimicry, base_common, Items.redstone, Items.slime_ball, lapis);
-        
-        ItemStack waterFeature = glaze_bucket.makeMimicingGlaze(Blocks.water, 0, -1);
-        ItemStack lavaFeature = glaze_bucket.makeMimicingGlaze(Blocks.lava, 0, -1);
-        shapelessOreRecipe(waterFeature, base_common, Items.water_bucket);
-        shapelessOreRecipe(lavaFeature, base_common, Items.lava_bucket);
-        
-        Core.registry.glaze_bucket.doneMakingStandardGlazes();
-        
-        //Sculpture combiniation recipe
-        IRecipe sculptureMergeRecipe = new IRecipe() {
-            ArrayList<ItemStack> merge(InventoryCrafting inv) {
-                ArrayList<ItemStack> match = null;
-                for (int i = 0; i < inv.getSizeInventory(); i++) {
-                    ItemStack is = inv.getStackInSlot(i);
-                    if (is == null) {
-                        continue;
-                    }
-                    if (!is.hasTagCompound()) {
-                        return null;
-                    }
-                    if (ItemUtil.similar(Core.registry.greenware_item, is)) {
-                        if (match == null) match = new ArrayList<ItemStack>(2);
-                        match.add(is);
-                    } else {
-                        return null;
-                    }
-                }
-                if (match == null || match.size() != 2) {
-                    return null;
-                }
-                return match;
-            }
-            
-            @Override
-            public boolean matches(InventoryCrafting inventorycrafting, World world) {
-                ArrayList<ItemStack> matching = merge(inventorycrafting);
-                if (matching == null) {
-                    return false;
-                }
-                int partCount = 0;
-                TileEntityGreenware rep = (TileEntityGreenware) FactoryType.CERAMIC.getRepresentative();
-                for (ItemStack is : matching) {
-                    rep.loadFromStack(is);
-                    if (rep.getState() != ClayState.WET) {
-                        return false;
-                    }
-                    partCount += rep.parts.size();
-                    if (partCount >= TileEntityGreenware.MAX_PARTS) {
-                        return false;
-                    }
-                }
-                return true;
-            }
-            
-            @Override
-            public int getRecipeSize() {
-                return 2;
-            }
-            
-            @Override
-            public ItemStack getRecipeOutput() {
-                return greenware_item.copy();
-            }
-
-            @Override
-            public ItemStack[] getRemainingItems(InventoryCrafting inv) {
-                return CraftUtil.getRemainingItems(inv);
-            }
-
-            @Override
-            public ItemStack getCraftingResult(InventoryCrafting inventorycrafting) {
-                ArrayList<ItemStack> matching = merge(inventorycrafting);
-                TileEntityGreenware target = new TileEntityGreenware();
-                for (ItemStack is : matching) {
-                    TileEntityGreenware rep = (TileEntityGreenware) FactoryType.CERAMIC.getRepresentative();
-                    rep.loadFromStack(is);
-                    target.parts.addAll(rep.parts);
-                }
-                return target.getItem();
-            }
-        };
-        GameRegistry.addRecipe(sculptureMergeRecipe);
-        
-        IRecipe mimicryGlazeRecipe = new IRecipe() {
-            @Override
-            public boolean matches(InventoryCrafting inventorycrafting, World world) {
-                int mimic_items = 0;
-                int other_items = 0;
-                for (int i = 0; i < inventorycrafting.getSizeInventory(); i++) {
-                    ItemStack is = inventorycrafting.getStackInSlot(i);
-                    if (is == null) {
-                        continue;
-                    }
-                    if (ItemUtil.couldMerge(glaze_base_mimicry, is)) {
-                        mimic_items++;
-                    } else {
-                        if (!(is.getItem() instanceof ItemBlock)) continue;
-                        int d = is.getItemDamage();
-                        if (d < 0 || d > 16) {
-                            return false;
-                        }
-                        Block b = Block.getBlockFromItem(is.getItem());
-                        if (b == null || b.getUnlocalizedName().equals("tile.ForgeFiller")) {
-                            return false;
-                        }
-                        other_items++;
-                    }
-                }
-                return mimic_items == 1 && other_items == 1;
-            }
-            
-            @Override
-            public int getRecipeSize() {
-                return 2;
-            }
-            
-            @Override
-            public ItemStack getRecipeOutput() {
-                return glaze_base_mimicry;
-            }
-
-            @Override
-            public ItemStack[] getRemainingItems(InventoryCrafting inv) {
-                return CraftUtil.getRemainingItems(inv);
-            }
-
-            final int[] side_map = new int[] {
-                    1, 2, 1,
-                    4, 0, 5,
-                    0, 3, 0
-            };
-            @Override
-            public ItemStack getCraftingResult(InventoryCrafting inventorycrafting) {
-                int bucket_slot = -1, block_slot = -1;
-
-                for (int i = 0; i < inventorycrafting.getSizeInventory(); i++) {
-                    ItemStack is = inventorycrafting.getStackInSlot(i);
-                    if (is == null) {
-                        continue;
-                    }
-                    if (ItemUtil.couldMerge(glaze_base_mimicry, is)) {
-                        bucket_slot = i;
-                        continue;
-                    }
-                    int d = is.getItemDamage();
-                    if (d < 0 || d > 16) {
-                        continue;
-                    }
-                    if (!(is.getItem() instanceof ItemBlock)) continue;
-                    Block b = Block.getBlockFromItem(is.getItem());
-                    if (b == null || b.getUnlocalizedName().equals("tile.ForgeFiller")) {
-                        continue;
-                    }
-                    block_slot = i;
-                }
-                if (bucket_slot == -1 || block_slot == -1) {
-                    return null;
-                }
-                int side = 0;
-                try {
-                    if (block_slot == 4) {
-                        side = side_map[block_slot];
-                    } else {
-                        side = -1;
-                    }
-                } catch (ArrayIndexOutOfBoundsException e) {}
-                ItemStack is = inventorycrafting.getStackInSlot(block_slot);
-                return glaze_bucket.makeMimicingGlaze(Block.getBlockFromItem(is.getItem()), is.getItemDamage(), side);
-            }
-        };
-        GameRegistry.addRecipe(mimicryGlazeRecipe);
-        RecipeSorter.register("factorization:sculptureMerge", sculptureMergeRecipe.getClass(), Category.SHAPELESS, "");
-        RecipeSorter.register("factorization:mimicryGlaze", mimicryGlazeRecipe.getClass(), Category.SHAPELESS, "");
         oreRecipe(new ItemStack(spawnPoster),
                 "0",
                 "-",
@@ -984,12 +774,6 @@ public class Registry {
                 'S', Items.gold_ingot,
                 'G', Blocks.glass_pane,
                 'W', diamond_shard);
-
-        oreRecipe(greenware_item,
-                "c",
-                "-",
-                'c', Items.clay_ball,
-                '-', "slabWood");
 
         //Electricity
 

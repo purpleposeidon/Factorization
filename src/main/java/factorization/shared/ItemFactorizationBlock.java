@@ -1,17 +1,13 @@
 package factorization.shared;
 
 import factorization.api.Coord;
-import factorization.ceramics.TileEntityGreenware;
-import factorization.ceramics.TileEntityGreenware.ClayState;
 import factorization.charge.enet.TileEntityLeydenJar;
 import factorization.common.FactoryType;
-import factorization.util.ItemUtil;
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.EnumFacing;
@@ -81,16 +77,6 @@ public class ItemFactorizationBlock extends ItemBlock {
 
     @Override
     public void addInformation(ItemStack is, EntityPlayer player, List<String> infoList, boolean verbose) {
-        if (Core.registry.greenware_item != null && is.isItemEqual(Core.registry.greenware_item) /* required to not compare NBT here */) {
-            NBTTagCompound tag = is.getTagCompound();
-            if (tag != null) {
-                TileEntityGreenware teg = (TileEntityGreenware) FactoryType.CERAMIC.getRepresentative();
-                teg.readFromNBT(tag);
-                ClayState state = teg.getState();
-                infoList.add(teg.parts.size() + " parts");
-                infoList.add(state.toString());
-            }
-        }
         if (this == Core.registry.leydenjar_item.getItem()) {
             int perc = 0;
             if (is.hasTagCompound()) {

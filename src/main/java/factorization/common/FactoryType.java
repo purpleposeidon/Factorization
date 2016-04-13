@@ -2,7 +2,6 @@ package factorization.common;
 
 import factorization.artifact.TileEntityLegendarium;
 import factorization.beauty.*;
-import factorization.ceramics.TileEntityGreenware;
 import factorization.charge.*;
 import factorization.charge.enet.TileEntityLeydenJar;
 import factorization.crafting.TileEntityCompressionCrafter;
@@ -49,7 +48,7 @@ public enum FactoryType {
     SOLARBOILER(22, false, TileEntitySolarBoiler.class, "factory_solarfurnace"), //Produces steam from sunlight
     //ROCKETENGINE(23, false, TileEntityRocketEngine.class, "factory_rocketengine"), //Is a rocket
     EXTENDED(24, false, TileEntityExtension.class, "factory_ext"), //Used for multipiece blocks (like beds & rocket engines)
-    CERAMIC(25, false, TileEntityGreenware.class, "factory_ceramic"), //clay sculpture
+    //25 -- Used to be CERAMIC
     LEYDENJAR(26, false, TileEntityLeydenJar.class, "factory_leyjar"), //inefficient bulk energy storage
     SERVORAIL(27, false, TileEntityServoRail.class, "factory_rail"),
     PARASIEVE(28, true, TileEntityParaSieve.class, "factory_sieve"),

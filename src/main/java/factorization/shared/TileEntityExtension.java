@@ -5,10 +5,7 @@ import factorization.api.HeatConverters;
 import factorization.api.IFurnaceHeatable;
 import factorization.api.datahelpers.DataHelper;
 import factorization.api.datahelpers.Share;
-import factorization.ceramics.TileEntityGreenware;
 import factorization.common.FactoryType;
-import factorization.net.StandardMessageType;
-import io.netty.buffer.ByteBuf;
 import net.minecraft.block.Block;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
@@ -135,14 +132,7 @@ public class TileEntityExtension extends TileEntityCommon implements IFurnaceHea
     public MovingObjectPosition collisionRayTrace(Vec3 startVec, Vec3 endVec) {
         TileEntityCommon p = getParent();
         if (p != null) {
-            MovingObjectPosition ret = p.collisionRayTrace(startVec, endVec);
-            if (!(p instanceof TileEntityGreenware)) {
-                //hax
-                if (ret != null && ret.typeOfHit == MovingObjectPosition.MovingObjectType.BLOCK) {
-                    return new MovingObjectPosition(ret.hitVec, ret.sideHit, pos);
-                }
-            }
-            return ret;
+            return p.collisionRayTrace(startVec, endVec);
         }
         return super.collisionRayTrace(startVec, endVec);
     }
