@@ -434,6 +434,7 @@ public class Registry {
         //ceramics
 
         //Misc
+        spawnPoster = new ItemSpawnPoster();
         pocket_table = new ItemPocketTable();
 
         //Rocketry
