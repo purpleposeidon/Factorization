@@ -283,7 +283,7 @@ class SocketPoweredCrank extends TileEntitySocketBase implements IWorker<Context
 
     public void setChain(IDimensionSlice idc, Vec3 hookLocation, Coord hookedBlock) {
         if (hookedIdc.trackingEntity()) {
-            getCoord().spawnItem(Core.registry.darkIronChain);
+            //getCoord().spawnItem(Core.registry.darkIronChain);
         }
         hookedIdc.trackEntity(idc.getEntity());
         this.hookLocation = hookLocation;
@@ -306,7 +306,7 @@ class SocketPoweredCrank extends TileEntitySocketBase implements IWorker<Context
         MechanicsController.deregister(idc, this);
         hookedIdc.trackEntity(null);
         final Coord at = getCoord();
-        at.spawnItem(new ItemStack(Core.registry.darkIronChain));
+        //at.spawnItem(new ItemStack(Core.registry.darkIronChain));
         at.syncTE();
         updateComparator();
         chainDelta = 0;
