@@ -87,7 +87,8 @@ public class Registry {
     public BlockFactorization legacy_factory_block;
     public BlockBarrel factory_block_barrel;
     public BlockParasieve parasieve_block;
-    public SimpleFzBlock caliometric_burner_block;
+    public SimpleFzBlock caliometric_burner_block, sap_tap_block;
+    public SimpleFzBlock solar_boiler_block;
     public SimpleFzBlock creative_energy;
     public BlockFurnaceHeater furnace_heater;
     public SimpleFzBlock whirligig;
@@ -194,6 +195,8 @@ public class Registry {
         parasieve_block = new BlockParasieve();
         parasieve_block.setUnlocalizedName("factorization:factoryBlock.PARASIEVE");
         caliometric_burner_block = new SimpleFzBlock(materialMachine, FactoryType.CALIOMETRIC_BURNER);
+        sap_tap_block = new SimpleFzBlock(Material.wood, FactoryType.SAP_TAP);
+        solar_boiler_block = new SimpleFzBlock(materialMachine, FactoryType.SOLARBOILER);
         creative_energy = new SimpleFzBlock(Material.barrier, FactoryType.CREATIVE_CHARGE);
         furnace_heater = new BlockFurnaceHeater();
         whirligig = new SimpleFzBlock(materialMachine, FactoryType.STEAM_SHAFT);
@@ -252,6 +255,8 @@ public class Registry {
         GameRegistry.registerBlock(blastBlock, "BlastBlock");
         GameRegistry.registerBlock(parasieve_block, ItemFactorizationBlock.class, "Parasieve");
         GameRegistry.registerBlock(caliometric_burner_block, ItemFactorizationBlock.class, "CaliometricBurner");
+        GameRegistry.registerBlock(sap_tap_block, ItemFactorizationBlock.class, "SapTap");
+        GameRegistry.registerBlock(solar_boiler_block, ItemFactorizationBlock.class, "SolarBoiler");
         GameRegistry.registerBlock(creative_energy, ItemFactorizationBlock.class, "CreativeEnergy");
         GameRegistry.registerBlock(furnace_heater, ItemFactorizationBlock.class, "FurnaceHeater");
         GameRegistry.registerBlock(whirligig, ItemFactorizationBlock.class, "Whirligig");

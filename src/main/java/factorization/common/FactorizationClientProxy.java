@@ -237,6 +237,8 @@ public class FactorizationClientProxy extends FactorizationProxy {
                 Core.registry.factory_block_barrel,
                 Core.registry.parasieve_block,
                 Core.registry.caliometric_burner_block,
+                Core.registry.sap_tap_block,
+                Core.registry.solar_boiler_block,
                 Core.registry.creative_energy,
                 Core.registry.furnace_heater,
                 Core.registry.whirligig,

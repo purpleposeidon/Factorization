@@ -1,0 +1,7 @@
+{
+    "parent": "factorization:block/top_side", 
+    "textures": {
+        "top": "factorization:blocks/beauty/saptap_top",
+        "side": "factorization:blocks/beauty/saptap"
+    }
+}

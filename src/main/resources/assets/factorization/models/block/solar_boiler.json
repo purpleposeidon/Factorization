@@ -1,0 +1,8 @@
+{
+    "parent": "factorization:block/top_side_bot", 
+    "textures": {
+        "top": "factorization:blocks/charge/boiler_top",
+        "side": "factorization:blocks/charge/boiler_side",
+        "bot": "factorization:blocks/charge/boiler_side"
+    }
+}
