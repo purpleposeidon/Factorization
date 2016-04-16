@@ -30,7 +30,7 @@ import java.util.List;
 
 import static factorization.util.SpaceUtil.*;
 
-public class TileEntityHinge extends TileEntityCommon implements IDCController, ITickable {
+class TileEntityHinge extends TileEntityCommon implements IDCController, ITickable {
     FzOrientation facing = FzOrientation.FACE_EAST_POINT_DOWN;
     final EntityReference<DimensionSliceEntityBase> idcRef = MechanicsController.autoJoin(this);
     Vec3 dseOffset = SpaceUtil.newVec();
@@ -38,7 +38,7 @@ public class TileEntityHinge extends TileEntityCommon implements IDCController, 
 
     @Override
     public FactoryType getFactoryType() {
-        return FactoryType.HINGE;
+        return null; //return FactoryType.HINGE;
     }
 
     @Override
