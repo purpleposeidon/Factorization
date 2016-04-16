@@ -31,7 +31,6 @@ public class TileEntityShaftRenderer extends TileEntitySpecialRenderer<TileEntit
         RenderUtil.scale3(2);
         IBakedModel model = ri.getItemModelMesher().getItemModel(shaft.shaftItem);
         ri.renderItem(shaft.shaftItem, model);
-        GL11.glPopAttrib();
         GL11.glPopMatrix();
     }
 }
