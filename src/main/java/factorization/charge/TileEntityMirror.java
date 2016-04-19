@@ -40,7 +40,7 @@ public class TileEntityMirror extends TileEntityCommon implements ITickable {
     //don't save, but *do* share w/ client
     public transient int target_rotation = NO_TARGET;
     private boolean covered_by_other_mirror = false;
-    public byte silver = 1;
+    public byte silver = 1; // This really ought to be called 'powerBosters' or something.
 
     @Override
     public FactoryType getFactoryType() {
@@ -85,14 +85,11 @@ public class TileEntityMirror extends TileEntityCommon implements ITickable {
     public void neighborChanged() {
         next_check = -1;
         IReflectionTarget target = reflection_target == null ? null : reflection_target.getTE(IReflectionTarget.class);
-        byte new_silver = countSilver();
-        if (new_silver == silver) return;
+        silver = countSilver();
         if (target == null) {
-            silver = new_silver;
             return;
         }
         int oldPower = -getPower();
-        silver = new_silver;
         int newPower = getPower();
         target.addReflector(oldPower + newPower);
         broadcastTargetInfoIfChanged(true);
