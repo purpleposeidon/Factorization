@@ -1,0 +1,16 @@
+{
+    "forge_marker": 1,
+    "defaults": {
+        "model": "factorization:mirrorbase",
+        "transform": "forge:default-block"
+    },
+    "variants": {
+        "normal": [{}],
+        "inventory": [{
+            "submodel": "factorization:mirrorface",
+            "transform": {
+                "translation": [0.5, 0.5, 0.5]
+            }
+        }]
+    }
+}

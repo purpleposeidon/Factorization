@@ -1,0 +1,21 @@
+{
+    "elements": [
+        {
+            "from": [ -6, 0, -6 ],
+            "to":   [  7, 1,  7 ],
+            "faces": {
+                "down":  { "texture": "#metal", "uv": [  2,  2, 14, 14] },
+                "up":    { "texture": "#metal", "uv": [  2,  2, 14, 14] },
+                "north": { "texture": "#metal", "uv": [  2,  2, 14,  3] },
+                "south": { "texture": "#metal", "uv": [  2, 13, 14, 14] },
+                "west":  { "texture": "#metal", "uv": [  2,  2,  3, 14] },
+                "east":  { "texture": "#metal", "uv": [ 13,  2, 14, 14] }
+            }
+        }
+    ],
+    "textures": {
+        "#metal": "factorization:blocks/charge/mirror_front",
+        "metal": "factorization:blocks/charge/mirror_front",
+        "particle": "factorization:blocks/charge/mirror_front"
+    }
+}

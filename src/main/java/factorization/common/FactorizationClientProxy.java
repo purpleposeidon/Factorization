@@ -7,6 +7,8 @@ import factorization.artifact.GuiArtifactForge;
 import factorization.beauty.*;
 import factorization.charge.TileEntityHeater;
 import factorization.charge.TileEntityHeaterRenderer;
+import factorization.charge.TileEntityMirror;
+import factorization.charge.TileEntityMirrorRender;
 import factorization.charge.enet.TileEntityLeydenJar;
 import factorization.charge.enet.TileEntityLeydenJarRender;
 import factorization.charge.sparkling.EntitySparkling;
@@ -244,7 +246,6 @@ public class FactorizationClientProxy extends FactorizationProxy {
                 Core.registry.whirligig,
                 Core.registry.hall_of_legends,
                 Core.registry.lamp,
-                Core.registry.leyden_jar,
                 Core.registry.anthrogen,
                 Core.registry.compression_crafter,
                 Core.registry.socket,
@@ -255,11 +256,13 @@ public class FactorizationClientProxy extends FactorizationProxy {
                 Core.registry.windmill,
                 Core.registry.bibliogen,
                 Core.registry.lightningrod,
-                Core.registry.leyden_jar
+                Core.registry.leyden_jar,
+                Core.registry.mirror,
         }) {
             setItemBlockModel(b, 0, "inventory");
         }
         modelForMetadata(Core.registry.resource_block, "copper_ore", "silver_block", "lead_block", "dark_iron_block", "copper_block");
+        setItemBlockModel(Core.registry.leyden_jar, 1, "inventoryfull");
 
         for (Block b : new Block[] {
                 Core.registry.resource_block,
@@ -334,6 +337,7 @@ public class FactorizationClientProxy extends FactorizationProxy {
         setTileEntityRendererDispatcher(TileEntitySteamShaft.class, new TileEntitySteamShaftRenderer());
         setTileEntityRendererDispatcher(TileEntityShaft.class, new TileEntityShaftRenderer());
         setTileEntityRendererDispatcher(TileEntityBiblioGen.class, new TileEntityBiblioGenRenderer());
+        setTileEntityRendererDispatcher(TileEntityMirror.class, new TileEntityMirrorRender());
 
 
         RenderManager rm = Minecraft.getMinecraft().getRenderManager();

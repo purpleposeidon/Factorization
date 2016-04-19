@@ -36,8 +36,9 @@ public class TileEntityMirror extends TileEntityCommon implements ITickable {
     //don't save
     public boolean is_lit = false;
     int next_check = 1;
+    static final int NO_TARGET = -99;
     //don't save, but *do* share w/ client
-    public transient int target_rotation = -99;
+    public transient int target_rotation = NO_TARGET;
     private boolean covered_by_other_mirror = false;
     public byte silver = 1;
 
@@ -128,7 +129,7 @@ public class TileEntityMirror extends TileEntityCommon implements ITickable {
     }
 
     int getTargetInfo() {
-        return reflection_target == null ? -99 : target_rotation;
+        return reflection_target == null ? NO_TARGET : target_rotation;
     }
 
     void setRotationTarget(int new_target) {
@@ -254,7 +255,7 @@ public class TileEntityMirror extends TileEntityCommon implements ITickable {
                         is_lit = false;
                         target.addReflector(-getPower());
                         reflection_target = null;
-                        setRotationTarget(-99);
+                        setRotationTarget(NO_TARGET);
                         return;
                     }
                 }
@@ -309,7 +310,7 @@ public class TileEntityMirror extends TileEntityCommon implements ITickable {
             reflection_target = closest.getCoord();
             updateRotation();
         } else {
-            setRotationTarget(-99);
+            setRotationTarget(NO_TARGET);
         }
     }
 

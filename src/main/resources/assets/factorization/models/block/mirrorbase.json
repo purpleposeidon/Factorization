@@ -1,0 +1,34 @@
+{
+    "elements": [
+        {
+            "__coment": "base",
+            "from": [  4, 0,  4 ],
+            "to":   [ 12, 2, 12 ],
+            "faces": {
+                "down":  { "texture": "#metal", "cullface": "down" },
+                "up":    { "texture": "#metal" },
+                "north": { "texture": "#metal" },
+                "south": { "texture": "#metal" },
+                "west":  { "texture": "#metal" },
+                "east":  { "texture": "#metal" }
+            }
+        },
+        {
+            "__coment": "stem",
+            "from": [  7,  0,  7 ],
+            "to":   [  9,  8,  9 ],
+            "faces": {
+                "up":    { "texture": "#metal" },
+                "north": { "texture": "#metal" },
+                "south": { "texture": "#metal" },
+                "west":  { "texture": "#metal" },
+                "east":  { "texture": "#metal" }
+            }
+        }
+    ],
+    "textures": {
+        "metal": "factorization:blocks/resource/copper_block",
+        "#metal": "factorization:blocks/resource/copper_block",
+        "particle": "factorization:blocks/resource/copper_block"
+    }
+}

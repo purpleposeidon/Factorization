@@ -13,7 +13,10 @@
     },
     "variants": {
         "normal": [{}],
-        "inventory": [{}]
+        "inventory": [{}],
+        "inventoryfull": [{
+            "submodel": "factorization:../item/charge/sparkle"
+        }]
     }
 }
 

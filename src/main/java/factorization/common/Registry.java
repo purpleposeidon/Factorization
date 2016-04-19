@@ -116,6 +116,7 @@ public class Registry {
     public BlockShaft shaft;
     public SimpleFzBlock bibliogen;
     public SimpleFzBlock lightningrod;
+    public SimpleFzBlock mirror;
 
     public ItemStack servorail_item;
     public ItemStack empty_socket_item;
@@ -123,7 +124,7 @@ public class Registry {
     public ItemStack
             lamp_item,
             leydenjar_item, leydenjar_item_full, heater_item, solarboiler_item, caliometric_burner_item,
-            mirror_item_hidden,
+            mirror_item,
             parasieve_item,
             compression_crafter_item,
             sap_generator_item, anthro_generator_item,
@@ -138,7 +139,6 @@ public class Registry {
     public ItemCraftingComponent insulated_coil, motor, fan, diamond_cutting_head, corkscrew;
     public ItemStack sulfuric_acid, aqua_regia;
     public ItemChargeMeter charge_meter;
-    public ItemBlockProxy mirror;
     public ItemCraftingComponent sludge;
     public ItemCraftingComponent logicMatrix, logicMatrixIdentifier, logicMatrixController;
     public ItemMatrixProgrammer logicMatrixProgrammer;
@@ -191,6 +191,7 @@ public class Registry {
         resource_block = new BlockResource(); // This needs to be at the top for things that refer to it.
         lightair_block = new BlockLightAir();
         legacy_factory_block = new BlockFactorization(materialMachine);
+        NORELEASE.fixme("Remove legacy_factory_block (probably)");
         factory_block_barrel = new BlockBarrel();
         parasieve_block = new BlockParasieve();
         parasieve_block.setUnlocalizedName("factorization:factoryBlock.PARASIEVE");
@@ -216,6 +217,7 @@ public class Registry {
         shaft = new BlockShaft();
         bibliogen = new SimpleFzBlock(Material.rock, FactoryType.BIBLIO_GEN);
         lightningrod = new SimpleFzBlock(Material.iron, FactoryType.LIGHTNING_ROD);
+        mirror = new SimpleFzBlock(Material.iron, FactoryType.MIRROR);
         for (BlockClass bc : BlockClass.values()) {
             if (bc == BlockClass.Barrel) {
                 bc.block = factory_block_barrel;
@@ -274,6 +276,7 @@ public class Registry {
         GameRegistry.registerBlock(shaft, ItemShaft.class, "Shaft");
         GameRegistry.registerBlock(bibliogen, ItemFactorizationBlock.class, "Bibliogen");
         GameRegistry.registerBlock(lightningrod, ItemFactorizationBlock.class, "LightningRod");
+        GameRegistry.registerBlock(mirror, ItemFactorizationBlock.class, "mirror" /* lowercase for hopeful compatibility w/ legacy hidden_mirror proxy item */);
         if (DeltaChunk.enabled()) {
             GameRegistry.registerBlock(colossal_block, ColossalBlockItem.class, "ColossalBlock");
             GameRegistry.registerTileEntity(TileEntityColossalHeart.class, "fz_colossal_heart");
@@ -390,7 +393,7 @@ public class Registry {
         wooden_shaft = FactoryType.SHAFT.itemStack();
         bibliogen_item = FactoryType.BIBLIO_GEN.itemStack();
         heater_item = FactoryType.HEATER.itemStack();
-        mirror_item_hidden = FactoryType.MIRROR.itemStack();
+        mirror_item = FactoryType.MIRROR.itemStack();
         if (DeltaChunk.enabled()) {
             wind_mill = FactoryType.WIND_MILL_GEN.itemStack();
             water_wheel = FactoryType.WATER_WHEEL_GEN.itemStack();
@@ -425,7 +428,6 @@ public class Registry {
         corkscrew = new ItemCraftingComponent("corkscrew");
         diamond_cutting_head = new ItemCraftingComponent("diamond_cutting_head", TabType.SERVOS, false);
         charge_meter = new ItemChargeMeter();
-        mirror = new ItemBlockProxy(mirror_item_hidden, "mirror", TabType.CHARGE);
         leydenjar_item_full = ItemStack.copyItemStack(leydenjar_item);
         NBTTagCompound tag = new NBTTagCompound();
         tag.setInteger("storage", TileEntityLeydenJar.MAX_STORAGE);
@@ -1081,10 +1083,9 @@ public class Registry {
                 'M', motor,
                 'L', copper_ingot);
         oreRecipe(bibliogen_item,
-                "I",
-                "O",
-                "Y",
-                'I', "crystallineDark Iron",
+                " I ",
+                "OYO",
+                'I', diamond_shard,
                 'O', "slimeball",
                 'Y', Blocks.enchanting_table);
 
