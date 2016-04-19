@@ -106,6 +106,8 @@ public class NORELEASE {
     // Free variables for use when hotswapping code
     public static int i1 = 0, i2 = 0, i3 = 0, i4 = 0;
     public static boolean b1 = false, b2 = false, b3 = false, b4 = false;
+    public static float f1 = 0, f2 = 0, f3 = 0, f4 = 0;
+    public static double d1 = 0, d2 = 0, d3 = 0, d4 = 0;
     public static short s1 = 0, s2 = 0, s3 = 0, s4 = 0;
     public static String str1 = "", str2 = "", str3 = "", str4 = "";
     public static long l1 = 0, l2 = 0, l3 = 0, l4 = 0;
