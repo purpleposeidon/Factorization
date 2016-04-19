@@ -1,0 +1,24 @@
+{
+    "elements": [{
+        "from": [6, 0, 6],
+        "to": [10, 12, 10],
+        "faces": {
+            "up":    { "texture": "#tex", "uv": [ 4,  0,  8,  4] },
+            "down":  { "texture": "#tex", "uv": [ 4,  8,  8, 12] },
+            "north": { "texture": "#tex", "uv": [ 0,  0,  4, 12] },
+            "south": { "texture": "#tex", "uv": [ 0,  0,  4, 12] },
+            "west":  { "texture": "#tex", "uv": [ 0,  0,  4, 12] },
+            "east":  { "texture": "#tex", "uv": [ 0,  0,  4, 12] }
+        }
+    }],
+    "display": {
+        "thirdperson": {
+            "rotation": [ 10, -45, 170 ],
+            "translation": [ 0, 1.5, -2.75 ],
+            "scale": [ 0.375, 0.375, 0.375 ]
+        }
+    },
+    "textures": {
+        "tex": "factorization:items/socket/robothand"
+    }
+}
