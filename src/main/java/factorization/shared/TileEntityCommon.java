@@ -9,6 +9,7 @@ import factorization.common.FactoryType;
 import factorization.migration.MigrationHelper;
 import factorization.net.*;
 import factorization.util.ItemUtil;
+import factorization.util.NORELEASE;
 import factorization.util.SpaceUtil;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
@@ -215,6 +216,7 @@ public abstract class TileEntityCommon extends TileEntity implements ICoord, IFa
     /** Called when an adjacent TE changes */
     public void neighborChanged(Block neighbor) {
         neighborChanged(); // NORELEASE ???
+        NORELEASE.fixme("There are 3 of these functions. :|");
     }
 
     private long pulseTime = -1000;

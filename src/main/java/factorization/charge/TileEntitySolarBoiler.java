@@ -12,6 +12,7 @@ import factorization.shared.BlockClass;
 import factorization.shared.TileEntityCommon;
 import factorization.util.FluidUtil;
 import io.netty.buffer.ByteBuf;
+import net.minecraft.block.Block;
 import net.minecraft.init.Blocks;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ITickable;
@@ -164,7 +165,7 @@ public class TileEntitySolarBoiler extends TileEntityCommon implements IReflecti
     }
 
     @Override
-    public void onNeighborTileChanged(int tilex, int tiley, int tilez) {
+    public void neighborChanged(Block neighbor) {
         above = this;
     }
 
