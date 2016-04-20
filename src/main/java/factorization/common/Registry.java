@@ -39,6 +39,7 @@ import factorization.wrath.BlockLightAir;
 import factorization.wrath.TileEntityWrathLamp;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockNetherrack;
+import net.minecraft.block.BlockStone;
 import net.minecraft.block.material.MapColor;
 import net.minecraft.block.material.Material;
 import net.minecraft.entity.player.EntityPlayer;
@@ -940,9 +941,22 @@ public class Registry {
         TileEntityGrinder.addRecipe(new ItemStack(Items.skull, 1, 2 /* zombie */), new ItemStack(Items.rotten_flesh), 2.5F);
         TileEntityGrinder.addRecipe(new ItemStack(Items.skull, 1, 3 /* player */), new ItemStack(Items.rotten_flesh), 3.5F);
         TileEntityGrinder.addRecipe(new ItemStack(Items.skull, 1, 4 /* creeper */), new ItemStack(Items.gunpowder), 1.5F);
-        
-        
-        
+
+        // 1.8 polished stones -> quartz
+        {
+            ItemStack dioriteSmooth = new ItemStack(Blocks.stone, 1, BlockStone.EnumType.DIORITE_SMOOTH.getMetadata());
+            ItemStack graniteSmooth = new ItemStack(Blocks.stone, 1, BlockStone.EnumType.GRANITE_SMOOTH.getMetadata());
+            ItemStack andesiteSmooth = new ItemStack(Blocks.stone, 1, BlockStone.EnumType.ANDESITE_SMOOTH.getMetadata());
+            // Diorite: 1 quartz per: 2 quartz + 2 cobble --> 2 units
+            // Granite: 2 quartz per: 1 diorite + 1 quartz --> 1 unit
+            // Andesite: 1/2 quartz per: 1 diorite + 1 cobblestone --> 2 units
+            ItemStack quartz = new ItemStack(Items.quartz);
+            float loss = 0.80F;
+            TileEntityGrinder.addRecipe(dioriteSmooth, quartz, 1.0F * loss);
+            TileEntityGrinder.addRecipe(graniteSmooth, quartz, 1.0F * loss);
+            TileEntityGrinder.addRecipe(andesiteSmooth, quartz, 0.5F * loss);
+        }
+
         FurnaceRecipes.instance().addSmeltingRecipe(new ItemStack(sludge), new ItemStack(Items.clay_ball), 0.1F);
 
         //Rocketry
