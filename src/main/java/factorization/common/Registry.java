@@ -140,7 +140,6 @@ public class Registry {
     public ItemCraftingComponent insulated_coil, motor, fan, diamond_cutting_head, corkscrew;
     public ItemStack sulfuric_acid, aqua_regia;
     public ItemChargeMeter charge_meter;
-    public ItemCraftingComponent sludge;
     public ItemCraftingComponent logicMatrix, logicMatrixIdentifier, logicMatrixController;
     public ItemMatrixProgrammer logicMatrixProgrammer;
     public Fluid steamFluid;
@@ -372,7 +371,6 @@ public class Registry {
     }
 
     public void makeItems() {
-        sludge = new ItemCraftingComponent("sludge");
         NORELEASE.fixme("Delete these guys");
         //ItemBlocks
         item_factorization = (ItemFactorizationBlock) Item.getItemFromBlock(legacy_factory_block);
@@ -956,8 +954,6 @@ public class Registry {
             TileEntityGrinder.addRecipe(graniteSmooth, quartz, 1.0F * loss);
             TileEntityGrinder.addRecipe(andesiteSmooth, quartz, 0.5F * loss);
         }
-
-        FurnaceRecipes.instance().addSmeltingRecipe(new ItemStack(sludge), new ItemStack(Items.clay_ball), 0.1F);
 
         //Rocketry
         TileEntityGrinder.addRecipe(new ItemStack(Blocks.netherrack), new ItemStack(nether_powder, 1), 1);
