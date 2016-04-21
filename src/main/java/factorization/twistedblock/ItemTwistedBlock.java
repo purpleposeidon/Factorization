@@ -3,6 +3,7 @@ package factorization.twistedblock;
 import factorization.api.Coord;
 import factorization.api.DeltaCoord;
 import factorization.api.Quaternion;
+import factorization.crafting.ItemFakeBlock;
 import factorization.fzds.BasicTransformOrder;
 import factorization.fzds.DeltaChunk;
 import factorization.fzds.Hammer;
@@ -13,6 +14,7 @@ import factorization.fzds.interfaces.transform.Pure;
 import factorization.fzds.interfaces.transform.TransformData;
 import factorization.shared.Core;
 import factorization.shared.Core.TabType;
+import factorization.shared.ItemFactorization;
 import factorization.util.FzUtil;
 import factorization.util.SpaceUtil;
 import net.minecraft.block.Block;
@@ -31,12 +33,12 @@ import net.minecraftforge.common.util.FakePlayer;
 
 import java.util.List;
 
-public class ItemTwistedBlock extends ItemBlock {
+public class ItemTwistedBlock extends ItemFactorization {
     static final Block darkIron = Core.registry.resource_block;
     static final int darkIronMd = Core.registry.dark_iron_block_item.getItemDamage();
 
     public ItemTwistedBlock() {
-        super(Core.registry.resource_block);
+        super("twistedBlock", TabType.ART);
         FzUtil.initItem(this, "twistedBlock", TabType.ART);
         DeltaChunk.assertEnabled();
     }
@@ -44,7 +46,11 @@ public class ItemTwistedBlock extends ItemBlock {
     final int channel = Hammer.instance.hammerInfo.makeChannelFor(Core.name, "twistedBlocks", 10, 64, "Allows placement of blocks at angles");
 
     @Override
-    public boolean placeBlockAt(ItemStack stack, EntityPlayer player, World world, BlockPos pos, EnumFacing side, float hitX, float hitY, float hitZ, IBlockState newState) {
+    public boolean onItemUse(ItemStack stack, EntityPlayer player, World world, BlockPos pos, EnumFacing side, float hitX, float hitY, float hitZ) {
+        return placeBlockAt(stack, player, world, pos, side, hitX, hitY, hitZ, null);
+    }
+
+    boolean placeBlockAt(ItemStack stack, EntityPlayer player, World world, BlockPos pos, EnumFacing side, float hitX, float hitY, float hitZ, IBlockState newState) {
         if (world.isRemote) return false;
         if (player instanceof FakePlayer) return false;
         Coord at = new Coord(world, pos);
