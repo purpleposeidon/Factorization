@@ -1,0 +1,13 @@
+{
+    "parent": "factorization:item/base",
+    "textures": {
+        "layer0": "factorization:items/socket/half_scissors"
+    },
+    "display": {
+        "fixed": {
+            "rotation": [0, 180, 0],
+            "translation": [0, 0.5, 0]
+        }
+    }
+
+}

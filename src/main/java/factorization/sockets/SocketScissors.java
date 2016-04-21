@@ -16,6 +16,7 @@ import factorization.shared.ICaptureDrops;
 import factorization.net.StandardMessageType;
 import factorization.util.InvUtil;
 import factorization.util.ItemUtil;
+import factorization.util.NORELEASE;
 import factorization.util.PlayerUtil;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.block.*;
@@ -137,7 +138,7 @@ public class SocketScissors extends TileEntitySocketBase implements ICaptureDrop
     
     @Override
     public boolean handleRay(ISocketHolder socket, MovingObjectPosition mop, World mopWorld, boolean mopIsThis, boolean powered) {
-        DropCaptureHandler.startCapture(this, new Coord(mopWorld, mop), 3);
+        DropCaptureHandler.startCapture(this, Coord.fromMop(mopWorld, mop), 3);
         try {
             return _handleRay(socket, mop, mopIsThis, powered);
         } finally {
@@ -284,58 +285,56 @@ public class SocketScissors extends TileEntitySocketBase implements ICaptureDrop
         float d = 0.5F;
         GL11.glTranslatef(d, d, d);
         Quaternion.fromOrientation(FzOrientation.fromDirection(facing.getOpposite())).glRotate();
-        float turn = 28*((float)openCount / (float)openTime);
-        GL11.glTranslatef(0f, 0.25F - 7f/16f, 0);
-        float n= -2F/16F;
-        GL11.glTranslatef(0, n, 0);
-        GL11.glRotatef(turn, 1, 0, 0);
-        GL11.glTranslatef(-0, -n, -0);
-        float sd = motor == null ? -2F/16F : 3F/16F;
-        GL11.glTranslatef(0, sd, 0);
-        
-        
-        if (motor != null) {
-            GL11.glTranslatef(0, -6F/16F, 0);
+        double turn = openCount / (double) openTime;
+        turn = 17 + 28 * (1 - turn);
+
+        GL11.glPushMatrix();
+        GL11.glTranslated(0, -4.5/16.0, 0);
+        {
+            GL11.glPushMatrix();
+            GL11.glRotated(turn - 45, 1, 0, 0);
+            GL11.glRotatef(90, 0, 1, 0);
+            GL11.glRotatef(180, 1, 0, 0);
+            GL11.glTranslated(-7.5/16.0, -7.5/16.0, -8.0/16.0);
+            scissor_half.draw();
+            GL11.glPopMatrix();
         }
-        GL11.glPushMatrix();
-        GL11.glRotatef(90, 1, 0, 0);
-        GL11.glTranslatef(-0.5F, -0.5F, 0);
-        GL11.glRotatef(90, 0, 1, 0);
-        GL11.glTranslatef(-1F + 8/16f, 0F, 0.5f);
-        scissor_half.draw();
+        {
+            GL11.glTranslated(-1.0 / 16.0, 0, 0);
+            GL11.glPushMatrix();
+            GL11.glRotated(-turn - 45, 1, 0, 0);
+            GL11.glRotatef(90, 0, 1, 0);
+            GL11.glRotatef(180, 1, 0, 0);
+            GL11.glTranslated(-7.5/16.0, -7.5/16.0, -8.0/16.0);
+            scissor_half.draw();
+            GL11.glPopMatrix();
+        }
         GL11.glPopMatrix();
-        GL11.glRotatef(-turn*2, 1, 0, 0);
-        GL11.glPushMatrix();
-        GL11.glRotatef(90, 1, 0, 0);
-        GL11.glTranslatef(0.5F, 0.5F, 0);
-        GL11.glRotatef(90, 0, 1, 0);
-        GL11.glRotatef(180, 1, 0, 0);
-        GL11.glTranslatef(-1F + 8/16f, 0F, 0.5f);
-        scissor_half.draw();
-        GL11.glPopMatrix();
-        GL11.glPushMatrix();
 
-        GL11.glRotatef(turn + 180, 1, 0, 0);
-        GL11.glTranslatef(0, -.5F - 1F/16F, .25F - 1F/16F);
-
-        TextureManager tex = Minecraft.getMinecraft().renderEngine;
-        tex.bindTexture(Core.blockAtlas);
-        
-        piston_base.draw();
-        GL11.glTranslatef(0, 0, -6f/16f);
-        piston_base.draw();
-        float offset = -1F/16F * ((float)openCount/(float)openTime) - 1F/16F;
-        GL11.glTranslatef(0, offset, 0f);
-        piston_head.draw();
-        GL11.glTranslatef(0, 0, 6f/16f);
-        piston_head.draw();
-
-        GL11.glPopMatrix();
+        {
+            GL11.glPushMatrix();
+            GL11.glTranslated(0, 0.25, -3.0 / 16.0);
+            GL11.glRotatef(180, 1, 0, 0);
+            piston_base.draw();
+            GL11.glTranslatef(0, 0, -6f / 16f);
+            piston_base.draw();
+            float offset = -1F / 16F * ((float) openCount / (float) openTime) - 1F / 16F;
+            GL11.glTranslatef(0, offset, 0f);
+            piston_head.draw();
+            GL11.glTranslatef(0, 0, 6f / 16f);
+            piston_head.draw();
+            GL11.glPopMatrix();
+        }
     }
 
-    private static FzModel piston_base = new FzModel("socket/scissors/piston_base");
-    private static FzModel piston_head = new FzModel("socket/scissors/piston_head");
-    private static FzModel scissor_half = new FzModel("socket/scissors/scissor_arm");
+    @Override
+    public boolean isStaticPart(int index, ItemStack part) {
+        return false;
+    }
+
+    private static FzModel piston_base = new FzModel("scissors/piston_base");
+    private static FzModel piston_head = new FzModel("scissors/piston_head");
+    private static FzModel scissor_half = new FzModel("scissors/scissor_arm");
 
     @Override
     @SideOnly(Side.CLIENT)
