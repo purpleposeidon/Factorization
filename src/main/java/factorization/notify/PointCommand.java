@@ -52,7 +52,7 @@ public class PointCommand extends CommandBase {
             switch (mop.typeOfHit) {
             default: return;
             case BLOCK:
-                PointNetworkHandler.INSTANCE.pointAtCoord(new Coord(player.worldObj, mop), msg);
+                PointNetworkHandler.INSTANCE.pointAtCoord(Coord.fromMop(player.worldObj, mop), msg);
                 break;
             case ENTITY:
                 PointNetworkHandler.INSTANCE.pointAtEntity(mop.entityHit, msg);

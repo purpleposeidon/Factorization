@@ -169,7 +169,7 @@ public class ItemGoo extends ItemFactorization implements ISensitiveMesh {
         // goo click: expand the selection.
         // ItemBlock click: replace everything with held item
         if (held == null) {
-            Coord at = new Coord(player.worldObj, mop);
+            Coord at = Coord.fromMop(player.worldObj, mop);
             Block bat = at.getBlock();
             if (!(bat instanceof BlockStairs || bat instanceof BlockSlab)) return;
             for (int i = 0; i < data.coords.length; i += 3) {

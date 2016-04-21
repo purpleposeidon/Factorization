@@ -95,11 +95,6 @@ public final class Coord implements IDataSerializable, ISaneCoord, Comparable<Co
         this(w, v.xCoord, v.yCoord, v.zCoord);
     }
 
-    @Deprecated
-    public Coord(World w, MovingObjectPosition mop) {
-        this(w, mop.getBlockPos());
-    }
-
     public static Coord fromMop(World world, MovingObjectPosition mop) {
         if (mop.typeOfHit == MovingObjectPosition.MovingObjectType.ENTITY && mop.entityHit != null) return new Coord(mop.entityHit);
         return new Coord(world, mop.getBlockPos());
