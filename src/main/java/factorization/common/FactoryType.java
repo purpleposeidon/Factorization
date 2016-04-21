@@ -6,6 +6,8 @@ import factorization.charge.*;
 import factorization.charge.enet.TileEntityLeydenJar;
 import factorization.crafting.TileEntityCompressionCrafter;
 import factorization.fzds.DeltaChunk;
+import factorization.mechanics.SocketPoweredCrank;
+import factorization.mechanics.TileEntityHinge;
 import factorization.redstone.TileEntityParaSieve;
 import factorization.servo.TileEntityServoRail;
 import factorization.shared.*;
@@ -65,10 +67,10 @@ public enum FactoryType {
     SOCKET_BARE_MOTOR(41, false, SocketBareMotor.class, "fzsock_motor"),
     SOCKET_SCISSORS(42, false, SocketScissors.class, "fzsock_scissors"),
     CREATIVE_CHARGE(43, false, InfiniteEnergy.class, "factory_creative_charge"),
-    //44 -- HINGE
+    HINGE(44, false, TileEntityHinge.class, "factory_hinge"),
     //ANCHOR(45, false, TileEntityAnchor.class, "factory_anchor"),
     //SOCKET_HAND_CRANK(46, false, SocketHandCrank.class, "fzsock_hand_crank"),
-    //47 -- SOCKET_POWERED_CRANK
+    SOCKET_POWERED_CRANK(47, false, SocketPoweredCrank.class, "factory_powered_crank"),
     //SOCKET_CONTROLLED_CRANK(48, true, SocketControlledCrank.class, "factory_controlled_crank"),
     SAP_TAP(49, false, TileEntitySapTap.class, "factory_sap_extractor"),
     ANTHRO_GEN(50, false, TileEntityAnthroGen.class, "factory_anthro_gen"),
@@ -95,6 +97,7 @@ public enum FactoryType {
             MAX_ID = Math.max(MAX_ID, ft.md);
         }
         if (!DeltaChunk.enabled()) {
+            HINGE.disable();
             WIND_MILL_GEN.disable();
             WATER_WHEEL_GEN.disable();
         }

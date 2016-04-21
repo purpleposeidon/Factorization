@@ -17,6 +17,9 @@ import factorization.colossi.ColossusController;
 import factorization.colossi.ColossusControllerRenderer;
 import factorization.crafting.TileEntityCompressionCrafter;
 import factorization.crafting.TileEntityCompressionCrafterRenderer;
+import factorization.mechanics.SocketPoweredCrank;
+import factorization.mechanics.TileEntityHinge;
+import factorization.mechanics.TileEntityHingeRenderer;
 import factorization.redstone.GuiParasieve;
 import factorization.servo.RenderServoMotor;
 import factorization.servo.ServoMotor;
@@ -334,6 +337,8 @@ public class FactorizationClientProxy extends FactorizationProxy {
         setTileEntityRendererDispatcher(SocketScissors.class, new TileEntitySocketRenderer());
         setTileEntityRendererDispatcher(SocketLacerator.class, new TileEntitySocketRenderer());
         setTileEntityRendererDispatcher(SocketFanturpeller.class, new TileEntitySocketRenderer());
+        setTileEntityRendererDispatcher(SocketPoweredCrank.class, new TileEntitySocketRenderer());
+        setTileEntityRendererDispatcher(TileEntityHinge.class, new TileEntityHingeRenderer());
         setTileEntityRendererDispatcher(TileEntitySteamShaft.class, new TileEntitySteamShaftRenderer());
         setTileEntityRendererDispatcher(TileEntityShaft.class, new TileEntityShaftRenderer());
         setTileEntityRendererDispatcher(TileEntityBiblioGen.class, new TileEntityBiblioGenRenderer());

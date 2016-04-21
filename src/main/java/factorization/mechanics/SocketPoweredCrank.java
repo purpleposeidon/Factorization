@@ -41,7 +41,7 @@ import org.lwjgl.opengl.GL11;
 
 import java.io.IOException;
 
-class SocketPoweredCrank extends TileEntitySocketBase implements IWorker<ContextTileEntity>, IDCController, IMeterInfo {
+public class SocketPoweredCrank extends TileEntitySocketBase implements IWorker<ContextTileEntity>, IDCController, IMeterInfo {
     final EntityReference<DimensionSliceEntityBase> hookedIdc = MechanicsController.autoJoin(this);
     Vec3 hookLocation = SpaceUtil.newVec();
     DeltaCoord hookDelta = new DeltaCoord();
@@ -55,7 +55,7 @@ class SocketPoweredCrank extends TileEntitySocketBase implements IWorker<Context
 
     @Override
     public FactoryType getFactoryType() {
-        return null; //return FactoryType.SOCKET_POWERED_CRANK;
+        return FactoryType.SOCKET_POWERED_CRANK;
     }
 
     @Override

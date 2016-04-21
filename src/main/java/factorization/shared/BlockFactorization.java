@@ -251,6 +251,9 @@ public class BlockFactorization extends BlockContainer {
         //dark
         put(itemList, reg.empty_socket_item);
         put(itemList, reg.servorail_item);
+
+        //mechanics
+        put(itemList, reg.hinge);
     }
 
 

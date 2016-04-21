@@ -18,6 +18,7 @@ import factorization.darkiron.BlockDarkIronOre;
 import factorization.flat.ItemFlat;
 import factorization.fzds.DeltaChunk;
 import factorization.fzds.HammerEnabled;
+import factorization.mechanics.ItemDarkIronChain;
 import factorization.oreprocessing.TileEntityGrinder;
 import factorization.redstone.BlockMatcher;
 import factorization.redstone.BlockParasieve;
@@ -121,7 +122,8 @@ public class Registry {
 
     public ItemStack servorail_item;
     public ItemStack empty_socket_item;
-
+    public ItemStack hinge; //, anchor;
+    
     public ItemStack
             lamp_item,
             leydenjar_item, leydenjar_item_full, heater_item, solarboiler_item, caliometric_burner_item,
@@ -157,6 +159,8 @@ public class Registry {
     public ItemGoo utiligoo;
     public ItemColossusGuide colossusGuide;
     public ItemTwistedBlock twistedBlock;
+    public ItemDarkIronChain darkIronChain;
+    public ItemCraftingComponent chainLink, shortChain;
     public ItemSpawnPoster spawnPoster;
     public ItemMinecartDayBarrel barrelCart;
     public ItemGrossFood sap, entheas;
@@ -394,6 +398,7 @@ public class Registry {
         heater_item = FactoryType.HEATER.itemStack();
         mirror_item = FactoryType.MIRROR.itemStack();
         if (DeltaChunk.enabled()) {
+            hinge = FactoryType.HINGE.itemStack();
             wind_mill = FactoryType.WIND_MILL_GEN.itemStack();
             water_wheel = FactoryType.WATER_WHEEL_GEN.itemStack();
             //anchor = FactoryType.ANCHOR.itemStack();
@@ -468,6 +473,9 @@ public class Registry {
         if (HammerEnabled.ENABLED) {
             colossusGuide = new ItemColossusGuide("colossusGuide", TabType.TOOLS);
             twistedBlock = new ItemTwistedBlock();
+            darkIronChain = new ItemDarkIronChain("darkIronChain", TabType.TOOLS);
+            chainLink = new ItemCraftingComponent("chainLink", TabType.MATERIALS);
+            shortChain = new ItemCraftingComponent("shortChain", TabType.MATERIALS);
         }
 
         // Beautiful generators
@@ -1053,6 +1061,28 @@ public class Registry {
                     "#",
                     '*', dark_iron_sprocket,
                     '#', this.dark_iron_block_item);
+            oreRecipe(hinge.copy(),
+                    "|##",
+                    "|  ",
+                    "|##",
+                    '|', dark_iron_ingot,
+                    '#', Blocks.iron_block);
+            oreRecipe(new ItemStack(chainLink, 15),
+                    "DD ",
+                    "D L",
+                    "DD ",
+                    'D', dark_iron_ingot,
+                    'L', Items.iron_ingot);
+            oreRecipe(new ItemStack(shortChain),
+                    "LLL",
+                    "LLL",
+                    "LLL",
+                    'L', chainLink);
+            oreRecipe(new ItemStack(darkIronChain),
+                    "L  ",
+                    "LLL",
+                    "  L",
+                    'L', shortChain);
         }
 
         // Beautiful generators
