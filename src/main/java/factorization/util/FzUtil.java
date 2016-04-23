@@ -20,10 +20,16 @@ import net.minecraft.entity.ai.attributes.ServersideAttributeMap;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.BlockPos;
 import net.minecraft.world.GameRules;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
+import net.minecraft.world.chunk.IChunkProvider;
+import net.minecraft.world.gen.ChunkProviderServer;
+import net.minecraft.world.gen.MapGenBase;
+import net.minecraft.world.gen.structure.MapGenStructure;
+import net.minecraft.world.gen.structure.StructureBoundingBox;
 import net.minecraftforge.common.DimensionManager;
 import net.minecraftforge.common.property.IUnlistedProperty;
 import net.minecraftforge.fml.common.Loader;
@@ -35,6 +41,7 @@ import java.awt.*;
 import java.awt.datatransfer.StringSelection;
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Set;
@@ -300,5 +307,31 @@ public class FzUtil {
             if (b.contains(e)) return true;
         }
         return false;
+    }
+
+    public static boolean isClear(World w, AxisAlignedBB box) {
+        IChunkProvider icp = w.getChunkProvider();
+        if (icp instanceof ChunkProviderServer) {
+            icp = ((ChunkProviderServer) icp).serverChunkGenerator;
+        }
+        Class ic = icp.getClass();
+        BlockPos center = new BlockPos(SpaceUtil.getMiddle(box));
+        while (ic != null && ic != Object.class) {
+            for (Field field : ic.getDeclaredFields()) {
+                if (!MapGenStructure.class.isAssignableFrom(field.getType())) continue;
+                MapGenStructure mgs;
+                try {
+                    mgs = (MapGenStructure) field.get(icp);
+                } catch (IllegalAccessException e) {
+                    continue;
+                }
+                BlockPos nearest = mgs.getClosestStrongholdPos(w, center);
+                if (SpaceUtil.contains(box, nearest)) {
+                    return false;
+                }
+            }
+            ic = ic.getSuperclass();
+        }
+        return true;
     }
 }

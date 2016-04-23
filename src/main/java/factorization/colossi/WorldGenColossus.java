@@ -5,6 +5,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.Random;
 
+import factorization.util.FzUtil;
 import gnu.trove.map.hash.TIntByteHashMap;
 
 import net.minecraft.block.material.Material;
@@ -289,6 +290,7 @@ public class WorldGenColossus implements IWorldGenerator {
         }
         start.y++;
         ColossalBuilder builder = new ColossalBuilder(Math.abs(worldRandom.nextInt()), start);
+        if (!FzUtil.isClear(world, builder.getBounds())) return;
         builder.construct();
     }
     

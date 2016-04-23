@@ -4,16 +4,21 @@ import factorization.api.Coord;
 import factorization.api.DeltaCoord;
 import factorization.api.ICoordFunction;
 import factorization.shared.Core;
+import factorization.util.FzUtil;
 import factorization.util.NumUtil;
+import factorization.util.SpaceUtil;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.init.Blocks;
+import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.BiomeGenBase;
 import net.minecraft.world.chunk.IChunkProvider;
 import net.minecraft.world.gen.NoiseGeneratorImproved;
+import net.minecraft.world.gen.structure.MapGenStructure;
+import net.minecraft.world.gen.structure.StructureBoundingBox;
 import net.minecraftforge.common.BiomeDictionary;
 import net.minecraftforge.fml.common.IWorldGenerator;
 
@@ -136,6 +141,10 @@ public class CopperGeyserGen implements IWorldGenerator {
         }
         IBlockState top_layer = (top_is_water ? Blocks.water : Blocks.air).getDefaultState();
         Coord groundClean = at.copy();
+        {
+            AxisAlignedBB box = at.boxAround(varR);
+            if (!FzUtil.isClear(at.w, box)) return;
+        }
         Coord geyser_spot = null;
         int depth = height;
         while (depth-- > 0) {

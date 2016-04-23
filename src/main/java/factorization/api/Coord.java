@@ -8,6 +8,7 @@ import java.util.Random;
 
 import com.google.common.io.ByteArrayDataInput;
 import com.google.common.io.ByteArrayDataOutput;
+import factorization.util.SpaceUtil;
 import io.netty.buffer.ByteBuf;
 
 import net.minecraft.block.Block;
@@ -1114,5 +1115,11 @@ public final class Coord implements IDataSerializable, ISaneCoord, Comparable<Co
         Block myBlock = mine.getBlock();
         if (myBlock != otherState.getBlock()) return false;
         return myBlock.getMetaFromState(mine) == myBlock.getMetaFromState(otherState);
+    }
+
+    public AxisAlignedBB boxAround(int varR) {
+        Coord min = this.add(-varR, -varR, -varR);
+        Coord max = this.add(+varR, +varR, +varR);
+        return SpaceUtil.newBox(min, max);
     }
 }

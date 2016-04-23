@@ -512,6 +512,13 @@ public final class SpaceUtil {
                 maxX, maxY, maxZ);
     }
 
+    public static boolean contains(AxisAlignedBB box, BlockPos at) {
+        return NumUtil.intersect(box.minX, box.maxX, at.getX(), at.getX() + 1)
+                && NumUtil.intersect(box.minY, box.maxY, at.getY(), at.getY() + 1)
+                && NumUtil.intersect(box.minZ, box.maxZ, at.getZ(), at.getZ() + 1);
+
+    }
+
     public static boolean contains(AxisAlignedBB box, Coord at) {
         return NumUtil.intersect(box.minX, box.maxX, at.x, at.x + 1)
                 && NumUtil.intersect(box.minY, box.maxY, at.y, at.y + 1)

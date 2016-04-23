@@ -4,11 +4,13 @@ import factorization.api.Coord;
 import factorization.api.DeltaCoord;
 import factorization.api.ICoordFunction;
 import factorization.colossi.Brush.BrushMask;
+import factorization.util.SpaceUtil;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockFalling;
 import net.minecraft.block.BlockSand;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.init.Blocks;
+import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.world.biome.BiomeGenBase;
 import net.minecraft.world.chunk.ChunkPrimer;
@@ -65,6 +67,13 @@ public class ColossalBuilder {
         start = start.add(new DeltaCoord(0, 0, -leg_size - leg_spread/2)).add(0, 0, -1);
         int radius = leg_size + (leg_spread + 1)/2;
         this.start = moveUp(start, radius);
+    }
+
+    AxisAlignedBB getBounds() {
+        int r = leg_size + leg_spread / 2;
+        Coord min = start.add(-r, 0, body_back_padding);
+        Coord max = start.add(+r, get_height(), body_front_padding);
+        return SpaceUtil.createAABB(min, max);
     }
 
     static Coord moveUp(Coord start, final int radius) {
