@@ -261,6 +261,7 @@ public class FactorizationClientProxy extends FactorizationProxy {
                 Core.registry.lightningrod,
                 Core.registry.leyden_jar,
                 Core.registry.mirror,
+                Core.registry.hinge,
         }) {
             setItemBlockModel(b, 0, "inventory");
         }

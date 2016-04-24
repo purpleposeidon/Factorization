@@ -79,7 +79,7 @@ public class BlockFactorization extends BlockContainer {
         return nuller;
     }
 
-    private static TileEntityCommon get(IBlockAccess w, BlockPos pos) {
+    public static TileEntityCommon get(IBlockAccess w, BlockPos pos) {
         pos = pos.getImmutable();
         TileEntity te = w.getTileEntity(pos);
         if (te instanceof TileEntityCommon) return (TileEntityCommon) te;
@@ -253,7 +253,7 @@ public class BlockFactorization extends BlockContainer {
         put(itemList, reg.servorail_item);
 
         //mechanics
-        put(itemList, reg.hinge);
+        put(itemList, new ItemStack(reg.hinge));
     }
 
 

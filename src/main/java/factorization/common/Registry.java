@@ -18,6 +18,7 @@ import factorization.darkiron.BlockDarkIronOre;
 import factorization.flat.ItemFlat;
 import factorization.fzds.DeltaChunk;
 import factorization.fzds.HammerEnabled;
+import factorization.mechanics.BlockHinge;
 import factorization.mechanics.ItemDarkIronChain;
 import factorization.oreprocessing.TileEntityGrinder;
 import factorization.redstone.BlockMatcher;
@@ -119,11 +120,11 @@ public class Registry {
     public SimpleFzBlock bibliogen;
     public SimpleFzBlock lightningrod;
     public SimpleFzBlock mirror;
+    public BlockHinge hinge;
 
     public ItemStack servorail_item;
     public ItemStack empty_socket_item;
-    public ItemStack hinge; //, anchor;
-    
+
     public ItemStack
             lamp_item,
             leydenjar_item, leydenjar_item_full, heater_item, solarboiler_item, caliometric_burner_item,
@@ -146,7 +147,7 @@ public class Registry {
     public ItemMatrixProgrammer logicMatrixProgrammer;
     public Fluid steamFluid;
     public ItemCraftingComponent nether_powder, rocket_fuel;
-    public ItemBlockProxy rocket_engine;
+    public ItemBlockProxy rocket_engine; { NORELEASE.fixme("Remove rocket bits"); }
     public ItemServoMotor servo_placer;
     public ItemServoMotor stepper_placer;
     public ItemServoRailWidget servo_widget_instruction, servo_widget_decor;
@@ -236,6 +237,7 @@ public class Registry {
         blasted_bedrock_block = new BlastedBedrock();
         if (DeltaChunk.enabled()) {
             colossal_block = new ColossalBlock();
+            hinge = new BlockHinge(Material.iron, FactoryType.HINGE);
         }
         blastBlock = new BlockBlast();
         gargantuan_block = new GargantuanBlock()
@@ -284,6 +286,7 @@ public class Registry {
         if (DeltaChunk.enabled()) {
             GameRegistry.registerBlock(colossal_block, ColossalBlockItem.class, "ColossalBlock");
             GameRegistry.registerTileEntity(TileEntityColossalHeart.class, "fz_colossal_heart");
+            GameRegistry.registerBlock(hinge, ItemFactorizationBlock.class, "hinge");
         }
 
 
@@ -398,7 +401,6 @@ public class Registry {
         heater_item = FactoryType.HEATER.itemStack();
         mirror_item = FactoryType.MIRROR.itemStack();
         if (DeltaChunk.enabled()) {
-            hinge = FactoryType.HINGE.itemStack();
             wind_mill = FactoryType.WIND_MILL_GEN.itemStack();
             water_wheel = FactoryType.WATER_WHEEL_GEN.itemStack();
             //anchor = FactoryType.ANCHOR.itemStack();
@@ -1061,7 +1063,7 @@ public class Registry {
                     "#",
                     '*', dark_iron_sprocket,
                     '#', this.dark_iron_block_item);
-            oreRecipe(hinge.copy(),
+            oreRecipe(new ItemStack(hinge),
                     "|##",
                     "|  ",
                     "|##",

@@ -11,19 +11,20 @@ import factorization.fzds.BasicTransformOrder;
 import factorization.fzds.DeltaChunk;
 import factorization.fzds.NullOrder;
 import factorization.fzds.interfaces.*;
-import factorization.shared.BlockClass;
-import factorization.shared.EntityReference;
-import factorization.shared.TileEntityCommon;
+import factorization.shared.*;
 import factorization.util.NumUtil;
 import factorization.util.PlayerUtil;
 import factorization.util.SpaceUtil;
 import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.texture.TextureManager;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.*;
 import net.minecraft.world.World;
+import org.lwjgl.opengl.GL11;
+import org.lwjgl.opengl.GL12;
 
 import java.io.IOException;
 import java.util.List;
@@ -43,7 +44,7 @@ public class TileEntityHinge extends TileEntityCommon implements IDCController, 
 
     @Override
     public BlockClass getBlockClass() {
-        return BlockClass.DarkIron;
+        return BlockClass.Socket;
     }
 
     @Override
@@ -64,6 +65,7 @@ public class TileEntityHinge extends TileEntityCommon implements IDCController, 
 
     @Override
     public void neighborChanged() {
+        if (worldObj.isRemote) return;
         if (idcRef.trackingEntity()) {
             IDimensionSlice idc = idcRef.getEntity();
             if (idc != null && getCoord().isWeaklyPowered()) {
@@ -107,9 +109,6 @@ public class TileEntityHinge extends TileEntityCommon implements IDCController, 
         idc.permit(DeltaCapability.ENTITY_PHYSICS);
         idc.permit(DeltaCapability.PHYSICS_DAMAGE);
         idc.permit(DeltaCapability.CONSERVE_MOMENTUM);
-        // idc.forbid(DeltaCapability.COLLIDE_WITH_WORLD);
-
-        Vec3 idcPos = idc.getTransform().getPos();
 
         final int faceSign = sign(facing.facing);
         final int topSign = sign(facing.top);
@@ -124,7 +123,6 @@ public class TileEntityHinge extends TileEntityCommon implements IDCController, 
         idc.getTransform().setOffset(com);
         idc.getTransform().addPos(half);
 
-        Coord dest = idc.getCenter();
         idcRef.spawnAndTrack(idc.getEntity());
         MechanicsController.register(idc, this);
         updateComparators();
@@ -494,5 +492,76 @@ public class TileEntityHinge extends TileEntityCommon implements IDCController, 
         angle /= 90;
         angle = 1 - angle;
         return (byte) (0xF * angle);
+    }
+
+    static final FzModel top = new FzModel("hingeTop");
+    public void renderTesr(float partial) {
+        if (idcRef.trackingEntity()) {
+            IDimensionSlice idc = getIdc();
+            if (idc != null) {
+                EnumFacing face = facing.facing, top = facing.top;
+                float faced = 0.5F, topd = 0.0F;
+
+                if (SpaceUtil.sign(facing.top) == +1) topd = 1;
+                if (SpaceUtil.sign(facing.facing) == -1) faced *= -1;
+
+                float dx = face.getFrontOffsetX() * faced + top.getFrontOffsetX() * topd;
+                float dy = face.getFrontOffsetY() * faced + top.getFrontOffsetY() * topd;
+                float dz = face.getFrontOffsetZ() * faced + top.getFrontOffsetZ() * topd;
+
+                GL11.glTranslatef(dx, dy, dz);
+                idc.getTransform(partial).getRot().glRotate();
+                GL11.glTranslatef(-dx, -dy, -dz);
+            }
+            setupHingeRotation2();
+        } else {
+            setupHingeRotation2();
+            float nowish = ticks + partial;
+            double now = (Math.cos(nowish / 24.0) - 1) * -6;
+            GL11.glRotated(now, 0, 0, 1);
+        }
+
+        GL11.glRotated(180, 0, 1, 0);
+        TextureManager tex = Minecraft.getMinecraft().renderEngine;
+        tex.bindTexture(Core.blockAtlas);
+        GL11.glEnable(GL11.GL_LIGHTING);
+        GL11.glDisable(GL11.GL_CULL_FACE);
+        GL11.glEnable(GL12.GL_RESCALE_NORMAL);
+        top.draw();
+        GL11.glEnable(GL11.GL_CULL_FACE);
+        GL11.glEnable(GL11.GL_LIGHTING);
+    }
+
+    private void setupHingeRotation2() {
+        // Well, it's better than my 125 line first try. I bet Player could do better tho.
+        final EnumFacing face = facing.facing;
+        final EnumFacing top = facing.top;
+        final int fsign = face.ordinal() % 2 == 0 ? -1 : +1;
+        final int tsign = top.ordinal() % 2 == 0 ? -1 : +1;
+        float dx = 0, dy = 0, dz = 0;
+        if (tsign == +1) {
+            EnumFacing v = top;
+            dx += v.getFrontOffsetX();
+            dy += v.getFrontOffsetY();
+            dz += v.getFrontOffsetZ();
+        }
+        if (fsign == +1) {
+            EnumFacing v = facing.rotateOnFace(1).top;
+            dx += v.getFrontOffsetX();
+            dy += v.getFrontOffsetY();
+            dz += v.getFrontOffsetZ();
+        }
+        GL11.glTranslatef(dx, dy, dz);
+        Quaternion.fromOrientation(facing).glRotate();
+        boolean left = false;
+        if (face.getFrontOffsetX() != 0) left = top == EnumFacing.NORTH || top == EnumFacing.UP;
+        if (face.getFrontOffsetY() != 0) left = top == EnumFacing.WEST || top == EnumFacing.SOUTH;
+        if (face.getFrontOffsetZ() != 0) left = top == EnumFacing.DOWN || top == EnumFacing.EAST;
+
+        float dleft = 0.5F;
+        if (left) {
+            dleft += fsign;
+        }
+        GL11.glTranslatef(0, 0.5F * fsign, dleft);
     }
 }
