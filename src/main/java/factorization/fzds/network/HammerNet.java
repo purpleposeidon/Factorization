@@ -14,6 +14,7 @@ import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.NetHandlerPlayServer;
 import net.minecraft.network.PacketBuffer;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.management.ItemInWorldManager;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.EnumFacing;
@@ -76,12 +77,17 @@ public class HammerNet {
 
     @SubscribeEvent
     public void messageFromClient(ServerCustomPacketEvent event) {
-        EntityPlayerMP player = ((NetHandlerPlayServer) event.handler).playerEntity;
-        try {
-            handleMessageFromClient(player, event.packet.payload());
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        MinecraftServer.getServer().addScheduledTask(new Runnable() {
+            @Override
+            public void run() {
+                EntityPlayerMP player = ((NetHandlerPlayServer) event.handler).playerEntity;
+                try {
+                    handleMessageFromClient(player, event.packet.payload());
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
     }
     
     void handleMessageFromClient(EntityPlayerMP player, ByteBuf dis) throws IOException {
