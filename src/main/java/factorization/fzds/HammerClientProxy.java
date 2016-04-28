@@ -60,7 +60,6 @@ import net.minecraftforge.fml.common.network.FMLNetworkEvent.ClientDisconnection
 import net.minecraftforge.fml.relauncher.Side;
 import org.lwjgl.opengl.GL11;
 
-import javax.annotation.Nonnull;
 import java.util.*;
 
 public class HammerClientProxy extends HammerProxy {
@@ -240,21 +239,17 @@ public class HammerClientProxy extends HammerProxy {
                     mc.effectRenderer.spawnEffectParticle(particleID, xCoord, yCoord, zCoord, xOffset, yOffset, zOffset, parameters);
                 }
 
+                @Override
                 protected void markBlocksForUpdate(int minX, int minY, int minZ, int maxX, int maxY, int maxZ) {
+                    // Don't call super: super.viewFrustrum is null
                     World w = Hammer.proxy.getClientRealWorld();
                     for (IDimensionSlice ids : DeltaChunk.getSlicesInRange(w, minX, minY, minZ, maxX, maxY, maxZ)) {
                         DimensionSliceEntity dse = (DimensionSliceEntity) ids;
                         dse.blocksChanged(minX, minY, minZ);
                         dse.blocksChanged(maxX, maxY, maxZ);
+                        RenderDimensionSliceEntity.markBlocksForUpdate(dse, minX, minY, minZ, maxX, maxY, maxZ);
                     }
                 }
-
-                // 'super.viewFrustum' is unset. The following overrides are to prevent invocation of a private method.
-                @Override public void markBlockForUpdate(BlockPos pos) { }
-                @Override public void notifyLightSet(BlockPos pos) { }
-                @Override public void markBlockRangeForRenderUpdate(int x1, int y1, int z1, int x2, int y2, int z2) { }
-
-
             };
             shadowRenderGlobal.theWorld = (WorldClient) world;
         }

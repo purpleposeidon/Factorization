@@ -400,6 +400,7 @@ public class RenderDimensionSliceEntity extends Render<DimensionSliceEntity> imp
         renderInfo.anyRenderersDirty = true;
         RenderGlobal rg = Minecraft.getMinecraft().renderGlobal;
         for (int i = 0; i < renderInfo.renderers.length; i++) {
+            NORELEASE.fixme("Lame. O(n).");
             RenderChunk wr = renderInfo.renderers[i];
             int wr_posX = wr.getPosition().getX();
             int wr_posY = wr.getPosition().getY();
