@@ -70,9 +70,8 @@ public class ScanColor extends Decorator {
     @Override
     protected void addRecipes() {
         Core.registry.oreRecipe(toItem(),
-                "+Q+",
-                "Q#Q",
-                "+Q+",
+                " Q ",
+                "+#+",
                 '+', FactoryType.SERVORAIL.itemStack(),
                 'Q', "gemQuartz",
                 '#', Core.registry.logicMatrixIdentifier);
