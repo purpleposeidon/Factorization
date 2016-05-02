@@ -3,6 +3,8 @@ package factorization.servo.instructions;
 import factorization.api.Coord;
 import factorization.api.datahelpers.DataHelper;
 import factorization.api.datahelpers.IDataSerializable;
+import factorization.flat.api.IFlatModel;
+import factorization.flat.api.IModelMaker;
 import factorization.servo.Instruction;
 import factorization.servo.ServoMotor;
 import factorization.servo.TileEntityServoRail;
@@ -59,4 +61,17 @@ public class EntryControl extends Instruction {
     public void afterClientLoad(TileEntityServoRail rail) {
         rail.priority = (byte) (blocking ? -1 : 1);
     }
+
+    static IFlatModel yes, no;
+    @Override
+    public IFlatModel getModel(Coord at, EnumFacing side) {
+        return blocking ? no : yes;
+    }
+
+    @Override
+    protected void loadModels(IModelMaker maker) {
+        yes = reg(maker, "entry_control/yes");
+        no = reg(maker, "entry_control/no");
+    }
+
 }

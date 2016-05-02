@@ -6,5 +6,5 @@ import javax.annotation.Nullable;
 
 public interface IModelMaker {
     @Nullable
-    IFlatModel getModel(ResourceLocation url);
+    IFlatModel getModel(ResourceLocation ...url);
 }

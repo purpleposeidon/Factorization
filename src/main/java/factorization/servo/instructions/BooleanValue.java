@@ -4,6 +4,8 @@ import factorization.api.Coord;
 import factorization.api.datahelpers.DataHelper;
 import factorization.api.datahelpers.IDataSerializable;
 import factorization.api.datahelpers.Share;
+import factorization.flat.api.IFlatModel;
+import factorization.flat.api.IModelMaker;
 import factorization.servo.Instruction;
 import factorization.servo.ServoMotor;
 import net.minecraft.entity.player.EntityPlayer;
@@ -44,7 +46,20 @@ public class BooleanValue extends Instruction {
     public String getName() {
         return "fz.instruction.boolean";
     }
-    
+
+    static IFlatModel _true, _false;
+
+    @Override
+    public IFlatModel getModel(Coord at, EnumFacing side) {
+        return val ? _true : _false;
+    }
+
+    @Override
+    protected void loadModels(IModelMaker maker) {
+        _true = reg(maker, "boolean/true");
+        _false = reg(maker, "boolean/false");
+    }
+
     @Override
     public String getInfo() {
         return Boolean.toString(val);

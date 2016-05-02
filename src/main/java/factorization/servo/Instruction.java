@@ -27,10 +27,12 @@ public abstract class Instruction extends Decorator {
     
     @Override
     protected void addRecipes() {
+        Object recipeItem = getRecipeItem();
+        if (recipeItem == null) return;
         Core.registry.oreRecipe(toItem(),
                 "I<#",
                 'I', getInstructionPlate(),
-                '<', getRecipeItem(),
+                '<', recipeItem,
                 '#', Core.registry.logicMatrixProgrammer);
     }
     

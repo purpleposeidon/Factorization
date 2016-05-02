@@ -4,13 +4,18 @@ import com.google.common.collect.BiMap;
 import com.google.common.collect.ImmutableBiMap;
 import factorization.api.Coord;
 import factorization.api.datahelpers.*;
+import factorization.flat.api.IFlatModel;
+import factorization.flat.api.IModelMaker;
 import factorization.servo.instructions.*;
 import factorization.shared.Core;
+import factorization.util.NORELEASE;
 import io.netty.buffer.ByteBuf;
+import net.minecraft.client.resources.model.IBakedModel;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.EnumFacing;
+import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
@@ -74,12 +79,7 @@ public abstract class ServoComponent implements IDataSerializable {
     @Override
     public final IDataSerializable serialize(String prefix, DataHelper data) throws IOException {
         if (data.isReader()) {
-            String componentName;
-            if (data.hasLegacy(componentTagKey)) {
-                componentName = data.asSameShare(componentTagKey).putString(getName());
-            } else {
-                componentName = data.asSameShare(prefix + componentTagKey).putString(getName());
-            }
+            String componentName = data.asSameShare(prefix + componentTagKey).putString(getName());
             Class<? extends ServoComponent> componentClass = getComponent(componentName);
             ServoComponent sc;
             try {
@@ -192,6 +192,7 @@ public abstract class ServoComponent implements IDataSerializable {
 
     @SideOnly(Side.CLIENT)
     public void addInformation(List info) {
+        NORELEASE.fixme("Generics!!! >:|");
         //info.add("Servo Component");
     }
 
@@ -202,9 +203,6 @@ public abstract class ServoComponent implements IDataSerializable {
         //registerRecursivelyFromPackage("factorization.common.servo.actuators");
         //registerRecursivelyFromPackage("factorization.common.servo.instructions");
         Class<? extends ServoComponent>[] decorations = (Class<? extends ServoComponent>[])new Class[] {
-                WoodenServoGrate.class,
-                GlassServoGrate.class,
-                IronServoGrate.class,
                 ScanColor.class,
         };
         Class<? extends ServoComponent>[] instructions = (Class<? extends ServoComponent>[])new Class[] {
@@ -212,8 +210,6 @@ public abstract class ServoComponent implements IDataSerializable {
                 // Cyan: Motion instructions
                 EntryControl.class,
                 SetDirection.class,
-                Spin.class,
-                RotateTop.class,
                 SetSpeed.class,
                 Trap.class,
 
@@ -257,4 +253,14 @@ public abstract class ServoComponent implements IDataSerializable {
     protected void addRecipes() {}
 
     public void onItemUse(Coord here, EntityPlayer player) { }
+
+    @SideOnly(Side.CLIENT)
+    public abstract IFlatModel getModel(Coord at, EnumFacing side);
+
+    @SideOnly(Side.CLIENT)
+    protected abstract void loadModels(IModelMaker maker);
+
+    protected static IFlatModel reg(IModelMaker maker, String name) {
+        return maker.getModel(new ResourceLocation("factorization:flat/servo/instruction/" + name));
+    }
 }

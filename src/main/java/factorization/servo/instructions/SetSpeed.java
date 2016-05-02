@@ -4,6 +4,8 @@ import factorization.api.Coord;
 import factorization.api.datahelpers.DataHelper;
 import factorization.api.datahelpers.IDataSerializable;
 import factorization.api.datahelpers.Share;
+import factorization.flat.api.IFlatModel;
+import factorization.flat.api.IModelMaker;
 import factorization.servo.CpuBlocking;
 import factorization.servo.Instruction;
 import factorization.servo.ServoMotor;
@@ -44,7 +46,20 @@ public class SetSpeed extends Instruction {
     public String getName() {
         return "fz.instruction.setspeed";
     }
-    
+
+    static IFlatModel[] speeds = new IFlatModel[5];
+    @Override
+    public IFlatModel getModel(Coord at, EnumFacing side) {
+        return speeds[speed - 1];
+    }
+
+    @Override
+    protected void loadModels(IModelMaker maker) {
+        for (int i = 0; i < 5; i++) {
+            speeds[i] = reg(maker, "setspeed/speed_" + i);
+        }
+    }
+
     @Override
     public boolean onClick(EntityPlayer player, Coord block, EnumFacing side) {
         if (!playerHasProgrammer(player)) {

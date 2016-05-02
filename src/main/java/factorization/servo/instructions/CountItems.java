@@ -1,23 +1,12 @@
 package factorization.servo.instructions;
 
-import factorization.api.datahelpers.DataHelper;
-import factorization.api.datahelpers.IDataSerializable;
-import factorization.servo.Instruction;
 import factorization.servo.ServoMotor;
 import factorization.util.InvUtil;
 import factorization.util.InvUtil.FzInv;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 
-import java.io.IOException;
-
-public class CountItems extends Instruction {
-
-    @Override
-    public IDataSerializable putData(String prefix, DataHelper data) throws IOException {
-        return this;
-    }
-
+public class CountItems extends SimpleInstruction {
     @Override
     protected Object getRecipeItem() {
         return new ItemStack(Items.comparator);
@@ -36,8 +25,7 @@ public class CountItems extends Instruction {
     }
 
     @Override
-    public String getName() {
-        return "fz.instruction.countitems";
+    protected String getSimpleName() {
+        return "countitems";
     }
-
 }

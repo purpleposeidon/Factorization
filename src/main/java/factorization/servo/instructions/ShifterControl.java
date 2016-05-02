@@ -4,6 +4,8 @@ import factorization.api.Coord;
 import factorization.api.datahelpers.DataHelper;
 import factorization.api.datahelpers.IDataSerializable;
 import factorization.api.datahelpers.Share;
+import factorization.flat.api.IFlatModel;
+import factorization.flat.api.IModelMaker;
 import factorization.servo.Instruction;
 import factorization.servo.ServoMotor;
 import factorization.servo.ServoStack;
@@ -15,12 +17,13 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumFacing;
 
 import java.io.IOException;
+import java.util.Locale;
 
 import static factorization.servo.instructions.ShifterControl.ShifterModes.EXPORT_MODE;
 import static factorization.servo.instructions.ShifterControl.ShifterModes.TRANSFER_LIMIT;
 
 public class ShifterControl extends Instruction {
-    static enum ShifterModes {
+    enum ShifterModes {
         EXPORT_MODE,
         IMPORT_MODE,
         TRANSFER_LIMIT,
@@ -115,6 +118,19 @@ public class ShifterControl extends Instruction {
     @Override
     public String getName() {
         return "fz.instruction.shifterctrl";
+    }
+
+    static IFlatModel[] model = new IFlatModel[ShifterModes.values().length];
+    @Override
+    public IFlatModel getModel(Coord at, EnumFacing side) {
+        return model[mode.ordinal()];
+    }
+
+    @Override
+    protected void loadModels(IModelMaker maker) {
+        for (ShifterModes m : ShifterModes.values()) {
+            model[m.ordinal()] = reg(maker, "shifterctrl/" + m.toString().toLowerCase(Locale.ROOT));
+        }
     }
 
 }

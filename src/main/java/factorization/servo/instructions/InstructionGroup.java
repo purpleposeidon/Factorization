@@ -1,9 +1,12 @@
 package factorization.servo.instructions;
 
 import com.google.common.base.Joiner;
+import factorization.api.Coord;
 import factorization.api.datahelpers.DataHelper;
 import factorization.api.datahelpers.IDataSerializable;
 import factorization.api.datahelpers.Share;
+import factorization.flat.api.IFlatModel;
+import factorization.flat.api.IModelMaker;
 import factorization.servo.Executioner;
 import factorization.servo.Instruction;
 import factorization.servo.ServoMotor;
@@ -12,6 +15,7 @@ import factorization.shared.Core;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.EnumFacing;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -79,9 +83,21 @@ public class InstructionGroup extends Instruction {
     
     @Override
     public String getInfo() {
-        ArrayList<String> bits = new ArrayList();
+        ArrayList<String> bits = new ArrayList<String>();
         addInformation(bits);
         return Joiner.on("\n").join(bits);
+    }
+
+    static IFlatModel filled, empty;
+    @Override
+    public IFlatModel getModel(Coord at, EnumFacing side) {
+        return stuff.getSize() == 0 ? empty : filled;
+    }
+
+    @Override
+    protected void loadModels(IModelMaker maker) {
+        filled = reg(maker, "instruction_group/filled");
+        empty = reg(maker, "instruction_group/empty");
     }
 
 }

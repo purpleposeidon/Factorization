@@ -1,22 +1,11 @@
 package factorization.servo.instructions;
 
-import factorization.api.datahelpers.DataHelper;
-import factorization.api.datahelpers.IDataSerializable;
 import factorization.servo.CpuBlocking;
-import factorization.servo.Instruction;
 import factorization.servo.ServoMotor;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemStack;
 
-import java.io.IOException;
-
-public class Trap extends Instruction {
-
-    @Override
-    public IDataSerializable putData(String prefix, DataHelper data) throws IOException {
-        return this;
-    }
-
+public class Trap extends SimpleInstruction {
     @Override
     protected Object getRecipeItem() {
         return new ItemStack(Blocks.trapped_chest);
@@ -34,10 +23,10 @@ public class Trap extends Instruction {
     }
 
     @Override
-    public String getName() {
-        return "fz.instruction.trap";
+    protected String getSimpleName() {
+        return "trap";
     }
-    
+
     @Override
     public CpuBlocking getBlockingBehavior() {
         return CpuBlocking.BLOCK_UNTIL_NEXT_ENTRY;

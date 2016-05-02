@@ -3,6 +3,8 @@ package factorization.servo.instructions;
 import factorization.api.Coord;
 import factorization.api.datahelpers.DataHelper;
 import factorization.api.datahelpers.IDataSerializable;
+import factorization.flat.api.IFlatModel;
+import factorization.flat.api.IModelMaker;
 import factorization.servo.CpuBlocking;
 import factorization.servo.EntryAction;
 import factorization.servo.Instruction;
@@ -14,6 +16,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumFacing;
 
 import java.io.IOException;
+import java.util.Locale;
 
 public class SetEntryAction extends Instruction {
     EntryAction mode = EntryAction.ENTRY_EXECUTE;
@@ -50,7 +53,21 @@ public class SetEntryAction extends Instruction {
     public String getName() {
         return "fz.instruction.entryaction";
     }
-    
+
+    static IFlatModel[] models = new IFlatModel[EntryAction.values().length];
+
+    @Override
+    public IFlatModel getModel(Coord at, EnumFacing side) {
+        return models[mode.ordinal()];
+    }
+
+    @Override
+    protected void loadModels(IModelMaker maker) {
+        for (EntryAction action : EntryAction.values()) {
+            models[action.ordinal()] = reg(maker, "entryaction/" + action.toString().toLowerCase(Locale.ROOT));
+        }
+    }
+
     @Override
     public boolean onClick(EntityPlayer player, Coord block, EnumFacing side) {
         if (!playerHasProgrammer(player)) {

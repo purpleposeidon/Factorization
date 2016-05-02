@@ -4,6 +4,8 @@ import factorization.api.Coord;
 import factorization.api.datahelpers.DataHelper;
 import factorization.api.datahelpers.IDataSerializable;
 import factorization.api.datahelpers.Share;
+import factorization.flat.api.IFlatModel;
+import factorization.flat.api.IModelMaker;
 import factorization.servo.Instruction;
 import factorization.servo.ServoMotor;
 import factorization.servo.ServoStack;
@@ -12,6 +14,7 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.EnumFacing;
 
 import java.io.IOException;
+import java.util.Locale;
 
 public class Compare extends Instruction {
     static enum CmpType {
@@ -68,6 +71,19 @@ public class Compare extends Instruction {
     @Override
     public String getName() {
         return "fz.instruction.cmp";
+    }
+
+    static IFlatModel models[] = new IFlatModel[CmpType.values().length];
+    @Override
+    public IFlatModel getModel(Coord at, EnumFacing side) {
+        return models[cmp.ordinal()];
+    }
+
+    @Override
+    protected void loadModels(IModelMaker maker) {
+        for (CmpType ct : CmpType.values()) {
+            models[ct.ordinal()] = reg(maker, "cmp/" + ct.toString().toLowerCase(Locale.ROOT));
+        }
     }
 
     @Override

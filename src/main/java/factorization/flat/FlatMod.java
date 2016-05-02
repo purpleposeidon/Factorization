@@ -91,14 +91,15 @@ public class FlatMod {
 
         @SubscribeEvent
         public void loadModels(TextureStitchEvent.Pre event) {
+            IModelMaker modelMaker = new IModelMaker() {
+                @Nullable
+                @Override
+                public IFlatModel getModel(ResourceLocation... url) {
+                    return new FlatModel(url);
+                }
+            };
             for (FlatFace face : Flat.getAllSamples()) {
-                face.loadModels(new IModelMaker() {
-                    @Nullable
-                    @Override
-                    public IFlatModel getModel(ResourceLocation url) {
-                        return new FlatModel(url);
-                    }
-                });
+                face.loadModels(modelMaker);
             }
         }
 

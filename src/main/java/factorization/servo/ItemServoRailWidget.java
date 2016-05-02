@@ -111,7 +111,7 @@ public class ItemServoRailWidget extends ItemFactorization {
     
     @Override
     @SideOnly(Side.CLIENT)
-    public void getSubItems(Item id, CreativeTabs tab, List list) {
+    public void getSubItems(Item id, CreativeTabs tab, List<ItemStack> list) {
         loadSubItems();
         list.addAll(subItemsCache);
     }

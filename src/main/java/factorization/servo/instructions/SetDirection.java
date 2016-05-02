@@ -4,6 +4,8 @@ import factorization.api.Coord;
 import factorization.api.datahelpers.DataHelper;
 import factorization.api.datahelpers.IDataSerializable;
 import factorization.api.datahelpers.Share;
+import factorization.flat.api.IFlatModel;
+import factorization.flat.api.IModelMaker;
 import factorization.servo.AbstractServoMachine;
 import factorization.servo.Instruction;
 import factorization.servo.ServoMotor;
@@ -15,6 +17,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumFacing;
 
 import java.io.IOException;
+import java.util.Locale;
 
 public class SetDirection extends Instruction {
     EnumFacing dir = EnumFacing.UP;
@@ -51,7 +54,21 @@ public class SetDirection extends Instruction {
     public String getName() {
         return "fz.instruction.setdirection";
     }
-    
+
+    static IFlatModel[] models = new IFlatModel[EnumFacing.VALUES.length];
+
+    @Override
+    public IFlatModel getModel(Coord at, EnumFacing side) {
+        return models[dir.ordinal()];
+    }
+
+    @Override
+    protected void loadModels(IModelMaker maker) {
+        for (EnumFacing f : EnumFacing.VALUES) {
+            models[f.ordinal()] = reg(maker, "setdirection/" + f.toString().toLowerCase(Locale.ROOT));
+        }
+    }
+
     @Override
     public IDataSerializable putData(String prefix, DataHelper data) throws IOException {
         dir = data.as(Share.MUTABLE, "dir").putEnum(dir);

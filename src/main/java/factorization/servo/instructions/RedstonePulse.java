@@ -1,10 +1,7 @@
 package factorization.servo.instructions;
 
 import factorization.api.Coord;
-import factorization.api.datahelpers.DataHelper;
-import factorization.api.datahelpers.IDataSerializable;
 import factorization.servo.CpuBlocking;
-import factorization.servo.Instruction;
 import factorization.servo.ServoMotor;
 import factorization.shared.TileEntityCommon;
 import net.minecraft.entity.player.EntityPlayer;
@@ -12,15 +9,7 @@ import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumFacing;
 
-import java.io.IOException;
-
-public class RedstonePulse extends Instruction {
-
-    @Override
-    public IDataSerializable putData(String prefix, DataHelper data) throws IOException {
-        return this;
-    }
-
+public class RedstonePulse extends SimpleInstruction {
     @Override
     public void motorHit(ServoMotor motor) {
         if (motor.worldObj.isRemote) {
@@ -44,8 +33,8 @@ public class RedstonePulse extends Instruction {
     }
 
     @Override
-    public String getName() {
-        return "fz.instruction.pulse";
+    protected String getSimpleName() {
+        return "pulse";
     }
 
     @Override

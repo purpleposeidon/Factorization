@@ -1,22 +1,11 @@
 package factorization.servo.instructions;
 
-import factorization.api.datahelpers.DataHelper;
-import factorization.api.datahelpers.IDataSerializable;
-import factorization.servo.Instruction;
 import factorization.servo.ServoMotor;
 import factorization.servo.ServoStack;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.EnumFacing;
 
-import java.io.IOException;
-
-public class Dup extends Instruction {
-    @Override
-    public IDataSerializable putData(String prefix, DataHelper data) throws IOException {
-        return this;
-    }
-
+public class Dup extends SimpleInstruction {
     @Override
     protected Object getRecipeItem() {
         return new ItemStack(Items.egg);
@@ -35,7 +24,7 @@ public class Dup extends Instruction {
     }
 
     @Override
-    public String getName() {
-        return "fz.instruction.dup";
+    protected String getSimpleName() {
+        return "dup";
     }
 }

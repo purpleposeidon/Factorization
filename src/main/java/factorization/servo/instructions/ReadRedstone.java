@@ -12,13 +12,7 @@ import net.minecraft.item.ItemStack;
 
 import java.io.IOException;
 
-public class ReadRedstone extends Instruction {
-
-    @Override
-    public IDataSerializable putData(String prefix, DataHelper data) throws IOException {
-        return this;
-    }
-
+public class ReadRedstone extends SimpleInstruction {
     @Override
     protected Object getRecipeItem() {
         return new ItemStack(Items.redstone);
@@ -40,8 +34,8 @@ public class ReadRedstone extends Instruction {
     }
 
     @Override
-    public String getName() {
-        return "fz.instruction.readredstone";
+    protected String getSimpleName() {
+        return "readredstone";
     }
 
 }

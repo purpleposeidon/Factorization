@@ -8,5 +8,5 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 
 public interface IFlatModel {
     @SideOnly(Side.CLIENT)
-    IBakedModel getModel(Coord at, EnumFacing side);
+    IBakedModel[] getModel(Coord at, EnumFacing side);
 }

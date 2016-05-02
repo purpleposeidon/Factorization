@@ -4,6 +4,8 @@ import factorization.api.Coord;
 import factorization.api.datahelpers.DataHelper;
 import factorization.api.datahelpers.IDataSerializable;
 import factorization.api.datahelpers.Share;
+import factorization.flat.api.IFlatModel;
+import factorization.flat.api.IModelMaker;
 import factorization.servo.CpuBlocking;
 import factorization.servo.Instruction;
 import factorization.servo.ServoMotor;
@@ -79,7 +81,20 @@ public class SocketCtrl extends Instruction {
     public String getName() {
         return "fz.instruction.socketCtrl";
     }
-    
+
+    static IFlatModel[] models = new IFlatModel[3];
+    @Override
+    public IFlatModel getModel(Coord at, EnumFacing side) {
+        return models[mode];
+    }
+
+    @Override
+    protected void loadModels(IModelMaker maker) {
+        models[0] = reg(maker, "socketCtrl/pulse");
+        models[1] = reg(maker, "socketCtrl/power");
+        models[2] = reg(maker, "socketCtrl/unpower");
+    }
+
     @Override
     public CpuBlocking getBlockingBehavior() {
         return CpuBlocking.BLOCK_FOR_TICK;

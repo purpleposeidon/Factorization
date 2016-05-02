@@ -1,21 +1,11 @@
 package factorization.servo.instructions;
 
-import factorization.api.datahelpers.DataHelper;
-import factorization.api.datahelpers.IDataSerializable;
-import factorization.servo.Instruction;
 import factorization.servo.ServoMotor;
 import factorization.servo.ServoStack;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemStack;
 
-import java.io.IOException;
-
-public class Product extends Instruction {
-    @Override
-    public IDataSerializable putData(String prefix, DataHelper data) throws IOException {
-        return this;
-    }
-
+public class Product extends SimpleInstruction {
     @Override
     protected Object getRecipeItem() {
         return new ItemStack(Blocks.iron_bars);
@@ -37,7 +27,7 @@ public class Product extends Instruction {
     }
 
     @Override
-    public String getName() {
-        return "fz.instruction.product";
+    protected String getSimpleName() {
+        return "product";
     }
 }

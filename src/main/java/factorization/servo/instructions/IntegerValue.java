@@ -3,6 +3,8 @@ package factorization.servo.instructions;
 import factorization.api.Coord;
 import factorization.api.datahelpers.DataHelper;
 import factorization.api.datahelpers.IDataSerializable;
+import factorization.flat.api.IFlatModel;
+import factorization.flat.api.IModelMaker;
 import factorization.servo.Instruction;
 import factorization.servo.ServoMotor;
 import net.minecraft.entity.player.EntityPlayer;
@@ -65,4 +67,22 @@ public class IntegerValue extends Instruction {
     public void setVal(int val) {
         this.val = val;
     }
+
+    static IFlatModel one, zero, negative_one, other;
+    @Override
+    public IFlatModel getModel(Coord at, EnumFacing side) {
+        if (val == +1) return one;
+        if (val == 0) return zero;
+        if (val == -1) return negative_one;
+        return other;
+    }
+
+    @Override
+    protected void loadModels(IModelMaker maker) {
+        one = reg(maker, "integer/one");
+        zero = reg(maker, "integer/zero");
+        negative_one = reg(maker, "integer/negative_one");
+        other = reg(maker, "integer/other");
+    }
+
 }

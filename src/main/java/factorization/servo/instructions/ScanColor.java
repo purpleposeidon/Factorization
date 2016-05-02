@@ -5,6 +5,8 @@ import factorization.api.FzColor;
 import factorization.api.datahelpers.DataHelper;
 import factorization.api.datahelpers.IDataSerializable;
 import factorization.common.FactoryType;
+import factorization.flat.api.IFlatModel;
+import factorization.flat.api.IModelMaker;
 import factorization.notify.Notice;
 import factorization.servo.Decorator;
 import factorization.servo.ServoMotor;
@@ -91,5 +93,17 @@ public class ScanColor extends Decorator {
         FzColor color = FzColor.readColor(here);
         if (color == FzColor.NO_COLOR) return;
         new Notice(here, "color." + color).sendTo(player);
+    }
+
+    IFlatModel model;
+
+    @Override
+    public IFlatModel getModel(Coord at, EnumFacing side) {
+        return model;
+    }
+
+    @Override
+    protected void loadModels(IModelMaker maker) {
+        model = reg(maker, "scancolor");
     }
 }

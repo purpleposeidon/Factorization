@@ -4,6 +4,8 @@ import factorization.api.Coord;
 import factorization.api.datahelpers.DataHelper;
 import factorization.api.datahelpers.IDataSerializable;
 import factorization.api.datahelpers.Share;
+import factorization.flat.api.IFlatModel;
+import factorization.flat.api.IModelMaker;
 import factorization.servo.*;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
@@ -79,6 +81,19 @@ public class Jump extends Instruction {
     @Override
     public CpuBlocking getBlockingBehavior() {
         return CpuBlocking.BLOCK_FOR_TICK;
+    }
+
+    static IFlatModel jmp_instruction, jmp_tile;
+    @Override
+    public IFlatModel getModel(Coord at, EnumFacing side) {
+        if (mode == Executioner.JMP_NEXT_INSTRUCTION) return jmp_instruction;
+        return jmp_tile;
+    }
+
+    @Override
+    protected void loadModels(IModelMaker maker) {
+        jmp_instruction = reg(maker, "jmp/instruction");
+        jmp_tile = reg(maker, "jmp/tile");
     }
 
 }
