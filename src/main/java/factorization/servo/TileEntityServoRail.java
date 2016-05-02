@@ -25,7 +25,6 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.*;
 import net.minecraftforge.fml.common.FMLCommonHandler;
-import net.minecraftforge.fml.common.network.ByteBufUtils;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import org.apache.commons.lang3.StringUtils;
@@ -40,7 +39,6 @@ public class TileEntityServoRail extends TileEntityCommon implements IChargeCond
     Charge charge = new Charge(this);
     public Decorator decoration = null;
     public byte priority = 0;
-    String comment = "";
     FzColor color = FzColor.NO_COLOR;
     
     @Override
@@ -75,7 +73,6 @@ public class TileEntityServoRail extends TileEntityCommon implements IChargeCond
         charge.serialize("", data);
         priority = data.as(Share.VISIBLE, "priority").putByte(priority);
         color = data.as(Share.VISIBLE, "color").putEnum(color);
-        comment = data.as(Share.VISIBLE, "rem").putString(comment);
         if (data.isReader()) {
             NBTTagCompound dtag = data.as(Share.VISIBLE, decor_tag_key).putTag(new NBTTagCompound());
             ServoComponent component = ServoComponent.load(dtag);
@@ -222,12 +219,6 @@ public class TileEntityServoRail extends TileEntityCommon implements IChargeCond
         info = info == null ? "" : info;
         final Coord here = getCoord();
         boolean powered = here.isWeaklyPowered();
-        if (comment.length() > 0) {
-            if (info.length() > 0) {
-                info += "\n";
-            }
-            info += EnumChatFormatting.ITALIC + comment;
-        }
         if (color != FzColor.NO_COLOR) {
             info += "\n" + color;
         }
@@ -279,7 +270,6 @@ public class TileEntityServoRail extends TileEntityCommon implements IChargeCond
         }
         if (messageType == ServoRailMessage.ServoRailDecor) {
             color = FzColor.fromOrdinal(input.readByte());
-            comment = input.readBoolean() ? "x" : null;
             boolean has_decor = input.readBoolean();
             if (has_decor) {
                 ServoComponent sc = ServoComponent.readFromPacket(input);
@@ -292,20 +282,11 @@ public class TileEntityServoRail extends TileEntityCommon implements IChargeCond
             }
             return true;
         }
-        if (messageType == ServoRailMessage.ServoRailEditComment) {
-            comment = ByteBufUtils.readUTF8String(input);
-            FMLCommonHandler.instance().showGuiScreen(new GuiCommentEditor(this));
-            return true;
-        }
         return false;
     }
     
     @Override
     public boolean handleMessageFromClient(Enum messageType, ByteBuf input) throws IOException {
-        if (messageType == ServoRailMessage.ServoRailEditComment) {
-            comment = ByteBufUtils.readUTF8String(input);
-            return true;
-        }
         return super.handleMessageFromClient(messageType, input);
     }
     
@@ -345,7 +326,7 @@ public class TileEntityServoRail extends TileEntityCommon implements IChargeCond
     }
 
     enum ServoRailMessage {
-        ServoRailDecor, ServoRailEditComment;
+        ServoRailDecor;
         public static final ServoRailMessage[] VALUES = values();
     }
 
