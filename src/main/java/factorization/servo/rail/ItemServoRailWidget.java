@@ -1,4 +1,4 @@
-package factorization.servo;
+package factorization.servo.rail;
 
 import factorization.api.Coord;
 import factorization.shared.Core;

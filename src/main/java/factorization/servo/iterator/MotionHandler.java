@@ -1,10 +1,11 @@
-package factorization.servo;
+package factorization.servo.iterator;
 
 import factorization.api.Coord;
 import factorization.api.FzColor;
 import factorization.api.FzOrientation;
 import factorization.api.datahelpers.DataHelper;
 import factorization.api.datahelpers.Share;
+import factorization.servo.rail.TileEntityServoRail;
 import factorization.shared.Core;
 import factorization.util.SpaceUtil;
 import net.minecraft.util.EnumFacing;

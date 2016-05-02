@@ -1,4 +1,4 @@
-package factorization.servo;
+package factorization.servo.rail;
 
 import factorization.api.Coord;
 import factorization.api.FzColor;
@@ -9,6 +9,7 @@ import factorization.flat.AbstractFlatWire;
 import factorization.flat.api.Flat;
 import factorization.flat.api.IFlatModel;
 import factorization.flat.api.IModelMaker;
+import factorization.servo.ServoFeature;
 import factorization.servo.instructions.GenericPlaceholder;
 import factorization.shared.FzModel;
 import net.minecraft.client.resources.model.IBakedModel;
@@ -23,7 +24,7 @@ import java.util.Locale;
 
 public class FlatServoRail extends AbstractFlatWire {
     public FzColor color = FzColor.NO_COLOR;
-    ServoComponent component = GenericPlaceholder.INSTANCE;
+    public ServoComponent component = GenericPlaceholder.INSTANCE;
 
     public ServoComponent getComponent() {
         return component;

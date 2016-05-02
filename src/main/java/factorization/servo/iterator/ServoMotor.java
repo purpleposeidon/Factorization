@@ -1,4 +1,4 @@
-package factorization.servo;
+package factorization.servo.iterator;
 
 import factorization.api.Coord;
 import factorization.api.FzColor;
@@ -12,6 +12,10 @@ import factorization.common.FactoryType;
 import factorization.net.FzNetDispatch;
 import factorization.net.NetworkFactorization;
 import factorization.net.StandardMessageType;
+import factorization.servo.rail.Decorator;
+import factorization.servo.rail.ItemServoRailWidget;
+import factorization.servo.rail.ServoComponent;
+import factorization.servo.rail.TileEntityServoRail;
 import factorization.shared.Core;
 import factorization.shared.Sound;
 import factorization.shared.TileEntityCommon;

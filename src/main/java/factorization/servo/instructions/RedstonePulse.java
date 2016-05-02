@@ -1,8 +1,8 @@
 package factorization.servo.instructions;
 
 import factorization.api.Coord;
-import factorization.servo.CpuBlocking;
-import factorization.servo.ServoMotor;
+import factorization.servo.iterator.CpuBlocking;
+import factorization.servo.iterator.ServoMotor;
 import factorization.shared.TileEntityCommon;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;

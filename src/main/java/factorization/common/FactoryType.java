@@ -9,7 +9,7 @@ import factorization.fzds.DeltaChunk;
 import factorization.mechanics.SocketPoweredCrank;
 import factorization.mechanics.TileEntityHinge;
 import factorization.redstone.TileEntityParaSieve;
-import factorization.servo.TileEntityServoRail;
+import factorization.servo.rail.TileEntityServoRail;
 import factorization.shared.*;
 import factorization.sockets.*;
 import factorization.sockets.fanturpeller.BlowEntities;

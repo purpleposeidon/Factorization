@@ -1,7 +1,7 @@
 package factorization.servo.instructions;
 
-import factorization.servo.ServoMotor;
-import factorization.servo.ServoStack;
+import factorization.servo.iterator.ServoMotor;
+import factorization.servo.iterator.ServoStack;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemStack;
 

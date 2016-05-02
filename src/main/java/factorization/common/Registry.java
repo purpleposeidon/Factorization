@@ -23,7 +23,10 @@ import factorization.mechanics.ItemDarkIronChain;
 import factorization.oreprocessing.TileEntityGrinder;
 import factorization.redstone.BlockMatcher;
 import factorization.redstone.BlockParasieve;
-import factorization.servo.*;
+import factorization.servo.ItemMatrixProgrammer;
+import factorization.servo.iterator.ItemServoMotor;
+import factorization.servo.rail.ItemServoRailWidget;
+import factorization.servo.rail.ServoComponent;
 import factorization.servo.stepper.ItemStepperEngine;
 import factorization.shared.*;
 import factorization.shared.Core.TabType;
@@ -155,7 +158,6 @@ public class Registry {
     public ItemCraftingComponent giant_scissors;
     public ItemDayBarrel daybarrel;
     public ItemCraftingComponent instruction_plate;
-    public ItemCommenter servo_rail_comment_editor;
     public ItemDocBook docbook;
     public ItemGoo utiligoo;
     public ItemColossusGuide colossusGuide;
@@ -461,7 +463,6 @@ public class Registry {
         servo_motor = new ItemStack(new ItemCraftingComponent("servo/servo_motor"));
         instruction_plate = new ItemCraftingComponent("servo/instruction_plate", TabType.SERVOS);
         instruction_plate.setMaxStackSize(16);
-        servo_rail_comment_editor = new ItemCommenter("servo/commenter");
         socket_robot_hand = new ItemSocketPart("socket/robotHand", TabType.SERVOS);
         socket_shifter_item = new ItemSocketPart("socket/itemShifter", TabType.SERVOS);
 
@@ -997,11 +998,6 @@ public class Registry {
                 "I ",
                 'I', dark_iron_ingot,
                 '>', logicMatrixProgrammer);
-        oreRecipe(new ItemStack(servo_rail_comment_editor),
-                "#",
-                "T",
-                '#', instruction_plate,
-                'T', Items.sign);
         GameRegistry.addSmelting(servo_widget_instruction, new ItemStack(instruction_plate), 0);
         oreRecipe(new ItemStack(docbook),
                 "B~>",

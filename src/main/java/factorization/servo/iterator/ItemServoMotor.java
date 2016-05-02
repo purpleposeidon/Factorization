@@ -1,7 +1,8 @@
-package factorization.servo;
+package factorization.servo.iterator;
 
 import factorization.api.Coord;
 import factorization.api.FzOrientation;
+import factorization.servo.rail.TileEntityServoRail;
 import factorization.shared.Core;
 import factorization.shared.Core.TabType;
 import factorization.shared.ItemCraftingComponent;
@@ -51,7 +52,7 @@ public class ItemServoMotor extends ItemCraftingComponent {
         //c.setAsEntityLocation(motor);
         //w.spawnEntityInWorld(motor);
 
-        ArrayList<FzOrientation> valid = new ArrayList();
+        ArrayList<FzOrientation> valid = new ArrayList<FzOrientation>();
         motor.motionHandler.beforeSpawn();
         
         EnumFacing playerAngle = SpaceUtil.determineOrientation(player);

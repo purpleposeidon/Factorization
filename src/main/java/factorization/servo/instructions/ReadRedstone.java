@@ -1,16 +1,11 @@
 package factorization.servo.instructions;
 
 import factorization.api.Coord;
-import factorization.api.datahelpers.DataHelper;
-import factorization.api.datahelpers.IDataSerializable;
-import factorization.servo.Instruction;
-import factorization.servo.ServoMotor;
+import factorization.servo.iterator.ServoMotor;
 import net.minecraft.block.BlockRedstoneWire;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
-
-import java.io.IOException;
 
 public class ReadRedstone extends SimpleInstruction {
     @Override

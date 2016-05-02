@@ -6,7 +6,7 @@ import factorization.api.datahelpers.DataHelper;
 import factorization.api.datahelpers.IDataSerializable;
 import factorization.flat.api.IFlatModel;
 import factorization.flat.api.IModelMaker;
-import factorization.servo.Instruction;
+import factorization.servo.rail.Instruction;
 import net.minecraft.util.EnumFacing;
 
 import java.io.IOException;

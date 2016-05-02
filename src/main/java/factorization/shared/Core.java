@@ -16,7 +16,7 @@ import factorization.fzds.HammerEnabled;
 import factorization.mechanics.MechanismsFeature;
 import factorization.net.FzNetEventHandler;
 import factorization.net.NetworkFactorization;
-import factorization.servo.ServoMotor;
+import factorization.servo.iterator.ServoMotor;
 import factorization.servo.stepper.EntityGrabController;
 import factorization.servo.stepper.StepperEngine;
 import factorization.truth.minecraft.DistributeDocs;

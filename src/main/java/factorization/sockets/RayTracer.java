@@ -6,7 +6,7 @@ import factorization.api.Quaternion;
 import factorization.fzds.DeltaChunk;
 import factorization.fzds.HammerEnabled;
 import factorization.fzds.interfaces.IDimensionSlice;
-import factorization.servo.TileEntityServoRail;
+import factorization.servo.rail.TileEntityServoRail;
 import factorization.util.SpaceUtil;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.AxisAlignedBB;

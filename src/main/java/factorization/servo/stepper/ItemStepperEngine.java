@@ -1,8 +1,8 @@
 package factorization.servo.stepper;
 
 import factorization.fzds.Hammer;
-import factorization.servo.AbstractServoMachine;
-import factorization.servo.ItemServoMotor;
+import factorization.servo.iterator.AbstractServoMachine;
+import factorization.servo.iterator.ItemServoMotor;
 import factorization.shared.Core;
 import net.minecraft.world.World;
 

@@ -1,4 +1,4 @@
-package factorization.servo;
+package factorization.servo.rail;
 
 import factorization.api.Charge;
 import factorization.api.Coord;
@@ -39,7 +39,7 @@ public class TileEntityServoRail extends TileEntityCommon implements IChargeCond
     Charge charge = new Charge(this);
     public Decorator decoration = null;
     public byte priority = 0;
-    FzColor color = FzColor.NO_COLOR;
+    public FzColor color = FzColor.NO_COLOR;
     
     @Override
     public FactoryType getFactoryType() {

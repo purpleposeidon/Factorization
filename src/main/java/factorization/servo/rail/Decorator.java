@@ -1,5 +1,6 @@
-package factorization.servo;
+package factorization.servo.rail;
 
+import factorization.servo.iterator.ServoMotor;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 

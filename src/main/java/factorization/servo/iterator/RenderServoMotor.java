@@ -1,4 +1,4 @@
-package factorization.servo;
+package factorization.servo.iterator;
 
 import factorization.api.FzColor;
 import factorization.api.FzOrientation;
@@ -6,6 +6,7 @@ import factorization.api.Quaternion;
 import factorization.fzds.DeltaChunk;
 import factorization.fzds.Hammer;
 import factorization.fzds.HammerEnabled;
+import factorization.servo.rail.TileEntityServoRail;
 import factorization.shared.Core;
 import factorization.shared.FzModel;
 import factorization.sockets.TileEntitySocketBase;

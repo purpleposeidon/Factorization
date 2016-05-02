@@ -7,7 +7,7 @@ import factorization.api.datahelpers.Share;
 import factorization.fzds.BasicTransformOrder;
 import factorization.fzds.interfaces.IDimensionSlice;
 import factorization.fzds.interfaces.Interpolation;
-import factorization.servo.MotionHandler;
+import factorization.servo.iterator.MotionHandler;
 import net.minecraft.util.EnumFacing;
 
 import java.io.IOException;

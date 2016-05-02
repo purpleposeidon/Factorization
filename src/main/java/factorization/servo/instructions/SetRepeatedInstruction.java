@@ -1,6 +1,6 @@
 package factorization.servo.instructions;
 
-import factorization.servo.ServoMotor;
+import factorization.servo.iterator.ServoMotor;
 import factorization.shared.Core;
 
 public class SetRepeatedInstruction extends SimpleInstruction {

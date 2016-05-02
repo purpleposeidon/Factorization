@@ -4,27 +4,21 @@ import factorization.api.Coord;
 import factorization.api.FzColor;
 import factorization.notify.Notice;
 import factorization.notify.Style;
+import factorization.servo.rail.Decorator;
+import factorization.servo.rail.TileEntityServoRail;
 import factorization.shared.Core;
 import factorization.shared.Core.TabType;
 import factorization.shared.ISensitiveMesh;
 import factorization.shared.ItemFactorization;
 import factorization.util.FzUtil;
-import factorization.util.ItemUtil;
-import factorization.util.PlayerUtil;
-import factorization.util.StatUtil;
-import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityList;
 import net.minecraft.entity.item.EntityPainting;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.stats.StatBase;
-import net.minecraft.stats.StatisticsFile;
 import net.minecraft.tileentity.TileEntityNote;
 import net.minecraft.util.BlockPos;
-import net.minecraft.util.ChatComponentTranslation;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.world.World;
 import net.minecraftforge.common.ForgeHooks;
@@ -32,9 +26,6 @@ import net.minecraftforge.event.entity.player.EntityInteractEvent;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
-import net.minecraftforge.fml.common.gameevent.PlayerEvent;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
 
 import javax.annotation.Nonnull;
 import java.util.Arrays;
@@ -71,7 +62,7 @@ public class ItemMatrixProgrammer extends ItemFactorization implements ISensitiv
             if (noteBlock.note != orig_note) {
                 noteBlock.triggerNote(world, pos);
             }
-            new Notice(noteBlock, "noteblock.pitch." + noteBlock.note).withStyle(Style.EXACTPOSITION).send(player);
+            new Notice(noteBlock, "noteblock.pitch." + noteBlock.note).withStyle(Style.EXACTPOSITION).sendTo(player);
             return true;
         }
         /*if (!player.isSneaking()) {

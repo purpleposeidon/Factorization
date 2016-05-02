@@ -19,7 +19,7 @@ import factorization.fzds.interfaces.IDimensionSlice;
 import factorization.fzds.interfaces.Interpolation;
 import factorization.fzds.interfaces.transform.Pure;
 import factorization.fzds.interfaces.transform.TransformData;
-import factorization.servo.ServoMotor;
+import factorization.servo.iterator.ServoMotor;
 import factorization.shared.Core;
 import factorization.shared.EntityReference;
 import factorization.shared.FzModel;

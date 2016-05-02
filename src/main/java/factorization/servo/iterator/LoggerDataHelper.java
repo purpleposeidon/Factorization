@@ -1,4 +1,4 @@
-package factorization.servo;
+package factorization.servo.iterator;
 
 import factorization.api.datahelpers.MergedDataHelper;
 import factorization.api.datahelpers.Share;

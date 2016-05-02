@@ -5,9 +5,9 @@ import factorization.api.datahelpers.DataHelper;
 import factorization.api.datahelpers.IDataSerializable;
 import factorization.flat.api.IFlatModel;
 import factorization.flat.api.IModelMaker;
-import factorization.servo.Instruction;
-import factorization.servo.ServoComponent;
-import factorization.servo.ServoMotor;
+import factorization.servo.rail.Instruction;
+import factorization.servo.rail.ServoComponent;
+import factorization.servo.iterator.ServoMotor;
 import net.minecraft.util.EnumFacing;
 
 import java.io.IOException;

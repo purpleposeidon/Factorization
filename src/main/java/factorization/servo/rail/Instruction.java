@@ -1,7 +1,9 @@
-package factorization.servo;
+package factorization.servo.rail;
 
 import factorization.api.Coord;
 import factorization.common.FzConfig;
+import factorization.servo.iterator.CpuBlocking;
+import factorization.servo.iterator.ServoMotor;
 import factorization.shared.Core;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;

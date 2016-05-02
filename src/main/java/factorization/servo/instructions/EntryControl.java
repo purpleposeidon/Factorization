@@ -5,9 +5,9 @@ import factorization.api.datahelpers.DataHelper;
 import factorization.api.datahelpers.IDataSerializable;
 import factorization.flat.api.IFlatModel;
 import factorization.flat.api.IModelMaker;
-import factorization.servo.Instruction;
-import factorization.servo.ServoMotor;
-import factorization.servo.TileEntityServoRail;
+import factorization.servo.rail.Instruction;
+import factorization.servo.iterator.ServoMotor;
+import factorization.servo.rail.TileEntityServoRail;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.EnumFacing;
 

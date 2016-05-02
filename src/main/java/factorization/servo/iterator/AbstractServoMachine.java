@@ -1,4 +1,4 @@
-package factorization.servo;
+package factorization.servo.iterator;
 
 import factorization.api.Coord;
 import factorization.api.FzOrientation;

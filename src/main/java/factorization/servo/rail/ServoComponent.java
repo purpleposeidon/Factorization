@@ -1,4 +1,4 @@
-package factorization.servo;
+package factorization.servo.rail;
 
 import com.google.common.collect.BiMap;
 import com.google.common.collect.ImmutableBiMap;
@@ -6,11 +6,11 @@ import factorization.api.Coord;
 import factorization.api.datahelpers.*;
 import factorization.flat.api.IFlatModel;
 import factorization.flat.api.IModelMaker;
+import factorization.servo.iterator.ServoMotor;
 import factorization.servo.instructions.*;
 import factorization.shared.Core;
 import factorization.util.NORELEASE;
 import io.netty.buffer.ByteBuf;
-import net.minecraft.client.resources.model.IBakedModel;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;

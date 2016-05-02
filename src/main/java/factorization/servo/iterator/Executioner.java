@@ -1,10 +1,12 @@
-package factorization.servo;
+package factorization.servo.iterator;
 
 import factorization.api.Coord;
 import factorization.api.datahelpers.DataHelper;
 import factorization.api.datahelpers.Share;
 import factorization.notify.Notice;
 import factorization.servo.instructions.IntegerValue;
+import factorization.servo.rail.Instruction;
+import factorization.servo.rail.TileEntityServoRail;
 
 import java.io.IOException;
 

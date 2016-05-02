@@ -8,7 +8,7 @@ import factorization.api.datahelpers.DataHelper;
 import factorization.api.datahelpers.IDataSerializable;
 import factorization.api.datahelpers.Share;
 import factorization.common.FactoryType;
-import factorization.servo.ServoMotor;
+import factorization.servo.iterator.ServoMotor;
 import factorization.shared.Core;
 import factorization.shared.FzModel;
 import factorization.sockets.ISocketHolder;
