@@ -103,6 +103,6 @@ public class ScanColor extends Decorator {
 
     @Override
     protected void loadModels(IModelMaker maker) {
-        model = reg(maker, "scancolor");
+        model = regDecor(maker, "scancolor");
     }
 }

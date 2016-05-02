@@ -25,7 +25,7 @@ public class WireCharge extends AbstractFlatWire {
      * If two FlatFaces have the same species, then the wire'll try to connect. If you're subclassing you may want to
      * change the species so things correct appropriately.
      */
-    protected static transient int SPECIES = Flat.nextSpeciesId();
+    public static transient int SPECIES = Flat.nextSpeciesId();
 
     @Override
     public int getSpecies() {

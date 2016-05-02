@@ -5,8 +5,10 @@ import factorization.api.FzColor;
 import factorization.api.datahelpers.DataHelper;
 import factorization.api.datahelpers.IDataSerializable;
 import factorization.api.datahelpers.Share;
+import factorization.charge.enet.WireCharge;
 import factorization.flat.AbstractFlatWire;
 import factorization.flat.api.Flat;
+import factorization.flat.api.FlatFace;
 import factorization.flat.api.IFlatModel;
 import factorization.flat.api.IModelMaker;
 import factorization.servo.ServoFeature;
@@ -105,5 +107,10 @@ public class FlatServoRail extends AbstractFlatWire {
     @Override
     protected String getModelGroupName() {
         return "factorization:flat/servorail/m";
+    }
+
+    @Override
+    public boolean shouldBeConnectedToBy(FlatFace wire) {
+        return super.shouldBeConnectedToBy(wire) || (component.connectWires() && wire.getSpecies() == WireCharge.SPECIES);
     }
 }

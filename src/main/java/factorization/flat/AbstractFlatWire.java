@@ -59,7 +59,7 @@ public abstract class AbstractFlatWire extends FlatFace {
     public abstract int getSpecies();
 
     protected boolean isWire(Coord at, EnumFacing side) {
-        return getSpecies() == Flat.get(at, side).getSpecies();
+        return Flat.get(at, side).shouldBeConnectedToBy(this);
     }
 
     protected boolean hasAnyWire(Coord at, EnumFacing side, EnumFacing hand) {

@@ -204,6 +204,7 @@ public abstract class ServoComponent implements IDataSerializable {
         //registerRecursivelyFromPackage("factorization.common.servo.instructions");
         Class<? extends ServoComponent>[] decorations = (Class<? extends ServoComponent>[])new Class[] {
                 ScanColor.class,
+                PowerStation.class,
         };
         Class<? extends ServoComponent>[] instructions = (Class<? extends ServoComponent>[])new Class[] {
                 // Color by class, sort by color
@@ -263,8 +264,15 @@ public abstract class ServoComponent implements IDataSerializable {
     protected static IFlatModel reg(IModelMaker maker, String name) {
         return maker.getModel(new ResourceLocation("factorization:flat/servo/instruction/" + name));
     }
+    protected static IFlatModel regDecor(IModelMaker maker, String name) {
+        return maker.getModel(new ResourceLocation("factorization:flat/servo/decorator/" + name));
+    }
 
     public byte getPriority() {
         return 0;
+    }
+
+    public boolean connectWires() {
+        return false;
     }
 }
