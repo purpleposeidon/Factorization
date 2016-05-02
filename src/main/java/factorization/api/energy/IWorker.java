@@ -61,7 +61,7 @@ public interface IWorker<T extends IWorkerContext> {
      * Receive a {@link WorkUnit} and get one unit of work done.
      * <p/>
      * Power may be given without simulate being checked first.
-     * For this reason, WorkUnits should be discarded if there is nowhere for them to fit.
+     * For this reason, WorkUnits should be discarded if there is nowhere for them to fit. (And LATER should be returned.)
      * <p/>
      * Returning something other than NEVER may imply unit-specific ramifications; for example, rotational power may
      * want you to send a packet to the client to keep your gears rendering in sync with the driver. Such details can be
@@ -76,8 +76,8 @@ public interface IWorker<T extends IWorkerContext> {
      * @param unit     The {@link WorkUnit}. You'll want to compare its category field to an {@link EnergyCategory} instance.
      * @param simulate if simulate is true, then this is a querying if the IWorker can handle the unit.
      * @return
-     *      NEVER if the worker can't handle the unit.
-     *      LATER if the worker can generally use it, but not right now.
+     *      NEVER if the worker can't handle the unit.<br/>
+     *      LATER if the worker can generally use it, but not right now.<br/>
      *      NOW if the worker can use the unit immediately,
      *      or NOW if simulate is true.
      */
