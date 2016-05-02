@@ -4,8 +4,15 @@ import factorization.api.Coord;
 import factorization.api.FzOrientation;
 import factorization.api.IChargeConductor;
 import factorization.api.datahelpers.*;
+import factorization.api.energy.ContextEntity;
+import factorization.api.energy.EnergyCategory;
+import factorization.api.energy.IWorker;
+import factorization.api.energy.WorkUnit;
+import factorization.charge.enet.ChargeEnetSubsys;
 import factorization.net.INet;
+import factorization.servo.instructions.Trap;
 import factorization.shared.Core;
+import factorization.util.NORELEASE;
 import factorization.util.PlayerUtil;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufInputStream;
@@ -26,7 +33,7 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 
 import java.io.IOException;
 
-public abstract class AbstractServoMachine extends Entity implements IEntityAdditionalSpawnData, INet {
+public abstract class AbstractServoMachine extends Entity implements IEntityAdditionalSpawnData, INet, IWorker<ContextEntity> {
     // Hey,. why doesn't this extend EntityFZ!?
     public final MotionHandler motionHandler = newMotionHandler();
 
@@ -85,6 +92,43 @@ public abstract class AbstractServoMachine extends Entity implements IEntityAddi
 
     public void putData(DataHelper data) throws IOException {
         motionHandler.putData(data);
+        waitingForPower = data.as(Share.PRIVATE, "waitingForPower").putBoolean(waitingForPower);
+        powered_steps = data.as(Share.PRIVATE, "poweredSteps").putInt(powered_steps);
+    }
+
+    protected int powered_steps = 0;
+    protected int getMaxBuffer() {
+        return 64 * 2;
+    }
+    protected int getStepsPerUnit() {
+        return 64;
+    }
+    protected boolean waitingForPower = false;
+
+    @Override
+    public Accepted accept(ContextEntity context, WorkUnit unit, boolean simulate) {
+        if (unit.category != EnergyCategory.ELECTRIC) return Accepted.NEVER;
+        if (powered_steps > getMaxBuffer()) {
+            return Accepted.LATER;
+        }
+        if (simulate) return Accepted.NOW;
+        powered_steps += getStepsPerUnit();
+        if (powered_steps > getMaxBuffer()) {
+            if (waitingForPower) {
+                setStopped(false);
+            }
+            waitingForPower = false;
+        }
+        return Accepted.NOW;
+    }
+
+    public void waitForPower() {
+        Accepted acc = accept(new ContextEntity(this), ChargeEnetSubsys.CHARGE, true);
+        if (acc == Accepted.NEVER || acc == Accepted.LATER) return;
+        new Trap().iteratorHit(this);
+        if (!isStopped()) return;
+
+        waitingForPower = true;
     }
 
     public enum ServoMessages {

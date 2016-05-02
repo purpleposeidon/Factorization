@@ -3,18 +3,27 @@ package factorization.charge.enet;
 import com.google.common.collect.Maps;
 import factorization.algos.FastBag;
 import factorization.api.Coord;
+import factorization.api.ICoordFunction;
 import factorization.api.energy.*;
 import factorization.flat.api.Flat;
 import factorization.flat.api.FlatCoord;
 import factorization.flat.api.FlatFace;
+import factorization.flat.api.IFlatVisitor;
 import factorization.shared.Core;
+import factorization.util.SpaceUtil;
+import net.minecraft.entity.Entity;
+import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
 
-import java.util.*;
+import javax.annotation.Nonnull;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.WeakHashMap;
 
 public class ChargeEnetSubsys implements IEnergyNet {
     public static final ChargeEnetSubsys instance = new ChargeEnetSubsys();
@@ -142,6 +151,10 @@ public class ChargeEnetSubsys implements IEnergyNet {
             ContextBlock block = (ContextBlock) context;
             at = block.at;
             side = block.side;
+        } else if (context instanceof ContextEntity) {
+            ContextEntity e = (ContextEntity) context;
+            feedEntityPower(e, e.ent);
+            return;
         } else {
             return;
         }
@@ -153,6 +166,46 @@ public class ChargeEnetSubsys implements IEnergyNet {
                     return;
                 }
             }
+        }
+    }
+
+    private static class StopIteration extends RuntimeException {}
+
+    private void feedEntityPower(final ContextEntity ctx, final Entity ent) {
+        final AxisAlignedBB box = ent.getEntityBoundingBox();
+        final Coord min = new Coord(ent.worldObj, SpaceUtil.getMin(box));
+        final Coord max = new Coord(ent.worldObj, SpaceUtil.getMax(box));
+        final Coord t = min.copy();
+        final IFlatVisitor visitor = new IFlatVisitor() {
+            @Override
+            public void visit(Coord at, EnumFacing side, @Nonnull FlatFace face) {
+                if (face.getSpecies() != WireCharge.SPECIES) return;
+                if (!(face instanceof WireLeader)) return;
+                WireLeader leader = (WireLeader) face;
+                if (leader.powerSum <= 0) return;
+                for (MemberPos mp : leader.members) {
+                    t.x = mp.x;
+                    t.y = mp.y;
+                    t.z = mp.z;
+                    if (t.inside(min, max)) {
+                        if (ctx.give(CHARGE, true) == IWorker.Accepted.NOW) {
+                            ctx.give(CHARGE, false);
+                            leader.powerSum--;
+                        }
+                        throw new StopIteration();
+                    }
+                }
+            }
+        };
+        try {
+            Coord.iterateChunks(min, max, new ICoordFunction() {
+                @Override
+                public void handle(Coord here) {
+                    Flat.iterateDynamics(here.getChunk(), visitor);
+                }
+            });
+        } catch (StopIteration e) {
+            // ignored
         }
     }
 

@@ -1,5 +1,6 @@
 package factorization.servo.rail;
 
+import factorization.servo.iterator.AbstractServoMachine;
 import factorization.servo.iterator.ServoMotor;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
@@ -15,6 +16,14 @@ public abstract class Decorator extends ServoComponent {
     }
 
     public void stepperHit(StepperEngine engine) { }
+
+    public void iteratorHit(AbstractServoMachine iterator) {
+        if (iterator instanceof ServoMotor) {
+            motorHit((ServoMotor) iterator);
+        } else if (iterator instanceof StepperEngine) {
+            stepperHit((StepperEngine) iterator);
+        }
+    }
 
     public float getSize() {
         return TileEntityServoRail.width - 1F/2048F;

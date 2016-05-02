@@ -2,12 +2,12 @@ package factorization.servo.iterator;
 
 import factorization.api.Coord;
 import factorization.api.FzColor;
+import factorization.api.FzOrientation;
 import factorization.api.datahelpers.DataHelper;
 import factorization.api.datahelpers.DataInByteBuf;
 import factorization.api.datahelpers.DataInByteBufClientEdited;
 import factorization.api.datahelpers.Share;
-import factorization.api.energy.ContextEntity;
-import factorization.api.energy.IWorkerContext;
+import factorization.api.energy.*;
 import factorization.common.FactoryType;
 import factorization.net.FzNetDispatch;
 import factorization.net.NetworkFactorization;
@@ -519,5 +519,18 @@ public class ServoMotor extends AbstractServoMachine implements IInventory, ISoc
     @Override
     public boolean extractAccelerationEnergy() {
         return extractCharge(2);
+    }
+
+    @Override
+    public Accepted accept(ContextEntity context, WorkUnit unit, boolean simulate) {
+        if (socket instanceof IWorker) {
+            IWorker sub = (IWorker) socket;
+            FzOrientation fzo = getOrientation();
+            ContextTileEntity ctx = new ContextTileEntity(socket, fzo.facing.getOpposite(), fzo.top);
+            if (sub.accept(ctx, unit, simulate) == Accepted.NOW) {
+                return Accepted.NOW;
+            }
+        }
+        return super.accept(context, unit, simulate);
     }
 }

@@ -3,12 +3,15 @@ package factorization.servo.instructions;
 import factorization.api.Coord;
 import factorization.api.datahelpers.DataHelper;
 import factorization.api.datahelpers.IDataSerializable;
+import factorization.api.energy.ContextEntity;
+import factorization.api.energy.IWorker;
 import factorization.common.FactoryType;
 import factorization.flat.api.IFlatModel;
 import factorization.flat.api.IModelMaker;
 import factorization.servo.iterator.ServoMotor;
 import factorization.servo.rail.Decorator;
 import factorization.shared.Core;
+import factorization.util.NORELEASE;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.EnumFacing;
 
@@ -17,7 +20,7 @@ import java.io.IOException;
 public class PowerStation extends Decorator {
     @Override
     public void motorHit(ServoMotor motor) {
-        new Trap().motorHit(motor);
+        motor.waitForPower();
     }
 
     @Override

@@ -5,6 +5,8 @@ import factorization.api.FzColor;
 import factorization.api.FzOrientation;
 import factorization.api.datahelpers.DataHelper;
 import factorization.api.datahelpers.Share;
+import factorization.api.energy.ContextEntity;
+import factorization.api.energy.IWorker;
 import factorization.servo.rail.TileEntityServoRail;
 import factorization.shared.Core;
 import factorization.util.SpaceUtil;
@@ -310,6 +312,12 @@ public class MotionHandler {
     }
 
     protected void tryUnstop() {
+        if (motor.waitingForPower) {
+            IWorker.requestPower(new ContextEntity(motor));
+        }
+        if (motor.waitingForPower) {
+            return;
+        }
         if (stopped && motor.getCurrentPos().isWeaklyPowered()) {
             setStopped(false);
         }
