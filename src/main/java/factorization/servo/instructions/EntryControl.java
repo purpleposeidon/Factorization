@@ -74,4 +74,8 @@ public class EntryControl extends Instruction {
         no = reg(maker, "entry_control/no");
     }
 
+    @Override
+    public byte getPriority() {
+        return (byte) (blocking ? -1 : +1);
+    }
 }

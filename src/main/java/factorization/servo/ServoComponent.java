@@ -263,4 +263,8 @@ public abstract class ServoComponent implements IDataSerializable {
     protected static IFlatModel reg(IModelMaker maker, String name) {
         return maker.getModel(new ResourceLocation("factorization:flat/servo/instruction/" + name));
     }
+
+    public byte getPriority() {
+        return 0;
+    }
 }
