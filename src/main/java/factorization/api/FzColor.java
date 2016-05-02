@@ -2,12 +2,15 @@ package factorization.api;
 
 import factorization.util.ItemUtil;
 import net.minecraft.block.*;
+import net.minecraft.block.properties.IProperty;
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.item.EnumDyeColor;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.oredict.OreDictionary;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 public enum FzColor {
     NO_COLOR(null, 0xFFFFFF),
@@ -78,12 +81,12 @@ public enum FzColor {
         if (b == null) {
             return NO_COLOR;
         }
-        if (b instanceof BlockColored || b instanceof BlockStainedGlassPane || b instanceof BlockStainedGlass || b instanceof BlockCarpet) {
-            int md = c.getMd();
-            if (md < 0 || md >= 16) {
-                return NO_COLOR;
+        IBlockState bs = c.getState();
+        for (Map.Entry<IProperty, Comparable> pair : bs.getProperties().entrySet()) {
+            if (pair.getKey().getValueClass() == EnumDyeColor.class) {
+                EnumDyeColor dye = (EnumDyeColor) bs.getValue(pair.getKey());
+                return fromVanilla(dye);
             }
-            return cache[md + 1];
         }
         return NO_COLOR;
     }
