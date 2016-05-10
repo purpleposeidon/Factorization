@@ -9,7 +9,6 @@ import factorization.fzds.DeltaChunk;
 import factorization.mechanics.SocketPoweredCrank;
 import factorization.mechanics.TileEntityHinge;
 import factorization.redstone.TileEntityParaSieve;
-import factorization.servo.rail.TileEntityServoRail;
 import factorization.shared.*;
 import factorization.sockets.*;
 import factorization.sockets.fanturpeller.BlowEntities;
@@ -50,7 +49,7 @@ public enum FactoryType {
     EXTENDED(24, false, TileEntityExtension.class, "factory_ext"), //Used for multipiece blocks (like beds & rocket engines)
     //25 -- Used to be CERAMIC
     LEYDENJAR(26, false, TileEntityLeydenJar.class, "factory_leyjar"), //inefficient bulk energy storage
-    SERVORAIL(27, false, TileEntityServoRail.class, "factory_rail"),
+    //27 -- Used to be SERVORAIL, which has been flattened.
     PARASIEVE(28, true, TileEntityParaSieve.class, "factory_sieve"),
     COMPRESSIONCRAFTER(29, false, TileEntityCompressionCrafter.class, "factory_compact"),
     DAYBARREL(30, false, TileEntityDayBarrel.class, "factory_barrel2"),

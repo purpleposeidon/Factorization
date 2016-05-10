@@ -9,6 +9,7 @@ import net.minecraft.util.BlockPos;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.Vec3;
 
+import javax.annotation.Nullable;
 import java.io.IOException;
 
 public class DeltaCoord implements IDataSerializable {
@@ -95,7 +96,8 @@ public class DeltaCoord implements IDataSerializable {
     public double getAngleHorizontal() {
         return Math.atan2(z, -x);
     }
-    
+
+    @Nullable
     public EnumFacing getDirection() {
         EnumFacing[] values = EnumFacing.VALUES;
         for (int i = 0; i < values.length; i++) {

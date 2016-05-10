@@ -72,16 +72,11 @@ public class ScanColor extends Decorator {
         Core.registry.oreRecipe(toItem(),
                 " Q ",
                 "+#+",
-                '+', FactoryType.SERVORAIL.itemStack(),
+                '+', Core.registry.servorail,
                 'Q', "gemQuartz",
                 '#', Core.registry.logicMatrixIdentifier);
     }
-    
-    @Override
-    public float getSize() {
-        return super.getSize() - 1F/32F;
-    }
-    
+
     @Override
     public boolean collides() {
         return false;

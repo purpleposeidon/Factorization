@@ -1,12 +1,18 @@
 package factorization.servo.iterator;
 
+import com.google.common.base.Function;
+import com.google.common.collect.Lists;
 import factorization.api.Coord;
+import factorization.api.DeltaCoord;
 import factorization.api.FzColor;
 import factorization.api.FzOrientation;
 import factorization.api.datahelpers.DataHelper;
 import factorization.api.datahelpers.Share;
 import factorization.api.energy.ContextEntity;
 import factorization.api.energy.IWorker;
+import factorization.flat.AbstractFlatWire;
+import factorization.flat.api.FlatCoord;
+import factorization.servo.rail.FlatServoRail;
 import factorization.servo.rail.TileEntityServoRail;
 import factorization.shared.Core;
 import factorization.util.SpaceUtil;
@@ -14,8 +20,12 @@ import net.minecraft.util.EnumFacing;
 import net.minecraft.util.Vec3;
 import net.minecraft.world.chunk.Chunk;
 
+import javax.annotation.Nullable;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Random;
 
 public class MotionHandler {
     public final AbstractServoMachine motor;
@@ -130,13 +140,83 @@ public class MotionHandler {
             speed_b--;
         }
     }
-    
-    boolean validPosition(Coord c, boolean desperate) {
-        TileEntityServoRail sr = c.getTE(TileEntityServoRail.class);
-        if (sr == null) {
-            return false;
+
+    int score(FlatCoord at) {
+        FlatServoRail fsr = at.get(FlatServoRail.class);
+        if (fsr == null) return Integer.MIN_VALUE; // Bad state.
+        int score = fsr.getComponent().getPriority() * 1000;
+        Coord mpos = motor.getCurrentPos();
+        FzOrientation fzo = motor.getOrientation();
+        if (at.side == fzo.top) {
+            score += 100;
+        } else if (at.side == fzo.top.getOpposite()) {
+            // checkerboard case:
+            // .##|...
+            // .##|...
+            // ...|##.
+            // ...|##.
+            score += 50;
         }
-        return (sr.priority >= 0 || desperate) && !color.conflictsWith(sr.color);
+        DeltaCoord dc = at.at.difference(mpos);
+        EnumFacing proposedMotion = dc.getDirection();
+        if (proposedMotion == fzo.facing) {
+            score += 30;
+        } else if (proposedMotion == fzo.facing.getOpposite()) {
+            score -= 30;
+        }
+        return score;
+    }
+
+    @Nullable
+    FlatCoord pickNextPos() {
+        final ArrayList<FlatCoord> potential = Lists.newArrayList();
+        final FlatCoord root = new FlatCoord(motor.getCurrentPos(), motor.getOrientation().facing);
+        final FlatServoRail rootRail = root.get(FlatServoRail.class);
+        if (rootRail == null) return null;
+        final FzColor color = rootRail.color;
+        AbstractFlatWire.iterateConnectable(root, new Function<FlatCoord, Void>() {
+            @Nullable
+            @Override
+            public Void apply(@Nullable FlatCoord input) {
+                if (input == null) return null;
+                final FlatServoRail rail = input.get(FlatServoRail.class);
+                if (rail == null) return null;
+                if (color.conflictsWith(rail.color)) return null;
+                {
+                    Coord at = input.at;
+                    EnumFacing side = input.side;
+                    boolean a = at.isSolidOnSide(side);
+                    boolean b = at.add(side).isSolidOnSide(side.getOpposite());
+                    // Both sides solid: Can't fit.
+                    // Both sides not solid: Bad state.
+                    if (a == b) return null;
+                    if (b) {
+                        input = input.flip();
+                    }
+                }
+                potential.add(input);
+                return null;
+            }
+        });
+        Collections.shuffle(potential);
+        potential.sort(new Comparator<FlatCoord>() {
+            @Override
+            public int compare(FlatCoord a, FlatCoord b) {
+                int sa = score(a);
+                int sb = score(b);
+                if (sa > sb) return +1;
+                if (sa < sb) return -1;
+                return 0;
+            }
+        });
+        if (potential.isEmpty()) return null;
+        return potential.get(0);
+    }
+    
+    boolean validPosition(FlatCoord c, boolean desperate) {
+        FlatServoRail fsr = c.get(FlatServoRail.class);
+        if (fsr == null) return false;
+        return (fsr.component.getPriority() >= 0 || desperate) && !color.conflictsWith(fsr.color);
     }
 
     boolean validDirection(EnumFacing dir, boolean desperate) {
@@ -192,9 +272,7 @@ public class MotionHandler {
         int available_nonbackwards_directions = 0;
         Coord look = pos_next.copy();
         int all_count = 0;
-        //noinspection ForLoopReplaceableByForEach
-        for (int i = 0; i < dirs.size(); i++) {
-            EnumFacing fd = dirs.get(i);
+        for (EnumFacing fd : dirs) {
             look.set(pos_next);
             look.adjust(fd);
             TileEntityServoRail sr = look.getTE(TileEntityServoRail.class);

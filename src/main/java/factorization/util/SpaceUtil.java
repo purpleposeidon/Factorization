@@ -20,8 +20,6 @@ public final class SpaceUtil {
     public static final byte GET_POINT_MIN = 0x0;
     public static final byte GET_POINT_MAX = 0x7;
 
-    private static ThreadLocal<ArrayList<EnumFacing>> direction_cache = new ThreadLocal<ArrayList<EnumFacing>>();
-
     public static EnumFacing determineOrientation(EntityPlayer player) {
         if (player.rotationPitch > 75) {
             return EnumFacing.DOWN;
@@ -310,13 +308,9 @@ public final class SpaceUtil {
     }
 
     public static ArrayList<EnumFacing> getRandomDirections(Random rand) {
-        ArrayList<EnumFacing> ret = direction_cache.get();
-        if (ret == null) {
-            ret = new ArrayList(6);
-            for (int i = 0; i < 6; i++) {
-                ret.add(SpaceUtil.getOrientation(i));
-            }
-            direction_cache.set(ret);
+        ArrayList<EnumFacing> ret = new ArrayList<EnumFacing>(6);
+        for (int i = 0; i < 6; i++) {
+            ret.add(SpaceUtil.getOrientation(i));
         }
         Collections.shuffle(ret, rand);
         return ret;

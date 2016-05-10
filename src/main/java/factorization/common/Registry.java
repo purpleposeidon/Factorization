@@ -24,6 +24,7 @@ import factorization.oreprocessing.TileEntityGrinder;
 import factorization.redstone.BlockMatcher;
 import factorization.redstone.BlockParasieve;
 import factorization.servo.ItemMatrixProgrammer;
+import factorization.servo.ServoFeature;
 import factorization.servo.iterator.ItemServoMotor;
 import factorization.servo.rail.ItemServoRailWidget;
 import factorization.servo.rail.ServoComponent;
@@ -125,6 +126,7 @@ public class Registry {
     public SimpleFzBlock mirror;
     public BlockHinge hinge;
 
+    public ItemFlat servorail;
     public ItemStack servorail_item;
     public ItemStack empty_socket_item;
 
@@ -386,7 +388,6 @@ public class Registry {
         item_resource = (ItemBlockResource) Item.getItemFromBlock(resource_block);
 
         //BlockFactorization stuff
-        servorail_item = FactoryType.SERVORAIL.itemStack();
         empty_socket_item = new ItemStack(socket);
         parasieve_item = FactoryType.PARASIEVE.itemStack();
         compression_crafter_item = FactoryType.COMPRESSIONCRAFTER.itemStack();
@@ -451,6 +452,8 @@ public class Registry {
         nether_powder = new ItemCraftingComponent("nether_powder");
 
         //Servos
+        servorail = new ItemFlat(ServoFeature.static_rail, TabType.SERVOS);
+        servorail_item = new ItemStack(servorail);
         servo_placer = new ItemServoMotor("servo");
         if (HammerEnabled.ENABLED && Core.dev_environ) {
             stepper_placer = new ItemStepperEngine("stepper");

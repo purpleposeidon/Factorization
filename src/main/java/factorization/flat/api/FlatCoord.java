@@ -2,10 +2,15 @@ package factorization.flat.api;
 
 import com.google.common.base.Objects;
 import factorization.api.Coord;
+import factorization.api.datahelpers.DataHelper;
+import factorization.api.datahelpers.IDataSerializable;
 import factorization.util.SpaceUtil;
 import net.minecraft.util.EnumFacing;
 
-public class FlatCoord {
+import javax.annotation.Nullable;
+import java.io.IOException;
+
+public class FlatCoord implements IDataSerializable {
     public final Coord at;
     public final EnumFacing side;
 
@@ -14,6 +19,15 @@ public class FlatCoord {
             at = at.add(side);
             side = side.getOpposite();
         }
+        this.at = at;
+        this.side = side;
+    }
+
+    public static FlatCoord unnormalized(Coord at, EnumFacing side) {
+        return new FlatCoord(at, side, true);
+    }
+
+    private FlatCoord(Coord at, EnumFacing side, boolean b) {
         this.at = at;
         this.side = side;
     }
@@ -36,6 +50,13 @@ public class FlatCoord {
         return Flat.get(at, side);
     }
 
+    @Nullable
+    public <T extends FlatFace> T get(final Class<T> tClass) {
+        FlatFace ret = get();
+        if (tClass.isInstance(ret)) return (T) ret;
+        return null;
+    }
+
     public void set(FlatFace face) {
         Flat.set(at, side, face);
     }
@@ -56,5 +77,19 @@ public class FlatCoord {
     @Override
     public String toString() {
         return at.toString() + " ON " + side;
+    }
+
+    @Override
+    public IDataSerializable serialize(String prefix, DataHelper data) throws IOException {
+        Coord new_at = data.asSameShare(prefix + ":at").putIDS(at);
+        EnumFacing new_side = data.asSameShare(prefix + ":side").putEnum(side);
+        if (data.isReader()) {
+            return new FlatCoord(new_at, new_side);
+        }
+        return this;
+    }
+
+    public FlatCoord flip() {
+        return new FlatCoord(at.add(side), side.getOpposite(), true);
     }
 }

@@ -9,10 +9,13 @@ import factorization.api.datahelpers.DataInByteBufClientEdited;
 import factorization.api.datahelpers.Share;
 import factorization.api.energy.*;
 import factorization.common.FactoryType;
+import factorization.flat.api.FlatCoord;
+import factorization.flat.api.FlatFace;
 import factorization.net.FzNetDispatch;
 import factorization.net.NetworkFactorization;
 import factorization.net.StandardMessageType;
 import factorization.servo.rail.Decorator;
+import factorization.servo.rail.FlatServoRail;
 import factorization.servo.rail.ItemServoRailWidget;
 import factorization.servo.rail.ServoComponent;
 import factorization.servo.rail.TileEntityServoRail;
@@ -196,6 +199,11 @@ public class ServoMotor extends AbstractServoMachine implements IInventory, ISoc
         }
         socket.onEnterNewBlock();
         motionHandler.onEnterNewBlock();
+        FlatFace ff = getFlatPos().get();
+        if (ff instanceof FlatServoRail) {
+            FlatServoRail fsr = (FlatServoRail) ff;
+            fsr.getComponent().
+        }
         TileEntityServoRail rail = getCurrentPos().getTE(TileEntityServoRail.class);
         if (rail != null && rail.decoration != null) {
             if (rail.decoration.preMotorHit(this)) {
@@ -203,6 +211,10 @@ public class ServoMotor extends AbstractServoMachine implements IInventory, ISoc
             }
         }
         executioner.onEnterNewBlock(rail);
+    }
+
+    FlatCoord getFlatPos() {
+        return new FlatCoord(getCurrentPos(), getOrientation().facing);
     }
     
     

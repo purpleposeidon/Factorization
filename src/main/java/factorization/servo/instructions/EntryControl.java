@@ -5,9 +5,8 @@ import factorization.api.datahelpers.DataHelper;
 import factorization.api.datahelpers.IDataSerializable;
 import factorization.flat.api.IFlatModel;
 import factorization.flat.api.IModelMaker;
-import factorization.servo.rail.Instruction;
 import factorization.servo.iterator.ServoMotor;
-import factorization.servo.rail.TileEntityServoRail;
+import factorization.servo.rail.Instruction;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.EnumFacing;
 
@@ -27,21 +26,8 @@ public class EntryControl extends Instruction {
         if (!playerHasProgrammer(player)) {
             return false;
         }
-        TileEntityServoRail sr = block.getTE(TileEntityServoRail.class);
-        if (sr.priority >= 0) {
-            sr.priority = -1;
-            blocking = true;
-        } else {
-            sr.priority = 1;
-            blocking = false;
-        }
+        blocking = !blocking;
         return true;
-    }
-    
-    @Override
-    public void onPlacedOnRail(TileEntityServoRail sr) {
-        sr.priority = 1;
-        blocking = false;
     }
 
     @Override
@@ -55,11 +41,6 @@ public class EntryControl extends Instruction {
     @Override
     public String getName() {
         return "fz.instruction.entryControl";
-    }
-    
-    @Override
-    public void afterClientLoad(TileEntityServoRail rail) {
-        rail.priority = (byte) (blocking ? -1 : 1);
     }
 
     static IFlatModel yes, no;

@@ -26,9 +26,9 @@ import java.util.Locale;
 
 public class FlatServoRail extends AbstractFlatWire {
     public FzColor color = FzColor.NO_COLOR;
-    public ServoComponent component = GenericPlaceholder.INSTANCE;
+    public Decorator component = GenericPlaceholder.INSTANCE;
 
-    public ServoComponent getComponent() {
+    public Decorator getComponent() {
         return component;
     }
 
