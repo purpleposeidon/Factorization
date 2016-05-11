@@ -33,14 +33,10 @@ import factorization.util.InvUtil;
 import factorization.util.ItemUtil;
 
 public class TileEntitySapTap extends TileEntityCommon implements ISidedInventory, ITickable {
-    ItemStack sap = new ItemStack(Core.registry.sap, 0, 0);
+    ItemStack sap = Core.registry.sap == null ? null : new ItemStack(Core.registry.sap, 0, 0);
     int log_count = 0, leaf_count = 0;
     long sap_rate = 0;
     int ticks = 0;
-
-    static {
-        TileEntityCaliometricBurner.register(Core.registry.sap, 8, 0.5);
-    }
 
     @Override
     public FactoryType getFactoryType() {

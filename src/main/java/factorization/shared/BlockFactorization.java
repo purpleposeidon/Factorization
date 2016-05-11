@@ -224,7 +224,7 @@ public class BlockFactorization extends BlockContainer {
     }
 
     private static void put(List<ItemStack> itemList, ItemStack item) {
-        if (item == null) return;
+        if (item == null || item.getItem() == null) return;
         itemList.add(item);
     }
     
@@ -253,7 +253,9 @@ public class BlockFactorization extends BlockContainer {
         put(itemList, reg.servorail_item);
 
         //mechanics
-        put(itemList, new ItemStack(reg.hinge));
+        if (reg.hinge != null) {
+            put(itemList, new ItemStack(reg.hinge));
+        }
     }
 
 

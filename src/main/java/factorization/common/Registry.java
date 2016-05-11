@@ -8,6 +8,7 @@ import factorization.beauty.*;
 import factorization.charge.BlockFurnaceHeater;
 import factorization.charge.ItemAcidBottle;
 import factorization.charge.ItemChargeMeter;
+import factorization.charge.TileEntityCaliometricBurner;
 import factorization.charge.enet.BlockLeydenJar;
 import factorization.charge.enet.ChargeEnetSubsys;
 import factorization.charge.enet.TileEntityLeydenJar;
@@ -1155,6 +1156,9 @@ public class Registry {
                 '#', new ItemStack(Blocks.quartz_block, 1, 1),
                 '-', "ingotGold",
                 '*', Items.nether_star);
+
+        TileEntityCaliometricBurner.register(Core.registry.sap, 8, 0.5);
+        TileEntityCaliometricBurner.register(Core.registry.entheas, 2, 16);
     }
     
     private void makeServoRecipes() {

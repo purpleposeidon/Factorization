@@ -14,6 +14,7 @@ import factorization.util.InvUtil;
 import factorization.util.ItemUtil;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
+import net.minecraft.init.Items;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemFood;
 import net.minecraft.item.ItemStack;
@@ -53,7 +54,7 @@ public class TileEntityCaliometricBurner extends TileEntityFactorization {
 
     private static final HashMultimap<Item, FoodInfo> special_foods = HashMultimap.create();
     static {
-        register(DataUtil.getItem(Blocks.cake), 12, 0.1);
+        register(Items.cake, 12, 0.1);
     }
 
     ItemStack stomache;

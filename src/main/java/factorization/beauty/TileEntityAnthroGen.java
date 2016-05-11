@@ -38,13 +38,9 @@ public class TileEntityAnthroGen extends TileEntityCommon implements IInventory,
     public static int MIN_WANDER_DISTANCE = 12 * 12;
     public static int VILLAGER_CHECKS_PER_ENTHEAS = 8;
     public static final int CHUNK_RANGE = 1;
-    ItemStack entheas = new ItemStack(Core.registry.entheas, 0, 0);
+    ItemStack entheas = Core.registry.entheas == null ? null : new ItemStack(Core.registry.entheas, 0, 0);
     int satisfactory_villagers = 0;
     transient boolean isLit = false;
-
-    static {
-        TileEntityCaliometricBurner.register(Core.registry.entheas, 2, 16);
-    }
 
     @Override
     public BlockClass getBlockClass() {
