@@ -11,7 +11,6 @@ import factorization.servo.iterator.Executioner;
 import factorization.servo.iterator.ServoMotor;
 import factorization.servo.iterator.ServoStack;
 import factorization.servo.rail.Instruction;
-import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumFacing;
@@ -54,10 +53,7 @@ public class Jump extends Instruction {
     }
 
     @Override
-    public boolean onClick(EntityPlayer player, Coord block, EnumFacing side) {
-        if (!playerHasProgrammer(player)) {
-            return super.onClick(player, block, side);
-        }
+    protected boolean lmpConfigure() {
         if (mode == Executioner.JMP_NEXT_INSTRUCTION) {
             mode = Executioner.JMP_NEXT_TILE;
         } else {
@@ -65,7 +61,7 @@ public class Jump extends Instruction {
         }
         return true;
     }
-    
+
     @Override
     public String getInfo() {
         if (mode == Executioner.JMP_NEXT_INSTRUCTION) {

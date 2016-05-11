@@ -6,8 +6,8 @@ import factorization.api.Coord;
 import factorization.api.datahelpers.*;
 import factorization.flat.api.IFlatModel;
 import factorization.flat.api.IModelMaker;
-import factorization.servo.iterator.ServoMotor;
 import factorization.servo.instructions.*;
+import factorization.servo.iterator.ServoMotor;
 import factorization.shared.Core;
 import factorization.util.NORELEASE;
 import io.netty.buffer.ByteBuf;
@@ -202,10 +202,12 @@ public abstract class ServoComponent implements IDataSerializable {
     static {
         //registerRecursivelyFromPackage("factorization.common.servo.actuators");
         //registerRecursivelyFromPackage("factorization.common.servo.instructions");
+        //noinspection unchecked
         Class<? extends ServoComponent>[] decorations = (Class<? extends ServoComponent>[])new Class[] {
                 ScanColor.class,
                 PowerStation.class,
         };
+        //noinspection unchecked
         Class<? extends ServoComponent>[] instructions = (Class<? extends ServoComponent>[])new Class[] {
                 // Color by class, sort by color
                 // Cyan: Motion instructions
@@ -232,9 +234,6 @@ public abstract class ServoComponent implements IDataSerializable {
 
                 // White: Computation instructions
                 Jump.class,
-                SetEntryAction.class,
-                SetRepeatedInstruction.class,
-                InstructionGroup.class,
         };
 
         for (Class<? extends ServoComponent> cl : decorations) register(cl, sorted_decors);

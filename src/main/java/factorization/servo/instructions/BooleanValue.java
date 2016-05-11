@@ -6,9 +6,8 @@ import factorization.api.datahelpers.IDataSerializable;
 import factorization.api.datahelpers.Share;
 import factorization.flat.api.IFlatModel;
 import factorization.flat.api.IModelMaker;
-import factorization.servo.rail.Instruction;
 import factorization.servo.iterator.ServoMotor;
-import net.minecraft.entity.player.EntityPlayer;
+import factorization.servo.rail.Instruction;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumFacing;
@@ -34,11 +33,8 @@ public class BooleanValue extends Instruction {
     }
     
     @Override
-    public boolean onClick(EntityPlayer player, Coord block, EnumFacing side) {
-        if (playerHasProgrammer(player)) {
-            val = !val;
-            return true;
-        }
+    protected boolean lmpConfigure() {
+        val = !val;
         return false;
     }
 

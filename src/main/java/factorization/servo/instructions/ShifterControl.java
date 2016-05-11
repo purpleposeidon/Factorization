@@ -6,12 +6,11 @@ import factorization.api.datahelpers.IDataSerializable;
 import factorization.api.datahelpers.Share;
 import factorization.flat.api.IFlatModel;
 import factorization.flat.api.IModelMaker;
-import factorization.servo.rail.Instruction;
 import factorization.servo.iterator.ServoMotor;
 import factorization.servo.iterator.ServoStack;
+import factorization.servo.rail.Instruction;
 import factorization.sockets.SocketShifter;
 import factorization.sockets.TileEntitySocketBase;
-import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumFacing;
@@ -87,10 +86,7 @@ public class ShifterControl extends Instruction {
     }
 
     @Override
-    public boolean onClick(EntityPlayer player, Coord block, EnumFacing side) {
-        if (!playerHasProgrammer(player)) {
-            return false;
-        }
+    protected boolean lmpConfigure() {
         int i = mode.ordinal();
         i++;
         if (i == ShifterModes.values.length) {

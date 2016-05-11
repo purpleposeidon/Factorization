@@ -7,11 +7,10 @@ import factorization.api.datahelpers.Share;
 import factorization.flat.api.IFlatModel;
 import factorization.flat.api.IModelMaker;
 import factorization.servo.iterator.CpuBlocking;
-import factorization.servo.rail.Instruction;
 import factorization.servo.iterator.ServoMotor;
+import factorization.servo.rail.Instruction;
 import factorization.servo.stepper.StepperEngine;
 import factorization.shared.Core;
-import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.EnumFacing;
 
 import java.io.IOException;
@@ -68,8 +67,7 @@ public class SocketCtrl extends Instruction {
     }
     
     @Override
-    public boolean onClick(EntityPlayer player, Coord block, EnumFacing side) {
-        if (!playerHasProgrammer(player)) return false;
+    protected boolean lmpConfigure() {
         mode++;
         if (mode > 2) {
             mode = 0;

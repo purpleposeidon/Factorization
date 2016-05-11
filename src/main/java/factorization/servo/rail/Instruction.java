@@ -11,7 +11,7 @@ import net.minecraft.util.EnumFacing;
 
 public abstract class Instruction extends Decorator {
     @Override
-    public final boolean onClick(EntityPlayer player, Coord block, EnumFacing side) {
+    public boolean onClick(EntityPlayer player, Coord block, EnumFacing side) {
         if (playerHasProgrammer(player)) {
             return lmpConfigure();
         }

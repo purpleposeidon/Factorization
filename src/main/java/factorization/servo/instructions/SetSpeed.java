@@ -7,9 +7,8 @@ import factorization.api.datahelpers.Share;
 import factorization.flat.api.IFlatModel;
 import factorization.flat.api.IModelMaker;
 import factorization.servo.iterator.CpuBlocking;
-import factorization.servo.rail.Instruction;
 import factorization.servo.iterator.ServoMotor;
-import net.minecraft.entity.player.EntityPlayer;
+import factorization.servo.rail.Instruction;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumFacing;
@@ -61,10 +60,7 @@ public class SetSpeed extends Instruction {
     }
 
     @Override
-    public boolean onClick(EntityPlayer player, Coord block, EnumFacing side) {
-        if (!playerHasProgrammer(player)) {
-            return false;
-        }
+    protected boolean lmpConfigure() {
         speed++;
         if (speed == 6) {
             speed = 1;

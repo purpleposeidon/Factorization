@@ -7,7 +7,6 @@ import factorization.flat.api.IFlatModel;
 import factorization.flat.api.IModelMaker;
 import factorization.servo.iterator.ServoMotor;
 import factorization.servo.rail.Instruction;
-import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.EnumFacing;
 
 import java.io.IOException;
@@ -22,10 +21,7 @@ public class EntryControl extends Instruction {
     }
     
     @Override
-    public boolean onClick(EntityPlayer player, Coord block, EnumFacing side) {
-        if (!playerHasProgrammer(player)) {
-            return false;
-        }
+    protected boolean lmpConfigure() {
         blocking = !blocking;
         return true;
     }

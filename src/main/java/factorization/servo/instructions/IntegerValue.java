@@ -5,9 +5,8 @@ import factorization.api.datahelpers.DataHelper;
 import factorization.api.datahelpers.IDataSerializable;
 import factorization.flat.api.IFlatModel;
 import factorization.flat.api.IModelMaker;
-import factorization.servo.rail.Instruction;
 import factorization.servo.iterator.ServoMotor;
-import net.minecraft.entity.player.EntityPlayer;
+import factorization.servo.rail.Instruction;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumFacing;
@@ -39,20 +38,19 @@ public class IntegerValue extends Instruction {
     }
     
     @Override
-    public boolean onClick(EntityPlayer player, Coord block, EnumFacing side) {
-        if (playerHasProgrammer(player)) {
-            if (getVal() == -1) {
-                setVal(1);
-                return true;
-            } else if (getVal() == 1) {
-                setVal(0);
-                return true;
-            } else if (getVal() == 0) {
-                setVal(-1);
-                return true;
-            }
+    protected boolean lmpConfigure() {
+        if (getVal() == -1) {
+            setVal(1);
+            return true;
+        } else if (getVal() == 1) {
+            setVal(0);
+            return true;
+        } else if (getVal() == 0) {
+            setVal(-1);
+            return true;
+        } else {
+            return false;
         }
-        return false;
     }
     
     @Override

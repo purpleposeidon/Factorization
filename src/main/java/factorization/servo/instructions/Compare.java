@@ -6,11 +6,10 @@ import factorization.api.datahelpers.IDataSerializable;
 import factorization.api.datahelpers.Share;
 import factorization.flat.api.IFlatModel;
 import factorization.flat.api.IModelMaker;
-import factorization.servo.rail.Instruction;
 import factorization.servo.iterator.ServoMotor;
 import factorization.servo.iterator.ServoStack;
+import factorization.servo.rail.Instruction;
 import factorization.util.FzUtil;
-import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.EnumFacing;
 
 import java.io.IOException;
@@ -93,10 +92,7 @@ public class Compare extends Instruction {
     }
     
     @Override
-    public boolean onClick(EntityPlayer player, Coord block, EnumFacing side) {
-        if (!playerHasProgrammer(player)) {
-            return false;
-        }
+    protected boolean lmpConfigure() {
         cmp = FzUtil.shiftEnum(cmp, CmpType.values(), 1);
         return true;
     }

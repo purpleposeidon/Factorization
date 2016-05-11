@@ -7,11 +7,10 @@ import factorization.api.datahelpers.Share;
 import factorization.flat.api.IFlatModel;
 import factorization.flat.api.IModelMaker;
 import factorization.servo.iterator.AbstractServoMachine;
-import factorization.servo.rail.Instruction;
 import factorization.servo.iterator.ServoMotor;
+import factorization.servo.rail.Instruction;
 import factorization.servo.stepper.StepperEngine;
 import factorization.util.SpaceUtil;
-import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumFacing;
@@ -23,13 +22,10 @@ public class SetDirection extends Instruction {
     EnumFacing dir = EnumFacing.UP;
 
     @Override
-    public boolean onClick(EntityPlayer player, Coord block, EnumFacing side) {
-        if (playerHasProgrammer(player)) {
-            int i = dir.ordinal();
-            dir = SpaceUtil.getOrientation((i + 1) % 6);
-            return true;
-        }
-        return false;
+    protected boolean lmpConfigure() {
+        int i = dir.ordinal();
+        dir = SpaceUtil.getOrientation((i + 1) % 6);
+        return true;
     }
 
     void hit(AbstractServoMachine motor) {
