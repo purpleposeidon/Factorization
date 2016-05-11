@@ -7,7 +7,7 @@ import net.minecraftforge.common.config.Configuration;
 import java.io.File;
 
 public class HammerEnabled {
-    public static final boolean ENABLED = isEnabled();
+    public static final boolean ENABLED = false; //isEnabled();
 
     private static boolean isEnabled() {
         final String the_devil = "Bukkit, Craftbukkit, Cauldron, KCauldron, or MCPC+";
