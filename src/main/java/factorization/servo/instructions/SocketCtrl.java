@@ -9,7 +9,6 @@ import factorization.flat.api.IModelMaker;
 import factorization.servo.iterator.CpuBlocking;
 import factorization.servo.iterator.ServoMotor;
 import factorization.servo.rail.Instruction;
-import factorization.servo.stepper.StepperEngine;
 import factorization.shared.Core;
 import net.minecraft.util.EnumFacing;
 
@@ -30,7 +29,7 @@ public class SocketCtrl extends Instruction {
         return Core.registry.empty_socket_item;
     }
 
-    @Override
+    /*@Override
     public void stepperHit(StepperEngine engine) {
         if (mode == MODE_POWER) {
             engine.fzdsGrab();
@@ -43,7 +42,7 @@ public class SocketCtrl extends Instruction {
                 engine.fzdsGrab();
             }
         }
-    }
+    }*/
 
     @Override
     public void motorHit(ServoMotor motor) {

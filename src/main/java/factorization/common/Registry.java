@@ -28,7 +28,6 @@ import factorization.servo.ServoFeature;
 import factorization.servo.iterator.ItemServoMotor;
 import factorization.servo.rail.ItemServoRailWidget;
 import factorization.servo.rail.ServoComponent;
-import factorization.servo.stepper.ItemStepperEngine;
 import factorization.shared.*;
 import factorization.shared.Core.TabType;
 import factorization.sockets.BlockSocket;
@@ -154,7 +153,7 @@ public class Registry {
     public ItemCraftingComponent nether_powder, rocket_fuel;
     public ItemBlockProxy rocket_engine; { NORELEASE.fixme("Remove rocket bits"); }
     public ItemServoMotor servo_placer;
-    public ItemServoMotor stepper_placer;
+    //public ItemServoMotor stepper_placer;
     public ItemServoRailWidget servo_widget_instruction, servo_widget_decor;
     public ItemStack dark_iron_sprocket, servo_motor;
     public ItemCraftingComponent giant_scissors;
@@ -455,9 +454,9 @@ public class Registry {
         servorail = new ItemFlat(ServoFeature.static_rail, TabType.SERVOS);
         servorail_item = new ItemStack(servorail);
         servo_placer = new ItemServoMotor("servo");
-        if (HammerEnabled.ENABLED && Core.dev_environ) {
+        /*if (HammerEnabled.ENABLED && Core.dev_environ) {
             stepper_placer = new ItemStepperEngine("stepper");
-        }
+        }*/
         servo_widget_decor = new ItemServoRailWidget("servo/decorator");
         servo_widget_instruction = new ItemServoRailWidget("servo/component");
         servo_widget_decor.setMaxStackSize(16);

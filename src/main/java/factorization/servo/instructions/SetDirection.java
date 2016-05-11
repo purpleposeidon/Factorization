@@ -9,7 +9,6 @@ import factorization.flat.api.IModelMaker;
 import factorization.servo.iterator.AbstractServoMachine;
 import factorization.servo.iterator.ServoMotor;
 import factorization.servo.rail.Instruction;
-import factorization.servo.stepper.StepperEngine;
 import factorization.util.SpaceUtil;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
@@ -38,10 +37,10 @@ public class SetDirection extends Instruction {
         hit(motor);
     }
 
-    @Override
+    /*@Override
     public void stepperHit(StepperEngine engine) {
         hit(engine);
-    }
+    }*/
 
     @Override
     public String getName() {

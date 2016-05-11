@@ -23,8 +23,6 @@ import factorization.mechanics.TileEntityHingeRenderer;
 import factorization.redstone.GuiParasieve;
 import factorization.servo.iterator.RenderServoMotor;
 import factorization.servo.iterator.ServoMotor;
-import factorization.servo.stepper.RenderStepperEngine;
-import factorization.servo.stepper.StepperEngine;
 import factorization.shared.*;
 import factorization.sockets.SocketLacerator;
 import factorization.sockets.SocketModel;
@@ -350,7 +348,7 @@ public class FactorizationClientProxy extends FactorizationProxy {
 
         RenderingRegistry.registerEntityRenderingHandler(TileEntityWrathLamp.RelightTask.class, new EmptyRender(rm));
         RenderingRegistry.registerEntityRenderingHandler(ServoMotor.class, new RenderServoMotor(rm));
-        RenderingRegistry.registerEntityRenderingHandler(StepperEngine.class, new RenderStepperEngine(rm));
+        //RenderingRegistry.registerEntityRenderingHandler(StepperEngine.class, new RenderStepperEngine(rm));
         RenderingRegistry.registerEntityRenderingHandler(ColossusController.class, new ColossusControllerRenderer(rm));
         RenderingRegistry.registerEntityRenderingHandler(EntityPoster.class, new RenderPoster(rm));
         RenderingRegistry.registerEntityRenderingHandler(EntityMinecartDayBarrel.class, new RenderMinecartDayBarrel(rm));

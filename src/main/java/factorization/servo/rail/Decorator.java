@@ -2,7 +2,6 @@ package factorization.servo.rail;
 
 import factorization.servo.iterator.AbstractServoMachine;
 import factorization.servo.iterator.ServoMotor;
-import factorization.servo.stepper.StepperEngine;
 import factorization.shared.Core;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
@@ -14,14 +13,14 @@ public abstract class Decorator extends ServoComponent {
         return false;
     }
 
-    public void stepperHit(StepperEngine engine) { }
+    //public void stepperHit(StepperEngine engine) { }
 
     public void iteratorHit(AbstractServoMachine iterator) {
         if (iterator instanceof ServoMotor) {
             motorHit((ServoMotor) iterator);
-        } else if (iterator instanceof StepperEngine) {
+        } /*else if (iterator instanceof StepperEngine) {
             stepperHit((StepperEngine) iterator);
-        }
+        }*/
     }
 
     public static boolean playerHasProgrammer(EntityPlayer player) {
