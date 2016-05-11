@@ -8,6 +8,7 @@ import factorization.fzds.HammerEnabled;
 import factorization.shared.Core;
 import factorization.shared.FzModel;
 import factorization.sockets.TileEntitySocketBase;
+import factorization.util.RenderUtil;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.renderer.RenderGlobal;
@@ -30,7 +31,7 @@ public class RenderServoMotor extends Render<ServoMotor> {
     static {
         for (FzColor color : FzColor.values()) {
             String colorName = color == FzColor.NO_COLOR ? "" : ("_" + color.name().toLowerCase(Locale.ROOT));
-            chasis[color.ordinal()] = new FzModel("iterator/chasis" + colorName + ".obj"); // static
+            chasis[color.ordinal()] = new FzModel("iterator/chasis" + colorName); // static
         }
     }
 
@@ -64,7 +65,7 @@ public class RenderServoMotor extends Render<ServoMotor> {
 
         GL11.glPushMatrix();
         GL11.glEnable(GL12.GL_RESCALE_NORMAL);
-        GL11.glTranslated(x + 0.5, y + 0.5, z + 0.5);
+        GL11.glTranslated(x, y, z);
         GL11.glPushMatrix();
 
         motor.motionHandler.interpolatePosition(motor.motionHandler.motionAction, motor.motionHandler.motionAction.progress + partial);
