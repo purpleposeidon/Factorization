@@ -3,10 +3,10 @@ package factorization.sockets;
 import factorization.api.Coord;
 import factorization.api.FzOrientation;
 import factorization.api.Quaternion;
+import factorization.flat.FlatRayTarget;
 import factorization.fzds.DeltaChunk;
 import factorization.fzds.HammerEnabled;
 import factorization.fzds.interfaces.IDimensionSlice;
-import factorization.servo.rail.TileEntityServoRail;
 import factorization.util.SpaceUtil;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.AxisAlignedBB;
@@ -145,6 +145,9 @@ public class RayTracer {
                 if (entity == socket) {
                     continue;
                 }
+                if (entity instanceof FlatRayTarget) {
+                    continue;
+                }
                 if (base.handleRay(socket, new MovingObjectPosition(entity), coord.w, false, powered)) {
                     return true;
                 }
@@ -166,7 +169,6 @@ public class RayTracer {
     }
 
     boolean mopBlock(Coord target, EnumFacing side) {
-        if (base != socket && target.getTE(TileEntityServoRail.class) != null) return false;
         boolean isThis = base == socket && target.isAt(base);
         Vec3 hitVec = new Vec3(base.getPos().getX() + side.getDirectionVec().getX(), base.getPos().getY() + side.getDirectionVec().getY(), base.getPos().getZ() + side.getDirectionVec().getZ());
         return base.handleRay(socket, target.createMop(side, hitVec), target.w, isThis, powered);
