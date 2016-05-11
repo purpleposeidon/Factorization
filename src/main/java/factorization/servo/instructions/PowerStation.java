@@ -3,15 +3,11 @@ package factorization.servo.instructions;
 import factorization.api.Coord;
 import factorization.api.datahelpers.DataHelper;
 import factorization.api.datahelpers.IDataSerializable;
-import factorization.api.energy.ContextEntity;
-import factorization.api.energy.IWorker;
-import factorization.common.FactoryType;
 import factorization.flat.api.IFlatModel;
 import factorization.flat.api.IModelMaker;
 import factorization.servo.iterator.ServoMotor;
 import factorization.servo.rail.Decorator;
 import factorization.shared.Core;
-import factorization.util.NORELEASE;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.EnumFacing;
 
@@ -51,7 +47,7 @@ public class PowerStation extends Decorator {
                 "|@|",
                 '|', Core.registry.wirePlacer,
                 '@', Core.registry.insulated_coil,
-                '+', FactoryType.SERVORAIL.itemStack());
+                '+', Core.registry.servorail);
     }
 
     static IFlatModel model;
