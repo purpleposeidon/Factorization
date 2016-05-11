@@ -1,11 +1,8 @@
 package factorization.servo;
 
 import factorization.api.Coord;
-import factorization.api.FzColor;
 import factorization.notify.Notice;
 import factorization.notify.Style;
-import factorization.servo.rail.Decorator;
-import factorization.servo.rail.TileEntityServoRail;
 import factorization.shared.Core;
 import factorization.shared.Core.TabType;
 import factorization.shared.ISensitiveMesh;
@@ -70,28 +67,6 @@ public class ItemMatrixProgrammer extends ItemFactorization implements ISensitiv
             }
             return false;
         }*/
-        TileEntityServoRail rail = c.getTE(TileEntityServoRail.class);
-        if (rail == null) {
-            return false;
-        }
-        rail.priority = 0;
-        Decorator decor = rail.getDecoration();
-        if (player.isSneaking()) {
-            if (decor == null) {
-                if (rail.color != FzColor.NO_COLOR) {
-                    rail.color = FzColor.NO_COLOR;
-                    c.redraw();
-                    c.syncTE();
-                }
-                return false;
-            }
-            if (!decor.isFreeToPlace() && !player.capabilities.isCreativeMode && !world.isRemote) {
-                c.spawnItem(decor.toItem());
-            }
-            rail.setDecoration(null);
-            c.redraw();
-            return false;
-        }
         return false;
     }
 

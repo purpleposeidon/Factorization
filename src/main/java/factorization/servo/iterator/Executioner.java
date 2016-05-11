@@ -1,12 +1,12 @@
 package factorization.servo.iterator;
 
-import factorization.api.Coord;
 import factorization.api.datahelpers.DataHelper;
 import factorization.api.datahelpers.Share;
 import factorization.notify.Notice;
-import factorization.servo.instructions.IntegerValue;
+import factorization.servo.rail.Decorator;
+import factorization.servo.rail.FlatServoRail;
 import factorization.servo.rail.Instruction;
-import factorization.servo.rail.TileEntityServoRail;
+import factorization.util.NORELEASE;
 
 import java.io.IOException;
 
@@ -58,12 +58,13 @@ public class Executioner {
         }
     }
     
-    public void onEnterNewBlock(TileEntityServoRail rail) {
+    public void onEnterNewBlock(FlatServoRail rail) {
+        Decorator decoration = rail == null ? null : rail.getComponent();
         cpu_blocked = false;
         switch (entry_action) {
         default:
         case ENTRY_EXECUTE:
-            if (rail == null /* :| */ || rail.decoration == null) {
+            if (rail == null /* :| */ || decoration == null) {
                 if (jmp == JMP_NEXT_TILE) {
                     jmp = JMP_NONE;
                 }
@@ -79,15 +80,31 @@ public class Executioner {
                 jmp = JMP_NONE;
                 break;
             }
-            rail.decoration.motorHit(motor);
+            decoration.motorHit(motor);
             break;
         case ENTRY_LOAD:
-            if (rail.decoration instanceof Instruction) {
-                argumentStack.push(rail.decoration.copyComponent());
+            NORELEASE.fixme("Program Counter iterators");
+            /*
+            So there's sort of a pairing thing going on here.
+            A 'pair' instruction. Or maybe decorator.
+            It allows one to pair two servos.
+            Only one servo in the pair is running at the same time.
+            (Oh, let's call it 'coroutine' or or 'coiterator' something)
+            So a peered servo can be in two modes: PEER, SERVER, or CLIENT.
+            This peering mode changes the behavior of how instructions are processed.
+            The pair must be either (PEER, PEER), (SERVER, CLIENT), or (CLIENT, SERVER).
+            In PEER mode, instructions are sent to the other servo.
+            In CLIENT mode, instructions the CLIENT hits are not sent to the SERVER. So the CLIENT executes all instructions.
+            Hmm. Let's call it a FIREWALL?
+
+            Anyways this replaces fugly instruction manipulation crap.
+             */
+            if (decoration instanceof Instruction) {
+                argumentStack.push(decoration.copyComponent());
             }
             break;
         case ENTRY_WRITE:
-            ServoStack ss = argumentStack;
+            /*ServoStack ss = argumentStack;
             if (ss.getSize() == 0) {
                 motor.putError("IO stack is emtpy!");
                 break;
@@ -107,7 +124,7 @@ public class Executioner {
             }
             if (ss.getSize() == 0) {
                 entry_action = EntryAction.ENTRY_IGNORE;
-            }
+            }*/
             break;
         case ENTRY_IGNORE:
             break;

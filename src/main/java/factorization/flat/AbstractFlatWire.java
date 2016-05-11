@@ -130,20 +130,33 @@ public abstract class AbstractFlatWire extends FlatFace {
     }
 
     public static void iterateConnectable(FlatCoord root, Function<FlatCoord, Void> iter) {
+        iterateConnectable(root, new IConnectionIter() {
+            @Override
+            public void apply(FlatCoord at, EnumFacing hand, int wrap) {
+                iter.apply(at);
+            }
+        });
+    }
+
+    public interface IConnectionIter {
+        void apply(FlatCoord at, EnumFacing hand, int wrap);
+    }
+
+    public static void iterateConnectable(FlatCoord root, IConnectionIter iter) {
         Coord oppositeBlock = root.at.add(root.side);
         for (int hour = 0; hour < 4; hour++) {
             EnumFacing hand = getEdgeOfFace(root.side, hour);
             {
-                FlatCoord cozySide = root.add(hand);
-                iter.apply(cozySide);
+                FlatCoord sameSide = root.add(hand);
+                iter.apply(sameSide, hand, 0);
             }
             {
                 FlatCoord backAndSide = root.atFace(hand);
-                iter.apply(backAndSide);
+                iter.apply(backAndSide, hand, -1);
             }
             {
                 FlatCoord frontAndSide = new FlatCoord(oppositeBlock, hand);
-                iter.apply(frontAndSide);
+                iter.apply(frontAndSide, hand, +1);
             }
         }
     }

@@ -15,19 +15,20 @@ public class FlatCoord implements IDataSerializable {
     public final EnumFacing side;
 
     public FlatCoord(Coord at, EnumFacing side) {
-        if (SpaceUtil.sign(side) == -1) {
-            at = at.add(side);
-            side = side.getOpposite();
-        }
-        this.at = at;
-        this.side = side;
+        this(at, side, false);
     }
 
     public static FlatCoord unnormalized(Coord at, EnumFacing side) {
         return new FlatCoord(at, side, true);
     }
 
-    private FlatCoord(Coord at, EnumFacing side, boolean b) {
+    public FlatCoord(Coord at, EnumFacing side, boolean unnormalized) {
+        if (!unnormalized) {
+            if (SpaceUtil.sign(side) == -1) {
+                at = at.add(side);
+                side = side.getOpposite();
+            }
+        }
         this.at = at;
         this.side = side;
     }
@@ -91,5 +92,9 @@ public class FlatCoord implements IDataSerializable {
 
     public FlatCoord flip() {
         return new FlatCoord(at.add(side), side.getOpposite(), true);
+    }
+
+    public FlatCoord copy() {
+        return new FlatCoord(at.copy(), side);
     }
 }

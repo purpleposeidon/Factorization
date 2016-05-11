@@ -1,7 +1,6 @@
 package factorization.servo.rail;
 
 import factorization.api.Coord;
-import factorization.common.FzConfig;
 import factorization.servo.iterator.CpuBlocking;
 import factorization.servo.iterator.ServoMotor;
 import factorization.shared.Core;
@@ -12,8 +11,14 @@ import net.minecraft.util.EnumFacing;
 
 public abstract class Instruction extends Decorator {
     @Override
-    public boolean onClick(EntityPlayer player, Coord block, EnumFacing side) {
-        // FIXME: This is lame. Put in a method for cycling through state...
+    public final boolean onClick(EntityPlayer player, Coord block, EnumFacing side) {
+        if (playerHasProgrammer(player)) {
+            return lmpConfigure();
+        }
+        return false;
+    }
+
+    protected boolean lmpConfigure() {
         return false;
     }
     
@@ -48,15 +53,7 @@ public abstract class Instruction extends Decorator {
     public CpuBlocking getBlockingBehavior() {
         return CpuBlocking.NO_BLOCKING;
     }
-    
-    @Override
-    public float getSize() {
-        if (FzConfig.large_servo_instructions) {
-            return 3F/16F;
-        }
-        return super.getSize();
-    }
-    
+
     @Override
     public boolean collides() {
         return false;

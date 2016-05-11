@@ -1,49 +1,101 @@
 package factorization.servo.iterator;
 
-import com.google.common.base.Function;
 import com.google.common.collect.Lists;
 import factorization.api.Coord;
 import factorization.api.DeltaCoord;
 import factorization.api.FzColor;
 import factorization.api.FzOrientation;
 import factorization.api.datahelpers.DataHelper;
+import factorization.api.datahelpers.IDataSerializable;
 import factorization.api.datahelpers.Share;
 import factorization.api.energy.ContextEntity;
 import factorization.api.energy.IWorker;
 import factorization.flat.AbstractFlatWire;
 import factorization.flat.api.FlatCoord;
 import factorization.servo.rail.FlatServoRail;
-import factorization.servo.rail.TileEntityServoRail;
 import factorization.shared.Core;
-import factorization.util.SpaceUtil;
+import factorization.util.NORELEASE;
 import net.minecraft.util.EnumFacing;
-import net.minecraft.util.Vec3;
+import net.minecraft.world.World;
 import net.minecraft.world.chunk.Chunk;
 
-import javax.annotation.Nullable;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Comparator;
-import java.util.Random;
+import java.util.List;
 
 public class MotionHandler {
+    enum TwistCategory {
+        STUCK,
+        // When making a turn the long way:
+        // CCBB
+        // CCBB
+        // []AA
+        // []AA
+        // The iterator is in the 'STRAIGHT' state as it enters block A.
+        // Then it sees it must enter the rails of C.
+        // It enters the 'EXTERIOR_START' state, which moves it from A to B.
+        // Then it enters 'TURN', which turns it so that it's lined up with C's rails.
+        // Then it enters STRAIGHT.
+        EXTERIOR_START,
+        // When making a turn the short way:
+        // [][][]
+        // [][][]
+        // []B2CC
+        // []1 CC
+        // []AA
+        // []AA
+        // The iterator is in the 'STRAIGHT' state as it enters block A.
+        // It continues to be in the 'STRAIGHT' state as it rides the rail B1.
+        // When it sees it must make an interior turn, it enters the 'TURN' state, which aligns it with
+        // block C's rails.
+        // It enters the 'STRAIGHT' state.
+        TURN,
+        // TURN will nominally have STRAIGHT as its next action.
+        STRAIGHT,
+    }
+
+    static class MotionAction implements IDataSerializable {
+        MotionAction(World world) {
+            src = new FlatCoord(new Coord(world, 0, 0, 0), EnumFacing.UP);
+            dst = new FlatCoord(new Coord(world, 0, 0, 0), EnumFacing.UP);
+            srcFzo = FzOrientation.FACE_UP_POINT_EAST;
+            dstFzo = FzOrientation.FACE_UP_POINT_EAST;
+            category = TwistCategory.STUCK;
+        }
+
+        MotionAction chain() {
+            MotionAction ret = new MotionAction(src.at.w);
+            ret.src = this.dst.copy();
+            ret.srcFzo = this.dstFzo;
+            return ret;
+        }
+
+        FlatCoord src, dst;
+        FzOrientation srcFzo, dstFzo;
+        TwistCategory category;
+        float progress = 0;
+
+        @Override
+        public IDataSerializable serialize(String prefix, DataHelper data) throws IOException {
+            src = data.asSameShare(prefix + ":src").putIDS(src);
+            dst = data.asSameShare(prefix + ":dst").putIDS(dst);
+            srcFzo = data.asSameShare(prefix + ":srcO").putFzOrientation(srcFzo);
+            dstFzo = data.asSameShare(prefix + ":dstO").putFzOrientation(dstFzo);
+            category = data.asSameShare(prefix + ":cat").putEnum(category);
+            progress = data.asSameShare(prefix + ":progress").putFloat(progress);
+            return this;
+        }
+    }
+
     public final AbstractServoMachine motor;
-    
-    Coord pos_prev, pos_next;
-    public float pos_progress;
-    public FzOrientation prevOrientation = null, orientation = null;
-    public EnumFacing nextDirection = null, lastDirection = null;
+
+    MotionAction motionAction;
     byte speed_b;
     byte target_speed_index = 2;
     static final byte max_speed_b = 127;
     double accumulated_motion;
-    boolean stopped = false;
     public FzColor color = FzColor.NO_COLOR;
-    
-    //For client-side rendering
-    public double sprocket_rotation = 0, prev_sprocket_rotation = 0;
-    public double servo_reorient = 0, prev_servo_reorient = 0;
+    boolean stopped = false;
 
     private static final byte normal_speed_byte = (byte) (max_speed_b/4);
     private static final byte[] target_speeds_b = {normal_speed_byte/3, normal_speed_byte/2, normal_speed_byte, normal_speed_byte*2, normal_speed_byte*4};
@@ -52,21 +104,14 @@ public class MotionHandler {
     
     public MotionHandler(AbstractServoMachine motor) {
         this.motor = motor;
-        pos_prev = new Coord(motor.worldObj, 0, 0, 0);
-        pos_next = pos_prev.copy();
+        motionAction = new MotionAction(motor.worldObj);
     }
     
     protected void putData(DataHelper data) throws IOException {
-        orientation = data.as(Share.VISIBLE, "Orient").putFzOrientation(orientation);
-        nextDirection = data.as(Share.VISIBLE, "nextDir").putEnum(nextDirection);
-        lastDirection = data.as(Share.VISIBLE, "lastDir").putEnum(lastDirection);
+        motionAction = data.as(Share.VISIBLE, "motionAction").putIDS(motionAction);
         speed_b = data.as(Share.VISIBLE, "speedb").putByte(speed_b);
         setTargetSpeed(data.as(Share.VISIBLE, "speedt").putByte(target_speed_index));
         accumulated_motion = data.as(Share.VISIBLE, "accumulated_motion").putDouble(accumulated_motion);
-        stopped = data.as(Share.VISIBLE, "stop").putBoolean(stopped);
-        pos_next = data.as(Share.VISIBLE, "pos_next").putIDS(pos_next);
-        pos_prev = data.as(Share.VISIBLE, "pos_prev").putIDS(pos_prev);
-        pos_progress = data.as(Share.VISIBLE, "pos_progress").putFloat(pos_progress);
         if (target_speed_index < 0) {
             target_speed_index = 0;
         } else if (target_speed_index >= target_speeds_b.length) {
@@ -81,6 +126,7 @@ public class MotionHandler {
         if (color == null) {
             color = FzColor.NO_COLOR;
         }
+        stopped = data.as(Share.VISIBLE, "stopped").putBoolean(stopped);
     }
     
     public void setTargetSpeed(byte newSpeed) {
@@ -93,16 +139,17 @@ public class MotionHandler {
     }
     
     void beforeSpawn() {
-        pos_prev = new Coord(motor);
-        pos_next = pos_prev.copy();
-        pickNextOrientation();
-        pickNextOrientation();
-        interpolatePosition(0);
-        prevOrientation = orientation;
+        motionAction.src = new FlatCoord(new Coord(motor), motionAction.src.side);
+        motionAction.dst = motionAction.src.copy();
+        chooseNextAction();
+        interpolatePosition(motionAction);
     }
     
 
-    public void interpolatePosition(float interp) {
+    public void interpolatePosition(MotionAction action) {
+        float interp = action.progress;
+        Coord pos_prev = action.src.at;
+        Coord pos_next = action.dst.at;
         motor.setPosition(
                 ip(pos_prev.x, pos_next.x, interp),
                 ip(pos_prev.y, pos_next.y, interp),
@@ -116,7 +163,7 @@ public class MotionHandler {
     void updateSpeed() {
         byte target_speed_b = target_speeds_b[target_speed_index];
         
-        boolean should_accelerate = speed_b < target_speed_b && orientation != null;
+        boolean should_accelerate = speed_b < target_speed_b;
         if (speed_b > target_speed_b) {
             speed_b = (byte)Math.max(target_speed_b, speed_b*3/4 - 1);
             return;
@@ -129,12 +176,6 @@ public class MotionHandler {
         }
     }
 
-    public Vec3 getVelocity() {
-        double speed = getProperSpeed();
-        Vec3 direction = pos_next.difference(pos_prev).toVector().normalize();
-        return SpaceUtil.scale(direction, speed);
-    }
-    
     public void penalizeSpeed() {
         if (speed_b > 4) {
             speed_b--;
@@ -167,181 +208,82 @@ public class MotionHandler {
         return score;
     }
 
-    @Nullable
-    FlatCoord pickNextPos() {
-        final ArrayList<FlatCoord> potential = Lists.newArrayList();
-        final FlatCoord root = new FlatCoord(motor.getCurrentPos(), motor.getOrientation().facing);
-        final FlatServoRail rootRail = root.get(FlatServoRail.class);
-        if (rootRail == null) return null;
-        final FzColor color = rootRail.color;
-        AbstractFlatWire.iterateConnectable(root, new Function<FlatCoord, Void>() {
-            @Nullable
+    static int support_flag(FlatCoord at) {
+        return (at.at.isSolid() ? 1 : 0)
+                | (at.flip().at.isSolid() ? 2 : 0);
+    }
+
+    List<MotionAction> availableActions(MotionAction startAction) {
+        List<MotionAction> ret = Lists.newArrayList();
+        int base_support = support_flag(startAction.src);
+        AbstractFlatWire.iterateConnectable(startAction.src, new AbstractFlatWire.IConnectionIter() {
             @Override
-            public Void apply(@Nullable FlatCoord input) {
-                if (input == null) return null;
-                final FlatServoRail rail = input.get(FlatServoRail.class);
-                if (rail == null) return null;
-                if (color.conflictsWith(rail.color)) return null;
-                {
-                    Coord at = input.at;
-                    EnumFacing side = input.side;
-                    boolean a = at.isSolidOnSide(side);
-                    boolean b = at.add(side).isSolidOnSide(side.getOpposite());
-                    // Both sides solid: Can't fit.
-                    // Both sides not solid: Bad state.
-                    if (a == b) return null;
-                    if (b) {
-                        input = input.flip();
-                    }
-                }
-                potential.add(input);
-                return null;
+            public void apply(FlatCoord at, EnumFacing hand, int wrap) {
+                FlatServoRail ff = at.get(FlatServoRail.class);
+                if (ff == null) return;
+                if (ff.getSpecies() != FlatServoRail.SPECIES) return;
+                if (MotionHandler.this.color.conflictsWith(ff.color)) return;
+                /*
+                Don't allow flipping
+                ||||W
+                ||||W
+                ||||W
+                ||||W
+                   W||||
+                   W||||
+                   W||||
+                   W||||
+
+                Don't allow a weird case with non-solid blocks
+                ||||----||||
+                ||||----||||
+                ||||----||||
+                ||||----||||
+                   W|WWW
+                   W|
+                   W|
+                   W|
+
+                Don't enter a wire that's covered on both sides.
+                Don't enter a wire that's floating unsupported
+                */
+                int at_support = support_flag(at);
+                if (at_support == 0 || at_support == 3) return;
+                int support = at_support | base_support;
+                if (support == 0 || support == 3) return;
+                NORELEASE.fixme("Probably an error here involving the side being normalized?");
+
+                MotionAction action = startAction.chain();
+                action.dst = at;
+                EnumFacing new_top = at.at.isSolid() ? at.side.getOpposite() : at.side;
+                action.dstFzo = action.srcFzo.pointTopTo(new_top);
             }
         });
-        Collections.shuffle(potential);
-        potential.sort(new Comparator<FlatCoord>() {
+        return ret;
+    }
+
+    void sort(List<MotionAction> actions) {
+        actions.sort(new Comparator<MotionAction>() {
             @Override
-            public int compare(FlatCoord a, FlatCoord b) {
-                int sa = score(a);
-                int sb = score(b);
+            public int compare(MotionAction a, MotionAction b) {
+                int sa = score(a.dst);
+                int sb = score(b.dst);
                 if (sa > sb) return +1;
                 if (sa < sb) return -1;
                 return 0;
             }
         });
-        if (potential.isEmpty()) return null;
-        return potential.get(0);
-    }
-    
-    boolean validPosition(FlatCoord c, boolean desperate) {
-        FlatServoRail fsr = c.get(FlatServoRail.class);
-        if (fsr == null) return false;
-        return (fsr.component.getPriority() >= 0 || desperate) && !color.conflictsWith(fsr.color);
     }
 
-    boolean validDirection(EnumFacing dir, boolean desperate) {
-        Coord at = motor.getCurrentPos();
-        at.adjust(dir);
-        try {
-            return validPosition(at, desperate);
-        } finally {
-            at.adjust(dir.getOpposite());
+    void chooseNextAction() {
+        List<MotionAction> potentials = availableActions(this.motionAction);
+        if (potentials.isEmpty()) {
+            this.motionAction = this.motionAction.chain();
+            this.motionAction.category = TwistCategory.STUCK;
+            return;
         }
-    }
-
-    public boolean testDirection(EnumFacing d, boolean desperate) {
-        if (d == null) {
-            return false;
-        }
-        return validDirection(d, desperate);
-    }
-    
-    
-    boolean pickNextOrientation() {
-        boolean ret = pickNextOrientation_impl();
-        pos_next = pos_prev.add(orientation.facing);
-        return ret;
-    }
-    
-    public void changeOrientation(EnumFacing dir) {
-        EnumFacing orig_direction = orientation.facing;
-        EnumFacing orig_top = orientation.top;
-        FzOrientation start = FzOrientation.fromDirection(dir);
-        FzOrientation perfect = start.pointTopTo(orig_top);
-        if (perfect == null) {
-            if (dir == orig_top) {
-                //convex turn
-                perfect = start.pointTopTo(orig_direction.getOpposite());
-            } else if (dir == orig_top.getOpposite()) {
-                //concave turn
-                perfect = start.pointTopTo(orig_direction);
-            }
-            if (perfect == null) {
-                perfect = start; //Might be impossible?
-            }
-        }
-        orientation = perfect;
-        lastDirection = orig_direction;
-        if (orientation.facing == nextDirection) {
-            nextDirection = null;
-        }
-    }
-
-    boolean pickNextOrientation_impl() {
-        ArrayList<EnumFacing> dirs = SpaceUtil.getRandomDirections(motor.worldObj.rand);
-        int available_nonbackwards_directions = 0;
-        Coord look = pos_next.copy();
-        int all_count = 0;
-        for (EnumFacing fd : dirs) {
-            look.set(pos_next);
-            look.adjust(fd);
-            TileEntityServoRail sr = look.getTE(TileEntityServoRail.class);
-            if (sr == null) {
-                continue;
-            }
-            if (color.conflictsWith(sr.color)) continue;
-            all_count++;
-            if (fd == orientation.facing.getOpposite()) {
-                continue;
-            }
-            if (sr.priority > 0) {
-                changeOrientation(fd);
-                return true;
-            }
-            if (sr.priority == 0) {
-                available_nonbackwards_directions++;
-            }
-        }
-        
-        if (all_count == 0) {
-            //Sadness
-            speed_b = 0;
-            return false;
-        }
-        
-        final boolean desperate = available_nonbackwards_directions < 1;
-        final EnumFacing direction = orientation.facing;
-        final EnumFacing opposite = direction.getOpposite();
-        
-        if (nextDirection != opposite && testDirection(nextDirection, desperate)) {
-            // We can go the way we were told to go next
-            changeOrientation(nextDirection);
-            return true;
-        }
-        if (testDirection(direction, desperate)) {
-            // Our course is fine.
-            return true;
-        }
-        if (lastDirection != opposite && testDirection(lastDirection, desperate)) {
-            // Try the direction we were going before (this makes us go in zig-zags)
-            changeOrientation(lastDirection);
-            return true;
-        }
-        final EnumFacing top = orientation.top;
-        if (testDirection(top, desperate) /* top being opposite won't be an issue because of Geometry */ ) {
-            // We'll turn upwards.
-            changeOrientation(top);
-            return true;
-        }
-        
-        // We'll pick a random direction; we're re-using the list from before, should be fine.
-        // Going backwards is our last resort.
-        for (int i = 0; i < 6; i++) {
-            EnumFacing d = dirs.get(i);
-            if (d == nextDirection || d == direction || d == opposite || d == lastDirection || d == top) {
-                continue;
-            }
-            if (validDirection(d, desperate)) {
-                changeOrientation(d);
-                return true;
-            }
-        }
-        if (validDirection(opposite, true)) {
-            changeOrientation(opposite);
-            return true;
-        }
-        orientation = null;
-        return false;
+        sort(potentials);
+        this.motionAction = potentials.get(0);
     }
 
     void accelerate() {
@@ -353,23 +295,9 @@ public class MotionHandler {
         if (accumulated_motion == 0) {
             return;
         }
-        double move = Math.min(accumulated_motion, 1 - pos_progress);
+        double move = Math.min(accumulated_motion, 1 - motionAction.progress);
         accumulated_motion -= move;
-        pos_progress += move;
-        if (motor.worldObj.isRemote) {
-            sprocket_rotation += move;
-            
-            if (orientation != prevOrientation) {
-                servo_reorient += move;
-                if (servo_reorient >= 0.95 /* Floating point inaccuracy!? */) {
-                    servo_reorient = 0;
-                    prev_servo_reorient = servo_reorient;
-                    prevOrientation = orientation;
-                }
-            } else {
-                servo_reorient = 0;
-            }
-        }
+        motionAction.progress += move;
     }
     
     public double getProperSpeed() {
@@ -383,10 +311,8 @@ public class MotionHandler {
     }
     
     protected void updateServoMotion() {
-        prev_sprocket_rotation = sprocket_rotation;
-        prev_servo_reorient = servo_reorient;
         doMotionLogic();
-        interpolatePosition(pos_progress);
+        interpolatePosition(motionAction);
     }
 
     protected void tryUnstop() {
@@ -416,27 +342,23 @@ public class MotionHandler {
                 return;
             }
         }
-        if (orientation == null) {
-            pickNextOrientation();
-        }
         if (!motor.worldObj.isRemote) {
             updateSpeed();
         }
         final double speed = getProperSpeed();
-        if (speed <= 0 || orientation == null) {
+        if (speed <= 0) {
             motor.updateSocket();
             return;
         }
         accumulated_motion += speed;
         moveMotor();
-        if (pos_progress >= 1) {
-            pos_progress -= 1F;
-            accumulated_motion = Math.min(pos_progress, speed);
-            Chunk oldChunk = pos_prev.getChunk(), newChunk = pos_next.getChunk();
-            pos_prev = pos_next;
+        if (motionAction.progress >= 1) {
+            float extra_progress = motionAction.progress - 1;
+            accumulated_motion = Math.min(extra_progress, speed);
+            Chunk oldChunk = motionAction.src.at.getChunk(), newChunk = motionAction.dst.at.getChunk();
             motor.updateSocket();
             motor.onEnterNewBlock();
-            pickNextOrientation();
+            chooseNextAction();
             if (oldChunk != newChunk) {
                 oldChunk.setChunkModified();
                 newChunk.setChunkModified();

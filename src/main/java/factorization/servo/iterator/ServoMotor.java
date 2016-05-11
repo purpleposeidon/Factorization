@@ -10,7 +10,6 @@ import factorization.api.datahelpers.Share;
 import factorization.api.energy.*;
 import factorization.common.FactoryType;
 import factorization.flat.api.FlatCoord;
-import factorization.flat.api.FlatFace;
 import factorization.net.FzNetDispatch;
 import factorization.net.NetworkFactorization;
 import factorization.net.StandardMessageType;
@@ -18,7 +17,6 @@ import factorization.servo.rail.Decorator;
 import factorization.servo.rail.FlatServoRail;
 import factorization.servo.rail.ItemServoRailWidget;
 import factorization.servo.rail.ServoComponent;
-import factorization.servo.rail.TileEntityServoRail;
 import factorization.shared.Core;
 import factorization.shared.Sound;
 import factorization.shared.TileEntityCommon;
@@ -187,7 +185,7 @@ public class ServoMotor extends AbstractServoMachine implements IInventory, ISoc
     public void updateSocket() {
         Coord here = getCurrentPos();
         here.setAsTileEntityLocation(socket);
-        socket.facing = motionHandler.orientation.top;
+        socket.facing = getOrientation().top;
         socket.genericUpdate(this, here, isSocketActive ^ isSocketPulsed);
         isSocketPulsed = false;
     }
@@ -199,18 +197,11 @@ public class ServoMotor extends AbstractServoMachine implements IInventory, ISoc
         }
         socket.onEnterNewBlock();
         motionHandler.onEnterNewBlock();
-        FlatFace ff = getFlatPos().get();
-        if (ff instanceof FlatServoRail) {
-            FlatServoRail fsr = (FlatServoRail) ff;
-            fsr.getComponent().
+        FlatServoRail ff = getFlatPos().get(FlatServoRail.class);
+        if (ff != null) {
+            ff.getComponent().preMotorHit(this);
         }
-        TileEntityServoRail rail = getCurrentPos().getTE(TileEntityServoRail.class);
-        if (rail != null && rail.decoration != null) {
-            if (rail.decoration.preMotorHit(this)) {
-                return;
-            }
-        }
-        executioner.onEnterNewBlock(rail);
+        executioner.onEnterNewBlock(ff);
     }
 
     FlatCoord getFlatPos() {
@@ -453,8 +444,9 @@ public class ServoMotor extends AbstractServoMachine implements IInventory, ISoc
     ArrayList<MovingObjectPosition> rayTrace() {
         ret.clear();
         final Coord c = getCurrentPos();
-        final EnumFacing top = motionHandler.orientation.top;
-        final EnumFacing face = motionHandler.orientation.facing;
+        final FzOrientation fzo = motionHandler.motionAction.srcFzo;
+        final EnumFacing top = fzo.top;
+        final EnumFacing face = fzo.facing;
         final EnumFacing right = SpaceUtil.rotate(face, top);
         
         AxisAlignedBB ab = new AxisAlignedBB(
