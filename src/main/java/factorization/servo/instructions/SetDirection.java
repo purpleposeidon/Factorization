@@ -31,9 +31,6 @@ public class SetDirection extends Instruction {
     void hit(AbstractServoMachine motor) {
         EnumFacing d = dir.getOpposite();
         motor.setNextDirection(d);
-        if (d == motor.getOrientation().facing.getOpposite()) {
-            motor.changeOrientation(d);
-        }
     }
 
     @Override

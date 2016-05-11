@@ -2,14 +2,14 @@ package factorization.servo;
 
 import factorization.flat.api.Flat;
 import factorization.servo.instructions.GenericPlaceholder;
+import factorization.servo.rail.Decorator;
 import factorization.servo.rail.FlatServoRail;
-import factorization.servo.rail.ServoComponent;
 import net.minecraft.util.ResourceLocation;
 
 public class ServoFeature {
     public static FlatServoRail static_rail;
 
-    static FlatServoRail staticComponent(ServoComponent sc) {
+    static FlatServoRail staticComponent(Decorator sc) {
         FlatServoRail fsr = new FlatServoRail();
         fsr.component = sc;
         return fsr;

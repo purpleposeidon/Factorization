@@ -46,7 +46,10 @@ public class StepperMotionHandler extends MotionHandler {
         FzOrientation orig = orientation;
         super.changeOrientation(dir);
         if (orientation == orig) return;
-        if (orig != null /* was not just spawned */) setStopped(true);
+        if (orig != null) {
+            // was not just spawned
+            setStopped(true);
+        }
         if (!engine.grabbed()) {
             turnThrough(Quaternion.fromOrientation(orig), Quaternion.fromOrientation(orientation));
             return;

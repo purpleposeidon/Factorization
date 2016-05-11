@@ -24,6 +24,7 @@ import java.util.Comparator;
 import java.util.List;
 
 public class MotionHandler {
+
     enum TwistCategory {
         STUCK,
         // When making a turn the long way:
@@ -96,6 +97,8 @@ public class MotionHandler {
     double accumulated_motion;
     public FzColor color = FzColor.NO_COLOR;
     boolean stopped = false;
+    public EnumFacing nextDirection = EnumFacing.UP;
+    public boolean nextDirectionSet = false;
 
     private static final byte normal_speed_byte = (byte) (max_speed_b/4);
     private static final byte[] target_speeds_b = {normal_speed_byte/3, normal_speed_byte/2, normal_speed_byte, normal_speed_byte*2, normal_speed_byte*4};
@@ -127,6 +130,8 @@ public class MotionHandler {
             color = FzColor.NO_COLOR;
         }
         stopped = data.as(Share.VISIBLE, "stopped").putBoolean(stopped);
+        nextDirectionSet = data.as(Share.VISIBLE, "nextDir?").putBoolean(nextDirectionSet);
+        nextDirection = data.as(Share.VISIBLE, "nextDir").putEnum(nextDirection);
     }
     
     public void setTargetSpeed(byte newSpeed) {

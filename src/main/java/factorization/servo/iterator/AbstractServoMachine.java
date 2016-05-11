@@ -12,7 +12,6 @@ import factorization.charge.enet.ChargeEnetSubsys;
 import factorization.net.INet;
 import factorization.servo.instructions.Trap;
 import factorization.shared.Core;
-import factorization.util.NORELEASE;
 import factorization.util.PlayerUtil;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufInputStream;
@@ -148,12 +147,16 @@ public abstract class AbstractServoMachine extends Entity implements IEntityAddi
     }
 
     public void broadcastBriefUpdate() {
-        Coord a = getCurrentPos();
-        Coord b = getNextPos();
-        broadcast(ServoMessages.servo_brief, (byte) motionHandler.orientation.ordinal(), motionHandler.speed_b,
-                a.x, a.y, a.z,
-                b.x, b.y, b.z,
-                motionHandler.pos_progress);
+        try {
+            ByteBuf buf = Unpooled.buffer();
+            Core.network.prefixEntityPacket(buf, this, ServoMessages.servo_brief);
+            DataHelper data = new DataOutByteBuf(buf, Side.SERVER);
+            motionHandler.motionAction.serialize("", data);
+            FMLProxyPacket toSend = Core.network.entityPacket(buf);
+            Core.network.broadcastPacket(null, getCurrentPos(), toSend);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     public void broadcastFullUpdate() {
@@ -182,18 +185,12 @@ public abstract class AbstractServoMachine extends Entity implements IEntityAddi
             return true;
         }
         if (messageType == ServoMessages.servo_brief) {
-            Coord a = getCurrentPos();
-            Coord b = getNextPos();
-            FzOrientation no = FzOrientation.getOrientation(input.readByte());
-            setOrientation(no);
-            motionHandler.speed_b = input.readByte();
-            a.x = input.readInt();
-            a.y = input.readInt();
-            a.z = input.readInt();
-            b.x = input.readInt();
-            b.y = input.readInt();
-            b.z = input.readInt();
-            motionHandler.pos_progress = input.readFloat();
+            try {
+                DataHelper data = new DataInByteBuf(input, Side.CLIENT);
+                motionHandler.motionAction.serialize("", data);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
             if (motionHandler.speed_b > 0) {
                 motionHandler.stopped = false;
             }
@@ -212,11 +209,11 @@ public abstract class AbstractServoMachine extends Entity implements IEntityAddi
     }
 
     public Coord getCurrentPos() {
-        return motionHandler.pos_prev;
+        return motionHandler.motionAction.src.at;
     }
 
     public Coord getNextPos() {
-        return motionHandler.pos_next;
+        return motionHandler.motionAction.dst.at;
     }
 
     protected abstract void markDirty();
@@ -236,19 +233,12 @@ public abstract class AbstractServoMachine extends Entity implements IEntityAddi
     public void onEnterNewBlock() { }
 
     public FzOrientation getOrientation() {
-        return motionHandler.orientation;
-    }
-
-    public void setOrientation(FzOrientation orientation) {
-        motionHandler.orientation = orientation;
-    }
-
-    public void changeOrientation(EnumFacing fd) {
-        motionHandler.changeOrientation(fd);
+        return motionHandler.motionAction.srcFzo;
     }
 
     public void setNextDirection(EnumFacing direction) {
         motionHandler.nextDirection = direction;
+        motionHandler.nextDirectionSet = true;
     }
 
     public void setTargetSpeed(byte newTarget) {
@@ -283,10 +273,10 @@ public abstract class AbstractServoMachine extends Entity implements IEntityAddi
         } else {
             if (!getNextPos().blockExists()) return;
             byte orig_speed = motionHandler.speed_b;
-            FzOrientation orig_or = motionHandler.orientation;
+            FzOrientation orig_or = getOrientation();
             motionHandler.updateServoMotion();
             updateServoLogic();
-            if (orig_speed != motionHandler.speed_b || orig_or != motionHandler.orientation) {
+            if (orig_speed != motionHandler.speed_b || orig_or != getOrientation()) {
                 broadcastBriefUpdate();
                 //NOTE: Could be spammy. Speed might be too important to not send tho.
             }
