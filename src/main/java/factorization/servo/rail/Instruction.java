@@ -54,11 +54,6 @@ public abstract class Instruction extends Decorator {
         return CpuBlocking.NO_BLOCKING;
     }
 
-    @Override
-    public boolean collides() {
-        return false;
-    }
-    
     public String toString() {
         String info = getInfo();
         if (info == null) {

@@ -11,6 +11,7 @@ import factorization.flat.api.Flat;
 import factorization.flat.api.FlatFace;
 import factorization.flat.api.IFlatModel;
 import factorization.flat.api.IModelMaker;
+import factorization.notify.Notice;
 import factorization.servo.ServoFeature;
 import factorization.servo.instructions.GenericPlaceholder;
 import factorization.shared.Core;
@@ -126,7 +127,8 @@ public class FlatServoRail extends AbstractFlatWire {
         ItemStack heldItem = player.getHeldItem();
         return super.canInteract(at, side, player)
                 || ItemUtil.is(heldItem, Core.registry.logicMatrixProgrammer)
-                || FzColor.fromItem(heldItem) != FzColor.NO_COLOR;
+                || FzColor.fromItem(heldItem) != FzColor.NO_COLOR
+                || (heldItem != null && heldItem.getItem() instanceof ItemServoRailWidget);
     }
 
     /** Convert a static instance into a dynamic one */
@@ -178,8 +180,14 @@ public class FlatServoRail extends AbstractFlatWire {
             ServoComponent sc = ((ItemServoRailWidget) held.getItem()).get(held);
             if (sc != null) {
                 component = (Decorator) sc;
-                return;
+                if (!(component.isFreeToPlace())) {
+                    PlayerUtil.cheatDecr(player, held);
+                }
             }
+        }
+        String info = component.getInfo();
+        if (info != null) {
+            new Notice(at, info).sendTo(player);
         }
     }
 }

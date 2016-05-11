@@ -78,11 +78,6 @@ public class ScanColor extends Decorator {
     }
 
     @Override
-    public boolean collides() {
-        return false;
-    }
-    
-    @Override
     public void onItemUse(Coord here, EntityPlayer player) {
         FzColor color = FzColor.readColor(here);
         if (color == FzColor.NO_COLOR) return;
