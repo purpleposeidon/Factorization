@@ -147,12 +147,11 @@ public class MotionHandler {
         motionAction.src = new FlatCoord(new Coord(motor), motionAction.src.side);
         motionAction.dst = motionAction.src.copy();
         chooseNextAction();
-        interpolatePosition(motionAction);
+        interpolatePosition(motionAction, motionAction.progress);
     }
     
 
-    public void interpolatePosition(MotionAction action) {
-        float interp = action.progress;
+    public void interpolatePosition(MotionAction action, float interp) {
         Coord pos_prev = action.src.at;
         Coord pos_next = action.dst.at;
         motor.setPosition(
@@ -317,7 +316,7 @@ public class MotionHandler {
     
     protected void updateServoMotion() {
         doMotionLogic();
-        interpolatePosition(motionAction);
+        interpolatePosition(motionAction, motionAction.progress);
     }
 
     protected void tryUnstop() {

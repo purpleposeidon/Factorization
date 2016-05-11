@@ -16,7 +16,9 @@ import factorization.fzds.HammerEnabled;
 import factorization.mechanics.MechanismsFeature;
 import factorization.net.FzNetEventHandler;
 import factorization.net.NetworkFactorization;
+import factorization.servo.ServoFeature;
 import factorization.servo.iterator.ServoMotor;
+import factorization.servo.rail.ServoComponent;
 import factorization.truth.minecraft.DistributeDocs;
 import factorization.util.DataUtil;
 import factorization.util.FzUtil;
@@ -197,6 +199,8 @@ public class Core {
         NetworkRegistry.INSTANCE.registerGuiHandler(this, proxy);
 
         registerSimpleTileEntities();
+        ServoComponent.init();
+        ServoFeature.setup();
         registry.makeItems();
         registry.registerItemVariantNames();
         FzConfig.config.save();

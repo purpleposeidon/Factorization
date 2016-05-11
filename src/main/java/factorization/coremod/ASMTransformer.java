@@ -25,9 +25,8 @@ public class ASMTransformer implements IClassTransformer {
 
     @Override
     public byte[] transform(String name, String transformedName, byte[] basicClass) {
-        // Sorted by beauty!
         {
-            // Why-isn't-this-in-Forge hooks stuff for unspecific FZ features
+            // Why-isn't-this-in-Forge stuff.
 
             // NORELEASE: There's a forge event now. But does it work properly yet?
             if (transformedName.equals("net.minecraft.client.gui.inventory.GuiContainer")) {
@@ -43,22 +42,32 @@ public class ASMTransformer implements IClassTransformer {
                         new AbstractAsmMethodTransform.Append(name, transformedName, "func_149659_a", "canDropFromExplosion")
                 );
             }
-        }
-
-        {
-            // FZDS-related hooks
 
             // Add an event to cancel attack/use key presses before anything else
-            // (Should go in Forge)
-            if (transformedName.equals("net.minecraft.client.Minecraft") && HammerEnabled.ENABLED) {
+            // FIXME: It belongs in a forge!
+            if (transformedName.equals("net.minecraft.client.Minecraft")) {
                 return applyTransform(basicClass,
                         new AbstractAsmMethodTransform.Prepend(name, transformedName, "func_147116_af", "clickMouse"), // "attack key pressed" function (first handler), MCPBot name clickMouse
                         new AbstractAsmMethodTransform.Prepend(name, transformedName, "func_147121_ag", "rightClickMouse") // "use key pressed" function, MCPBot name rightClickMouse
                 );
             }
+
+            // Lets me efficiently store per-chunk data.
+            // Used for efficient FZDS collisions and for storing the flat data layer.
+            if (transformedName.equals("net.minecraft.world.chunk.Chunk")) {
+                Chunk c = null;
+                return applyTransform(basicClass,
+                        new AbstractAsmClassTransform.Mixin("factorization.coremodhooks.MixinExtraChunkData", "Lfactorization/coremodhooks/MixinExtraChunkData;"),
+                        new AbstractAsmMethodTransform.Append(name, transformedName, "func_177414_a", "getEntitiesWithinAABBForEntity")
+                );
+            }
+        }
+        if (HammerEnabled.ENABLED) {
+            // FZDS-specific hooks
+
             // Make the camera take UCs into account in 3rd-person view
             // (Could go in forge, but is implemented specifically for FZDS)
-            if (transformedName.equals("net.minecraft.client.renderer.EntityRenderer") && HammerEnabled.ENABLED) {
+            if (transformedName.equals("net.minecraft.client.renderer.EntityRenderer")) {
                 return applyTransform(basicClass,
                         new AbstractAsmMethodTransform.MutateCall(name, transformedName, "func_78467_g", "orientCamera")
                                 .setOwner("net.minecraft.client.multiplayer.WorldClient")
@@ -66,29 +75,20 @@ public class ASMTransformer implements IClassTransformer {
                                 .setDescr("(Lnet/minecraft/util/Vec3;Lnet/minecraft/util/Vec3;)Lnet/minecraft/util/MovingObjectPosition;", "(Laui;Laui;)Lauh;")
                 );
             }
-            // Add "Universal Colliders". Adds a list of entities to the chunk that are added to every collision query.
-            // The alternative to this is setting World.MAX_ENTITY_RADIUS to a large value, and putting collodier-entities everywhere, which is slow & ugly
-            if (transformedName.equals("net.minecraft.world.chunk.Chunk") && HammerEnabled.ENABLED) {
-                Chunk c = null;
-                return applyTransform(basicClass,
-                        new AbstractAsmClassTransform.Mixin("factorization.coremodhooks.MixinExtraChunkData", "Lfactorization/coremodhooks/MixinExtraChunkData;"),
-                        new AbstractAsmMethodTransform.Append(name, transformedName, "func_177414_a", "getEntitiesWithinAABBForEntity")
-                );
-            }
             // Allow the player to stand on a UC without getting kicked from the server
-            if (transformedName.equals("net.minecraft.world.World") && HammerEnabled.ENABLED) {
+            if (transformedName.equals("net.minecraft.world.World")) {
                 return applyTransform(basicClass,
                         new AbstractAsmMethodTransform.Append(name, transformedName, "func_72829_c", "checkBlockCollision"));
             }
             // (This... might not be entirely necessary. I didn't test this problem enough!)
             // Something about limiting the velocity of an entity when it's being influenced by multiple IDCs moving in the same direction...
             // Is this just vestigial? Shouldn't cause too much trouble tho.
-            if (transformedName.equals("net.minecraft.entity.Entity") && HammerEnabled.ENABLED) {
+            if (transformedName.equals("net.minecraft.entity.Entity")) {
                 return applyTransform(basicClass,
                         new AbstractAsmClassTransform.Mixin("factorization.coremodhooks.MixinEntityKinematicsTracker", "Lfactorization/coremodhooks/MixinEntityKinematicsTracker;"));
             }
             // Don't let IDCs be knocked backwards; fixes a vanilla bug
-            if (transformedName.equals("net.minecraft.world.Explosion") && HammerEnabled.ENABLED) {
+            if (transformedName.equals("net.minecraft.world.Explosion")) {
                 return applyTransform(basicClass,
                         new AbstractAsmMethodTransform.MutateCall(name, transformedName, "func_77278_a", "doExplosionA")
                                 // find(String owner, String srg_name, String mcp_name, String notch_name, String find_notch_desc)
@@ -98,7 +98,7 @@ public class ASMTransformer implements IClassTransformer {
                 );
             }
             // Sigh. :/ needed to keep minimap mods happy...
-            if (transformedName.equals("net.minecraft.client.multiplayer.WorldClient") && HammerEnabled.ENABLED) {
+            if (transformedName.equals("net.minecraft.client.multiplayer.WorldClient")) {
                 return applyTransform(basicClass,
                         new AbstractAsmMethodTransform.MutateCall(name, transformedName, "<init>", "<init>")
                                 .setOwner("net.minecraftforge.fml.common.eventhandler.EventBus")

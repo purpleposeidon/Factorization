@@ -215,8 +215,9 @@ public class FactorizationClientProxy extends FactorizationProxy {
     }
 
     private void setItemBlockModel(Block block, int meta, String variant) {
-        ModelLoader.setCustomModelResourceLocation(Item.getItemFromBlock(block), meta,
-                new ModelResourceLocation(Block.blockRegistry.getNameForObject(block), variant));
+        ModelResourceLocation model = new ModelResourceLocation(Block.blockRegistry.getNameForObject(block), variant);
+        NORELEASE.println(model);
+        ModelLoader.setCustomModelResourceLocation(Item.getItemFromBlock(block), meta, model);
     }
 
     private void setItemBlockModelFromState(Block block) {
@@ -261,6 +262,7 @@ public class FactorizationClientProxy extends FactorizationProxy {
                 Core.registry.mirror,
                 Core.registry.hinge,
         }) {
+            if (b == null) continue; // Skip disabled blocks
             setItemBlockModel(b, 0, "inventory");
         }
         modelForMetadata(Core.registry.resource_block, "copper_ore", "silver_block", "lead_block", "dark_iron_block", "copper_block");
@@ -270,10 +272,12 @@ public class FactorizationClientProxy extends FactorizationProxy {
                 Core.registry.resource_block,
                 Core.registry.colossal_block,
         }) {
+            if (b == null) continue;
             setItemBlockModelFromState(b);
         }
 
         for (Item it : standardItems) {
+            if (it == null) continue;
             setItemModel(it, 0, "inventory");
         }
         standardItems = null;

@@ -4,6 +4,7 @@ import factorization.flat.api.Flat;
 import factorization.servo.instructions.GenericPlaceholder;
 import factorization.servo.rail.Decorator;
 import factorization.servo.rail.FlatServoRail;
+import factorization.servo.rail.ServoComponent;
 import net.minecraft.util.ResourceLocation;
 
 public class ServoFeature {

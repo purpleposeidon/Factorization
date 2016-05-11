@@ -1,16 +1,13 @@
 package factorization.servo.iterator;
 
 import factorization.api.FzColor;
-import factorization.api.FzOrientation;
 import factorization.api.Quaternion;
 import factorization.fzds.DeltaChunk;
 import factorization.fzds.Hammer;
 import factorization.fzds.HammerEnabled;
-import factorization.servo.rail.TileEntityServoRail;
 import factorization.shared.Core;
 import factorization.shared.FzModel;
 import factorization.sockets.TileEntitySocketBase;
-import factorization.util.NumUtil;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.renderer.RenderGlobal;
@@ -26,14 +23,14 @@ import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL12;
 
 import java.util.Iterator;
+import java.util.Locale;
 
 public class RenderServoMotor extends Render<ServoMotor> {
-    static FzModel sprocket = new FzModel("servo/sprocket");
-    static FzModel[] colorMarkings = new FzModel[FzColor.values().length];
+    static FzModel[] chasis = new FzModel[FzColor.values().length];
     static {
         for (FzColor color : FzColor.values()) {
-            String colorName = color.name() == null ? "" : ("_" + color.name());
-            colorMarkings[color.ordinal()] = new FzModel("servo/chasis" + colorName + ".obj"); // static
+            String colorName = color == FzColor.NO_COLOR ? "" : ("_" + color.name().toLowerCase(Locale.ROOT));
+            chasis[color.ordinal()] = new FzModel("iterator/chasis" + colorName + ".obj"); // static
         }
     }
 
@@ -70,11 +67,11 @@ public class RenderServoMotor extends Render<ServoMotor> {
         GL11.glTranslated(x + 0.5, y + 0.5, z + 0.5);
         GL11.glPushMatrix();
 
-        motor.motionHandler.interpolatePosition((float) Math.pow(motor.motionHandler.pos_progress, 2));
-        float reorientInterpolation = interp(motor.motionHandler.servo_reorient, motor.motionHandler.prev_servo_reorient, partial);
-        orientMotor(motor, partial, reorientInterpolation);
+        motor.motionHandler.interpolatePosition(motor.motionHandler.motionAction, motor.motionHandler.motionAction.progress + partial);
+        //float reorientInterpolation = interp(motor.motionHandler.servo_reorient, motor.motionHandler.prev_servo_reorient, partial);
+        //orientMotor(motor, partial, reorientInterpolation);
 
-        renderMainModel(motor, partial, reorientInterpolation, false);
+        renderMainModel(motor, partial, false);
         renderSocketAttachment(motor, motor.socket, partial);
         
         boolean render_details = false;
@@ -118,7 +115,7 @@ public class RenderServoMotor extends Render<ServoMotor> {
             GL11.glEnable(GL11.GL_DEPTH_TEST);
         }
         GL11.glPopMatrix();
-        motor.motionHandler.interpolatePosition(motor.motionHandler.pos_progress);
+        motor.motionHandler.interpolatePosition(motor.motionHandler.motionAction, motor.motionHandler.motionAction.progress);
         GL11.glDisable(GL12.GL_RESCALE_NORMAL);
         Core.profileEndRender();
     }
@@ -127,7 +124,7 @@ public class RenderServoMotor extends Render<ServoMotor> {
         RenderGlobal.drawSelectionBoundingBox(box);
     }
     
-    void orientMotor(ServoMotor motor, float partial, float reorientInterpolation) {
+    /*void orientMotor(ServoMotor motor, float partial, float reorientInterpolation) {
         final FzOrientation orientation = motor.motionHandler.orientation;
         FzOrientation prevOrientation = motor.motionHandler.prevOrientation;
         if (prevOrientation == null) {
@@ -183,7 +180,7 @@ public class RenderServoMotor extends Render<ServoMotor> {
             GL11.glEnable(GL11.GL_TEXTURE_2D);
             GL11.glEnable(GL11.GL_LIGHTING);
         }
-    }
+    }*/
     
     void renderSocketAttachment(ServoMotor motor, TileEntitySocketBase socket, float partial) {
         socket.setPos(new BlockPos(0, 0, 0));
@@ -208,54 +205,10 @@ public class RenderServoMotor extends Render<ServoMotor> {
         return Core.blockAtlas;
     }
     
-    void renderMainModel(ServoMotor motor, float partial, double ro, boolean hilighting) {
-        GL11.glPushMatrix();
-        bindTexture(Core.blockAtlas);
-        colorMarkings[motor.motionHandler.color.ordinal()].draw();
-
-        FzColor c = motor.motionHandler.color;
-
-        // Determine the sprocket location & rotation
-        double rail_width = TileEntityServoRail.width;
-        double radius = 0.56 /* from sprocket center to the outer edge of the ring (excluding the teeth) */
-                    + 0.06305 /* half the width of the teeth */;
-        double constant = Math.PI * 2 * (radius);
-        double partial_rotation = NumUtil.interp((float) motor.motionHandler.prev_sprocket_rotation, (float) motor.motionHandler.sprocket_rotation, partial);
-        final double angle = constant * partial_rotation;
-
-        radius = 0.25 - 1.0 / 48.0;
-        radius = -4.0/16.0;
-
-        float rd = (float) (radius + rail_width);
-        if (motor.motionHandler.orientation != motor.motionHandler.prevOrientation && motor.motionHandler.prevOrientation != null) {
-            // This could use some work: only stretch if the new direction is parallel to the old gear direction.
-            double stretch_interp = ro * 2;
-            if (stretch_interp < 1) {
-                if (stretch_interp > 0.5) {
-                    stretch_interp = 1 - stretch_interp;
-                }
-                rd += stretch_interp / 8;
-            }
-        }
-        // Render them
-        float height_d = 2F/16F;
-        GL11.glRotatef(180, 1, 0, 0);
-        {
-            GL11.glPushMatrix();
-            GL11.glTranslatef(0, height_d, rd);
-            GL11.glRotatef((float) Math.toDegrees(angle), 0, 1, 0);
-            sprocket.draw();
-            GL11.glPopMatrix();
-        }
-        {
-            GL11.glPushMatrix();
-            GL11.glTranslatef(0, height_d, -rd);
-            GL11.glRotatef((float) Math.toDegrees(-angle) + 360F / 9F, 0, 1, 0);
-            sprocket.draw();
-            GL11.glPopMatrix();
-        }
-        
-        GL11.glPopMatrix();
+    void renderMainModel(ServoMotor motor, float partial, boolean hilighting) {
+        int ord = motor.motionHandler.color.ordinal();
+        FzModel model = chasis[ord];
+        model.draw();
     }
     
     static EntityLiving dummy_entity = new EntityEnderman(null);

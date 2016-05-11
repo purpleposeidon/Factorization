@@ -30,7 +30,7 @@ public abstract class ServoComponent implements IDataSerializable {
     private static HashMap<String, Class<? extends ServoComponent>> componentMap = new HashMap<String, Class<? extends ServoComponent>>(50, 0.5F);
     final private static String componentTagKey = "SCId";
 
-    public static void register(Class<? extends ServoComponent> componentClass, ArrayList<ItemStack> sortedList) {
+    public static void register(Class<? extends ServoComponent> componentClass) {
         String name;
         ServoComponent decor;
         try {
@@ -42,7 +42,6 @@ public abstract class ServoComponent implements IDataSerializable {
         }
         name = decor.getName();
         componentMap.put(name, componentClass);
-        sortedList.add(decor.toItem());
     }
 
     public static Class<? extends ServoComponent> getComponent(String name) {
@@ -198,17 +197,19 @@ public abstract class ServoComponent implements IDataSerializable {
 
     static ArrayList<ItemStack> sorted_instructions = new ArrayList<ItemStack>();
     static ArrayList<ItemStack> sorted_decors = new ArrayList<ItemStack>();
+    static Class<? extends ServoComponent>[] decorations;
+    static Class<? extends ServoComponent>[] instructions;
 
-    static {
+    public static void init() {
         //registerRecursivelyFromPackage("factorization.common.servo.actuators");
         //registerRecursivelyFromPackage("factorization.common.servo.instructions");
         //noinspection unchecked
-        Class<? extends ServoComponent>[] decorations = (Class<? extends ServoComponent>[])new Class[] {
+        decorations = (Class<? extends ServoComponent>[])new Class[] {
                 ScanColor.class,
                 PowerStation.class,
         };
         //noinspection unchecked
-        Class<? extends ServoComponent>[] instructions = (Class<? extends ServoComponent>[])new Class[] {
+        instructions = (Class<? extends ServoComponent>[])new Class[] {
                 // Color by class, sort by color
                 // Cyan: Motion instructions
                 EntryControl.class,
@@ -236,8 +237,8 @@ public abstract class ServoComponent implements IDataSerializable {
                 Jump.class,
         };
 
-        for (Class<? extends ServoComponent> cl : decorations) register(cl, sorted_decors);
-        for (Class<? extends ServoComponent> cl : instructions) register(cl, sorted_instructions);
+        for (Class<? extends ServoComponent> cl : decorations) register(cl);
+        for (Class<? extends ServoComponent> cl : instructions) register(cl);
     }
     
     public static void setupRecipes() {
@@ -248,8 +249,20 @@ public abstract class ServoComponent implements IDataSerializable {
                 e.printStackTrace();
             }
         }
+        instantiateItems(sorted_decors, decorations);
+        instantiateItems(sorted_instructions, instructions);
     }
-    
+
+    protected static void instantiateItems(ArrayList<ItemStack> items, Class<? extends ServoComponent>[] classes) {
+        for (Class<? extends ServoComponent> klazz : classes) {
+            try {
+                items.add(klazz.newInstance().toItem());
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
     protected void addRecipes() {}
 
     public void onItemUse(Coord here, EntityPlayer player) { }
