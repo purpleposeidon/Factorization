@@ -44,8 +44,8 @@ public abstract class AbstractServoMachine extends Entity implements IEntityAddi
      * You <b>must</b> call this method instead of using worldObj.spawnEntityInWorld!
      * (Wait, isn't there EntityInit?)
      */
-    public void spawnServoMotor() {
-        motionHandler.beforeSpawn();
+    public void spawnServoMotor(EnumFacing top) {
+        motionHandler.beforeSpawn(top);
         worldObj.spawnEntityInWorld(this);
     }
 

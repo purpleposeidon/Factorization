@@ -68,6 +68,7 @@ public class MotionHandler {
             MotionAction ret = new MotionAction(src.at.w);
             ret.src = this.dst.copy();
             ret.srcFzo = this.dstFzo;
+            ret.dstFzo = this.srcFzo;
             return ret;
         }
 
@@ -143,9 +144,11 @@ public class MotionHandler {
         target_speed_index = newSpeed;
     }
     
-    void beforeSpawn() {
-        motionAction.src = new FlatCoord(new Coord(motor), motionAction.src.side);
+    void beforeSpawn(EnumFacing top) {
+        motionAction.src = new FlatCoord(new Coord(motor), top);
         motionAction.dst = motionAction.src.copy();
+        motionAction.srcFzo = FzOrientation.fromDirection(top);
+        motionAction.dstFzo = motionAction.srcFzo;
         chooseNextAction();
         interpolatePosition(motionAction, motionAction.progress);
     }
@@ -213,8 +216,8 @@ public class MotionHandler {
     }
 
     static int support_flag(FlatCoord at) {
-        return (at.at.isSolid() ? 1 : 0)
-                | (at.flip().at.isSolid() ? 2 : 0);
+        return (at.at.isSolidOnSide(at.side) ? 1 : 0)
+                | (at.flip().at.isSolidOnSide(at.side.getOpposite()) ? 2 : 0);
     }
 
     List<MotionAction> availableActions(MotionAction startAction) {
@@ -260,7 +263,13 @@ public class MotionHandler {
                 MotionAction action = startAction.chain();
                 action.dst = at;
                 EnumFacing new_top = at.at.isSolid() ? at.side.getOpposite() : at.side;
-                action.dstFzo = action.srcFzo.pointTopTo(new_top);
+                FzOrientation nextO = action.srcFzo.pointTopTo(new_top);
+                if (nextO == null) {
+                    nextO = action.srcFzo;
+                    NORELEASE.fixme("This shouldn't happen.");
+                }
+                action.dstFzo = nextO;
+                ret.add(action);
             }
         });
         return ret;

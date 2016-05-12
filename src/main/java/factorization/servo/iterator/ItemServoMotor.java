@@ -48,10 +48,8 @@ public class ItemServoMotor extends ItemCraftingComponent {
         //c.setAsEntityLocation(motor);
         //w.spawnEntityInWorld(motor);
 
-        motor.motionHandler.beforeSpawn();
-        
         PlayerUtil.cheatDecr(player, stack);
-        motor.spawnServoMotor();
+        motor.spawnServoMotor(top);
         return true;
     }
 }
