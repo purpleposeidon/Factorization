@@ -46,7 +46,7 @@ version = open("fzversion").read().strip()
 mc_forge_version = getMinecraftVersion()
 filename = "Factorization-{0}.jar".format(version)
 
-run("./rungradle build deobfJar writeFzFile")
+run("./gradlew build deobfJar writeFzFile")
 
 oldfile = exp("~/Dropbox/Public/old/" + filename)
 last_fz = open("last_fz").read().strip()
