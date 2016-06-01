@@ -239,8 +239,8 @@ public class HammerClientProxy extends HammerProxy {
                     mc.effectRenderer.spawnEffectParticle(particleID, xCoord, yCoord, zCoord, xOffset, yOffset, zOffset, parameters);
                 }
 
-                @Override
-                protected void markBlocksForUpdate(int minX, int minY, int minZ, int maxX, int maxY, int maxZ) {
+                //@Override
+                public void markBlocksForUpdate(int minX, int minY, int minZ, int maxX, int maxY, int maxZ) {
                     // Don't call super: super.viewFrustrum is null
                     World w = Hammer.proxy.getClientRealWorld();
                     for (IDimensionSlice ids : DeltaChunk.getSlicesInRange(w, minX, minY, minZ, maxX, maxY, maxZ)) {
