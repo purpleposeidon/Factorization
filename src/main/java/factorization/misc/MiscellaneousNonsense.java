@@ -80,9 +80,6 @@ public class MiscellaneousNonsense {
         if (FzConfig.equal_opportunities_for_mobs) {
             Core.loadBus(new MobEqualizer());
         }
-        if (FzConfig.embarken_wood) {
-            Core.loadBus(new Embarkener());
-        }
         if (FzConfig.mushroomalize) {
             Core.loadBus(new Mushroomalizer());
         }

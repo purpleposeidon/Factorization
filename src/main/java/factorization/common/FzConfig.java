@@ -41,7 +41,6 @@ public class FzConfig {
     public static boolean stretchy_clay = true;
     public static boolean equal_opportunities_for_mobs = true;
     public static boolean fix_middle_click = true;
-    public static boolean embarken_wood = true;
     public static boolean mushroomalize = true;
     public static boolean proper_projectile_physics = true;
     public static boolean buffed_nametags = true;
@@ -209,7 +208,6 @@ public class FzConfig {
         stretchy_clay = getBoolConfig("stretchyClay", "server", stretchy_clay, "If true, maximum clay lump volume is 1 m³ instead of (1 m³)/4");
         tps_reporting_interval = getIntConfig("tpsReportInterval", "server", tps_reporting_interval, "How many ticks the server will wait before sending out TPS reports. 20 ticks = 1 second, unless it's lagging.");
         equal_opportunities_for_mobs = getBoolConfig("equalOpportunitiesForMobs", "server", equal_opportunities_for_mobs, "Causes some mobs to rarely spawn wearing your armor");
-        embarken_wood = getBoolConfig("barkRecipes", "server", embarken_wood, "Adds recipes for bark variants of logs");
         mushroomalize = getBoolConfig("mushroomNormalize", "server", mushroomalize, "Textures giant mushroom blocks when placed");
         blockundo = getBoolConfig("blockUndo", "server", blockundo, "If true, then recently placed blocks break easily");
         blockundo_grab = getBoolConfig("blockUndoGrab", "server", blockundo_grab, "If true, then blocks broken with blockundo will be instantly picked up");
