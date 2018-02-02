@@ -29,7 +29,7 @@ import static net.minecraftforge.client.IItemRenderer.ItemRenderType.ENTITY;
 
 public class RenderSorter implements Comparator<Object> {
     public static void dirtyTileEntity(TileEntity te) {
-        if (!client) return;
+        if (!te.getWorldObj().isRemote) return;
         List tes = Minecraft.getMinecraft().renderGlobal.tileEntities;
         if (tes instanceof CleaningList) {
             ((CleaningList) tes).setDirty();
@@ -37,7 +37,7 @@ public class RenderSorter implements Comparator<Object> {
     }
 
     public static void dirtyEntity(Entity ent) {
-        if (!client) return;
+        if (!ent.worldObj.isRemote) return;
         List ents = ent.worldObj.loadedEntityList;
         if (ents instanceof CleaningList) {
             ((CleaningList) ents).setDirty();
@@ -86,6 +86,10 @@ public class RenderSorter implements Comparator<Object> {
 
     @Override
     public int compare(Object a, Object b) {
+        if (a == null || b == null) {
+            return 0;
+        }
+
         Class aClass = a.getClass();
         Class bClass = b.getClass();
 
@@ -96,8 +100,6 @@ public class RenderSorter implements Comparator<Object> {
         }
         return 0;
     }
-
-    private static boolean client = FMLCommonHandler.instance().getSide() == Side.CLIENT;
 
     private static int getComplexity(ItemStack a, IItemRenderer.ItemRenderType renderType) {
         if (a == null) return 0;

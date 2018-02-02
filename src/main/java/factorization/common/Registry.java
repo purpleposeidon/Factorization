@@ -263,6 +263,23 @@ public class Registry {
         }
     }
 
+    void registerOres() {
+        OreDictionary.registerOre("sludge", sludge);
+
+        OreDictionary.registerOre("oreSilver", silver_ore_item);
+        OreDictionary.registerOre("ingotSilver", new ItemStack(silver_ingot));
+        OreDictionary.registerOre("ingotLead", new ItemStack(lead_ingot));
+        OreDictionary.registerOre("blockSilver", silver_block_item);
+        OreDictionary.registerOre("blockLead", lead_block_item);
+        OreDictionary.registerOre("oreFzDarkIron", dark_iron_ore);
+        OreDictionary.registerOre("ingotFzDarkIron", dark_iron);
+        OreDictionary.registerOre("blockFzDarkIron", dark_iron_block_item);
+
+        OreDictionary.registerOre("sulfuricAcid", sulfuric_acid);
+        OreDictionary.registerOre("bottleSulfuricAcid", sulfuric_acid);
+        OreDictionary.registerOre("aquaRegia", aqua_regia);
+    }
+
     void postMakeItems() {
         HashSet<Item> foundItems = new HashSet<Item>();
         for (Field field : this.getClass().getFields()) {
@@ -288,6 +305,8 @@ public class Registry {
                 registerItem(it);
             }
         }
+
+        registerOres();
     }
 
     public void makeItems() {
@@ -296,7 +315,6 @@ public class Registry {
         ore_reduced = new ItemOreProcessing("reduced");
         ore_crystal = new ItemOreProcessing("crystal");
         sludge = new ItemCraftingComponent("sludge");
-        OreDictionary.registerOre("sludge", sludge);
         //ItemBlocks
         item_factorization = (ItemFactorizationBlock) Item.getItemFromBlock(factory_block);
         item_resource = (ItemBlockResource) Item.getItemFromBlock(resource_block);
@@ -351,14 +369,6 @@ public class Registry {
         
         lead_ingot = new ItemCraftingComponent("lead_ingot");
         silver_ingot = new ItemCraftingComponent("silver_ingot");
-        OreDictionary.registerOre("oreSilver", silver_ore_item);
-        OreDictionary.registerOre("ingotSilver", new ItemStack(silver_ingot));
-        OreDictionary.registerOre("ingotLead", new ItemStack(lead_ingot));
-        OreDictionary.registerOre("blockSilver", silver_block_item);
-        OreDictionary.registerOre("blockLead", lead_block_item);
-        OreDictionary.registerOre("oreFzDarkIron", dark_iron_ore);
-        OreDictionary.registerOre("ingotFzDarkIron", dark_iron);
-        OreDictionary.registerOre("blockFzDarkIron", dark_iron_block_item);
 
         
         logicMatrixProgrammer = new ItemMatrixProgrammer();
@@ -370,9 +380,6 @@ public class Registry {
         acid = new ItemAcidBottle();
         sulfuric_acid = new ItemStack(acid, 1);
         aqua_regia = new ItemStack(acid, 1, 1);
-        OreDictionary.registerOre("sulfuricAcid", sulfuric_acid);
-        OreDictionary.registerOre("bottleSulfuricAcid", sulfuric_acid);
-        OreDictionary.registerOre("aquaRegia", aqua_regia);
         insulated_coil = new ItemCraftingComponent("insulated_coil");
         motor = new ItemCraftingComponent("motor");
         giant_scissors = new ItemCraftingComponent("socket/scissors");

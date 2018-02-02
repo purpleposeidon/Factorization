@@ -19,6 +19,9 @@ import factorization.shared.*;
 import factorization.shared.NetworkFactorization.MessageType;
 import factorization.util.*;
 import factorization.util.InvUtil.FzInv;
+import gnu.trove.iterator.TIntIterator;
+import gnu.trove.set.TIntSet;
+import gnu.trove.set.hash.TIntHashSet;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockRailBase;
@@ -1076,8 +1079,8 @@ public class TileEntityDayBarrel extends TileEntityFactorization implements ISor
         }
         return true;
     }
-    
-    static final ArrayList<Integer> finalizedDisplayLists = new ArrayList();
+
+    static final TIntSet finalizedDisplayLists = new TIntHashSet();
     
     public static void addFinalizedDisplayList(int display_list) {
         if (display_list == 0) return;
@@ -1101,11 +1104,10 @@ public class TileEntityDayBarrel extends TileEntityFactorization implements ISor
     
     @SideOnly(Side.CLIENT)
     final void freeDisplayList() {
-        if (display_list == 0) {
-            return;
+        if (display_list != 0) {
+            GLAllocation.deleteDisplayLists(display_list);
+            display_list = 0;
         }
-        GLAllocation.deleteDisplayLists(display_list);
-        display_list = 0;
     }
     
     @SubscribeEvent
@@ -1131,9 +1133,14 @@ public class TileEntityDayBarrel extends TileEntityFactorization implements ISor
         }
         iterateDelay = 60*20;
         synchronized (finalizedDisplayLists) {
-            for (Integer i : finalizedDisplayLists) {
-                if (i == null) continue;
-                GLAllocation.deleteDisplayLists(i);
+            TIntIterator iterator = finalizedDisplayLists.iterator();
+            while (iterator.hasNext()) {
+                try {
+                    GLAllocation.deleteDisplayLists(iterator.next());
+                } catch (Exception e) {
+                    Core.logWarning("Freeing display list failed! Was the display list attempted to be freed twice?");
+                    e.printStackTrace();
+                }
             }
             finalizedDisplayLists.clear();
         }
