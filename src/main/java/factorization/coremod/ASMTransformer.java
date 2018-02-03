@@ -1,5 +1,8 @@
 package factorization.coremod;
 
+import cpw.mods.fml.client.FMLClientHandler;
+import cpw.mods.fml.common.FMLCommonHandler;
+import cpw.mods.fml.common.Loader;
 import cpw.mods.fml.relauncher.FMLRelaunchLog;
 import factorization.fzds.HammerEnabled;
 import net.minecraft.launchwrapper.IClassTransformer;
@@ -109,12 +112,22 @@ public class ASMTransformer implements IClassTransformer {
             }
             // Sigh. :/ needed to keep minimap mods happy...
             if (transformedName.equals("net.minecraft.client.multiplayer.WorldClient") && HammerEnabled.ENABLED) {
-                return applyTransform(basicClass,
-                        new AbstractAsmMethodTransform.MutateCall(name, transformedName, "<init>", "<init>")
-                                .setOwner("cpw.mods.fml.common.eventhandler.EventBus")
-                                .setName("post", "post", "post")
-                                .setDescr("(Lcpw/mods/fml/common/eventhandler/Event;)Z", "(Lcpw/mods/fml/common/eventhandler/Event;)Z")
-                );
+                try {
+                    return applyTransform(basicClass,
+                            new AbstractAsmMethodTransform.MutateCall(name, transformedName, "<init>", "<init>")
+                                    .setOwner("cpw.mods.fml.common.eventhandler.EventBus")
+                                    .setName("post", "post", "post")
+                                    .setDescr("(Lcpw/mods/fml/common/eventhandler/Event;)Z", "(Lcpw/mods/fml/common/eventhandler/Event;)Z")
+                    );
+                } catch (RuntimeException e) {
+                    if (FMLClientHandler.instance().hasOptifine()) {
+                        log("WorldClient FZDS patch failed! This is due to the presence of OptiFine. Minimap mods may crash, however - you'll need to choose one or the other if so.");
+                        e.printStackTrace();
+                    } else {
+                        log("WorldClient FZDS patch failed! The reason is not known. Minimap mods may crash, however.");
+                        e.printStackTrace();
+                    }
+                }
             }
         }
         {
