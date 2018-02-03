@@ -1,3 +1,8 @@
+0.8.109
+  Let the coremod accept certain different patch failures for pseudo-compatibility w/ OptiFine! (For some reason, FZDS works on OptiFine now.) (#4)
+  Fixed barrel GLAllocation crash bug (#13)
+  Fixed registering OreDictionary entries too early (#5)
+
 0.8.108
   Let the coremod accept certain patch failures for pseudo-compatibility w/ The Betweenlands.
 
