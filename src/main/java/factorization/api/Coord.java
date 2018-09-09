@@ -1039,7 +1039,7 @@ public final class Coord implements IDataSerializable, ISaneCoord, Comparable<Co
             at.y = (int) (d.y * t) + start.y;
             at.z = (int) (d.z * t) + start.z;
             if (!at.equals(last)) {
-                func.handle(at);;
+                func.handle(at);
                 last.set(at);
             }
             t += dt;

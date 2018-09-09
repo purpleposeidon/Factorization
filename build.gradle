@@ -73,6 +73,8 @@ dependencies {
     }
     api 'net.industrial-craft:industrialcraft-2:2.2.767-experimental:dev'
     compile 'mods.railcraft:Railcraft_1.7.10:9.12.3.0:dev'
+    compile "thaumcraft:Thaumcraft:1.7.10-4.2.3.5:dev"  
+    compile "com.azanor.baubles:Baubles:1.7.10-1.0.1.10:deobf"
     compile files("apis/*.jar") // TODO: Copy what railcraft's build.gradle does for the IC2 dependency
 }
 
@@ -85,6 +87,7 @@ compileJava {
     if (System.getenv("DISABLE_CBBS") != null) {
         exclude "factorization/nei/**.java"
     }
+
 }
 
 task writeFzFile {
