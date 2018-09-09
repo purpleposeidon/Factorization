@@ -210,7 +210,7 @@ public class CompressionState {
         }
         Coord c = root.getCoord();
         Coord d = c.copy();
-        for (int _ = 0; _ < height + 1; _++) d.adjust(up);
+        for (int y = 0; y < height + 1; y++) d.adjust(up);
         for (int x = 0; x < width; x++) {
             mark(c);
             c.adjust(r);
@@ -222,7 +222,7 @@ public class CompressionState {
         hypoRoot.adjust(r.getOpposite());
         c = hypoRoot;
         d = c.copy();
-        for (int _ = 0; _ < width + 1; _++) d.adjust(r);
+        for (int y = 0; y < width + 1; y++) d.adjust(r);
         for (int x = 0; x < height; x++) {
             mark(c);
             c.adjust(up);

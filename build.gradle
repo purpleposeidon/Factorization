@@ -27,21 +27,12 @@ if (System.getenv("ALLOW_NORELEASE") != null) {
 group = "factorization"
 archivesBaseName = "Factorization"
 
-ext.apiRailcraft = "./apis/railcraft"
-
+// ext.apiRailcraft = "./apis/railcraft"
 
 minecraft {
-    version = "1.7.10-10.13.2.1230" // FORGEMARK
+    version = "1.7.10-10.13.4.1614-1.7.10" // FORGEMARK
     assetDir = "eclipse/assets"
     replace '@FZVERSION@', (project.version.split("-")[1])
-}
-
-sourceSets {
-    main {
-        java {
-            srcDir project.apiRailcraft
-        }
-    }
 }
 
 repositories {
@@ -64,7 +55,11 @@ repositories {
     maven {   
         name = "ChickenBones"
         url = "http://chickenbones.net/maven/"
-    }   
+    }
+    maven {
+        name = "GregTech mirror"
+        url = "http://gregtech.overminddl1.com/"
+    }
 }
 
 
@@ -77,18 +72,7 @@ dependencies {
         compile "codechicken:CodeChickenCore:1.7.10-1.0.7.47:dev"
     }
     api 'net.industrial-craft:industrialcraft-2:2.2.767-experimental:dev'
-    // you may put jars on which you depend on in ./libs
-    // or you may define them like so..
-    //compile "some.group:artifact:version:classifier"
-    //compile "some.group:artifact:version"
-    
-    // real examples
-    //compile 'com.mod-buildcraft:buildcraft:6.0.8:dev'  // adds buildcraft to the dev env 
-    //compile 'com.googlecode.efficient-java-matrix-library:ejml:0.24' // adds ejml to the dev env 
-
-    // for more info...
-    // http://www.gradle.org/docs/current/userguide/artifact_dependencies_tutorial.html
-    // http://www.gradle.org/docs/current/userguide/dependency_management.html
+    compile 'mods.railcraft:Railcraft_1.7.10:9.12.3.0:dev'
     compile files("apis/*.jar") // TODO: Copy what railcraft's build.gradle does for the IC2 dependency
 }
 

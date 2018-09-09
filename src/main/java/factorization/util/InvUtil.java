@@ -133,11 +133,11 @@ public final class InvUtil {
         }
         if (orig_inv instanceof net.minecraft.inventory.ISidedInventory) {
             final net.minecraft.inventory.ISidedInventory inv = (net.minecraft.inventory.ISidedInventory) orig_inv;
-            int[] _ = inv.getAccessibleSlotsFromSide(side);
-            if (_ == null) {
-                _ = new int[0];
+            int[] slotMapTmp = inv.getAccessibleSlotsFromSide(side);
+            if (slotMapTmp == null) {
+                slotMapTmp = new int[0];
             }
-            final int[] slotMap = _;
+            final int[] slotMap = slotMapTmp;
             return new FzInv(inv) {
                 @Override
                 int slotIndex(int i) {
