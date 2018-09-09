@@ -856,7 +856,7 @@ public class TileEntityGreenware extends TileEntityCommon implements IFurnaceHea
         if (event.target.subHit == -1) {
             return;
         }
-        Coord c = new Coord(event.player.worldObj, event.target);
+        Coord c = Coord.fromMop(event.player.worldObj, event.target);
         TileEntityGreenware clay = c.getTE(TileEntityGreenware.class);
         if (clay == null) {
             return;

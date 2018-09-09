@@ -67,7 +67,7 @@ public class ClickHandler {
                         (float) (hit.hitVec.xCoord - hit.blockX),
                         (float) (hit.hitVec.yCoord - hit.blockY),
                         (float) (hit.hitVec.zCoord - hit.blockZ));
-                Coord at = new Coord(DeltaChunk.getClientShadowWorld(), hit);
+                Coord at = Coord.fromMop(DeltaChunk.getClientShadowWorld(), hit);
                 Block block = at.getBlock();
                 EntityPlayer real_player = Minecraft.getMinecraft().thePlayer;
                 Hammer.proxy.setShadowWorld();
@@ -139,7 +139,7 @@ public class ClickHandler {
         if (player == null) return;
         World shadowWorld = DeltaChunk.getClientShadowWorld();
         Minecraft mc = Minecraft.getMinecraft();
-        Coord at = new Coord(shadowWorld, hit);
+        Coord at = Coord.fromMop(shadowWorld, hit);
         Block hitBlock = at.getBlock();
         PlayerControllerMP controller = mc.playerController;
         if (!(mc.currentScreen == null && mc.gameSettings.keyBindAttack.getIsKeyPressed() && mc.inGameHasFocus)) {

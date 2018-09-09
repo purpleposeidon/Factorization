@@ -151,7 +151,7 @@ public class MetaAxisAlignedBB extends AxisAlignedBB implements IFzdsShenanigans
     }
 
     private AxisAlignedBB real2shadowBox = SpaceUtil.newBox();
-    private Vec3 realMiddle = SpaceUtil.newVec3();
+    private Vec3 realMiddle = SpaceUtil.newVec();
 
     AxisAlignedBB convertRealBoxToShadowBox(AxisAlignedBB realBox) {
         // This function returns a box is likely larger than what it should really be.
@@ -168,10 +168,10 @@ public class MetaAxisAlignedBB extends AxisAlignedBB implements IFzdsShenanigans
         return real2shadowBox;
     }
     
-    private Vec3 minMinusMiddle = SpaceUtil.newVec3();
-    private Vec3 maxMinusMiddle = SpaceUtil.newVec3();
+    private Vec3 minMinusMiddle = SpaceUtil.newVec();
+    private Vec3 maxMinusMiddle = SpaceUtil.newVec();
     private AxisAlignedBB shadowWorker = SpaceUtil.newBox();
-    private Vec3 shadowMiddle = SpaceUtil.newVec3();
+    private Vec3 shadowMiddle = SpaceUtil.newVec();
     AxisAlignedBB convertShadowBoxToRealBox(AxisAlignedBB shadowBox) {
         // We're gonna try a different approach here.
         // Will work well so long as everything is a cube.

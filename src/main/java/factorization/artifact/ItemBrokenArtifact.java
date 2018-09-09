@@ -63,7 +63,7 @@ public class ItemBrokenArtifact extends ItemFactorization {
         ItemStack held = get(is);
         if (held == null) return;
         ItemStack fresh = new ItemStack(held.getItem());
-        ItemStack repair = new ItemStack(getRepairItem(fresh));
+        ItemStack repair = getRepairItemStack(fresh);
         String got = LangUtil.translateWithCorrectableFormat("item.factorization:brokenArtifact.repairhint", repair.getDisplayName());
         Collections.addAll(list, got.split("\\\\n"));
         List infos = held.getTooltip(player, false);
@@ -73,6 +73,7 @@ public class ItemBrokenArtifact extends ItemFactorization {
         }
     }
 
+    @Deprecated /* Use getRepairItemStack */
     public Item getRepairItem(ItemStack held) {
         Item template = held.getItem();
 
@@ -82,6 +83,13 @@ public class ItemBrokenArtifact extends ItemFactorization {
         return template;
     }
 
+    public ItemStack getRepairItemStack(ItemStack held) {
+        if (held.getItem() instanceof ItemTool) {
+            return ((ItemTool) held.getItem()).func_150913_i(/*getToolMaterial*/).getRepairItemStack();
+        }
+        return held.copy();
+    }
+
     @SubscribeEvent
     public void reforge(AnvilUpdateEvent event) {
         ItemStack right = event.right;
@@ -89,9 +97,9 @@ public class ItemBrokenArtifact extends ItemFactorization {
         if (!ItemUtil.is(left, this)) return;
         ItemStack held = get(left);
         if (held == null) return;
-        Item template = getRepairItem(held);
+        ItemStack template = getRepairItemStack(held);
 
-        if (!ItemUtil.is(right, template)) return;
+        if (!ItemUtil.wildcardSimilar(right, template)) return;
         if (right.getItemDamage() != 0) return;
         // Check for enchants? Previous repairs? Nah.
         held.setItemDamage(0);

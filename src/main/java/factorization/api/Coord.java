@@ -12,6 +12,7 @@ import factorization.shared.*;
 import factorization.shared.NetworkFactorization.MessageType;
 import factorization.util.FzUtil;
 import factorization.util.ItemUtil;
+import factorization.util.PlayerUtil;
 import factorization.util.SpaceUtil;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.block.Block;
@@ -1058,16 +1059,20 @@ public final class Coord implements IDataSerializable, ISaneCoord, Comparable<Co
         return b.getComparatorInputOverride(w, x, y, z, side.ordinal());
     }
     
-    private static Vec3 nullVec = Vec3.createVectorHelper(0, 0, 0);
+    private static final Vec3 nullVec = Vec3.createVectorHelper(0, 0, 0);
     private static boolean spam = false;
+
     public ItemStack getPickBlock(ForgeDirection dir) {
+       return getPickBlock(createMop(dir, nullVec));
+    }
+    
+    public ItemStack getPickBlock(MovingObjectPosition mop) {
         Block b = getBlock();
         if (b == null) {
             return null;
         }
-        MovingObjectPosition mop = createMop(dir, nullVec);
         try {
-            return b.getPickBlock(mop, w, x, y, z);
+            return b.getPickBlock(mop, w, x, y, z, PlayerUtil.makePlayer(this, "Lookup"));
         } catch (NoSuchMethodError t) {
             if (!spam) {
                 /*Core.logWarning("Blocks.getPickBlock is unusable on the server." +
@@ -1081,14 +1086,6 @@ public final class Coord implements IDataSerializable, ISaneCoord, Comparable<Co
             }
             return BlockHelper.getPlacingItem(b, mop, w, x, y, z);
         }
-    }
-    
-    public ItemStack getPickBlock(MovingObjectPosition mop) {
-        Block b = getBlock();
-        if (b == null) {
-            return null;
-        }
-        return b.getPickBlock(mop, w, x, y, z);
     }
     
     public ItemStack getBrokenBlock() {

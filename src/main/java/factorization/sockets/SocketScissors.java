@@ -139,7 +139,7 @@ public class SocketScissors extends TileEntitySocketBase implements ICaptureDrop
     
     @Override
     public boolean handleRay(ISocketHolder socket, MovingObjectPosition mop, World mopWorld, boolean mopIsThis, boolean powered) {
-        DropCaptureHandler.startCapture(this, new Coord(mopWorld, mop), 3);
+        DropCaptureHandler.startCapture(this, Coord.fromMop(mopWorld, mop), 3);
         try {
             return _handleRay(socket, mop, mopIsThis, powered);
         } finally {
